@@ -1,0 +1,26 @@
+{
+    "name": "statamic/cms",
+    "description": "Statamic CMS",
+    "keywords": ["statamic", "cms", "flat file", "laravel"],
+    "type": "project",
+    "require": {
+        "php": ">=7.0.0",
+        "fideloper/proxy": "~3.3",
+        "laravel/framework": "5.5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Statamic\\": "app/",
+            "Statamic\\Addons\\": "bundles/"
+        },
+        "files": [
+            "app/helpers.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
+}
