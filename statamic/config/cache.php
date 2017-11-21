@@ -45,7 +45,7 @@ return [
         ],
 
         'file' => [
-            'driver' => 'file',
+            'driver' => 'statamic',
             'path' => storage_path('framework/cache/data'),
         ],
 
