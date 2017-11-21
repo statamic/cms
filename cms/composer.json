@@ -9,7 +9,8 @@
         "laravel/framework": "5.5.*",
         "league/glide": "^1.1",
         "league/glide-laravel": "^1.0.0",
-        "danielstjules/stringy": "dev-master"
+        "danielstjules/stringy": "dev-master",
+        "mustangostang/spyc": "dev-master#dfd9aadc1f5224065d55b42b712c7e99a50a3f4d"
     },
     "autoload": {
         "psr-4": {
