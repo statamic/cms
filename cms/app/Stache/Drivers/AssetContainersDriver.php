@@ -19,7 +19,7 @@ class AssetContainersDriver extends AbstractDriver
 
     public function getFilesystemRoot()
     {
-        return 'assets';
+        return 'content/assets';
     }
 
     public function createItem($path, $contents)
@@ -27,7 +27,7 @@ class AssetContainersDriver extends AbstractDriver
         $data = YAML::parse($contents);
 
         // The path would be `assets/id.yaml` so we'll remove the directory and extension to get the ID.
-        $id = substr($path, 7, -5);
+        $id = substr($path, 15, -5);
 
         $driver = array_get($data, 'driver', 'local');
 

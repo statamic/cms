@@ -20,7 +20,7 @@ class Manager
         'Globals',
         'Entries',
         'Users',
-        'UserGroups',
+        // 'UserGroups',
         'AssetContainers',
         'Taxonomies',
     ];

@@ -14,7 +14,7 @@ class GlobalsDriver extends AbstractDriver
 
     public function getFilesystemRoot()
     {
-        return 'globals';
+        return 'content/globals';
     }
 
     public function createItem($path, $contents)

@@ -1,6 +1,9 @@
 <?php
 
+use Stringy\Stringy;
 use Statamic\API\Path;
+
+define('STATAMIC_VERSION', '3.0.0');
 
 function log_todo()
 {
@@ -42,4 +45,24 @@ function site_locale($locale = null)
     }
 
     return config('app.locale');
+}
+
+/**
+ * @param array $value
+ * @return \Statamic\FileCollection;
+ */
+function collect_files($value = [])
+{
+    return new \Statamic\FileCollection($value);
+}
+
+/**
+ * Turns a string into a slug
+ *
+ * @param string $var
+ * @return string
+ */
+function slugify($value)
+{
+    return Stringy::slugify($value);
 }

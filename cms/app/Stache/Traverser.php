@@ -2,13 +2,13 @@
 
 namespace Statamic\Stache;
 
-use League\Flysystem\Filesystem;
 use Illuminate\Support\Collection;
+use Illuminate\Filesystem\Filesystem;
 
 class Traverser
 {
     /**
-     * @var \League\Flysystem\Filesystem
+     * @var \Illuminate\Filesystem\Filesystem
      */
     private $filesystem;
 
@@ -39,7 +39,7 @@ class Traverser
 
     /**
      * @param \Statamic\Stache\Driver $driver
-     * @param \League\Flysystem\Filesystem     $filesystem
+     * @param \Illuminate\Filesystem\Filesystem     $filesystem
      */
     public function __construct(Driver $driver, Filesystem $filesystem)
     {
@@ -98,9 +98,21 @@ class Traverser
      */
     private function setAllFiles()
     {
-        $this->files = collect(
-            $this->filesystem->listContents($this->driver->getFilesystemRoot(), $this->driver->traverseRecursively())
-        )->filter(function ($file) {
+        $method = $this->driver->traverseRecursively() ? 'allFiles' : 'files';
+        $directory = base_path($this->driver->getFilesystemRoot());
+        $files = $this->filesystem->$method($directory);
+
+        $this->files = collect($files)->map(function ($file) {
+            return [
+                'type' => $file->isDir() ? 'dir' : 'file',
+                'path' => \Statamic\API\Str::removeLeft($file->getPathname(), base_path().'/'),
+                'size' => $file->getSize(),
+                'basename' => $file->getBasename(),
+                'filename' => $file->getBasename('.'.$file->getExtension()),
+                'extension' => $file->getExtension(),
+                'timestamp' => $file->getMTime()
+            ];
+        })->filter(function ($file) {
             // Always ignore these annoying files.
             if (in_array($file['basename'], ['.DS_Store'])) {
                 return false;
@@ -151,7 +163,7 @@ class Traverser
     private function addContentsToModifiedFiles()
     {
         $this->modified_files = $this->modified_files->map(function ($file) {
-            $file['contents'] = $this->filesystem->read($file['path']);
+            $file['contents'] = $this->filesystem->get(base_path().'/'.$file['path']);
             return $file;
         });
     }

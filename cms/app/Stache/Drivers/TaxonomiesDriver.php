@@ -13,7 +13,7 @@ class TaxonomiesDriver extends AbstractDriver
 
     public function getFilesystemRoot()
     {
-        return 'taxonomies';
+        return 'content/taxonomies';
     }
 
     public function createItem($path, $contents)

@@ -48,11 +48,11 @@ class EntryItemCreator
     {
         return $this->files->map(function ($contents, $path) {
             // We only want files from the default locale.
-            if (substr_count($path, '/') > 2) {
+            if (substr_count($path, '/') > 3) {
                 return null;
             }
 
-            $collection = explode('/', $path)[1];
+            $collection = explode('/', $path)[2];
             $item = $this->createEntry($contents, $path, $collection);
             return compact('item', 'path', 'collection');
         })->filter()->values()->groupBy('collection');

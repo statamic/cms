@@ -37,7 +37,7 @@ class Config
      */
     public static function all()
     {
-        return self::config()->all();
+        return config()->all();
     }
 
     /**

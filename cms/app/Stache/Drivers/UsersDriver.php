@@ -16,7 +16,7 @@ class UsersDriver extends AbstractDriver
 
     public function getFilesystemRoot()
     {
-        return '/';
+        return 'users';
     }
 
     public function createItem($path, $contents)
