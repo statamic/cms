@@ -167,15 +167,11 @@ return [
         /*
          * Package Service Providers...
          */
+        Statamic\Providers\StatamicServiceProvider::class,
 
         /*
          * Application Service Providers...
          */
-        Statamic\Providers\AppServiceProvider::class,
-        Statamic\Providers\AuthServiceProvider::class,
-        // Statamic\Providers\BroadcastServiceProvider::class,
-        Statamic\Providers\EventServiceProvider::class,
-        Statamic\Providers\RouteServiceProvider::class,
 
     ],
 
