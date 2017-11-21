@@ -2,20 +2,23 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Support\Facades\Event;
+use Statamic\Extend\Management\AddonRepository;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event listener mappings for the application.
-     *
-     * @var array
-     */
     protected $listen = [
-        'App\Events\Event' => [
-            'App\Listeners\EventListener',
-        ],
+        \Statamic\Events\DataIdCreated::class => [
+            \Statamic\Stache\Listeners\SaveCreatedId::class
+        ]
+    ];
+
+    protected $subscribe = [
+        \Statamic\Stache\Listeners\UpdateItem::class,
+        \Statamic\Data\Taxonomies\TermTracker::class,
+        \Statamic\Listeners\GeneratePresetImageManipulations::class,
+        \Statamic\StaticCaching\Invalidator::class,
+        \Statamic\Listeners\UpdateRoutes::class,
     ];
 
     /**
@@ -27,6 +30,17 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        $dispatcher = $this->app->make('events');
+
+        // Register all the events specified in each listener class
+        foreach ($this->app->make(AddonRepository::class)->listeners()->installed()->classes() as $class) {
+            $listener = app($class);
+
+            foreach ($listener->events as $event => $methods) {
+                foreach (Helper::ensureArray($methods) as $method) {
+                    $dispatcher->listen($event, [$listener, $method]);
+                }
+            }
+        }
     }
 }

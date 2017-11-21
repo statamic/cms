@@ -91,4 +91,17 @@ return [
         str_slug(env('APP_NAME', 'laravel'), '_').'_cache'
     ),
 
+
+
+    'static_caching' => [
+       'enabled' => true,
+       'type' => 'cache',
+       'default_cache_length' => null,
+       'file_path' => 'static',
+       'ignore_query_strings' => true,
+       'exclude' => [],
+       'invalidation' => [],
+       'lock_hold_length' => 0,
+    ]
+
 ];
