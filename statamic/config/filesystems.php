@@ -45,7 +45,12 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => base_path(),
+        ],
+
+        'content' => [ // todo: remove when taking out flysystem.
+            'driver' => 'local',
+            'root' => base_path().'/content',
         ],
 
         'public' => [
