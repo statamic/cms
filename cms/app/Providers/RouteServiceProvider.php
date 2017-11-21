@@ -37,6 +37,13 @@ class RouteServiceProvider extends ServiceProvider
     {
         $path = __DIR__.'/../../routes/';
 
+        if (config('cp.enabled')) {
+            Route::middleware('web')
+                ->prefix(config('cp.route'))
+                ->namespace($this->namespace . '\\CP')
+                ->group($path . 'cp.php');
+        }
+
         Route::middleware('web')
              ->namespace($this->namespace)
              ->group($path . 'web.php');
