@@ -62,6 +62,12 @@ return [
             'root' => base_path().'/resources',
         ],
 
+        // todo: hardcoded for now, probably should be dynamic.
+        'assets:main' => [
+            'driver' => 'local',
+            'root' => public_path('assets'),
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
