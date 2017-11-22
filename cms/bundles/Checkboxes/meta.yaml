@@ -1,0 +1,3 @@
+fieldtype_fields:
+  options:
+    type: array

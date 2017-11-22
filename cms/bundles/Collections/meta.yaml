@@ -1,0 +1,3 @@
+fieldtype_fields:
+  max_items:
+    type: integer

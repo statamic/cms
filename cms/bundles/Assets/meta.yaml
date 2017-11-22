@@ -1,0 +1,14 @@
+fieldtype_fields:
+  container:
+    type: asset_container
+  folder:
+    type: asset_folder
+  restrict:
+    type: toggle
+  max_files:
+    type: integer
+  mode:
+    type: select
+    options:
+      grid: Grid
+      list: List

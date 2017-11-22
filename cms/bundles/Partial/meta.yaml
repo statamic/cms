@@ -1,0 +1,4 @@
+fieldtype_fields:
+  fieldset:
+    type: fieldset
+    hidden: true

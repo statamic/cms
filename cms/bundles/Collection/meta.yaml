@@ -1,0 +1,14 @@
+fieldtype_fields:
+  max_items:
+    type: text
+  sort:
+    type: text
+  label:
+    type: text
+  collection:
+    type: collections
+  mode:
+    type: select
+    options:
+      tags: Tags
+      panes: Panes

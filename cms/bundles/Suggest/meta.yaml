@@ -1,0 +1,7 @@
+fieldtype_fields:
+  max_items:
+    type: integer
+  options:
+    type: array
+  create:
+    type: toggle

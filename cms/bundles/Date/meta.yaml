@@ -1,0 +1,11 @@
+fieldtype_fields:
+  allow_blank:
+    type: toggle
+  allow_time:
+    type: toggle
+    default: true
+  earliest_date:
+    type: text
+    default: January 1, 1900
+  format:
+    type: text
