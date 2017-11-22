@@ -12,6 +12,7 @@
         "danielstjules/stringy": "dev-master",
         "mustangostang/spyc": "dev-master#dfd9aadc1f5224065d55b42b712c7e99a50a3f4d",
         "michelf/php-markdown": "1.7.0"
+        "funkjedi/composer-include-files": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -19,7 +20,6 @@
             "Statamic\\Addons\\": "bundles/"
         },
         "files": [
-            "app/helpers.php"
         ]
     },
     "minimum-stability": "dev",
@@ -27,5 +27,10 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "optimize-autoloader": true
+    },
+    "extra": {
+        "include_files": [
+            "app/helpers.php"
+        ]
     }
 }
