@@ -1,0 +1,42 @@
+<?php
+
+namespace Tests\Search;
+
+use Mockery;
+use Tests\TestCase;
+use Statamic\Search\Comb\Index;
+use Illuminate\Contracts\Filesystem\Filesystem;
+
+class CombIndexTest extends TestCase
+{
+    use IndexTests;
+
+    private $fs;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->fs = Mockery::mock(Filesystem::class);
+        $this->fs->shouldReceive('disk')->andReturn(Mockery::self());
+        $this->instance('filesystem', $this->fs);
+    }
+
+    protected function beforeSearched()
+    {
+        $this->fs
+            ->shouldReceive('exists')
+            ->with('local/storage/search/test.json')
+            ->andReturn(true);
+
+        $this->fs
+            ->shouldReceive('get')
+            ->with('local/storage/search/test.json')
+            ->andReturn('[[]]');
+    }
+
+    public function getIndex()
+    {
+        return app(Index::class);
+    }
+}
