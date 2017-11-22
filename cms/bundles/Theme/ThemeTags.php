@@ -180,8 +180,8 @@ class ThemeTags extends Tags
         }
 
         $url = URL::assemble(
-            Config::get('system.filesystems.themes.url'),
-            Config::get('theming.theme'),
+            // Config::get('system.filesystems.themes.url'),
+            // Config::get('theming.theme'),
             $path
         );
 

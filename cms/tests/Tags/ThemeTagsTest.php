@@ -12,7 +12,7 @@ class ThemeTagsTest extends TestCase
 
     public function setUp()
     {
-        $this->path = '/site/themes/redwood';
+        $this->path = '';
 
         parent::setUp();
     }

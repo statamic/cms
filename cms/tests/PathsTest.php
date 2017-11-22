@@ -1,8 +1,9 @@
 <?php namespace Tests;
 
+use Tests\TestCase;
 use Statamic\API\Path;
 
-class PathsTest extends \PHPUnit_Framework_TestCase
+class PathsTest extends TestCase
 {
     public function testPathCleaning()
     {
@@ -21,8 +22,8 @@ class PathsTest extends \PHPUnit_Framework_TestCase
 
     public function testRelativePath()
     {
-        $path = Path::makeRelative(settings_path('foo/bar.md'));
-        $this->assertTrue($path == 'site/settings/foo/bar.md');
+        $path = Path::makeRelative(base_path().'/content/foo/bar.md');
+        $this->assertTrue($path == 'content/foo/bar.md');
     }
 
     public function testIfPage()

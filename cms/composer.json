@@ -11,16 +11,28 @@
         "league/glide-laravel": "^1.0.0",
         "danielstjules/stringy": "dev-master",
         "mustangostang/spyc": "dev-master#dfd9aadc1f5224065d55b42b712c7e99a50a3f4d",
-        "michelf/php-markdown": "1.7.0"
+        "michelf/php-markdown": "1.7.0",
+        "netcarver/textile": "3.6.*@dev",
+        "webpatser/laravel-uuid": "1.*",
         "funkjedi/composer-include-files": "^1.0"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "~1.4",
+        "mockery/mockery": "~1.0",
+        "phpunit/phpunit": "~6.0",
+        "statamic/statamic": "*"
     },
     "autoload": {
         "psr-4": {
             "Statamic\\": "app/",
             "Statamic\\Addons\\": "bundles/"
-        },
-        "files": [
-        ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests",
+            "Statamic\\Addons\\": "tests/addon-stubs"
+        }
     },
     "minimum-stability": "dev",
     "config": {

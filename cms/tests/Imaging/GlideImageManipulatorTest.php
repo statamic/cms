@@ -5,7 +5,7 @@ use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
 
-class GlideImageManipulatorTest extends \PHPUnit_Framework_TestCase
+class GlideImageManipulatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GlideImageManipulator

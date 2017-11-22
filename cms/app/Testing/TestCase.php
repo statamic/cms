@@ -2,30 +2,16 @@
 
 namespace Statamic\Testing;
 
-use Statamic\Testing\Doubles\EventFake;
+use Illuminate\Foundation\Testing\TestCase as IlluminateTestCase;
 
-class TestCase extends \Illuminate\Foundation\Testing\TestCase
+abstract class TestCase extends IlluminateTestCase
 {
-    /**
-     * The base URL to use while testing the application.
-     *
-     * @var string
-     */
-    protected $baseUrl = 'http://localhost';
+    use CreatesApplication;
 
     /**
-     * Creates the application.
+     * The path to the bootstrap/app.php file
      *
-     * @return \Illuminate\Foundation\Application
+     * @return string
      */
-    public function createApplication()
-    {
-        $app = require __DIR__.'/../../bootstrap/app.php';
-
-        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
-
-        \Event::swap(new EventFake);
-
-        return $app;
-    }
+    abstract protected function bootstrapAppFile();
 }

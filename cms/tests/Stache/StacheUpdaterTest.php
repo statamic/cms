@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Tests\Stache;
+namespace Tests\Stache;
 
+use Tests\TestCase;
 use Statamic\API\YAML;
 use Statamic\Stache\Drivers\AbstractDriver;
 use Statamic\Stache\Drivers\PagesDriver;
@@ -13,7 +14,6 @@ use Statamic\API\Config;
 use Statamic\Stache\Stache;
 use Statamic\Stache\UpdateManager;
 use Statamic\Stache\Updater;
-use Statamic\Testing\TestCase;
 use Statamic\Stache\StacheUpdater;
 
 /**

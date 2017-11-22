@@ -1,13 +1,18 @@
-<?php namespace Tests;
+<?php
 
-class TestCase extends \Statamic\Testing\TestCase
+namespace Tests;
+
+use Statamic\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
 {
-    //
-}
-
-/**
- * A simple placeholder class for testing dependency injection.
- */
-class TestDependency {
-    //
+    /**
+     * The path to the bootstrap/app.php file
+     *
+     * @return string
+     */
+    protected function bootstrapAppFile()
+    {
+        return __DIR__ . '/../vendor/statamic/statamic/bootstrap/app.php';
+    }
 }

@@ -4,7 +4,7 @@ use Tests\TestCase;
 use Statamic\CP\Navigation\Nav;
 use Statamic\CP\Navigation\NavItem;
 
-class NavTest extends \PHPUnit_Framework_TestCase
+class NavTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Tests\Stache;
+namespace Tests\Stache;
 
+use Tests\TestCase;
 use Statamic\Stache\Repository;
-use Statamic\Testing\TestCase;
 
 /**
  * @group stache

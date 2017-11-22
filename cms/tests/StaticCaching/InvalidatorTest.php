@@ -11,7 +11,7 @@ use Statamic\Data\Content\Content;
 use Statamic\StaticCaching\Invalidator;
 use Statamic\Events\Stache\RepositoryItemInserted;
 
-class InvalidatorTest extends \PHPUnit_Framework_TestCase
+class InvalidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @test */
     public function non_content_in_event_will_do_nothing()

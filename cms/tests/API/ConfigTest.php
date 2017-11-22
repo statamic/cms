@@ -8,9 +8,9 @@ class ConfigTest extends TestCase
     {
         parent::setUp();
 
-        $config = app('Statamic\Config\Settings');
+        app()->instance('config', $config = new \Illuminate\Config\Repository([]));
 
-        $config->hydrate([
+        $config->set([
             'foo' => 'bar',
             'myscope' => ['baz' => 'qux'],
             'system' => [
@@ -41,6 +41,8 @@ class ConfigTest extends TestCase
 
     public function testCanGetOtherLocales()
     {
+        site_locale('en');
+
         $this->assertEquals(['fr', 'de'], Config::getOtherLocales());
     }
 }

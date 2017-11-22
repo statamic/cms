@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tests\Extend;
+namespace Tests\Extend;
 
 use Tests\TestCase;
 use Tests\TestDependency;

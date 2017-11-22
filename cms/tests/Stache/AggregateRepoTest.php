@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Tests\Stache;
+namespace Tests\Stache;
 
+use Tests\TestCase;
 use Statamic\API\YAML;
 use Statamic\Stache\AggregateRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\StacheUpdater;
-use Statamic\Testing\TestCase;
 
 /**
  * @group stache

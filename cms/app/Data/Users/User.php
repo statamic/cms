@@ -283,6 +283,11 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
         return $this->id();
     }
 
+    public function getAuthIdentifierName()
+    {
+        return 'id';
+    }
+
     /**
      * Get the password for the user.
      *

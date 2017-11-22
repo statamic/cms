@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Tests\Extend;
+namespace Tests\Extend;
 
 use Mockery;
+use Tests\TestCase;
 use Statamic\API\Addon;
-use Statamic\Testing\TestCase;
 use Statamic\Extend\Management\AddonRepository;
 use Illuminate\Contracts\Filesystem\Filesystem;
 

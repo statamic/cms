@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Tests\Taxonomies;
+namespace Tests\Taxonomies;
 
+use Tests\TestCase;
 use Statamic\API\Config;
 use Statamic\API\Term;
 use Statamic\Stache\Staches\TaxonomyStache;
-use Statamic\Testing\TestCase;
 
 class TaxonomyStacheTest extends TestCase
 {

@@ -3,12 +3,12 @@
 namespace Statamic\Testing\Extend;
 
 use Mockery;
+use Tests\TestCase;
 use Statamic\API\URL;
 use Statamic\API\Path;
 use Statamic\Extend\Meta;
 use Statamic\Extend\Addon;
 use Statamic\Config\Addons;
-use Statamic\Testing\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;
 
 class AddonTest extends TestCase

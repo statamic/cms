@@ -2,16 +2,17 @@
 
 namespace Statamic\Tests\Stache;
 
-use Statamic\Stache\Drivers\EntriesDriver;
-use Statamic\Stache\Drivers\PagesDriver;
-use Statamic\Stache\Repository;
+use Tests\TestCase;
 use Statamic\Stache\Stache;
+use Statamic\Stache\Repository;
+use Statamic\Stache\Drivers\PagesDriver;
+use Statamic\Stache\Drivers\EntriesDriver;
 
 /**
  * @group stache
  * @group stacheunits
  */
-class StacheTest extends \PHPUnit_Framework_TestCase
+class StacheTest extends TestCase
 {
     /**
      * @var Stache

@@ -2,7 +2,7 @@
 
 use Statamic\DataStore;
 
-class DataStoreTest extends \PHPUnit_Framework_TestCase
+class DataStoreTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \Statamic\DataStore */
     private $store;

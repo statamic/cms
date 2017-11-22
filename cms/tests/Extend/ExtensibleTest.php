@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Testing\Extend;
+namespace Tests\Extend;
 
+use Tests\TestCase;
 use Statamic\API\Path;
 use Statamic\API\Config;
 use Statamic\Config\Addons;
-use Statamic\Testing\TestCase;
 use Statamic\Extend\Contextual\ContextualJs;
 use Statamic\Extend\Contextual\ContextualCss;
 use Statamic\Extend\Contextual\ContextualBlink;

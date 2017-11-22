@@ -113,7 +113,7 @@ class EntryTest extends TestCase
 
     public function testThrowExceptionWhenGettingDateForNonDateEntry()
     {
-        $this->setExpectedException('Statamic\Exceptions\InvalidEntryTypeException');
+        $this->expectException('Statamic\Exceptions\InvalidEntryTypeException');
 
         $this->entry->date();
     }

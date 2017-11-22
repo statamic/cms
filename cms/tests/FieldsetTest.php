@@ -37,7 +37,7 @@ class FieldsetTest extends TestCase
 
     public function testThrowsExceptionOnInvalidType()
     {
-        $this->setExpectedException('Exception');
+        $this->expectException('Exception');
 
         $this->fieldset->type('something');
     }
@@ -63,14 +63,7 @@ class FieldsetTest extends TestCase
     public function testGetsPath()
     {
         $this->assertEquals(
-            'site/settings/fieldsets/fieldset.yaml',
-            $this->fieldset->path()
-        );
-
-        $this->fieldset->type('settings');
-
-        $this->assertEquals(
-            'statamic/settings/fieldsets/fieldset.yaml',
+            'resources/fieldsets/fieldset.yaml',
             $this->fieldset->path()
         );
     }

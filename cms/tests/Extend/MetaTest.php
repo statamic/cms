@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Testing\Extend;
+namespace Tests\Extend;
 
 use Mockery;
+use Tests\TestCase;
 use Statamic\Extend\Addon;
 use Statamic\Extend\Meta;
-use Statamic\Testing\TestCase;
 use Illuminate\Contracts\Filesystem\Filesystem;
 
 class MetaTest extends TestCase

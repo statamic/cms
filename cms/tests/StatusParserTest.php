@@ -4,7 +4,7 @@ namespace Tests;
 
 use Statamic\Data\Content\StatusParser;
 
-class StatusParserTest extends \PHPUnit_Framework_TestCase
+class StatusParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Statamic\Data\Content\StatusParser

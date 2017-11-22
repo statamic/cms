@@ -10,31 +10,31 @@ class UrlTest extends TestCase
 {
     public function testBuildsUrl()
     {
-        $url = URL::buildFromPath('pages/about/index.md');
+        $url = URL::buildFromPath('content/pages/about/index.md');
         $this->assertEquals('/about', $url);
     }
 
     public function testBuildsHomepage()
     {
-        $url = URL::buildFromPath('pages/index.md');
+        $url = URL::buildFromPath('content/pages/index.md');
         $this->assertEquals('/', $url);
     }
 
     public function testBuildsUrlFromFullPath()
     {
-        $url = URL::buildFromPath(BASE . '/pages/index.md');
+        $url = URL::buildFromPath(base_path() . '/content/pages/index.md');
         $this->assertEquals('/', $url);
     }
 
     public function testBuildsLocalizedUrl()
     {
-        $url = URL::buildFromPath('pages/about/fr.index.md');
+        $url = URL::buildFromPath('content/pages/about/fr.index.md');
         $this->assertEquals('/about', $url);
     }
 
     public function testBuildsLocalizedHomepage()
     {
-        $url = URL::buildFromPath('pages/fr.index.md');
+        $url = URL::buildFromPath('content/pages/fr.index.md');
         $this->assertEquals('/', $url);
     }
 

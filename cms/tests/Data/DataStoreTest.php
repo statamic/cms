@@ -5,7 +5,7 @@ namespace Statamic\Tests;
 use Statamic\Data\DataStore;
 use Statamic\Testing\TestCase;
 
-class DataStoreTest extends \PHPUnit_Framework_TestCase
+class DataStoreTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DataStore

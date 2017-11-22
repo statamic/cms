@@ -3,6 +3,7 @@
 use Statamic\API\Path;
 use Statamic\Extend\Addon;
 use Michelf\MarkdownExtra;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
@@ -15,10 +16,31 @@ function log_todo()
     $str = array_get($backtrace, 'class', '') . '::' . $backtrace['function'];
 
     if (!array_has($GLOBALS['statamictodos'], $str)) {
-        Log::debug('Todo: ' . $str);
+        \Log::debug('Todo: ' . $str);
         $GLOBALS['statamictodos'][$str] = true;
     }
 }
+
+
+if (! function_exists('array_get')) {
+    /**
+     * Get an item from an array using "dot" or "colon" notation.
+     *
+     * @param  array  $array
+     * @param  string $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function array_get($array, $key, $default = null)
+    {
+        if ($key) {
+            $key = str_replace(':', '.', $key);
+        }
+
+        return Arr::get($array, $key, $default);
+    }
+}
+
 
 /**
  * Gets the site's default locale
@@ -302,3 +324,40 @@ function array_reindex($array)
 
     return $array;
 }
+
+function root_path()
+{
+    return base_path();
+}
+
+function bundles_path($path = null)
+{
+    return path(app_path('../bundles'), $path);
+}
+
+
+/**
+ * Parse string with basic Textile
+ *
+ * @param $content
+ * @return string
+ */
+function textile($content)
+{
+    $parser = new \Netcarver\Textile\Parser();
+
+    return $parser
+        ->setDocumentType('html5')
+        ->parse($content);
+}
+
+/**
+ * @param array $value
+ * @return \Statamic\Data\Pages\PageCollection
+ */
+function collect_pages($value = [])
+{
+    return new \Statamic\Data\Pages\PageCollection($value);
+}
+
+

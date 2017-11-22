@@ -4,7 +4,7 @@ namespace Tests;
 
 use Statamic\Data\Content\OrderParser;
 
-class OrderParserTest extends \PHPUnit_Framework_TestCase
+class OrderParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Statamic\Data\Content\OrderParser
