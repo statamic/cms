@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP;
+namespace Statamic\Http\Controllers;
 
 use Statamic\API\Str;
 use Statamic\API\File;
@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * The base control panel controller
  */
-class BaseController extends Controller
+class CpController extends Controller
 {
     /**
      * @var \Illuminate\Http\Request
