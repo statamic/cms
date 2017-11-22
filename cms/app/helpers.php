@@ -8,10 +8,16 @@ use Stringy\StaticStringy as Stringy;
 
 define('STATAMIC_VERSION', '3.0.0');
 
+$GLOBALS['statamictodos'] = [];
 function log_todo()
 {
     $backtrace = debug_backtrace()[1];
-    Log::debug(sprintf('Todo: %s::%s', array_get($backtrace, 'class', ''), $backtrace['function']));
+    $str = array_get($backtrace, 'class', '') . '::' . $backtrace['function'];
+
+    if (!array_has($GLOBALS['statamictodos'], $str)) {
+        Log::debug('Todo: ' . $str);
+        $GLOBALS['statamictodos'][$str] = true;
+    }
 }
 
 /**
