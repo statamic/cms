@@ -7,6 +7,7 @@ use Statamic\API\File;
 use Statamic\API\Config;
 use League\Glide\Server;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
 use Twistor\Flysystem\GuzzleAdapter;
 
 class ImageGenerator
@@ -58,7 +59,7 @@ class ImageGenerator
         $this->path = $path;
         $this->params = $params;
 
-        $this->server->setSource(File::disk('webroot')->filesystem()->getDriver());
+        $this->server->setSource(new Filesystem(new Local(public_path())));
         $this->server->setSourcePathPrefix('/');
         $this->server->setCachePathPrefix('paths');
 
