@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers;
+namespace Statamic\Http\Controllers\CP;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers;
+namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
 use Statamic\API\Page;

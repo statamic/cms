@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers;
+namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Content;
 use Statamic\API\Helper;

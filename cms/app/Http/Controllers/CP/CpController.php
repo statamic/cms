@@ -1,12 +1,13 @@
 <?php
 
-namespace Statamic\Http\Controllers;
+namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Folder;
 use Illuminate\Http\Request;
+use Statamic\Http\Controllers\Controller;
 
 /**
  * The base control panel controller

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers;
+namespace Statamic\Http\Controllers\CP;
 
 use Aws\S3\Exception\PermanentRedirectException;
 use Aws\S3\Exception\S3Exception;
