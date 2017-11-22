@@ -242,10 +242,10 @@ trait Extensible
      */
     public function getConfig($keys = null, $default = null)
     {
-        $config = app(Addons::class)->get(Str::snake($this->addon_name)) ?: [];
+        log_todo();
 
         if (is_null($keys)) {
-            return $config;
+            return [];
         }
 
         if (! is_array($keys)) {

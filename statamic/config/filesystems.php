@@ -48,9 +48,18 @@ return [
             'root' => base_path(),
         ],
 
-        'content' => [ // todo: remove when taking out flysystem.
+        // todo: remove when taking out flysystem.
+        'content' => [
             'driver' => 'local',
             'root' => base_path().'/content',
+        ],
+        'themes' => [
+            'driver' => 'local',
+            'root' => base_path().'/resources',
+        ],
+        'theme' => [
+            'driver' => 'local',
+            'root' => base_path().'/resources',
         ],
 
         'public' => [

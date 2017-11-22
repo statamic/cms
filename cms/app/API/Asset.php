@@ -72,7 +72,7 @@ class Asset
     {
         return AssetContainer::all()->sortBy(function ($container) {
             return strlen($container->url());
-        })->first(function ($id, $container) use ($url) {
+        })->first(function ($container, $id) use ($url) {
             $containerUrl = ($container->driver() === 'local')
                 ? URL::makeRelative($container->url())
                 : $container->url();

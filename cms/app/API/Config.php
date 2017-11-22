@@ -95,7 +95,7 @@ class Config
     public static function getFullLocale($locale = null)
     {
         if (is_null($locale)) {
-            $locale = LOCALE;
+            $locale = site_locale();
         }
 
         return self::get('system.locales.' . $locale . '.full', 'en_US');
@@ -123,7 +123,7 @@ class Config
     public static function getLocaleName($locale = null)
     {
         if (is_null($locale)) {
-            $locale = LOCALE;
+            $locale = site_locale();
         }
 
         return self::get('system.locales.' . $locale . '.name', 'English');

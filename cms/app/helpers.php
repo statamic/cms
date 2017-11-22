@@ -1,7 +1,10 @@
 <?php
 
-use Stringy\Stringy;
 use Statamic\API\Path;
+use Statamic\Extend\Addon;
+use Michelf\MarkdownExtra;
+use Illuminate\Support\Carbon;
+use Stringy\StaticStringy as Stringy;
 
 define('STATAMIC_VERSION', '3.0.0');
 
@@ -32,6 +35,11 @@ function cache_path($path = null)
     return path(storage_path('statamic/cache'), $path);
 }
 
+function addons_path($path = null)
+{
+    return path(base_path('addons'), $path);
+}
+
 /**
  * Gets or sets the site locale
  *
@@ -57,6 +65,33 @@ function collect_files($value = [])
 }
 
 /**
+ * @param array $value
+ * @return \Statamic\Data\Content\ContentCollection
+ */
+function collect_content($value = [])
+{
+    return new \Statamic\Data\Content\ContentCollection($value);
+}
+
+/**
+ * Gets an addon's API class if it exists, or creates a temporary generic addon class.
+ *
+ * @param string $addon
+ * @return Addon|API
+ */
+function addon($addon)
+{
+    try {
+        $addon = app("Statamic\\Addons\\{$addon}\\{$addon}API");
+    } catch (ReflectionException $e) {
+        $addon = new Addon($addon);
+    }
+
+    return $addon;
+}
+
+
+/**
  * Turns a string into a slug
  *
  * @param string $var
@@ -65,4 +100,199 @@ function collect_files($value = [])
 function slugify($value)
 {
     return Stringy::slugify($value);
+}
+
+/**
+ * Make sure a URL /looks/like/this
+ *
+ * @param string $url Any given URL
+ * @return string
+ */
+function format_url($url)
+{
+    return '/' . trim($url, '/');
+}
+
+function cp_route($route, $params = [])
+{
+    if (! config('cp.enabled')) {
+        return null;
+    }
+
+    return route($route, $params);
+}
+
+/**
+ * Parse string with basic Markdown
+ *
+ * @param $content
+ * @return mixed
+ */
+function markdown($content)
+{
+    $parser = new MarkdownExtra;
+
+    if (Config::get('theming.markdown_hard_wrap')) {
+        $parser->hard_wrap = true;
+    }
+
+    return $parser->transform($content);
+}
+
+/**
+ * @return \Statamic\DataStore
+ */
+function datastore()
+{
+    return app('Statamic\DataStore');
+}
+
+
+/**
+ * Recusive friendly method of sanitizing an array.
+ *
+ * @return array
+ */
+function sanitize_array($array)
+{
+    $result = [];
+
+    foreach ($array as $key => $value) {
+        $key = htmlentities($key);
+        $result[$key] = is_array($value) ? sanitize_array($value) : htmlentities($value);
+    }
+
+    return $result;
+}
+
+/**
+ * @param array $value
+ * @return \Statamic\Data\Globals\GlobalCollection
+ */
+function collect_globals($value = [])
+{
+    return new \Statamic\Data\Globals\GlobalCollection($value);
+}
+
+function translate($id, array $parameters = [])
+{
+    return trans($id, $parameters);
+}
+
+
+function start_measure()
+{
+    log_todo();
+}
+function stop_measure()
+{
+    log_todo();
+}
+
+
+if (! function_exists('array_filter_use_both')) {
+    /**
+     * Polyfill for the array_filter constant ARRAY_FILTER_USE_BOTH.
+     *
+     * This filters the array passing the key as the second parameter
+     * for more complex filtering.
+     *
+     * BC for `array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);`
+     *
+     * @param  array  $array
+     * @param  Closure  $callback
+     * @return array
+     */
+    function array_filter_use_both($array, $callback)
+    {
+        $items = [];
+
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                continue;
+            }
+
+            $items[$key] = $value;
+        }
+
+        return $items;
+    }
+}
+
+/**
+ * @param array $value
+ * @return \Statamic\Data\Entries\EntryCollection
+ */
+function collect_entries($value = [])
+{
+    return new \Statamic\Data\Entries\EntryCollection($value);
+}
+/**
+ * Returns a real boolean from a string based boolean
+ *
+ * @param string $value
+ * @return bool
+ */
+function bool($value)
+{
+    return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
+}
+
+
+/**
+ * Filtering a array by its keys using a callback.
+ *
+ * @param $array array The array to filter
+ * @param $callback Callback The filter callback, that will get the key as first argument.
+ *
+ * @return array The remaining key => value combinations from $array.
+ */
+function array_filter_key(array $array, $callback)
+{
+    $matchedKeys = array_filter(array_keys($array), $callback);
+
+    return array_intersect_key($array, array_flip($matchedKeys));
+}
+
+/**
+ * Return a real integer from a string based integer
+ *
+ * @param string $value
+ * @return int
+ */
+function int($value)
+{
+    return intval($value);
+}
+/**
+ * @param array $value
+ * @return \Statamic\Data\Taxonomies\TermCollection
+ */
+function collect_terms($value = [])
+{
+    return new \Statamic\Data\Taxonomies\TermCollection($value);
+}
+
+
+function carbon($value)
+{
+    if (! $value instanceof Carbon) {
+        $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
+    }
+
+    return $value;
+}
+/**
+ * Reindex an array so unnamed keys are named
+ *
+ * @param array $array
+ * @return mixed
+ */
+function array_reindex($array)
+{
+    if (array_values($array) === $array) {
+        $array = array_flip($array);
+    }
+
+    return $array;
 }
