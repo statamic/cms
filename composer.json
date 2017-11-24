@@ -44,5 +44,11 @@
         "include_files": [
             "app/helpers.php"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../statamic"
+        }
+    ]
 }
