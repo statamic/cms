@@ -42,6 +42,8 @@ class File
             $disk->setRootDirectory(base_path('resources'));
         } elseif ($name === 'users') {
             $disk->setRootDirectory(base_path('users'));
+        } elseif ($name === 'storage') {
+            $disk->setRootDirectory(storage_path('statamic'));
         } else {
             throw new \Exception('Todo: Handle [' . $name . '] disk.');
         }
