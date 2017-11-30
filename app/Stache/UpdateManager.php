@@ -104,7 +104,7 @@ class UpdateManager
      */
     protected function createTraverser($driver)
     {
-        $traverser = new Traverser($driver, app('files'));
+        $traverser = new Traverser($driver, $driver->getFilesystem());
 
         $traverser->timestamps(
             $this->getTimestamps()->get($driver->key(), collect())

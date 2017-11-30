@@ -2,13 +2,14 @@
 
 namespace Statamic\Stache\Drivers;
 
-use Illuminate\Support\Collection;
+use Statamic\API\File;
 use Statamic\API\Config;
 use Statamic\API\Folder;
-use Statamic\Stache\AggregateRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Driver;
 use Statamic\Stache\Repository;
+use Illuminate\Support\Collection;
+use Statamic\Stache\AggregateRepository;
 use Statamic\Exceptions\DuplicateIdException;
 
 abstract class AbstractDriver implements Driver
@@ -75,14 +76,9 @@ abstract class AbstractDriver implements Driver
         return $this->key();
     }
 
-    /**
-     * Get the Flysystem driver
-     *
-     * @return \League\Flysystem\Filesystem
-     */
-    public function getFilesystemDriver()
+    public function getFilesystem()
     {
-        return Folder::disk('content')->filesystem()->getDriver();
+        return File::disk('content');
     }
 
     /**

@@ -3,12 +3,12 @@
 namespace Statamic\Stache;
 
 use Illuminate\Support\Collection;
-use Illuminate\Filesystem\Filesystem;
+use Statamic\Filesystem\Filesystem;
 
 class Traverser
 {
     /**
-     * @var \Illuminate\Filesystem\Filesystem
+     * @var \Statamic\Filesystem\Filesystem
      */
     private $filesystem;
 
@@ -39,7 +39,7 @@ class Traverser
 
     /**
      * @param \Statamic\Stache\Driver $driver
-     * @param \Illuminate\Filesystem\Filesystem     $filesystem
+     * @param \Statamic\Filesystem\Filesystem  $filesystem
      */
     public function __construct(Driver $driver, Filesystem $filesystem)
     {
@@ -98,19 +98,17 @@ class Traverser
      */
     private function setAllFiles()
     {
-        $method = $this->driver->traverseRecursively() ? 'allFiles' : 'files';
-        $directory = base_path($this->driver->getFilesystemRoot());
-        $files = $this->filesystem->$method($directory);
+        $files = $this->filesystem->getFiles($this->driver->getFilesystemRoot(), $this->driver->traverseRecursively());
 
-        $this->files = collect($files)->map(function ($file) {
+        $this->files = collect($files)->map(function ($path) {
             return [
-                'type' => $file->isDir() ? 'dir' : 'file',
-                'path' => \Statamic\API\Str::removeLeft($file->getPathname(), base_path().'/'),
-                'size' => $file->getSize(),
-                'basename' => $file->getBasename(),
-                'filename' => $file->getBasename('.'.$file->getExtension()),
-                'extension' => $file->getExtension(),
-                'timestamp' => $file->getMTime()
+                'type' => $this->filesystem->isDirectory($path) ? 'dir' : 'file',
+                'path' => $path,
+                'size' => $this->filesystem->size($path),
+                'basename' => pathinfo($path)['basename'],
+                'filename' => pathinfo($path)['filename'],
+                'extension' => pathinfo($path)['extension'],
+                'timestamp' => $this->filesystem->lastModified($path),
             ];
         })->filter(function ($file) {
             // Always ignore these annoying files.
@@ -163,7 +161,7 @@ class Traverser
     private function addContentsToModifiedFiles()
     {
         $this->modified_files = $this->modified_files->map(function ($file) {
-            $file['contents'] = $this->filesystem->get(base_path().'/'.$file['path']);
+            $file['contents'] = $this->filesystem->get($file['path']);
             return $file;
         });
     }

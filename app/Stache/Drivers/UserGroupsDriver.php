@@ -8,11 +8,6 @@ use Statamic\API\Folder;
 
 class UserGroupsDriver extends AbstractDriver
 {
-    public function getFilesystemDriver()
-    {
-        return Folder::disk()->filesystem()->getDriver();
-    }
-
     public function getFilesystemRoot()
     {
         return 'site/settings/users';

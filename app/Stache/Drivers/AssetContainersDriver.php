@@ -12,11 +12,6 @@ class AssetContainersDriver extends AbstractDriver
 {
     protected $relatable = false;
 
-    public function getFilesystemDriver()
-    {
-        return Folder::disk('content')->filesystem()->getDriver();
-    }
-
     public function getFilesystemRoot()
     {
         return 'assets';

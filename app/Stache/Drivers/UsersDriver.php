@@ -4,19 +4,20 @@ namespace Statamic\Stache\Drivers;
 
 use Statamic\API\User;
 use Statamic\API\YAML;
+use Statamic\API\File;
 use Statamic\API\Folder;
 use Statamic\Stache\Repository;
 
 class UsersDriver extends AbstractDriver
 {
-    public function getFilesystemDriver()
-    {
-        return Folder::disk('users')->filesystem()->getDriver();
-    }
-
     public function getFilesystemRoot()
     {
         return 'users';
+    }
+
+    public function getFilesystem()
+    {
+        return File::disk();
     }
 
     public function createItem($path, $contents)
