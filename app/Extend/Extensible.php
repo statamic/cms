@@ -335,7 +335,7 @@ trait Extensible
     public function eventUrl($url, $relative = true)
     {
         $url = URL::tidy(
-            URL::prependSiteUrl(EVENT_ROUTE . '/' . $this->getAddonClassName() . '/' . $url)
+            URL::prependSiteUrl(event_route() . '/' . $this->getAddonClassName() . '/' . $url)
         );
 
         if ($relative) {

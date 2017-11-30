@@ -394,6 +394,13 @@ function cp_root()
     log_todo();
     return '/cp';
 }
+
+function event_route()
+{
+    log_todo();
+    return '!';
+}
+
 /**
  * Inline SVG helper
  *
