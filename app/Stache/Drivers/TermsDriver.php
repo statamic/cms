@@ -11,7 +11,7 @@ class TermsDriver extends AbstractDriver implements AggregateDriver
 
     public function getFilesystemRoot()
     {
-        return 'content/taxonomies';
+        return 'taxonomies';
     }
 
     public function getModifiedItems($files)

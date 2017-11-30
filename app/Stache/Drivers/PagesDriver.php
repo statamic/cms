@@ -18,7 +18,7 @@ class PagesDriver extends AbstractDriver
 
     public function getFilesystemRoot()
     {
-        return 'content/pages';
+        return 'pages';
     }
 
     public function createItem($path, $contents)

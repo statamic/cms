@@ -303,7 +303,7 @@ class URL
 
         $path = Path::clean($path);
 
-        $path = preg_replace('/^content\/pages/', '', $path);
+        $path = preg_replace('/^pages/', '', $path);
 
         $path = preg_replace('#\/(?:[a-z]+\.)?index\.'.$ext.'$#', '', $path);
 

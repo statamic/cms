@@ -11,12 +11,12 @@ class CollectionsDriver extends AbstractDriver
 
     public function getFilesystemRoot()
     {
-        return 'content/collections';
+        return 'collections';
     }
 
     public function createItem($path, $contents)
     {
-        $collection = Collection::create(explode('/', $path)[2]);
+        $collection = Collection::create(explode('/', $path)[1]);
 
         $collection->data(YAML::parse($contents));
 
@@ -25,7 +25,7 @@ class CollectionsDriver extends AbstractDriver
 
     public function getItemId($item, $path)
     {
-        return explode('/', $path)[2];
+        return explode('/', $path)[1];
     }
 
     public function isMatchingFile($file)

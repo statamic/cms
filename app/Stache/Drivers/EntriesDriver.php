@@ -11,7 +11,7 @@ class EntriesDriver extends AbstractDriver implements AggregateDriver
 
     public function getFilesystemRoot()
     {
-        return 'content/collections';
+        return 'collections';
     }
 
     public function getModifiedItems($files)
