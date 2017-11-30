@@ -333,7 +333,7 @@ function root_path()
 
 function bundles_path($path = null)
 {
-    return path(app_path('../bundles'), $path);
+    return path(statamic_path('bundles'), $path);
 }
 
 

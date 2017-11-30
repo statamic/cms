@@ -143,7 +143,7 @@ trait Extensible
 
         return Str::contains(
             Path::tidy($reflection->getFileName()),
-            'statamic/bundles/'
+            'cms/bundles/'
         );
     }
 
