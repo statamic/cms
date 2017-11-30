@@ -19,7 +19,7 @@ class Form
     {
         $form = self::create($name);
 
-        $path = settings_path("formsets/{$name}.yaml");
+        $path = resource_path("formsets/{$name}.yaml");
 
         if (! File::exists($path)) {
             return;
