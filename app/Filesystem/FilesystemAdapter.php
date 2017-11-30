@@ -44,6 +44,10 @@ class FilesystemAdapter implements FilesystemInterface
 
     public function get($path, $fallback = null)
     {
+        if (! $this->exists($path)) { // not under test
+            return $fallback;
+        }
+
         return $this->filesystem->get($this->normalizePath($path), $fallback);
     }
 
