@@ -40,6 +40,8 @@ class File
             $disk->setRootDirectory(base_path('content'));
         } elseif ($name === 'theme') {
             $disk->setRootDirectory(base_path('resources'));
+        } elseif ($name === 'users') {
+            $disk->setRootDirectory(base_path('users'));
         } else {
             throw new \Exception('Todo: Handle [' . $name . '] disk.');
         }

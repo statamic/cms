@@ -31,7 +31,7 @@ class UsersService extends BaseService
      */
     public function username($username)
     {
-        return $this->all()->first(function ($id, $user) use ($username) {
+        return $this->all()->first(function ($user, $id) use ($username) {
             return strtolower($user->username()) === strtolower($username);
         });
     }

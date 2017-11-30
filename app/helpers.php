@@ -1,5 +1,6 @@
 <?php
 
+use Statamic\API\URL;
 use Statamic\API\Path;
 use Statamic\Extend\Addon;
 use Michelf\MarkdownExtra;
@@ -360,4 +361,107 @@ function collect_pages($value = [])
     return new \Statamic\Data\Pages\PageCollection($value);
 }
 
+function bool_str($bool)
+{
+    return ((bool) $bool) ? 'true' : 'false';
+}
 
+function cp_resource_url($url)
+{
+    return resource_url('cp/' . $url);
+}
+
+function resource_url($url)
+{
+    log_todo();
+    return '/resources/' . $url;
+}
+
+function site_root()
+{
+    log_todo();
+    return '/';
+}
+
+function resources_root()
+{
+    log_todo();
+    return '_resources';
+}
+
+function cp_root()
+{
+    log_todo();
+    return '/cp';
+}
+/**
+ * Inline SVG helper
+ *
+ * Outputs the contents of an svg file
+ *
+ * @param string $src Name of svg
+ * @return string
+ */
+function inline_svg($src)
+{
+    return Stringy::collapseWhitespace(
+        File::get(statamic_path("resources/dist/svg/{$src}.svg"))
+    );
+}
+
+function statamic_path($path = null)
+{
+    return path(__DIR__ . '/../', $path);
+}
+
+/**
+ * Shorthand for translate()
+ *
+ * @param string $var
+ * @param array  $params
+ * @return string
+ */
+function t($var, $params = [])
+{
+    return translate('cp.'.$var, $params);
+}
+/**
+ * SVG helper
+ *
+ * Outputs a tag to reference a symbol in the sprite.
+ *
+ * @param string $name Name of svg
+ * @return string
+ */
+function svg($name)
+{
+    return '<svg><use xlink:href="#'.$name.'" /></svg>';
+}
+
+
+/**
+ * Return a gravatar image
+ *
+ * @param  string  $email
+ * @param  integer $size
+ * @return string
+ */
+function gravatar($email, $size = null)
+{
+    $url = "https://www.gravatar.com/avatar/" . e(md5(strtolower($email)));
+
+    if ($size) {
+        $url .= '?s=' . $size;
+    }
+
+    return $url;
+}
+
+/**
+ * @param array $value
+ * @return \Statamic\Data\Users\UserCollection
+ */
+function collect_users($value = [])
+{
+    return new \Statamic\Data\Users\UserCollection($value);
+}
