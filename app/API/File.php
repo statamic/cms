@@ -3,6 +3,7 @@
 namespace Statamic\API;
 
 use Statamic\Filesystem\FileAccessor;
+use Statamic\Filesystem\FilesystemAdapter;
 
 /**
  * Manipulating files on the local filesystem
@@ -26,14 +27,24 @@ class File
     /**
      * Get a disk
      *
-     * @param string|null $disk
+     * @param string|null $name
      * @return \Statamic\Filesystem\FileAccessor
      */
-    public static function disk($disk = null)
+    public static function disk($name = null)
     {
-        $disk = (is_null($disk)) ? 'local' : $disk;
+        $disk = app(FilesystemAdapter::class);
 
-        return new FileAccessor($disk, app('filesystem')->disk($disk));
+        if ($name === null) {
+            //
+        } elseif ($name === 'content') {
+            $disk->setRootDirectory(base_path('content'));
+        } elseif ($name === 'theme') {
+            $disk->setRootDirectory(base_path('resources'));
+        } else {
+            throw new \Exception('Todo: Handle [' . $name . '] disk.');
+        }
+
+        return $disk;
     }
 
     /**

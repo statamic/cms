@@ -23,30 +23,7 @@ use Statamic\Filesystem\FolderAccessor;
  * @method static bool delete(string $folder)
  * @method static void deleteEmptySubfolders(string $folder)
  */
-class Folder
+class Folder extends File
 {
-    /**
-     * Get a disk
-     *
-     * @param string|null $disk
-     * @return \Statamic\Filesystem\FolderAccessor
-     */
-    public static function disk($disk = null)
-    {
-        $disk = (is_null($disk)) ? 'local' : $disk;
-
-        return new FolderAccessor($disk, app('filesystem')->disk($disk));
-    }
-
-    /**
-     * Pass methods through to the default disk
-     *
-     * @param string $method
-     * @param array $args
-     * @return mixed
-     */
-    public static function __callStatic($method, $args)
-    {
-        return call_user_func_array([self::disk(), $method], $args);
-    }
+    //
 }
