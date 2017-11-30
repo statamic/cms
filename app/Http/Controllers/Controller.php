@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
+use Statamic\API\User;
 use Statamic\API\Config;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -13,6 +14,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    protected function access($area)
+    {
+        if (! User::getCurrent()->can($area)) {
+            throw $this->createGateUnauthorizedException($area, []);
+        }
+    }
 
     protected function loadKeyVars()
     {
