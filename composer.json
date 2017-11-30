@@ -7,6 +7,7 @@
         "php": ">=7.0.0",
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",
+        "laravelcollective/html": "^5.5",
         "league/glide": "^1.1",
         "league/glide-laravel": "^1.0.0",
         "danielstjules/stringy": "dev-master",
