@@ -242,8 +242,6 @@ class FrontendController extends Controller
         // Load some essential variables that will be available in the template.
         $this->loadKeyVars();
 
-        $this->ensureTheme();
-
         // Get the output of the parsed template and add it to the response
         $this->response->setContent($this->view->render($this->data));
 
@@ -364,15 +362,6 @@ class FrontendController extends Controller
     private function protect()
     {
         return addon('Protect')->protect($this->data);
-    }
-
-    private function ensureTheme()
-    {
-        $theme = Config::get('theming.theme');
-
-        if (! Folder::disk('themes')->exists($theme)) {
-            \Log::error("The [$theme] theme doesn't exist.");
-        }
     }
 
     public function setUpDebugBar()
