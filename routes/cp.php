@@ -9,15 +9,27 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['middleware' => 'auth'], function () {
     Route::redirect('/', 'cp/dashboard')->name('cp');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+
+    Route::group(['prefix' => 'pages'], function () {
+        Route::get('/', 'PagesController@pages')->name('pages');
+        Route::post('/', 'PagesController@save')->name('pages.post');
+        Route::get('/get', 'PagesController@get')->name('pages.get');
+        Route::post('/delete', 'PagesController@delete')->name('page.delete');
+        Route::post('publish', 'PublishPageController@save')->name('page.save');
+        Route::get('create/{parent?}', 'PublishPageController@create')->name('page.create')->where('parent', '.*');
+        Route::get('edit/{url?}', ['uses' => 'PublishPageController@edit', 'as' => 'page.edit'])->where('url', '.*');
+        Route::post('mount', ['uses' => 'PagesController@mountCollection', 'as' => 'page.mount']);
+        Route::post('duplicate', 'DuplicatePageController@store');
+    });
+
+
 });
 
 // Just to make stuff work.
-Route::get('/page-edit', function () { return ''; })->name('page.edit');
 Route::get('/entry-edit', function () { return ''; })->name('entry.edit');
 Route::get('/collections/entries/{collection}', function () { return ''; })->name('entries.show');
 Route::get('/term.edit', function () { return ''; })->name('term.edit');
 Route::get('/account', function () { return ''; })->name('account');
-Route::get('/pages', function () { return ''; })->name('pages');
 Route::get('/collections', function () { return ''; })->name('collections');
 Route::get('/taxonomies', function () { return ''; })->name('taxonomies');
 Route::get('/assets', function () { return ''; })->name('assets');
