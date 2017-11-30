@@ -472,3 +472,18 @@ function collect_users($value = [])
 {
     return new \Statamic\Data\Users\UserCollection($value);
 }
+
+/**
+ * Check whether the nav link is active
+ *
+ * @param string $url
+ * @return string
+ */
+function nav_is($url)
+{
+    $url = URL::makeRelative($url);
+    $url = ltrim(URL::removeSiteRoot($url), '/');
+    $url = preg_replace('/^index\.php\//', '', $url);
+
+    return request()->is($url . '*');
+}

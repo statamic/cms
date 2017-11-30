@@ -183,7 +183,7 @@ class URL
      */
     public static function removeSiteRoot($url, $locale = null)
     {
-        return self::tidy('/' . Str::removeLeft($url, SITE_ROOT));
+        return self::tidy('/' . Str::removeLeft($url, site_root()));
     }
 
     /**

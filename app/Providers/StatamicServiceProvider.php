@@ -36,13 +36,13 @@ class StatamicServiceProvider extends AggregateServiceProvider
 
         ViewServiceProvider::class,
         AppServiceProvider::class,
-        AuthServiceProvider::class,
         CollectionsServiceProvider::class,
         DataServiceProvider::class,
         FilesystemServiceProvider::class,
         EventServiceProvider::class,
         RouteServiceProvider::class,
         StacheServiceProvider::class,
+        AuthServiceProvider::class,
         GlideServiceProvider::class,
         \Statamic\StaticCaching\ServiceProvider::class,
 

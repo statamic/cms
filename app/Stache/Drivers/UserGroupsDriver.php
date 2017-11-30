@@ -2,15 +2,21 @@
 
 namespace Statamic\Stache\Drivers;
 
-use Illuminate\Support\Collection;
 use Statamic\API\YAML;
+use Statamic\API\File;
 use Statamic\API\Folder;
+use Illuminate\Support\Collection;
 
 class UserGroupsDriver extends AbstractDriver
 {
     public function getFilesystemRoot()
     {
-        return 'site/settings/users';
+        return 'resources/users';
+    }
+
+    public function getFilesystem()
+    {
+        return File::disk();
     }
 
     /**
@@ -23,7 +29,7 @@ class UserGroupsDriver extends AbstractDriver
     {
         // We know it's only ever going to be one modified file, and it's groups.yaml
         $file = $modified->first();
-        $path = 'site/settings/users/groups.yaml';
+        $path = 'resources/users/groups.yaml';
 
         return collect(YAML::parse($file))->map(function ($data, $id) {
             $factory = app('Statamic\Contracts\Permissions\UserGroupFactory');

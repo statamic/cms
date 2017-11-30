@@ -18,6 +18,9 @@ class AppServiceProvider extends ServiceProvider
                 $this->app['config']["cache.stores.file"]['path']
             ));
         });
+
+        view()->composer('partials.nav-main', 'Statamic\Http\ViewComposers\NavigationComposer');
+
     }
 
     public function register()

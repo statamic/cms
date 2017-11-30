@@ -44,7 +44,7 @@
                         {!! inline_svg('statamic-logo') !!}
                         <span class="version" v-cloak>@{{ version }}</span>
                   </a>
-                  {{--  @include('partials.nav-main')  --}}
+                  @include('partials.nav-main')
             </nav>
 
             <div class="content @yield('content-class')">
