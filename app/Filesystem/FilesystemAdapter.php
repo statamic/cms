@@ -201,11 +201,13 @@ class FilesystemAdapter implements FilesystemInterface
 
     public function getFilesByType($folder, $extension, $recursive = false)
     {
-        $files = collect_files($this->getFiles($folder, $recursive));
-
         $extensions = Helper::ensureArray($extension);
 
-        return $files->filterByExtension($extensions)->all();
+        $files = $this->getFiles($folder, $recursive);
+
+        return collect($files)->filter(function ($file) use ($extensions) {
+            return in_array($this->extension($file), $extensions);
+        })->all();
     }
 
     public function getFilesByTypeRecursively($folder, $extension)
