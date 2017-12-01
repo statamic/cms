@@ -21,6 +21,22 @@ class Controller extends BaseController
         }
     }
 
+    /**
+     * Set the successful flash message
+     *
+     * @param string $message
+     * @param null   $text
+     * @return array
+     */
+    protected function success($message, $text = null)
+    {
+        session()->flash('success', $message);
+
+        if ($text) {
+            session()->flash('success_text', $text);
+        }
+    }
+
     protected function loadKeyVars()
     {
         $now = Carbon::now();
