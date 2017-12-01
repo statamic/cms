@@ -67,7 +67,7 @@
 
       <script>
             {{--  Statamic.translations = {!! $translations !!};  --}}
-            {{--  Statamic.permissions = '{!! $permissions !!}';  --}}
+            Statamic.permissions = '{!! $permissions !!}';
             Statamic.version = '{!! STATAMIC_VERSION !!}';
 
             @if(session()->has('success'))
