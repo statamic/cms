@@ -64,7 +64,7 @@ class FilesystemAdapter implements FilesystemInterface
     {
         $this->makeDirectory(pathinfo($path)['dirname']);
 
-        return $this->filesystem->put($this->normalizePath($path), $contents);
+        $this->filesystem->put($this->normalizePath($path), $contents);
     }
 
     public function delete($path)
