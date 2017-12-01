@@ -22,6 +22,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('duplicate', 'DuplicatePageController@store');
     });
 
+    Route::group(['prefix' => 'collections'], function () {
+        Route::get('get', 'CollectionsController@get')->name('collections.get');
+    });
+
     Route::group(['prefix' => 'fieldsets'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
         Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
@@ -56,6 +60,7 @@ Route::get('/addons', function () { return ''; })->name('addons');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
 Route::get('/collections.manage', function () { return ''; })->name('collections.manage');
+Route::get('/collection.edit', function () { return ''; })->name('collection.edit');
 Route::get('/taxonomies.manage', function () { return ''; })->name('taxonomies.manage');
 Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
 Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
