@@ -23,7 +23,20 @@ Route::group(['middleware' => 'auth'], function () {
     });
 
     Route::group(['prefix' => 'fieldsets'], function () {
+        Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
         Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
+
+        Route::group(['middleware' => 'configurable'], function () {
+            Route::get('/', 'FieldsetController@index')->name('fieldsets');
+            Route::get('/create', 'FieldsetController@create')->name('fieldset.create');
+            Route::post('/update-layout/{fieldset}', 'FieldsetController@updateLayout')->name('fieldset.update-layout');
+            Route::delete('delete', 'FieldsetController@delete')->name('fieldsets.delete');
+            Route::post('quick', 'FieldsetController@quickStore');
+            Route::get('/{fieldset}', 'FieldsetController@edit')->name('fieldset.edit');
+            Route::post('/{fieldset}', 'FieldsetController@update')->name('fieldset.update');
+            Route::post('/', 'FieldsetController@store')->name('fieldset.store');
+        });
+
     });
 });
 
