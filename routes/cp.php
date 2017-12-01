@@ -40,6 +40,20 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/{collection}', 'EntriesController@show')->name('entries.show');
     });
 
+    Route::group(['prefix' => 'taxonomies'], function () {
+        Route::get('/', 'TaxonomiesController@index')->name('taxonomies');
+        Route::get('get', 'TaxonomiesController@get')->name('taxonomies.get');
+    });
+
+    Route::group(['prefix' => 'taxonomies/terms'], function () {
+        Route::get('/', 'TaxonomyTermsController@index')->name('terms');
+        Route::delete('delete', 'TaxonomyTermsController@delete')->name('terms.delete');
+        Route::get('/{collection}/get', 'TaxonomyTermsController@get')->name('terms.get');
+        Route::get('/{collection}/create', 'PublishTaxonomyController@create')->name('term.create');
+        Route::get('/{collection}/{slug}', 'PublishTaxonomyController@edit')->name('term.edit');
+        Route::post('publish', 'PublishTaxonomyController@save')->name('taxonomy.save');
+        Route::get('/{collection}', 'TaxonomyTermsController@show')->name('terms.show');
+    });
 
     Route::group(['prefix' => 'fieldsets'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
@@ -60,9 +74,7 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 // Just to make stuff work.
-Route::get('/term.edit', function () { return ''; })->name('term.edit');
 Route::get('/account', function () { return ''; })->name('account');
-Route::get('/taxonomies', function () { return ''; })->name('taxonomies');
 Route::get('/assets', function () { return ''; })->name('assets');
 Route::get('/globals', function () { return ''; })->name('globals');
 Route::get('/forms', function () { return ''; })->name('forms');
@@ -74,6 +86,8 @@ Route::get('/assets.containers.manage', function () { return ''; })->name('asset
 Route::get('/collections.manage', function () { return ''; })->name('collections.manage');
 Route::get('/collection.edit', function () { return ''; })->name('collection.edit');
 Route::get('/taxonomies.manage', function () { return ''; })->name('taxonomies.manage');
+Route::get('/taxonomy.edit', function () { return ''; })->name('taxonomy.edit');
+Route::get('/taxonomy.create', function () { return ''; })->name('taxonomy.create');
 Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
 Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
 Route::get('/settings', function () { return ''; })->name('settings');

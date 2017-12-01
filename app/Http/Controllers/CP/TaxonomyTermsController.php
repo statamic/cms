@@ -86,20 +86,20 @@ class TaxonomyTermsController extends CpController
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $terms = $terms->slice($offset, $perPage);
-        $paginator = new LengthAwarePaginator($terms, $totalTermCount, $perPage, $currentPage);
+        // $paginator = new LengthAwarePaginator($terms, $totalTermCount, $perPage, $currentPage);
 
         return [
             'items' => $terms,
             'columns' => $columns,
-            'pagination' => [
-                'totalItems' => $totalTermCount,
-                'itemsPerPage' => $perPage,
-                'totalPages'    => $paginator->lastPage(),
-                'currentPage'   => $paginator->currentPage(),
-                'prevPage'      => $paginator->previousPageUrl(),
-                'nextPage'      => $paginator->nextPageUrl(),
-                'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
-            ]
+            // 'pagination' => [
+            //     'totalItems' => $totalTermCount,
+            //     'itemsPerPage' => $perPage,
+            //     'totalPages'    => $paginator->lastPage(),
+            //     'currentPage'   => $paginator->currentPage(),
+            //     'prevPage'      => $paginator->previousPageUrl(),
+            //     'nextPage'      => $paginator->nextPageUrl(),
+            //     'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
+            // ]
         ];
     }
 

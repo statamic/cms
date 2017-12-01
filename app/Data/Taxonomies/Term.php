@@ -371,7 +371,7 @@ class Term extends Content implements TermContract
 
         // Then the default content fieldset
         $fieldset = Config::get('theming.default_' . $this->contentType() . '_fieldset');
-        $path = settings_path('fieldsets/'.$fieldset.'.yaml');
+        $path = resource_path('fieldsets/'.$fieldset.'.yaml');
         if (File::exists($path)) {
             return Fieldset::get($fieldset);
         }
