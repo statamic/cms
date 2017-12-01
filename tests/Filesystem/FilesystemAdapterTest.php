@@ -22,7 +22,8 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
     /** @test */
     function gets_file_contents()
     {
-        $this->mock->shouldReceive('get')->with('/path/to/filename.txt', null)->andReturn('bar');
+        $this->mock->shouldReceive('exists')->with('/path/to/filename.txt')->andReturnTrue();
+        $this->mock->shouldReceive('get')->with('/path/to/filename.txt')->andReturn('bar');
 
         $this->assertEquals('bar', $this->adapter->get('filename.txt'));
     }
@@ -30,7 +31,7 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
     /** @test */
     function gets_fallback_if_file_doesnt_exist()
     {
-        $this->mock->shouldReceive('get')->with('/path/to/filename.txt', 'baz')->andReturn('baz');
+        $this->mock->shouldReceive('exists')->with('/path/to/filename.txt')->andReturnFalse();
 
         $this->assertEquals('baz', $this->adapter->get('filename.txt', 'baz'));
     }
@@ -46,6 +47,7 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
     /** @test */
     function puts_contents_into_a_file()
     {
+        $this->mock->shouldReceive('makeDirectory')->with('/path/to', 0755, true, true)->andReturnTrue();
         $this->mock->shouldReceive('put')->with('/path/to/filename.txt', 'bar')->andReturnTrue();
 
         $this->assertTrue($this->adapter->put('filename.txt', 'bar'));

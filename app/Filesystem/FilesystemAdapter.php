@@ -32,6 +32,10 @@ class FilesystemAdapter implements FilesystemInterface
             return $path;
         }
 
+        if ($path === '.') {
+            $path = '/';
+        }
+
         $str = Str::ensureLeft($path, $this->root);
 
         return Str::trimRight($str, '/');
@@ -44,11 +48,11 @@ class FilesystemAdapter implements FilesystemInterface
 
     public function get($path, $fallback = null)
     {
-        if (! $this->exists($path)) { // not under test
+        if (! $this->exists($path)) {
             return $fallback;
         }
 
-        return $this->filesystem->get($this->normalizePath($path), $fallback);
+        return $this->filesystem->get($this->normalizePath($path));
     }
 
     public function exists($path)
@@ -58,7 +62,7 @@ class FilesystemAdapter implements FilesystemInterface
 
     public function put($path, $contents)
     {
-        $this->makeDirectory(pathinfo($path)['dirname']); // not under test
+        $this->makeDirectory(pathinfo($path)['dirname']);
 
         return $this->filesystem->put($this->normalizePath($path), $contents);
     }
