@@ -15,94 +15,98 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->mock = Mockery::mock(Filesystem::class);
-        $this->adapter = new FilesystemAdapter($this->mock, '/path/to');
+        $this->tempDir = __DIR__.'/tmp';
+        mkdir($this->tempDir);
+
+        $this->adapter = new FilesystemAdapter(new Filesystem, $this->tempDir);
+    }
+
+    public function tearDown()
+    {
+        (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
     function gets_file_contents()
     {
-        $this->mock->shouldReceive('exists')->with('/path/to/filename.txt')->andReturnTrue();
-        $this->mock->shouldReceive('get')->with('/path/to/filename.txt')->andReturn('bar');
-
-        $this->assertEquals('bar', $this->adapter->get('filename.txt'));
+        file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
+        $this->assertEquals('Hello World', $this->adapter->get('filename.txt'));
     }
 
     /** @test */
     function gets_fallback_if_file_doesnt_exist()
     {
-        $this->mock->shouldReceive('exists')->with('/path/to/filename.txt')->andReturnFalse();
-
-        $this->assertEquals('baz', $this->adapter->get('filename.txt', 'baz'));
+        $this->assertEquals('Hello World', $this->adapter->get('filename.txt', 'Hello World'));
     }
 
     /** @test */
     function checks_if_file_exists()
     {
-        $this->mock->shouldReceive('exists')->with('/path/to/filename.txt')->andReturnTrue();
-
+        file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
         $this->assertTrue($this->adapter->exists('filename.txt'));
+        $this->assertFalse($this->adapter->exists('another.txt'));
     }
 
     /** @test */
     function puts_contents_into_a_file()
     {
-        $this->mock->shouldReceive('makeDirectory')->with('/path/to', 0755, true, true)->andReturnTrue();
-        $this->mock->shouldReceive('put')->with('/path/to/filename.txt', 'bar')->andReturnTrue();
-
-        $this->assertTrue($this->adapter->put('filename.txt', 'bar'));
+        $this->adapter->put('filename.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/filename.txt', 'Hello World');
     }
 
     /** @test */
     function deletes_files()
     {
-        $this->mock->shouldReceive('delete')->with('/path/to/filename.txt')->andReturnTrue();
-
-        $this->assertTrue($this->adapter->delete('filename.txt'));
+        file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
+        $this->adapter->delete('filename.txt');
+        $this->assertFileNotExists($this->tempDir.'/filename.txt');
     }
 
     /** @test */
     function copies_files()
     {
-        $this->mock->shouldReceive('copy')->with('/path/to/src.txt', '/path/to/dest.txt')->andReturnTrue();
-
+        file_put_contents($this->tempDir.'/src.txt', 'Hello World');
         $this->assertTrue($this->adapter->copy('src.txt', 'dest.txt'));
+        $this->assertFileExists($this->tempDir.'/dest.txt');
+        $this->assertFileExists($this->tempDir.'/src.txt');
     }
 
     /** @test */
     function copies_files_and_overwrites()
     {
-        $this->mock->shouldReceive('exists')->with('/path/to/dest.txt')->andReturnTrue();
-        $this->mock->shouldReceive('delete')->with('/path/to/dest.txt')->andReturnTrue();
-        $this->mock->shouldReceive('copy')->with('/path/to/src.txt', '/path/to/dest.txt')->andReturnTrue();
-
+        file_put_contents($this->tempDir.'/src.txt', 'Hello World');
+        file_put_contents($this->tempDir.'/dest.txt', 'Existing Content');
         $this->assertTrue($this->adapter->copy('src.txt', 'dest.txt'));
+        $this->assertStringEqualsFile($this->tempDir.'/src.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
     }
 
     /** @test */
     function moves_files()
     {
-        $this->mock->shouldReceive('move')->with('/path/to/src.txt', '/path/to/dest.txt')->andReturnTrue();
-
+        file_put_contents($this->tempDir.'/src.txt', 'Hello World');
         $this->assertTrue($this->adapter->move('src.txt', 'dest.txt'));
+        $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
+        $this->assertFileNotExists($this->tempDir.'/src.txt');
     }
 
     /** @test */
     function moves_files_and_overwrites()
     {
-        $this->mock->shouldReceive('exists')->with('/path/to/dest.txt')->andReturnTrue();
-        $this->mock->shouldReceive('delete')->with('/path/to/dest.txt')->andReturnTrue();
-        $this->mock->shouldReceive('move')->with('/path/to/src.txt', '/path/to/dest.txt')->andReturnTrue();
-
+        file_put_contents($this->tempDir.'/src.txt', 'Hello World');
+        file_put_contents($this->tempDir.'/dest.txt', 'Existing Content');
         $this->assertTrue($this->adapter->move('src.txt', 'dest.txt'));
+        $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
+        $this->assertFileNotExists($this->tempDir.'/src.txt');
     }
 
     /** @test */
     function renames_a_file()
     {
-        $this->mock->shouldReceive('move')->with('/path/to/src.txt', '/path/to/dest.txt')->andReturnTrue();
-
+        file_put_contents($this->tempDir.'/src.txt', 'Hello World');
         $this->assertTrue($this->adapter->rename('src.txt', 'dest.txt'));
+        $this->assertFileNotExists($this->tempDir.'/src.txt');
+        $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
     }
 
     /** @test */
@@ -114,34 +118,29 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
     /** @test */
     function gets_mime_type()
     {
-        $this->mock->shouldReceive('mimeType')->with('/path/to/test.json')->andReturn('application/json');
-
-        $this->assertEquals('application/json', $this->adapter->mimeType('test.json'));
+        file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
+        $this->assertEquals('text/plain', $this->adapter->mimeType('filename.txt'));
     }
 
     /** @test */
     function gets_last_modified()
     {
-        $this->mock->shouldReceive('lastModified')->with('/path/to/filename.txt')->andReturn(12345);
-
-        $this->assertEquals(12345, $this->adapter->lastModified('filename.txt'));
+        file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
+        touch($this->tempDir.'/filename.txt', $time = 1512160249);
+        $this->assertEquals($time, $this->adapter->lastModified('filename.txt'));
     }
 
     /** @test */
     function gets_file_size()
     {
-        $this->mock->shouldReceive('size')->with('/path/to/filename.txt')->andReturn(5678);
-
-        $this->assertEquals(5678, $this->adapter->size('filename.txt'));
+        file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
+        $this->assertEquals(11, $this->adapter->size('filename.txt'));
     }
 
     /** @test */
     function gets_file_size_for_humans()
     {
-        // $this->mock->shouldReceive('size')->with('/path/to/filename.txt')->andReturn(10270);
-        // Str::shouldReceive('fileSizeForHumans')->andReturn('10 MB');
-
-        // $this->assertEquals('10 MB', $this->adapter->sizeHuman('filename.txt'));
+        // todo
     }
 
     /** @test */
@@ -161,8 +160,197 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
     /** @test */
     function makes_a_directory()
     {
-        $this->mock->shouldReceive('makeDirectory')->with('/path/to/directory', 0755, true, true)->andReturnTrue();
-
         $this->assertTrue($this->adapter->makeDirectory('directory'));
+        $this->assertDirectoryExists($this->tempDir.'/directory');
+    }
+
+    /** @test */
+    function gets_files_from_a_directory()
+    {
+        mkdir($this->tempDir.'/sub/sub', 0755, true);
+        file_put_contents($this->tempDir.'/one.txt', '');
+        file_put_contents($this->tempDir.'/sub/two.txt', '');
+        file_put_contents($this->tempDir.'/sub/three.txt', '');
+        file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
+
+        $this->assertArraysHaveSameValues(
+            ['sub/two.txt', 'sub/three.txt'],
+            $this->adapter->getFiles('sub')
+        );
+
+        $this->assertEquals([], $this->adapter->getFiles('non-existent-directory'));
+    }
+
+    /** @test */
+    function gets_files_from_a_directory_recursively()
+    {
+        mkdir($this->tempDir.'/sub/sub', 0755, true);
+        file_put_contents($this->tempDir.'/one.txt', '');
+        file_put_contents($this->tempDir.'/sub/two.txt', '');
+        file_put_contents($this->tempDir.'/sub/three.txt', '');
+        file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
+
+        $expected = ['sub/two.txt', 'sub/three.txt', 'sub/sub/four.txt'];
+        $this->assertArraysHaveSameValues($expected, $this->adapter->getFiles('sub', true));
+        $this->assertArraysHaveSameValues($expected, $this->adapter->getFilesRecursively('sub'));
+    }
+
+    /** @test */
+    function gets_files_recursively_with_directory_exceptions()
+    {
+        mkdir($this->tempDir.'/sub/sub', 0755, true);
+        mkdir($this->tempDir.'/sub/exclude', 0755, true);
+        file_put_contents($this->tempDir.'/one.txt', '');
+        file_put_contents($this->tempDir.'/sub/two.txt', '');
+        file_put_contents($this->tempDir.'/sub/three.txt', '');
+        file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
+        file_put_contents($this->tempDir.'/sub/exclude/five.txt', '');
+
+        $this->assertArraysHaveSameValues(
+            ['sub/two.txt', 'sub/three.txt', 'sub/sub/four.txt'],
+            $this->adapter->getFilesRecursivelyExcept('sub', ['exclude'])
+        );
+    }
+
+    /** @test */
+    function gets_folders()
+    {
+        mkdir($this->tempDir.'/foo');
+        mkdir($this->tempDir.'/foo/bar');
+        mkdir($this->tempDir.'/foo/baz');
+        mkdir($this->tempDir.'/foo/bar/qux');
+        mkdir($this->tempDir.'/baz');
+        mkdir($this->tempDir.'/baz/foo');
+
+        $this->assertArraysHaveSameValues(
+            ['foo/bar', 'foo/baz'],
+            $this->adapter->getFolders('foo')
+        );
+    }
+
+    /** @test */
+    function gets_folders_recursively()
+    {
+        mkdir($this->tempDir.'/foo');
+        mkdir($this->tempDir.'/foo/bar');
+        mkdir($this->tempDir.'/foo/baz');
+        mkdir($this->tempDir.'/foo/bar/qux');
+        mkdir($this->tempDir.'/baz');
+        mkdir($this->tempDir.'/baz/foo');
+
+        $this->assertArraysHaveSameValues(
+            ['foo/bar', 'foo/baz', 'foo/bar/qux'],
+            $this->adapter->getFoldersRecursively('foo')
+        );
+    }
+
+    /** @test */
+    function gets_files_by_type()
+    {
+        mkdir($this->tempDir.'/docs');
+        file_put_contents($this->tempDir.'/image.jpg', '');
+        file_put_contents($this->tempDir.'/image2.jpg', '');
+        file_put_contents($this->tempDir.'/text.txt', '');
+        file_put_contents($this->tempDir.'/docs/word.doc', '');
+        file_put_contents($this->tempDir.'/docs/test.pdf', '');
+        file_put_contents($this->tempDir.'/docs/photo.jpg', '');
+
+        $this->assertArraysHaveSameValues(
+            ['image.jpg', 'image2.jpg'],
+            $this->adapter->getFilesByType('/', 'jpg')
+        );
+
+        $this->assertArraysHaveSameValues(
+            ['docs/test.pdf'],
+            $this->adapter->getFilesByType('docs', 'pdf')
+        );
+
+        $this->assertArraysHaveSameValues(
+             ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
+            $this->adapter->getFilesByType('/', 'jpg', true)
+        );
+
+        $this->assertArraysHaveSameValues(
+             ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
+            $this->adapter->getFilesByTypeRecursively('/', 'jpg')
+        );
+    }
+
+    /** @test */
+    function checks_for_empty_directories()
+    {
+        mkdir($this->tempDir.'/empty');
+        mkdir($this->tempDir.'/full');
+        file_put_contents($this->tempDir.'/full/filename.txt', '');
+        $this->assertTrue($this->adapter->isEmpty('empty'));
+        $this->assertFalse($this->adapter->isEmpty('full'));
+    }
+
+    /** @test */
+    function checks_for_directories()
+    {
+        mkdir($this->tempDir.'/directory');
+        file_put_contents($this->tempDir.'/filename.txt', '');
+        $this->assertTrue($this->adapter->isDirectory('directory'));
+        $this->assertFalse($this->adapter->isDirectory('filename.txt'));
+    }
+
+    /** @test */
+    function copies_directories()
+    {
+        mkdir($this->tempDir.'/src');
+        file_put_contents($this->tempDir.'/src/one.txt', 'One');
+        file_put_contents($this->tempDir.'/src/two.txt', 'Two');
+
+        $this->adapter->copyDirectory('src', 'dest');
+
+        $this->assertStringEqualsFile($this->tempDir.'/src/one.txt', 'One');
+        $this->assertStringEqualsFile($this->tempDir.'/src/two.txt', 'Two');
+        $this->assertStringEqualsFile($this->tempDir.'/dest/one.txt', 'One');
+        $this->assertStringEqualsFile($this->tempDir.'/dest/two.txt', 'Two');
+    }
+
+    /** @test */
+    function moves_directories()
+    {
+        mkdir($this->tempDir.'/src');
+        file_put_contents($this->tempDir.'/src/one.txt', 'One');
+        file_put_contents($this->tempDir.'/src/two.txt', 'Two');
+
+        $this->adapter->moveDirectory('src', 'dest');
+
+        $this->assertFileNotExists($this->tempDir.'/src/one.txt');
+        $this->assertFileNotExists($this->tempDir.'/src/two.txt');
+        $this->assertStringEqualsFile($this->tempDir.'/dest/one.txt', 'One');
+        $this->assertStringEqualsFile($this->tempDir.'/dest/two.txt', 'Two');
+    }
+
+    /** @test */
+    function deletes_empty_subdirectories()
+    {
+        mkdir($this->tempDir.'/one/two', 0755, true);
+        mkdir($this->tempDir.'/three/four', 0755, true);
+        mkdir($this->tempDir.'/three/five/six', 0755, true);
+        file_put_contents($this->tempDir.'/one/two/file.txt', '');
+        file_put_contents($this->tempDir.'/three/file.txt', '');
+
+        $this->adapter->deleteEmptySubfolders('/');
+
+        $this->assertDirectoryExists($this->tempDir.'/one');
+        $this->assertDirectoryExists($this->tempDir.'/one/two');
+        $this->assertDirectoryExists($this->tempDir.'/three');
+        $this->assertDirectoryNotExists($this->tempDir.'/three/four');
+        $this->assertDirectoryNotExists($this->tempDir.'/three/five');
+        $this->assertDirectoryNotExists($this->tempDir.'/three/five/six');
+    }
+
+    /**
+     * Assert that two arrays have the same values but not necessarily in the same order.
+     */
+    private function assertArraysHaveSameValues($expected, $actual)
+    {
+        sort($expected);
+        sort($actual);
+        $this->assertEquals($expected, $actual);
     }
 }
