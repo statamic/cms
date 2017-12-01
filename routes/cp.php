@@ -22,7 +22,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('duplicate', 'DuplicatePageController@store');
     });
 
-
+    Route::group(['prefix' => 'fieldsets'], function () {
+        Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
+    });
 });
 
 // Just to make stuff work.
