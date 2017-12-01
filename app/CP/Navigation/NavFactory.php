@@ -37,10 +37,10 @@ class NavFactory
 
     private function buildContentNav()
     {
-        $nav = $this->item('content')->title(t('nav_content'));
+        $nav = $this->item('content')->title(__('Content'));
 
         if ($this->access('pages:edit')) {
-            $nav->add($this->item('pages')->route('pages')->title(t('nav_pages')));
+            $nav->add($this->item('pages')->route('pages')->title(__('Pages')));
         }
 
         if ($this->access('collections:*:edit')) {
@@ -57,7 +57,7 @@ class NavFactory
 
         if ($this->access('assets:*:edit')) {
             if (! AssetContainer::all()->isEmpty()) {
-                $nav->add($this->item('assets')->route('assets')->title(t('nav_assets')));
+                $nav->add($this->item('assets')->route('assets')->title(__('Assets')));
             }
         }
 
@@ -82,7 +82,7 @@ class NavFactory
             return $this->item('collections')->route('collections')->title($collections->first()->title());
         }
 
-        $nav = $this->item('collections')->route('collections')->title(t('nav_collections'));
+        $nav = $this->item('collections')->route('collections')->title(__('Collections'));
 
         foreach ($collections as $slug => $collection) {
             $nav->add(
@@ -97,7 +97,7 @@ class NavFactory
 
     private function buildTaxonomiesNav()
     {
-        $nav = $this->item('taxonomies')->route('taxonomies')->title(t('nav_taxonomies'));
+        $nav = $this->item('taxonomies')->route('taxonomies')->title(__('Taxonomies'));
 
         $taxonomies = collect(Taxonomy::all())->filter(function ($taxonomy) {
             return $this->access("taxonomies:{$taxonomy->path()}:edit");
@@ -124,7 +124,7 @@ class NavFactory
 
     private function buildGlobalsNav()
     {
-        $nav = $this->item('globals')->route('globals')->title(t('nav_globals'));
+        $nav = $this->item('globals')->route('globals')->title(__('Globals'));
 
         $globals = GlobalSet::all()->filter(function ($set) {
             return $this->access("globals:{$set->slug()}:edit");
@@ -145,10 +145,10 @@ class NavFactory
 
     private function buildToolsNav()
     {
-        $nav = $this->item('tools')->title(t('nav_tools'));
+        $nav = $this->item('tools')->title(__('Tools'));
 
         if ($this->access('forms')) {
-            $nav->add($this->item('forms')->route('forms')->title(t('nav_forms')));
+            $nav->add($this->item('forms')->route('forms')->title(_('Forms')));
         }
 
         if ($this->access('updater')) {
@@ -157,13 +157,13 @@ class NavFactory
             $nav->add(
                 $this->item('updater')
                      ->route('updater')
-                     ->title(t('nav_updater'))
+                     ->title(__('Updater'))
                      ->badge($updates)
             );
         }
 
         if ($this->access('importer')) {
-            $nav->add($this->item('import')->route('import')->title(t('nav_import')));
+            $nav->add($this->item('import')->route('import')->title(__('Import')));
         }
 
         $duplicates = app('stache')->duplicates();
@@ -171,7 +171,7 @@ class NavFactory
             $nav->add(
                 $this->item('resolve_duplicates')
                      ->route('resolve-duplicate-ids')
-                     ->title(t('nav_resolve_duplicate_ids'))
+                     ->title(__('Duplicate IDs'))
                      ->badge($duplicates->count())
             );
         }
@@ -181,12 +181,12 @@ class NavFactory
 
     private function buildConfigureNav()
     {
-        $nav = $this->item('configure')->title(t('nav_configure'));
+        $nav = $this->item('configure')->title(__('Configure'));
 
         if ($this->access('super')) {
-            $nav->add($this->item('addons')->route('addons')->title(t('nav_addons')));
+            $nav->add($this->item('addons')->route('addons')->title(__('Addons')));
             $nav->add($this->buildConfigureContentNav());
-            $nav->add($this->item('fieldsets')->route('fieldsets')->title(t('nav_fieldsets')));
+            $nav->add($this->item('fieldsets')->route('fieldsets')->title(__('Fieldsets')));
             $nav->add($this->buildConfigureSettingsNav());
         }
 
@@ -199,19 +199,19 @@ class NavFactory
 
     private function buildConfigureContentNav()
     {
-        $nav = $this->item('config-content')->route('content')->title(t('nav_content'));
+        $nav = $this->item('config-content')->route('content')->title(__('Content'));
 
-        $nav->add($this->item('assets')->route('assets.containers.manage')->title(t('nav_assets')));
-        $nav->add($this->item('collections')->route('collections.manage')->title(t('nav_collections')));
-        $nav->add($this->item('taxonomies')->route('taxonomies.manage')->title(t('nav_taxonomies')));
-        $nav->add($this->item('globals')->route('globals.manage')->title(t('nav_globals')));
+        $nav->add($this->item('assets')->route('assets.containers.manage')->title(__('Assets')));
+        $nav->add($this->item('collections')->route('collections.manage')->title(__('Collections')));
+        $nav->add($this->item('taxonomies')->route('taxonomies.manage')->title(__('Taxonomies')));
+        $nav->add($this->item('globals')->route('globals.manage')->title(__('Globals')));
 
         return $nav;
     }
 
     private function buildConfigureSettingsNav()
     {
-        $nav = $this->item('settings')->route('settings')->title(t('nav_settings'));
+        $nav = $this->item('settings')->route('settings')->title(__('Settings'));
 
         $sections = collect(Folder::getFilesByType(statamic_path('settings/defaults'), 'yaml'))
             ->map(function ($file) {
@@ -226,7 +226,7 @@ class NavFactory
                 $this
                     ->item($section)
                     ->route('settings.edit', $section)
-                    ->title(t("settings_$section"))
+                    ->title(__($section))
             );
         }
 
@@ -235,11 +235,11 @@ class NavFactory
 
     private function buildUsersNav()
     {
-        $nav = $this->item('users')->route('users')->title(t('nav_users'));
+        $nav = $this->item('users')->route('users')->title(__('Users'));
 
         if ($this->access('super')) {
-            $nav->add($this->item('user-groups')->route('user.groups')->title(t('nav_user-groups')));
-            $nav->add($this->item('user-roles')->route('user.roles')->title(t('nav_user-roles')));
+            $nav->add($this->item('user-groups')->route('user.groups')->title(__('User Groups')));
+            $nav->add($this->item('user-roles')->route('user.roles')->title(__('User Roles')));
         }
 
         return $nav;

@@ -30,7 +30,7 @@ class CollectionWidget extends Widget
         $button = array_get(
                 $collection->fieldset()->contents(),
                 'create_title',
-                t('create_entry', ['noun' => $collection->fieldset()->title()])
+                __('New :thing', ['thing' => $collection->fieldset()->title()])
         );
 
         return $this->view('widget', compact('collection', 'entries', 'title', 'format', 'button'));

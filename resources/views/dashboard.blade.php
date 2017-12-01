@@ -3,8 +3,8 @@
 
 @section('content')
     <div class="flexy mb-24">
-        <h1 class="fill">{{ t('dashboard') }}</h1>
-        <a href="{{ route('settings.edit', 'cp')}}" class="btn btn-white">{{ t('manage_widgets') }}</a>
+        <h1 class="fill">{{ __('Dashboard') }}</h1>
+        <a href="{{ route('settings.edit', 'cp')}}" class="btn btn-white">{{ _('Manage Widgets') }}</a>
     </div>
 
     <div class="widgets">
