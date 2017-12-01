@@ -17,7 +17,7 @@ class UserPublisher extends Publisher
      */
     protected function prepare()
     {
-        $this->login_type = Config::get('users.login_type');
+        $this->login_type = Config::get('auth.login_type', 'username');
 
         $username = array_get($this->fields, 'username');
         $email = array_get($this->fields, 'email');
