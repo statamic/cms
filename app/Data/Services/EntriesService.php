@@ -58,7 +58,7 @@ class EntriesService extends AbstractService
             ? $this->collection($collection)
             : $this->repo()->getItems();
 
-        return $items->first(function ($id, $entry) use ($slug, $collection) {
+        return $items->first(function ($entry, $id) use ($slug, $collection) {
             return $entry->slug() === $slug;
         });
     }
