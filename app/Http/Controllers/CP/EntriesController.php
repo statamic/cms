@@ -148,7 +148,7 @@ class EntriesController extends CpController
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $entries = $entries->slice($offset, $perPage);
-        $paginator = new LengthAwarePaginator($entries, $totalEntryCount, $perPage, $currentPage);
+        // $paginator = new LengthAwarePaginator($entries, $totalEntryCount, $perPage, $currentPage);
 
         $items = $entries->toArray();
 
@@ -162,15 +162,15 @@ class EntriesController extends CpController
         return [
             'columns' => $columns,
             'items' => $items,
-            'pagination' => [
-                'totalItems' => $totalEntryCount,
-                'itemsPerPage' => $perPage,
-                'totalPages'    => $paginator->lastPage(),
-                'currentPage'   => $paginator->currentPage(),
-                'prevPage'      => $paginator->previousPageUrl(),
-                'nextPage'      => $paginator->nextPageUrl(),
-                'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
-            ]
+            // 'pagination' => [
+            //     'totalItems' => $totalEntryCount,
+            //     'itemsPerPage' => $perPage,
+            //     'totalPages'    => $paginator->lastPage(),
+            //     'currentPage'   => $paginator->currentPage(),
+            //     'prevPage'      => $paginator->previousPageUrl(),
+            //     'nextPage'      => $paginator->nextPageUrl(),
+            //     'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
+            // ]
         ];
     }
 
