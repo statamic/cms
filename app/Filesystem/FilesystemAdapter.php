@@ -143,8 +143,6 @@ class FilesystemAdapter implements FilesystemInterface
         return $this->filesystem->makeDirectory($this->normalizePath($path), 0755, true, true);
     }
 
-    // --- untested ---
-
     public function getFiles($path, $recursive = false)
     {
         $method = $recursive ? 'allFiles' : 'files';
