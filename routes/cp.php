@@ -97,6 +97,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('{username}/send-reset-email', 'UsersController@sendResetEmail');
     });
 
+    Route::get('system/templates/get', 'CpController@templates');
 
     Route::group(['prefix' => 'fieldsets'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
