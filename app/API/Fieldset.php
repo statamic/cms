@@ -78,7 +78,7 @@ class Fieldset
         $path = $fieldset->path();
         if (! File::exists($path)) {
             // Then the default fallbacks
-            $path = "statamic/settings/defaults/fieldsets/{$name}.yaml";
+            $path = statamic_path("defaults/fieldsets/{$name}.yaml");
 
             if (! File::exists($path)) {
                 throw new FileNotFoundException("Fieldset [$name] doesn't exist.");
@@ -113,7 +113,7 @@ class Fieldset
     public static function all($type = 'default')
     {
         $fieldsets = [];
-        $files = collect_files(Folder::getFiles(settings_path('fieldsets')))->removeHidden()->all();
+        $files = collect_files(Folder::getFiles(resource_path('fieldsets')))->removeHidden()->all();
 
         foreach ($files as $path) {
             $filename = pathinfo($path)['filename'];
