@@ -68,7 +68,7 @@ class PasswordReset
 
         $this->user->save();
 
-        $url = $this->base_url ?: EVENT_ROUTE.'/user/reset';
+        $url = $this->base_url ?: event_route().'/user/reset';
         $url .= "?user={$this->user->id()}&code={$code}";
 
         return URL::makeAbsolute(URL::prependSiteUrl($url));
