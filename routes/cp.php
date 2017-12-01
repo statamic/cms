@@ -23,8 +23,23 @@ Route::group(['middleware' => 'auth'], function () {
     });
 
     Route::group(['prefix' => 'collections'], function () {
+        Route::get('/', 'CollectionsController@index')->name('collections');
         Route::get('get', 'CollectionsController@get')->name('collections.get');
     });
+
+    Route::group(['prefix' => 'collections/entries'], function () {
+        Route::get('/', 'EntriesController@index')->name('entries');
+        Route::delete('delete', 'EntriesController@delete')->name('entries.delete');
+        Route::get('/{collection}/get', 'EntriesController@get')->name('entries.get');
+        Route::get('/{collection}/search', 'EntriesSearchController@search')->name('entries.search');
+        Route::post('reorder', 'EntriesController@reorder')->name('entries.reorder');
+        Route::get('/{collection}/create', 'PublishEntryController@create')->name('entry.create');
+        Route::post('/{collection}/duplicate', 'DuplicateEntryController@store')->name('entry.duplicate');
+        Route::get('/{collection}/{slug}', ['uses' => 'PublishEntryController@edit', 'as' => 'entry.edit']);
+        Route::post('publish', 'PublishEntryController@save')->name('entry.save');
+        Route::get('/{collection}', 'EntriesController@show')->name('entries.show');
+    });
+
 
     Route::group(['prefix' => 'fieldsets'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
@@ -45,11 +60,8 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 // Just to make stuff work.
-Route::get('/entry-edit', function () { return ''; })->name('entry.edit');
-Route::get('/collections/entries/{collection}', function () { return ''; })->name('entries.show');
 Route::get('/term.edit', function () { return ''; })->name('term.edit');
 Route::get('/account', function () { return ''; })->name('account');
-Route::get('/collections', function () { return ''; })->name('collections');
 Route::get('/taxonomies', function () { return ''; })->name('taxonomies');
 Route::get('/assets', function () { return ''; })->name('assets');
 Route::get('/globals', function () { return ''; })->name('globals');
@@ -69,6 +81,5 @@ Route::get('/users', function () { return ''; })->name('users');
 Route::get('/user.groups', function () { return ''; })->name('user.groups');
 Route::get('/user.roles', function () { return ''; })->name('user.roles');
 Route::get('/settings.edit', function () { return ''; })->name('settings.edit');
-Route::get('/entry.create', function () { return ''; })->name('entry.create');
 Route::get('/form.show', function () { return ''; })->name('form.show');
 
