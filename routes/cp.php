@@ -55,6 +55,13 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/{collection}', 'TaxonomyTermsController@show')->name('terms.show');
     });
 
+    Route::group(['prefix' => 'globals'], function () {
+        Route::get('/', 'GlobalsController@index')->name('globals');
+        Route::get('get', 'GlobalsController@get')->name('globals.get');
+        Route::get('{slug}', ['uses' => 'PublishGlobalController@edit', 'as' => 'globals.edit']);
+        Route::post('publish', 'PublishGlobalController@save')->name('global.save');
+    });
+
     Route::group(['prefix' => 'fieldsets'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
         Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
@@ -76,7 +83,6 @@ Route::group(['middleware' => 'auth'], function () {
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');
 Route::get('/assets', function () { return ''; })->name('assets');
-Route::get('/globals', function () { return ''; })->name('globals');
 Route::get('/forms', function () { return ''; })->name('forms');
 Route::get('/updater', function () { return ''; })->name('updater');
 Route::get('/import', function () { return ''; })->name('import');
