@@ -62,6 +62,42 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('publish', 'PublishGlobalController@save')->name('global.save');
     });
 
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('account', 'UsersController@account')->name('account');
+        Route::get('/', 'UsersController@index')->name('users');
+        Route::get('get', 'UsersController@get')->name('users.get');
+        Route::get('create', 'UsersController@create')->name('user.create');
+        Route::delete('delete', 'UsersController@delete')->name('users.delete');
+        Route::post('publish', 'PublishUserController@save')->name('user.save');
+
+        Route::group(['prefix' => 'roles'], function () {
+            Route::get('/', 'RolesController@index')->name('user.roles');
+            Route::get('get', 'RolesController@get')->name('user.roles.get');
+            Route::get('create', 'RolesController@create')->name('user.role.create');
+            Route::post('/', 'RolesController@store')->name('user.role.store');
+            Route::delete('delete', 'RolesController@delete')->name('user.roles.delete');
+            Route::get('roles', 'RolesController@getRoles');
+            Route::get('{role}', 'RolesController@edit')->name('user.role');
+            Route::post('{role}', 'RolesController@update')->name('user.role');
+        });
+
+        Route::group(['prefix' => 'groups'], function () {
+            Route::get('/', 'UserGroupsController@index')->name('user.groups');
+            Route::get('get', 'UserGroupsController@get')->name('user.groups.get');
+            Route::get('create', 'UserGroupsController@create')->name('user.group.create');
+            Route::post('/', 'UserGroupsController@store')->name('user.group.store');
+            Route::delete('delete', 'UserGroupsController@delete')->name('user.groups.delete');
+            Route::get('groups', 'UserGroupsController@getGroups');
+            Route::get('{group}', 'UserGroupsController@edit')->name('user.group');
+            Route::post('{group}', 'UserGroupsController@update')->name('user.group');
+        });
+
+        Route::get('{username}', ['uses' => 'UsersController@edit', 'as' => 'user.edit']);
+        Route::get('{username}/reset-url', 'UsersController@getResetUrl');
+        Route::get('{username}/send-reset-email', 'UsersController@sendResetEmail');
+    });
+
+
     Route::group(['prefix' => 'fieldsets'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
         Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
@@ -97,9 +133,6 @@ Route::get('/taxonomy.create', function () { return ''; })->name('taxonomy.creat
 Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
 Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
 Route::get('/settings', function () { return ''; })->name('settings');
-Route::get('/users', function () { return ''; })->name('users');
-Route::get('/user.groups', function () { return ''; })->name('user.groups');
-Route::get('/user.roles', function () { return ''; })->name('user.roles');
 Route::get('/settings.edit', function () { return ''; })->name('settings.edit');
 Route::get('/form.show', function () { return ''; })->name('form.show');
 
