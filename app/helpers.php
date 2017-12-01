@@ -487,3 +487,18 @@ function nav_is($url)
 
     return request()->is($url . '*');
 }
+
+function format_input_options($options)
+{
+    $formatted_options = [];
+
+    foreach ($options as $key => $text) {
+        if ($options === array_values($options)) {
+            $formatted_options[] = ['value' => $text, 'text' => $text];
+        } else {
+            $formatted_options[] = ['value' => $key, 'text' => $text];
+        }
+    }
+
+    return $formatted_options;
+}
