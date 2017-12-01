@@ -256,7 +256,7 @@ class UserGroup implements UserGroupContract
      */
     public function save()
     {
-        $path = settings_path('users/groups.yaml');
+        $path = resource_path('users/groups.yaml');
 
         $groups = YAML::parse(File::get($path));
 
@@ -311,7 +311,7 @@ class UserGroup implements UserGroupContract
      */
     public function delete()
     {
-        $path = settings_path('users/groups.yaml');
+        $path = resource_path('users/groups.yaml');
 
         $groups = YAML::parse(File::get($path));
 
