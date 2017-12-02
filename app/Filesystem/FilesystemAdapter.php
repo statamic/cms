@@ -3,12 +3,10 @@
 namespace Statamic\Filesystem;
 
 use Statamic\API\Str;
-use Statamic\API\Helper;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Filesystem\Filesystem as FilesystemInterface;
 
-class FilesystemAdapter implements FilesystemInterface
+class FilesystemAdapter extends AbstractAdapter
 {
     protected $root;
     protected $filesystem;
@@ -26,7 +24,7 @@ class FilesystemAdapter implements FilesystemInterface
         return $this;
     }
 
-    private function normalizePath($path)
+    protected function normalizePath($path)
     {
         if ($path !== '/' && Str::startsWith($path, '/')) {
             return $path;
@@ -41,106 +39,9 @@ class FilesystemAdapter implements FilesystemInterface
         return Str::trimRight($str, '/');
     }
 
-    private function relativePath($path)
+    public function isDirectory($path)
     {
-        return Str::removeLeft($path, $this->root);
-    }
-
-    public function get($path, $fallback = null)
-    {
-        if (! $this->exists($path)) {
-            return $fallback;
-        }
-
-        return $this->filesystem->get($this->normalizePath($path));
-    }
-
-    public function exists($path)
-    {
-        return $this->filesystem->exists($this->normalizePath($path));
-    }
-
-    public function put($path, $contents)
-    {
-        $this->makeDirectory(pathinfo($path)['dirname']);
-
-        $this->filesystem->put($this->normalizePath($path), $contents);
-    }
-
-    public function delete($path)
-    {
-        $path = $this->normalizePath($path);
-
-        if ($this->isDirectory($path)) { // not under test
-            return $this->filesystem->deleteDirectory($path);
-        }
-
-        return $this->filesystem->delete($path);
-    }
-
-    public function copy($src, $dest, $overwrite = false)
-    {
-        if ($this->isDirectory($src)) { // not under test
-            return $this->copyDirectory($src, $dest, $overwrite);
-        }
-
-        if ($overwrite && $this->exists($dest)) {
-            $this->delete($dest);
-        }
-
-        return $this->filesystem->copy($this->normalizePath($src), $this->normalizePath($dest));
-    }
-
-
-    public function move($src, $dest, $overwrite = false)
-    {
-        if ($this->isDirectory($src)) { // not under test
-            return $this->moveDirectory($src, $dest, $overwrite);
-        }
-
-        if ($overwrite && $this->exists($dest)) {
-            $this->delete($dest);
-        }
-
-        return $this->filesystem->move($this->normalizePath($src), $this->normalizePath($dest));
-    }
-
-    public function rename($old, $new)
-    {
-        return $this->move($old, $new);
-    }
-
-    public function extension($path)
-    {
-        return pathinfo($path, PATHINFO_EXTENSION);
-    }
-
-    public function mimeType($path)
-    {
-        return $this->filesystem->mimeType($this->normalizePath($path));
-    }
-
-    public function lastModified($path)
-    {
-        return $this->filesystem->lastModified($this->normalizePath($path));
-    }
-
-    public function size($file)
-    {
-        return $this->filesystem->size($this->normalizePath($file));
-    }
-
-    public function isImage($path)
-    {
-        return in_array(
-            strtolower($this->extension($path)),
-            ['jpg', 'jpeg', 'png', 'gif']
-        );
-    }
-
-    public function makeDirectory($path)
-    {
-        return $this->filesystem->makeDirectory($this->normalizePath($path), 0755, true, true);
+        return $this->filesystem->isDirectory($this->normalizePath($path));
     }
 
     public function getFiles($path, $recursive = false)
@@ -158,28 +59,6 @@ class FilesystemAdapter implements FilesystemInterface
         })->all();
     }
 
-    public function getFilesRecursively($path)
-    {
-        return $this->getFiles($path, true);
-    }
-
-    public function getFilesRecursivelyExcept($path, $exclude = [])
-    {
-        $files = collect($this->getFiles($path));
-        $folders = $this->getFolders($path);
-
-        foreach ($folders as $folder) {
-            $fn = pathinfo($folder)['filename'];
-            if (in_array($fn, $exclude)) {
-                continue;
-            }
-
-            $files = $files->merge($this->getFilesRecursively($folder));
-        }
-
-        return $files->all();
-    }
-
     public function getFolders($path, $recursive = false)
     {
         $finder = Finder::create()
@@ -192,39 +71,6 @@ class FilesystemAdapter implements FilesystemInterface
         })->values()->all();
     }
 
-    public function getFoldersRecursively($folder)
-    {
-        return $this->getFolders($folder, true);
-    }
-
-    public function getFilesByType($folder, $extension, $recursive = false)
-    {
-        $extensions = Helper::ensureArray($extension);
-
-        $files = $this->getFiles($folder, $recursive);
-
-        return collect($files)->filter(function ($file) use ($extensions) {
-            return in_array($this->extension($file), $extensions);
-        })->all();
-    }
-
-    public function getFilesByTypeRecursively($folder, $extension)
-    {
-        return $this->getFilesByType($folder, $extension, true);
-    }
-
-    public function isEmpty($folder)
-    {
-        $files = $this->getFilesRecursively($folder);
-
-        return empty($files);
-    }
-
-    public function isDirectory($path)
-    {
-        return is_dir($this->normalizePath($path));
-    }
-
     public function copyDirectory($src, $dest, $overwrite = false)
     {
         // todo: implement the overwrite argument
@@ -235,24 +81,5 @@ class FilesystemAdapter implements FilesystemInterface
     public function moveDirectory($src, $dest, $overwrite = false)
     {
         return $this->filesystem->moveDirectory($this->normalizePath($src), $this->normalizePath($dest), $overwrite);
-    }
-
-    public function deleteEmptySubfolders($path)
-    {
-        // Grab all the folders
-        $folders = $this->getFoldersRecursively($path);
-
-        // Sort by deepest first. In order to delete a folder, it must be empty.
-        // This means we need to delete the deepest child folders first.
-        uasort($folders, function ($a, $b) {
-            return (substr_count($a, '/') >= substr_count($b, '/')) ? -1 : 1;
-        });
-
-        // Iterate and delete
-        foreach ($folders as $dir) {
-            if ($this->isEmpty($dir)) {
-                $this->delete($dir);
-            }
-        }
     }
 }
