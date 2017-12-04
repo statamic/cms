@@ -17,9 +17,9 @@ abstract class AbstractAdapter implements Filesystem
         return $this->filesystem->get($this->normalizePath($path));
     }
 
-    public function exists($path)
+    public function exists($path = null)
     {
-        if ($path === '/') {
+        if ($path === '/' || $path === null) {
             return true;
         }
 

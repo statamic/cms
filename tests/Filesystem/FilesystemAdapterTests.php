@@ -44,6 +44,12 @@ trait FilesystemAdapterTests
     }
 
     /** @test */
+    function assumes_existence_if_checking_on_the_root()
+    {
+        $this->assertTrue($this->adapter->exists());
+    }
+
+    /** @test */
     function puts_contents_into_a_file()
     {
         $this->adapter->put('filename.txt', 'Hello World');
