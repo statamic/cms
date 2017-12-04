@@ -62,6 +62,42 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('publish', 'PublishGlobalController@save')->name('global.save');
     });
 
+    Route::group(['prefix' => 'assets'], function () {
+        Route::get('/', 'AssetsController@index')->name('assets');
+
+        Route::group(['prefix' => 'containers'], function () {
+            Route::delete('delete', 'AssetContainersController@delete')->name('assets.containers.delete');
+            Route::get('get', 'AssetContainersController@get')->name('assets.containers.get');
+            Route::post('resolve-path', 'AssetContainersController@getResolvedPath');
+            Route::post('resolve-url', 'AssetContainersController@getResolvedUrl');
+            Route::post('validate-s3', 'AssetContainersController@validateS3Credentials');
+            Route::get('{container}/folders', 'AssetContainersController@folders')->name('assets.containers.folders');
+        });
+
+        Route::group(['prefix' => 'folders'], function () {
+            Route::post('/', 'AssetFoldersController@store')->name('assets.folder.store');
+            Route::delete('delete', 'AssetFoldersController@delete')->name('assets.folders.delete');
+            Route::get('{container}/{path?}', 'AssetFoldersController@edit')->where('path',
+                '.*')->name('assets.folder.edit');
+            Route::post('{container}/{path?}', 'AssetFoldersController@update')->where('path',
+                '.*')->name('assets.folder.update');
+        });
+
+        Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('asset.thumbnail');
+
+        Route::post('get', 'AssetsController@get')->name('assets.get');
+        Route::delete('delete', 'AssetsController@delete')->name('asset.delete');
+        Route::get('browse/{container}/{folder?}', 'AssetsController@browse')->where('folder', '.*')->name('assets.browse');
+        Route::post('browse', 'AssetsController@json');
+        Route::post('search', 'AssetsController@search');
+        Route::post('/', 'AssetsController@store')->name('asset.store');
+        Route::get('download/{container}/{path}', 'AssetsController@download')->name('asset.download')->where('path', '.*');
+        Route::post('rename/{container}/{path}', 'AssetsController@rename')->name('asset.rename')->where('path', '.*');
+        Route::post('move', 'AssetsController@move')->name('asset.move');
+        Route::get('{container}/{path}', 'AssetsController@edit')->name('asset.edit')->where('path', '.*');
+        Route::post('{container}/{path}', 'AssetsController@update')->name('asset.update')->where('path', '.*');
+    });
+
     Route::group(['prefix' => 'users'], function () {
         Route::get('account', 'UsersController@account')->name('account');
         Route::get('/', 'UsersController@index')->name('users');
@@ -119,13 +155,13 @@ Route::group(['middleware' => 'auth'], function () {
 
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');
-Route::get('/assets', function () { return ''; })->name('assets');
 Route::get('/forms', function () { return ''; })->name('forms');
 Route::get('/updater', function () { return ''; })->name('updater');
 Route::get('/import', function () { return ''; })->name('import');
 Route::get('/addons', function () { return ''; })->name('addons');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
+Route::get('/assets.container.edit', function () { return ''; })->name('assets.container.edit');
 Route::get('/collections.manage', function () { return ''; })->name('collections.manage');
 Route::get('/collection.edit', function () { return ''; })->name('collection.edit');
 Route::get('/taxonomies.manage', function () { return ''; })->name('taxonomies.manage');
