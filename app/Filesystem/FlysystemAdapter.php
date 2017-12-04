@@ -62,4 +62,9 @@ class FlysystemAdapter extends AbstractAdapter
 
         $this->delete($src);
     }
+
+    public function url($path)
+    {
+        return $this->filesystem->url($path);
+    }
 }
