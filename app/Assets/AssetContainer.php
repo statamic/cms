@@ -269,11 +269,11 @@ class AssetContainer implements AssetContainerContract
         event(new AssetContainerDeleted($this->id(), $path));
     }
 
-    public function disk($type = 'folder')
+    public function disk()
     {
-        $disk = "assets:{$this->id}";
+        $disk = array_get($this->data(), 'disk');
 
-        return ($type === 'folder') ? Folder::disk($disk) : File::disk($disk);
+        return File::disk($disk);
     }
 
     /**
