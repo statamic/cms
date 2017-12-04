@@ -7,6 +7,7 @@ use Statamic\API\Cache;
 use Statamic\API\Config;
 use League\Glide\Server;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Http\Controllers\Controller;
 
 class AssetThumbnailController extends Controller
 {
