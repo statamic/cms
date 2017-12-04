@@ -346,6 +346,12 @@ trait FilesystemAdapterTests
         $this->assertDirectoryNotExists($this->tempDir.'/three/five/six');
     }
 
+    /** @test */
+    function gets_filesystem()
+    {
+        $this->assertEquals($this->filesystem, $this->adapter->filesystem());
+    }
+
     /**
      * Assert that two arrays have the same values but not necessarily in the same order.
      */

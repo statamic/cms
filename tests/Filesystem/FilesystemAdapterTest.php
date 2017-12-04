@@ -12,6 +12,9 @@ class FilesystemAdapterTest extends \PHPUnit\Framework\TestCase
 
     protected function makeAdapter()
     {
-        return new FilesystemAdapter(new Filesystem, $this->tempDir);
+        return new FilesystemAdapter(
+            $this->filesystem = new Filesystem,
+            $this->tempDir
+        );
     }
 }

@@ -188,6 +188,11 @@ abstract class AbstractAdapter implements Filesystem
         }
     }
 
+    public function filesystem()
+    {
+        return $this->filesystem;
+    }
+
     protected function relativePath($path)
     {
         return Str::removeLeft($path, $this->root);

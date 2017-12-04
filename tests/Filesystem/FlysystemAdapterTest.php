@@ -16,10 +16,10 @@ class FlysystemAdapterTest extends \PHPUnit\Framework\TestCase
     protected function makeAdapter()
     {
         // Equivalent to `Storage::disk()`
-        $adapter = new IlluminateFilesystemAdapter(
+        $this->filesystem = new IlluminateFilesystemAdapter(
             new Flysystem(new Local($this->tempDir))
         );
 
-        return new FlysystemAdapter($adapter);
+        return new FlysystemAdapter($this->filesystem);
     }
 }
