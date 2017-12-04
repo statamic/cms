@@ -39,24 +39,7 @@ class AssetContainersDriver extends AbstractDriver
 
     private function getUrl($id, $driver, $data)
     {
-        $method = 'get'.ucfirst($driver).'Url';
-
-        return $this->$method($id, $data);
-    }
-
-    private function getLocalUrl($id, $data)
-    {
-        return array_get($data, 'url');
-    }
-
-    private function getS3Url($id, $data)
-    {
-        // Double getAdapter since we're using CachedAdapter for s3.
-        $adapter = File::disk("assets:$id")->filesystem()->getAdapter()->getAdapter();
-
-        $url = rtrim($adapter->getClient()->getObjectUrl($adapter->getBucket(), array_get($data, 'path', '/')), '/');
-
-        return URL::tidy($url);
+        return File::disk($data['disk'])->url('/');
     }
 
     public function isMatchingFile($file)
