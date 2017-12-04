@@ -3,6 +3,8 @@
 namespace Statamic\API;
 
 use Statamic\Filesystem\FileAccessor;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Filesystem\FlysystemAdapter;
 use Statamic\Filesystem\FilesystemAdapter;
 
 /**
@@ -25,30 +27,27 @@ use Statamic\Filesystem\FilesystemAdapter;
 class File
 {
     /**
-     * Get a disk
+     * Get a filesystem disk.
      *
-     * @param string|null $name
-     * @return \Statamic\Filesystem\FileAccessor
+     * @param string|null $name  Either the name of a native filesystem (eg. "content"), null for the
+     *                           project root, or the name of a user defined disk in filesystems.php
+     * @return \Statamic\Filesystem\Filesystem
      */
     public static function disk($name = null)
     {
-        $disk = app(FilesystemAdapter::class);
-
         if ($name === null) {
-            //
-        } elseif ($name === 'content') {
-            $disk->setRootDirectory(base_path('content'));
-        } elseif ($name === 'theme') {
-            $disk->setRootDirectory(base_path('resources'));
-        } elseif ($name === 'users') {
-            $disk->setRootDirectory(base_path('users'));
-        } elseif ($name === 'storage') {
-            $disk->setRootDirectory(storage_path('statamic'));
-        } else {
-            throw new \Exception('Todo: Handle [' . $name . '] disk.');
+            $name = 'standard';
         }
 
-        return $disk;
+        try {
+            $root = app("filesystems.paths.$name");
+        } catch (\ReflectionException $e) {
+            return new FlysystemAdapter(Storage::disk($name));
+        }
+
+        $fs = app(FilesystemAdapter::class);
+        $fs->setRootDirectory($root);
+        return $fs;
     }
 
     /**
