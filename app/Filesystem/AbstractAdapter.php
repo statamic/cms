@@ -95,6 +95,11 @@ abstract class AbstractAdapter implements Filesystem
         return $this->filesystem->size($this->normalizePath($file));
     }
 
+    public function sizeHuman($file)
+    {
+        return Str::fileSizeForHumans($this->size($file), 2);
+    }
+
     public function isImage($path)
     {
         return in_array(
