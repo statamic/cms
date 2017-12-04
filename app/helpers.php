@@ -502,3 +502,13 @@ function format_input_options($options)
 
     return $formatted_options;
 }
+
+
+/**
+ * @param array $value
+ * @return \Statamic\Assets\AssetCollection
+ */
+function collect_assets($value = [])
+{
+    return new \Statamic\Assets\AssetCollection($value);
+}
