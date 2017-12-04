@@ -136,4 +136,5 @@ Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
 Route::get('/settings', function () { return ''; })->name('settings');
 Route::get('/settings.edit', function () { return ''; })->name('settings.edit');
 Route::get('/form.show', function () { return ''; })->name('form.show');
+Route::get('/login.reset', function () { return ''; })->name('login.reset');
 
