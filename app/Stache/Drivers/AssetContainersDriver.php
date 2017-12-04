@@ -24,7 +24,8 @@ class AssetContainersDriver extends AbstractDriver
         // The path would be `assets/id.yaml` so we'll remove the directory and extension to get the ID.
         $id = substr($path, 7, -5);
 
-        $driver = array_get($data, 'driver', 'local');
+        $disk = array_get($data, 'disk');
+        $driver = config("filesystems.disks.$disk.driver");
 
         $container = AssetContainer::create();
         $container->id($id);
