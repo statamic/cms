@@ -75,7 +75,7 @@ class AssetsController extends CpController
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $assets = $assets->slice($offset, $perPage);
-        $paginator = new LengthAwarePaginator($assets, $totalAssetCount, $perPage, $currentPage);
+        // $paginator = new LengthAwarePaginator($assets, $totalAssetCount, $perPage, $currentPage);
 
         $assets = $this->supplementAssetsForDisplay($assets);
 
@@ -97,11 +97,11 @@ class AssetsController extends CpController
             'pagination' => [
                 'totalItems' => $totalAssetCount,
                 'itemsPerPage' => $perPage,
-                'totalPages'    => $paginator->lastPage(),
-                'currentPage'   => $paginator->currentPage(),
-                'prevPage'      => $paginator->previousPageUrl(),
-                'nextPage'      => $paginator->nextPageUrl(),
-                'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
+                'totalPages'    => 1, //$paginator->lastPage(),
+                'currentPage'   => 1, //$paginator->currentPage(),
+                // 'prevPage'      => $paginator->previousPageUrl(),
+                // 'nextPage'      => $paginator->nextPageUrl(),
+                // 'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
             ]
         ];
     }
