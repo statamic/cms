@@ -59,5 +59,6 @@ class Kernel extends HttpKernel
         'guest' => \Statamic\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'staticcache' => \Statamic\StaticCaching\Middleware\Cache::class,
+        'configurable' => \Statamic\Http\Middleware\CP\Configurable::class,
     ];
 }
