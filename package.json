@@ -1,0 +1,53 @@
+{
+  "name": "Statamic",
+  "private": true,
+  "devDependencies": {
+    "autosize": "~3.0.12",
+    "bootstrap": "~3.3.5",
+    "browserify-global-shim": "~1.0.0",
+    "codemirror": "^5.11.0",
+    "cookies-js": "^1.2.2",
+    "dropzone": "^4.0.1",
+    "gulp": "^3.9",
+    "gulp-shell": "^0.4.2",
+    "gulp-watch": "^4.2.4",
+    "jquery": "~1.11.3",
+    "jquery-serializejson": "~2.5.0",
+    "jquery-ui": "^1.12.1",
+    "laravel-elixir": "^4.0.0",
+    "laravel-elixir-svg-symbols": "^1.0.1",
+    "laravel-elixir-vueify": "^1.0.0",
+    "luminous-lightbox": "^0.2.0",
+    "marked": "^0.3.6",
+    "minimist": "^1.1.1",
+    "moment": "^2.10.3",
+    "mousetrap": "~1.5.3",
+    "slug": "^0.9.1",
+    "sweetalert": "~1.0.1",
+    "trix": "^0.9.0",
+    "underscore": "^1.8.3",
+    "vue": "~1.0.21",
+    "vue-resource": "~0.5.0",
+    "vue-typeahead": "~1.0.4"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-global-shim"
+    ]
+  },
+  "browserify-global-shim": {
+    "jquery": "$",
+    "bootstrap": "bootstrap",
+    "underscore": "_",
+    "vue": "Vue",
+    "vue-resource": "VueResource",
+    "moment": "moment",
+    "jquery-serializejson": "serializeJSON",
+    "dropzone": "Dropzone"
+  },
+  "dependencies": {
+    "bootstrap-sass": "^3.3.7",
+    "marked-plaintext": "0.0.2",
+    "tippy.js": "^1.2.1"
+  }
+}
