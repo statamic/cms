@@ -30,31 +30,31 @@ elixir(function(mix) {
         "./node_modules/slug/slug.js",
         "./node_modules/tippy.js/dist/tippy.min.js",
         "./node_modules/luminous-lightbox/dist/luminous.js",
-        "app/statamic/resources/js/vendor/dmuploader.js",
-        "app/statamic/resources/js/vendor/calendar.js",
-        "app/statamic/resources/js/vendor/redactor.js",
-        "app/statamic/resources/js/vendor/redactor/assets.js",
-        "app/statamic/resources/js/vendor/selectize.js",
-        "app/statamic/resources/js/vendor/jquery-ui.js",
-        "app/statamic/resources/js/vendor/nested-sortable.js",
-    ], 'app/statamic/resources/dist/js/johnny-deps.js');
+        "resources/js/vendor/dmuploader.js",
+        "resources/js/vendor/calendar.js",
+        "resources/js/vendor/redactor.js",
+        "resources/js/vendor/redactor/assets.js",
+        "resources/js/vendor/selectize.js",
+        "resources/js/vendor/jquery-ui.js",
+        "resources/js/vendor/nested-sortable.js",
+    ], 'resources/dist/js/johnny-deps.js');
 
-    mix.browserify('cp.js', 'app/statamic/resources/dist/js/cp.js');
-    mix.browserify('jabbascripts.js', 'app/statamic/resources/dist/js/jabbascripts.js');
-    mix.browserify('app.js', 'app/statamic/resources/dist/js/app.js');
+    mix.browserify('cp.js', 'resources/dist/js/cp.js');
+    mix.browserify('jabbascripts.js', 'resources/dist/js/jabbascripts.js');
+    mix.browserify('app.js', 'resources/dist/js/app.js');
 
     // Build css file
-    mix.sass('cp.scss', 'app/statamic/resources/dist/css/cp.css', {
+    mix.sass('cp.scss', 'resources/dist/css/cp.css', {
         includePaths: [
             paths.sweetalert
         ]
     });
 
-    mix.svgSprite('app/statamic/resources/svg/', 'app/statamic/resources/dist/svg/');
+    mix.svgSprite('resources/svg/', 'resources/dist/svg/');
 
     // Copy assets into a location ready for distribution
-    mix.copy('app/statamic/resources/img/**/*.*', 'app/statamic/resources/dist/img/');
-    mix.copy('app/statamic/resources/svg/**/*.*', 'app/statamic/resources/dist/svg/');
-    mix.copy('app/statamic/resources/audio/**/*.*', 'app/statamic/resources/dist/audio/');
-    mix.copy('app/statamic/resources/fonts/**/*.*', 'app/statamic/resources/dist/fonts/');
+    mix.copy('resources/img/**/*.*', 'resources/dist/img/');
+    mix.copy('resources/svg/**/*.*', 'resources/dist/svg/');
+    mix.copy('resources/audio/**/*.*', 'resources/dist/audio/');
+    mix.copy('resources/fonts/**/*.*', 'resources/dist/fonts/');
 });
