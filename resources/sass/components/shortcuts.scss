@@ -1,0 +1,54 @@
+.shortcut-pair {
+	display: block;
+	margin-bottom: 10px;
+	-webkit-font-smoothing: antialiased;
+}
+
+.shortcut {
+    font-size: 14px;
+    background: #FFF;
+    border-radius: 3px;
+    border: 1px solid #c7cacc;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 3px 5px;
+    min-width: 28px;
+    box-sizing: border-box;
+    color: #37474F;
+    text-align: center;
+    box-shadow: 0 2px 0 0 #e6e9ec;
+}
+
+.shortcut-key {
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+    margin-right: 15px;
+    float: left;
+}
+
+.shortcut-joiner {
+	margin: 0 3px;
+    font-size: 13px;
+    line-height: 24px;
+    color: #78909C;
+    font-weight: 400;
+}
+
+.shortcut-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    padding: 4px 0;
+    font-size: 16px;
+}
+
+#shortcuts {
+	.modal-body {
+		border-top: 1px solid #ededed;
+		background: #f3f3f3;
+	}
+}

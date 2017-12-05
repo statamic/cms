@@ -1,0 +1,970 @@
+/* ==========================================================================
+   ASSETS
+   ========================================================================== */
+
+// only used in the folder editor now.
+.asset-modal {
+	// Saving overlay
+	.saving {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 200;
+		background: rgba(white, .9);
+		display: flex;
+		align-items: center;
+		border-radius: 3px;
+
+		.inner {
+			text-align: center;
+			padding: 50px;
+			margin: 0 auto;
+		}
+
+		i {
+			position: relative;
+			top: -1px;
+			margin-right: 10px;
+		}
+	}
+}
+
+.drag-notification {
+    border: 1px dashed #ccc;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1049;
+    background: rgba(white, .9);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    div {
+        font-size: 24px;
+    }
+
+    .icon {
+        font-size: 60px;
+        color: #333;
+        border: 2px solid #333;
+        border-radius: 60px;
+        padding: 20px;
+        margin-bottom: 25px;
+        line-height: 48px;
+        -webkit-font-smoothing: antialiased;
+        &:before {
+            top: 0;
+        }
+    }
+
+    h3 {
+        font-weight: 400;
+        margin: 25px 0;
+        color: #333;
+        font-size: 21px;
+        max-width: 75%;
+        line-height: 1.5;
+        margin: 0 auto;
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+
+/**
+ * Asset browser
+ *
+ * The "listing" container.
+ * Used in the "Assets" section to browse through containers/folders.
+ * Also used in the selector modal inside the fieldtype.
+ */
+
+.asset-browser {
+    display: flex;
+    justify-content: space-between;
+    padding: 0; // negate the .card padding
+    position: relative;
+    overflow: hidden;
+
+    .asset-browser-sidebar {
+        padding: 20px;
+        border-right: 1px solid $border;
+    }
+
+    .asset-browser-main {
+        flex: 1;
+    }
+
+    .asset-browser-loading {
+        flex-basis: 100%;
+    }
+
+    .contextual-actions {
+        background: #fafafa;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 16px 24px;
+    }
+
+    .breadcrumbs {
+        margin-top: 0;
+        border-radius: 0 0 3px 3px;
+        position: absolute;
+        border-bottom: none;
+        bottom: 0;
+        width: 100%;
+    }
+}
+
+.asset-browser-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0 24px;
+    border-bottom: 1px solid $border;
+    flex-wrap: wrap;
+
+    .asset-browser-actions {
+        text-align: right;
+    }
+
+    h1 {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.25;
+    }
+
+    .action {
+        margin-left: 16px;
+    }
+
+    .filter-control.search {
+        margin-left: 24px;
+    }
+
+    .loading-indicator {
+        color: $color_green;
+        display: inline-block;
+        margin-left: 5px;
+    }
+}
+
+@media all and (max-width: 860px) {
+    .asset-browser-header {
+        justify-content: center;
+
+        .flexy { justify-content: center; }
+
+        .filter-control.search {
+            flex: 1;
+            order: 3;
+            margin-left: 0;
+            flex-basis: 100%;
+        }
+    }
+
+    .asset-browser .extra-col { display: none; }
+}
+
+@media all and (max-width: 540px) {
+    .asset-browser-header h1 { text-align: center; }
+}
+
+.asset-browser-content {
+    padding-bottom: 29px; // account for the breadcrumbs
+}
+
+.asset-browser-sidebar {
+
+    h4 {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .sidebar-item {
+        margin-bottom: 10px;
+
+        &.active a {
+            color: $brand-primary;
+        }
+    }
+
+}
+
+/**
+ * Asset upload listing
+ *
+ * Used in the browser and fieldtype to show files being uploaded.
+ */
+
+.asset-upload-listing {
+    background: $asset_bg;
+    color: #fff;
+    padding: 0px 5px;
+
+    .asset-upload-listing-header {
+        @extend .little-heading;
+        padding: 10px;
+    }
+
+    table {
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+
+        tr { border-top: 1px solid rgba(white, .1); }
+        tr:first-child { border: none; }
+        td { vertical-align: middle;}
+    }
+
+    .column-status {
+        width: 1px;
+        padding-left: 10px;
+
+        &.error {
+            color: $color_red;
+        }
+
+        &.pending {
+            color: $color_green;
+        }
+    }
+
+    .column-icon {
+        width: 1px;
+
+        img {
+            width: 25px;
+            height: 25px;
+        }
+    }
+
+    .column-thumbnail {
+        .img {
+            width: 25px;
+            height: 25px;
+            border-radius: 2px;
+        }
+
+        .svg-icon, svg {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .column-filename {
+        .filename {
+            display: inline-block;
+            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 300px;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .column-progress {
+        width: 60%;
+    }
+
+    .progress {
+        margin-bottom: 0;
+    }
+}
+
+
+/**
+ * Table listing
+ *
+ * Inside the asset browser when viewing in "table" mode.
+ */
+
+.asset-table-listing {
+	position: relative;
+
+    table {
+        @extend .no-select;
+        margin: 0;
+    }
+
+    thead {
+        border-top: 0;
+        th { background: #f4f5f5; }
+    }
+
+    tbody tr {
+        cursor: pointer;
+    }
+
+    thead tr:first-child {
+        border-top: 0;
+    }
+
+    tr > td:first-child,
+    tr > th:first-child {
+        padding-left: 10px;
+        width: 1px;
+    }
+
+    tr > td:last-child,
+    tr > th:last-child {
+        padding-right: 15px;
+    }
+
+    tr.selected {
+        background: $brand-primary;
+        color: #fff;
+        border-color: transparent;
+    }
+
+    tr.selected + tr {
+        border-color: transparent;
+    }
+
+    tr.selected + tr.selected {
+        border-color: rgba(255, 255, 255, .25);
+    }
+
+
+    td.thumbnail-col {
+        padding-right: 5px;
+    }
+
+    .img, img {
+        width: 25px;
+        height: 25px;
+        border-radius: 2px;
+    }
+
+    .svg-img {
+        background-size: contain;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+    }
+
+    .svg-icon, svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.asset-listing .actions {
+    margin-bottom: 15px;
+    display: flex;
+
+    .search {
+        flex: 1;
+        margin-right: 15px;
+        margin-left: 0;
+    }
+
+    > .btn {
+        margin-right: 15px;
+    }
+}
+
+
+
+/**
+ * Grid listing
+ *
+ * Used in the asset browser when using 'grid' style and inside the fieldtype.
+ */
+
+.asset-grid-listing {
+    background: #fff;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-row-gap: 16px;
+    grid-column-gap: 8px;
+    padding: 16px;
+    position: relative;
+
+    .asset-tile {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 8px;
+
+        .asset-thumb-container {
+            align-items: center;
+            display: flex;
+            flex: 1;
+        }
+    }
+
+    img {
+        width: 100%;
+    }
+}
+
+
+
+/**
+ * Solo Asset
+ *
+ * Used in a fieldtypes showing just one Asset.
+ */
+
+ .asset-solo-container {
+
+    .asset-tile {
+        padding: 0;
+        max-width: 300px;
+    }
+
+    .asset-tile .asset-thumb img {
+         height: auto;
+         width: auto;
+         max-width: 100%;
+         max-height: 100%;
+
+     }
+
+     .asset-tile .asset-meta {
+         max-width: 100%;
+     }
+ }
+
+
+/**
+ * Asset tile
+ *
+ * The "asset" used in grid listings and in the fieldtype.
+ */
+
+.asset-tile {
+    min-width: 0;
+    position: relative;
+    padding: 8px;
+
+    .asset-thumb {
+        text-align: center;
+
+        img {
+            @extend .z-depth-1;
+            border: 5px solid #fff;
+            display: block;
+            max-height: 150px;
+            max-width: 150px;
+            height: auto;
+            width: auto;
+            margin: 0 auto;
+        }
+    }
+
+    .asset-meta {
+        padding-top: 8px;
+        font-size: 13px;
+        color: $color_gray_light;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+        text-align: center;
+    }
+
+    .asset-controls {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -40px;
+        display: none;
+        width: 80px;
+        height: 32px;
+        margin-top: -16px;
+        text-align: center;
+    }
+
+    &:hover .asset-controls {
+        display: block;
+    }
+
+    &.is-selected {
+        background: rgba($color_dark_blue, .07);
+        border-radius: 4px;
+    }
+
+    &.is-svg {
+        .asset-thumb-container {
+            background: url('../img/trans-bg.gif');
+        }
+    }
+
+    .svg-img {
+        background-size: contain;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        padding-bottom: 100%;
+    }
+
+    .svg-icon {
+        height: 150px;
+        width: 150px;
+    }
+}
+
+
+/* Fieldtype
+  ========================================================================== */
+
+ .assets-fieldtype {
+     position: relative;
+
+     &.empty .drag-notification {
+         flex-direction: row;
+         .icon {
+             font-size: 21px;
+             padding: 5px;
+             border: none;
+             margin: 0;
+         }
+         h3 { font-size: 18px; margin: 0; padding: 5px;}
+     }
+ }
+
+.assets-fieldtype .manage-assets {
+    background: $color_gray_lighter;
+    padding: 16px;
+    position: relative;
+    border: 1px solid $border;
+    border-radius: 3px;
+
+    .icon {
+        color: #babfc2;
+    }
+
+    p {
+        margin: 0 0 0 10px;
+        font-size: 14px;
+        display: inline-block;
+
+        a {
+            border-bottom: 1px solid;
+        }
+    }
+}
+
+.assets-fieldtype > .asset-grid-listing {
+    border: 1px solid $border;
+
+    .ui-sortable-placeholder {
+        .faux-thumbnail {
+            background: #fcfcfc;
+            padding-top: 100%;
+            border: 1px dashed #ccc;
+            width: 150px;
+            border-radius: 3px;
+        }
+    }
+}
+
+.assets-fieldtype > .asset-table-listing {
+    border: 1px solid $border;
+    border-radius: 0 0 3px 3px;
+    padding: 5px 0;
+
+    tr { border-top: 1px solid $border; }
+    td { padding: 5px; }
+
+    .remove-asset {
+        background: #fff url('../img/delete.png') no-repeat 0 0;
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 2px 0 0 5px;
+        cursor: pointer;
+    }
+}
+
+.assets-fieldtype .manage-assets ~ .asset-grid-listing {
+    margin-top: -3px;
+    border-radius: 0 0 3px 3px;
+}
+
+.assets-fieldtype .manage-assets ~ .asset-table-listing {
+    border-top: 0;
+}
+
+.assets-fieldtype > .asset-grid-listing > .asset-tile {
+
+    .asset-thumb-container {
+        position: relative;
+    }
+
+    .asset-filename {
+        flex-grow: 1;
+        text-align: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .asset-filesize {
+        display: none;
+    }
+}
+
+.assets-fieldtype .asset-upload-listing {
+    margin: 0;
+    border: 1px dashed #ccc;
+    border-top: 0;
+
+    table {
+        margin: 0;
+    }
+
+    tr:first-child {
+        border-top: 0;
+    }
+
+    .img {
+        width: 25px;
+        height: 25px;
+        border-radius: 2px;
+    }
+}
+
+
+
+
+/**
+ * Asset selector modal
+ *
+ * Used in fieldtypes when interacting with the asset browser.
+ * In the assets, markdown, and redactor fieldtypes.
+ */
+
+.asset-selector {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: white;
+    box-shadow: 0 0 15px rgba(black, .5);
+
+    .asset-browser-main {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .asset-browser-content {
+        overflow: auto;
+        height: auto;
+    }
+
+    .asset-browser {
+        flex-grow: 1;
+        box-shadow: none;
+        margin: 0;
+        max-height: 100%;
+        min-height: 50%;
+        height: 100%;
+
+        // The publish form has styles that cascade into here.
+        // We'll just undo those.
+        h1 .icon {
+            position: static;
+            color: $color_green;
+            font-size: 16px;
+        }
+    }
+}
+
+// The wrapper div that acts as the modal background and sizer.
+.asset-selector-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 30px;
+    background: rgba(#333, .8);
+    z-index: 1000;
+
+    .modal-footer {
+        box-shadow: 0 -2px 10px rgba(0,0,0,.05);
+        z-index: 5;
+    }
+}
+
+/**
+ * Asset Editor
+ */
+
+.asset-editor-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 30px;
+    background: rgba(#333, .8);
+    z-index: 1000;
+    will-change: transform;
+
+    .asset-editor {
+        height: 100%;
+        box-shadow: 0 0 15px rgba(black, .5);
+    }
+}
+
+@media all and (max-width: 960px) {
+    .asset-editor-modal {
+        padding: 0;
+    }
+}
+
+@media all and (max-width: 800px) {
+    .asset-editor-meta-items .meta-item {
+        display: none;
+    }
+}
+
+.asset-editor {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: white;
+
+    > .loading {
+        flex-basis: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .editor-main {
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .editor-preview {
+        flex-basis: 64%;
+    }
+
+    .editor-form {
+        flex-basis: 36%;
+    }
+
+    .editor-meta {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+    }
+}
+
+.asset-editor-meta-items {
+    display: flex;
+    flex: 1;
+
+    .meta-item {
+        border-left: 1px solid $border;
+        padding: 10px 30px;
+        color: $color_gray_light;
+
+        &.one-line {
+            display: flex;
+            align-items: center;
+        }
+
+        &:first-child {
+            padding-left: 15px;
+        }
+    }
+
+    .meta-label {
+        display: block;
+        padding: 0;
+        font-size: 13px;
+        color: $color_gray_dark;
+    }
+
+    .file-icon {
+        width: 25px;
+        height: 25px;
+        margin-right: 10px;
+    }
+}
+
+.asset-editor-meta-actions {
+    display: flex;
+    align-items: center;
+    height: 60px;
+
+    a {
+        display: block;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 25px;
+
+        &:not(:first-child) {
+            border-left: 1px solid $border;
+        }
+        svg { opacity: .75; }
+        &:hover svg { opacity: 1; }
+    }
+}
+
+.asset-editor .editor-preview {
+    background: $asset_bg;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+
+    .editor-preview-image {
+        flex-grow: 1;
+        padding: 30px 30px 90px; // bottom padding accounts for action button bar.
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .audio-wrapper,
+    .video-wrapper {
+        align-items: center;
+        display: flex;
+        height: 100%;
+        padding: 30px;
+        audio, video {
+            box-shadow: 0 0 30px rgba(black, .35);
+            text-align: center;
+            width: 100%;
+        }
+    }
+
+    .image-wrapper {
+        flex: 1 1 auto;
+        position: relative;
+
+        img {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 0 30px rgba(black, .35);
+        }
+    }
+
+    .editor-file-actions {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+
+        right: 0;
+        background: rgba(black, .45);
+        text-align: center;
+        padding: 15px;
+
+        button {
+            margin: 0 5px;
+        }
+    }
+}
+
+.asset-editor .editor-form {
+    position: relative;
+
+    .editor-form-fields {
+        // Could have done this with flexbox but firefox was pushing
+        // out the height if there were many publish fields.
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 60px;
+        right: 0;
+        overflow: auto;
+    }
+
+    .editor-form-actions {
+        padding: 15px;
+        text-align: right;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+
+        // a fade so it indicates you can scroll.
+        &:after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, rgba(white, 0), white);
+        }
+    }
+
+    .publish-fields {
+        padding: 15px 30px;
+    }
+}
+
+
+
+
+/* In a Replicator fieldtype
+  ========================================================================== */
+
+.replicator-fieldtype .assets-fieldtype,
+.grid-fieldtype .grid-stacked .assets-fieldtype {
+    .manage-assets {
+        background: rgba(0,0,0,.03);
+    }
+}
+
+
+
+
+/* In a Grid fieldtype
+  ========================================================================== */
+
+.grid-fieldtype .grid-table .assets-fieldtype {
+    .manage-assets {
+        background: #fff;
+        border: none;
+        text-align: center;
+        padding: 0 8px 16px;
+
+        p { display: none; }
+        .btn { margin-top: 16px; }
+    }
+    .asset-table-listing {
+        border: 0;
+        padding: 0;
+    }
+}
+
+
+
+
+/* Responsive
+  ========================================================================== */
+
+@media all and (max-width: $screen-xs-max) {
+  .assets-fieldtype {
+      .manage-assets {
+          text-align: center;
+          p { display: none; }
+      }
+  }
+}

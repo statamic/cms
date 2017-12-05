@@ -1,0 +1,27 @@
+// Hide the dropdown. It's silly when it's just "Add [the thing you're typing]"
+.tags-fieldtype .selectize-dropdown {
+    display: none !important;
+}
+
+// Selectize Override
+.selectize-control {
+    &.multi .selectize-input > div,
+    &.multi .selectize-input > div.focus,
+    &.multi .selectize-input > div.active {
+        background: $brand-primary;
+        border-radius: 2px;
+        color: #fff;
+        margin: 4px 8px 4px 0;
+        padding: 2px 8px;
+
+        &.focus, &.active {
+            background: darken($brand-primary, 13%);
+            color: #fff;
+        }
+    }
+}
+
+.selectize-control.plugin-remove_button [data-value] .remove {
+    border-color: rgba(255,255,255,.8);
+    padding-top: 2px;
+}

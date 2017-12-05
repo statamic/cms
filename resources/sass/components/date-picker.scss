@@ -1,0 +1,121 @@
+.daterange-namespace {
+	display: block;
+	position: relative;
+	width: 100%;
+	z-index: 10;
+
+	.time {
+		float: right;
+		padding-left: 33px;
+		width: 35%;
+
+		@include background('../img/time.png', 14px 18px, $color_gray_input, 10px center);
+	}
+	.add-time {
+		float: right;
+	}
+
+	.daterange {
+		float: float;
+		padding: 0;
+		width: 60%;
+	}
+	.dr-selections {
+		z-index: 10;
+	}
+	.daterange--single {
+		.dr-input  {
+			.dr-dates {
+				.dr-date {
+					font-size: 14px;
+					padding: 0 0 0 25px;
+
+					@include background('../img/calendar.png', 16px, transparent, left center);
+
+					&:focus,
+					&:active,
+					&:hover {
+						color: $color_gray_light;
+					}
+				}
+			}
+		}
+		.dr-selections {
+			.dr-calendar {
+				border: solid 1px $color_border;
+				border-radius: 2px;
+				box-shadow: none;
+				left: -25px;
+				padding: 20px 30px;
+				width: 350px !important;
+
+				.dr-range-switcher,
+				.dr-days-of-week-list,
+				.dr-day-list {
+					font-size: 14px;
+				}
+				.dr-days-of-week-list {
+					background: none;
+					border: none;
+				}
+				.dr-range-switcher {
+					padding-top: 15px;
+					padding-bottom: 20px;
+
+					.dr-switcher {
+						border: none;
+					}
+					.dr-month-switcher {
+						// padding-top: 20px;
+						position: relative;
+						// width: 100%;
+						z-index: 1;
+
+						span {
+							display: block;
+							font-size: 16px;
+							font-weight: bold;
+							// margin-bottom: 20px;
+							margin-right: 0;
+
+						}
+					}
+					.dr-year-switcher {
+						color: $color_gray_light;
+						display: inline-block;
+						font-size: 12px;
+						left: 0;
+						min-width: 0;
+						position: absolute;
+						text-align: center;
+						top:20px;
+						width: 100%;
+						z-index: 0;
+
+
+						.dr-left,
+						.dr-right {
+							display: none;
+						}
+					}
+				}
+				.dr-day {
+					&.dr-current {
+						background: none !important;
+						border: solid 1px $brand-primary;
+						color: $color_gray_dark !important;
+					}
+					&.dr-maybe {
+						background-color: $color_border !important;
+					}
+				}
+			}
+		}
+	}
+}
+
+.time-template-wrapper {
+    display: flex;
+    align-items: center;
+    .colon { margin: 0 5px; }
+}

@@ -1,0 +1,41 @@
+trix-editor {
+	@extend .form-control;
+	min-height: 180px;
+}
+
+trix-toolbar {
+	display: block;
+	margin: 0 1px;
+	position: relative;
+	width: auto;
+
+	.button_groups {
+		@include toolbar;
+		height: 30px;
+		position: relative;
+		z-index: 100;
+	}
+
+	.button_group {
+		background: none;
+		border:none;
+		border-radius: 2px;
+		margin-right: 0;
+		border-right: 1px solid #ccc;
+		button,
+		input[type=button] {
+			border: none !important;
+			background: none;
+		}
+		button::before,
+		input[type=button]::before {
+			background-size: 19px;
+		}
+	}
+
+	.dialogs .dialog {
+		border-radius: 0px;
+		@extend .z-depth-1;
+		border: none;
+	}
+}

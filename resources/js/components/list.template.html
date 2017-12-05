@@ -1,0 +1,88 @@
+<div>
+    <div v-if="loading" class="loading">
+        <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+    </div>
+
+    <div v-if="!loading && list.rows && !list.rows.length">
+        <div class="no-results">
+            <span class="icon icon-documents"></span>
+            <h2>{{ no_results_heading }}</h2>
+            <h3 v-if="no_results_subheading">{{ no_results_subheading }}</h3>
+            <a href="{{ new_url }}" class="btn btn-default btn-lg">{{ no_results_button }}</a>
+        </div>
+    </div>
+
+    <div v-if="!loading && list.rows && list.rows.length" class="actions">
+        <div class="actions-controls" v-if="hasActions">
+            <input type="checkbox" id="checkbox-all" :checked="allEntriesChecked" v-on:click="checkAllEntries">
+            <label for="checkbox-all"></label>
+
+            <template v-if="list.actions.delete">
+                <a :href="list.actions.delete.endpoint" class="btn" v-on:click="deleteMultiple">
+                    {{ translate('cp.delete') }}
+                </a>
+            </template>
+
+            <template v-if="list.actions.reorder">
+                <a href="" v-on:click="toggleReorder($event)" class="btn" v-show="! reordering">{{ translate('cp.reorder') }}</a>
+                <a href="" v-on:click="saveOrder(list.actions.reorder.endpoint, $event)" class="btn" v-show="reordering">{{ translate('cp.save_order') }}</a>
+            </template>
+        </div>
+        <input type="text" :placeholder="'Search ' + type" v-on:keydown.esc="reset" v-model="search" name="query" class="search pull-right">
+    </div>
+
+    <table v-if="!loading && list.rows && list.rows.length" class="sortable control">
+        <thead>
+            <tr>
+                <th class="checkbox-col" v-if="hasActions || reordering"></th>
+                <th v-if="hasStatus">{{ translate_choice('cp.statuses', 1) }}</th>
+                <th v-for="key in list.columns" :class="'column-' + key">
+                    {{ key }}
+                </th>
+                <th class="column-actions">{{ translate_choice('cp.actions', 2) }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="entry in list.rows | filterBy search" style="background: #fff;">
+                <td class="checkbox-col" v-if="hasActions || reordering">
+                    <div v-show="! reordering">
+                        <input type="checkbox" :id="'checkbox-' + $index" v-model="entry.checked">
+                        <label :for="'checkbox-' + $index"></label>
+                    </div>
+                    <div class="drag-handle" v-show="reordering">
+                        <i class="fa fa-bars"></i>
+                    </div>
+                </td>
+
+                <td v-for="key in list.columns" :class="'column-' + key">
+                     <component :is="resolveComponent(key)"
+                                :entry="entry"
+                                :type="key"
+                                :primary="list.primary">
+                     </component>
+                </td>
+
+                <td class="column-actions">
+                    <div class="btn-group">
+                        <button type="button" class="btn-more dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon icon-dots-three-vertical"></i>
+                        </button>
+
+                        <ul class="dropdown-menu">
+                            <li v-if="list.actions">
+                                <a href="">
+                                  {{ translate('cp.view') }}
+                                </a>
+                            </li>
+                            <li v-if="list.actions.delete" class="warning">
+                                <a href="" v-on:click="deleteItem(entry, $index, list.actions.delete.endpoint, $event)">
+                                   {{ list.actions.delete.label }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

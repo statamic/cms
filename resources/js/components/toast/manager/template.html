@@ -1,0 +1,9 @@
+<div class="vue-toast-manager_container" :class="classesOfPosition">
+  <vue-toast
+      v-for="toast in toasts"
+      :message="toast.message"
+      :options="toast.options"
+      :destroyed.sync="toast.isDestroyed"
+      :position="$index"
+    ></vue-toast>
+</div>

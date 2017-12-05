@@ -1,0 +1,25 @@
+<div class="card">
+
+    <div class="head">
+        <h1>{{ translate_choice('cp.permissions', 2) }}</h1>
+    </div>
+
+    <hr>
+
+    <div v-if="loading" class="loading loading-basic">
+        <span class="icon icon-circular-graph animation-spin"></span>
+        {{ translate('cp.checking_folder_permissions') }}
+    </div>
+
+    <div v-if="failure">
+        <p>{{ translate('cp.folders_unwritable') }}</p>
+        <ul>
+            <li v-for="path in unwritable"><code>{{ path }}</code></li>
+        </ul>
+    </div>
+
+    <template v-if="success">
+        <p>{{ translate('cp.folders_permission_valid') }}</p>
+    </template>
+
+</div>

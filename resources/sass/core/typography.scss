@@ -1,0 +1,46 @@
+h1 {
+	font-size: 24px;
+    font-family: $font;
+    font-weight: 300;
+	margin: 0;
+    -webkit-font-smoothing: antialiased;
+
+	strong {
+		color: $color_gray_dark;
+		font-weight: normal;
+	}
+}
+
+h2 { font-size: 18px; }
+h3 { font-size: 16px; }
+
+a {
+    color: #4e5e73;
+    cursor: pointer;
+	&:hover {
+		color: $brand-primary;
+		text-decoration: none;
+	}
+}
+
+.subhead {
+    font: 11px $font;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.normal {
+    font-weight: normal !important;
+}
+
+sup {
+    top: -0.25em;
+}
+
+.little-heading {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 15px 0 0 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}

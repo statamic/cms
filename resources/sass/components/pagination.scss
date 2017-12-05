@@ -1,0 +1,90 @@
+.pagination {
+	margin: 0;
+	position: relative;
+	text-align: center;
+	width: 100%;
+    padding: 6px 0 1px;
+	border-top: 1px solid $border;
+
+	> li {
+		display: none;
+		// display: inline-block;
+
+		&.previous,
+		&.next,
+		&.active,
+		&.active + li {
+			display: inline-block;
+
+			@include minWidth(400px) {
+				&.active + li + li,
+				&.active + li + li + li {
+					display: inline-block;
+				}
+			}
+			@include minWidth(500px) {
+				&.active + li + li + li + li,
+				&.active + li + li + li + li + li {
+					display: inline-block;
+				}
+			}
+		}
+
+		@include minWidth(600px) {
+			display: inline-block;
+		}
+
+
+		&.previous,
+		&.next {
+			position: absolute;
+
+			a {
+				padding: 6px 0;
+			}
+		}
+		&.previous {
+			left: 0;
+		}
+		&.next {
+			right: 0;
+		}
+		&.active {
+			a {
+				&,
+				&:hover {
+					background: none;
+					color: $color_gray_dark;
+				}
+			}
+		}
+		&.disabled {
+			a {
+				opacity: .4;
+			}
+		}
+
+		> a {
+			border: none;
+
+			&,
+			&:hover {
+				background: none;
+			}
+		}
+	}
+
+	.arrow {
+		color: $color_gray_light;
+		font-size: 26px;
+		line-height: 0;
+		vertical-align: -2px;
+	}
+
+	.previous .arrow {
+		margin-right: 5px;
+	}
+	.next .arrow {
+		margin-left: 5px;
+	}
+}

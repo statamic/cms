@@ -1,0 +1,11 @@
+.roles {
+    li li {
+        margin-left: 30px;
+    }
+
+    .disabled {
+        opacity: 0.5;
+
+        .disabled { opacity: 1; } // prevent cascading
+    }
+}

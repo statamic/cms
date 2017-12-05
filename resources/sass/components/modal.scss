@@ -1,0 +1,91 @@
+.modal {
+	background: rgba($color_dark_blue, .25);
+	display: block; // override bootstrap
+	overflow: auto;
+
+	.modal-content {
+		border: none;
+		border-radius: 0;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+		width: 100%;
+	}
+	.modal-header {
+		padding: 15px 30px;
+
+		.close {
+			margin: 0;
+		}
+	}
+    .chooser {
+        margin: -15px -15px 0 -15px;
+        list-style: none;
+        padding: 0;
+        a {
+            color: #333;
+            display: block;
+            padding: 7px 15px;
+            font-size: 16px;
+            &:hover {
+                background: $brand-primary;
+                border-radius: 4px;
+    			color: #fff;
+            }
+        }
+    }
+	.modal-body {
+		padding: 30px 30px 16px 30px;
+        max-height: 75vh;
+        overflow: scroll;
+	}
+	.modal-footer {
+		padding: 15px 30px;
+        line-height: 30px;
+	}
+    .close,
+    .close:active,
+    .close:focus,
+    .close:focus:active {
+        outline: none;
+    }
+}
+
+.modal-open .modal {
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	overflow-y: scroll;
+}
+
+.modal-full > .modal-dialog {
+	width: 90%;
+}
+
+.modal-small > .modal-dialog {
+    max-width: 400px;
+}
+
+.modal-footer .left {
+    float: left;
+    font-size: 14px;
+    line-height: 30px;
+}
+
+// Offset nested modals so they can see what they're on top of.
+.modal-content .modal-content {
+	margin-top: 60px;
+	.modal-content {
+		margin-top: 90px;
+		.modal-content {
+			margin-top: 120px;
+			.modal-content {
+				margin-top: 150px;
+			}
+		}
+	}
+}
+
+.modal .markdown-fieldtype .markdown-modes {
+    .active:before,
+    .active:after {
+        top: 100%;
+    }
+}

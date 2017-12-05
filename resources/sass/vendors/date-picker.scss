@@ -1,0 +1,341 @@
+// Colors
+$blue: $brand-primary;
+$bluemoon: #BFDEEC;
+$moon: #EBF1F4;
+$white: #FFFFFF;
+$rat: #9BA3A7;
+$mouse: #C3CACD;
+
+// Variables
+$radius: 2px;
+$rem-base: 10px;
+
+// Functions
+@function strip-unit($num) {
+  @return $num / ($num * 0 + 1);
+}
+
+@function convert-to-rem($value, $base-value: $rem-base)  {
+  $value: strip-unit($value) / strip-unit($base-value) * 1rem;
+  @if ($value == 0rem) { $value: 0; } // Turn 0rem into 0
+  @return $value;
+}
+
+@function rem($values, $base-value: $rem-base) {
+  $max: length($values);
+
+  @if $max == 1 { @return convert-to-rem(nth($values, 1), $base-value); }
+
+  $remValues: ();
+  @for $i from 1 through $max {
+    $remValues: append($remValues, convert-to-rem(nth($values, $i), $base-value));
+  }
+  @return $remValues;
+}
+
+.daterange {
+  position: relative;
+
+  * {
+    box-sizing: border-box;
+  }
+  
+  div, span, ul, li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  
+  ul {
+    list-style: none;
+  }
+  
+  &.dr-active {
+    z-index: 10;
+  }
+  
+  .dr-input {
+  	@extend .form-control;
+    display: flex;
+    position: relative;
+    z-index: 5;
+    overflow: hidden;
+
+    &:hover {
+      border-color: $blue;
+    }
+    &.dr-active {
+     
+    }
+    .dr-dates {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 rem(24) 0 rem(12);
+      min-width: 230px;
+
+      .dr-date {
+        font-size: rem(15);
+        padding: rem(10.5 0);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        outline: none;
+
+        &:hover, &:focus, &.dr-active {
+          color: $blue;
+        }
+      }
+      .dr-dates-dash {
+        color: $mouse;
+        position: relative;
+        top: -2px;
+        padding: 0 5px;
+        flex-grow: 0;
+        text-align: center;
+      }
+    }
+    .dr-presets {
+      width: rem(35);
+      border-left: 1px solid $mouse;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+
+      &:hover, &.dr-active {
+        border-color: $blue;
+        box-shadow: inset 0 2px 3px $moon;
+
+        .dr-preset-bar {
+          background-color: $blue;
+        }
+      }
+      .dr-preset-bar {
+        height: 2px;
+        background-color: $mouse;
+        margin: 1px 0 1px 25%;
+
+        &:nth-child(1) {
+          width: 50%;
+        }
+        &:nth-child(2) {
+          width: 40%;
+        }
+        &:nth-child(3) {
+          width: 30%;
+        }
+      }
+    }
+  }
+
+  .dr-selections {
+    position: absolute;
+
+    .dr-calendar {
+      @extend .z-depth-1;
+      background-color: #fff;
+      font-size: rem(15);
+      border-radius: 0 0 $radius $radius;
+      position: relative;
+      overflow: hidden;
+      z-index: 4;
+      padding-top: 5px;
+      top: 2px;
+      left: 2px;
+      transition: width .2s;
+      min-width: 208px;
+
+      .dr-range-switcher {
+        display: flex;
+        justify-content: space-between;
+        padding: rem(6 8);
+        font-size: rem(14);
+
+        .dr-switcher {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border: 1px solid rgba($mouse, 0.5);
+          border-radius: $radius;
+          height: rem(25);
+
+          i {
+            color: $mouse;
+            position: relative;
+            top: -1px;
+            cursor: pointer;
+            font-size: rem(12);
+            height: 100%;
+            width: 20px;
+
+            &:hover:before, &:hover:after {
+              background-color: $blue;
+            }
+            &.dr-disabled {
+              pointer-events: none;
+              opacity: 0;
+            }
+            &:before, &:after {
+              content: "";
+              position: absolute;
+              width: 7px;
+              height: 2px;
+              background-color: $mouse;
+              border-radius: 1px;
+              left: 50%;
+            }
+            &.dr-left:before {
+              top: calc(50% - 2px);
+              transform: translate(-50%, -50%) rotate(-45deg);
+            }
+            &.dr-left:after {
+              top: calc(50% + 2px);
+              transform: translate(-50%, -50%) rotate(45deg);
+            }
+            &.dr-right:before {
+              top: calc(50% - 2px);
+              transform: translate(-50%, -50%) rotate(45deg);
+            }
+            &.dr-right:after {
+              top: calc(50% + 2px);
+              transform: translate(-50%, -50%) rotate(-45deg);
+            }
+          }
+        }
+        .dr-month-switcher {
+          width: 100%;
+          margin-right: rem(6);
+        }
+        .dr-year-switcher {
+          min-width: 80px;
+        }
+      }
+      .dr-days-of-week-list {
+        display: flex;
+        @include linear-gradient(to bottom, white, #f9f9f9);
+        font-size: rem(10);
+        color: $rat;
+        padding: rem(5 0);
+        border: 1px solid rgba($mouse, 0.5);
+        border-left: none;
+        border-right: none;
+
+        .dr-day-of-week {
+          width: calc(100% / 7);
+          text-align: center;
+        }
+      }
+      .dr-day-list {
+        display: flex;
+        flex-wrap: wrap;
+        font-size: rem(15);
+
+        .dr-day {
+          padding: rem(5);
+          text-align: center;
+          width: calc(100% / 7);
+          cursor: pointer;
+
+          &.dr-hover:not(.dr-current) {
+            background-color: $moon !important;
+          }
+          &.dr-hover-before {
+            border-left: 2px solid $blue !important;
+            border-radius: 2px 0 0 2px;
+            padding-left: rem(3) !important;
+          }
+          &.dr-hover-after {
+            border-right: 2px solid $blue !important;
+            border-radius: 0 2px 2px 0;
+            padding-right: rem(3) !important;
+          }
+        }
+        .dr-selected, .dr-start, .dr-end {
+          background-color: $moon;
+        }
+        .dr-maybe {
+          background-color: $moon !important;
+        }
+        .dr-fade {
+          color: $mouse;
+        }
+        .dr-start {
+          border-left: 2px solid $blue;
+          border-radius: 2px 0 0 2px;
+          padding-left: rem(3);
+        }
+        .dr-end {
+          border-right: 2px solid $blue;
+          border-radius: 0 2px 2px 0;
+          padding-right: rem(3);
+        }
+        .dr-current {
+          color: $blue !important;
+          background-color: rgba($brand-primary, 0.2) !important;
+        }
+        .dr-outside {
+          pointer-events: none;
+          cursor: default;
+          color: rgba($mouse, 0.5);
+        }
+      }
+    }
+
+    .dr-preset-list {
+      background-color: $white;
+      color: $blue;
+      font-size: rem(15);
+      box-shadow: 0 0 5px $mouse;
+      border-radius: 0 0 $radius $radius;
+      position: relative;
+      overflow: hidden;
+      z-index: 4;
+      padding-top: 5px;
+      top: -5px;
+      left: 4px;
+      width: 100%;
+    }
+    .dr-list-item {
+      display: flex;
+      align-items: flex-end;
+      padding: rem(12 10);
+      border-bottom: 1px solid $moon;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &:hover {
+        background-color: $moon;
+      }
+      .dr-item-aside {
+        color: $rat;
+        font-size: rem(12);
+        margin-left: rem(5);
+      }
+    }
+  }
+}
+
+.daterange--single {
+
+  .dr-input {
+    cursor: text;
+
+    .dr-dates {
+      padding: 0;
+      min-width: 160px;
+      width: 100%;
+
+      .dr-date {
+      	font-size: 14px;
+        padding: 0;
+        text-align: left;
+        width: 100%;
+      }
+    }
+  }
+}

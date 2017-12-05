@@ -1,0 +1,40 @@
+.metrics {
+    display: flex;
+    margin: 0 -1% 0;
+}
+
+.metric {
+    flex: 1;
+    margin: 0 1%;
+}
+
+.mini-chart {
+    background: $color_dark_blue;
+    @extend .z-depth-1;
+    position: relative;
+    border-radius: 3px;
+    .count {
+        overflow: hidden;
+        color: #fff;
+        padding: 15px;
+        h2 {
+            font-size: 24px;
+            margin: 10px 0 0;
+        }
+    }
+    &.dark { }
+    &.blue { background: $brand-primary; }
+    &.green { background: $color_green; }
+    &.red { background: $color_red; }
+}
+
+.metric.simple {
+    text-align: center;
+    .count {
+        padding: 5px 0;
+        h2 {
+            font-size: 32px;
+            margin: 10px 0 0;
+        }
+    }
+}

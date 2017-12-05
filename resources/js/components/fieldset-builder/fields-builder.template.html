@@ -1,0 +1,18 @@
+<div class="fields-builder">
+
+    <fieldset-fields v-show="hasFields"
+                     :fields.sync="fields"
+                     :fieldtypes="fieldtypes"
+                     :selected-field.sync="selectedField"
+                     :fieldtype-config="selectedFieldConfig"
+                     :on-select="selectField"
+                     :on-delete="deleteField"
+                     :on-sort="sortFields"
+                     :root="root">
+    </fieldset-fields>
+
+    <fieldtype-selector :fieldtypes="fieldtypes"
+                        :on-select="addField">
+    </fieldtype-selector>
+
+</div>

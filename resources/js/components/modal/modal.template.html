@@ -1,0 +1,33 @@
+<div class="modal" :class="classes" role="dialog" tabindex="-1" v-if="show">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="saving" v-if="saving">
+                <div class="inner">
+                    <i class="icon icon-circular-graph animation-spin"></i> {{ translate('cp.saving') }}
+                </div>
+            </div>
+
+            <div class="modal-header">
+                <slot name="close">
+                    <button type="button" tabindex="-1" class="close" aria-label="Close" @click="close"><span aria-hidden="true">&times;</span></button>
+                </slot>
+                <h1><slot name="header"></slot></h1>
+            </div>
+
+            <div v-if="loading" class="loading">
+                <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            </div>
+
+            <div v-if="! loading" class="modal-body">
+                <slot name="body"></slot>
+            </div>
+
+            <div v-if="! loading" class="modal-footer">
+                <slot name="footer">
+                    <button type="button" class="btn" @click="close">{{ translate('cp.close') }}</button>
+                </slot>
+            </div>
+        </div>
+    </div>
+</div>

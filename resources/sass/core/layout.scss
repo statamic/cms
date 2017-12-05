@@ -1,0 +1,195 @@
+/* ==========================================================================
+   MAIN CONTROL PANEL LAYOUT
+   ========================================================================== */
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background: $bg;
+    color: $color_gray_dark;
+	font-family: $font;
+    font-size: 16px;
+}
+
+// svg sprite
+body > svg { display: none; }
+
+.application-grid {
+    display: grid;
+    grid-template-columns: 200px auto;
+}
+
+@media (max-width: 980px) {
+    .application-grid {
+        grid-template-columns: 140px 1fr auto;
+    }
+}
+
+@media (max-width: $screen-xs-max) {
+    .application-grid {
+        display: block;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+.cp-head {
+	position: relative;
+	display: flex;
+    align-items: center;
+    justify-content: space-between;
+	padding: 24px;
+    margin-bottom: 8px;
+	font-size: 14px;
+
+    #typeahead {
+        @extend .z-depth-1;
+        border-radius: 4px;
+        background: #fff;
+        padding: 0 8px;
+        width: 100%;
+        max-width: 400px;
+        margin-right: 16px;
+    }
+
+	.search {
+        background: #fff;
+		font-size: 14px;
+        max-width: 400px;
+        width: 100%;
+		&:focus {
+			outline: 0;
+		}
+	}
+
+    .head-links {
+        position: relative;
+    }
+}
+
+.site-status-stripe {
+    background: $brand-darker;
+    box-shadow: inset 0 -2px 3px rgba(0,0,0,.1);
+    padding: 8px 24px;
+    font-size: 14px;
+    color: #fff;
+}
+
+
+
+
+/* Page Wrapper
+  ========================================================================== */
+
+.page-wrapper {
+	padding: 0 24px;
+	width: 100%;
+
+	hr {
+		margin: 15px -30px 25px -30px;
+
+		&.inner {
+			border-top: 2px solid $color_border;
+			margin: 15px 0 25px 0;
+		}
+	}
+
+	.head {
+		.btn-group {
+			margin-left: 10px;
+		}
+
+		.views {
+			font-size: 12px;
+			line-height: 34px;
+			margin-right: 35px;
+
+			.grid,
+			.list {
+				display: inline-block;
+				height: 16px;
+				margin-left: 10px;
+				opacity: 0.3;
+				vertical-align: text-top;
+				width: 16px;
+
+				&.selected {
+					opacity: 1;
+				}
+			}
+
+			.grid {
+				@include background('../img/grid.png', 16px 16px, transparent, center);
+			}
+
+			.list {
+				@include background('../img/list.png', 16px 14px, transparent, center);
+			}
+		}
+	}
+
+	.actions {
+        display: flex;
+        flex-wrap: wrap;
+
+		input[type="checkbox"] + label {
+			margin: 7px 5px 5px 5px;
+		}
+
+        .actions-controls {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            .btn {
+    			margin-right: 8px;
+    		}
+        }
+
+
+		.select {
+			max-width: 100px;
+			width: 100%;
+		}
+    }
+
+	.actions.no-checkboxes {
+		flex-direction: row;
+		justify-content: flex-end;
+	}
+}
+
+.outside {
+	background: url('../img/blurry.jpg') top center no-repeat fixed;
+	background-size: cover;
+	padding-top: 48px;
+    padding-left: 0;
+
+	#wrapper {
+		border-radius: 2px;
+		border-color: #587175;
+	}
+
+	.box {
+		width: 320px;
+		padding: 30px;
+	}
+
+	.logo {
+		svg {
+			width: 120px;
+			margin: 0 auto 32px;
+			display: block;
+			path { fill: rgba(0,0,0,.25); }
+		}
+	}
+}
+
+.fieldtype-hidden {
+	display: none;
+}
+
+.head .btn-icon {
+	margin-right: 10px;
+}

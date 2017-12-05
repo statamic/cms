@@ -1,0 +1,30 @@
+
+.dashboard .widgets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 32px;
+}
+
+.widget {
+    &.full {
+        grid-column-start: 1;
+        grid-column-end: -1;
+    }
+
+    .card {
+        height: 100%;
+        margin-bottom: 0;
+    }
+}
+
+@media all and (max-width: 900px) {
+    .dashboard #publish-controls .controls { display: none; }
+}
+
+@media all and (max-width: 900px) {
+    .dashboard .widgets {
+        display: block;
+    }
+
+    .dashboard .widget { margin-bottom: 32px; }
+}

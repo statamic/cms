@@ -1,0 +1,15 @@
+.login-with-email {
+    text-align: center;
+}
+
+.login-or {
+    margin: 10px 0;
+    font-style: italic;
+    text-align: center;
+}
+
+.login-oauth-providers {
+    .provider + .provider {
+        margin-top: 10px;
+    }
+}

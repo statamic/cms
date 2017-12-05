@@ -1,0 +1,73 @@
+.dossier {
+    font-size: 14px;
+
+    a { font-size: 15px; }
+
+    &, thead, thead tr, thead th {
+        border: none;
+    }
+
+    tbody tr {
+        border: none;
+        &:not(:last-child) {
+            border-bottom: solid 1px $color_border;
+        }
+    }
+
+    .cell-slug {
+        color: #777;
+        font-family: $font_monospace;
+        font-size: 12px;
+        a { font-size: 13px; }
+    }
+
+    .column-sortable.active {
+        padding-bottom: 10px;
+        border-bottom: 2px solid $brand-primary;
+    }
+
+    .column-sortable:hover {
+        padding-bottom: 10px !important;
+    }
+
+    .column-sortable .icon {
+        float: right;
+        top: 6px;
+        right: 5px;
+    }
+
+    .checkbox-col {
+        width: 44px;
+    }
+
+    .column-actions {
+        width: 44px;
+        text-align: center;
+    }
+
+    .checkbox-col label:before {
+        margin-right: 0;
+    }
+}
+
+.dossier-table-wrapper {
+    .bulk-actions {
+        padding: 16px;
+        border-top: 1px solid #ddd;
+    }
+
+    .bulk-actions .action {
+        margin-right: 8px;
+    }
+}
+
+.card.flush table.dossier {
+    thead label { margin: 0; }
+
+    td { padding: 8px; }
+
+    tr th:first-child,
+    tr td:first-child { padding-left: 16px;}
+}
+
+.dossier-search { flex: 1; }

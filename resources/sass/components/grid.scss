@@ -1,0 +1,196 @@
+/* ==========================================================================
+   GRID/TABLE FIELDTYPE
+   ========================================================================== */
+
+.grid-field,
+.table-field {
+    > table { @extend .bordered-table; }
+
+    > table > thead > tr > th {
+        background: $bg;
+        display: table-cell;
+        box-shadow: none;
+        font-size: 11px;
+        padding-left: 8px;
+
+        .help-block {
+            margin: 5px 0 0;
+            p:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    > table > thead > tr > th:first-child,
+    > table > tbody > tr > th:first-child { text-align: left; }
+
+    > table > thead > tr > th.row-controls {
+        display: table-cell;
+        box-shadow: none;
+        width: 60px;
+    }
+
+    > table > tbody > tr > td {
+        vertical-align: top;
+        padding: 0;
+    }
+
+    > table > tbody > tr > .row-controls {
+        background: $bg;
+        padding: 0;
+        text-align: center;
+        vertical-align: middle;
+        width: 60px;
+
+        span {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 22px;
+            color: #777;
+            box-shadow: 0 1px 1px rgba(0,0,0,.05);
+            line-height: 1;
+            text-align: center;
+            height: 22px;
+            width: 22px;
+
+            &:hover {
+                box-shadow: none;
+                color: #555;
+            }
+        }
+
+        .delete { cursor: pointer; }
+    }
+
+    > table > tbody > td {
+    	vertical-align: top;
+        padding: 0;
+    }
+}
+
+.grid-field th:nth-last-child(2) { border-right: none; }
+
+.grid-mode-table {
+    label { margin-bottom: 0; }
+
+    &.headless tbody {
+        tr:first-child td,
+        tr:first-child th { border-top: 1px solid $border; }
+
+        tr:first-child th:first-child { border-top-left-radius: 2px; }
+    	tr:first-child td:last-child { border-top-right-radius: 2px; }
+    	tr:last-child th:first-child { border-bottom-left-radius: 2px; }
+    	tr:last-child td:last-child { border-bottom-right-radius: 2px; }
+
+        th {
+            text-align: left;
+            background: $bg;
+            padding: 10px;
+            border-right: 1px solid $border;
+            border-top: none;
+            width: 25%;
+            font-weight: 500;
+        }
+    }
+
+    .form-control,
+    textarea,
+    input {
+        background-color: #fff;
+        box-shadow: none;
+        padding: 10px;
+        height: auto;
+        &:hover { background-color: #fafafa; }
+    }
+
+    .select {
+        background: #fff;
+        border: none;
+        height: auto;
+        box-shadow: none;
+        max-height: none;
+
+        &:before {
+            font-size: 14px;
+            line-height: 1.42857;
+            padding: 10px 0;
+            min-height: 28px;
+        }
+
+        &:after { top: 16px; }
+        &:hover { top: 0; background-color: #fafafa; }
+    }
+
+    .radio-fieldtype {
+        padding: 5px;
+
+        ul, label { margin: 0; }
+
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        li {
+            flex-basis: 40%;
+            margin: 5px 10px;
+        }
+    }
+
+}
+
+
+
+
+/* Inception! Grid inside a grid...
+  ========================================================================== */
+
+.grid-mode-table .grid-mode-table {
+    .grid-table {
+        margin-bottom: 0;
+
+        label { margin:  0; }
+
+        tr:first-child th:first-child,
+        td:first-child { border-left: none; }
+
+        tr:first-child, th { border-top: none; }
+
+        tr:first-child th:last-child,
+        tr td:last-child { border-right: none; }
+
+        td.row-controls {
+            background: #fff;
+            span { border: none; box-shadow: none; }
+        }
+    }
+
+    .add-row {
+        background: #f4f4f4;
+        color: $brand-primary;
+        padding: 10px 10px 11px;
+        display: block;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        border: 0;
+        margin: 0;
+        text-align: left;
+
+        &:hover, &:active, &:focus {
+            top: 0;
+        }
+    }
+}
+
+/* Inside Replicator
+  ========================================================================== */
+
+.replicator-fieldtype {
+    .grid-field, .table-field {
+        > table > thead > tr > th { background: #fff; }
+        > table > thead > tr > th.row-controls { background: $bg; }
+
+        input { border: none;  }
+    }
+}

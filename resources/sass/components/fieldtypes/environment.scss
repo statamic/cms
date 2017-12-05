@@ -1,0 +1,14 @@
+.environment-field {
+    @extend .form-control;
+    color: #bbb;
+    cursor: not-allowed;
+
+    .icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 5px;
+        &:before {
+            top: 1px;
+        }
+    }
+}

@@ -1,0 +1,44 @@
+table.sortable {
+
+}
+
+%ui-sortable-helper {
+	background: #fff;
+	display: table;
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),0 3px 1px -2px rgba(0, 0, 0, 0.1),0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+table .ui-sortable-helper {
+	@extend %ui-sortable-helper;
+}
+
+.placeholder {
+	background: #eee;
+	height: 37px;
+}
+
+.drag-handle {
+    cursor: move;
+	&:active {
+		cursor: grabbing !important;
+	}
+}
+
+tbody.ui-sortable {
+	> tr > .cell-counter > .move {
+		display: none;
+		font-size: 15px;
+		color: $color_gray_light;
+		position: relative;
+		top: 2px;
+	}
+
+	> tr:hover {
+		.default {
+			display: none;
+		}
+		.cell-counter > .move {
+			display: block;
+		}
+	}
+}

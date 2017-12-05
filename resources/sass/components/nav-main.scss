@@ -1,0 +1,312 @@
+.nav-main {
+    @extend .no-select;
+    overflow-y: auto;
+    z-index: 102;
+
+    .logo {
+        display: block;
+        margin: 24px 24px 40px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        svg {
+            height: 20px;
+            width: 90px;
+        }
+    }
+
+    .version {
+        color: rgba(#6D868C, .5);
+        font-size: 10px;
+        left: 5px;
+        position: relative;
+        bottom: -3px;
+    }
+
+    .badge {
+        position: relative;
+        top: -2px;
+    }
+
+    // Generic list styles
+    ul {
+        list-style: none;
+        margin: 16px 0;
+        flex: 1;
+        flex-shrink: 0;
+        flex-basis: auto;
+        padding: 0;
+        width: 100%;
+
+        li {
+            a:hover .icon,
+            a:hover:before {
+                opacity: 1;
+            }
+
+            > ul {
+                // Subnavs hidden by defualt
+                display: none;
+                margin: 5px 0 0 0;
+
+                li {
+                    line-height: 20px;
+                    a { font-size: 13px; }
+                    a:hover { color: $brand-primary; }
+                    &.active a { font-weight: 400; }
+                }
+            }
+
+            // Opened subnav
+            // &:hover ul,
+            &.visible ul {
+                display: block;
+            }
+        }
+
+        a {
+            color: $color_gray_dark;
+            display: block;
+            outline: none;
+            border-left: 1px solid rgba(255,255,255,.1);
+            padding: 2px 10px 2px 22px;
+            margin-left: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .active > a {
+            color: $brand-primary;
+            font-weight: bolder;
+        }
+    }
+
+    // Top-level list
+    > ul > li {
+        line-height: 16px;
+        position: relative;
+        padding: 2px 0 2px 20px;
+        margin: 5px 0 0;
+
+        > a:before, .icon {
+            font-size: 16px;
+            position: absolute;
+            top: 4px;
+            left: 20px;
+            opacity: .7;
+        }
+
+        > a:before {
+            @extend .icon;
+        }
+
+        // Top-level links
+        > a {
+            border-left: 3px solid transparent;
+            font-weight: 400;
+            margin-left: 0;
+            padding: 2px 0 0 24px;
+            margin: 0;
+
+            &:hover {
+                font-weight: bolder;
+            }
+        }
+
+        &.active {
+
+            border-left: 3px solid $brand-primary;
+            padding-left: 17px; // negate the margin
+            > a:before, .icon {
+                left: 17px;
+            }
+        }
+    }
+
+    li.section {
+        @extend .little-heading;
+        color: #3C4858;
+        margin: 15px 0 10px;
+    }
+
+    .foot {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-shrink: 0;
+        flex-basis: auto;
+        padding: 20px 0;
+        z-index: 1;
+        width: 100%;
+
+        > a {
+            color: $color_gray_light;
+            font-size: 12px;
+            text-align: center;
+            flex-basis: 50%;
+            font-weight: 400;
+        }
+
+        .account {
+            img {
+                height: 32px;
+                width: 32px;
+                display: block;
+                border-radius: 32px;
+                margin: 0 auto 5px;
+            }
+        }
+        .logout {
+
+            &:before {
+                border-radius: 32px;
+                content: '';
+                display: block;
+                height: 32px;
+                left: 50%;
+                margin: 0 0 5px -16px;
+                position: relative;
+                width: 32px;
+
+                @include background('../img/arrow-logout.png', 13px 11px, $color_gray_page, center);
+            }
+
+            &:hover:before {
+                @include background('../img/arrow-logout.png', 13px 11px, #fff, center);
+            }
+        }
+    }
+
+    .nav-actions {
+        position: absolute;
+        top: 9px;
+        right: 10px;
+
+        .icon {
+            color: darken(#6D868C, 10);
+            opacity: 0;
+            transition: all .1s ease;
+
+            &:before {
+                top: 0;
+            }
+        }
+
+        &:hover .icon,
+        &.open .icon {
+            font-weight: bolder;
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            margin: 5px 0 0 0;
+            padding: 8px;
+            right: auto;
+        }
+        .open .dropdown-menu {
+            left: -15px;
+        }
+
+        a {
+            color: $color_gray_dark;
+        }
+    }
+}
+
+.nav-main > ul {
+    > .nav-dashboard > a { @extend .icon-compass; margin-bottom: -10px; }
+    > .nav-pages > a { @extend .icon-flow-tree; }
+    > .nav-collections > a { @extend .icon-documents; }
+    > .nav-taxonomies > a { @extend .icon-price-tag; }
+    > .nav-globals > a { @extend .icon-network; }
+    > .nav-assets > a { @extend .icon-folder-images; }
+    > .nav-addons > a { @extend .icon-power-plug; }
+    > .nav-config-content > a { @extend .icon-text; }
+    > .nav-settings > a { @extend .icon-cog; }
+    > .nav-updater > a { @extend .icon-progress-two; }
+    > .nav-import > a { @extend .icon-rocket; }
+    > .nav-resolve_duplicates > a { @extend .icon-copy; }
+    > .nav-users > a { @extend .icon-users; }
+    > .nav-forms > a { @extend .icon-download; }
+    > .nav-fieldsets > a { @extend .icon-text-document-inverted; }
+
+    // Settings specific
+    > .nav-back > a { @extend .icon-arrow-with-circle-left; }
+    > .nav-caching > a { @extend .icon-layers; }
+    > .nav-cp > a { @extend .icon-compass; }
+    > .nav-debug > a { @extend .icon-code; }
+    > .nav-email > a { @extend .icon-email; }
+    > .nav-routes > a { @extend .icon-network; }
+    > .nav-search > a { @extend .icon-magnifying-glass; }
+    > .nav-system > a { @extend .icon-tools; }
+    > .nav-theming > a { @extend .icon-laptop; }
+}
+
+.nav-mobile {
+    display: none;
+    width: 100%;
+    padding: 8px 16px;
+    background: #2d393c;
+    height: 60px;
+    align-items: center;
+    justify-content: space-between;
+
+    .toggle { color: #fff; }
+    .toggle .icon { font-size: 26px; }
+}
+
+.nav-mobile .logo {
+    align-items: center;
+    svg {
+        width: 90px;
+        height: 20px;
+        path { fill: $brand-darker; }
+    }
+}
+
+@media (max-width: 980px) and (min-width: $screen-xs-max ) {
+    .nav-main .version { display: none; }
+}
+
+// small screen styles
+@media (max-width: $screen-xs-max) {
+    body {
+        padding-left: 0;
+        transition: all 0.2s ease;
+    }
+
+    #statamic-logo path { fill: #fff; }
+
+    nav.nav-main {
+        background: #fff;
+        box-shadow: 0 7px 14px 0 rgba(50,50,93,.1), 0 3px 6px 0 rgba(0,0,0,.07);
+        left: -200px;
+        transition: all 0.2s ease;
+        position: absolute;
+        min-height: 100vh;
+    }
+
+    nav.nav-main .logo { display: none; }
+
+    .nav-mobile {
+        display: flex;
+    }
+
+    body.nav-visible {
+        nav.nav-main {
+            left: 0;
+            min-width: 240px;
+        }
+        .content { opacity: 0.5; }
+    }
+
+    .stuck .card.sticky {
+        // if you cant beat 'em, join 'em. sticky is difficult to adjust
+        // when responsive. just make it not sticky for now.
+        position: static !important;
+        margin: 0;
+        box-shadow: none;
+        border-bottom: 1px solid $color_border;
+    }
+}

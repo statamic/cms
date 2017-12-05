@@ -1,0 +1,68 @@
+
+/**
+ * Breadcrumbs
+ *
+ * Used as a navigation tool inside cards/sheets
+ */
+
+.breadcrumbs {
+    border-top: 1px solid $border;
+    border-bottom: 1px solid $border;
+    margin-top: -1px; // do this so we dont have to check if there are or aren't breadcrumbs.
+    background: #f4f5f5;
+    font-size: 13px;
+
+    a, .step {
+        color: $color_dark_blue;
+        display: inline-block;
+        padding: 5px 20px 5px 33px;
+        position: relative;
+
+        &:before, &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            border: 14px solid transparent;
+            border-left-width: 10px;
+            border-right-width: 0;
+        }
+
+        &:after {
+            right: 0;
+            border-left-color: $border;
+            z-index: 1;
+        }
+
+        &:before {
+            right: 1px;
+            border-left-color: #f4f5f5;
+            z-index: 2;
+        }
+
+        &:hover {
+            color: $brand-primary;
+        }
+    }
+
+
+    .icon {
+        position: absolute;
+        top: 3px;
+        left: 10px;
+    }
+}
+
+.breadcrumbs.wizard {
+    font-size: 15px;
+    padding-left: 30px;
+
+    .step {
+        padding: 10px 60px 10px 0;
+
+        &:before, &:after { border: 21px solid transparent; }
+        &:after { border-left-color: $border; }
+        &:before { border-left-color: white; }
+        &:hover { color: $color_dark_blue; }
+        &.active { color: $brand-primary; }
+    }
+}

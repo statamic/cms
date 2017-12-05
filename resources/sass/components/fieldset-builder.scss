@@ -1,0 +1,78 @@
+.fields-table {
+    th {
+        background: $bg;
+        display: table-cell;
+        box-shadow: none;
+        padding-left: 10px;
+        text-align: left !important; // where/why was this being centered?
+    }
+
+    td {
+        padding: 10px;
+    }
+
+    .col-display, .col-handle {
+        padding: 0;
+        width: 30%;
+
+        input {
+            background-color: #fff;
+            box-shadow: none;
+            padding: 10px;
+            width: 100%;
+
+            &:focus { outline: 0; }
+            &:hover { background-color: #fafafa; }
+        }
+    }
+
+    .col-localizable {
+        width: 70px;
+    }
+
+    .col-column {
+        width: 80px;
+    }
+
+    .row-controls {
+        padding: 0 0 0 6px;
+        vertical-align: middle;
+        width: 85px;
+
+        > span {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 22px;
+            color: #777;
+            box-shadow: 0 1px 1px rgba(0,0,0,.05);
+            line-height: 1;
+            text-align: center;
+            height: 22px;
+            width: 22px;
+            vertical-align: middle;
+            cursor: pointer;
+
+            &:hover {
+                box-shadow: none;
+                color: #555;
+            }
+        }
+
+        .edit:before { font-size: 12px; }
+    }
+
+    td.row-controls {
+        background: #f4f4f4;
+    }
+}
+
+
+.taxonomy-fields-builder .fields-table .row-controls {
+    width: 116px;
+
+    .toggle-fieldtype-wrapper {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+}

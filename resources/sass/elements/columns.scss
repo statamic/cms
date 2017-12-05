@@ -1,0 +1,21 @@
+@include minMaxWidth(500px, 700px) {
+	.col-md-8 {
+		float: left;
+		width: 66%;
+	}
+	.col-md-4 {
+		float: left;
+		width: 33%;
+	}
+}
+
+@include minWidth(800px) {
+	.col-md-8 {
+		float: left;
+		width: 66%;
+	}
+	.col-md-4 {
+		float: left;
+		width: 33%;
+	}
+}

@@ -1,0 +1,43 @@
+.yaml-fieldtype-wrapper {
+    position: relative;
+
+    > span {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        border: 1px solid $color_border;
+        padding: 2px 5px;
+        font-family: $font;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #ccc;
+        text-shadow: 0 1px 0 white;
+        border-radius: 0 3px 0 0;
+    }
+
+    .editor {
+        border: 1px solid $border;
+        font-family: $font_monospace;
+        border-radius: 3px;
+
+        .CodeMirror {
+            @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
+            height: auto;
+        }
+
+        .CodeMirror-code { min-height: 100px; }
+    }
+}
+
+.grid-fieldtype .yaml-fieldtype-wrapper {
+    > span {
+        border-top: 0;
+        border-right: 0;
+    }
+    .editor {
+        border: none;
+        border-radius: 0;
+        .CodeMirror { box-shadow: none; }
+    }
+}

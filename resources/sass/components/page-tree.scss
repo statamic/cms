@@ -1,0 +1,342 @@
+$branchHeight: 38px;
+$branchIndent: 25px;
+$treeIndent: 70px;
+$branchHoverBg: rgba(black,.025);
+
+.page-tree {
+    @extend .z-depth-1;
+    position: relative;
+    background: white;
+    border-radius: 3px;
+    padding-left: $treeIndent;
+
+    ul.branches {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border-top: 1px solid $color_border;
+        margin-left: $branchIndent;
+        outline: rgba(black, .01);
+    }
+
+    // The top level list
+    > ul.branches {
+        margin-left: 0;
+    }
+
+    ul.empty {
+        border: 0;
+
+        // When a branch is being dragged into an empty list, we'll need that border back.
+        .branch {
+            border-top: 1px solid $color_border;
+        }
+    }
+
+    .branch-row {
+        border-top: 1px solid $color_border;
+        font-size: 13px;
+        position: relative;
+    }
+
+    // Remove the border on the top items.
+    // Also remove it on the second, when the first is being dragged.
+    li:first-child > .branch-row,
+    li.branch-dragged:first-child + li > .branch-row {
+        border-top: 0;
+    }
+
+    .page-text {
+        display: inline-block;
+        vertical-align: middle;
+        padding: 10px 0 10px 10px;
+    }
+
+    .page-url {
+        display: none;
+    }
+
+    .page-extras {
+        display: inline-block;
+        vertical-align: middle;
+        color: #ccc;
+    }
+
+    .page-entries {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .page-entries {
+        margin-left: 12px;
+    }
+
+    .page-entries .icon {
+        margin-right: 4px;
+    }
+
+    .page-entries a {
+        padding: 5px 2px;
+    }
+
+    .branch-meta {
+        float: right;
+    }
+
+    .page-actions {
+        float: right;
+        padding: 7px 10px 0 0;
+
+        i {
+            font-size: 16px;
+            color: rgba(0,0,0,.1);
+            cursor: pointer;
+        }
+    }
+
+    .page-action {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+
+    .action-more i {
+        transition: transform .2s ease;
+    }
+
+    .action-more.open i {
+        transform: rotate(90deg);
+    }
+
+    .page-indent {
+        position: absolute;
+        top: -1px;
+        left: 0;
+        height: $branchHeight + 1;
+        border-top: 1px solid $color_border;
+
+        .page-toggle {
+            position: absolute;
+            top: 0;
+            left: 20px;
+            width: 30px;
+            height: $branchHeight;
+            text-align: center;
+            border-right: 1px solid $color_border;
+            background: rgba(black, .02);
+            user-select: none;
+
+            &.toggleable {
+                cursor: pointer;
+            }
+
+            .icon {
+                display: inline-block;
+                position: relative;
+                top: 12px;
+                left: 0;
+                font-size: 13px;
+                color: #777;
+                transition: 0.1s all ease;
+            }
+
+            .collapsed {
+                transform: rotate(-90deg);
+            }
+        }
+
+        .page-move,
+        .page-unmovable {
+            background: rgba(black, .02);
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: $branchHeight;
+            width: 20px;
+        }
+
+        .indent-arrow {
+            display: block;
+            width: 11px;
+            height: 10px;
+            background: url('../img/page-arrow.png');
+            position: absolute;
+            top: 13px;
+            right: 2px;
+        }
+    }
+
+    // Each nesting gets a bigger indent
+    $indent: $treeIndent;
+    @for $i from 1 through 10 {
+        .depth-#{$i} > .branch > .branch-row > .page-indent {
+            width: $indent;
+            left: -#{$indent};
+            $indent: $indent + $branchIndent;
+        }
+    }
+
+    .branch-row:hover {
+        background: $branchHoverBg;
+
+        .page-indent {
+            background: $branchHoverBg;
+        }
+
+        .page-actions i {
+            color: $color_gray_light;
+        }
+    }
+
+    // Top level pages have a little more oomph.
+    .depth-1 > .branch > .branch-row {
+        .page-text {
+            font-size: 14px;
+            font-weight: 500;
+            padding-top: 9px; // negate the font size increase
+        }
+        .indent-arrow {
+            display: none;
+        }
+        .page-move {
+            display: block;
+        }
+    }
+
+    // Collapsed branches
+    .branches-collapsed {
+        border: 0;
+
+        // We want to hide all the branches
+        > li.branch {
+            display: none;
+        }
+
+        // But show any branches that are being dragged in
+        > li.branch-placeholder {
+            display: block;
+        }
+    }
+
+    // The branch being dragged
+    .branch-dragged {
+        //display: none;
+        background: #fff;
+        position: absolute;
+        z-index: 200;
+        box-shadow: 0 0 2px 2px rgba(63,63,68,.3),0 4px 8px rgba(63,63,68,.15);
+        border-radius: 2px;
+        border: 0;
+        opacity: 0.9;
+        width: auto !important;
+        height: auto !important;
+
+        .page-text {
+            padding: 3px 5px !important;
+            font-weight: normal !important;
+            font-size: 13px !important;
+        }
+
+        .branch-row {
+            border: 0;
+        }
+
+        .page-indent, .page-extras, .page-actions, ul {
+            display: none !important;
+        }
+    }
+
+    // Only if the tree is sortable
+    &.tree-sortable {
+        .drag-handle {
+            cursor: move;
+            cursor: grab;
+            &:active {
+                cursor: grabbing;
+            }
+        }
+
+        .page-indent .page-move {
+            background: rgba(black, .02) url('../img/drag-dots.gif') center center no-repeat;
+            border-right: 1px solid $color_border;
+        }
+    }
+
+    // Dragging placeholder
+    .branch-placeholder {
+        .page-text {
+            color: $color_green;
+        }
+    }
+
+    // URL mode
+    &.show-urls {
+        .page-title {
+            display: none;
+        }
+        .page-url {
+            display: block;
+        }
+    }
+
+    // Drafts
+    .draft  .page-title {
+        color: rgba($brand-darker, .5);
+        &:hover { color: rgba($brand-darker, .75); }
+    }
+
+    // Saving overlay
+    .saving {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 200;
+        background: rgba(white, .7);
+        display: flex;
+        align-items: center;
+        border-radius: 3px;
+
+        .inner {
+            text-align: center;
+            padding: 50px;
+            margin: 0 auto;
+        }
+
+        i {
+            position: relative;
+            top: -1px;
+            margin-right: 10px;
+        }
+    }
+
+    // The home branch is different too
+    .tree-home {
+        margin: 0;
+        border: 0;
+
+        .branch-row {
+            border-top: 0;
+            cursor: default;
+        }
+
+        .page-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .page-indent {
+            width: $treeIndent;
+            left: -$treeIndent;
+            border-top: 1px solid transparent;
+        }
+    }
+}
+
+
+// When dragging
+.page-tree-dragging {
+    cursor: move;
+    cursor: rabbing;
+}

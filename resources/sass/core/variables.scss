@@ -1,0 +1,40 @@
+// Colors
+$color_dark_blue:       #2d393c;
+$color_border: 		    #e0e0e0;
+$color_pin:			    #979797;
+$color_gray_dark: 	    #32325d;
+$color_gray_light: 	    #676767;
+$color_gray_input: 	    #f6f9fc;
+$color_gray_page: 	    #E5E5E5;
+$color_gray_upload:     #979797;
+$color_gray_upload_alt: #919191;
+$color_green: 		    #479967;
+$color_search_alt:	    #DCDCD1;
+$color_red:             #E75650;
+$color_yellow:          #fbfab0;
+
+$border:                $color_border;
+$color_gray_lighter:    $color_gray_input;
+$bg:                    #f1f5f9;
+$asset_bg:              #394045;
+
+// Fonts
+$font: -apple-system, BlinkMacSystemFont,  "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font_monospace:    'Menlo', monospace;
+
+// Z indexes
+$z_index_modal: 100;
+
+$hidpi: 'only screen and (-webkit-min-device-pixel-ratio:1.5),only screen and (min-device-pixel-ratio:1.5)';
+
+// Bootstrap
+$brand-primary: 	#3aa3e3;
+$brand-secondary:   #48606f;
+$brand-darker:      #3C4858;
+
+$font-family-monospace: $font_monospace;
+$border-radius-base: 3px;
+$nav-link-hover-bg: $bg;
+$nav-tabs-border-color: $color_border;
+$nav-tabs-link-hover-border-color: $color_border;
+$nav-tabs-active-link-hover-border-color: $color_border;

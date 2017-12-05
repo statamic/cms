@@ -1,0 +1,24 @@
+<div id="typeahead" v-cloak :class="{'dirty': isDirty}">
+    <div class="state-container">
+        <i class="icon icon-magnifying-glass" @click="focus"></i>
+    </div>
+
+    <typeahead-input class="search alt"
+                     id="global-search"
+                     :query.sync="query"
+                     :on-up="up"
+                     :on-down="down"
+                     :on-hit="hit"
+                     :on-reset="reset"
+                     @keyup.esc="reset"
+    ></typeahead-input>
+
+    <i class="icon icon-cross" v-show="isDirty || loading" @click="reset"></i>
+
+    <ul v-show="hasItems">
+        <li v-for="item in items" :class="{'active': isActive($index)}" @mousedown="hit" @mousemove="setActive($index)">
+            <span class="title" v-html="item.title"></span>
+            <span class="url" v-html="item.url"></span>
+        </li>
+    </ul>
+</div>

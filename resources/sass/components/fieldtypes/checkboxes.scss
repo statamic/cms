@@ -1,0 +1,13 @@
+.checkboxes-fieldtype {
+    ul {
+        @extend .list-unstyled;
+        margin: 0;
+    }
+    li { margin-bottom: 5px; }
+    // li:last-child { margin-bottom: 0; }
+
+    li label { margin: 0; }
+}
+
+// The Grid
+.grid-fieldtype .checkboxes-fieldtype { padding: 10px }

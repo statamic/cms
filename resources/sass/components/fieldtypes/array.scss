@@ -1,0 +1,43 @@
+.array-fieldtype .row {
+    margin-bottom: 8px;
+}
+
+.array-fieldtype .array-keyed .grid-table {
+    margin-bottom: 0;
+}
+
+// Inside a grid
+.grid-table .array-fieldtype {
+
+    // Applies to both modes
+    .grid-table {
+        margin-bottom: 0;
+        tr:first-child {
+            td, th { border-top: 0; }
+        }
+        tr:last-child {
+            td, th { border-radius: 0; }
+        }
+        tr > :first-child { border-left: 0; }
+        tr > :last-child { border-right: 0; }
+    }
+
+    // Dynamic mode only
+    .array-dynamic .btn {
+        background: #f4f4f4;
+        color: $brand-primary;
+        padding: 10px 10px 11px;
+        display: block;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        border: 0;
+        margin: 15px 0 0;
+        text-align: left;
+
+        &:hover, &:active, &:focus {
+            top: 0;
+        }
+    }
+
+}

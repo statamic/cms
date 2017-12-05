@@ -1,0 +1,85 @@
+.vue-toast_container {
+  position: absolute;
+  padding-bottom: 10px;
+  transform: translateY(0);
+  transition: transform .2s ease-out, opacity .3s ease-out;
+  backface-visibility: hidden;
+
+  &._default .vue-toast_message {
+    background-color: rgba(#000, .9);
+  }
+  &._info .vue-toast_message {
+    background-color: rgba(#31708f, .9);
+  }
+  &._success .vue-toast_message {
+    background-color:  rgba(#3c763d, .9);
+  }
+  &._warning .vue-toast_message {
+    background-color:  rgba(#8a6d3b, .9);
+  }
+  &._error .vue-toast_message {
+    background-color:  rgba(#a94442, .9);
+  }
+
+}
+
+
+.vue-toast-manager_container {
+  &.--top .vue-toast_container {
+    top: 0;
+  }
+  &.--bottom .vue-toast_container {
+    bottom: 0;
+  }
+  &.--left .vue-toast_container {
+    left: 0;
+  }
+  &.--right .vue-toast_container {
+    right: 0;
+  }
+}
+
+.vue-toast_container.v-enter,
+.vue-toast_container.v-leave {
+  opacity: 0;
+}
+
+.vue-toast_message {
+  padding: 15px 22px 15px 10px;
+  color: white;
+  font-family: arial, sans-serif;
+}
+
+.vue-toast_close-btn {
+  cursor: pointer;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+  opacity: .7;
+  transition: opacity .15s ease-in-out;
+  backface-visibility: hidden;
+
+  &:hover {
+    opacity: .9;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    width: 14px;
+    height: 2px;
+    background-color: white;
+  }
+
+  &::before {
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}

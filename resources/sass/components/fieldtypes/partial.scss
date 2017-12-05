@@ -1,0 +1,22 @@
+.partial-fieldtype {
+    &.form-group {
+        padding: 0;
+        margin: 0;
+    }
+
+    > .field-inner {
+        padding: 0;
+
+        > label, > .help-block {
+            display: none;
+        }
+    }
+}
+
+.editing-layout .partial-fieldtype.form-group {
+    padding: 15px;
+
+    > .field-inner > .publish-fields > .form-group {
+        padding: 0;
+    }
+}

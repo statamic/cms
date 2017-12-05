@@ -1,0 +1,39 @@
+<div>
+    <table class="fields-table bordered-table">
+        <thead>
+            <tr>
+                <th>{{ translate('cp.handle')}}</th>
+                <th>{{ translate('cp.label')}}</th>
+                <th>{{ translate('cp.type')}}</th>
+                <th class="col-localizable" v-if="canLocalize"><i class="icon icon-globe"></i></th>
+                <th class="row-controls"></th>
+            </tr>
+        </thead>
+        <tbody v-el:tbody>
+            <tr v-for="field in fields">
+                <td class="col-handle"><input type="text" class="code" v-model="field.name" :disabled="field.name === 'title'" tabindex="0" /></td>
+                <td class="col-display"><input type="text" v-model="field.display" tabindex="0" /></td>
+                <td>{{ fieldtypeLabel(field.type) }}</td>
+                <td class="col-localizable" v-if="canLocalize">
+                    <toggle-fieldtype :data.sync="field.localizable"></toggle-fieldtype>
+                </td>
+                <td class="row-controls">
+                    <span class="icon icon-edit edit" @click="selectField($index)"></span>
+                    <span class="icon icon-menu move drag-handle" v-if="field.name !== 'title'"></span>
+                    <span class="icon icon-cross delete" @click="deleteField($index)"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <modal :show.sync="showEditModal" class="markdown-modal">
+        <template slot="header">{{ fields[selectedField].display }}</template>
+        <template slot="body">
+            <field-settings :field.sync="fields[selectedField]"
+                            :fieldtype-config="fieldtypeConfig"
+                            :fieldtypes="fieldtypes"
+                            :root="root">
+            </field-settings>
+        </template>
+    </modal>
+</div>

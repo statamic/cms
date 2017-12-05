@@ -1,0 +1,71 @@
+$toggle_green: #64BD63;
+$toggle_radius: 20px;
+
+.toggle-fieldtype-wrapper {
+    height: 32px;
+    display: flex;
+    align-items: center;
+}
+
+.locale-status-field .toggle-fieldtype-wrapper {
+    height: auto;
+    display: inline-block;
+}
+
+.toggle-container {
+    height: 22px;
+    width: 46px;
+    border-radius: $toggle_radius;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #dfdfdf;
+    font-size: 0.1px;
+    margin: 6px 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: -1px;
+    width: 20px;
+    height: 22px;
+    border-radius: $toggle_radius;
+    transition: all 0.2s ease;
+}
+
+
+.toggle-knob {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(black, .4);
+    outline: none;
+    transition: box-shadow 0.1s, background-color 0.2s ease-in-out;
+}
+
+.toggle-knob:hover {
+    box-shadow: 0 1px 3px rgba($brand-primary, .9);
+}
+
+.toggle-knob:focus {
+    background-color: #efefef;
+    @include form-control-focus;
+}
+
+.toggle-container.on {
+    .toggle-slider {
+        width: 44px;
+        background: $toggle_green;
+    }
+
+    .toggle-knob:focus {
+        background-color: darken($toggle_green, 20%);
+        box-shadow: 0 0 10px rgba($toggle_green, .7);
+    }
+}
+
+// The Grid
+.grid-fieldtype .toggle-fieldtype { padding: 10px; }

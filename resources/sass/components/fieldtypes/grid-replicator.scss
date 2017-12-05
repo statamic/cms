@@ -1,0 +1,122 @@
+/* ==========================================================================
+   GRID & REPLICATOR
+   ========================================================================== */
+
+.grid-field, .replicator-fieldtype {
+
+    .form-group {
+        padding: 0;
+    }
+
+    .list-group-item {
+        background: $color_gray_lighter;
+
+        .form-control, textarea, input,
+        &[type="checkbox"] + label:before,
+        &[type="radio"] + label:before,
+        .redactor-toolbar {
+            background: #fff;
+        }
+
+        label {
+            margin-bottom: 0;
+        }
+    }
+
+    .list-group-item + .list-group-item {
+        padding-top: 20px;
+    }
+
+}
+
+.group-header {
+    @include toolbar;
+    box-shadow: none;
+    box-shadow: 0 0 0 #000;
+    transition: box-shadow .15s ease;
+
+    .icon,
+    button > .icon {
+        cursor: pointer;
+        color: $color_gray_light;
+        margin: 0;
+        font-size: 18px;
+
+        &:hover {
+            color: $color_gray_dark;
+        }
+    }
+
+}
+
+.stacked-placeholder {
+    background: rgba($color_yellow, .5);
+    border: 1px dashed mix(black, $color_yellow, 10%);
+    margin-bottom: 20px;
+    border-radius: 3px;
+}
+
+
+
+/* Replicator/Stacked Grids only
+  ========================================================================== */
+
+.replicator-fieldtype, .grid-fieldtype .grid-stacked {
+    .list-group-item.group-header {
+        background: #edf1f4;
+        &.collapsed {
+            border-radius: 3px;
+            .help-block { display: none; }
+        }
+
+        .help-block {
+            margin: 0;
+            p { margin: 0; }
+        }
+    }
+
+    .form-control,
+    textarea,
+    input {
+         border: 1px solid #d0d0d0;
+    }
+
+    .replicator-set-summary {
+        font-size: 11px;
+        color: rgba(0,0,0,.5);
+        margin-left: 16px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
+        overflow: hidden;
+        max-width: 360px;
+
+        .sneak-peeking & {
+            max-width: 160px;
+        }
+    }
+}
+
+tr.excess {
+    background: #f2f2f2;
+    .form-control,
+    textarea,
+    input {
+        &,
+        &[type="checkbox"] + label:before,
+        &[type="radio"] + label:before {
+            background: #fff;
+        }
+    }
+}
+
+
+
+
+/* Drag Interaction
+  ========================================================================== */
+
+.replicator-fieldtype .list-group.ui-sortable-helper {
+    box-shadow: 0 8px 24px 0 rgba(50,50,93,.1), 0 4px 8px 0 rgba(0,0,0,.08);
+    border-bottom: 1px solid #ccc;
+}

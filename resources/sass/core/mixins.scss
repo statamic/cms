@@ -1,0 +1,129 @@
+@mixin button($background, $text: #fff) {
+    border: none;
+	background: $background;
+    border-radius: 3px;
+	box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.07), 0 1px 2px 0 rgba(0,0,0,.08), 0 0 0 0 transparent;
+    color: $text;
+    display: inline-block;
+    font-size: 13px;
+    height: 32px;
+    padding: 0 12px;
+    line-height: 32px;
+    position: relative;
+    text-shadow: none;
+	vertical-align: middle;
+	transition: box-shadow .08s ease-in,color .08s ease-in;
+
+    &:hover, &:active, &:focus, &:active:focus {
+        background: $background;
+        color: $text;
+    	outline: none !important;
+    }
+
+	&:hover,
+    &.depressed {
+		box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.1), 0 3px 9px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.08), 0 1px 2px 0 rgba(0,0,0,.08);
+	}
+}
+
+// Box Shadow
+@mixin box-shadow($shadows...) {
+	-moz-box-shadow: $shadows;
+	-webkit-box-shadow: $shadows;
+	box-shadow: $shadows;
+}
+
+@mixin input-shadow() {
+    box-shadow: inset 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+}
+
+// Background with retina support
+@mixin background($imgpath, $size: 100% 100%, $color: transparent, $position:0 0, $repeat: no-repeat) {
+    background: #{$color} url(#{$imgpath}) $repeat $position;
+
+    @media #{$hidpi} {
+		background: #{$color} url(#{hidpiImage($imgpath)}) $repeat $position;
+		background-size: $size;
+    }
+}
+
+// Responsive support
+@mixin minWidth($width) {
+	@media (min-width: #{$width}) {
+		@content;
+	}
+}
+
+@mixin maxWidth($width) {
+	@media (max-width: #{$width}) {
+		@content;
+	}
+}
+
+@mixin minMaxWidth($min, $max) {
+	@media (max-width:$max) and (min-width:$min) {
+		@content;
+	}
+}
+
+// Mixin printing a linear-gradient
+// as well as a plain color fallback
+// and the `-webkit-` prefixed declaration
+// @access public
+// @param {String | List | Angle} $direction - Linear gradient direction
+// @param {Arglist} $color-stops - List of color-stops composing the gradient
+@mixin linear-gradient($direction, $color-stops...) {
+	@if is-direction($direction) == false {
+		$color-stops: ($direction, $color-stops);
+		$direction: 180deg;
+	}
+
+	background: nth(nth($color-stops, 1), 1);
+	background: -webkit-linear-gradient($direction, $color-stops);
+	background: linear-gradient($direction, $color-stops);
+}
+
+@mixin clearfix() {
+	&:before,
+	&:after {
+		content: " "; // 1
+		display: table; // 2
+	}
+	&:after {
+		clear: both;
+	}
+}
+
+@mixin toolbar() {
+	@include clearfix;
+	background: $color_gray_lighter;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 5px 5px -5px rgba(0,0,0,0.05);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    display: block;
+    list-style: none;
+
+    .grid-fieldtype tbody & {
+        background: #f4f4f4;
+        border-radius: 0;
+        border-bottom: 1px solid $border;
+        box-shadow: none;
+    }
+}
+
+@function hidpiImage($string) {
+	$length: str-length($string);
+
+	@return str-slice($string, 1, $length - 4) + '@2x' + str-slice($string, $length - 3, $length);
+}
+
+
+// Test if `$value` is an angle
+// @param {*} $value - Value to test
+// @return {Bool}
+@function is-direction($value) {
+	$is-direction: index((to top, to top right, to right top, to right, to bottom right, to right bottom, to bottom, to bottom left, to left bottom, to left, to left top, to top left), $value);
+	$is-angle: type-of($value) == 'number' and index('deg' 'grad' 'turn' 'rad', unit($value));
+
+	@return $is-direction or $is-angle;
+}

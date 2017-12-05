@@ -1,0 +1,129 @@
+<div class="content-type-{{ contentType }}">
+<div class="publish-form" id="publish-form" :class="{'no-meta' : ! shouldShowMeta}">
+
+    <div v-if="loading" class="loading loading-blocker">
+        <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+    </div>
+
+    <div class="publish-errors alert alert-danger" v-if="hasErrors">
+        <ul>
+            <li v-for="error in errors">{{ error }}</li>
+        </ul>
+    </div>
+
+    <div class="flexy mb-24 full-width sticky" id="publish-controls">
+
+        <h1 class="fill">
+            <span v-if="! isDefaultLocale" class="locale">{{ locale }}</span>
+            <span>{{ title }}</span>
+        </h1>
+
+        <div class="controls">
+
+            <user-options v-if="isUser && !isNew" :username="slug" :status="contentData.status"></user-options>
+
+            <template v-if="editingLayout">
+                <button class="btn" @click="editLayout(false)">
+                    {{ translate('cp.cancel') }}
+                </button>
+                <div class="btn-group btn-group-primary">
+                    <button type="button" class="btn btn-primary" @click="saveLayout">
+                        {{ translate('cp.save_layout') }}
+                    </button>
+                </div>
+            </template>
+
+            <div class="btn-group mr-8" v-if="$parent.isPublishPage && !editingLayout">
+                <button type="button" class="btn" @click.prevent="$parent.preview">{{ translate('cp.sneak_peek') }}</button>
+                <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">{{ translate('cp.toggle_dropdown') }}</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ url }}" target="_blank">{{ translate('cp.visit_url') }}</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group btn-group-primary" v-if="!editingLayout">
+
+                <button v-if="! continuing" type="button" class="btn btn-primary" @click="publishWithoutContinuing" :disabled="saving">{{ translate('cp.save') }}</button>
+                <button v-else type="button" class="btn btn-primary" @click="publishAndContinue" :disabled="saving">{{ translate('cp.save_and_continue') }}</button>
+
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" :disabled="saving">
+                    <span class="caret"></span>
+                    <span class="sr-only">{{ translate('cp.toggle_dropdown') }}</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li v-if="! continuing"><a id="publish-continue" @click="publishAndContinue">{{ translate('cp.save_and_continue') }}</a></li>
+                    <li v-else><a @click="publishWithoutContinuing">{{ translate('cp.save') }}</a></li>
+                    <li v-if="canEditLayout"><a @click="editLayout(true)">{{ translate('cp.edit_layout') }}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="publish-meta" v-if="shouldShowMeta">
+        <div class="card">
+            <div class="publish-fields pb-0">
+                <div class="form-group title-field" v-if="shouldShowTitle">
+                    <label class="block">{{ titleDisplayName }}</label>
+                    <input type="text" class="form-control type-text" autofocus="autofocus" v-model="formData.fields.title" placeholder="{{ translate('cp.new') }} {{ contentType }}" />
+                </div>
+
+                <div class="form-group inline">
+                    <div class="form-group major" v-if="shouldShowSlug">
+                        <label class="block">{{ translate('cp.slug') }}</label>
+                        <input type="text" v-model="formData.slug" class="form-control mono" @keydown="modifySlug"
+                        placeholder="{{ translate('cp.new').toLowerCase() }}-{{ contentType.toLowerCase() }}">
+                    </div>
+
+                    <div class="form-group major" v-if="shouldShowDate">
+                        <label class="block">{{ translate('cp.date_and_time') }}</label>
+                        <date-fieldtype name="date" :data.sync="formData.extra.datetime" :leave-alert="true"></date-fieldtype>
+                    </div>
+
+                    <status-field
+                            v-if="!editingLayout"
+                            :locale="locale"
+                            :locales="locales"
+                            :allow-statuses="allowStatuses"
+                            :status.sync="formData.status"></status-field>
+                </div>
+
+                <taxonomy-fields v-if="shouldShowTaxonomies" :taxonomies="taxonomies" :fields="formData.fields"></taxonomy-fields>
+            </div>
+        </div>
+    </div>
+
+    <div id="publish-fields" v-if="formDataInitialized">
+        <div class="card">
+            <div :class="{ 'editing-layout': editingLayout }">
+                <div class="publish-main">
+
+                    <div class="publish-fields title-field" v-if="shouldShowTitle">
+                        <div class="form-group">
+                            <label class="block">{{ titleDisplayName }}</label>
+                            <input type="text" class="form-control type-text" autofocus="autofocus" v-model="formData.fields.title" placeholder="{{ translate('cp.new') }} {{ contentType }}" />
+                        </div>
+                    </div>
+
+                    <publish-fields v-if="formDataInitialized"
+                                    v-ref:publish-fields
+                                    :errors="errors"
+                                    :fieldset-name="fieldsetName"
+                                    :uuid="uuid"
+                                    :locale="locale"
+                                    :editing-fieldset="editingLayout"
+                                    :field-data="formData.fields"
+                                    :env="extra.env"
+                                    :remove-title="removeTitle"
+                                    :focus="! hasAnyMetaData">
+                    </publish-fields>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

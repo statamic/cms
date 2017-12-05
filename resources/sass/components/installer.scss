@@ -1,0 +1,25 @@
+.installer {
+
+    .license-error {
+        margin: 15px 0;
+
+        .help-block { color: $color_red; }
+    }
+
+    .trial {
+        padding-bottom: 10px;
+
+        .btn { margin-right: 10px; }
+
+        .what {
+            font-size: 13px;
+            display: inline-block;
+            margin-top: 7px;
+        }
+    }
+
+    .install-user, .install-settings {
+        padding-bottom: 30px;
+    }
+
+}

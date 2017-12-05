@@ -1,0 +1,16 @@
+<div class="vue-toast_container"
+     @mouseover="_stopTimer"
+     @mouseleave="_startTimer"
+     :style="style"
+     v-show="isShow"
+     transition>
+    <div class="vue-toast_message alert" :class="styles">
+        <button type="button"
+                class="close"
+                aria-label="Close"
+                v-if="options.closeBtn" @click="remove">
+            <span aria-hidden="true">×</span>
+        </button>
+        <span v-html="message"></span>
+    </div>
+</div>

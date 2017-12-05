@@ -1,0 +1,94 @@
+
+.daterange {
+	outline: none;
+	@include form-control-focus;
+
+	.icon {
+		position: absolute;
+		z-index: 20;
+		color: rgba(0,0,0,.3);
+	}
+
+	.icon-calendar {
+		top: 5px;
+		right: 10px;
+		pointer-events: none;
+	}
+
+	.icon-remove { right: 32px; }
+	.dr-calendar { max-width: 250px; }
+}
+
+.datetime .icon-remove, .time-fieldtype .icon-remove {
+	top: 8px;
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.1);
+	font-size: 15px;
+	line-height: 1;
+	padding: 0px 4px 2px;
+	border-radius: 50%;
+	color: #777;
+	text-shadow: 0 1px 1px #FFF;
+}
+
+.time-fieldtype {
+	input {
+		max-width: 40px !important;
+        padding-left: 3px;
+        padding-right: 3px;
+        text-align: center;
+		-moz-appearance: textfield;
+	}
+
+	input::-webkit-inner-spin-button,
+	input::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	.icon-remove {
+		position: relative;
+		top: 0;
+		right: -8px;
+		outline: none;
+	}
+
+	.icon-remove:focus {
+		@include form-control-focus;
+	}
+}
+
+.date-time-container {
+	display: flex;
+
+	.col-date {
+		flex: 1;
+	}
+	.col-time {
+		padding-left: 10px;
+	}
+}
+
+/* === Inside a Grid === */
+
+.grid-field .date-fieldtype {
+    .daterange .icon {
+        top: 8px;
+    }
+
+    .btn.add-time { top: 8px; }
+
+    .col-time {
+        padding: 0 10px;
+        input.form-control {
+            background: #f8f8f8;
+            width: auto;
+            text-align: center;
+        }
+        .colon {
+            background: #f8f8f8;
+            margin: 0;
+            padding: 8px 5px;
+        }
+    }
+}

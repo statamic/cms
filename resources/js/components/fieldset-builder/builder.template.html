@@ -1,0 +1,69 @@
+<div>
+
+		<div class="flexy mb-24 sticky">
+			<h1 class="fill" v-if="create">
+				{{ translate('cp.create_fieldset') }}
+			</h1>
+
+			<h1 class="fill" v-else>
+				{{ translate('cp.editing_fieldset') }}:
+				<strong>{{ fieldsetTitle }}</strong>
+			</h1>
+			<button type="button" class="btn btn-primary" v-on:click="save()" :disabled="!canSave">{{ translate('cp.save') }}</button>
+		</div>
+
+	<div class="card">
+		<div v-if="loading && !errorMessage" class="loading">
+			<span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+		</div>
+
+		<div v-if="errorMessage" class="alert alert-danger">
+			<p>{{ errorMessage }}</p>
+		</div>
+
+		<div class="fieldset-builder" v-if="! loading">
+
+			<div class="form-group">
+				<label class="block">{{ translate('cp.title') }}</label>
+				<small class="help-block">{{ translate('cp.fieldset_title_instructions') }}</small>
+				<input type="text" class="form-control" v-model="fieldset.title" autofocus="autofocus" />
+			</div>
+
+			<div class="form-group" v-if="create">
+				<label class="block">{{ translate('cp.handle') }}</label>
+				<small class="help-block">{{ translate('cp.fieldset_handle_instructions') }}</small>
+				<input type="text" class="form-control" v-model="slug" />
+			</div>
+
+            <div class="form-group">
+				<label class="block">{{ translate('cp.create_title') }}</label>
+				<small class="help-block">{{ translate('cp.fieldset_create_title_instructions') }}</small>
+				<input type="text" class="form-control" v-model="fieldset.create_title" />
+			</div>
+
+			<div class="form-group">
+				<label class="block">{{ translate('cp.hide') }}</label>
+				<small class="help-block">{{ translate('cp.fieldset_hide_instructions') }}</small>
+				<toggle-fieldtype :data.sync="fieldset.hide"></toggle-fieldtype>
+			</div>
+
+			<div class="form-group">
+				<label class="block">{{ translate_choice('cp.fields', 2) }}</label>
+				<small class="help-block">{{ translate('cp.fieldset_fields_instructions') }}</small>
+				<fields-builder :fields="fieldset.fields"
+								:fieldtypes="fieldtypes"
+								:root="true">
+				</fields-builder>
+			</div>
+
+			<div class="form-group">
+				<label class="block">{{ translate_choice('cp.taxonomies', 2) }}</label>
+				<small class="help-block">{{ translate('cp.fieldset_taxonomies_instructions') }}</small>
+				<taxonomy-fields-builder
+						:fields="fieldset.taxonomies"
+						:fieldtypes="fieldtypes">
+				</taxonomy-fields-builder>
+			</div>
+		</div>
+	</div>
+</div>

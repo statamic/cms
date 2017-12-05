@@ -1,0 +1,68 @@
+<div>
+    <table class="fields-table bordered-table">
+        <thead>
+            <tr>
+                <th>{{ translate('cp.handle') }}</th>
+                <th>{{ translate('cp.label') }}</th>
+                <th class="col-column">{{ translate_choice('cp.columns', 1) }}</th>
+                <th class="row-controls"></th>
+            </tr>
+        </thead>
+        <tbody class="sortable" v-el:tbody>
+            <tr v-for="field in fields">
+                <td class="col-handle"><input type="text" class="code" v-model="field.name" /></td>
+                <td class="col-display"><input type="text" v-model="field.display" /></td>
+                <td class="col-column">
+                    <toggle-fieldtype :data.sync="field.column"></toggle-fieldtype>
+                </td>
+                <td class="row-controls">
+                    <span class="icon icon-edit edit" @click="selectField($index)"></span>
+                    <span class="icon icon-menu move drag-handle"></span>
+                    <span class="icon icon-cross delete" @click="deleteField($index)"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <modal :show.sync="showEditModal" class="markdown-modal">
+        <template slot="header">{{ translate('cp.edit_field') }}</template>
+        <template slot="body">
+            <field-settings :field.sync="fields[selectedField]">
+            </field-settings>
+        </template>
+    </modal>
+
+
+                <!--
+    <div class="fieldset-fields">
+        <div class="sortable fieldset-fields-body">
+            <div v-for="field in fields" :class="{ 'fieldset-field': true, 'active': selectedField === $index }">
+
+                <div class="field-row">
+                    <span class="drag-handle" v-on:mousedown="deselectField"></span>
+
+                    <div class="cell">
+                        <a href="#" v-on:click="selectField($index, $event)">{{ field.display }}</a>
+                    </div>
+
+                    <div class="cell">
+                        <code>{{ field.name }}</code>
+                    </div>
+
+                    <div class="cell actions">
+                        <span v-on:click="selectField($index, $event)" v-if="selectedField !== $index"><i class="icon icon-chevron-down"></i></span>
+                        <span v-on:click="deselectField" v-if="selectedField === $index"><i class="icon icon-chevron-up"></i></span>
+                        <span v-on:click="deleteField($index)"><i class="icon icon-trash"></i></span>
+                    </div>
+                </div>
+
+                <div class="field-settings" v-if="selectedField === $index">
+                    <field-settings :field="field"></field-settings>
+                </div>
+
+            </div>
+        </div>
+    </div> -->
+
+    <button type="button" class="btn btn-default" @click="addField">{{ translate_choice('cp.fields', 1) }} <i class="icon icon-plus icon-right"></i></button>
+</div>

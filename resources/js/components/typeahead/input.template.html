@@ -1,0 +1,10 @@
+<input type="text"
+       autocomplete="off"
+       v-model="query"
+       @keydown.up="up"
+       @keydown.down="down"
+       @keydown.enter="hit"
+       @keydown.esc="reset"
+       @blur="reset"
+       placeholder="Search..."
+   />

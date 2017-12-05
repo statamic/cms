@@ -1,0 +1,72 @@
+/* ==========================================================================
+   REDACTOR OVERRIDES
+   ========================================================================== */
+
+.redactor-box {
+    border: 1px solid $border;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.redactor-editor {
+    @include input-shadow;
+    background: $bg;
+    padding: 16px;
+    border-radius: 0;
+    border: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+.redactor-toolbar {
+    background: #fff;
+    border-bottom: 1px solid #cecece;
+    z-index: 5;
+    box-shadow: none;
+}
+
+.redactor-toolbar li a {
+    padding: 12px;
+}
+
+.redactor-toolbar li a:hover {
+    background: $brand-primary;
+}
+
+// Our stylesheet hides checkboxes, and shows fancy ones with
+// special markup. This doesn't use the markup so it's hidden.
+// We'll just bring it back manually.
+#redactor-modal input[type=checkbox] {
+	display: inline-block;
+}
+
+
+
+
+/* Inside a Replicator Fieldtype
+  ========================================================================== */
+
+.replicator-fieldtype .redactor-fieldtype,
+.grid-fieldtype .grid-stacked .redactor-fieldtype {
+    .redactor-editor {
+        background: #fff;
+    }
+}
+
+
+
+
+/* Inside a Grid Fieldtype
+  ========================================================================== */
+
+.grid-fieldtype .grid-table .redactor-fieldtype {
+    .redactor-box {
+        border: none;
+        border-radius: 0;
+    }
+
+    .redactor-editor {
+        background: #fff;
+    }
+
+    .redactor-toolbar { border-radius: 0; }
+}

@@ -1,0 +1,45 @@
+<div v-if="loading" class="loading">
+	<span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+</div>
+
+<div class="publish-fields">
+	<div v-for="field in fields" v-show="peekaboo(field)"
+	     class="form-group {{ field.type }}-fieldtype width-{{ field.width || 100 }} {{ hasError(field) ? 'has-error' : '' }}">
+		<div class="field-inner">
+
+			<label class="block" :class="{'bold': field.bold}">
+				<template v-if="field.display">{{ field.display }}</template>
+				<template v-if="!field.display">{{ field.name | deslugify | titleize }}</template>
+				<i class="required" v-if="field.required">*</i>
+			</label>
+
+			<small class="help-block" v-if="field.instructions" v-html="field.instructions | markdown"></small>
+
+			<div v-if="definedInEnvironment(field.name)" class="environment-field">
+                <i class="icon icon-lock"></i> {{ translate('defined_in_environment') }}
+			</div>
+
+			<component v-else
+						:is="componentName(field)"
+						:name="field.name"
+						:data.sync="fieldData[field.name]"
+						:config="fields[$index]"
+						:autofocus="focus && $index == 0"
+						:leave-alert="true"
+						v-focus="$index == 0">
+			</component>
+
+			<div class="field-mask" v-if="editingFieldset">
+				<div class="field-actions">
+					<i class="icon icon-menu"></i>
+					<div class="select" :data-content="widthText(field.width)">
+						<select v-model="field.width">
+							<option v-for="width in widths" :value="width.value">{{ width.text }}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

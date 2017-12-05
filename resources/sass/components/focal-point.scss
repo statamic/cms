@@ -1,0 +1,101 @@
+.focal-point {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 5px solid #394045;
+}
+
+.focal-point-toolbox {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 120;
+    width: 360px;
+    padding: 15px;
+
+    .form-group {
+        margin-bottom: 15px;
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.focal-point-coordinates {
+    display: flex;
+    flex-direction: column;
+    font-family: $font_monospace;
+
+    .pair {
+        display: flex;
+        align-items: center;
+    }
+    .axis {
+        font-weight: bold;
+        font-size: 12px;
+        margin-right: 5px;
+        color: $color_dark_blue;
+    }
+    .value {
+        display: block;
+        font-size: 14px;
+    }
+}
+
+.focal-point-image {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+
+    img {
+        max-width: 100%;
+    }
+}
+
+.focal-point-reticle {
+    border: 1px solid white;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin: -50px 0 0 -50px;
+    position: absolute;
+    box-shadow: 0 0 5px rgba(0,0,0,.5);
+    transition: all 0.5s ease;
+    pointer-events: none;
+
+    &:before {
+        content: "";
+        width: 4px;
+        height: 4px;
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        margin: -2px 0 0 -2px;
+        box-shadow: 0 0 5px rgba(0,0,0,.5);
+    }
+}
+
+.focal-point .frame {
+    background-size: cover;
+    position: absolute;
+    margin: -5px 0 0 -5px;
+    border: 10px solid #394045;
+    box-sizing: content-box;
+    transition: background-position 0.5s ease;
+}
+
+.focal-point {
+    .frame-1, .frame-4, .frame-7 { left: 0; width: 66.6666667%; }
+    .frame-2, .frame-5, .frame-8 { left: 66.6666667%; width: 22.2222222%; }
+    .frame-3, .frame-6, .frame-9 { left: 88.8888889%; width: 11.1111111%; }
+    .frame-1, .frame-2, .frame-3 { top: 0; height: 66.6666667%; }
+    .frame-4, .frame-5, .frame-6 { top: 66.6666667%; height: 22.2222222%; }
+    .frame-7, .frame-8, .frame-9 { top: 88.8888889%; height: 11.1111111%; }
+}
