@@ -53,7 +53,11 @@ class Outpost
     /**
      * Radio into the Outpost
      *
+     * Tampering with outgoing API call will cause Statamic to consider your license invalid.
+     * We’ll also send our flying police monkeys to your office to throw poop at you. Maybe.
+     *
      * @return array
+     * @throws PoopException maybe.
      */
     public function radio()
     {
