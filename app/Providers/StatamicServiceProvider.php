@@ -49,8 +49,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         AddonServiceProvider::class,
         ValidationServiceProvider::class,
 
-        \Collective\Html\HtmlServiceProvider::class,
-
         // AuthServiceProvider::class,
         // BroadcastServiceProvider::class,
         // EventServiceProvider::class,
