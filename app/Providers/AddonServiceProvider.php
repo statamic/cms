@@ -3,7 +3,9 @@
 namespace Statamic\Providers;
 
 use Statamic\API\Folder;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Extend\Management\Manifest;
 use Statamic\Extend\Management\AddonManager;
 use Statamic\Extend\Management\AddonRepository;
 use Statamic\Extend\Management\ComposerManager;
@@ -30,6 +32,12 @@ class AddonServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->instance(Manifest::class, new Manifest(
+            new Filesystem,
+            $this->app->basePath(),
+            $this->app->bootstrapPath().'/cache/addons.php'
+        ));
+
         $this->repo = new AddonRepository($this->findAddonFiles());
 
         $this->app->instance(AddonRepository::class, $this->repo);
