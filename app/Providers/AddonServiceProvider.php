@@ -50,25 +50,6 @@ class AddonServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('Statamic\Extend\Contextual\Store');
-
-        $this->registerAddonServiceProviders();
-    }
-
-    private function registerAddonServiceProviders()
-    {
-        foreach ($this->repo->serviceProviders()->installed()->classes() as $provider) {
-            $provider = $this->app->resolveProviderClass($provider);
-
-            if (! empty($provider->providers)) {
-                call_user_func([$provider, 'registerAdditionalProviders']);
-            }
-
-            if (! empty($provider->aliases)) {
-                call_user_func([$provider, 'registerAdditionalAliases']);
-            }
-
-            $this->app->register($provider);
-        }
     }
 
     private function findAddonFiles()
