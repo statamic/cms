@@ -114,7 +114,7 @@ class Path
                 continue;
             }
 
-            $segment = preg_replace(Pattern::ORDER_KEY, '', $segment);
+            $segment = preg_replace(Pattern::orderKey(), '', $segment);
         }
 
         return implode('/', $segments);

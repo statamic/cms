@@ -10,14 +10,20 @@ class Pattern
      *
      * 4 digits, dash, 2 digits, dash, 2 digits, period.
      */
-    const DATE = "/(\d{4})\-(\d{2})\-(\d{2})\./";
+    public function date()
+    {
+        return "/(\d{4})\-(\d{2})\-(\d{2})\./";
+    }
 
     /**
      * Order key for datetime
      *
      * 4 digits, dash, 2 digits, dash, 2 digits, dash, 4 digits, period.
      */
-    const DATETIME = "/(\d{4})\-(\d{2})\-(\d{2})\-(\d{4})\./";
+    public function dateTime()
+    {
+        return "/(\d{4})\-(\d{2})\-(\d{2})\-(\d{4})\./";
+    }
 
     /**
      * Order key for date _or_ datetime
@@ -26,14 +32,20 @@ class Pattern
      * Then optionally a dash and 4 digits
      * Period.
      */
-    const DATE_OR_DATETIME = "/(\d{4})\-(\d{2})\-(\d{2})(?:\-(\d{4}))?\./";
+    public function dateOrDateTime()
+    {
+        return "/(\d{4})\-(\d{2})\-(\d{2})(?:\-(\d{4}))?\./";
+    }
 
     /**
      * Order key for numerics
      *
      * Any number of digits, period.
      */
-    const NUMERIC = "/(\d+)\./";
+    public function numeric()
+    {
+        return "/(\d+)\./";
+    }
 
     /**
      * Any order key
@@ -43,12 +55,18 @@ class Pattern
      *   or any number of digits
      * Followed by a period
      */
-    const ORDER_KEY = "/^((?:(\d{4})\-(\d{2})\-(\d{2})(?:\-(\d{4}))?)|(\d+))\./";
+    public function orderKey()
+    {
+        return "/^((?:(\d{4})\-(\d{2})\-(\d{2})(?:\-(\d{4}))?)|(\d+))\./";
+    }
 
     /**
      * A UUID
      */
-    const UUID = "/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i";
+    public function uuid()
+    {
+        return "/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i";
+    }
 
     /**
      * Checks to see if a given $haystack starts with a given $needle
@@ -82,6 +100,6 @@ class Pattern
      */
     public function isUUID($value)
     {
-        return (bool) preg_match(self::UUID, $value);
+        return (bool) preg_match($this->uuid(), $value);
     }
 }
