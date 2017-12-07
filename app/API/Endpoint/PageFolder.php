@@ -11,7 +11,7 @@ class PageFolder
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function all()
+    public function all()
     {
         return app(PageFoldersService::class)->all();
     }
@@ -22,7 +22,7 @@ class PageFolder
      * @param string $handle
      * @return \Statamic\Contracts\Data\Pages\PageFolder
      */
-    public static function whereHandle($handle)
+    public function whereHandle($handle)
     {
         return app(PageFoldersService::class)->handle($handle);
     }
@@ -33,7 +33,7 @@ class PageFolder
      * @param string $handle
      * @return bool
      */
-    public static function handleExists($handle)
+    public function handleExists($handle)
     {
         return self::whereHandle($handle) !== null;
     }
@@ -43,7 +43,7 @@ class PageFolder
      *
      * @return \Statamic\Contracts\Data\Pages\PageFolder
      */
-    public static function create()
+    public function create()
     {
         /** @var \Statamic\Contracts\Data\Pages\PageFolder $folder */
         $folder = app('Statamic\Contracts\Data\Pages\PageFolder');

@@ -2,7 +2,10 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\File;
+use Statamic\API\YAML;
 use Statamic\API\Helper;
+use Statamic\API\Folder;
 use Statamic\Exceptions\FileNotFoundException;
 
 class Fieldset
@@ -21,7 +24,7 @@ class Fieldset
      * @param array  $contents
      * @return \Statamic\Contracts\CP\Fieldset
      */
-    public static function create($name, $contents = [])
+    public function create($name, $contents = [])
     {
         /** @var \Statamic\Contracts\CP\Fieldset $fieldset */
         $fieldset = app('Statamic\Contracts\CP\Fieldset');
@@ -40,7 +43,7 @@ class Fieldset
      * @return \Statamic\CP\Fieldset
      * @throws FileNotFoundException
      */
-    public static function get($name, $type = 'default')
+    public function get($name, $type = 'default')
     {
         $names = Helper::ensureArray($name);
 
@@ -63,7 +66,7 @@ class Fieldset
      * @return \Statamic\CP\Fieldset
      * @throws FileNotFoundException
      */
-    private static function fetch($name, $type = 'default')
+    private function fetch($name, $type = 'default')
     {
         $fieldset = self::create($name);
 
@@ -95,7 +98,7 @@ class Fieldset
         return $fieldset;
     }
 
-    public static function exists($name, $type = 'default')
+    public function exists($name, $type = 'default')
     {
         $fieldset = self::create($name);
 
@@ -110,7 +113,7 @@ class Fieldset
      * @param string $type
      * @return \Statamic\Contracts\CP\Fieldset[]
      */
-    public static function all($type = 'default')
+    public function all($type = 'default')
     {
         $fieldsets = [];
         $files = collect_files(Folder::getFiles(resource_path('fieldsets')))->removeHidden()->all();

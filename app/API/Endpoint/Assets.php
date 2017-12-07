@@ -13,7 +13,7 @@ class Assets
      * @return \Statamic\Assets\AssetCollection
      * @deprecated since 2.1
      */
-    public static function all()
+    public function all()
     {
         \Log::notice('Assets::all() is deprecated. Use Asset::all()');
 
@@ -26,7 +26,7 @@ class Assets
      * @return \Statamic\Contracts\Assets\AssetContainer[]
      * @deprecated since 2.1
      */
-    public static function getContainers()
+    public function getContainers()
     {
         \Log::notice('Assets::getContainers() is deprecated. Use AssetContainer::all()');
 
@@ -40,7 +40,7 @@ class Assets
      * @return \Statamic\Contracts\Assets\AssetContainer
      * @deprecated since 2.1
      */
-    public static function getContainer($id)
+    public function getContainer($id)
     {
         \Log::notice('Assets::getContainer() is deprecated. Use AssetContainer::find()');
 
@@ -54,7 +54,7 @@ class Assets
      * @return \Statamic\Contracts\Assets\AssetContainer
      * @deprecated since 2.1
      */
-    public static function getContainerByPath($path)
+    public function getContainerByPath($path)
     {
         \Log::notice('Assets::getContainerByPath() is deprecated. Use AssetContainer::wherePath()');
 
@@ -68,7 +68,7 @@ class Assets
      * @return \Statamic\Contracts\Assets\AssetContainer
      * @deprecated since 2.1
      */
-    public static function createContainer($driver = null)
+    public function createContainer($driver = null)
     {
         \Log::notice('Assets::createContainer() is deprecated. Use AssetContainer::create()');
 

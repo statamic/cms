@@ -10,7 +10,7 @@ class Addon
     /**
      * @return AddonManager
      */
-    public static function manager()
+    public function manager()
     {
         return app(AddonManager::class);
     }
@@ -21,7 +21,7 @@ class Addon
      * @param string $name  The name of the addon. This will be converted to StudlyCase.
      * @return AddonInstance
      */
-    public static function create($name)
+    public function create($name)
     {
         return new AddonInstance($name);
     }

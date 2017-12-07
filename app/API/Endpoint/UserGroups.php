@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\UserGroup;
+
 /**
  * @deprecated since 2.1
  */
@@ -12,7 +14,7 @@ class UserGroups
      *
      * @deprecated since 2.1
      */
-    public static function all()
+    public function all()
     {
         \Log::notice('UserGroups::all() is deprecated. Use UserGroup::all()');
 
@@ -26,7 +28,7 @@ class UserGroups
      * @return \Statamic\Contracts\Permissions\UserGroup
      * @deprecated since 2.1
      */
-    public static function get($id)
+    public function get($id)
     {
         \Log::notice('UserGroups::get() is deprecated. Use UserGroup::find()');
 
@@ -40,7 +42,7 @@ class UserGroups
      * @return \Statamic\Contracts\Permissions\UserGroup
      * @deprecated since 2.1
      */
-    public static function slug($slug)
+    public function slug($slug)
     {
         \Log::notice('UserGroups::slug() is deprecated. Use UserGroup::whereHandle()');
 
@@ -54,7 +56,7 @@ class UserGroups
      * @return \Illuminate\Support\Collection
      * @deprecated since 2.1
      */
-    public static function forUser($user)
+    public function forUser($user)
     {
         \Log::notice('UserGroups::forUser() is deprecated. Use UserGroup::whereUser()');
 

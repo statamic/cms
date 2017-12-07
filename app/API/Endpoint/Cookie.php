@@ -7,7 +7,7 @@ class Cookie
     /**
      * @return \Illuminate\Cookie\CookieJar
      */
-    private static function cookie()
+    private function cookie()
     {
         return cookie();
     }
@@ -19,7 +19,7 @@ class Cookie
      * @param mixed  $value Value to save
      * @param int    $mins  Minutes to keep the cookie (defaults to null which means forever / 5 years)
      */
-    public static function put($key, $value, $mins = null)
+    public function put($key, $value, $mins = null)
     {
         $cookie = (is_null($mins))
             ? self::cookie()->forever($key, $value)
@@ -35,7 +35,7 @@ class Cookie
      * @param null   $default  Fallback data if the cookie doesn't exist
      * @return mixed
      */
-    public static function get($key, $default = null)
+    public function get($key, $default = null)
     {
         return request()->cookie($key, $default);
     }
@@ -46,7 +46,7 @@ class Cookie
      * @param string $key Key to retrieve
      * @return boolean
      */
-    public static function has($key)
+    public function has($key)
     {
         return ! is_null(self::get($key));
     }
@@ -57,7 +57,7 @@ class Cookie
      * @param string $key  Key to forget
      * @return bool
      */
-    public static function forget($key)
+    public function forget($key)
     {
         return self::cookie()->forget($key);
     }

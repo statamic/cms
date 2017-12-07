@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Addon;
+
 class OAuth
 {
     /**
@@ -9,7 +11,7 @@ class OAuth
      *
      * @return bool
      */
-    public static function enabled()
+    public function enabled()
     {
         return Addon::create('OAuthBridge')->isInstalled()
             && class_exists('Statamic\Addons\OAuthBridge\OAuthBridgeServiceProvider');
@@ -21,7 +23,7 @@ class OAuth
      * @param string|null $provider
      * @return string
      */
-    public static function route($provider = null)
+    public function route($provider = null)
     {
         if (! is_null($provider)) {
             return route('oauth', $provider);
@@ -39,7 +41,7 @@ class OAuth
      *
      * @return array
      */
-    public static function providers()
+    public function providers()
     {
         return app('oauth.bridge')->getProviders();
     }

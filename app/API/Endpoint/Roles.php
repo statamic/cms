@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Role;
+
 /**
  * @deprecated since 2.1
  */
@@ -12,7 +14,7 @@ class Roles
      *
      * @deprecated since 2.1
      */
-    public static function all()
+    public function all()
     {
         \Log::notice('Roles::all() is deprecated. Use Role::all()');
 
@@ -26,7 +28,7 @@ class Roles
      * @return \Statamic\Contracts\Permissions\Role
      * @deprecated since 2.1
      */
-    public static function get($id)
+    public function get($id)
     {
         \Log::notice('Roles::get() is deprecated. Use Role::find()');
 
@@ -40,7 +42,7 @@ class Roles
      * @return \Statamic\Contracts\Permissions\Role
      * @deprecated since 2.1
      */
-    public static function slug($slug)
+    public function slug($slug)
     {
         \Log::notice('Roles::slug() is deprecated. Use Role::whereHandle()');
 

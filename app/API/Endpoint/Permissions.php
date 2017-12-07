@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Permission;
+
 /**
  * @deprecated since 2.1
  */
@@ -10,7 +12,7 @@ class Permissions
     /**
      * @deprecated since 2.1
      */
-    public static function all($wildcards = false)
+    public function all($wildcards = false)
     {
         \Log::notice('Permissions::all() is deprecated. Use Permission::all()');
 
@@ -20,7 +22,7 @@ class Permissions
     /**
      * @deprecated since 2.1
      */
-    public static function structured()
+    public function structured()
     {
         \Log::notice('Permissions::structured() is deprecated. Use Permission::structured()');
 

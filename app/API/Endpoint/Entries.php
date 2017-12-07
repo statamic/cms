@@ -2,6 +2,10 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Entry;
+use Statamic\API\Helper;
+use Statamic\API\Collection;
+
 /**
  * @deprecated since 2.1
  */
@@ -15,7 +19,7 @@ class Entries
      * @return \Statamic\Data\ContentCollection
      * @deprecated since 2.1
      */
-    public static function getFromCollection($collection, $slugs = null)
+    public function getFromCollection($collection, $slugs = null)
     {
         \Log::notice('Entries::getFromCollection() is deprecated. Use Entry::whereCollection()');
 
@@ -37,7 +41,7 @@ class Entries
      * @return \Statamic\Contracts\Data\Entries\Collection
      * @deprecated since 2.1
      */
-    public static function createCollection($slug)
+    public function createCollection($slug)
     {
         \Log::notice('Entries::createCollection() is deprecated. Use Collection::create()');
 

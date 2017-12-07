@@ -9,7 +9,7 @@ class Cache
      *
      * @return  \Illuminate\Contracts\Cache\Store
      */
-    public static function cache()
+    public function cache()
     {
         return app('cache');
     }
@@ -21,7 +21,7 @@ class Cache
      * @param mixed  $data  Data to cache
      * @param int    $mins  Minutes to keep in the cache (defaults to null which means forever)
      */
-    public static function put($key, $data, $mins = null)
+    public function put($key, $data, $mins = null)
     {
         if (is_null($mins)) {
             self::cache()->forever($key, $data);
@@ -37,7 +37,7 @@ class Cache
      * @param null   $default  Fallback data if the value doesn't exist
      * @return mixed
      */
-    public static function get($key, $default = null)
+    public function get($key, $default = null)
     {
         return self::cache()->get($key, $default);
     }
@@ -48,7 +48,7 @@ class Cache
      * @param string $key      Key to retrieve
      * @return boolean
      */
-    public static function has($key)
+    public function has($key)
     {
         return self::cache()->has($key);
     }
@@ -59,7 +59,7 @@ class Cache
      * @param string $key  Key to forget
      * @return bool
      */
-    public static function forget($key)
+    public function forget($key)
     {
         return self::cache()->forget($key);
     }
@@ -67,7 +67,7 @@ class Cache
     /**
      * Clear the entire cache
      */
-    public static function clear()
+    public function clear()
     {
         \Artisan::call('cache:clear');
     }

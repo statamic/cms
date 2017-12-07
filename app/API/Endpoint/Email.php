@@ -11,7 +11,7 @@ class Email
      *
      * @return \Statamic\Email\Builder
      */
-    private static function email()
+    private function email()
     {
         return app('Statamic\Email\Builder');
     }
@@ -21,7 +21,7 @@ class Email
      *
      * @return \Statamic\Email\Builder
      */
-    public static function create()
+    public function create()
     {
         return self::email();
     }
@@ -33,7 +33,7 @@ class Email
      * @param string|null  $name
      * @return \Statamic\Email\Builder
      */
-    public static function to($address, $name = null)
+    public function to($address, $name = null)
     {
         return self::email()->to($address, $name);
     }
@@ -45,7 +45,7 @@ class Email
      * @param string|null  $name
      * @return \Statamic\Email\Builder
      */
-    public static function from($address, $name = null)
+    public function from($address, $name = null)
     {
         return self::email()->from($address, $name);
     }
@@ -56,7 +56,7 @@ class Email
      * @param string  $template
      * @return \Statamic\Email\Builder
      */
-    public static function template($template)
+    public function template($template)
     {
         return self::email()->template($template);
     }

@@ -3,6 +3,7 @@
 namespace Statamic\API\Endpoint;
 
 use Collator;
+use Statamic\API\Config;
 use Stringy\StaticStringy;
 
 /**
@@ -10,7 +11,7 @@ use Stringy\StaticStringy;
  */
 class Str extends \Illuminate\Support\Str
 {
-    public static function __callStatic($method, $parameters)
+    public function __call($method, $parameters)
     {
         return call_user_func_array([StaticStringy::class, $method], $parameters);
     }

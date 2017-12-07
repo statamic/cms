@@ -7,7 +7,7 @@ class Hash
     /**
      * @return \Illuminate\Contracts\Hashing\Hasher
      */
-    private static function hasher()
+    private function hasher()
     {
         return app('hash');
     }
@@ -18,7 +18,7 @@ class Hash
      * @param string $value
      * @return string
      */
-    public static function make($value)
+    public function make($value)
     {
         return self::hasher()->make($value);
     }
@@ -30,7 +30,7 @@ class Hash
      * @param string $hash
      * @return bool
      */
-    public static function check($value, $hash)
+    public function check($value, $hash)
     {
         return self::hasher()->check($value, $hash);
     }

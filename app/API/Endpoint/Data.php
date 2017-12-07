@@ -2,6 +2,10 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\User;
+use Statamic\API\Asset;
+use Statamic\API\Content;
+
 class Data
 {
     /**
@@ -10,7 +14,7 @@ class Data
      * @param string $id
      * @return mixed
      */
-    public static function find($id)
+    public function find($id)
     {
         if ($content = Content::find($id)) {
             return $content;

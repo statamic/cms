@@ -2,6 +2,9 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\YAML;
+use Statamic\API\File;
+
 /**
  * Interacting with the theme
  */
@@ -13,7 +16,7 @@ class Theme
      * @param string  $macro  Name of the modifier
      * @return array
      */
-    public static function getMacro($macro)
+    public function getMacro($macro)
     {
         $path = base_path('resources/macros.yaml');
 

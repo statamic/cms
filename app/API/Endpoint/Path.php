@@ -2,7 +2,9 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
 use League\Flysystem\Util;
+use Statamic\API\Pattern;
 
 /**
  * Everything to do with file paths
@@ -15,7 +17,7 @@ class Path
      * @param string $path  The path to change
      * @return string
      */
-    public static function makeRelative($path)
+    public function makeRelative($path)
     {
         $base = base_path();
 
@@ -37,7 +39,7 @@ class Path
      * @param  string $path  The path to change
      * @return string
      */
-    public static function makeFull($path)
+    public function makeFull($path)
     {
         return self::assemble(root_path(), $path);
     }
@@ -52,7 +54,7 @@ class Path
      * @param string $path
      * @return bool
      */
-    public static function isAbsolute($path)
+    public function isAbsolute($path)
     {
         return $path[0] === DIRECTORY_SEPARATOR || preg_match('~\A[A-Z]:(?![^/\\\\])~i', $path) > 0;
     }
@@ -63,7 +65,7 @@ class Path
      * @param string $path  The path to change
      * @return string
      */
-    public static function toUrl($path)
+    public function toUrl($path)
     {
         return Str::ensureLeft(self::makeRelative($path), '/');
     }
@@ -78,7 +80,7 @@ class Path
      * @param $path
      * @return string
      */
-    public static function resolve($path)
+    public function resolve($path)
     {
         $leadingSlash = Str::startsWith($path, '/');
 
@@ -96,7 +98,7 @@ class Path
      * @param string  $path  Path to clean
      * @return string
      */
-    public static function clean($path)
+    public function clean($path)
     {
         // Remove draft and hidden flags
         $path = preg_replace('/\/_[_]?/', '/', $path);
@@ -124,7 +126,7 @@ class Path
      * @param mixed string  Open ended number of arguments
      * @return string
      */
-    public static function assemble($args)
+    public function assemble($args)
     {
         $args = func_get_args();
         if (is_array($args[0])) {
@@ -144,7 +146,7 @@ class Path
      * @param string $path  Path to check
      * @return bool
      */
-    public static function isPage($path)
+    public function isPage($path)
     {
         $ext = pathinfo($path)['extension'];
 
@@ -157,7 +159,7 @@ class Path
      * @param string $path  Path to check
      * @return bool
      */
-    public static function isEntry($path)
+    public function isEntry($path)
     {
         return ! self::isPage($path);
     }
@@ -168,7 +170,7 @@ class Path
      * @param $path
      * @return string
      */
-    public static function status($path)
+    public function status($path)
     {
         if (self::isDraft($path)) {
             return 'draft';
@@ -185,7 +187,7 @@ class Path
      * @param string $path  Path to check
      * @return bool
      */
-    public static function isDraft($path)
+    public function isDraft($path)
     {
         $ext = pathinfo($path)['extension'];
 
@@ -202,7 +204,7 @@ class Path
      * @param string $path  Path to check
      * @return bool
      */
-    public static function isHidden($path)
+    public function isHidden($path)
     {
         $ext = pathinfo($path)['extension'];
 
@@ -219,7 +221,7 @@ class Path
      * @param string $path  Path to tidy
      * @return string
      */
-    public static function tidy($path)
+    public function tidy($path)
     {
         // Remove occurrences of "//" in a $path (except when part of a protocol).
         $path = preg_replace('#(^|[^:])//+#', '\\1/', $path);
@@ -235,7 +237,7 @@ class Path
      * @param string $path
      * @return string|null
      */
-    public static function extension($path)
+    public function extension($path)
     {
         return array_get(pathinfo($path), 'extension');
     }
@@ -248,7 +250,7 @@ class Path
      * @param string $path
      * @return string
      */
-    public static function directory($path)
+    public function directory($path)
     {
         $info = pathinfo($path);
 
@@ -263,7 +265,7 @@ class Path
      * @param string $path
      * @return string mixed
      */
-    public static function folder($path)
+    public function folder($path)
     {
         $parts = explode('/', self::directory($path));
 
@@ -278,7 +280,7 @@ class Path
      * @param string $path
      * @return string
      */
-    public static function popLastSegment($path)
+    public function popLastSegment($path)
     {
         $parts = explode('/', $path);
         array_pop($parts);
@@ -293,7 +295,7 @@ class Path
      * @param string  $slug  New slug to use
      * @return string
      */
-    public static function replaceSlug($path, $slug)
+    public function replaceSlug($path, $slug)
     {
         return self::popLastSegment($path) . '/' . $slug;
     }

@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+
 /**
  * Interacting with the configuration
  */
@@ -14,7 +16,7 @@ class Config
      * @param mixed|bool  $default  The fallback value
      * @return mixed
      */
-    public static function get($key, $default = false)
+    public function get($key, $default = false)
     {
         return config($key, $default);
     }
@@ -25,7 +27,7 @@ class Config
      * @param string $key  The name of the key
      * @param mixed $value The value to set
      */
-    public static function set($key, $value)
+    public function set($key, $value)
     {
         config([$key => $value]);
     }
@@ -35,7 +37,7 @@ class Config
      *
      * @return array
      */
-    public static function all()
+    public function all()
     {
         return config()->all();
     }
@@ -45,7 +47,7 @@ class Config
      *
      * @return void
      */
-    public static function save()
+    public function save()
     {
         self::config()->save();
     }
@@ -55,7 +57,7 @@ class Config
      *
      * @return string
      */
-    public static function getAppKey()
+    public function getAppKey()
     {
         return self::get('system.app_key');
     }
@@ -65,7 +67,7 @@ class Config
      *
      * @return string|null
      */
-    public static function getLicenseKey()
+    public function getLicenseKey()
     {
         $key = self::get('system.license_key');
 
@@ -81,7 +83,7 @@ class Config
      *
      * @return string
      */
-    public static function getThemeName()
+    public function getThemeName()
     {
         return self::get('theming.theme', 'default');
     }
@@ -92,7 +94,7 @@ class Config
      * @param string|null $locale
      * @return string
      */
-    public static function getFullLocale($locale = null)
+    public function getFullLocale($locale = null)
     {
         if (is_null($locale)) {
             $locale = site_locale();
@@ -107,7 +109,7 @@ class Config
      * @param string|null $locale
      * @return string
      */
-    public static function getShortLocale($locale = null)
+    public function getShortLocale($locale = null)
     {
         $full = str_replace('_', '-', self::getFullLocale($locale));
 
@@ -120,7 +122,7 @@ class Config
      * @param string|null $locale
      * @return string
      */
-    public static function getLocaleName($locale = null)
+    public function getLocaleName($locale = null)
     {
         if (is_null($locale)) {
             $locale = site_locale();
@@ -134,7 +136,7 @@ class Config
      *
      * @return array
      */
-    public static function getLocales()
+    public function getLocales()
     {
         return array_keys(self::get('system.locales'));
     }
@@ -144,7 +146,7 @@ class Config
      *
      * @return mixed
      */
-    public static function getDefaultLocale()
+    public function getDefaultLocale()
     {
         if (env('APP_ENV') === 'testing') {
             return 'en';
@@ -161,7 +163,7 @@ class Config
      * @param string|null $locale The locale to treat as the current one
      * @return array
      */
-    public static function getOtherLocales($locale = null)
+    public function getOtherLocales($locale = null)
     {
         if (! $locale) {
             $locale = site_locale();
@@ -178,7 +180,7 @@ class Config
      * @param string|null $locale Optionally get the site url for a locale
      * @return mixed
      */
-    public static function getSiteUrl($locale = null)
+    public function getSiteUrl($locale = null)
     {
         $locales = self::get('system.locales');
 
@@ -192,7 +194,7 @@ class Config
      *
      * @return array
      */
-    public static function getRoutes()
+    public function getRoutes()
     {
         return self::get('routes');
     }
@@ -202,7 +204,7 @@ class Config
      *
      * @return array
      */
-    public static function getImageManipulationPresets()
+    public function getImageManipulationPresets()
     {
         return config('assets.image_manipulation_presets', []);
     }

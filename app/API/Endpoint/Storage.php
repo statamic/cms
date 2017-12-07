@@ -2,6 +2,10 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+use Statamic\API\File;
+use Statamic\API\YAML;
+
 class Storage
 {
     /**
@@ -10,7 +14,7 @@ class Storage
      * @param string $key   Key to save under
      * @param mixed  $data  Data to cache
      */
-    public static function put($key, $data)
+    public function put($key, $data)
     {
         File::disk('storage')->put(self::getPath($key), $data);
     }
@@ -21,7 +25,7 @@ class Storage
      * @param string $key   Key to save under
      * @param mixed  $data  Data to cache
      */
-    public static function putYAML($key, $data)
+    public function putYAML($key, $data)
     {
         if ($content = array_get($data, 'content')) {
             unset($data['content']);
@@ -36,7 +40,7 @@ class Storage
      * @param string $key   Key to save under
      * @param mixed  $data  Data to cache
      */
-    public static function putSerialized($key, $data)
+    public function putSerialized($key, $data)
     {
         self::put(Str::ensureRight($key, '.php'), serialize($data));
     }
@@ -47,7 +51,7 @@ class Storage
      * @param string $key   Key to save under
      * @param mixed  $data  Data to cache
      */
-    public static function putJSON($key, $data)
+    public function putJSON($key, $data)
     {
         self::put(Str::ensureRight($key, '.json'), json_encode($data));
     }
@@ -58,7 +62,7 @@ class Storage
      * @param  string $key Key to check
      * @return bool
      */
-    public static function exists($key)
+    public function exists($key)
     {
         return File::disk('storage')->exists(self::getPath($key));
     }
@@ -68,7 +72,7 @@ class Storage
      *
      * @param string $key   Key to delete
      */
-    public static function delete($key)
+    public function delete($key)
     {
         File::disk('storage')->delete(self::getPath($key));
     }
@@ -80,7 +84,7 @@ class Storage
      * @param null   $default  Fallback data if the value doesn't exist
      * @return mixed
      */
-    public static function get($key, $default = null)
+    public function get($key, $default = null)
     {
         return File::disk('storage')->get(self::getPath($key), $default);
     }
@@ -92,7 +96,7 @@ class Storage
      * @param null   $default  Fallback data if the value doesn't exist
      * @return mixed
      */
-    public static function getYAML($key, $default = null)
+    public function getYAML($key, $default = null)
     {
         if ($data = self::get(Str::ensureRight($key, '.yaml'))) {
             return YAML::parse($data);
@@ -108,7 +112,7 @@ class Storage
      * @param null   $default  Fallback data if the value doesn't exist
      * @return mixed
      */
-    public static function getSerialized($key, $default = null)
+    public function getSerialized($key, $default = null)
     {
         if ($data = self::get(Str::ensureRight($key, '.php'))) {
             return unserialize($data);
@@ -124,7 +128,7 @@ class Storage
      * @param null   $default  Fallback data if the value doesn't exist
      * @return mixed
      */
-    public static function getJSON($key, $default = null)
+    public function getJSON($key, $default = null)
     {
         if ($data = self::get(Str::ensureRight($key, '.json'))) {
             return json_decode($data, true);

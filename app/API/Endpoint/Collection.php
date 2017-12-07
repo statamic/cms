@@ -11,7 +11,7 @@ class Collection
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function all()
+    public function all()
     {
         return app(CollectionsService::class)->all()->sortBy(function ($collection) {
             return $collection->title();
@@ -23,7 +23,7 @@ class Collection
      *
      * @return array
      */
-    public static function handles()
+    public function handles()
     {
         return self::all()->keys()->all();
     }
@@ -34,7 +34,7 @@ class Collection
      * @param string $handle
      * @return \Statamic\Contracts\Data\Entries\Collection
      */
-    public static function whereHandle($handle)
+    public function whereHandle($handle)
     {
         return app(CollectionsService::class)->handle($handle);
     }
@@ -45,7 +45,7 @@ class Collection
      * @param string $handle
      * @return bool
      */
-    public static function handleExists($handle)
+    public function handleExists($handle)
     {
         return self::whereHandle($handle) !== null;
     }
@@ -56,7 +56,7 @@ class Collection
      * @param string $handle
      * @return \Statamic\Contracts\Data\Entries\Collection
      */
-    public static function create($handle)
+    public function create($handle)
     {
         /** @var \Statamic\Contracts\Data\Entries\Collection $collection */
         $collection = app('Statamic\Contracts\Data\Entries\Collection');

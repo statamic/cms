@@ -11,7 +11,7 @@ class Taxonomy
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function all()
+    public function all()
     {
         return app(TaxonomiesService::class)->all()->sortBy(function ($taxonomy) {
             return $taxonomy->title();
@@ -23,7 +23,7 @@ class Taxonomy
      *
      * @return array
      */
-    public static function handles()
+    public function handles()
     {
         return self::all()->keys()->all();
     }
@@ -34,7 +34,7 @@ class Taxonomy
      * @param string $handle
      * @return \Statamic\Contracts\Data\Taxonomies\Taxonomy
      */
-    public static function whereHandle($handle)
+    public function whereHandle($handle)
     {
         return app(TaxonomiesService::class)->handle($handle);
     }
@@ -45,7 +45,7 @@ class Taxonomy
      * @param string $handle
      * @return bool
      */
-    public static function handleExists($handle)
+    public function handleExists($handle)
     {
         return self::whereHandle($handle) !== null;
     }
@@ -56,7 +56,7 @@ class Taxonomy
      * @param $slug
      * @return \Statamic\Contracts\Data\Taxonomies\Taxonomy
      */
-    public static function create($slug)
+    public function create($slug)
     {
         /** @var \Statamic\Contracts\Data\Taxonomies\Taxonomy $taxonomy */
         $taxonomy = app('Statamic\Contracts\Data\Taxonomies\Taxonomy');

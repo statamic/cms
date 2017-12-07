@@ -11,7 +11,7 @@ class Page
      *
      * @return PagesService
      */
-    private static function service()
+    private function service()
     {
         return app(PagesService::class);
     }
@@ -22,7 +22,7 @@ class Page
      * @param string $id
      * @return \Statamic\Contracts\Data\Pages\Page
      */
-    public static function find($id)
+    public function find($id)
     {
         return self::service()->id($id);
     }
@@ -32,7 +32,7 @@ class Page
      *
      * @return \Statamic\Data\Pages\PageCollection
      */
-    public static function all()
+    public function all()
     {
         return self::service()->all();
     }
@@ -43,7 +43,7 @@ class Page
      * @param string $uri
      * @return \Statamic\Contracts\Data\Pages\Page
      */
-    public static function whereUri($uri)
+    public function whereUri($uri)
     {
         return self::service()->uri($uri);
     }
@@ -54,7 +54,7 @@ class Page
      * @param string $id
      * @return bool
      */
-    public static function exists($id)
+    public function exists($id)
     {
         return self::service()->exists($id);
     }
@@ -65,7 +65,7 @@ class Page
      * @param string $uri
      * @return bool
      */
-    public static function uriExists($uri)
+    public function uriExists($uri)
     {
         return self::service()->uriExists($uri);
     }
@@ -76,7 +76,7 @@ class Page
      * @param string $uri
      * @return \Statamic\Contracts\Data\Pages\PageFactory
      */
-    public static function create($uri)
+    public function create($uri)
     {
         return app('Statamic\Contracts\Data\Pages\PageFactory')->create($uri);
     }
@@ -88,7 +88,7 @@ class Page
      * @return \Statamic\Contracts\Data\Pages\Page
      * @deprecated since 2.1
      */
-    public static function getByUuid($uuid)
+    public function getByUuid($uuid)
     {
         \Log::notice('Page::getByUuid() is deprecated. Use Page::find()');
 
@@ -102,7 +102,7 @@ class Page
      * @return \Statamic\Contracts\Data\Pages\Page
      * @deprecated since 2.1
      */
-    public static function getByUrl($url)
+    public function getByUrl($url)
     {
         \Log::notice('Page::getByUrl() is deprecated. Use Page::whereUri()');
 

@@ -11,7 +11,7 @@ class Term
      *
      * @return TermsService
      */
-    private static function service()
+    private function service()
     {
         return app(TermsService::class);
     }

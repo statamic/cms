@@ -14,7 +14,7 @@ class Auth
      * @param  bool $remember Whether to remember the user
      * @return bool
      */
-    public static function login($username, $password = null, $remember = false)
+    public function login($username, $password = null, $remember = false)
     {
         if ($username instanceof Authenticatable) {
             return \Auth::login($username, $remember);

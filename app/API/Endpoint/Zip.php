@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+use Statamic\API\Path;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 
@@ -13,7 +15,7 @@ class Zip
      * @param string $path
      * @return \League\Flysystem\Filesystem
      */
-    private static function zip($path)
+    private function zip($path)
     {
         $path = root_path(Path::makeRelative($path));
         $path = Str::ensureRight($path, '.zip');
@@ -29,7 +31,7 @@ class Zip
      * @param string $path
      * @return \League\Flysystem\Filesystem
      */
-    public static function make($path)
+    public function make($path)
     {
         return self::zip($path);
     }
@@ -42,7 +44,7 @@ class Zip
      * @param string $path
      * @return \League\Flysystem\Filesystem
      */
-    public static function get($path)
+    public function get($path)
     {
         return self::zip($path);
     }
@@ -53,7 +55,7 @@ class Zip
      * @param string $path        Path to zip
      * @param string $destination Where it should be extracted
      */
-    public static function extract($path, $destination)
+    public function extract($path, $destination)
     {
         $zip = self::zip($path);
 
@@ -65,7 +67,7 @@ class Zip
      *
      * @param Filesystem $zip
      */
-    public static function write($zip)
+    public function write($zip)
     {
         $zip->getAdapter()->getArchive()->close();
     }

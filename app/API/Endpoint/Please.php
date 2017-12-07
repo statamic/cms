@@ -13,7 +13,7 @@ class Please
      * @param array $args
      * @return mixed
      */
-    public static function __callStatic($method, $args)
+    public function __callStatic($method, $args)
     {
         return forward_static_call_array(['Statamic\Console\Please', $method], $args);
     }

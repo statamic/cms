@@ -2,10 +2,11 @@
 
 namespace Statamic\API\Endpoint;
 
+use Request as Req;
 use Statamic\API\File;
+use Statamic\API\YAML;
 use Statamic\API\Folder;
 use Statamic\API\Metrics;
-use Request as Req;
 
 class Form
 {
@@ -15,7 +16,7 @@ class Form
      * @param  string $name
      * @return Statamic\Contracts\Forms\Form
      */
-    public static function get($name)
+    public function get($name)
     {
         $form = self::create($name);
 
@@ -39,7 +40,7 @@ class Form
      * @param  string $name
      * @return array of Statamic\Contracts\Forms\Forms
      */
-    public static function all()
+    public function all()
     {
         $forms = [];
         $files = Folder::getFilesByType(settings_path('formsets'), 'yaml');
@@ -66,7 +67,7 @@ class Form
      * @param  string $name
      * @return array of Statamic\Contracts\Forms\Forms
      */
-    public static function getAllFormsets()
+    public function getAllFormsets()
     {
         $forms = [];
         $files = Folder::getFilesByType(settings_path('formsets'), 'yaml');
@@ -89,7 +90,7 @@ class Form
      * @param  [type] $name [description]
      * @return [type]       [description]
      */
-    public static function create($name)
+    public function create($name)
     {
         $formset = app('Statamic\Contracts\Forms\Formset');
         $formset->name($name);
@@ -101,7 +102,7 @@ class Form
         return $form;
     }
 
-    public static function fields($form)
+    public function fields($form)
     {
         $fields = [];
         $form = self::get($form)->formset()->data();

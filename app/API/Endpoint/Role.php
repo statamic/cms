@@ -11,7 +11,7 @@ class Role
      *
      * @return \Illuminate\Support\Collection
      */
-    private static function roles()
+    private function roles()
     {
         return collect(app(Roles::class)->all());
     }
@@ -21,7 +21,7 @@ class Role
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function all()
+    public function all()
     {
         return self::roles()->sortBy('title');
     }
@@ -32,7 +32,7 @@ class Role
      * @param string $id
      * @return \Statamic\Contracts\Permissions\Role
      */
-    public static function find($id)
+    public function find($id)
     {
         return self::roles()->get($id);
     }
@@ -43,7 +43,7 @@ class Role
      * @param string $id
      * @return bool
      */
-    public static function exists($id)
+    public function exists($id)
     {
         return self::roles()->has($id);
     }
@@ -54,7 +54,7 @@ class Role
      * @param  string $handle
      * @return \Statamic\Contracts\Permissions\Role
      */
-    public static function whereHandle($handle)
+    public function whereHandle($handle)
     {
         return self::roles()->filter(function ($role) use ($handle) {
             return $role->slug() === $handle;

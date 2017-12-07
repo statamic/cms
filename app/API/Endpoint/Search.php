@@ -2,6 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Config;
 use Statamic\Search\Index;
 
 class Search
@@ -11,7 +12,7 @@ class Search
      *
      * @return \Statamic\Search\Search
      */
-    private static function search()
+    private function search()
     {
         return app('Statamic\Search\Search');
     }
@@ -23,7 +24,7 @@ class Search
      * @param  array|null $fields Fields to search in, or null to search all fields
      * @return array
      */
-    public static function get($query, $fields = null)
+    public function get($query, $fields = null)
     {
         return self::search()->search($query, $fields);
     }
@@ -34,7 +35,7 @@ class Search
      * @param  string $index Name of the index
      * @return Index
      */
-    public static function in($index)
+    public function in($index)
     {
         return self::search()->index($index);
     }
@@ -45,7 +46,7 @@ class Search
      * @param  string $index Name of the index
      * @return void
      */
-    public static function update($index = null)
+    public function update($index = null)
     {
         try {
             return self::search()->update($index);
@@ -62,7 +63,7 @@ class Search
      * @param mixed $value
      * @return mixed
      */
-    public static function insert($id, $value)
+    public function insert($id, $value)
     {
         try {
             return self::search()->insert($id, $value);
@@ -77,7 +78,7 @@ class Search
      *
      * @param mixed $id
      */
-    public static function delete($id)
+    public function delete($id)
     {
         try {
             return self::search()->delete($id);
@@ -86,7 +87,7 @@ class Search
         }
     }
 
-    public static function indexExists($index)
+    public function indexExists($index)
     {
         return self::search()->index($index)->exists();
     }
@@ -94,7 +95,7 @@ class Search
     /**
      * @return \Illuminate\Support\Collection
      */
-    public static function indexes()
+    public function indexes()
     {
         $indexes = collect(['default' => [
             'driver' => Config::get('search.driver'),

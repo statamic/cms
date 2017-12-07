@@ -6,7 +6,7 @@ use Statamic\CP\Navigation\NavItem;
 
 class Nav
 {
-    public static function item($name)
+    public function item($name)
     {
         $item = new NavItem;
         $item->name($name);

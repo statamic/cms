@@ -9,7 +9,7 @@ class Crypt
      *
      * @return \Illuminate\Encryption\Encrypter
      */
-    private static function encrypter()
+    private function encrypter()
     {
         return app('encrypter');
     }
@@ -20,7 +20,7 @@ class Crypt
      * @param mixed $value
      * @return string
      */
-    public static function encrypt($value)
+    public function encrypt($value)
     {
         return self::encrypter()->encrypt($value);
     }
@@ -31,7 +31,7 @@ class Crypt
      * @param $string
      * @return string
      */
-    public static function decrypt($string)
+    public function decrypt($string)
     {
         return self::encrypter()->decrypt($string);
     }

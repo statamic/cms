@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+
 /**
  * Miscellaneous helper methods
  */
@@ -17,7 +19,7 @@ class Helper
      * @param int $instance  The number of times to go back
      * @return bool|int
      */
-    public static function strrposCount($haystack, $needle, $instance = 0)
+    public function strrposCount($haystack, $needle, $instance = 0)
     {
         do {
             // get the last occurrence in the current haystack
@@ -40,7 +42,7 @@ class Helper
      * @param mixed $value
      * @return mixed
      */
-    public static function grab($value)
+    public function grab($value)
     {
         $arr = self::ensureArray($value);
 
@@ -53,7 +55,7 @@ class Helper
      * @param mixed $value  Variable to check
      * @return array
      **/
-    public static function ensureArray($value)
+    public function ensureArray($value)
     {
         if (! is_array($value)) {
             return array($value);
@@ -69,7 +71,7 @@ class Helper
      * @param array $options  An array of options the value is allowed to be.
      * @return mixed
      */
-    public static function ensureInArray($value, array $options)
+    public function ensureInArray($value, array $options)
     {
         if (! in_array($value, $options)) {
             return reset($options);
@@ -84,7 +86,7 @@ class Helper
      * @param mixed  $value  Value to check
      * @return bool
      */
-    public static function isEmptyArray($value)
+    public function isEmptyArray($value)
     {
         if (is_array($value)) {
             foreach ($value as $subvalue) {
@@ -107,7 +109,7 @@ class Helper
      * @param bool  $oxford_comma  Include a comma before $glue?
      * @return string
      */
-    public static function makeSentenceList(Array $list, $glue = "and", $oxford_comma = true)
+    public function makeSentenceList(Array $list, $glue = "and", $oxford_comma = true)
     {
         $length = count($list);
 
@@ -137,7 +139,7 @@ class Helper
      * @param bool $keyed  Are options keyed?
      * @return array
      */
-    public static function explodeOptions($string, $keyed=FALSE)
+    public function explodeOptions($string, $keyed=FALSE)
     {
         $options = explode('|', $string);
 
@@ -173,7 +175,7 @@ class Helper
      * @param mixed
      * @return array
      */
-    public static function normalizeArguments($args)
+    public function normalizeArguments($args)
     {
         $output = [];
 
@@ -193,7 +195,7 @@ class Helper
      *
      * @return mixed
      */
-    public static function pick()
+    public function pick()
     {
         $args = func_get_args();
 
@@ -210,7 +212,7 @@ class Helper
         return null;
     }
 
-    public static function stripTags($html, $tags_list = [])
+    public function stripTags($html, $tags_list = [])
     {
 
         if (count($tags_list) > 0) {
@@ -257,7 +259,7 @@ class Helper
      * @param string $value
      * @return string
      */
-    public static function widont($value)
+    public function widont($value)
     {
         // thanks to Shaun Inman for inspiration here
         // http://www.shauninman.com/archive/2008/08/25/widont_2_1_1
@@ -290,7 +292,7 @@ class Helper
      * @param mixed $two Value 2 to compare
      * @return int
      */
-    public static function compareValues($one, $two)
+    public function compareValues($one, $two)
     {
         // something is null
         if (is_null($one) || is_null($two)) {
@@ -356,7 +358,7 @@ class Helper
      *
      * @return string
      */
-    public static function makeUuid()
+    public function makeUuid()
     {
         return (string) \Uuid::generate(4);
     }

@@ -57,7 +57,7 @@ class Pattern
      * @param string $needle    String to look for
      * @return bool
      */
-    public static function startsWith($haystack, $needle)
+    public function startsWith($haystack, $needle)
     {
         return (substr($haystack, 0, strlen($needle)) === $needle);
     }
@@ -69,7 +69,7 @@ class Pattern
      * @param string $needle    String to look for
      * @return bool
      */
-    public static function endsWith($haystack, $needle)
+    public function endsWith($haystack, $needle)
     {
         return (strcasecmp(substr($haystack, strlen($haystack) - strlen($needle)), $needle) === 0);
     }
@@ -80,7 +80,7 @@ class Pattern
      * @param string $value
      * @return bool
      */
-    public static function isUUID($value)
+    public function isUUID($value)
     {
         return (bool) preg_match(self::UUID, $value);
     }

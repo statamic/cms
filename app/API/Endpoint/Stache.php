@@ -9,7 +9,7 @@ class Stache
     /**
      * @throws \Exception
      */
-    public static function update()
+    public function update()
     {
         app(Manager::class)->update();
     }
@@ -19,7 +19,7 @@ class Stache
      *
      * @return void
      */
-    public static function clear()
+    public function clear()
     {
         collect(Cache::get('stache::keys', []))
             ->merge(['meta', 'timestamps', 'config', 'keys', 'duplicates'])

@@ -33,7 +33,7 @@ class File
      *                           project root, or the name of a user defined disk in filesystems.php
      * @return \Statamic\Filesystem\Filesystem
      */
-    public static function disk($name = null)
+    public function disk($name = null)
     {
         if ($name === null) {
             $name = 'standard';
@@ -57,8 +57,8 @@ class File
      * @param array $args
      * @return mixed
      */
-    public static function __callStatic($method, $args)
+    public function __call($method, $args)
     {
-        return call_user_func_array([self::disk(), $method], $args);
+        return call_user_func_array([$this->disk(), $method], $args);
     }
 }

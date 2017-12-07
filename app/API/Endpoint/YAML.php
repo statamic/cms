@@ -3,6 +3,7 @@
 namespace Statamic\API\Endpoint;
 
 use Spyc;
+use Statamic\API\Pattern;
 
 /**
  * Parsing and dumping YAML
@@ -15,7 +16,7 @@ class YAML
      * @param string $str  The YAML string
      * @return array
      */
-    public static function parse($str)
+    public function parse($str)
     {
         if (empty($str)) {
             return [];
@@ -39,7 +40,7 @@ class YAML
      * @param string|bool  $content
      * @return string
      */
-    public static function dump($data, $content = false)
+    public function dump($data, $content = false)
     {
         $yaml = Spyc::YAMLDump($data, 2, 100);
         $yaml = substr($yaml, 4); // remove the initial fencing by spyc

@@ -11,7 +11,7 @@ class Event
      * @param mixed $payload
      * @return mixed
      */
-    public static function fire($event, $payload = [])
+    public function fire($event, $payload = [])
     {
         return event($event, $payload);
     }
@@ -23,7 +23,7 @@ class Event
      * @param mixed $payload
      * @return mixed
      */
-    public static function fireFirst($event, $payload = [])
+    public function fireFirst($event, $payload = [])
     {
         $response = self::fire($event, $payload);
 

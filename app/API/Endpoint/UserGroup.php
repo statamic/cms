@@ -10,7 +10,7 @@ class UserGroup
     /**
      * Get all the groups
      */
-    public static function all()
+    public function all()
     {
         return app(UserGroupsService::class)->all();
     }
@@ -21,7 +21,7 @@ class UserGroup
      * @param string $id
      * @return \Statamic\Contracts\Permissions\UserGroup
      */
-    public static function find($id)
+    public function find($id)
     {
         return app(UserGroupsService::class)->id($id);
     }
@@ -32,7 +32,7 @@ class UserGroup
      * @param  string $handle
      * @return \Statamic\Contracts\Permissions\UserGroup
      */
-    public static function whereHandle($handle)
+    public function whereHandle($handle)
     {
         return app(UserGroupsService::class)->handle($handle);
     }
@@ -43,7 +43,7 @@ class UserGroup
      * @param string|\Statamic\Contracts\Permissions\Permissible $user
      * @return \Illuminate\Support\Collection
      */
-    public static function whereUser($user)
+    public function whereUser($user)
     {
         $groups = [];
 

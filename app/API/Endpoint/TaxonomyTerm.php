@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Term;
+
 /**
  * @deprecated since 2.1
  */
@@ -12,7 +14,7 @@ class TaxonomyTerm
      * @return \Statamic\Contracts\Data\Taxonomies\TermFactory
      * @deprecated since 2.1
      */
-    public static function create($slug)
+    public function create($slug)
     {
         \Log::notice('TaxonomyTerm::create() is deprecated. Use Term::create()');
 
@@ -27,7 +29,7 @@ class TaxonomyTerm
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      * @deprecated since 2.1
      */
-    public static function getFromTaxonomy($taxonomy, $slug)
+    public function getFromTaxonomy($taxonomy, $slug)
     {
         \Log::notice('TaxonomyTerm::getFromTaxonomy() is deprecated. Use Term::whereSlug()');
 
@@ -41,7 +43,7 @@ class TaxonomyTerm
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      * @deprecated since 2.1
      */
-    public static function getByUuid($uuid)
+    public function getByUuid($uuid)
     {
         \Log::notice('TaxonomyTerm::getByUuid() is deprecated. Use Term::find()');
 

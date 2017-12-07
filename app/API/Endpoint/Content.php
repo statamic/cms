@@ -2,6 +2,13 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Page;
+use Statamic\API\Term;
+use Statamic\API\Entry;
+use Statamic\API\Helper;
+use Statamic\API\GlobalSet;
+use Statamic\API\Collection;
+use Statamic\API\PageFolder;
 use Statamic\Data\Services\ContentService;
 use Statamic\Data\Services\PageStructureService;
 
@@ -12,7 +19,7 @@ class Content
      *
      * @return \Statamic\Data\Content\ContentCollection
      */
-    public static function all()
+    public function all()
     {
         return app(ContentService::class)->all();
     }
@@ -23,7 +30,7 @@ class Content
      * @param string $id
      * @return mixed
      */
-    public static function find($id)
+    public function find($id)
     {
         return app(ContentService::class)->id($id);
     }
@@ -34,7 +41,7 @@ class Content
      * @param string      $uri       The URI to look for.
      * @return \Statamic\Contracts\Data\Content\Content
      */
-    public static function whereUri($uri)
+    public function whereUri($uri)
     {
         if ($uri === null) {
             return null;
@@ -57,7 +64,7 @@ class Content
      * @param string $id
      * @return bool
      */
-    public static function exists($id)
+    public function exists($id)
     {
         return app(ContentService::class)->exists($id);
     }
@@ -68,7 +75,7 @@ class Content
      * @param string $uri
      * @return bool
      */
-    public static function uriExists($uri)
+    public function uriExists($uri)
     {
         return app(ContentService::class)->uriExists($uri);
     }
@@ -84,7 +91,7 @@ class Content
      * @param string|null  $locale
      * @return array
      */
-    public static function tree(
+    public function tree(
         $uri = null,
         $depth = null,
         $entries = null,
@@ -102,7 +109,7 @@ class Content
      * @return \Statamic\Contracts\Data\Content\Content
      * @deprecated since 2.1
      */
-    public static function uuidRaw($uuid)
+    public function uuidRaw($uuid)
     {
         \Log::notice('Content::uuidRaw() is deprecated. Use Content::find()');
 
@@ -116,7 +123,7 @@ class Content
      * @return array
      * @deprecated since 2.1
      */
-    public static function uuid($uuid)
+    public function uuid($uuid)
     {
         \Log::notice('Content::uuid() is deprecated. Use Content::find()->toArray()');
 
@@ -130,7 +137,7 @@ class Content
      * @return \Statamic\Contracts\Data\Pages\Page
      * @deprecated since 2.1
      */
-    public static function pageRaw($uri)
+    public function pageRaw($uri)
     {
         \Log::notice('Content::pageRaw() is deprecated. Use Page::whereUri()');
 
@@ -144,7 +151,7 @@ class Content
      * @return array
      * @deprecated since 2.1
      */
-    public static function page($url)
+    public function page($url)
     {
         \Log::notice('Content::page() is deprecated. Use Page::whereUri()->toArray()');
 
@@ -159,7 +166,7 @@ class Content
      * @return \Statamic\Contracts\Data\Entries\Entry
      * @deprecated since 2.1
      */
-    public static function entryRaw($slug, $collection)
+    public function entryRaw($slug, $collection)
     {
         \Log::notice('Content::entryRaw() is deprecated. Use Entry::whereSlug()');
 
@@ -173,7 +180,7 @@ class Content
      * @param string      $slug
      * @return mixed
      */
-    public static function entry($collection, $slug)
+    public function entry($collection, $slug)
     {
         \Log::notice('Content::entryRaw() is deprecated. Use Entry::whereSlug()->toArray()');
 
@@ -188,7 +195,7 @@ class Content
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      * @deprecated since 2.1
      */
-    public static function taxonomyTermRaw($slug, $taxonomy)
+    public function taxonomyTermRaw($slug, $taxonomy)
     {
         \Log::notice('Content::taxonomyTermRaw() is deprecated. Use Term::whereSlug()');
 
@@ -204,7 +211,7 @@ class Content
      * @return mixed
      * @deprecated since 2.1
      */
-    public static function taxonomyTerm($taxonomy, $slug, $locale = null)
+    public function taxonomyTerm($taxonomy, $slug, $locale = null)
     {
         \Log::notice('Content::taxonomyTermRaw() is deprecated. Use Term::whereSlug()->toArray()');
 
@@ -218,7 +225,7 @@ class Content
      * @return \Statamic\Contracts\Data\Content\Content
      * @deprecated since 2.1
      */
-    public static function getRaw($uri)
+    public function getRaw($uri)
     {
         \Log::notice('Content::getRaw() is deprecated. Use Content::whereUri()');
 
@@ -232,7 +239,7 @@ class Content
      * @return mixed
      * @deprecated since 2.1
      */
-    public static function get($uri)
+    public function get($uri)
     {
         \Log::notice('Content::getRaw() is deprecated. Use Content::whereUri()->toArray()');
 
@@ -246,7 +253,7 @@ class Content
      * @return \Statamic\Contracts\Data\Entries\Entry
      * @deprecated since 2.1
      */
-    public static function entryByUrlRaw($url)
+    public function entryByUrlRaw($url)
     {
         \Log::notice('Content::entryByUrlRaw() is deprecated. Use Entry::whereUri()');
 
@@ -260,7 +267,7 @@ class Content
      * @return \Statamic\Contracts\Data\Entries\Entry
      * @deprecated since 2.1
      */
-    public static function entryByUrl($url)
+    public function entryByUrl($url)
     {
         \Log::notice('Content::entryByUrlRaw() is deprecated. Use Entry::whereUri()->toArray()');
 
@@ -274,7 +281,7 @@ class Content
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      * @deprecated since 2.1
      */
-    public static function taxonomyTermByUrlRaw($url)
+    public function taxonomyTermByUrlRaw($url)
     {
         \Log::notice('Content::taxonomyTermByUrlRaw() is deprecated. Use Term::whereUri()');
 
@@ -288,7 +295,7 @@ class Content
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      * @deprecated since 2.1
      */
-    public static function taxonomyTermByUrl($url)
+    public function taxonomyTermByUrl($url)
     {
         \Log::notice('Content::taxonomyTermByUrlRaw() is deprecated. Use Term::whereUri()->toArray()');
 
@@ -302,7 +309,7 @@ class Content
      * @return \Statamic\Data\Entries\EntryCollection
      * @deprecated since 2.1
      */
-    public static function entries($collection = null)
+    public function entries($collection = null)
     {
         if ($collection) {
             \Log::notice('Content::entries() is deprecated. Use Entry::whereCollection()');
@@ -322,7 +329,7 @@ class Content
      * @return \Statamic\Data\Pages\PageCollection
      * @deprecated since 2.1
      */
-    public static function pages($urls = null)
+    public function pages($urls = null)
     {
         if ($urls) {
             \Log::notice('Content::pages() is deprecated. Use Page::whereUriIn()');
@@ -342,7 +349,7 @@ class Content
      * @return \Statamic\Data\Taxonomies\TermCollection
      * @deprecated since 2.1
      */
-    public static function taxonomyTerms($taxonomy = null)
+    public function taxonomyTerms($taxonomy = null)
     {
         if ($taxonomy) {
             \Log::notice('Content::taxonomyTerms() is deprecated. Use Term::whereTaxonomy()');
@@ -362,7 +369,7 @@ class Content
      * @return \Statamic\Data\Globals\GlobalCollection
      * @deprecated since 2.1
      */
-    public static function globals($slug = null)
+    public function globals($slug = null)
     {
         if ($slug) {
             \Log::notice('Content::globals() is deprecated. Use GlobalSet::whereHandle()');
@@ -382,7 +389,7 @@ class Content
      * @return \Statamic\Contracts\Data\Globals\GlobalSet
      * @deprecated since 2.1
      */
-    public static function globalSet($slug)
+    public function globalSet($slug)
     {
         \Log::notice('Content::globals() is deprecated. Use GlobalSet::whereHandle()');
 
@@ -395,7 +402,7 @@ class Content
      * @return \Statamic\Contracts\Data\Entries\Collection[]
      * @deprecated since 2.1
      */
-    public static function collections()
+    public function collections()
     {
         \Log::notice('Content::collections() is deprecated. Use Collection::all()');
 
@@ -407,7 +414,7 @@ class Content
      * @return \Statamic\Contracts\Data\Entries\Collection
      * @deprecated since 2.1
      */
-    public static function collection($collection)
+    public function collection($collection)
     {
         \Log::notice('Content::collection() is deprecated. Use Collection::whereHandle()');
 
@@ -420,7 +427,7 @@ class Content
      * @return array
      * @deprecated since 2.1
      */
-    public static function collectionNames()
+    public function collectionNames()
     {
         \Log::notice('Content::collectionNames() is deprecated. Use Collection::handles()');
 
@@ -434,7 +441,7 @@ class Content
      * @return bool
      * @deprecated since 2.1
      */
-    public static function collectionExists($collection)
+    public function collectionExists($collection)
     {
         \Log::notice('Content::collectionExists() is deprecated. Use Collection::handleExists()');
 
@@ -449,7 +456,7 @@ class Content
      * @return bool
      * @deprecated since 2.1
      */
-    public static function entryExists($slug, $collection)
+    public function entryExists($slug, $collection)
     {
         \Log::notice('Content::entryExists() is deprecated. Use Entry::slugExists()');
 
@@ -463,7 +470,7 @@ class Content
      * @return bool
      * @deprecated since 2.1
      */
-    public static function pageExists($url)
+    public function pageExists($url)
     {
         \Log::notice('Content::pageExists() is deprecated. Use Page::uriExists()');
 
@@ -478,7 +485,7 @@ class Content
      * @return bool
      * @deprecated since 2.1
      */
-    public static function taxonomyTermExists($slug, $taxonomy)
+    public function taxonomyTermExists($slug, $taxonomy)
     {
         \Log::notice('Content::taxonomyTermExists() is deprecated. Use Term::slugExists()');
 
@@ -491,7 +498,7 @@ class Content
      * @return \Statamic\Contracts\Data\Taxonomies\Taxonomy[]
      * @deprecated since 2.1
      */
-    public static function taxonomies()
+    public function taxonomies()
     {
         \Log::notice('Content::taxonomies() is deprecated. Use Taxonomy::all()');
 
@@ -505,7 +512,7 @@ class Content
      * @return \Statamic\Contracts\Data\Taxonomies\Taxonomy
      * @deprecated since 2.1
      */
-    public static function taxonomy($taxonomy)
+    public function taxonomy($taxonomy)
     {
         \Log::notice('Content::taxonomy() is deprecated. Use Taxonomy::whereHandle()');
 
@@ -519,7 +526,7 @@ class Content
      * @return bool
      * @deprecated since 2.1
      */
-    public static function taxonomyExists($taxonomy)
+    public function taxonomyExists($taxonomy)
     {
         \Log::notice('Content::taxonomyExists() is deprecated. Use Taxonomy::handleExists()');
 
@@ -530,7 +537,7 @@ class Content
      * @return array
      * @deprecated since 2.1
      */
-    public static function taxonomyNames()
+    public function taxonomyNames()
     {
         \Log::notice('Content::taxonomyNames() is deprecated. Use Taxonomy::handles()');
 
@@ -541,7 +548,7 @@ class Content
      * @return \Statamic\Contracts\Data\Pages\PageFolder[]
      * @deprecated since 2.1
      */
-    public static function pageFolders()
+    public function pageFolders()
     {
         \Log::notice('Content::pageFolders() is deprecated. Use PageFolder::all()');
 
@@ -553,7 +560,7 @@ class Content
      * @return \Statamic\Contracts\Data\Pages\PageFolder
      * @deprecated since 2.1
      */
-    public static function pageFolder($path)
+    public function pageFolder($path)
     {
         \Log::notice('Content::pageFolder() is deprecated. Use PageFolder::whereHandle()');
 

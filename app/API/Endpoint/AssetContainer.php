@@ -12,7 +12,7 @@ class AssetContainer
      *
      * @return \Illuminate\Support\Collection
      */
-    public static function all()
+    public function all()
     {
         return app(AssetContainersService::class)->all();
     }
@@ -23,7 +23,7 @@ class AssetContainer
      * @param string $id
      * @return \Statamic\Contracts\Assets\AssetContainer
      */
-    public static function find($id)
+    public function find($id)
     {
         return app(AssetContainersService::class)->id($id);
     }
@@ -34,7 +34,7 @@ class AssetContainer
      * @param string $path
      * @return \Statamic\Contracts\Assets\AssetContainer
      */
-    public static function wherePath($path)
+    public function wherePath($path)
     {
         return self::all()->filter(function ($container) use ($path) {
             return $container->path() == $path;
@@ -47,7 +47,7 @@ class AssetContainer
      * @param string|null $driver
      * @return \Statamic\Contracts\Assets\AssetContainer
      */
-    public static function create($driver = null)
+    public function create($driver = null)
     {
         return app(AssetContainerFactory::class)->create($driver);
     }

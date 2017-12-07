@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+use Statamic\API\YAML;
 use Statamic\View\Antlers\Template as Antlers;
 
 /**
@@ -17,7 +19,7 @@ class Parse
      * @param array $context    Contextual variables to also use
      * @return string
      */
-    public static function template($str, $variables = [], $context = [])
+    public function template($str, $variables = [], $context = [])
     {
         return Antlers::parse($str, $variables, $context);
     }
@@ -31,7 +33,7 @@ class Parse
      * @param array   $context     Contextual variables to also use
      * @return string
      */
-    public static function templateLoop($content, $data, $supplement = true, $context = [])
+    public function templateLoop($content, $data, $supplement = true, $context = [])
     {
         return Antlers::parseLoop($content, $data, $supplement, $context);
     }
@@ -42,7 +44,7 @@ class Parse
      * @param string $str  The YAML string
      * @return array
      */
-    public static function YAML($str)
+    public function YAML($str)
     {
         return YAML::parse($str);
     }
@@ -53,7 +55,7 @@ class Parse
      * @param string  $string  Content to parse
      * @return array
      */
-    public static function frontMatter($string)
+    public function frontMatter($string)
     {
         $data = [];
         $content = $string;
@@ -73,7 +75,7 @@ class Parse
      * @param   mixed  $val  The value to parse
      * @return  mixed
      */
-    public static function env($val)
+    public function env($val)
     {
         if (! Str::contains($val, '{env:')) {
             return $val;

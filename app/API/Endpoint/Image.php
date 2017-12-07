@@ -13,7 +13,7 @@ class Image
      * @param null|array  $params Array of manipulation parameters.
      * @return string|ImageManipulator
      */
-    public static function manipulate($item = null, $params = null)
+    public function manipulate($item = null, $params = null)
     {
         $manipulator = self::manipulator();
 
@@ -35,7 +35,7 @@ class Image
      *
      * @return ImageManipulator
      */
-    public static function manipulator()
+    public function manipulator()
     {
         return app(ImageManipulator::class);
     }
@@ -45,7 +45,7 @@ class Image
      *
      * @return array
      */
-    public static function getCpImageManipulationPresets()
+    public function getCpImageManipulationPresets()
     {
         return [
             'cp_thumbnail_small' => ['w' => '300', 'fit' => 'crop'],

@@ -13,7 +13,7 @@ class GlobalSet
      * @param string $slug
      * @return GlobalFactory
      */
-    public static function create($slug)
+    public function create($slug)
     {
         return app(GlobalFactory::class)->create($slug);
     }
@@ -24,7 +24,7 @@ class GlobalSet
      * @param string $handle
      * @return \Statamic\Contracts\Data\Globals\GlobalSet
      */
-    public static function whereHandle($handle)
+    public function whereHandle($handle)
     {
         return app(GlobalsService::class)->handle($handle);
     }
@@ -35,7 +35,7 @@ class GlobalSet
      * @param string $id
      * @return \Statamic\Contracts\Data\Globals\GlobalSet
      */
-    public static function find($id)
+    public function find($id)
     {
         return app(GlobalsService::class)->id($id);
     }
@@ -45,7 +45,7 @@ class GlobalSet
      *
      * @return \Statamic\Data\Globals\GlobalCollection
      */
-    public static function all()
+    public function all()
     {
         return app(GlobalsService::class)->all()->sortBy(function ($global) {
             return $global->title();

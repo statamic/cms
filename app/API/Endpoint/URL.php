@@ -2,6 +2,11 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+use Statamic\API\Path;
+use Statamic\API\Config;
+use Statamic\API\Content;
+use Statamic\API\Pattern;
 use Stringy\StaticStringy as Stringy;
 use Statamic\Data\Services\ContentService;
 
@@ -17,7 +22,7 @@ class URL
      * @param string  $url  URL to remove "//" from
      * @return string
      */
-    public static function tidy($url)
+    public function tidy($url)
     {
         return Path::tidy($url);
     }
@@ -28,7 +33,7 @@ class URL
      * @param mixed string  Open ended number of arguments
      * @return string
      */
-    public static function assemble($args)
+    public function assemble($args)
     {
         $args = func_get_args();
 
@@ -43,7 +48,7 @@ class URL
      * @return string
      * @deprecated since 2.1
      */
-    public static function unlocalize($url, $locale = null)
+    public function unlocalize($url, $locale = null)
     {
         return self::getDefaultUri($locale, $url);
     }
@@ -54,7 +59,7 @@ class URL
      * @param string       $url     URL to find
      * @return bool
      */
-    public static function exists($url)
+    public function exists($url)
     {
         return Content::uriExists($url);
     }
@@ -65,7 +70,7 @@ class URL
      * @param string $url  URL to parse
      * @return string
      */
-    public static function slug($url)
+    public function slug($url)
     {
         return basename($url);
     }
@@ -77,7 +82,7 @@ class URL
      * @param string  $slug  New slug to use
      * @return string
      */
-    public static function replaceSlug($url, $slug)
+    public function replaceSlug($url, $slug)
     {
         return Path::replaceSlug($url, $slug);
     }
@@ -88,7 +93,7 @@ class URL
      * @param string $url
      * @return string
      */
-    public static function parent($url)
+    public function parent($url)
     {
         $url_array = explode('/', $url);
         array_pop($url_array);
@@ -104,7 +109,7 @@ class URL
      * @param string        $uri
      * @return boolean
      */
-    public static function isAncestor($parent_uri, $uri = null)
+    public function isAncestor($parent_uri, $uri = null)
     {
         // Homepage would always be ancestor
         // and not what we're looking for here.
@@ -134,7 +139,7 @@ class URL
      * @param  boolean      $controller
      * @return string
      */
-    public static function prependSiteRoot($url, $locale = null, $controller = true)
+    public function prependSiteRoot($url, $locale = null, $controller = true)
     {
         // Backwards compatibility fix:
         // 2.1 added the $locale argument in the second position to match prependSiteurl.
@@ -157,7 +162,7 @@ class URL
      * @param bool        $controller
      * @return string
      */
-    public static function prependSiteUrl($url, $locale = null, $controller = true)
+    public function prependSiteUrl($url, $locale = null, $controller = true)
     {
         $prepend = rtrim(Config::getSiteUrl($locale), '/');
 
@@ -181,7 +186,7 @@ class URL
      * @param string|null $locale
      * @return string
      */
-    public static function removeSiteRoot($url, $locale = null)
+    public function removeSiteRoot($url, $locale = null)
     {
         return self::tidy('/' . Str::removeLeft($url, site_root()));
     }
@@ -192,7 +197,7 @@ class URL
      * @param string $url
      * @return string
      */
-    public static function removeSiteUrl($url)
+    public function removeSiteUrl($url)
     {
         return preg_replace('#^'. Config::getSiteUrl() .'#', '/', $url);
     }
@@ -203,7 +208,7 @@ class URL
      * @param string $url
      * @return string
      */
-    public static function makeRelative($url)
+    public function makeRelative($url)
     {
         $parsed = parse_url($url);
 
@@ -226,7 +231,7 @@ class URL
      * @param string $url
      * @return string
      */
-    public static function makeAbsolute($url)
+    public function makeAbsolute($url)
     {
         // If it doesn't start with a slash, we'll just leave it as-is.
         if (! Str::startsWith($url, '/')) {
@@ -241,7 +246,7 @@ class URL
      *
      * @return string
      */
-    public static function getCurrent()
+    public function getCurrent()
     {
         return format_url(app('request')->path());
     }
@@ -252,7 +257,7 @@ class URL
      * @param string $url
      * @return string
      */
-    public static function format($url)
+    public function format($url)
     {
         return self::tidy(format_url($url));
     }
@@ -262,7 +267,7 @@ class URL
      * @param  string  $url
      * @return boolean
      */
-    public static function isExternalUrl($url)
+    public function isExternalUrl($url)
     {
         return ! Pattern::startsWith(
             Str::ensureRight($url, '/'),
@@ -274,7 +279,7 @@ class URL
      * Get the current site url from Apache headers
      * @return string
      */
-    public static function getSiteUrl()
+    public function getSiteUrl()
     {
         if (app()->runningInConsole()) {
             return '/';
@@ -295,7 +300,7 @@ class URL
      * @param string $path
      * @return string
      */
-    public static function buildFromPath($path)
+    public function buildFromPath($path)
     {
         $path = Path::makeRelative($path);
 
@@ -316,7 +321,7 @@ class URL
      * @param string $url
      * @return string
      */
-    public static function encode($url)
+    public function encode($url)
     {
         $dont_encode = [
             '%2F' => '/',
@@ -344,7 +349,7 @@ class URL
      * @param string $locale  The locale of the provided URI
      * @param string $uri     The URI from which to find the default
      */
-    public static function getDefaultUri($locale, $uri)
+    public function getDefaultUri($locale, $uri)
     {
         return app(ContentService::class)->defaultUri($locale, $uri);
     }

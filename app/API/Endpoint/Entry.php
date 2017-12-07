@@ -11,7 +11,7 @@ class Entry
      *
      * @return EntriesService
      */
-    private static function service()
+    private function service()
     {
         return app(EntriesService::class);
     }
@@ -22,7 +22,7 @@ class Entry
      * @param string $id
      * @return \Statamic\Contracts\Data\Entries\Entry
      */
-    public static function find($id)
+    public function find($id)
     {
         return self::service()->id($id);
     }
@@ -32,7 +32,7 @@ class Entry
      *
      * @return \Statamic\Data\Entries\EntryCollection
      */
-    public static function all()
+    public function all()
     {
         return self::service()->all();
     }
@@ -43,7 +43,7 @@ class Entry
      * @param string $collection
      * @return \Statamic\Data\Entries\EntryCollection
      */
-    public static function whereCollection($collection)
+    public function whereCollection($collection)
     {
         return self::service()->collection($collection);
     }
@@ -55,7 +55,7 @@ class Entry
      * @param string $collection
      * @return \Statamic\Contracts\Data\Entries\Entry
      */
-    public static function whereSlug($slug, $collection)
+    public function whereSlug($slug, $collection)
     {
         return self::service()->slug($slug, $collection);
     }
@@ -66,7 +66,7 @@ class Entry
      * @param string $uri
      * @return \Statamic\Contracts\Data\Entries\Entry
      */
-    public static function whereUri($uri)
+    public function whereUri($uri)
     {
         return self::service()->uri($uri);
     }
@@ -77,7 +77,7 @@ class Entry
      * @param string $id
      * @return bool
      */
-    public static function exists($id)
+    public function exists($id)
     {
         return self::service()->exists($id);
     }
@@ -89,7 +89,7 @@ class Entry
      * @param string $collection
      * @return bool
      */
-    public static function slugExists($slug, $collection)
+    public function slugExists($slug, $collection)
     {
         return self::service()->slugExists($slug, $collection);
     }
@@ -100,7 +100,7 @@ class Entry
      * @param string $collection
      * @return int
      */
-    public static function countWhereCollection($collection)
+    public function countWhereCollection($collection)
     {
         return self::service()->countCollection($collection);
     }
@@ -111,7 +111,7 @@ class Entry
      * @param string $slug
      * @return \Statamic\Contracts\Data\Entries\EntryFactory
      */
-    public static function create($slug)
+    public function create($slug)
     {
         return app('Statamic\Contracts\Data\Entries\EntryFactory')->create($slug);
     }
@@ -124,7 +124,7 @@ class Entry
      * @return \Statamic\Contracts\Data\Entries\Entry
      * @deprecated since 2.1
      */
-    public static function getFromCollection($collection, $slug)
+    public function getFromCollection($collection, $slug)
     {
         \Log::notice('Entry::getFromCollection() is deprecated. Use Entry::whereSlug()');
 
@@ -138,7 +138,7 @@ class Entry
      * @return \Statamic\Contracts\Data\Entries\Entry
      * @deprecated since 2.11
      */
-    public static function getByUuid($uuid)
+    public function getByUuid($uuid)
     {
         \Log::notice('Entry::getByUuid() is deprecated. Use Entry::find()');
 

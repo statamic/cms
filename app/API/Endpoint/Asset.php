@@ -2,6 +2,9 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Str;
+use Statamic\API\URL;
+use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Assets\AssetFactory;
 
@@ -13,7 +16,7 @@ class Asset
      * @param string $asset
      * @return \Statamic\Contracts\Assets\Asset
      */
-    public static function find($asset)
+    public function find($asset)
     {
         if (Str::contains($asset, '::')) {
             return self::whereId($asset);
@@ -28,7 +31,7 @@ class Asset
      * @param string $id  An asset ID in the form of "container_id::asset_path""
      * @return \Statamic\Contracts\Assets\Asset
      */
-    public static function whereId($id)
+    public function whereId($id)
     {
         list($container_id, $path) = explode('::', $id);
 
@@ -85,7 +88,7 @@ class Asset
      *
      * @return AssetCollection
      */
-    public static function all()
+    public function all()
     {
         return collect_assets(AssetContainer::all()->flatMap(function ($container) {
             return $container->assets();
@@ -99,7 +102,7 @@ class Asset
      * @param string $container
      * @return AssetCollection
      */
-    public static function whereFolder($folder, $container)
+    public function whereFolder($folder, $container)
     {
         return AssetContainer::find($container)->assets($folder);
     }
@@ -110,7 +113,7 @@ class Asset
      * @param string $container
      * @return AssetCollection
      */
-    public static function whereContainer($container)
+    public function whereContainer($container)
     {
         return AssetContainer::find($container)->assets();
     }
@@ -121,7 +124,7 @@ class Asset
      * @param string      $path
      * @return Asset
      */
-    public static function wherePath($path)
+    public function wherePath($path)
     {
         return self::all()->filter(function ($asset) use ($path) {
             return $asset->resolvedPath() === $path;
@@ -132,7 +135,7 @@ class Asset
      * @param string|null $path
      * @return \Statamic\Contracts\Assets\AssetFactory
      */
-    public static function create($path = null)
+    public function create($path = null)
     {
         return app(AssetFactory::class)->create($path);
     }
@@ -144,7 +147,7 @@ class Asset
      * @return \Statamic\Contracts\Assets\Asset
      * @deprecated since 2.1
      */
-    public static function uuidRaw($uuid)
+    public function uuidRaw($uuid)
     {
         \Log::notice('Asset::uuidRaw() is deprecated. Use Asset::find()');
 
@@ -158,7 +161,7 @@ class Asset
      * @return array
      * @deprecated since 2.1
      */
-    public static function uuid($uuid)
+    public function uuid($uuid)
     {
         \Log::notice('Asset::uuid() is deprecated. Use Asset::find()->toArray()');
 
@@ -172,7 +175,7 @@ class Asset
      * @return Asset
      * @deprecated since 2.1
      */
-    public static function path($path)
+    public function path($path)
     {
         \Log::notice('Asset::path() is deprecated. Use Asset::wherePath()');
 

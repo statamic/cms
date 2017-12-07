@@ -15,7 +15,7 @@ class TaxonomyTerms
      * @return \Statamic\Data\Taxonomies\TermCollection
      * @deprecated since 2.1
      */
-    public static function getFromTaxonomy($taxonomy, $slugs = null)
+    public function getFromTaxonomy($taxonomy, $slugs = null)
     {
         \Log::notice('TaxonomyTerms::getFromTaxonomy() is deprecated. Use Term::whereTaxonomy()');
 

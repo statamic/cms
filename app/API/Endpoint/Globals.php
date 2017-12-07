@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\GlobalSet;
+
 /**
  * @deprecated since 2.1
  */
@@ -12,7 +14,7 @@ class Globals
      * @return \Statamic\Contracts\Data\Globals\GlobalFactory
      * @deprecated since 2.1
      */
-    public static function create($slug)
+    public function create($slug)
     {
         \Log::notice('Globals::create() is deprecated. Use GlobalSet::create()');
 
@@ -26,7 +28,7 @@ class Globals
      * @return \Statamic\Contracts\Data\Globals\GlobalSet
      * @deprecated since 2.1
      */
-    public static function getByUuid($uuid)
+    public function getByUuid($uuid)
     {
         \Log::notice('Globals::getByUuid() is deprecated. Use GlobalSet::find()');
 
@@ -40,7 +42,7 @@ class Globals
      * @return \Statamic\Contracts\Data\Globals\GlobalSet
      * @deprecated since 2.1
      */
-    public static function getBySlug($slug)
+    public function getBySlug($slug)
     {
         \Log::notice('Globals::getBySlug() is deprecated. Use GlobalSet::whereHandle()');
 
@@ -51,7 +53,7 @@ class Globals
      * @return \Statamic\Data\Globals\GlobalCollection
      * @deprecated since 2.1
      */
-    public static function getAll()
+    public function getAll()
     {
         \Log::notice('Globals::getAll() is deprecated. Use GlobalSet::all()');
 
