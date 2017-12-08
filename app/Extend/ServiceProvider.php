@@ -45,4 +45,16 @@ abstract class ServiceProvider extends LaravelServiceProvider
     {
         $this->app['statamic.tags'][$tag] = $class;
     }
+
+    /**
+     * Register a modifier class.
+     *
+     * @param string $modifier  The name of the modifier. (eg. "foo" would handle {{ x | foo }})
+     * @param string $class     The name of the class.
+     * @return void
+     */
+    public function registerModifier(string $modifier, string $class)
+    {
+        $this->app['statamic.modifiers'][$modifier] = $class;
+    }
 }

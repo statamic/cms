@@ -132,10 +132,6 @@ class Modify implements \IteratorAggregate
         // We should make sure it's always an array.
         $params = Helper::ensureArray($params);
 
-        // Some modifier names are strange, reserved, or just more convenient
-        // using alternate names. We'll get the alias here if one exists.
-        $modifier = $this->resolveAlias($modifier);
-
         // Templates will use snake_case to specify modifiers, so we'll
         // convert them to the correct PSR-2 modifier method name.
         $modifier = Str::camel($modifier);
@@ -175,16 +171,9 @@ class Modify implements \IteratorAggregate
      */
     protected function runModifier($modifier, $params)
     {
-        if (method_exists($nativeModifiers = app('Statamic\View\BaseModifiers'), $modifier)) {
-            return $nativeModifiers->$modifier($this->value, $params, $this->context);
-        }
+        list($class, $method) = $this->loader->load($modifier);
 
-        $helpers = 'Statamic\SiteHelpers\Modifiers';
-        if (class_exists($helpers) && method_exists($helpers, $modifier)) {
-            return app($helpers)->$modifier($this->value, $params, $this->context);
-        }
-
-        return $this->modifyThirdParty($modifier, $params);
+        return $class->$method($this->value, $params, $this->context);
     }
 
     /**
@@ -204,91 +193,5 @@ class Modify implements \IteratorAggregate
         }
 
         return $class->index($this->value, $params, $this->context);
-    }
-
-    /**
-     * Resolve a modifier alias
-     *
-     * @param string $modifier
-     * @return string
-     */
-    protected function resolveAlias($modifier)
-    {
-        switch ($modifier) {
-            case "+":
-                return "add";
-
-            case "-":
-                return "subtract";
-
-            case "*":
-                return "multiply";
-
-            case "/":
-                return "divide";
-
-            case "%":
-                return "mod";
-
-            case "^":
-                return "exponent";
-
-            case "dd":
-                return "dump";
-
-            case "ago":
-            case "until":
-            case "since":
-                return "relative";
-
-            case "specialchars":
-            case "htmlspecialchars":
-                return "sanitize";
-
-            case "striptags":
-                return "stripTags";
-
-            case "join":
-            case "implode":
-            case "list":
-                return "joinplode";
-
-            case "piped":
-                return "optionList";
-
-            case "json":
-                return "toJson";
-
-            case "email":
-                return "obfuscateEmail";
-
-            case "l10n":
-                return "formatLocalized";
-
-            case "lowercase":
-                return "lower";
-
-            case "85":
-                return "slackEasterEgg";
-
-            case "tz":
-                return "timezone";
-
-            case "inFuture":
-            case "in_future":
-            case "is_future":
-                return "isFuture";
-
-            case "inPast":
-            case "in_past":
-            case "is_past":
-                return "isPast";
-
-            case "as":
-                return "scopeAs";
-
-            default:
-                return $modifier;
-        }
     }
 }

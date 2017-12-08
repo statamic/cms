@@ -3,6 +3,8 @@
 namespace Statamic\Providers;
 
 use Statamic\DataStore;
+use Statamic\Extend\Modifier;
+use Statamic\View\BaseModifiers;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +36,41 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     /**
+     * Aliases for modifiers bundled with Statamic.
+     *
+     * @var array
+     */
+    protected $bundledModifierAliases = [
+        '+' => 'add',
+        '-' => 'subtract',
+        '*' => 'multiply',
+        '/' => 'divide',
+        '%' => 'mod',
+        '^' => 'exponent',
+        'dd' => 'dump',
+        'ago' => 'relative',
+        'until' => 'relative',
+        'since' => 'relative',
+        'specialchars' => 'sanitize',
+        'htmlspecialchars' => 'sanitize',
+        'striptags' => 'stripTags',
+        'join' => 'joinplode',
+        'implode' => 'joinplode',
+        'list' => 'joinplode',
+        'piped' => 'optionList',
+        'json' => 'toJson',
+        'email' => 'obfuscateEmail',
+        'l10n' => 'formatLocalized',
+        'lowercase' => 'lower',
+        '85' => 'slackEasterEgg',
+        'tz' => 'timezone',
+        'in_future' => 'isFuture',
+        'inPast' => 'isPast',
+        'in_past' => 'isPast',
+        'as' => 'scopeAs',
+    ];
+
+    /**
      * Register any application services.
      *
      * @return void
@@ -41,6 +78,7 @@ class ExtensionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerTags();
+        $this->registerModifiers();
     }
 
     /**
@@ -85,6 +123,55 @@ class ExtensionServiceProvider extends ServiceProvider
         foreach ($this->app['files']->files(app_path('Tags')) as $file) {
             $tag = snake_case($class = $file->getBasename('.php'));
             $this->app['statamic.tags'][$tag] = "App\\Tags\\{$class}";
+        }
+    }
+
+    /**
+     * Register tags.
+     *
+     * @return void
+     */
+    protected function registerModifiers()
+    {
+        $this->app->instance('statamic.modifiers', collect());
+
+        $this->registerBundledModifiers();
+        $this->registerAppModifiers();
+    }
+
+    /**
+     * Register bundled tags.
+     *
+     * @return void
+     */
+    protected function registerBundledModifiers()
+    {
+        $methods = array_diff(
+            get_class_methods(BaseModifiers::class),
+            get_class_methods(Modifier::class)
+        );
+
+        foreach ($methods as $method) {
+            $this->app['statamic.modifiers'][$method] = "Statamic\\View\\BaseModifiers@{$method}";
+        }
+
+        foreach ($this->bundledModifierAliases as $alias => $actual) {
+            $this->app['statamic.modifiers'][$alias] = "Statamic\\View\\BaseModifiers@{$actual}";
+        }
+    }
+
+    /**
+     * Register modifiers located in the App directory.
+     *
+     * This prevents requiring users to manually bind their modifiers.
+     *
+     * @return void
+     */
+    protected function registerAppModifiers()
+    {
+        foreach ($this->app['files']->files(app_path('Modifiers')) as $file) {
+            $modifier = snake_case($class = $file->getBasename('.php'));
+            $this->app['statamic.modifiers'][$modifier] = "App\\Modifiers\\{$class}";
         }
     }
 }
