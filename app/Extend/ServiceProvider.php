@@ -33,4 +33,16 @@ abstract class ServiceProvider extends LaravelServiceProvider
             }
         }
     }
+
+    /**
+     * Register a tags class.
+     *
+     * @param string $tag    The name of the tag. (eg. "foo" would handle {{ foo }}, {{ foo:bar }}, etc)
+     * @param string $class  The name of the class.
+     * @return void
+     */
+    public function registerTags(string $tag, string $class)
+    {
+        $this->app['statamic.tags'][$tag] = $class;
+    }
 }

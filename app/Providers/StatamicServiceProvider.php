@@ -40,6 +40,7 @@ class StatamicServiceProvider extends AggregateServiceProvider
         CollectionsServiceProvider::class,
         DataServiceProvider::class,
         FilesystemServiceProvider::class,
+        ExtensionServiceProvider::class,
         EventServiceProvider::class,
         RouteServiceProvider::class,
         StacheServiceProvider::class,
