@@ -24,7 +24,7 @@ class Term
      * @param string $id
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      */
-    public static function find($id)
+    public function find($id)
     {
         list($taxonomy, $slug) = explode('/', $id);
 
@@ -36,7 +36,7 @@ class Term
      *
      * @return \Statamic\Data\Taxonomies\TermCollection
      */
-    public static function all()
+    public function all()
     {
         return self::service()->all();
     }
@@ -48,7 +48,7 @@ class Term
      * @param bool   $includeUnassociated  Whether to include terms that have not been associated with data.
      * @return \Statamic\Data\Taxonomies\TermCollection
      */
-    public static function whereTaxonomy($taxonomy, $includeUnassociated = true)
+    public function whereTaxonomy($taxonomy, $includeUnassociated = true)
     {
         return self::service()->taxonomy($taxonomy, $includeUnassociated);
     }
@@ -60,7 +60,7 @@ class Term
      * @param string $taxonomy
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      */
-    public static function whereSlug($slug, $taxonomy)
+    public function whereSlug($slug, $taxonomy)
     {
         return self::service()->slug($slug, $taxonomy);
     }
@@ -71,7 +71,7 @@ class Term
      * @param string $uri
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      */
-    public static function whereUri($uri)
+    public function whereUri($uri)
     {
         return self::service()->uri($uri);
     }
@@ -83,7 +83,7 @@ class Term
      * @param bool   $includeUnassociated  Whether to include unassociated terms.
      * @return bool
      */
-    public static function exists($id, $includeUnassociated = true)
+    public function exists($id, $includeUnassociated = true)
     {
         return self::service()->exists($id, $includeUnassociated);
     }
@@ -96,7 +96,7 @@ class Term
      * @param bool   $includeUnassociated  Whether to include unassociated terms.
      * @return bool
      */
-    public static function slugExists($slug, $taxonomy, $includeUnassociated = true)
+    public function slugExists($slug, $taxonomy, $includeUnassociated = true)
     {
         return self::service()->slugExists($slug, $taxonomy, $includeUnassociated);
     }
@@ -107,7 +107,7 @@ class Term
      * @param string $slug
      * @return \Statamic\Contracts\Data\Taxonomies\TermFactory
      */
-    public static function create($slug)
+    public function create($slug)
     {
         return app('Statamic\Contracts\Data\Taxonomies\TermFactory')->create($slug);
     }
@@ -122,7 +122,7 @@ class Term
      * @param string $slug
      * @return string
      */
-    public static function normalizeSlug($slug)
+    public function normalizeSlug($slug)
     {
         return slugify($slug);
     }
