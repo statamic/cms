@@ -209,16 +209,6 @@ function translate($id, array $parameters = [])
 }
 
 
-function start_measure()
-{
-    log_todo();
-}
-function stop_measure()
-{
-    log_todo();
-}
-
-
 if (! function_exists('array_filter_use_both')) {
     /**
      * Polyfill for the array_filter constant ARRAY_FILTER_USE_BOTH.
