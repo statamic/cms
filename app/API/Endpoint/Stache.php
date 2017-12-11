@@ -2,6 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\API\Cache;
 use Statamic\Stache\Manager;
 
 class Stache
