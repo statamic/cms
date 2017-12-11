@@ -36,6 +36,29 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     /**
+     * Fieldtypes bundled with Statamic.
+     *
+     * @var array
+     */
+    protected $bundledFieldtypes = [
+        'arr', 'asset_container', 'asset_folder', 'assets', 'checkboxes', 'collection', 'collections',
+        'date', 'fields', 'fieldset', 'form', 'grid', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
+        'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
+        'revealer', 'section', 'select', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
+        'theme', 'time', 'title', 'toggle', 'user', 'user_groups', 'user_password', 'user_roles', 'yaml',
+    ];
+
+    /**
+     * Aliases for fieldtypes bundled with Statamic.
+     *
+     * @var array
+     */
+    protected $bundledFieldtypeAliases = [
+        'array' => 'Arr',
+        'list' => 'lists'
+    ];
+
+    /**
      * Aliases for modifiers bundled with Statamic.
      *
      * @var array
@@ -79,6 +102,7 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->registerTags();
         $this->registerModifiers();
+        $this->registerFieldtypes();
     }
 
     /**
@@ -172,6 +196,35 @@ class ExtensionServiceProvider extends ServiceProvider
         foreach ($this->app['files']->files(app_path('Modifiers')) as $file) {
             $modifier = snake_case($class = $file->getBasename('.php'));
             $this->app['statamic.modifiers'][$modifier] = "App\\Modifiers\\{$class}";
+        }
+    }
+
+    /**
+     * Register fieldtypes.
+     *
+     * @return void
+     */
+    protected function registerFieldtypes()
+    {
+        $this->app->instance('statamic.fieldtypes', collect());
+
+        $this->registerBundledFieldtypes();
+    }
+
+    /**
+     * Register bundled tags.
+     *
+     * @return void
+     */
+    protected function registerBundledFieldtypes()
+    {
+        foreach ($this->bundledFieldtypes as $tag) {
+            $studly = studly_case($tag);
+            $this->app['statamic.fieldtypes'][$tag] = "Statamic\\Addons\\{$studly}\\{$studly}Fieldtype";
+        }
+
+        foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
+            $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
     }
 }

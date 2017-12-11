@@ -57,4 +57,16 @@ abstract class ServiceProvider extends LaravelServiceProvider
     {
         $this->app['statamic.modifiers'][$modifier] = $class;
     }
+
+    /**
+     * Register a fieldtype class.
+     *
+     * @param string $fieldtype  The name of the fieldtype. (eg. "foo" would handle `type: foo`)
+     * @param string $class      The name of the class.
+     * @return void
+     */
+    public function registerFieldtype(string $fieldtype, string $class)
+    {
+        $this->app['statamic.fieldtypes'][$fieldtype] = $class;
+    }
 }
