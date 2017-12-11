@@ -14,15 +14,6 @@ class Widget
      */
     use HasParameters;
 
-    /**
-     * Create a new Widget instance
-     */
-    public function __construct()
-    {
-        $this->bootstrap();
-        $this->init();
-    }
-
     public function setParameters($parameters)
     {
         $this->parameters = $parameters;

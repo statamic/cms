@@ -66,15 +66,6 @@ abstract class Tags
      */
     protected $trim = false;
 
-    /**
-     * Create a new Tags instance
-     */
-    public function __construct()
-    {
-        $this->bootstrap();
-        $this->init();
-    }
-
     public function setProperties($properties)
     {
         $this->content     = $properties['content'];

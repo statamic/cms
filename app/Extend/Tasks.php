@@ -15,15 +15,6 @@ abstract class Tasks
     use Extensible;
 
     /**
-     * Create a new Tasks instance
-     */
-    public function __construct()
-    {
-        $this->bootstrap();
-        $this->init();
-    }
-
-    /**
      * Define the task schedule
      *
      * @param \Illuminate\Console\Scheduling\Schedule $schedule
