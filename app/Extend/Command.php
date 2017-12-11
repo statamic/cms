@@ -16,15 +16,4 @@ class Command extends LaravelCommand
      * Provides various command enhancements
      */
     use EnhancesCommands;
-
-    /**
-     * Create a new Command instance
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->bootstrap();
-        $this->init();
-    }
 }

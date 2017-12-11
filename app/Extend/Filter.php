@@ -25,15 +25,6 @@ abstract class Filter
      */
     protected $context;
 
-    /**
-     * Create a new Filter instance
-     */
-    public function __construct()
-    {
-        $this->bootstrap();
-        $this->init();
-    }
-
     public function setProperties($properties)
     {
         $this->collection = $properties['collection'];

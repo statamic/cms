@@ -41,15 +41,6 @@ class Fieldtype implements FieldtypeInterface
      */
     public $is_config = false;
 
-    /**
-     * Create a new fieldtype instance
-     */
-    public function __construct()
-    {
-        $this->bootstrap();
-        $this->init();
-    }
-
     public function setFieldConfig($config)
     {
         $this->field_config = $config;

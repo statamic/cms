@@ -17,13 +17,4 @@ abstract class Listener
      * @var array
      */
     public $events = [];
-
-    /**
-     * Create a new Listener instance
-     */
-    public function __construct()
-    {
-        $this->bootstrap();
-        $this->init();
-    }
 }
