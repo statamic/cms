@@ -10,6 +10,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::redirect('/', 'cp/dashboard')->name('cp');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
+    Route::get('licensing', 'LicensingController@index')->name('licensing');
+    Route::get('licensing/refresh', 'LicensingController@refresh')->name('licensing.refresh');
+    Route::post('licensing', 'LicensingController@update')->name('licensing.update');
+
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', 'PagesController@pages')->name('pages');
         Route::post('/', 'PagesController@save')->name('pages.post');
@@ -149,7 +153,18 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/{fieldset}', 'FieldsetController@update')->name('fieldset.update');
             Route::post('/', 'FieldsetController@store')->name('fieldset.store');
         });
+    });
 
+    Route::get('fieldtypes', 'FieldtypesController@index')->name('fieldtypes');
+
+    Route::group(['prefix' => 'addons', 'middleware' => 'configurable'], function () {
+        Route::get('/', 'AddonsController@index')->name('addons');
+        Route::get('get', 'AddonsController@get')->name('addons.get');
+    });
+
+    Route::group(['prefix' => 'addons', 'middleware' => 'configurable'], function () {
+        Route::get('{addon}/settings', 'AddonsController@settings')->name('addon.settings');
+        Route::post('{addon}/settings', 'AddonsController@saveSettings');
     });
 });
 
@@ -158,7 +173,6 @@ Route::get('/account', function () { return ''; })->name('account');
 Route::get('/forms', function () { return ''; })->name('forms');
 Route::get('/updater', function () { return ''; })->name('updater');
 Route::get('/import', function () { return ''; })->name('import');
-Route::get('/addons', function () { return ''; })->name('addons');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
 Route::get('/assets.container.edit', function () { return ''; })->name('assets.container.edit');

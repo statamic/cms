@@ -4,6 +4,7 @@ namespace Statamic\Extend;
 
 use Statamic\API\Helper;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 abstract class ServiceProvider extends LaravelServiceProvider
@@ -32,6 +33,49 @@ abstract class ServiceProvider extends LaravelServiceProvider
                 Event::listen($event, [$listener, $method]);
             }
         }
+    }
+
+    /**
+     * Register routes from the root of the site.
+     *
+     * @param string $path   Path to the routes file.
+     * @return void
+     */
+    public function registerRoutes($path)
+    {
+        Route::group($this->routeGroupAttributes(), function () use ($path) {
+            require $path;
+        });
+    }
+
+    /**
+     * Register routes scoped to the addon's section in the Control Panel.
+     *
+     * @param string $path  Path to the routes file.
+     * @return void
+     */
+    public function registerCpRoutes($path)
+    {
+        $attributes = $this->routeGroupAttributes([
+            'prefix' => config('cp.route') . '/' . $this->getAddon()->slug(),
+        ]);
+
+        Route::group($attributes, function () use ($path) {
+            require $path;
+        });
+    }
+
+    /**
+     * The attributes to be applied to the route group.
+     *
+     * @param array $overrides  Any additional attributes.
+     * @return array
+     */
+    protected function routeGroupAttributes($overrides = [])
+    {
+        return array_merge($overrides, [
+            'namespace' => $this->getAddon()->namespace()
+        ]);
     }
 
     /**

@@ -2,20 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Extend\Management\AddonRepository;
-
 class FieldtypesController extends CpController
 {
-    /**
-     * @var AddonRepository
-     */
-    private $addonRepo;
-
-    public function __construct(AddonRepository $addonRepo)
-    {
-        $this->addonRepo = $addonRepo;
-    }
-
     public function index()
     {
         $fieldtypes = [];
@@ -67,10 +55,12 @@ class FieldtypesController extends CpController
      */
     private function getAllFieldtypes()
     {
-        return $this->addonRepo->fieldtypes()->classes()->map(function ($class) {
-            return app($class);
-        })->sortBy(function ($fieldtype) {
-            return $fieldtype->getAddonName();
-        })->values();
+        return app('statamic.fieldtypes')
+            ->unique() // Remove any dupes in the case of aliases. Aliases are defined later so they will win.
+            ->map(function ($class) {
+                return app($class);
+            })->sortBy(function ($fieldtype) {
+                return $fieldtype->getAddonName();
+            })->values();
     }
 }

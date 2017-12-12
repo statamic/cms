@@ -3,21 +3,23 @@
 namespace Statamic\Extend;
 
 use Statamic\API\URL;
-use Statamic\API\File;
+use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\YAML;
+use Statamic\API\File;
 use Statamic\API\Email;
-use Statamic\API\Str;
+use Statamic\API\Addon;
 use ReflectionException;
 use Statamic\Config\Addons;
 use Statamic\Extend\Contextual\Store;
+use Statamic\Extend\Management\Manifest;
 use Statamic\Extend\Contextual\ContextualJs;
-use Statamic\Extend\Contextual\ContextualCss;
 use Statamic\Exceptions\ApiNotFoundException;
-use Statamic\Extend\Contextual\ContextualBlink;
+use Statamic\Extend\Contextual\ContextualCss;
 use Statamic\Extend\Contextual\ContextualCache;
-use Statamic\Extend\Contextual\ContextualFlash;
+use Statamic\Extend\Contextual\ContextualBlink;
 use Statamic\Extend\Contextual\ContextualImage;
+use Statamic\Extend\Contextual\ContextualFlash;
 use Statamic\Extend\Contextual\ContextualCookie;
 use Statamic\Extend\Contextual\ContextualStorage;
 use Statamic\Extend\Contextual\ContextualSession;
@@ -80,24 +82,31 @@ trait Extensible
     }
 
     /**
-     * Load the addon's bootstrap file, if available.
-     * Useful for an addon to use a composer autoloader, for example.
+     *
      */
-    public function bootstrap()
+    public function getAddon()
     {
-        $path = $this->getDirectory() . '/bootstrap.php';
-
-        if (File::exists($path)) {
-            require_once $path;
+        if ($this->isFirstParty()) {
+            return $this->createBundle();
         }
+
+        $class = get_class($this);
+
+        return Addon::all()->first(function ($addon) use ($class) {
+            return Str::startsWith($class, $addon->namespace());
+        });
     }
 
-    /**
-     * Initialize the addon without needing to re-construct the class
-     */
-    protected function init()
+    private function createBundle()
     {
+        $class = get_class($this);
+        $id = explode('\\', $class)[2];
 
+        return Addon::create([
+            'id' => $id,
+            'name' => $class,
+            'directory' => base_path('vendor/statamic/cms/bundles/'.$id)
+        ]);
     }
 
     /**
@@ -107,27 +116,7 @@ trait Extensible
      */
     public function getAddonClassName()
     {
-        return explode('\\', get_called_class())[2];
-    }
-
-    public function getClassNameWithoutSuffix()
-    {
-        $suffixes = [
-            'API', 'Command', 'Controller', 'Fieldtype', 'Filter', 'Listener',
-            'Modifier', 'ServiceProvider', 'Tags', 'Tasks', 'Widget'
-        ];
-
-        $original = $class = last(explode('\\', get_called_class()));
-
-        foreach ($suffixes as $suffix) {
-            $class = Str::removeRight($class, $suffix);
-
-            if ($class !== $original) {
-                return $class;
-            }
-        }
-
-        return $class;
+        return $this->getAddon()->id();
     }
 
     /**
@@ -166,41 +155,7 @@ trait Extensible
      */
     public function getAddonName()
     {
-        if ($name = array_get($this->getMeta(), 'name')) {
-            return $name;
-        }
-
-        return $this->getAddonClassName();
-    }
-
-    /**
-     * Gets the type of plugin
-     *
-     * @return string
-     */
-    public function getAddonType()
-    {
-        $class_bits = explode('\\', get_called_class());
-        $class = last($class_bits);
-        $split = preg_split('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', $class);
-
-        return end($split);
-    }
-
-    /**
-     * Get the meta information
-     *
-     * @return array
-     */
-    public function getMeta()
-    {
-        $file = $this->getDirectory() . '/meta.yaml';
-
-        if (! File::exists($file)) {
-            return [];
-        }
-
-        return YAML::parse(File::get($file));
+        return $this->getAddon()->name();
     }
 
     /**
@@ -242,10 +197,12 @@ trait Extensible
      */
     public function getConfig($keys = null, $default = null)
     {
-        log_todo();
+        $config = config(
+            optional($this->getAddon())->handle()
+        );
 
         if (is_null($keys)) {
-            return [];
+            return $config;
         }
 
         if (! is_array($keys)) {
@@ -294,9 +251,7 @@ trait Extensible
      */
     public function getDirectory()
     {
-        $path = $this->getAddonClassName();
-
-        return $this->isFirstParty() ? bundles_path($path) : addons_path($path);
+        return $this->getAddon()->directory();
     }
 
     /**

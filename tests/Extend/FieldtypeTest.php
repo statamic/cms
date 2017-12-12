@@ -3,102 +3,84 @@
 namespace Tests\Extend;
 
 use Tests\TestCase;
+use Tests\ModifiesAddonManifest;
 
 class FieldtypeTest extends TestCase
 {
-    private function inEachAddonLocation($callback)
-    {
-        $classes = [
-            \Statamic\Addons\Test\TestFieldtype::class,             // Primary in root
-            \Statamic\Addons\Test\SecondaryFieldtype::class,        // Secondary in root
-            \Statamic\Addons\Test\Fieldtypes\TestFieldtype::class,      // Primary in namespace
-            \Statamic\Addons\Test\Fieldtypes\SecondaryFieldtype::class, // Secondary in namespace
-        ];
+    use ModifiesAddonManifest;
 
-        foreach ($classes as $class) {
-            tap(new $class, function ($addon) use ($callback) {
-                $callback($addon);
-            });
-        }
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->fakeManifest();
     }
 
     /** @test */
-    public function can_determine_if_primary_fieldtype()
+    public function gets_name_from_class()
     {
-        // Located in root
-        $this->assertTrue((new \Statamic\Addons\Test\TestFieldtype)->isPrimaryFieldtype());
-
-        // Located in namespace
-        $this->assertTrue((new \Statamic\Addons\Test\Fieldtypes\TestFieldtype)->isPrimaryFieldtype());
+        $this->assertEquals('Bar', (new \Foo\Bar\Fieldtypes\Bar)->getFieldtypeName());
     }
 
     /** @test */
-    public function can_determine_if_secondary_fieldtype()
+    function gets_name_from_class_without_fieldtype_suffix()
     {
-        // Located in root
-        $this->assertFalse((new \Statamic\Addons\Test\SecondaryFieldtype)->isPrimaryFieldtype());
-
-        // Located in namespace
-        $this->assertFalse((new \Statamic\Addons\Test\Fieldtypes\SecondaryFieldtype)->isPrimaryFieldtype());
+        $this->assertEquals('Bar', (new \Foo\Bar\Fieldtypes\BarFieldtype)->getFieldtypeName());
     }
 
     /** @test */
-    public function gets_fieldtype_name()
+    function appends_addon_name_if_class_is_different()
     {
-        $this->assertEquals('Test', (new \Statamic\Addons\Test\TestFieldtype)->getFieldtypeName());
-        $this->assertEquals('Test', (new \Statamic\Addons\Test\Fieldtypes\TestFieldtype)->getFieldtypeName());
-        $this->assertEquals('Test - Secondary', (new \Statamic\Addons\Test\SecondaryFieldtype)->getFieldtypeName());
-        $this->assertEquals('Test - Secondary', (new \Statamic\Addons\Test\Fieldtypes\SecondaryFieldtype)->getFieldtypeName());
+        $this->assertEquals('Text - Bar', (new \Foo\Bar\Fieldtypes\Text)->getFieldtypeName());
     }
 
     /** @test */
     public function gets_handle()
     {
-        $this->assertEquals('test', (new \Statamic\Addons\Test\TestFieldtype)->getHandle());
-        $this->assertEquals('test', (new \Statamic\Addons\Test\Fieldtypes\TestFieldtype)->getHandle());
-        $this->assertEquals('test.secondary', (new \Statamic\Addons\Test\SecondaryFieldtype)->getHandle());
-        $this->assertEquals('test.secondary', (new \Statamic\Addons\Test\Fieldtypes\SecondaryFieldtype)->getHandle());
+        $this->app['statamic.fieldtypes']['bar'] = \Foo\Bar\Fieldtypes\Bar::class;
+
+        $this->assertEquals('bar', (new \Foo\Bar\Fieldtypes\Bar)->getHandle());
     }
 
     /** @test */
     public function sets_and_gets_field_config()
     {
-        $this->inEachAddonLocation(function ($ft) {
-            $ft->setFieldConfig($config = [
-                'name' => 'test_field',
-                'max_items' => 123
-            ]);
+        $ft = new \Foo\Bar\Fieldtypes\Text;
 
-            $this->assertEquals($config, $ft->getFieldConfig());
-            $this->assertEquals('test_field', $ft->getFieldConfig('name'));
-            $this->assertEquals('fallback', $ft->getFieldConfig('unknown', 'fallback'));
-            $this->assertNull($ft->getFieldConfig('unknown'));
-        });
+        $ft->setFieldConfig($config = [
+            'name' => 'test_field',
+            'max_items' => 123
+        ]);
+
+        $this->assertEquals($config, $ft->getFieldConfig());
+        $this->assertEquals('test_field', $ft->getFieldConfig('name'));
+        $this->assertEquals('fallback', $ft->getFieldConfig('unknown', 'fallback'));
+        $this->assertNull($ft->getFieldConfig('unknown'));
     }
 
     /** @test */
     public function gets_field_name()
     {
-        $this->inEachAddonLocation(function ($ft) {
-            $ft->setFieldConfig(['name' => 'test_field']);
+        $ft = new \Foo\Bar\Fieldtypes\Text;
 
-            $this->assertEquals('test_field', $ft->getName());
-        });
+        $ft->setFieldConfig(['name' => 'test_field']);
+
+        $this->assertEquals('test_field', $ft->getName());
     }
 
     /** @test */
     public function gets_field_config_parameters()
     {
-        $this->inEachAddonLocation(function ($addon) {
-            $addon->setFieldConfig([
-                'foo' => 'bar',
-                'max_items' => '123',
-                'truthy' => '1'
-            ]);
+        $addon = new \Foo\Bar\Fieldtypes\Text;
 
-            $this->assertEquals('bar', $addon->getParam('foo'));
-            $this->assertEquals(123, $addon->getParamInt('max_items'));
-            $this->assertTrue($addon->getParamBool('truthy'));
-        });
+        $addon->setFieldConfig([
+            'foo' => 'bar',
+            'max_items' => '123',
+            'truthy' => '1'
+        ]);
+
+        $this->assertEquals('bar', $addon->getParam('foo'));
+        $this->assertEquals(123, $addon->getParamInt('max_items'));
+        $this->assertTrue($addon->getParamBool('truthy'));
     }
 }

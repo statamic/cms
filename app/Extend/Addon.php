@@ -2,31 +2,99 @@
 
 namespace Statamic\Extend;
 
+use Statamic\API\Arr;
 use Statamic\API\URL;
 use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\File;
-use Statamic\API\Folder;
-use Statamic\API\Fieldset;
 use Statamic\API\YAML;
-use Statamic\Config\Addons;
 
 final class Addon
 {
     /**
+     * The identifier.
+     * Typically the class name without the namespace. eg. "Bloodhound"
+     *
      * @var string
      */
-    private $id;
+    protected $id;
 
     /**
+     * The addon's namespace. eg. "Statamic\Addons\Bloodhound"
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound"
+     *
+     * @var string
+     */
+    protected $directory;
+
+    /**
+     * The autoloaded directory, relative to the addon root. eg. "src" or ""
+     *
+     * @var string
+     */
+    protected $autoload;
+
+    /**
+     * The name of the addon. eg. "Bloodhound Search"
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * The addon description.
+     *
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * The Composer package name. eg. "statamic/bloodhound"
+     *
+     * @var string
+     */
+    protected $package;
+
+    /**
+     * The addon's version.
+     *
+     * @var string
+     */
+    protected $version;
+
+    /**
+     * The marketing URL.
+     *
+     * @var string
+     */
+    protected $url;
+
+    /**
+     * The name of the developer.
+     *
+     * @var string
+     */
+    protected $developer;
+
+    /**
+     * The developer's URL
+     *
+     * @var string
+     */
+    protected $developerUrl;
+
+    /**
+     * Whether the addon is commercial.
+     *
      * @var bool
      */
-    private $isFirstParty = false;
-
-    /**
-     * @var Meta
-     */
-    private $meta;
+    protected $isCommercial = false;
 
     /**
      * @param string $id
@@ -34,7 +102,39 @@ final class Addon
     public function __construct($id)
     {
         $this->id = Str::studly($id);
-        $this->meta = $this->makeMeta();
+    }
+
+    /**
+     * Create an addon instance.
+     *
+     * @return self
+     */
+    public static function create($name)
+    {
+        return new self($name);
+    }
+
+    /**
+     * Create an addon instance from package details.
+     *
+     * @param array $package
+     * @return self
+     */
+    public static function createFromPackage(array $package)
+    {
+        $instance = self::create($package['id']);
+
+        $keys = [
+            'id', 'name', 'namespace', 'directory', 'autoload', 'description',
+            'package', 'version', 'url', 'developer', 'developerUrl', 'isCommercial',
+        ];
+
+        foreach (Arr::only($package, $keys) as $key => $value) {
+            $method = Str::camel($key);
+            $instance->$method($value);
+        }
+
+        return $instance;
     }
 
     /**
@@ -74,34 +174,20 @@ final class Addon
     }
 
     /**
-     * The name of the addon.
+     * The name of addon.
      *
-     * @return string
+     * @param string $name
+     * @return stirng|self
      */
-    public function name()
+    public function name($name = null)
     {
-        return $this->meta()->get('name', $this->id);
-    }
-
-    public function isFirstParty($firstParty = null)
-    {
-        if (is_null($firstParty)) {
-            return $this->isFirstParty;
+        if (is_null($name)) {
+            return $this->name ?? $this->id;
         }
 
-        $this->isFirstParty = $firstParty;
+        $this->name = $name;
 
         return $this;
-    }
-
-    /**
-     * The path to the directory.
-     *
-     * @return string
-     */
-    public function directory()
-    {
-        return $this->isFirstParty() ? bundles_path($this->id) : addons_path($this->id);
     }
 
     /**
@@ -112,6 +198,10 @@ final class Addon
      */
     public function hasFile($path)
     {
+        if (! $this->directory()) {
+            throw new \Exception('Cannot check files without a directory specified.');
+        }
+
         return File::exists(Path::assemble($this->directory(), $path));
     }
 
@@ -123,6 +213,10 @@ final class Addon
      */
     public function getFile($path)
     {
+        if (! $this->directory()) {
+            throw new \Exception('Cannot get files without a directory specified.');
+        }
+
         return File::get(Path::assemble($this->directory(), $path));
     }
 
@@ -134,64 +228,14 @@ final class Addon
      */
     public function putFile($path, $contents)
     {
+        if (! $this->directory()) {
+            throw new \Exception('Cannot write files without a directory specified.');
+        }
+
         File::put(
             Path::assemble($this->directory(), $path),
             $contents
         );
-    }
-
-    /**
-     * Whether the addon has a settings fieldset.
-     *
-     * @return bool
-     */
-    public function hasSettings()
-    {
-        return $this->hasFile('settings.yaml') || $this->isCommercial();
-    }
-
-    /**
-     * The URL to the settings page in the control panel.
-     *
-     * @return string
-     */
-    public function settingsUrl()
-    {
-        return route('addon.settings', $this->slug());
-    }
-
-    /**
-     * The fieldset for the settings page in the control panel.
-     *
-     * @return \Statamic\CP\Fieldset
-     */
-    public function settingsFieldset()
-    {
-        if (! $this->hasSettings()) {
-            return;
-        }
-
-        $fieldset = Fieldset::create($this->id . '.settings');
-
-        $fieldset->type('addon');
-
-        $contents = [
-            'fields' => []
-        ];
-
-        if ($this->isCommercial()) {
-            $contents['fields']['license_key'] = [
-                'type' => 'text'
-            ];
-        }
-
-        if ($this->hasFile('settings.yaml')) {
-            $contents = array_merge_recursive($contents, YAML::parse($this->getFile('settings.yaml')));
-        }
-
-        $fieldset->contents($contents);
-
-        return $fieldset;
     }
 
     /**
@@ -201,67 +245,7 @@ final class Addon
      */
     public function config()
     {
-        return app(Addons::class)->get($this->handle()) ?: [];
-    }
-
-    /**
-     * Get the addon's marketing URL.
-     *
-     * @return string
-     */
-    public function url()
-    {
-        return $this->meta()->get('url');
-    }
-
-    /**
-     * Get the version.
-     *
-     * @return string
-     */
-    public function version()
-    {
-        return $this->meta()->get('version');
-    }
-
-    /**
-     * Get the developer's name.
-     *
-     * @return string
-     */
-    public function developer()
-    {
-        return $this->meta()->get('developer');
-    }
-
-    /**
-     * Get the developer's URL.
-     *
-     * @return string
-     */
-    public function developerUrl()
-    {
-        return $this->meta()->get('developer_url');
-    }
-
-    /**
-     * Get the description.
-     *
-     * @return string
-     */
-    public function description()
-    {
-        return $this->meta()->get('description');
-    }
-
-    /**
-     * Whether this is a commercial addon.
-     *
-     * @return bool
-     */
-    public function isCommercial()
-    {
-        return $this->meta()->get('commercial', false);
+        return config($this->handle());
     }
 
     /**
@@ -274,58 +258,59 @@ final class Addon
         return array_get($this->config(), 'license_key');
     }
 
-    /**
-     * Makes a meta object associated with this addon.
-     *
-     * @param array $data
-     * @return Meta
-     */
-    public function makeMeta($data = [])
+    public function toComposerJson()
     {
-        return (new Meta($this))->data($data);
+        return json_encode($this->toComposerJsonArray(), JSON_PRETTY_PRINT);
+    }
+
+    public function toComposerJsonArray()
+    {
+        return [
+            'name' => $this->package,
+            'description' => $this->description,
+            'version' => $this->version,
+            'type' => 'statamic-addon',
+            'autoload' => [
+                'psr-4' => [
+                    $this->namespace.'\\' => $this->autoload,
+                ]
+            ],
+            'extra' => [
+                'statamic' => [
+                    'name' => $this->name,
+                    'description' => $this->description,
+                    'developer' => $this->developer,
+                    'developer-url' => $this->developerUrl,
+                ],
+                'laravel' => [
+                    'providers' => [
+                        $this->namespace.'\\'.$this->id.'ServiceProvider'
+                    ]
+                ],
+            ]
+        ];
     }
 
     /**
-     * Access the meta object, and make sure it's loaded.
+     * Handle method calls.
+     * Typically will get or set property values.
      *
-     * @return Meta
+     * @param string $method
+     * @param array $args
+     * @return mixed
      */
-    public function meta()
+    public function __call($method, $args)
     {
-        if (! $this->meta->isLoaded()) {
-            $this->meta->load();
+        if (! property_exists($this, $method)) {
+            throw new \Exception(sprintf('Call to undefined method %s::%s', get_class($this), $method));
         }
 
-        return $this->meta;
-    }
-
-    public function isInstalled()
-    {
-        if (! $this->hasFile('composer.json')) {
-            return true;
+        if (empty($args)) {
+            return $this->$method;
         }
 
-        // Get this addon's package name
-        $composer = json_decode($this->getFile('composer.json'), true);
-        $packageName = $composer['name'];
+        $this->$method = $args[0];
 
-        // Get the packages from statamic's composer lock file
-        $contents = File::get(statamic_path('composer.lock'));
-        $json = json_decode($contents, true);
-        $packages = $json['packages'];
-
-        // Check if it's in there.
-        foreach ($packages as $package) {
-            if ($package['name'] === $packageName) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function delete()
-    {
-        Folder::delete($this->directory());
+        return $this;
     }
 }

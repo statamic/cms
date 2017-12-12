@@ -7,7 +7,9 @@ use Statamic\Extend\Modifier;
 use Statamic\View\BaseModifiers;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Extend\Management\Manifest;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
@@ -45,7 +47,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'date', 'fields', 'fieldset', 'form', 'grid', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
         'revealer', 'section', 'select', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
-        'theme', 'time', 'title', 'toggle', 'user', 'user_groups', 'user_password', 'user_roles', 'yaml',
+        'theme', 'time', 'title', 'toggle', 'user_groups', 'user_password', 'user_roles', 'yaml',
     ];
 
     /**
@@ -100,6 +102,12 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->instance(Manifest::class, new Manifest(
+            new Filesystem,
+            $this->app->basePath(),
+            $this->app->bootstrapPath().'/cache/addons.php'
+        ));
+
         $this->registerTags();
         $this->registerModifiers();
         $this->registerFieldtypes();

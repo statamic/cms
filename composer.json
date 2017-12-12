@@ -33,7 +33,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests",
-            "Statamic\\Addons\\": "tests/addon-stubs"
+            "Foo\\Bar\\": "tests/fixtures/Addon"
         }
     },
     "minimum-stability": "dev",

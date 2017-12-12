@@ -5,11 +5,10 @@ namespace Statamic;
 use Log;
 use GuzzleHttp\Client;
 use Statamic\API\Cache;
+use Statamic\API\Addon;
 use Statamic\API\Config;
-use Statamic\Extend\Addon;
 use Illuminate\Http\Request;
 use GuzzleHttp\Exception\RequestException;
-use Statamic\Extend\Management\AddonRepository;
 
 class Outpost
 {
@@ -34,20 +33,13 @@ class Outpost
     private $response;
 
     /**
-     * @var AddonRepository
-     */
-    private $addonRepo;
-
-    /**
      * Create a new Outpost instance
      *
      * @param Request $request
-     * @param AddonRepository $addonRepo
      */
-    public function __construct(Request $request, AddonRepository $addonRepo)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->addonRepo = $addonRepo;
     }
 
     /**
@@ -108,7 +100,7 @@ class Outpost
         return true;
     }
 
-    public function isAddonLicenseValid(Addon $addon)
+    public function isAddonLicenseValid(\Statamic\Extend\Addon $addon)
     {
         $addons = collect(array_get($this->response, 'addons', []));
 
@@ -297,7 +289,7 @@ class Outpost
 
     private function getAddonsPayload()
     {
-        return $this->addonRepo->thirdParty()->addons()->map(function ($addon) {
+        return Addon::all()->map(function ($addon) {
              return [
                  'addon' => $addon->id(),
                  'version' => $addon->version(),

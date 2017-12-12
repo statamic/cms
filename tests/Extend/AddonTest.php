@@ -2,314 +2,241 @@
 
 namespace Statamic\Testing\Extend;
 
-use Mockery;
 use Tests\TestCase;
 use Statamic\API\URL;
 use Statamic\API\Path;
-use Statamic\Extend\Meta;
+use Statamic\API\File;
 use Statamic\Extend\Addon;
-use Statamic\Config\Addons;
-use Illuminate\Contracts\Filesystem\Filesystem;
 
 class AddonTest extends TestCase
 {
-    private $fs;
-
-    /** @var Addon */
-    private $addon;
-
-    public function setUp()
+    /** @test */
+    function it_creates_an_instance_with_a_name()
     {
-        parent::setUp();
-
-        $this->addon = new Addon('TestAddon');
-
-        $this->fs = Mockery::mock(Filesystem::class);
-        $this->fs->shouldReceive('disk')->andReturn(Mockery::self());
-        $this->instance('filesystem', $this->fs);
+        $this->assertInstanceOf(Addon::class, Addon::create('TestAddon'));
     }
 
     /** @test */
     public function it_gets_the_id()
     {
-        $this->assertEquals('TestAddon', $this->addon->id());
+        $this->assertEquals(
+            'TestAddon',
+            Addon::create('Test Addon')->id()
+        );
     }
 
     /** @test */
     public function it_initializes_the_id_as_studly_case()
     {
-        $addon = new Addon('test addon');
-        $this->assertEquals('TestAddon', $addon->id());
+        $this->assertEquals(
+            'TestAddon',
+            Addon::create('test addon')->id()
+        );
     }
 
     /** @test */
     public function it_gets_the_handle()
     {
-        $this->assertEquals('test_addon', $this->addon->handle());
+        $this->assertEquals(
+            'test_addon',
+            Addon::create('TestAddon')->handle()
+        );
     }
 
     /** @test */
     public function it_gets_the_slug()
     {
-        $this->assertEquals('test-addon', $this->addon->slug());
-    }
-
-    /** @test */
-    public function it_determines_whether_its_first_party()
-    {
-        $this->assertFalse($this->addon->isFirstParty());
-    }
-
-    /** @test */
-    public function it_sets_whether_its_first_party()
-    {
-        $returned = $this->addon->isFirstParty(true);
-
-        $this->assertTrue($this->addon->isFirstParty());
-        $this->assertInstanceOf(Addon::class, $returned);
-    }
-
-    /** @test */
-    public function it_gets_the_directory()
-    {
         $this->assertEquals(
-            Path::resolve(Path::makeFull('site/addons/TestAddon')),
-            Path::resolve($this->addon->directory())
+            'test-addon',
+            Addon::create('test addon')->slug()
         );
     }
 
     /** @test */
-    public function it_gets_the_directory_for_first_party_addons()
+    function it_creates_an_instance_from_a_package()
     {
-        $this->addon->isFirstParty(true);
+        $addon = $this->createFromPackage([]);
 
-        $this->assertEquals(
-            Path::resolve(Path::makeFull('statamic/bundles/TestAddon')),
-            Path::resolve($this->addon->directory())
-        );
-    }
-
-    /** @test */
-    public function it_gets_the_settings_url()
-    {
-        $this->assertEquals(
-            '/cp/addons/test-addon/settings',
-            URL::makeRelative($this->addon->settingsUrl())
-        );
+        $this->assertInstanceOf(Addon::class, $addon);
+        $this->assertEquals('TestAddon', $addon->id());
+        $this->assertEquals('Test Addon', $addon->name());
+        $this->assertEquals('Test description', $addon->description());
+        $this->assertEquals('test-vendor/test-addon', $addon->package());
+        $this->assertEquals('Vendor\\TestAddon', $addon->namespace());
+        $this->assertEquals('/path/to/addon', $addon->directory());
+        $this->assertEquals('http://test-url.com', $addon->url());
+        $this->assertEquals('Test Developer LLC', $addon->developer());
+        $this->assertEquals('http://test-developer.com', $addon->developerUrl());
+        $this->assertEquals('1.0', $addon->version());
     }
 
     /** @test */
     public function it_checks_if_a_file_exists()
     {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/test.txt')->andReturn(true);
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/notfound.txt')->andReturn(false);
+        $addon = Addon::create('Test Addon')->directory('/path/to/addon');
 
-        $this->assertTrue($this->addon->hasFile('test.txt'));
-        $this->assertFalse($this->addon->hasFile('notfound.txt'));
+        File::shouldReceive('exists')->with('/path/to/addon/test.txt')->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/addon/notfound.txt')->andReturnFalse();
+
+        $this->assertTrue($addon->hasFile('test.txt'));
+        $this->assertFalse($addon->hasFile('notfound.txt'));
     }
 
     /** @test */
     public function it_gets_file_contents()
     {
-        $this->fs->shouldReceive('get')->with('site/addons/TestAddon/test.txt')->andReturn('the file contents');
+        $addon = Addon::create('Test Addon')->directory('/path/to/addon');
 
-        $this->assertEquals('the file contents', $this->addon->getFile('test.txt'));
+        File::shouldReceive('get')->with('/path/to/addon/test.txt')->andReturn('the file contents');
+
+        $this->assertEquals('the file contents', $addon->getFile('test.txt'));
     }
 
     /** @test */
     public function it_writes_file_contents()
     {
-        $this->fs->shouldReceive('put')->with('site/addons/TestAddon/test.txt', 'the file contents');
+        $addon = Addon::create('Test Addon')->directory('/path/to/addon');
 
-        $this->addon->putFile('test.txt', 'the file contents');
+        File::shouldReceive('put')->with('/path/to/addon/test.txt', 'the file contents');
+
+        $addon->putFile('test.txt', 'the file contents');
     }
 
     /** @test */
-    public function it_gets_the_name_from_the_meta_file_if_it_exists()
+    function it_doesnt_allow_getting_files_if_no_directory_is_set()
     {
-        $this->withMeta('name: My Test Addon');
+        File::spy();
+        $addon = $this->createFromPackage(['directory' => null]);
 
-        $this->assertEquals('My Test Addon', $this->addon->name());
+        try {
+            $addon->getFile('foo.txt', 'foo');
+        } catch (\Exception $e) {
+            $this->assertEquals('Cannot get files without a directory specified.', $e->getMessage());
+            File::shouldNotHaveReceived('get');
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     /** @test */
-    public function it_gets_the_name_from_id_if_the_meta_doesnt_exist()
+    function it_doesnt_allow_checking_for_files_if_no_directory_is_set()
     {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/meta.yaml')->andReturn(false);
+        File::spy();
+        $addon = $this->createFromPackage(['directory' => null]);
 
-        $this->assertEquals('TestAddon', $this->addon->name());
+        try {
+            $addon->hasFile('foo.txt', 'foo');
+        } catch (\Exception $e) {
+            $this->assertEquals('Cannot check files without a directory specified.', $e->getMessage());
+            File::shouldNotHaveReceived('get');
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+
+
+    /** @test */
+    function it_doesnt_allow_writing_files_if_no_directory_is_set()
+    {
+        File::spy();
+        $addon = $this->createFromPackage(['directory' => null]);
+
+        try {
+            $addon->putFile('foo.txt', 'foo');
+        } catch (\Exception $e) {
+            $this->assertEquals('Cannot write files without a directory specified.', $e->getMessage());
+            File::shouldNotHaveReceived('put');
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
     }
 
     /** @test */
-    public function it_gets_the_url()
+    public function it_gets_the_name_from_id_if_it_wasnt_specified()
     {
-        $this->withMeta('url: http://example.com');
+        $addon = $this->createFromPackage([
+            'name' => null,
+            'id' => 'BarBaz',
+        ]);
 
-        $this->assertEquals('http://example.com', $this->addon->url());
+        $this->assertEquals('BarBaz', $addon->name());
     }
 
     /** @test */
-    public function it_gets_the_version()
+    public function it_checks_if_commercial()
     {
-        $this->withMeta('version: 1.0');
-
-        $this->assertEquals('1.0', $this->addon->version());
-    }
-
-    /** @test */
-    public function it_gets_the_developer_name()
-    {
-        $this->withMeta('developer: Testerson');
-
-        $this->assertEquals('Testerson', $this->addon->developer());
-    }
-
-    /** @test */
-    public function it_gets_the_developer_url()
-    {
-        $this->withMeta('developer_url: http://testerson.com');
-
-        $this->assertEquals('http://testerson.com', $this->addon->developerUrl());
-    }
-
-    /** @test */
-    public function it_gets_the_description()
-    {
-        $this->withMeta('description: This is an addon.');
-
-        $this->assertEquals('This is an addon.', $this->addon->description());
-    }
-
-    /** @test */
-    public function its_commercial_if_it_says_so_in_the_meta()
-    {
-        $this->withMeta('commercial: true');
-
-        $this->assertTrue($this->addon->isCommercial());
-    }
-
-    /** @test */
-    public function its_not_commercial_if_the_meta_doesnt_contain_a_commercial_boolean()
-    {
-        $this->withMeta(''); // no mention of commercial
-
-        $this->assertFalse($this->addon->isCommercial());
-    }
-
-    /** @test */
-    public function its_not_commercial_if_there_is_no_meta_file()
-    {
-        $this->withoutMeta();
-
-        $this->assertFalse($this->addon->isCommercial());
+        $this->assertTrue($this->createFromPackage(['isCommercial' => true])->isCommercial());
+        $this->assertFalse($this->createFromPackage(['isCommercial' => false])->isCommercial());
+        $this->assertFalse($this->createFromPackage([])->isCommercial());
     }
 
     /** @test */
     public function it_gets_the_license_key()
     {
-        $addons = new Addons;
-        $addons->hydrate(['test_addon' => ['license_key' => 'TESTLICENSEKEY']]);
-        $this->instance(Addons::class, $addons);
+        config(['test_addon' => ['license_key' => 'TESTLICENSEKEY']]);
 
-        $this->assertEquals('TESTLICENSEKEY', $this->addon->licenseKey());
+        $this->assertEquals('TESTLICENSEKEY', Addon::create('TestAddon')->licenseKey());
+    }
 
-        $addons->hydrate(['test_addon' => []]);
+    public function it_gets_the_autoloaded_directory()
+    {
+        $addon = $this->createFromPackage(['autoload' => 'src']);
 
-        $this->assertNull($this->addon->licenseKey());
+        $this->assertEquals('src', $addon->autoload());
     }
 
     /** @test */
-    public function it_should_have_settings_if_the_file_exists()
+    public function it_creates_a_composer_json_file()
     {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/settings.yaml')->andReturn(true);
+        $addon = $this->createFromPackage([]);
 
-        $this->assertTrue($this->addon->hasSettings());
+        $expected = [
+            'name' => 'test-vendor/test-addon',
+            'description' => 'Test description',
+            'version' => '1.0',
+            'type' => 'statamic-addon',
+            'autoload' => [
+                'psr-4' => [
+                    'Vendor\\TestAddon\\' => 'src',
+                ]
+            ],
+            'extra' => [
+                'statamic' => [
+                    'name' => 'Test Addon',
+                    'description' => 'Test description',
+                    'developer' => 'Test Developer LLC',
+                    'developer-url' => 'http://test-developer.com',
+                ],
+                'laravel' => [
+                    'providers' => [
+                        'Vendor\\TestAddon\\TestAddonServiceProvider'
+                    ]
+                ],
+            ]
+        ];
+
+        $this->assertEquals($expected, $addon->toComposerJsonArray());
+        $this->assertEquals(json_encode($expected, JSON_PRETTY_PRINT), $addon->toComposerJson());
     }
 
-    /** @test */
-    public function it_should_have_settings_if_the_addon_is_commercial()
+    private function createFromPackage($attributes)
     {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/settings.yaml')->andReturn(false);
-        $this->withMeta('commercial: true');
-
-        $this->assertTrue($this->addon->hasSettings());
-    }
-
-    /** @test */
-    public function it_makes_an_empty_meta_object()
-    {
-        $this->assertInstanceOf(Meta::class, $this->addon->makeMeta());
-    }
-
-    /** @test */
-    public function it_makes_a_meta_object_and_populates_it()
-    {
-        $meta = $this->addon->makeMeta(['foo' => 'bar']);
-
-        $this->assertInstanceOf(Meta::class, $meta);
-        $this->assertEquals('bar', $meta->get('foo'));
-    }
-
-    /** @test */
-    public function it_gets_the_loaded_meta_object()
-    {
-        $this->withMeta();
-        $meta = $this->addon->meta();
-
-        $this->assertInstanceOf(Meta::class, $meta);
-        $this->assertTrue($meta->isLoaded());
-    }
-
-    /** @test */
-    public function it_is_installed_if_no_composer_file_exists()
-    {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/composer.json')->andReturn(false);
-
-        $this->assertTrue($this->addon->isInstalled());
-    }
-
-    /** @test */
-    public function it_is_installed_if_composer_lock_file_contains_package()
-    {
-        $path = 'site/addons/TestAddon/composer.json';
-        $this->fs->shouldReceive('exists')->with($path)->andReturn(true);
-        $this->fs->shouldReceive('get')->with($path)->andReturn(json_encode(['name' => 'test/test-addon']));
-        $this->fs->shouldReceive('get')->with('statamic/composer.lock')->andReturn(json_encode([
-            'packages' => [['name' => 'test/test-addon']]
-        ]));
-
-        $this->assertTrue($this->addon->isInstalled());
-    }
-
-    /** @test */
-    public function it_is_not_installed_if_composer_lock_file_doesnt_contains_package()
-    {
-        $path = 'site/addons/TestAddon/composer.json';
-        $this->fs->shouldReceive('exists')->with($path)->andReturn(true);
-        $this->fs->shouldReceive('get')->with($path)->andReturn(json_encode(['name' => 'test/test-addon']));
-        $this->fs->shouldReceive('get')->with('statamic/composer.lock')->andReturn(json_encode([
-            'packages' => [['name' => 'something/else']]
-        ]));
-
-        $this->assertFalse($this->addon->isInstalled());
-    }
-
-    /** @test */
-    public function it_can_be_deleted()
-    {
-        $this->fs->shouldReceive('deleteDirectory')->with('site/addons/TestAddon');
-
-        $this->addon->delete();
-    }
-
-    private function withoutMeta()
-    {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/meta.yaml')->andReturn(false);
-    }
-
-    private function withMeta($contents = '')
-    {
-        $this->fs->shouldReceive('exists')->with('site/addons/TestAddon/meta.yaml')->andReturn(true);
-        $this->fs->shouldReceive('get')->with('site/addons/TestAddon/meta.yaml')->andReturn($contents);
+        return Addon::createFromPackage(array_merge([
+            'id' => 'TestAddon',
+            'package' => 'test-vendor/test-addon',
+            'name' => 'Test Addon',
+            'description' => 'Test description',
+            'namespace' => 'Vendor\\TestAddon',
+            'directory' => '/path/to/addon',
+            'autoload' => 'src',
+            'url' => 'http://test-url.com',
+            'developer' => 'Test Developer LLC',
+            'developerUrl' => 'http://test-developer.com',
+            'version' => '1.0',
+        ], $attributes));
     }
 }

@@ -74,15 +74,7 @@ class Fieldtype implements FieldtypeInterface
 
     public function getHandle()
     {
-        $actual = ($this->isPrimaryFieldtype()) ? $this->getAddonClassName() : $this->getClassNameWithoutSuffix();
-
-        $name = $this->snake_name ?: Str::snake($actual);
-
-        if (! $this->isPrimaryFieldtype()) {
-            $name = Str::snake($this->getAddonClassName()) . '.' . $name;
-        }
-
-        return $name;
+        return app('statamic.fieldtypes')->flip()->get(get_class($this));
     }
 
     /**
@@ -94,18 +86,13 @@ class Fieldtype implements FieldtypeInterface
      */
     public function getFieldtypeName()
     {
-        $name = $this->getAddonName();
+        $addon = $this->getAddonClassName();
 
-        if (! $this->isPrimaryFieldtype()) {
-            $name .= ' - ' . $this->getClassNameWithoutSuffix();
-        }
+        $classBasedName = Str::removeRight(last(explode('\\', get_class($this))), 'Fieldtype');
 
-        return $name;
-    }
-
-    public function isPrimaryFieldtype()
-    {
-        return $this->getAddonClassName() === $this->getClassNameWithoutSuffix();
+        return ($classBasedName === $addon)
+            ? $classBasedName
+            : $classBasedName . ' - ' . $addon;
     }
 
     /**
@@ -213,7 +200,10 @@ class Fieldtype implements FieldtypeInterface
 
     public function getConfigFieldset()
     {
-        $fields = array_get($this->getMeta(), 'fieldtype_fields', []);
+        $addon = $this->getAddon();
+        $path = 'config/fieldtype-fieldset.yaml';
+
+        $fields = $addon->hasFile($path) ? YAML::parse($addon->getFile($path)) : [];
 
         $fieldset = Fieldset::create('config', compact('fields'));
         $fieldset->type('fieldtype');

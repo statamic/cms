@@ -1,17 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Test;
+namespace Foo\Bar\Tags;
 
-use Statamic\Extend\Tags;
-
-class TestTags extends Tags
+class RecursiveChildren extends \Statamic\Extend\Tags
 {
     public function index()
-    {
-        return $this->get('variable');
-    }
-
-    public function nav()
     {
         return $this->parseLoop([
             [
@@ -31,19 +24,5 @@ class TestTags extends Tags
                 ]
             ]
         ]);
-    }
-
-    /**
-     * Takes a param of "var", gets the value from the context, and simply parses the contents.
-     *
-     * @return string
-     */
-    public function someParsing()
-    {
-        $var = $this->get('var');
-
-        $val = array_get($this->context, $var);
-
-        return $this->parse([$var => $val]);
     }
 }

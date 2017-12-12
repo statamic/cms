@@ -8,7 +8,6 @@ use Statamic\API\YAML;
 use Statamic\API\Addon;
 use Statamic\API\Config;
 use Illuminate\Http\Request;
-use Statamic\Extend\Management\AddonRepository;
 
 class LicensingController extends CpController
 {
@@ -23,19 +22,13 @@ class LicensingController extends CpController
     private $statamicValid = true;
 
     /**
-     * @var AddonRepository
-     */
-    private $addonRepo;
-
-    /**
      * @var array
      */
     private $items;
 
-    public function index(Outpost $outpost, AddonRepository $addonRepo)
+    public function index(Outpost $outpost)
     {
         $this->outpost = $outpost;
-        $this->addonRepo = $addonRepo;
 
         $messages = [];
 
@@ -103,7 +96,7 @@ class LicensingController extends CpController
 
     private function listAddons()
     {
-        $items = $this->addonRepo->thirdParty()->addons()->map(function ($addon) {
+        $items = Addon::all()->map(function ($addon) {
              return [
                  'id' => $addon->id(),
                  'name' => $addon->name(),

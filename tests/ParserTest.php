@@ -221,9 +221,10 @@ class ParserTest extends TestCase
 
     public function testRecursiveChildren()
     {
-        // the variables are inside TestTags@nav
+        // the variables are inside RecursiveChildren@index
+        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
 
-        $template = '<ul>{{ test:nav }}<li>{{ title }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /test:nav }}</ul>';
+        $template = '<ul>{{ recursive_children }}<li>{{ title }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
         $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
 
@@ -232,7 +233,8 @@ class ParserTest extends TestCase
 
     public function testRecursiveChildrenWithScope()
     {
-        // the variables are inside TestTags@nav
+        // the variables are inside RecursiveChildren@index
+        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
 
         $template = '<ul>{{ test:nav scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /test:nav }}</ul>';
 

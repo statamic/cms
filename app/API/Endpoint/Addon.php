@@ -2,27 +2,46 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\Extend\Management\Manifest;
 use Statamic\Extend\Addon as AddonInstance;
-use Statamic\Extend\Management\AddonManager;
 
 class Addon
 {
     /**
-     * @return AddonManager
+     * Create an addon instance.
+     *
+     * @param string|array $addon  The name of the addon. This will be converted to StudlyCase.
+     *                             Or, an array containing package data.
+     * @return AddonInstance
      */
-    public function manager()
+    public function create($addon)
     {
-        return app(AddonManager::class);
+        $method = is_array($addon) ? 'createFromPackage' : 'create';
+
+        return AddonInstance::$method($addon);
     }
 
     /**
-     * Create an addon instance.
+     * Get all the addons.
      *
-     * @param string $name  The name of the addon. This will be converted to StudlyCase.
+     * @return \Illuminate\Support\Collection
+     */
+    public function all()
+    {
+        return app(Manifest::class)->addons()->map(function ($addon) {
+            return $this->create($addon);
+        });
+    }
+
+    /**
+     * Get an addon instance.
+     *
      * @return AddonInstance
      */
-    public function create($name)
+    public function get($id)
     {
-        return new AddonInstance($name);
+        return $this->create(
+            app(Manifest::class)->addons()->get($id)
+        );
     }
 }
