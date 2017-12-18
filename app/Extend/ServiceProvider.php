@@ -92,7 +92,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     public function registerActionRoutes($routes)
     {
         $this->registerRouteGroup($routes, [
-            'prefix' => event_route() . '/' . $this->getAddon()->slug()
+            'prefix' => config('routes.action') . '/' . $this->getAddon()->slug()
         ]);
     }
 
