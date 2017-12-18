@@ -66,6 +66,23 @@ abstract class ServiceProvider extends LaravelServiceProvider
     }
 
     /**
+     * Register routes scoped to the addon's front-end actions.
+     *
+     * @param string $path  Path to the routes file.
+     * @return void
+     */
+    public function registerActionRoutes($path)
+    {
+        $attributes = $this->routeGroupAttributes([
+            'prefix' => event_route() . '/' . $this->getAddon()->slug()
+        ]);
+
+        Route::group($attributes, function () use ($path) {
+            require $path;
+        });
+    }
+
+    /**
      * The attributes to be applied to the route group.
      *
      * @param array $overrides  Any additional attributes.
