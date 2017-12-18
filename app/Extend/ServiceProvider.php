@@ -2,6 +2,7 @@
 
 namespace Statamic\Extend;
 
+use Closure;
 use Statamic\API\Helper;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -36,50 +37,81 @@ abstract class ServiceProvider extends LaravelServiceProvider
     }
 
     /**
-     * Register routes from the root of the site.
+     * Register all different types of routes at once.
      *
-     * @param string $path   Path to the routes file.
+     * @param string  $path  The path to the routes file.
      * @return void
      */
     public function registerRoutes($path)
     {
-        Route::group($this->routeGroupAttributes(), function () use ($path) {
-            require $path;
-        });
+        $routes = require $path;
+
+        if ($web = array_get($routes, 'web')) {
+            $this->registerWebRoutes($web);
+        }
+
+        if ($cp = array_get($routes, 'cp')) {
+            $this->registerCpRoutes($cp);
+        }
+
+        if ($actions = array_get($routes, 'actions')) {
+            $this->registerActionRoutes($actions);
+        }
+    }
+
+    /**
+     * Register routes from the root of the site.
+     *
+     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
+     * @return void
+     */
+    public function registerWebRoutes($routes)
+    {
+        $this->registerRouteGroup($routes);
     }
 
     /**
      * Register routes scoped to the addon's section in the Control Panel.
      *
-     * @param string $path  Path to the routes file.
+     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
      * @return void
      */
-    public function registerCpRoutes($path)
+    public function registerCpRoutes($routes)
     {
-        $attributes = $this->routeGroupAttributes([
+        $this->registerRouteGroup($routes, [
             'prefix' => config('cp.route') . '/' . $this->getAddon()->slug(),
         ]);
-
-        Route::group($attributes, function () use ($path) {
-            require $path;
-        });
     }
 
     /**
      * Register routes scoped to the addon's front-end actions.
      *
-     * @param string $path  Path to the routes file.
+     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
      * @return void
      */
-    public function registerActionRoutes($path)
+    public function registerActionRoutes($routes)
     {
-        $attributes = $this->routeGroupAttributes([
+        $this->registerRouteGroup($routes, [
             'prefix' => event_route() . '/' . $this->getAddon()->slug()
         ]);
+    }
 
-        Route::group($attributes, function () use ($path) {
-            require $path;
-        });
+    /**
+     * Register a route group.
+     *
+     * @param string|Closure $routes   Either the path to a routes file, or a closure containing routes.
+     * @param array $attributes  Additional attributes to be applied to the route group.
+     * @return void
+     */
+    protected function registerRouteGroup($routes, array $attributes = [])
+    {
+        if (is_string($routes)) {
+            $routes = function () use ($routes) {
+                require $routes;
+            };
+        }
+
+        Route::group($this->routeGroupAttributes($attributes), $routes);
     }
 
     /**
