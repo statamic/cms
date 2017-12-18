@@ -200,6 +200,9 @@ class ParserTest extends TestCase
 
     public function testTagsWithCurliesInParamsGetsParsed()
     {
+        // the variables are inside Test@index
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
         $template = "{{ test variable='{string}' }}";
 
         $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
@@ -236,7 +239,7 @@ class ParserTest extends TestCase
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
 
-        $template = '<ul>{{ test:nav scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /test:nav }}</ul>';
+        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
         $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
 
@@ -265,6 +268,9 @@ class ParserTest extends TestCase
 
     public function testEmptyValuesAreNotOverriddenByPreviousIterationWithParsing()
     {
+        // the variables are inside Test@some_parsing
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
         $context = [
             'loop' => [
                 [
@@ -301,8 +307,8 @@ class ParserTest extends TestCase
     public function testNestedArraySyntax()
     {
         $variables = [
-            'foo' => [
-                'bar' => [
+            'hello' => [
+                'world' => [
                     ['baz' => 'one'],
                     ['baz' => 'two'],
                 ],
@@ -312,12 +318,12 @@ class ParserTest extends TestCase
 
         $this->assertEquals(
             '[one][two]',
-            Antlers::parse('{{ foo:bar }}[{{ baz }}]{{ /foo:bar }}', $variables)
+            Antlers::parse('{{ hello:world }}[{{ baz }}]{{ /hello:world }}', $variables)
         );
 
         $this->assertEquals(
             '[one][two]',
-            Antlers::parse('{{ foo:bar scope="s" }}[{{ s:baz }}]{{ /foo:bar }}', $variables)
+            Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
     }
 }
