@@ -173,10 +173,10 @@ class ExtensibleTest extends TestCase
         config(['system.locales.en.url' => 'http://example.com']);
 
         $addon = new Extension;
-        $this->assertEquals('/!/Bar/foo', $addon->eventUrl('foo'));
-        $this->assertEquals('/!/Bar/foo', $addon->actionUrl('foo'));
-        $this->assertEquals('http://example.com/!/Bar/foo', $addon->eventUrl('foo', false));
-        $this->assertEquals('http://example.com/!/Bar/foo', $addon->actionUrl('foo', false));
+        $this->assertEquals('/!/bar/foo', $addon->eventUrl('foo'));
+        $this->assertEquals('/!/bar/foo', $addon->actionUrl('foo'));
+        $this->assertEquals('http://example.com/!/bar/foo', $addon->eventUrl('foo', false));
+        $this->assertEquals('http://example.com/!/bar/foo', $addon->actionUrl('foo', false));
     }
 
     /** @test */
