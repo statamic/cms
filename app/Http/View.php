@@ -37,8 +37,10 @@ class View
     {
         $this->store = $store;
 
-        // Ensure the ViewFinder will look in the theme directory for templates
-        app('view')->getFinder()->prependLocation(base_path().'/resources/templates');
+        // If applicable, look for templates within the templates directory. v2-style.
+        if (config('theming.dedicated_view_directories')) {
+            app('view')->getFinder()->prependLocation(resource_path() . '/templates');
+        }
     }
 
     /**
@@ -139,7 +141,7 @@ class View
     private function getLayout()
     {
         if ($this->errorLayoutShouldBeUsed()) {
-            return 'error';
+            return config('theming.dedicated_view_directories') ? 'error' : 'errors/layout';
         }
 
         return $this->data->layout();
@@ -147,7 +149,11 @@ class View
 
     private function errorLayoutShouldBeUsed()
     {
+        $customLayout = config('theming.dedicated_view_directories')
+            ? 'layouts/error.html'
+            : 'views/errors/layout.html';
+
         return $this->data instanceof ExceptionRoute
-            && File::disk('theme')->exists('layouts/error.html');
+            && File::exists(resource_path($customLayout));
     }
 }

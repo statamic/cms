@@ -79,16 +79,6 @@ class Config
     }
 
     /**
-     * Get the active theme name
-     *
-     * @return string
-     */
-    public function getThemeName()
-    {
-        return self::get('theming.theme', 'default');
-    }
-
-    /**
      * Get the current locale's full code for date string translations
      *
      * @param string|null $locale

@@ -126,7 +126,7 @@ class EntryTest extends TestCase
 
     public function testGetsLayout()
     {
-        $this->assertEquals(Config::get('theming.default_layout'), $this->entry->layout());
+        $this->assertEquals(config('theming.views.layout'), $this->entry->layout());
 
         $this->entry->set('layout', 'my-layout');
 

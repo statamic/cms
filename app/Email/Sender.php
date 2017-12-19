@@ -98,7 +98,7 @@ class Sender
         $raw_template = File::disk($disk)->get($path);
 
         // Split out the text version and the html versions
-        $separator = Config::get('theming.email_separator', '---');
+        $separator = Config::get('mail.separator', '---');
         $split = preg_split("#".PHP_EOL.$separator.PHP_EOL."#", $raw_template);
         $text = $split[0];
         $html = array_get($split, 1);

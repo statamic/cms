@@ -328,7 +328,7 @@ class Page extends Content implements PageContract
         if (is_null($template)) {
             return [
                 $this->getWithCascade('template'), // gets `template` from the entry, and falls back to what's in folder.yaml
-                Config::get('theming.default_page_template')
+                config('theming.views.page')
             ];
         }
 
@@ -350,7 +350,7 @@ class Page extends Content implements PageContract
             }
 
             // Lastly, return a default
-            return Config::get('theming.default_layout');
+            return config('theming.views.layout');
         }
 
         $this->set('layout', $layout);
@@ -467,14 +467,14 @@ class Page extends Content implements PageContract
         }
 
         // Then the default content fieldset
-        $fieldset = Config::get('theming.default_' . $this->contentType() . '_fieldset');
+        $fieldset = config('theming.fieldsets.' . $this->contentType());
         $path = resource_path('fieldsets/'.$fieldset.'.yaml');
         if (File::exists($path)) {
             return Fieldset::get($fieldset);
         }
 
         // Finally the default fieldset
-        return Fieldset::get(Config::get('theming.default_fieldset'));
+        return Fieldset::get(config('theming.fieldsets.default'));
     }
 
     /**

@@ -214,8 +214,8 @@ class Collection extends DataFolder implements CollectionContract
 
         return Fieldset::get([
             $this->get('fieldset'),
-            Config::get('theming.default_entry_fieldset'),
-            Config::get('theming.default_fieldset')
+            config('theming.fieldsets.entry'),
+            config('theming.fieldsets.default')
         ]);
     }
 }

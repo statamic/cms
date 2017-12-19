@@ -22,15 +22,10 @@ class ThemeTagsTest extends TestCase
         return Parse::template($tag, []);
     }
 
-    public function testOutputsThemeName()
-    {
-        $this->assertEquals('redwood', $this->tag('{{ theme }}'));
-    }
-
     public function testOutputsThemedJs()
     {
         $this->assertEquals(
-            $this->path.'/js/redwood.js',
+            $this->path.'/js/app.js',
             $this->tag('{{ theme:js }}')
         );
     }
@@ -62,7 +57,7 @@ class ThemeTagsTest extends TestCase
     public function testOutputsThemedCss()
     {
         $this->assertEquals(
-            $this->path.'/css/redwood.css',
+            $this->path.'/css/app.css',
             $this->tag('{{ theme:css }}')
         );
     }

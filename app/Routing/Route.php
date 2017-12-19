@@ -28,13 +28,13 @@ class Route
     {
         return [
             $this->get('template'),
-            Config::get('theming.default_page_template')
+            config('theming.views.default')
         ];
     }
 
     public function layout()
     {
-        return $this->get('layout', Config::get('theming.default_layout'));
+        return $this->get('layout', config('theming.views.layout'));
     }
 
     public function url()

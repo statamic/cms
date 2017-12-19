@@ -193,8 +193,8 @@ class Taxonomy extends DataFolder implements TaxonomyContract
 
         return Fieldset::get([
             $this->get('fieldset'),
-            Config::get('theming.default_term_fieldset'),
-            Config::get('theming.default_fieldset')
+            config('theming.fieldsets.term'),
+            config('theming.fieldsets.default')
         ]);
     }
 

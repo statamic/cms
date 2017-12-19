@@ -13,16 +13,6 @@ use Statamic\Extend\Tags;
 class ThemeTags extends Tags
 {
     /**
-     * The {{ theme }} tag outputs the theme name
-     *
-     * @return mixed
-     */
-    public function index()
-    {
-        return Config::get('theming.theme');
-    }
-
-    /**
      * Catch-all for dynamic theme tags.
      *
      * Namespaces the `src` to the specified directory.
@@ -65,7 +55,7 @@ class ThemeTags extends Tags
      */
     public function img()
     {
-        $src = $this->get('src', Config::get('theming.theme'));
+        $src = $this->get('src');
 
         $path = 'img/' . $src;
 
@@ -87,7 +77,7 @@ class ThemeTags extends Tags
      */
     public function js()
     {
-        $src = $this->get('src', Config::get('theming.theme'));
+        $src = $this->get('src', 'app');
 
         $path = 'js/' . Str::ensureRight($src, '.js');
 
@@ -107,7 +97,7 @@ class ThemeTags extends Tags
      */
     public function css()
     {
-        $src = $this->get('src', Config::get('theming.theme'));
+        $src = $this->get('src', 'app');
 
         $path = 'css/' . Str::ensureRight($src, '.css');
 
@@ -179,14 +169,8 @@ class ThemeTags extends Tags
             $path = $this->versioned($pi['extension'], $pi['filename']);
         }
 
-        $url = URL::assemble(
-            // Config::get('system.filesystems.themes.url'),
-            // Config::get('theming.theme'),
-            $path
-        );
-
         $url = URL::prependSiteUrl(
-            $url,
+            $path,
             $this->get('locale', default_locale()),
             false
         );

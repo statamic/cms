@@ -1,5 +1,7 @@
 <?php namespace Tests;
 
+use Statamic\API\Term;
+use Statamic\API\Taxonomy;
 use Statamic\View\Antlers\Template as Antlers;
 
 class ParserTest extends TestCase
@@ -291,10 +293,14 @@ class ParserTest extends TestCase
 
     public function testTermsAreConvertedToArrays()
     {
+        Taxonomy::shouldReceive('whereHandle')->with('tags')->andReturn(
+            new \Statamic\Data\Taxonomies\Taxonomy
+        );
+
         $variables = [
             'tags' => [
-                \Statamic\API\Term::create('foo')->taxonomy('tags')->get(),
-                \Statamic\API\Term::create('bar')->taxonomy('tags')->get(),
+                Term::create('foo')->taxonomy('tags')->get(),
+                Term::create('bar')->taxonomy('tags')->get(),
             ]
         ];
 

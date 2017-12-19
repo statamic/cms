@@ -574,7 +574,7 @@ class Asset extends Data implements AssetContract
         }
 
         // Then the default asset fieldset
-        return Fieldset::get(Config::get('theming.default_asset_fieldset'));
+        return Fieldset::get(config('theming.fieldsets.asset'));
     }
 
     /**

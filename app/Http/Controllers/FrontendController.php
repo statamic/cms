@@ -385,7 +385,7 @@ class FrontendController extends Controller
     {
         $this->loadKeyVars();
 
-        $template = Str::removeLeft(Path::assemble(Config::get('theming.error_template_folder'), '404'), '/');
+        $template = Str::removeLeft(Path::assemble(config('theming.errors_directory'), '404'), '/');
 
         $route = new ExceptionRoute($url, [
             'response_code' => 404,

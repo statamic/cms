@@ -103,10 +103,16 @@ class Engine implements EngineInterface
     private function loadLayout()
     {
         foreach (Helper::ensureArray($this->data['layout']) as $layout) {
-            $layout_path = "layouts/{$layout}.html";
+            $path = resource_path() . '/';
 
-            if (File::disk('theme')->exists($layout_path)) {
-                return File::disk('theme')->get($layout_path);
+            $path .= config('theming.dedicated_view_directories')
+                ? 'layouts'
+                : 'views'; // @todo: Make dynamic since it's possible it could be changed.
+
+            $path .= "/{$layout}.html";
+
+            if (File::exists($path)) {
+                return File::get($path);
             }
         }
 
