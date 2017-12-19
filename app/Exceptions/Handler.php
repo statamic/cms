@@ -3,6 +3,7 @@
 namespace Statamic\Exceptions;
 
 use Exception;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -49,5 +50,19 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         return parent::render($request, $exception);
+    }
+
+    /**
+     * Render an exception to a string using Symfony.
+     *
+     * @param  \Exception  $e
+     * @param  bool  $debug
+     * @return string
+     */
+    protected function renderExceptionWithSymfony(Exception $e, $debug)
+    {
+        return (new SymfonyExceptionHandler($debug))->getHtml(
+            FlattenException::create($e)
+        );
     }
 }
