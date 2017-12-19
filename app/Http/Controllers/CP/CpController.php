@@ -65,4 +65,12 @@ class CpController extends Controller
 
         return $themes;
     }
+
+    /**
+     * 404
+     */
+    public function pageNotFound()
+    {
+        abort(404);
+    }
 }

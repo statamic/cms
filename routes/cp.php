@@ -188,3 +188,4 @@ Route::get('/settings.edit', function () { return ''; })->name('settings.edit');
 Route::get('/form.show', function () { return ''; })->name('form.show');
 Route::get('/login.reset', function () { return ''; })->name('login.reset');
 
+Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');
