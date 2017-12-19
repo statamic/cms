@@ -15,12 +15,10 @@ class SymfonyExceptionHandler extends ExceptionHandler
     public function getStylesheet(FlattenException $exception)
     {
         return tap(parent::getStylesheet($exception), function (&$css) {
-            $rad = config('app.rad_exceptions', true);
-
             $css .= 'body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }';
             $css .= '.exception-illustration { display: none; }';
 
-            if ($rad) {
+            if (config('app.rad_exceptions', true)) {
                 $css = str_replace('B0413E', 'ff469c', $css);
                 $css .= '.exception-summary {';
                 $css .= 'background-image: -webkit-gradient(linear,right top,left top,from(#a832d7),color-stop(90%,#ff269e));';
