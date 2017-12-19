@@ -12,12 +12,12 @@ class UsersDriver extends AbstractDriver
 {
     public function getFilesystemRoot()
     {
-        return 'users';
+        return '/';
     }
 
     public function getFilesystem()
     {
-        return File::disk();
+        return File::disk('users');
     }
 
     public function createItem($path, $contents)
