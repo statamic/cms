@@ -19,19 +19,9 @@ class DashboardController extends CpController
      */
     public function index(WidgetLoader $loader)
     {
-        $widgets = $this->getWidgets($loader);
-
-        if ($widgets->isEmpty() && !User::getCurrent()->can('settings:cp')) {
-            return redirect()->route('pages');
-        }
-
-        $data = [
-            'title' => translate('cp.dashboard'),
-            'sidebar' => false,
-            'widgets' => $widgets
-        ];
-
-        return view('dashboard', $data);
+        return view('dashboard', [
+            'widgets' => $this->getWidgets($loader)
+        ]);
     }
 
     private function getWidgets($loader)
