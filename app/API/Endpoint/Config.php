@@ -196,6 +196,6 @@ class Config
      */
     public function getImageManipulationPresets()
     {
-        return config('assets.image_manipulation_presets', []);
+        return config('assets.image_manipulation.presets', []);
     }
 }

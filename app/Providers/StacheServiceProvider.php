@@ -180,7 +180,7 @@ class StacheServiceProvider extends ServiceProvider
         }
 
         // Is this a Glide route? We don't want to update for those.
-        $glide_route = ltrim(Str::ensureRight(Config::get('assets.image_manipulation_route'), '/'), '/');
+        $glide_route = ltrim(Str::ensureRight(Config::get('assets.image_manipulation.route'), '/'), '/');
         if (Str::startsWith($this->request->path(), $glide_route)) {
             return false;
         }

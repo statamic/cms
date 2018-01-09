@@ -137,7 +137,7 @@ class GlideController extends Controller
     private function validateSignature()
     {
         // If secure images aren't enabled, don't bother validating the signature.
-        if (! Config::get('assets.image_manipulation_secure')) {
+        if (! Config::get('assets.image_manipulation.secure')) {
             return;
         }
 

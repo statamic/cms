@@ -43,9 +43,9 @@ class GlideServiceProvider extends ServiceProvider
             return ServerFactory::create([
                 'source'   => base_path(), // this gets overriden on the fly by the image generator
                 'cache'    => storage_path('glide'),
-                'base_url' => Config::get('assets.image_manipulation_route', 'img'),
+                'base_url' => Config::get('assets.image_manipulation.route', 'img'),
                 'response' => new LaravelResponseFactory(app('request')),
-                'driver'   => Config::get('assets.image_manipulation_driver'),
+                'driver'   => Config::get('assets.image_manipulation.driver'),
                 'cache_with_file_extensions' => true,
                 'presets' => $presets,
             ]);
@@ -61,16 +61,16 @@ class GlideServiceProvider extends ServiceProvider
 
     private function getBuilder()
     {
-        $route = Config::get('assets.image_manipulation_route');
+        $route = Config::get('assets.image_manipulation.route');
 
-        if (Config::get('assets.image_manipulation_cached')) {
+        if (Config::get('assets.image_manipulation.cached')) {
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
                 'route' => URL::prependSiteUrl($route)
             ]);
         }
 
         return new GlideUrlBuilder([
-            'key' => (Config::get('assets.image_manipulation_secure')) ? Config::getAppKey() : null,
+            'key' => (Config::get('assets.image_manipulation.secure')) ? Config::getAppKey() : null,
             'route' => $route
         ]);
     }

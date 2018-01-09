@@ -4,7 +4,7 @@
  * Glide
  * On-the-fly URL-based image transforms.
  */
-Route::group(['prefix' => Config::get('assets.image_manipulation_route')], function () {
+Route::group(['prefix' => Config::get('assets.image_manipulation.route')], function () {
     Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
     Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
     Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
