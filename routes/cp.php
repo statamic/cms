@@ -166,12 +166,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('{addon}/settings', 'AddonsController@settings')->name('addon.settings');
         Route::post('{addon}/settings', 'AddonsController@saveSettings');
     });
+
+    Route::get('updater', 'UpdaterController@index')->name('updater');
+    Route::get('updater/{version}', 'UpdaterController@update')->name('updater.update');
 });
 
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');
 Route::get('/forms', function () { return ''; })->name('forms');
-Route::get('/updater', function () { return ''; })->name('updater');
 Route::get('/import', function () { return ''; })->name('import');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
