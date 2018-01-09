@@ -162,10 +162,6 @@ class NavFactory
             );
         }
 
-        if ($this->access('importer')) {
-            $nav->add($this->item('import')->route('import')->title(__('Import')));
-        }
-
         $duplicates = app('stache')->duplicates();
         if (! $duplicates->isEmpty()) {
             $nav->add(

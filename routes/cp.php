@@ -174,7 +174,6 @@ Route::group(['middleware' => 'auth'], function () {
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');
 Route::get('/forms', function () { return ''; })->name('forms');
-Route::get('/import', function () { return ''; })->name('import');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
 Route::get('/assets.container.edit', function () { return ''; })->name('assets.container.edit');
