@@ -183,7 +183,6 @@ class NavFactory
             $nav->add($this->item('addons')->route('addons')->title(__('Addons')));
             $nav->add($this->buildConfigureContentNav());
             $nav->add($this->item('fieldsets')->route('fieldsets')->title(__('Fieldsets')));
-            $nav->add($this->buildConfigureSettingsNav());
         }
 
         if ($this->access('users:edit')) {
@@ -201,30 +200,6 @@ class NavFactory
         $nav->add($this->item('collections')->route('collections.manage')->title(__('Collections')));
         $nav->add($this->item('taxonomies')->route('taxonomies.manage')->title(__('Taxonomies')));
         $nav->add($this->item('globals')->route('globals.manage')->title(__('Globals')));
-
-        return $nav;
-    }
-
-    private function buildConfigureSettingsNav()
-    {
-        $nav = $this->item('settings')->route('settings')->title(__('Settings'));
-
-        $sections = collect(Folder::getFilesByType(statamic_path('settings/defaults'), 'yaml'))
-            ->map(function ($file) {
-                return pathinfo($file)['filename'];
-            })
-            ->reject(function ($setting) {
-                return $setting == 'services';
-            });
-
-        foreach ($sections as $section) {
-            $nav->add(
-                $this
-                    ->item($section)
-                    ->route('settings.edit', $section)
-                    ->title(__($section))
-            );
-        }
 
         return $nav;
     }
