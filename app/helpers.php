@@ -70,6 +70,11 @@ function addons_path($path = null)
     return path(base_path('addons'), $path);
 }
 
+function temp_path($path = null)
+{
+    return path(storage_path('statamic/temp'), $path);
+}
+
 /**
  * Gets or sets the site locale
  *

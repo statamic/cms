@@ -14,6 +14,8 @@ use Statamic\API\Image;
 use Statamic\Data\Data;
 use Statamic\API\Config;
 use Statamic\API\Fieldset;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\API\AssetContainer as AssetContainerAPI;
@@ -522,15 +524,11 @@ class Asset extends Data implements AssetContract
      */
     private function performUpload(UploadedFile $file, $path)
     {
-        // Get the underlying root flysystem driver instance
-        $temp_disk = File::disk()->filesystem()->getDriver();
-
         // Build up a path where the file will be temporarily stored
-        $temp = Path::makeRelative(
-            temp_path('uploads/'.md5($file->getRealPath().microtime(true)).'.'.$file->getClientOriginalExtension())
-        );
+        $temp = 'uploads/'.md5($file->getRealPath().microtime(true)).'.'.$file->getClientOriginalExtension();
 
         // Upload to a temporary location
+        $temp_disk = new Filesystem(new Local(temp_path()));
         $stream = fopen($file->getRealPath(), 'r+');
         $temp_disk->putStream($temp, $stream);
         fclose($stream);
