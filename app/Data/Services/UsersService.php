@@ -44,7 +44,7 @@ class UsersService extends BaseService
      */
     public function email($email)
     {
-        return $this->all()->first(function ($id, $user) use ($email) {
+        return $this->all()->first(function ($user, $id) use ($email) {
             return strtolower($user->email()) === strtolower($email);
         });
     }
@@ -58,7 +58,7 @@ class UsersService extends BaseService
      */
     public function oauth($provider, $id)
     {
-        return $this->all()->first(function ($user_id, $user) use ($provider, $id) {
+        return $this->all()->first(function ($user, $user_id) use ($provider, $id) {
             return (string) $user->getOAuthId($provider) === (string) $id;
         });
     }
