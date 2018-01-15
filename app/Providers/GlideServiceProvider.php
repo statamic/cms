@@ -15,7 +15,8 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Contracts\Imaging\ImageManipulator;
-use League\Glide\Responses\LaravelResponseFactory;
+// use League\Glide\Responses\LaravelResponseFactory;
+use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 
 class GlideServiceProvider extends ServiceProvider
 {
