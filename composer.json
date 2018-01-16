@@ -13,8 +13,8 @@
         "laravelcollective/html": "5.6.*",
         "league/glide": "^1.1",
         "michelf/php-markdown": "1.7.0",
-        "mustangostang/spyc": "dev-master#dfd9aadc1f5224065d55b42b712c7e99a50a3f4d",
         "netcarver/textile": "3.6.*@dev",
+        "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*"
     },
     "require-dev": {

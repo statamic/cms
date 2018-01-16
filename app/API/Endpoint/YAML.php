@@ -2,8 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
-use Spyc;
 use Statamic\API\Pattern;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 /**
  * Parsing and dumping YAML
@@ -27,10 +27,10 @@ class YAML
             $yaml = $split[0];
             $content = ltrim(array_get($split, 1, ''));
 
-            return Spyc::YAMLLoadString($yaml) + ['content' => $content];
+            return SymfonyYaml::parse($yaml) + ['content' => $content];
         }
 
-        return Spyc::YAMLLoadString($str);
+        return SymfonyYaml::parse($str);
     }
 
     /**
@@ -42,8 +42,7 @@ class YAML
      */
     public function dump($data, $content = false)
     {
-        $yaml = Spyc::YAMLDump($data, 2, 100);
-        $yaml = substr($yaml, 4); // remove the initial fencing by spyc
+        $yaml = SymfonyYaml::dump($data, 2, 2);
 
         if ($content) {
             $fenced = "---".PHP_EOL . $yaml . "---".PHP_EOL;
