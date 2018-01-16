@@ -512,3 +512,13 @@ function format_update($string)
 
     return $string;
 }
+
+function start_measure()
+{
+    // make things work until debug bar is back
+}
+
+function stop_measure()
+{
+    // make things work until debug bar is back
+}

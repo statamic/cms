@@ -5,7 +5,6 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
-        "barryvdh/laravel-debugbar": "^3.0@dev",
         "danielstjules/stringy": "dev-master",
         "fideloper/proxy": "~4.0",
         "funkjedi/composer-include-files": "^1.0",
