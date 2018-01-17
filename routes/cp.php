@@ -169,6 +169,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('updater', 'UpdaterController@index')->name('updater');
     Route::get('updater/{version}', 'UpdaterController@update')->name('updater.update');
+
+    Route::get('resolve-duplicate-ids', 'DuplicateIdController@index')->name('resolve-duplicate-ids');
+    Route::post('resolve-duplicate-ids', 'DuplicateIdController@update')->name('resolve-duplicate-ids.update');
 });
 
 // Just to make stuff work.
