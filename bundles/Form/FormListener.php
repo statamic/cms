@@ -45,6 +45,10 @@ class FormListener extends Listener
 
         $submission = $form->createSubmission();
 
+        if ($form->formset()->get('sanitize', true)) {
+            $fields = sanitize_array($fields);
+        }
+
         try {
             $submission->data($fields);
             $submission->uploadFiles();

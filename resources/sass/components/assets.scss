@@ -957,6 +957,41 @@
 
 
 
+/* In a Bard fieldtype
+  ========================================================================== */
+
+.bard-fieldtype .assets-fieldtype {
+    margin-bottom: 0 !important;
+
+    .manage-assets {
+        background: #fff;
+    }
+}
+
+.bard-fieldtype .manage-assets { background: #fff; }
+
+.bard-fieldtype .bard-fullscreen .assets-fieldtype .manage-assets {
+    background: $bg;
+}
+
+.bard-set-solo .asset-tile {
+    max-width: none;
+    padding: 0;
+}
+
+.bard-set-solo .assets-fieldtype label {
+    display: none;
+}
+
+// Only show the trash button when its a solo field.
+// Probably better as a template condition but difficult at the moment.
+.assets-fieldtype .delete-bard-set {
+    display: none;
+    .bard-set-solo & { display: block; }
+}
+
+
+
 /* Responsive
   ========================================================================== */
 

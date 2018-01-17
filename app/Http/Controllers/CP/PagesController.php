@@ -23,7 +23,7 @@ class PagesController extends CpController
      */
     public function pages()
     {
-        $this->access('pages:edit');
+        $this->access('pages:view');
 
         $this->ensureHome();
 
@@ -56,7 +56,7 @@ class PagesController extends CpController
      */
     public function get()
     {
-        $this->access('pages:edit');
+        $this->access('pages:view');
 
         $tree = Content::tree('/', INF, false, request('drafts', true), null, request('locale'));
 

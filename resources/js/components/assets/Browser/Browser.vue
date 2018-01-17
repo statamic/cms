@@ -9,7 +9,7 @@
             <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
         </div>
 
-        <div class="drag-notification" v-show="draggingFile">
+        <div class="drag-notification" v-show="canEdit && draggingFile">
             <i class="icon icon-download"></i>
             <h3>{{ translate('cp.drop_to_upload') }}</h3>
         </div>
@@ -17,7 +17,7 @@
         <div v-if="showSidebar" class="asset-browser-sidebar">
             <h4>Containers</h4>
             <div v-for="c in containers" class="sidebar-item" :class="{ 'active': container.id == c.id }">
-                <a @click.prevent="selectContainer(c.id)">
+                <a @click="selectContainer(c.id)">
                     {{ c.title }}
                 </a>
             </div>
@@ -69,7 +69,7 @@
                         </button>
                     </div>
 
-                    <div class="btn-group action mb-24">
+                    <div class="btn-group action mb-24" v-if="canEdit">
                         <button type="button"
                                 class="btn"
                                 v-if="!restrictNavigation && !isSearching"
@@ -258,6 +258,10 @@ module.exports = {
 
         isEmpty() {
             return !this.hasAssets && !this.hasSubfolders;
+        },
+
+        canEdit: function() {
+            return this.can('assets'+ this.container +':edit')
         },
 
         showSidebar() {
@@ -515,7 +519,9 @@ module.exports = {
          * When an asset has been chosen for editing.
          */
         editAsset(id) {
-            this.editedAssetId = id;
+            if (this.canEdit) {
+                this.editedAssetId = id;
+            }
         },
 
         /**

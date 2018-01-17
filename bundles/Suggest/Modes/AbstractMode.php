@@ -4,18 +4,23 @@ namespace Statamic\Addons\Suggest\Modes;
 
 use Statamic\API\Str;
 use Statamic\API\Parse;
+use Statamic\Extend\Extensible;
 use Statamic\Addons\Suggest\Mode;
 use Statamic\Addons\Suggest\RequestAdapter;
 
 abstract class AbstractMode implements Mode
 {
+    use Extensible;
+
     protected $config;
     protected $request;
 
-    public function __construct($config)
+    public function setConfig($config)
     {
         $this->config = $config;
         $this->request = new RequestAdapter($config);
+
+        return $this;
     }
 
     protected function label($object, $default)

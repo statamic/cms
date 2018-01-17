@@ -134,6 +134,7 @@ module.exports = {
 
         toggleFullScreen: function() {
             this.fullScreenMode = ! this.fullScreenMode;
+            this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
         /**

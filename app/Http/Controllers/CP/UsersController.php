@@ -2,13 +2,15 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Config;
 use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Email;
+use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
 use Statamic\Addons\User\PasswordReset;
+use Statamic\Presenters\PaginationPresenter;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UsersController extends CpController
 {
@@ -36,7 +38,7 @@ class UsersController extends CpController
      */
     public function index()
     {
-        $this->access('users:edit');
+        $this->access('users:view');
 
         $data = [
             'title' => 'Users'
@@ -67,9 +69,26 @@ class UsersController extends CpController
             $users = $users->multisort($sort . ':' . request('order'));
         }
 
+        // Set up the paginator, since we don't want to display all the users.
+        $totalUserCount = $users->count();
+        $perPage = Config::get('cp.pagination_size');
+        $currentPage = (int) $this->request->page ?: 1;
+        $offset = ($currentPage - 1) * $perPage;
+        $users = $users->slice($offset, $perPage);
+        $paginator = new LengthAwarePaginator($users, $totalUserCount, $perPage, $currentPage);
+
         return [
-            'items'   => $users->values()->toArray(),
-            'columns' => ['name', 'username', 'email']
+            'items'   => $users->toArray(),
+            'columns' => ['name', 'username', 'email'],
+            'pagination' => [
+                'totalItems' => $totalUserCount,
+                'itemsPerPage' => $perPage,
+                'totalPages'    => $paginator->lastPage(),
+                'currentPage'   => $paginator->currentPage(),
+                'prevPage'      => $paginator->previousPageUrl(),
+                'nextPage'      => $paginator->nextPageUrl(),
+                'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
+            ]
         ];
     }
 
@@ -118,7 +137,7 @@ class UsersController extends CpController
 
         // Users can always manage their data
         if ($this->user !== User::getCurrent()) {
-            $this->authorize('users:edit');
+            $this->authorize('users:view');
         }
 
         $data = $this->populateWithBlanks($this->user);
@@ -129,7 +148,9 @@ class UsersController extends CpController
             $data['username'] = $this->user->username();
         }
 
-        $data['roles'] = $this->user->get('roles');
+        $data['roles'] = $this->user->roles()->map(function ($role) {
+            return $role->uuid();
+        });
         $data['user_groups'] = $this->user->groups()->keys();
         $data['status'] = $this->user->status();
 

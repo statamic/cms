@@ -17,7 +17,7 @@
             ></radio-fieldtype>
 
             <template v-if="isStandard">
-                <small class="help-block">Choose a combination of fields and corresponding values.</small>
+                <small class="help-block">{{ translate('cp.display_standard_instructions') }}</small>
 
                 <table v-if="hasConditions" class="table">
                     <tr is="condition"
@@ -36,7 +36,7 @@
             </template>
 
             <template v-if="isCustom">
-                <small class="help-block">Enter your custom JavaScript condition method name.</small>
+                <small class="help-block">{{ translate('cp.display_custom_instructions') }}</small>
                 <input type="text" class="form-control" v-model="data.custom" />
             </template>
 
@@ -62,16 +62,16 @@ export default {
             conditions: [],
             conditionSelectFieldtypeConfig: {
                 options: [
-                    {text: 'Always Show', value: null},
-                    {text: 'Show when...', value: 'show'},
-                    {text: 'Hide when...', value: 'hide'}
+                    {text: translate('cp.always_show'), value: null},
+                    {text: translate('cp.show_when'), value: 'show'},
+                    {text: translate('cp.hide_when'), value: 'hide'}
                 ]
             },
             styleRadioFieldtypeConfig: {
                 inline: true,
                 options: [
-                    {text: 'Standard', value: 'standard'},
-                    {text: 'Custom', value: 'custom'}
+                    {text: translate('cp.standard'), value: 'standard'},
+                    {text: translate('cp.custom'), value: 'custom'}
                 ]
             }
         }

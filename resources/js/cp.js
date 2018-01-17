@@ -1,4 +1,5 @@
 var $ = require('jquery');
+window.MediumEditor = require('medium-editor');
 
 global.cp_url = function(url) {
     url = Statamic.cpRoot + '/' + url;

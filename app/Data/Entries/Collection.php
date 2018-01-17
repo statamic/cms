@@ -94,7 +94,7 @@ class Collection extends DataFolder implements CollectionContract
         $date = null;
 
         foreach ($this->entries() as $entry) {
-            $modified = $entry->getLastModified();
+            $modified = $entry->lastModified();
 
             if ($date) {
                 if ($modified->gt($date)) {

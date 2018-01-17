@@ -24,9 +24,9 @@ class PublishTaxonomyController extends PublishController
             return redirect(route('collections'))->withErrors("Taxonomy [$group->path()] doesn't exist.");
         }
 
-        $fieldset = $group->fieldset()->name();
+        $data = $this->addBlankFields($fieldset = $group->fieldset());
 
-        $data = $this->populateWithBlanks($fieldset);
+        $fieldset = $fieldset->name();
 
         $title = translate(
             'cp.create_taxonomy_term',
@@ -67,7 +67,7 @@ class PublishTaxonomyController extends PublishController
      */
     public function edit(Request $request, $taxonomy, $slug)
     {
-        $this->authorize("taxonomies:$taxonomy:edit");
+        $this->authorize("taxonomies:$taxonomy:view");
 
         $locale = $request->query('locale', site_locale());
 
@@ -86,7 +86,7 @@ class PublishTaxonomyController extends PublishController
             'default_slug' => $slug
         ];
 
-        $data = $this->populateWithBlanks($term);
+        $data = $this->addBlankFields($term->fieldset(), $term->processedData());
         $data['title'] = $term->title();
         $data['slug'] = $term->slug();
 

@@ -29,6 +29,7 @@ class Permissions
             'super',                           // can do everything
             'cp:access',                       // access the cp
             'content:view_drafts_on_frontend', // can view drafts
+            'pages:view',                      // can view existing pages
             'pages:edit',                      // can edit existing pages
             'pages:create',                    // can create new pages
             'pages:delete',                    // can delete pages
@@ -37,6 +38,7 @@ class Permissions
             'updater',                         // can access the updater to see updates
             'updater:update',                  // can perform updates
             'importer',                        // can import data
+            'users:view',                      // can view users
             'users:edit',                      // can edit users
             'users:create',                    // can create users
             'users:delete',                    // can delete users
@@ -53,9 +55,13 @@ class Permissions
 
     private function buildCollectionsPermissions()
     {
-        $permissions = ['collections:*:edit'];
+        $permissions = [
+            'collections:*:view',
+            'collections:*:edit'
+        ];
 
         foreach (Collection::handles() as $collection) {
+            $permissions[] = "collections:{$collection}:view";
             $permissions[] = "collections:{$collection}:edit";
             $permissions[] = "collections:{$collection}:create";
             $permissions[] = "collections:{$collection}:delete";
@@ -66,9 +72,13 @@ class Permissions
 
     private function buildTaxonomiesPermissions()
     {
-        $permissions = ['taxonomies:*:edit'];
+        $permissions = [
+            'taxonomies:*:view',
+            'taxonomies:*:edit'
+        ];
 
         foreach (Taxonomy::handles() as $taxonomy) {
+            $permissions[] = "taxonomies:{$taxonomy}:view";
             $permissions[] = "taxonomies:{$taxonomy}:edit";
             $permissions[] = "taxonomies:{$taxonomy}:create";
             $permissions[] = "taxonomies:{$taxonomy}:delete";
@@ -79,9 +89,13 @@ class Permissions
 
     private function buildGlobalsPermissions()
     {
-        $permissions = ['globals:*:edit'];
+        $permissions = [
+            'globals:*:view',
+            'globals:*:edit'
+        ];
 
         foreach (GlobalSet::all() as $global) {
+            $permissions[] = "globals:{$global->slug()}:view";
             $permissions[] = "globals:{$global->slug()}:edit";
         }
 
@@ -90,9 +104,13 @@ class Permissions
 
     private function buildAssetsPermissions()
     {
-        $permissions = ['assets:*:edit'];
+        $permissions =[
+            'assets:*:view',
+            'assets:*:edit'
+        ];
 
         foreach (AssetContainer::all() as $container) {
+            $permissions[] = "assets:{$container->id()}:view";
             $permissions[] = "assets:{$container->id()}:edit";
             $permissions[] = "assets:{$container->id()}:create";
             $permissions[] = "assets:{$container->id()}:delete";
@@ -106,37 +124,45 @@ class Permissions
         $structure = [
             'general' => ['cp:access', 'content:view_drafts_on_frontend', 'resolve_duplicates'],
             'pages' => [
-                'pages:edit' => ['pages:create', 'pages:delete', 'pages:reorder']
+                'pages:view' => ['pages:edit' => ['pages:create', 'pages:delete', 'pages:reorder']]
             ]
         ];
 
         foreach (Collection::handles() as $collection) {
             $structure['collections:'.$collection] = [
-                "collections:{$collection}:edit" => [
-                    "collections:{$collection}:create",
-                    "collections:{$collection}:delete"
+                "collections:{$collection}:view" => [
+                    "collections:{$collection}:edit" => [
+                        "collections:{$collection}:create",
+                        "collections:{$collection}:delete"
+                    ]
                 ]
             ];
         }
 
         foreach (Taxonomy::handles() as $taxonomy) {
             $structure['taxonomies:'.$taxonomy] = [
-                "taxonomies:{$taxonomy}:edit" => [
-                    "taxonomies:{$taxonomy}:create",
-                    "taxonomies:{$taxonomy}:delete"
+                "taxonomies:{$taxonomy}:view" => [
+                    "taxonomies:{$taxonomy}:edit" => [
+                        "taxonomies:{$taxonomy}:create",
+                        "taxonomies:{$taxonomy}:delete"
+                    ]
                 ]
             ];
         }
 
         foreach (GlobalSet::all() as $set) {
-            $structure['globals:'.$set->slug()] = ["globals:{$set->slug()}:edit"];
+            $structure['globals:'.$set->slug()] = [
+                "globals:{$set->slug()}:view" => ["globals:{$set->slug()}:edit"]
+            ];
         }
 
         foreach (AssetContainer::all() as $container) {
             $structure['assets:'.$container->id()] = [
-                "assets:{$container->id()}:edit" => [
-                    "assets:{$container->id()}:create",
-                    "assets:{$container->id()}:delete"
+                "assets:{$container->id()}:view" => [
+                    "assets:{$container->id()}:edit" => [
+                        "assets:{$container->id()}:create",
+                        "assets:{$container->id()}:delete"
+                    ]
                 ]
             ];
         }
@@ -148,7 +174,9 @@ class Permissions
             ],
             'importer' => ['importer'],
             'users' => [
-                'users:edit' => ['users:create', 'users:delete']
+                'users:view' => [
+                    'users:edit' => ['users:create', 'users:delete']
+                ]
             ]
         ]);
 

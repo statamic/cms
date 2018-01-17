@@ -22,7 +22,7 @@
                 </div>
             </template>
 
-            <div class="card">
+            <div class="card flush">
                 <dossier-table v-if="hasItems" :items="items" :options="tableOptions"></dossier-table>
             </div>
 

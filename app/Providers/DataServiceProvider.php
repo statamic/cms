@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\Config;
 use Illuminate\Support\ServiceProvider;
 
 class DataServiceProvider extends ServiceProvider
@@ -93,10 +94,19 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\CP\Fieldset::class
         );
 
-        $this->app->bind(
-            \Statamic\Contracts\Data\Users\User::class,
-            \Statamic\Data\Users\User::class
-        );
+        $this->app->bind(\Statamic\Contracts\Data\Users\User::class, function () {
+            $driver = Config::get('users.driver');
+
+            if ($driver === 'eloquent') {
+                $class = \Statamic\Data\Users\Eloquent\User::class;
+            } elseif ($driver === 'redis') {
+                $class = \Statamic\Data\Users\Redis\User::class;
+            } else {
+                $class = \Statamic\Data\Users\User::class;
+            }
+
+            return app($class);
+        });
 
         $this->app->bind(
             \Statamic\Contracts\Data\Users\UserFactory::class,
@@ -113,15 +123,29 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Permissions\File\RoleFactory::class
         );
 
-        $this->app->bind(
-            \Statamic\Contracts\Permissions\UserGroup::class,
-            \Statamic\Permissions\File\UserGroup::class
-        );
+        $this->app->bind(\Statamic\Contracts\Permissions\UserGroup::class, function () {
+            $driver = Config::get('users.driver');
 
-        $this->app->singleton(
-            \Statamic\Contracts\Permissions\UserGroupFactory::class,
-            \Statamic\Permissions\File\UserGroupFactory::class
-        );
+            if ($driver === 'eloquent') {
+                $class = \Statamic\Permissions\Eloquent\UserGroup::class;
+            } elseif ($driver === 'redis') {
+                $class = \Statamic\Permissions\Redis\UserGroup::class;
+            } else {
+                $class = \Statamic\Permissions\File\UserGroup::class;
+            }
+
+            return app($class);
+        });
+
+        $this->app->singleton(\Statamic\Contracts\Permissions\UserGroupFactory::class, function () {
+            if (Config::get('users.driver') === 'redis') {
+                $class = \Statamic\Permissions\Redis\UserGroupFactory::class;
+            } else {
+                $class = \Statamic\Permissions\File\UserGroupFactory::class;
+            }
+
+            return app($class);
+        });
 
         $this->app->singleton(
             \Statamic\CP\Navigation\Nav::class,
@@ -142,5 +166,13 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\Submission::class,
             \Statamic\Forms\Submission::class
         );
+
+        $this->app->bind(\Statamic\Contracts\Data\Services\UsersService::class, function () {
+            $class = (Config::get('users.driver') === 'eloquent')
+                ? \Statamic\Data\Services\Eloquent\UsersService::class
+                : \Statamic\Data\Services\UsersService::class;
+
+            return app($class);
+        });
     }
 }

@@ -4,7 +4,7 @@
         :class="{
             'max-files-reached': maxFilesReached,
             'empty': ! assets.length,
-            'solo': soloAsset && maxFilesReached
+            'solo drag-handle': soloAsset
         }"
         @dragover="dragOver"
         @dragleave="dragStop"
@@ -48,6 +48,15 @@
                     </button>
 
                     <p>{{ translate('cp.or_drag_and_drop_files') }}</p>
+
+                    <button
+                        type="button"
+                        class="delete-bard-set btn btn-icon pull-right"
+                        v-if="isInBardField"
+                        @click.prevent="$dispatch('asset-field.delete-bard-set')">
+                        <span class="icon icon-trash"></span>
+                    </button>
+
                 </template>
             </div>
 
@@ -262,6 +271,22 @@ export default {
          */
         uploadElement() {
             return this.$el;
+        },
+
+        isInBardField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.constructor.name === 'BardFieldtype') {
+                    return true;
+                }
+
+                vm = parent;
+            }
         }
 
     },
@@ -313,6 +338,7 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
+            this.$root.hideOverflow = true;
         },
 
         /**
@@ -320,6 +346,7 @@ export default {
          */
         closeSelector() {
             this.showSelector = false;
+            this.$root.hideOverflow = false;
         },
 
         /**
@@ -352,6 +379,8 @@ export default {
         },
 
         sortable() {
+            if (this.maxFiles === 1) return;
+
             $(this.$els.assets).sortable({
                 items: '> :not(.ghost)',
                 start: (e, ui) => {
@@ -375,8 +404,10 @@ export default {
         },
 
         getReplicatorPreviewText() {
-            return _.map(this.data, (asset) => {
-                return asset.substring(asset.lastIndexOf('/') + 1);
+            return _.map(this.assets, (asset) => {
+                return asset.is_image ?
+                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+                    : asset.basename;
             }).join(', ');
         }
 

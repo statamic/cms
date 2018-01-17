@@ -19,10 +19,10 @@ class TaxonomiesController extends CpController
      */
     public function index()
     {
-        $this->access('taxonomies:*:edit');
+        $this->access('taxonomies:*:view');
 
         $groups = collect(Taxonomy::all())->filter(function ($taxonomy) {
-            return User::getCurrent()->can("taxonomies:{$taxonomy->path()}:edit");
+            return User::getCurrent()->can("taxonomies:{$taxonomy->path()}:view");
         })->all();
 
         if (count($groups) === 1) {
@@ -46,7 +46,7 @@ class TaxonomiesController extends CpController
         $groups = [];
 
         foreach (Taxonomy::all() as $group) {
-            if (! User::getCurrent()->can("taxonomies:{$group->path()}:edit")) {
+            if (! User::getCurrent()->can("taxonomies:{$group->path()}:view")) {
                 continue;
             }
 

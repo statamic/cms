@@ -1,0 +1,310 @@
+/* The field itself.
+  ========================================================================== */
+
+.bard-fieldtype-wrapper {
+    position: relative;
+    background: $color_gray_input;
+    color: $color_gray_dark;
+    border: 0;
+    border-radius: 3px;
+    padding: 8px 24px;
+    @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
+}
+
+.bard-field-options {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+
+    a {
+        opacity: 0.5;
+        margin-left: 4px;
+
+        &.active {
+            opacity: 1;
+        }
+    }
+}
+
+.bard-blocks {
+    padding: 32px 40px;
+}
+
+/* Each block. Can be either a text block or a set.
+  ========================================================================== */
+
+.bard-block {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* The text field!
+  ========================================================================== */
+
+.bard-text .bard-editor {
+    font-family: $font_serif;
+    padding: 0;
+
+    &:first-child {
+        padding-top: 0 !important;
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    h2, h3, p {
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    h2 {
+        font-weight: bold;
+        font-size: 32px;
+        line-height: 1.25;
+        margin-bottom: .5em;
+    }
+
+    h3 {
+        font-weight: bold;
+        font-size: 24px;
+        margin-bottom: .5em;
+    }
+
+    p, ol, ul {
+        margin-bottom: 24px;
+
+        &:last-child { margin-bottom: 0; }
+    }
+
+    blockquote {
+        font-size: 21px;
+        border-left: 5px solid #333;
+        padding: 10px 40px;
+        margin: 0 0 24px;
+        line-height: 1.75;
+        font-style: italic;
+    }
+
+    a {
+        color: $color_gray_dark;
+        text-decoration: underline;
+    }
+}
+
+.bard-text .bard-source {
+    font-family: $font_monospace;
+    font-size: 13px;
+    width: 100%;
+    line-height: 1.75;
+    border: none;
+    box-shadow: none;
+    padding: 16px 0 8px;
+    resize: none;
+
+    &:focus {
+        outline: 0;
+    }
+}
+
+
+/* Medium Editor customizations
+  ========================================================================== */
+
+.medium-editor-action {
+    font-family: $font_serif;
+}
+
+.medium-editor-action-italic {
+    text-transform: lowercase;
+}
+
+.medium-editor-action-quote b {
+    font-size: 32px;
+}
+
+
+
+/* The line between each block
+  ========================================================================== */
+
+.bard-divider {
+    cursor: pointer;
+    width: 100%;
+    height: 40px;
+    border-radius: 3px;
+
+    &:hover {
+        display: block;
+    }
+}
+
+.bard-drop-area {
+    position: relative;
+    top: -10px;
+    transition: all 0.1s ease;
+    height: 0;
+    // outline: 1px solid red;
+
+    .bard-drop-area-inner {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        border-radius: 3px;
+        // outline: 1px dashed $brand-primary;
+        height: 43px;
+        margin-top: -21px; // half the height
+    }
+
+    &:hover {
+        height: 43px;
+        top: -31px;
+
+        .bard-drop-area-inner {
+            margin-top: 0;
+        }
+    }
+}
+
+.bard-drop-area, .bard-drop-area-inner, .bard-divider {
+    transition: all 0.1s ease;
+}
+
+.draggable--is-dragging .bard-divider:hover {
+    height: 80px;
+}
+
+/* The set selection options for each text block
+  ========================================================================== */
+
+.bard-set-selector {
+    position: absolute;
+    left: -50px;
+    top: -2px;
+    transition: all .15s ease-in-out;
+
+    .dropdown-menu {
+        left: -5px;
+        right: auto;
+    }
+}
+
+.bard-fieldtype-wrapper.no-sets .bard-set-selector {
+    display: none;
+}
+
+/* A replicator set within Bard
+  ========================================================================== */
+
+.bard-set {
+    margin-top: 40px;
+    margin-bottom: 40px;
+
+    .list-group {
+        margin: 0;
+    }
+
+    + .bard-set {
+        margin-top: 15px;
+    }
+
+    &.divider-at-start {
+        margin-top: 0;
+    }
+
+    &:last-child, &.divider-at-end {
+        margin-bottom: 0;
+    }
+
+    &:first-child {
+        margin-top: -40px; // negative height of the divider
+    }
+}
+
+.bard-set.divider-at-end + .bard-set {
+    margin-top: 0;
+}
+
+.bard-set.draggable-mirror {
+    margin: 0;
+    z-index: 10000;
+
+    .list-group {
+        opacity: 0.5;
+    }
+}
+
+
+/* Fullscreen mode
+  ========================================================================== */
+.bard-field-title {
+    display: none;
+}
+
+.bard-fullscreen {
+    background: #fff;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 0;
+    z-index: 1000;
+    min-height: 100vh;
+    overflow: scroll;
+
+    .bard-field-title {
+        position: absolute;
+        display: block;
+        font-weight: bold;
+        top: 16px;
+        left: 16px;
+    }
+
+    .bard-blocks {
+        margin-top: 56px;
+        border-top: 1px solid #dddd;
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+
+    .bard-block {
+        max-width: 940px;
+    }
+
+    .bard-editor, .bard-set {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    .bard-field-options .icon { font-size: 21px; }
+    .bard-field-options a { margin-left: 16px; }
+}
+
+
+/* Single field sets and/or fieldtype specific
+  ========================================================================== */
+
+.bard-set-solo {
+
+    .list-group .form-group {
+        padding: 0;
+        margin-bottom: 0;
+    }
+
+    .text-fieldtype input { background: white; }
+    .markdown-fieldtype .CodeMirror { background: white; }
+    .toggle-fieldtype .toggle-container { background: white; }
+}
+
+
+/* Inside Replicator (or grid stacked mode)
+  ========================================================================== */
+
+.grid-mode-stacked, .replicator-fieldtype {
+    .bard-fieldtype-wrapper {
+        background: white;
+        border: 1px solid $border;
+    }
+}

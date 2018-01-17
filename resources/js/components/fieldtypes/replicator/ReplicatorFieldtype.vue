@@ -1,5 +1,5 @@
 <template>
-    <div class="replicator-fieldtype-wrapper relative">
+    <div class="replicator replicator-fieldtype-wrapper relative">
 
         <div class="replicator-sets">
             <replicator-set
@@ -35,9 +35,11 @@
 </template>
 
 <script>
+import Replicator from './Replicator';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Replicator, Fieldtype],
 
     components: {
         ReplicatorSet: require('./ReplicatorSet.vue')
@@ -65,12 +67,8 @@ export default {
             this.data = [];
         }
 
-        this.accordionMode = this.getAccordionModeFromStorage();
-
-        if (this.accordionMode) this.collapseAll();
-
-        this.sortable();
         this.bindChangeWatcher();
+        this.sortable();
     },
 
     methods: {
@@ -101,14 +99,6 @@ export default {
             });
         },
 
-        setConfig: function(type) {
-            return _.findWhere(this.config.sets, { name: type });
-        },
-
-        deleteSet: function(index) {
-            this.data.splice(index, 1);
-        },
-
         addSet: function(type, index) {
             var newSet = { type: type };
 
@@ -131,16 +121,6 @@ export default {
             this.$nextTick(() => this.$refs.set[index].focus());
         },
 
-        expandAll: function() {
-            _.each(this.$refs.set, set => set.expand(true));
-            this.setAccordionMode(false);
-        },
-
-        collapseAll: function () {
-            _.each(this.$refs.set, set => set.collapse(true));
-            this.setAccordionMode(true);
-        },
-
         collapseAllExcept(except) {
             _.map(this.$refs.set, set => {
                 if (set.index !== except) set.collapse();
@@ -153,24 +133,6 @@ export default {
             if (all) return;
 
             if (this.accordionMode) this.collapseAllExcept(set.index);
-        },
-
-        getAccordionModeFromStorage() {
-            let mode = this.accordionMode;
-            const stored = localStorage.getItem('statamic.replicator.accordion');
-
-            if (stored === 'true') {
-                mode = true;
-            } else if (stored === 'false') {
-                mode = false;
-            }
-
-            return mode;
-        },
-
-        setAccordionMode(mode) {
-            this.accordionMode = mode;
-            localStorage.setItem('statamic.replicator.accordion', mode);
         },
 
         getReplicatorPreviewText() {

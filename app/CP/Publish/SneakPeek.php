@@ -12,6 +12,8 @@ use Statamic\Contracts\Data\Entries\Entry as EntryObject;
 
 class SneakPeek
 {
+    use ProcessesFields;
+
     /**
      * @var Request
      */
@@ -65,7 +67,11 @@ class SneakPeek
 
         $fields = $this->request->input('fields', []);
 
-        $fields = $this->processFields($fields);
+        $fieldset = (! $this->new)
+            ? $this->content->fieldset()
+            : Fieldset::get($this->request->input('fieldset'));
+
+        $fields = $this->processFields($fieldset, $fields);
 
         // For entries...
         if ($this->content instanceof EntryObject) {
@@ -135,33 +141,5 @@ class SneakPeek
     private function createPage()
     {
         return Page::create('/'.$this->request->path())->get();
-    }
-
-    /**
-     * Process the submitted fields
-     *
-     * @param  array $fields
-     * @return array
-     */
-    private function processFields($fields)
-    {
-        // Existing pages will have their own fieldset, but new ones will have theirs
-        // passed through with the POST request.
-        $fieldset = (! $this->new)
-            ? $this->content->fieldset()
-            : Fieldset::get($this->request->input('fieldset'));
-
-        foreach ($fieldset->fieldtypes() as $field) {
-            if (! in_array($field->getName(), array_keys($fields))) {
-                continue;
-            }
-
-            $fields[$field->getName()] = $field->process($fields[$field->getName()]);
-        }
-
-        // Get rid of null fields
-        $fields = array_filter($fields);
-
-        return $fields;
     }
 }

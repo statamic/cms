@@ -17,7 +17,7 @@ class AddonsController extends CpController
     }
 
     public function get()
-    {;
+    {
         $addons = Addon::all()->map(function ($addon) {
             return [
                 'id'            => $addon->id(),

@@ -13,7 +13,7 @@
                 <h2>{{ t('on_latest') }}</h2>
             @endif
         @else
-            <h2>There was a problem fetching updates.</h2>
+            <h2>{{ t('couldnt_fetch_updates')  }}</h2>
         @endif
     </div>
 </div>

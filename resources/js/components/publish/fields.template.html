@@ -2,7 +2,7 @@
 	<span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
 </div>
 
-<div class="publish-fields">
+<div v-else class="publish-fields">
 	<div v-for="field in fields" v-show="peekaboo(field)"
 	     class="form-group {{ field.type }}-fieldtype width-{{ field.width || 100 }} {{ hasError(field) ? 'has-error' : '' }}">
 		<div class="field-inner">

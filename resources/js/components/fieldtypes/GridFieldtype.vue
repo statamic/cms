@@ -256,6 +256,8 @@ module.exports = {
 
         getReplicatorPreviewText() {
             return _.map(this.$children, (fieldtype) => {
+                if (fieldtype.config.replicator_preview === false) return;
+
                 return (typeof fieldtype.getReplicatorPreviewText !== 'undefined')
                     ? fieldtype.getReplicatorPreviewText()
                     : JSON.stringify(fieldtype.data);

@@ -507,7 +507,18 @@ class Asset extends Data implements AssetContract
 
     private function getSafeFilename($string)
     {
-        return (string) Stringy::create($string)->toAscii()->replace(' ', '-');
+        $replacements = [
+            ' ' => '-',
+            '#' => '-',
+        ];
+
+        $str = Stringy::create($string)->toAscii();
+
+        foreach ($replacements as $from => $to) {
+            $str = $str->replace($from, $to);
+        }
+
+        return (string) $str;
     }
 
     /**

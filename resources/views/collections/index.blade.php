@@ -4,7 +4,7 @@
 
     <collection-listing inline-template v-cloak>
         <div>
-            <div class="flexy mb-24">
+            <div class="flexy mb-24 sticky">
                 <h1 class="fill">{{ translate('cp.nav_collections') }}</h1>
 
                 @can('super')

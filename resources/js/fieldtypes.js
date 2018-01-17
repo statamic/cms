@@ -4,6 +4,7 @@ import ArrayFieldtype from './components/fieldtypes/ArrayFieldtype.vue'
 import AssetsFieldtype from './components/fieldtypes/assets/AssetsFieldtype.vue'
 import AssetsFolderFieldtype from './components/fieldtypes/AssetsFolderFieldtype.vue'
 import AssetContainerFieldtype from './components/fieldtypes/AssetContainerFieldtype.vue'
+import BardFieldtype from './components/fieldtypes/bard/BardFieldtype.vue'
 import CheckboxesFieldtype from './components/fieldtypes/CheckboxesFieldtype.vue'
 import CollectionFieldtype from './components/fieldtypes/CollectionFieldtype.vue'
 import CollectionsFieldtype from './components/fieldtypes/CollectionsFieldtype.vue'
@@ -40,12 +41,14 @@ import ToggleFieldtype from './components/fieldtypes/ToggleFieldtype.vue'
 import YamlFieldtype from './components/fieldtypes/YamlFieldtype.vue'
 import UserGroupsFieldtype from './components/fieldtypes/UserGroupsFieldtype.vue'
 import UserRolesFieldtype from './components/fieldtypes/UserRolesFieldtype.vue'
+import VideoFieldtype from './components/fieldtypes/VideoFieldtype.vue'
 import UsersFieldtype from './components/fieldtypes/UsersFieldtype.vue'
 
 Vue.component('array-fieldtype', ArrayFieldtype);
 Vue.component('assets-fieldtype', AssetsFieldtype);
 Vue.component('asset_container-fieldtype', AssetContainerFieldtype);
 Vue.component('asset_folder-fieldtype', AssetsFolderFieldtype);
+Vue.component('bard-fieldtype', BardFieldtype);
 Vue.component('checkboxes-fieldtype', CheckboxesFieldtype);
 Vue.component('collection-fieldtype', CollectionFieldtype);
 Vue.component('collections-fieldtype', CollectionsFieldtype);
@@ -82,4 +85,5 @@ Vue.component('toggle-fieldtype', ToggleFieldtype);
 Vue.component('users-fieldtype', UsersFieldtype);
 Vue.component('user_groups-fieldtype', UserGroupsFieldtype);
 Vue.component('user_roles-fieldtype', UserRolesFieldtype);
+Vue.component('video-fieldtype', VideoFieldtype);
 Vue.component('yaml-fieldtype', YamlFieldtype);

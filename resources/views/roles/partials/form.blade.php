@@ -1,4 +1,4 @@
-<div class="card flat-top">
+<div class="card">
     <div class="form-group">
         <label for="">{{ trans_choice('cp.titles', 1) }}</label>
         <input type="text" name="title" value="{{ $role_title }}" class="form-control" autofocus="autofocus" />
@@ -22,7 +22,7 @@
                 </li>
             </ul>
         </div>
-        <template  v-if="!superSelected">
+        <template v-if="!superSelected">
             <hr>
             <div v-for="(group, p) in permissions">
                 <h3>@{{ label(group) }}</h3>

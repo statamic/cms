@@ -45,7 +45,7 @@ class PublishPageController extends PublishController
             'locale'            => $this->locale($request),
             'locales'           => $this->getLocales(),
             'fieldset'          => $fieldset,
-            'content_data'      => $this->populateWithBlanks($fieldset),
+            'content_data'      => $this->addBlankFields(Fieldset::get($fieldset)),
             'taxonomies'        => $this->getTaxonomies(Fieldset::get($fieldset)),
             'suggestions'       => $this->getSuggestions(Fieldset::get($fieldset)),
         ]);
@@ -60,7 +60,7 @@ class PublishPageController extends PublishController
      */
     public function edit(Request $request, $url = '/')
     {
-        $this->authorize('pages:edit');
+        $this->authorize('pages:view');
 
         if (! $page = $this->page($url)) {
             return redirect()->route('pages')->withErrors('No page found.');
@@ -68,7 +68,7 @@ class PublishPageController extends PublishController
 
         $locale = $this->locale($request);
         $page   = $page->in($locale)->get();
-        $data   = $this->populateWithBlanks($page);
+        $data   = $this->addBlankFields($page->fieldset(), $page->processedData());
 
         return view('publish', [
             'is_new'            => false,

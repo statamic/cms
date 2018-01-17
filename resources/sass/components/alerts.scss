@@ -71,6 +71,8 @@
 
 
 .vue-toast-manager_container {
+  z-index: 1100;
+
   &.--top .vue-toast_container {
     top: 0;
   }

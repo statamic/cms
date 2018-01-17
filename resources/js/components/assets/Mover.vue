@@ -42,7 +42,7 @@ export default {
             selectedFolder: null,
             saving: false,
             errors: null,
-            warningText: translate('cp.rename_file_warning')
+            warningText: translate('cp.move_file_warning')
         }
     },
 

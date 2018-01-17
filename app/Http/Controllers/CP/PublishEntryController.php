@@ -35,17 +35,13 @@ class PublishEntryController extends PublishController
 
         $fieldset = $collection->fieldset();
 
-        $data = $this->populateWithBlanks($fieldset->name());
+        $data = $this->addBlankFields($fieldset);
 
         $extra = [
             'collection' => $collection->path(),
             'order_type' => $collection->order(),
             'route'      => $collection->route()
         ];
-
-        if ($collection->order() === 'date') {
-            $extra['datetime'] = Carbon::now()->format('Y-m-d');
-        }
 
         return view('publish', [
             'extra'             => $extra,
@@ -76,7 +72,7 @@ class PublishEntryController extends PublishController
      */
     public function edit($collection, $slug)
     {
-        $this->authorize("collections:$collection:edit");
+        $this->authorize("collections:$collection:view");
 
         $locale = $this->locale($this->request);
 
@@ -106,7 +102,7 @@ class PublishEntryController extends PublishController
             $extra['datetime'] = $datetime;
         }
 
-        $data = $this->populateWithBlanks($entry);
+        $data = $this->addBlankFields($entry->fieldset(), $entry->processedData());
 
         return view('publish', [
             'extra'              => $extra,
@@ -127,6 +123,18 @@ class PublishEntryController extends PublishController
             'taxonomies'         => $this->getTaxonomies($entry->fieldset()),
             'suggestions'        => $this->getSuggestions($entry->fieldset()),
         ]);
+    }
+
+    /**
+     * Override the method and display the collection name.
+     *
+     * @param  Request  $request
+     * @param  Content  $content
+     * @return string
+     */
+    protected function buildSuccessMessage($request, $content)
+    {
+        return $content->collection()->title();
     }
 
     /**

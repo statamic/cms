@@ -17,10 +17,10 @@ class CollectionsController extends CpController
      */
     public function index()
     {
-        $this->access('collections:*:edit');
+        $this->access('collections:*:view');
 
         $collections = collect(Collection::all())->filter(function ($collection) {
-            return User::getCurrent()->can("collections:{$collection->path()}:edit");
+            return User::getCurrent()->can("collections:{$collection->path()}:view");
         })->all();
 
         if (count($collections) === 1) {
@@ -44,7 +44,7 @@ class CollectionsController extends CpController
         $collections = [];
 
         foreach (Collection::all() as $collection) {
-            if (! User::getCurrent()->can("collections:{$collection->path()}:edit")) {
+            if (! User::getCurrent()->can("collections:{$collection->path()}:view")) {
                 continue;
             }
 

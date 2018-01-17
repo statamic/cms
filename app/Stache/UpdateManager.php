@@ -17,6 +17,11 @@ class UpdateManager
     private $timestamps;
 
     /**
+     * @var \Illuminate\Support\Collection
+     */
+    private $originalTimestamps;
+
+    /**
      * Repos that have been updated
      *
      * @var \Illuminate\Support\Collection
@@ -129,7 +134,7 @@ class UpdateManager
             $timestamps = json_decode($timestamps, true);
         }
 
-        return collect($timestamps);
+        return $this->originalTimestamps = collect($timestamps);
     }
 
     /**
@@ -139,7 +144,9 @@ class UpdateManager
      */
     private function persistTimestamps()
     {
-        Cache::put('stache::timestamps', json_encode($this->timestamps->all()));
+        if ($this->timestamps->all() !== $this->originalTimestamps->all()) {
+            Cache::put('stache::timestamps', json_encode($this->timestamps->all()));
+        }
     }
 
     /**
@@ -149,6 +156,10 @@ class UpdateManager
      */
     private function persistConfig()
     {
-        Cache::put('stache::config', $this->stache->buildConfig());
+        $config = $this->stache->buildConfig();
+
+        if (Cache::get('stache::config') !== $config) {
+            Cache::put('stache::config', $config);
+        }
     }
 }

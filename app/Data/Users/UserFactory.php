@@ -3,6 +3,7 @@
 namespace Statamic\Data\Users;
 
 use Statamic\API\Config;
+use Statamic\Contracts\Data\Users\User;
 use Statamic\Contracts\Data\Users\UserFactory as UserFactoryContract;
 
 class UserFactory implements UserFactoryContract
@@ -61,7 +62,7 @@ class UserFactory implements UserFactoryContract
      */
     public function get()
     {
-        $user = new User;
+        $user = app(User::class);
         $user->data($this->data);
         $user->username($this->username);
 

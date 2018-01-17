@@ -39,29 +39,29 @@ class NavFactory
     {
         $nav = $this->item('content')->title(__('Content'));
 
-        if ($this->access('pages:edit')) {
+        if ($this->access('pages:view')) {
             $nav->add($this->item('pages')->route('pages')->title(__('Pages')));
         }
 
-        if ($this->access('collections:*:edit')) {
+        if ($this->access('collections:*:view')) {
             if ($sub = $this->buildCollectionsNav()) {
                 $nav->add($sub);
             }
         }
 
-        if ($this->access('taxonomies:*:edit')) {
+        if ($this->access('taxonomies:*:view')) {
             if ($sub = $this->buildTaxonomiesNav()) {
                 $nav->add($sub);
             }
         }
 
-        if ($this->access('assets:*:edit')) {
+        if ($this->access('assets:*:view')) {
             if (! AssetContainer::all()->isEmpty()) {
                 $nav->add($this->item('assets')->route('assets')->title(__('Assets')));
             }
         }
 
-        if ($this->access('globals:*:edit')) {
+        if ($this->access('globals:*:view')) {
             $nav->add($this->buildGlobalsNav());
         }
 
@@ -71,7 +71,7 @@ class NavFactory
     private function buildCollectionsNav()
     {
         $collections = collect(Collection::all())->filter(function ($collection) {
-            return $this->access("collections:{$collection->path()}:edit");
+            return $this->access("collections:{$collection->path()}:view");
         });
 
         if ($collections->isEmpty()) {
@@ -100,7 +100,7 @@ class NavFactory
         $nav = $this->item('taxonomies')->route('taxonomies')->title(__('Taxonomies'));
 
         $taxonomies = collect(Taxonomy::all())->filter(function ($taxonomy) {
-            return $this->access("taxonomies:{$taxonomy->path()}:edit");
+            return $this->access("taxonomies:{$taxonomy->path()}:view");
         });
 
         if ($taxonomies->isEmpty()) {
@@ -127,7 +127,7 @@ class NavFactory
         $nav = $this->item('globals')->route('globals')->title(__('Globals'));
 
         $globals = GlobalSet::all()->filter(function ($set) {
-            return $this->access("globals:{$set->slug()}:edit");
+            return $this->access("globals:{$set->slug()}:view");
         });
 
         if (count($globals) > 1) {
@@ -185,7 +185,7 @@ class NavFactory
             $nav->add($this->item('fieldsets')->route('fieldsets')->title(__('Fieldsets')));
         }
 
-        if ($this->access('users:edit')) {
+        if ($this->access('users:view')) {
             $nav->add($this->buildUsersNav());
         }
 

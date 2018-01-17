@@ -110,8 +110,8 @@ class Form
         foreach ($form['fields'] as $key => $field) {
             $fields[] = [
                 'field' => $key,
-                'name' => $key, // alias
-                'old' => (Req::hasSession()) ? old($key) : ''
+                'name' => $key, //
+                'old' => (Req::hasSession()) ? sanitize(old($key)) : ''
             ] + $field;
         }
 

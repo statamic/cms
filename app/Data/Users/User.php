@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Users;
 
+use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Hash;
@@ -133,27 +134,20 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function save()
     {
-        $content = $this->get('content');
-        if ($content || $content == '') {
-            $this->remove('content');
-        }
-
         $this->ensureSecured();
         $this->ensureId();
 
-        $data = $this->data();
+        if ($this->shouldWriteFile()) {
+            $data = $this->toSavableArray();
+            $content = array_pull($data, 'content');
+            $contents = YAML::dump($data, $content);
 
-        if (Config::get('users.login_type') === 'email') {
-            unset($data['email']);
-        }
+            File::disk('users')->put($this->path(), $contents);
 
-        $contents = YAML::dump($data, $content);
-
-        File::disk('users')->put($this->path(), $contents);
-
-        // Has this been renamed?
-        if ($this->path() !== $this->originalPath()) {
-            File::disk('users')->delete($this->originalPath());
+            // Has this been renamed?
+            if ($this->path() !== $this->originalPath()) {
+                File::disk('users')->delete($this->originalPath());
+            }
         }
 
         $this->syncOriginal();
@@ -162,17 +156,36 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
 
         return $this;
     }
-//
-//    /**
-//     * Delete the data
-//     *
-//     * @return mixed
-//     */
-//    public function delete()
-//    {
-//        File::disk('users')->delete($this->path());
-//    }
-//
+
+    /**
+     * Get an array of data that should be persisted.
+     *
+     * @return array
+     */
+    protected function toSavableArray()
+    {
+        return tap($this->data(), function (&$data) {
+            if (Config::get('users.login_type') === 'email') {
+                unset($data['email']);
+            }
+
+            $content = array_get($data, 'content');
+            if ($content || $content == '') {
+                unset($data['content']);
+            }
+        });
+    }
+
+    /**
+     * Whether a file should be written to disk when saving.
+     *
+     * @return bool
+     */
+    protected function shouldWriteFile()
+    {
+        return true;
+    }
+
     /**
      * Ensure's this user's password is secured
      *
@@ -240,11 +253,27 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
     }
 
     /**
+     * The timestamp of the last modification date.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function lastModified()
+    {
+        // Users with no files have been created programmatically and haven't
+        // been saved yet. We'll use the current time in that case.
+        $timestamp = File::disk('users')->exists($path = $this->path())
+            ? File::disk('users')->lastModified($path)
+            : time();
+
+        return Carbon::createFromTimestamp($timestamp);
+    }
+
+    /**
      * Add supplemental data to the attributes
      */
     public function supplement()
     {
-        $this->supplements['last_modified'] = File::disk('users')->lastModified($this->path());
+        $this->supplements['last_modified'] = $this->lastModified()->timestamp;
         $this->supplements['username'] = $this->username();
         $this->supplements['email'] = $this->email();
         $this->supplements['status'] = $this->status();
@@ -283,11 +312,6 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
         return $this->id();
     }
 
-    public function getAuthIdentifierName()
-    {
-        return 'id';
-    }
-
     /**
      * Get the password for the user.
      *
@@ -296,6 +320,16 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
     public function getAuthPassword()
     {
         return $this->password();
+    }
+
+    /**
+     * Get the avatar for the user.
+     *
+     * @return string
+     */
+    public function getAvatar($size = 64)
+    {
+        return Config::get('users.enable_gravatar') ? gravatar($this->email(), $size) : 'INSERT FALLBACK';
     }
 
     /**
@@ -501,4 +535,5 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
     {
         return true;
     }
+
 }

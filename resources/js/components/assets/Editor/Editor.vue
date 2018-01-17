@@ -110,6 +110,12 @@
                 <div class="editor-form">
 
                     <div class="editor-form-fields">
+                        <div class="alert alert-danger" v-if="hasErrors">
+                            <ul>
+                                <li v-for="error in errors">{{ error }}</li>
+                            </ul>
+                        </div>
+
                         <publish-fields
                             :uuid="asset.id"
                             :field-data="fields"
@@ -203,7 +209,8 @@ export default {
             fields: null,
             showFocalPointEditor: false,
             showRenamer: false,
-            showMover: false
+            showMover: false,
+            errors: []
         }
     },
 
@@ -217,7 +224,14 @@ export default {
             if (! this.asset) return false;
 
             return this.asset.is_image;
-        }
+        },
+
+        /**
+         * Whether there are errors present.
+         */
+        hasErrors: function() {
+            return _.size(this.errors) !== 0;
+        },
 
     },
 
@@ -289,6 +303,10 @@ export default {
             this.$http.post(url, this.fields).success((response) => {
                 this.$emit('saved', response.asset);
                 this.saving = false;
+            }).error((error) => {
+                this.$notify.error(translate('cp.error'), { timeout: 2000 });
+                this.saving = false;
+                this.errors = error;
             });
 
             this.$dispatch('changesMade', false);

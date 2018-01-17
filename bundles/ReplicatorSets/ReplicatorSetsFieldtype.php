@@ -57,6 +57,10 @@ class ReplicatorSetsFieldtype extends Fieldtype
 
     public function process($data)
     {
+        if (! $data) {
+            return;
+        }
+
         $processed = [];
 
         foreach ($data as $set) {
@@ -66,7 +70,7 @@ class ReplicatorSetsFieldtype extends Fieldtype
             $processed[$set_name] = $set;
         }
 
-        return $processed;
+        return empty($processed) ? null : $processed;
     }
 
     private function moveOutNameKey($fields)

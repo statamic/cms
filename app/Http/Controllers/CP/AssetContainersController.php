@@ -27,7 +27,7 @@ class AssetContainersController extends CpController
         $containers = [];
 
         foreach (AssetContainer::all() as $container) {
-            if (! User::getCurrent()->can("assets:{$container->uuid()}:edit")) {
+            if (! User::getCurrent()->can("assets:{$container->uuid()}:view")) {
                 continue;
             }
 

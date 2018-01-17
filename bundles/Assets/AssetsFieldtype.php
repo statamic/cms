@@ -7,11 +7,6 @@ use Statamic\Extend\Fieldtype;
 
 class AssetsFieldtype extends Fieldtype
 {
-    public function canBeValidated()
-    {
-        return false;
-    }
-
     public function canHaveDefault()
     {
         return false;

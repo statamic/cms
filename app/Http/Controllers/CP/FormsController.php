@@ -114,20 +114,24 @@ class FormsController extends CpController
         collect($submission->data())->each(function ($value, $field) use ($submission) {
             $sanitized = ($submission->formset()->isUploadableField($field))
                 ? UploadedFilePresenter::render($submission, $field)
-                : $this->sanitizeField($value);
+                : $this->sanitizeField($value, $submission);
 
             $submission->set($field, $sanitized);
         });
     }
 
-    private function sanitizeField($value)
+    private function sanitizeField($value, $submission)
     {
         $is_arr = is_array($value);
 
         $values = Helper::ensureArray($value);
 
         foreach ($values as &$value) {
-            $value = (is_array($value)) ? json_encode($value) : htmlspecialchars($value);
+            if (is_array($value)) {
+                $value = json_encode($value);
+            } elseif (! $submission->formset()->get('sanitize', true)) {
+                $value = sanitize($value);
+            }
         }
 
         return ($is_arr) ? $values : $values[0];

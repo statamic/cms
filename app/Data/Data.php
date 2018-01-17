@@ -407,19 +407,9 @@ abstract class Data implements DataContract
      */
     public function processedData()
     {
-        $data = $this->dataWithDefaultLocale();
-
-        $fieldtypes = collect($this->fieldset()->fieldtypes())->keyBy(function($fieldtype) {
-            return $fieldtype->getFieldConfig('name');
-        });
-
-        foreach ($data as $field_name => $field_data) {
-            if ($fieldtype = $fieldtypes->get($field_name)) {
-                $data[$field_name] = $fieldtype->preProcess($field_data);
-            }
-        }
-
-        return $data;
+        return (new Processor($this->fieldset()))->preProcess(
+            $this->dataWithDefaultLocale()
+        );
     }
 
     /**
@@ -529,6 +519,25 @@ abstract class Data implements DataContract
     }
 
     /**
+     * Parses the raw content
+     *
+     * @return mixed|string
+     */
+    public function parseRawContent()
+    {
+        if (! $content = $this->content()) {
+            return;
+        }
+
+        if (! $this->getWithCascade('parse_content', true)) {
+            $content = Str::replace($content, '{', '&lbrace;');
+            $content = Str::replace($content, '}', '&rbrace;');
+        }
+
+        return $content;
+    }
+
+    /**
      * Get or set the path
      *
      * @param string|null $path
@@ -617,8 +626,8 @@ abstract class Data implements DataContract
     {
         $this->supplement();
 
-        $content_raw = $this->content();
         $content = $this->parseContent();
+        $content_raw = $this->parseRawContent();
 
         $array = array_merge(
             $this->cascadingData(),

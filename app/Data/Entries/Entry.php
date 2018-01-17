@@ -312,6 +312,22 @@ class Entry extends Content implements EntryContract
     }
 
     /**
+     * Get the last modified time of the entry.
+     *
+     * @return \Carbon\Carbon
+     */
+    public function lastModified()
+    {
+        // Entries with no files have been created programmatically (eg. for a sneak peek)
+        // and haven't been saved yet. We'll use the current time in that case.
+        $timestamp = File::disk('content')->exists($path = $this->path())
+            ? File::disk('content')->lastModified($path)
+            : time();
+
+        return Carbon::createFromTimestamp($timestamp);
+    }
+
+    /**
      * Add supplemental data to the attributes
      *
      * Some data on the entry is dynamic and only available through methods.
@@ -333,12 +349,6 @@ class Entry extends Content implements EntryContract
         $this->supplements['order_type'] = $this->orderType();
         $this->supplements['collection'] = $this->collectionName();
         $this->supplements['is_entry'] = true;
-
-        // If the file isn't found, it's probably temporary content created during a sneak peek.
-        try {
-            $this->supplements['last_modified'] = File::disk('content')->lastModified($this->path());
-        } catch (FileNotFoundException $e) {
-            $this->supplements['last_modified'] = time();
-        }
+        $this->supplements['last_modified'] = $this->lastModified()->timestamp;
     }
 }

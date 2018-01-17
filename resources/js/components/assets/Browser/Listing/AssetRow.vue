@@ -23,12 +23,12 @@
 
         <td class="column-actions">
 
-            <div class="btn-group action-more" :class="{ open: showActionsDropdown }">
+            <div class="btn-group action-more" :class="{ open: showActionsDropdown }" v-if="canEdit">
                 <button type="button" class="btn-more dropdown-toggle" @click.prevent.stop="toggleActions">
                     <i class="icon icon-dots-three-vertical"></i>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="" @click.prevent="closeDropdownAndEditAsset">{{ translate('cp.edit') }}</a></li>
+                    <li><a @click="closeDropdownAndEditAsset">{{ translate('cp.edit') }}</a></li>
                     <li class="divider"></li>
                     <li class="warning"><a href="" @click.prevent="closeDropdownAndDeleteAsset">{{ translate('cp.delete') }}</a></li>
                 </ul>
@@ -48,6 +48,12 @@ import Row from './Row';
 export default {
 
     mixins: [Asset, Row],
+
+    computed: {
+        canEdit: function() {
+            return this.can('assets:'+ this.asset.container +':edit')
+        }
+    },
 
     methods: {
 

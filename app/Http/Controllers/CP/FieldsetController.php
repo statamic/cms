@@ -378,7 +378,7 @@ class FieldsetController extends CpController
 
         $fields = array_get($contents, 'fields', []);
 
-        $title_field = $fields['title'];
+        $title_field = array_get($fields, 'title');
 
         $updated_fields = [];
 
@@ -393,7 +393,9 @@ class FieldsetController extends CpController
         }
 
         // Put back the title field at the front.
-        $updated_fields = array_merge(['title' => $title_field], $updated_fields);
+        if ($title_field) {
+            $updated_fields = array_merge(['title' => $title_field], $updated_fields);
+        }
 
         $contents['fields'] = $updated_fields;
 

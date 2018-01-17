@@ -13,6 +13,7 @@ $.Redactor.prototype.assets = function () {
         },
 
         show: function () {
+            this.selection.save();
             this.assets.vue().addAsset();
         },
 

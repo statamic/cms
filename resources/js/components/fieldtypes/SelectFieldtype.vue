@@ -40,7 +40,11 @@ module.exports = {
     methods: {
         focus() {
             this.$els.select.focus();
-        }
+        },
+
+        getReplicatorPreviewText() {
+            return this.label;
+        },
     }
 };
 </script>

@@ -18,7 +18,10 @@ module.exports = {
 
     props: {
         title: String,
-        extra: String,
+        extra: {
+            type: String,
+            default: '{}'
+        },
         isNew: Boolean,
         contentType: String,
         titleDisplayName: {
@@ -38,8 +41,14 @@ module.exports = {
             type: Boolean,
             default: true
         },
-        locale: String,
-        locales: String,
+        locale: {
+            type: String,
+            default: () => Object.keys(Statamic.locales)[0]
+        },
+        locales: {
+            type: String,
+            default: '[{}]'
+        },
         isDefaultLocale: {
             type: Boolean,
             default: true
@@ -47,12 +56,16 @@ module.exports = {
         removeTitle: {
             type: Boolean,
             default: false
+        },
+        readOnly: {
+            type: Boolean,
+            default: false
         }
     },
 
     data: function() {
         return {
-            loading: false,
+            loading: true,
             saving: false,
             editingLayout: false,
             fieldset: {},
@@ -102,6 +115,26 @@ module.exports = {
             return this.isPage && this.uri === '/';
         },
 
+        canEdit: function() {
+            if (this.readOnly === true) return false;
+
+            if (this.contentType === 'entry') {
+                return this.can('collections:'+ this.extra.collection +':edit')
+            } else if (this.contentType === 'page') {
+                return this.can('pages:edit')
+            } else if (this.contentType === 'taxonomy') {
+                return this.can('taxonomies:'+ this.extra.taxonomy +':edit')
+            } else if (this.contentType === 'global') {
+                return this.can('globals:'+ this.slug +':edit')
+            } else if (this.contentType === 'user') {
+                return this.can('users:edit')
+            } else if (this.isAddon || this.isSettings) {
+                return this.can('super');
+            }
+
+            return true;
+        },
+
         shouldShowMeta: function() {
             if (! this.formDataInitialized) return false;
 
@@ -117,7 +150,7 @@ module.exports = {
         },
 
         shouldShowTitle: function() {
-            return !this.isSettings && !this.isAddon && !this.isGlobal && !this.isUser;
+            return !this.isSettings && !this.isAddon && !this.isGlobal && !this.isUser && !this.loading;
         },
 
         shouldShowSlug: function() {
@@ -183,6 +216,10 @@ module.exports = {
             return this.shouldShowTitle || this.shouldShowSlug || this.shouldShowDate || this.shouldShowStatus;
         },
 
+        dateFieldConfig: function () {
+            return this.fieldset.date || {};
+        }
+
     },
 
     methods: {
@@ -193,6 +230,7 @@ module.exports = {
                 new: this.isNew,
                 type: this.contentType,
                 uuid: this.uuid,
+                id: this.uuid,
                 status: this.status,
                 slug: this.contentData.slug || this.slug,
                 locale: this.locale,
@@ -484,17 +522,20 @@ module.exports = {
 
         this.$on('fieldsetLoaded', function(fieldset) {
             this.fieldset = fieldset;
+            this.loading = false;
         });
 
-        Mousetrap.bindGlobal('mod+s', function(e) {
-            e.preventDefault();
-            self.publishAndContinue();
-        });
+        if (this.canEdit) {
+            Mousetrap.bindGlobal('mod+s', function(e) {
+                e.preventDefault();
+                self.publishAndContinue();
+            });
 
-        Mousetrap.bindGlobal(['meta+enter','meta+return'], function(e) {
-            e.preventDefault();
-            self.publish();
-        });
+            Mousetrap.bindGlobal('meta+enter', function(e) {
+                e.preventDefault();
+                self.publish();
+            });
+        }
     }
 
 };

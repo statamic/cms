@@ -16,7 +16,7 @@ class PublishGlobalController extends PublishController
      */
     public function edit(Request $request, $slug)
     {
-        $this->authorize("globals:$slug:edit");
+        $this->authorize("globals:$slug:view");
 
         $locale = $this->request->query('locale', site_locale());
 
@@ -33,7 +33,7 @@ class PublishGlobalController extends PublishController
             'env' => datastore()->getEnvInScope('globals.'.$slug)
         ];
 
-        $data = $this->populateWithBlanks($global);
+        $data = $this->addBlankFields($global->fieldset(), $global->processedData());
 
         return view('publish', [
             'extra'             => $extra,

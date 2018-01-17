@@ -15,7 +15,7 @@
     		</div>
     		<div class="col-time">
     			<div class="time-fieldtype" v-if="timeAllowed">
-    				<time-fieldtype v-ref:time v-show="hasTime" :data.sync="time"></time-fieldtype>
+    				<time-fieldtype v-ref:time v-show="hasTime" :data.sync="time" :required="timeRequired"></time-fieldtype>
     				<button type="button" class="btn btn-default btn-icon add-time" v-show="!hasTime" @click="addTime" tabindex="0">
     					<span class="icon icon-clock"></span>
     				</button>
@@ -62,7 +62,11 @@ module.exports = {
         },
 
         timeAllowed: function() {
-            return this.config.allow_time !== false;
+            return this.timeRequired || this.config.allow_time !== false;
+        },
+
+        timeRequired: function () {
+            return this.config.require_time;
         },
 
         blankAllowed: function() {
@@ -159,15 +163,23 @@ module.exports = {
     },
 
     ready: function() {
-        if (this.data) {
-            this.time = this.data.substr(11);
+        const timeFormat = 'HH:mm';
+        const dateFormat = 'YYYY-MM-DD';
+
+        if (!this.data && !this.blankAllowed) {
+            const format = (this.timeRequired || this.config.show_time)
+                ? dateFormat + ' ' + timeFormat
+                : dateFormat;
+
+            this.data = moment().format(format);
         }
 
-        // If there's no data (ie. a blank field) and blanks are _not_ allowed, we want
-        // to initialize the data to the current date, so that the value will get
-        // saved without the user needing to interact with the field first.
-        if (!this.data && !this.blankAllowed) {
-            this.data = moment().format('YYYY-MM-DD');
+        else if (this.data && this.timeRequired && !this.hasTime) {
+            this.data += ' ' + moment().format(timeFormat);
+        }
+
+        if (this.data) {
+            this.time = this.data.substr(11);
         }
 
         this.watchTime();

@@ -20,7 +20,8 @@ $asset_bg:              #394045;
 
 // Fonts
 $font: -apple-system, BlinkMacSystemFont,  "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-$font_monospace:    'Menlo', monospace;
+$font_monospace: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
+$font_serif: 'Noto serif', 'serif';
 
 // Z indexes
 $z_index_modal: 100;

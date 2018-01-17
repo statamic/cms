@@ -20,6 +20,6 @@ class SuggestController extends Controller
             $request->input('mode', 'options')
         );
 
-        return (new $mode($request->all()))->suggestions();
+        return $mode->setConfig($request->all())->suggestions();
     }
 }

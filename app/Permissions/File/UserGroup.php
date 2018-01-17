@@ -260,12 +260,22 @@ class UserGroup implements UserGroupContract
 
         $groups = YAML::parse(File::get($path));
 
-        $groups[$this->id()] = $this->toArray();
+        $groups[$this->id()] = $this->toSavableArray();
 
         File::put($path, YAML::dump($groups));
 
         // Whoever wants to know about it can do so now.
         event('usergroup.saved', $this);
+    }
+
+    /**
+     * Get the array that should be written to file for this group.
+     *
+     * @return array
+     */
+    protected function toSavableArray()
+    {
+        return $this->toArray();
     }
 
     /**

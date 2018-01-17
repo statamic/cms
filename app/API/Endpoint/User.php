@@ -2,7 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Data\Services\UsersService;
+use Statamic\Contracts\Data\Services\UsersService;
 
 class User
 {

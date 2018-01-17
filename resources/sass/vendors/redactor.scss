@@ -19,12 +19,13 @@
   display: block;
   position: relative;
   margin: 0;
-  padding: 0;
+  padding: 8px;
   width: 100%;
   overflow: auto;
   outline: none;
-  border: none;
-  background-color: #111;
+  border: none !important;
+  background-color: #111 !important;
+  border-radius: 0 !important;
   box-shadow: none;
   color: #ccc;
   font-size: 13px;

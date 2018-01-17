@@ -708,9 +708,13 @@ class BaseModifiers extends Modifier
      */
     public function inArray($value, $params, $context)
     {
-        $array = array_get($context, $params[0], $params);
+        $needle = array_get($context, $params[0], $params);
 
-        return in_array($value, $array);
+        if (is_array($needle) && count($needle) === 1) {
+            $needle = $needle[0];
+        }
+
+        return in_array($needle, $value);
     }
 
     /**
@@ -1316,7 +1320,7 @@ class BaseModifiers extends Modifier
      */
     public function readTime($value, $params)
     {
-        $words = str_word_count(strip_tags($value));
+        $words = mb_str_word_count(strip_tags($value));
 
         return ceil($words / array_get($params, 0, 200));
     }
@@ -2036,7 +2040,7 @@ class BaseModifiers extends Modifier
      */
     public function wordCount($value)
     {
-        return str_word_count($value);
+        return mb_str_word_count($value);
     }
 
     /**
@@ -2050,6 +2054,38 @@ class BaseModifiers extends Modifier
     public function yearsAgo($value, $params)
     {
         return carbon($value)->diffInYears(array_get($params, 0));
+    }
+
+    /**
+     * Get the embed URL when given a youtube or vimeo link that's
+     * direct to the page.
+     *
+     * @param string  $url
+     *
+     * @return string
+     */
+    public function embedUrl($url)
+    {
+        if (str_contains($url, 'youtube')) {
+            return str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (str_contains($url, 'vimeo')) {
+            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * Whether a given video URL is embeddable.
+     *
+     * @param string $url
+     * @return bool
+     */
+    public function isEmbeddable($url)
+    {
+        return Str::contains($url, ['youtube', 'vimeo']);
     }
 
     // ------------------------------------

@@ -5,6 +5,7 @@ namespace Statamic\Addons\Collection;
 use Statamic\API\Collection;
 use Statamic\API\Config;
 use Statamic\API\Content;
+use Statamic\API\User;
 use Statamic\Extend\Widget;
 
 class CollectionWidget extends Widget
@@ -15,6 +16,11 @@ class CollectionWidget extends Widget
 
         if (! Collection::handleExists($collection)) {
             return "Error: Collection [$collection] doesn't exist.";
+        }
+
+        // Ensure the collection can be viewed
+        if ( ! User::getCurrent()->can("collections:{$collection}:view")) {
+            return;
         }
 
         $collection = Collection::whereHandle($collection);

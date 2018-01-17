@@ -19,9 +19,13 @@ module.exports = {
     methods: {
 
         focus() {
-            console.log(`${this.name}-0`);
             document.getElementById(`${this.name}-0`).focus();
-        }
+        },
+
+        getReplicatorPreviewText() {
+            var option = _.findWhere(this.config.options, {value: this.data});
+            return (option) ? option.text : this.data;
+        },
 
     }
 };

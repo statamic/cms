@@ -229,6 +229,16 @@ class Submission implements SubmissionContract
     }
 
     /**
+     * Whether the submissin has the given key.
+     *
+     * @return bool
+     */
+    public function has($field)
+    {
+        return array_has($this->data(), $field);
+    }
+
+    /**
      * Get a value of a field
      *
      * @param  string $key

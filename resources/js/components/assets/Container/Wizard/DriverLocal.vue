@@ -9,9 +9,9 @@
         </div>
         <small class="help-block" v-if="showResolvedPath">
             <span>
-                Path resolves to: {{ resolvedPath }}
-                <span v-show="resolvedPathExists" class="text-success">Path exists.</span>
-                <span v-else class="text-danger">Path does not exist.</span>
+                {{ translate('cp.path_resolves_to', { path: resolvedPath  }) }}
+                <span v-show="resolvedPathExists" class="text-success">{{ translate('cp.path_exists') }}</span>
+                <span v-else class="text-danger">{{ translate('cp.path_does_not_exist') }}</span>
             </span>
         </small>
     </div>

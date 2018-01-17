@@ -50,12 +50,14 @@ export default {
         },
 
         makeZoomable() {
-            if (this.isImage) {
-                new Luminous($(this.$el).find('a.zoom')[0], {
-                    closeOnScroll: true,
-                    captionAttribute: 'title'
-                });
-            }
+            const el = $(this.$el).find('a.zoom')[0];
+
+            if (! el || ! this.isImage) return;
+
+            new Luminous(el, {
+                closeOnScroll: true,
+                captionAttribute: 'title'
+            });
         },
 
         closeEditor() {

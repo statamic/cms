@@ -27,18 +27,18 @@ class TypeMode
 
         // First, native suggest modes.
         if (class_exists($native = 'Statamic\Addons\Suggest\Modes\\' . $name . 'Mode')) {
-            return $native;
+            return app($native);
         }
 
         // Suggest Modes may be stored in the root of the addon directory, named using YourAddonSuggestMode.php or
         // secondary ones may be named SecondarySuggestMode.php. Classes in the root will take precedence.
         if (class_exists($rootClass = "{$root}\\{$name}SuggestMode")) {
-            return $rootClass;
+            return app($rootClass);
         }
 
         // Alternatively, Suggest Modes may be placed in a "SuggestModes" namespace.
         if (class_exists($namespacedClass = "{$root}\\SuggestModes\\{$name}SuggestMode")) {
-            return $namespacedClass;
+            return app($namespacedClass);
         }
 
         throw new ResourceNotFoundException("Could not find files to load the `{$mode}` suggest mode.");

@@ -36,7 +36,7 @@ class EntriesController extends CpController
      */
     public function show($collection)
     {
-        $this->access("collections:$collection:edit");
+        $this->access("collections:$collection:view");
 
         if (! Collection::handleExists($collection)) {
             abort(404, "Collection [$collection] does not exist.");

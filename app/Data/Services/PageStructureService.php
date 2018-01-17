@@ -7,6 +7,7 @@ use Statamic\API\Helper;
 use Statamic\API\URL;
 use Statamic\API\Page;
 use Statamic\API\Path;
+use Statamic\API\Stache;
 use Statamic\API\Pattern;
 
 class PageStructureService extends BaseService
@@ -80,24 +81,12 @@ class PageStructureService extends BaseService
             }
 
             // Get information
-            $content = Page::whereUri($url)->in($locale)->get();
+            $content = $this->getPage($url)->in($locale)->get();
             $content->setSupplement('depth', $current_depth);
 
             // Draft?
             if (! $show_drafts && ! $content->published()) {
                 continue;
-            }
-
-            // Get entries belonging to this page. We'll treat them as child
-            // pages and merge them into the children array later.
-            $entries = [];
-            if ($include_entries) {
-                foreach (Page::whereUri($url)->entries()->all() as $entry) {
-                    $entries[] = [
-                        'page' => $entry->in($locale)->get(),
-                        'depth' => $current_depth
-                    ];
-                }
             }
 
             // Get child pages
@@ -107,7 +96,7 @@ class PageStructureService extends BaseService
             $output[] = [
                 'page' => $content,
                 'depth' => $current_depth,
-                'children' => array_merge($children, $entries)
+                'children' => $children
             ];
         }
 
@@ -116,6 +105,37 @@ class PageStructureService extends BaseService
             return Helper::compareValues($one['page']->order(), $two['page']->order());
         });
 
+        // Merge in any entries on the end if required.
+        if ($include_entries) {
+            foreach (Page::whereUri($base_url)->entries()->all() as $entry) {
+                $output[] = [
+                    'page' => $entry->in($locale)->get(),
+                    'depth' => $current_depth
+                ];
+            }
+        }
+
         return array_values($output);
+    }
+
+    /**
+     * Get a page by URL, with a workaround for a currently unreproducible bug.
+     *
+     * @return \Statamic\Contracts\Data\Pages\Page
+     * @see https://github.com/statamic/v2-hub/issues/1303
+     */
+    private function getPage($url)
+    {
+        // If the page doesn't exist, the cache is in the buggy state where the item
+        // (correctly) exists in the page structure, but is missing from the meta
+        // data. Rebuilding the cache should fix the issue temporarily. Once we
+        // track down the cause for the invalid cache, this can be removed.
+        if (! $page = Page::whereUri($url)) {
+            Stache::clear();
+            Stache::update();
+            $page = Page::whereUri($url);
+        }
+
+        return $page;
     }
 }

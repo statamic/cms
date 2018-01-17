@@ -2,7 +2,7 @@
    GRID & REPLICATOR
    ========================================================================== */
 
-.grid-field, .replicator-fieldtype {
+   .grid-field, .replicator-fieldtype {
 
     .form-group {
         padding: 0;
@@ -61,7 +61,7 @@
 /* Replicator/Stacked Grids only
   ========================================================================== */
 
-.replicator-fieldtype, .grid-fieldtype .grid-stacked {
+.replicator, .grid-fieldtype .grid-stacked {
     .list-group-item.group-header {
         background: #edf1f4;
         &.collapsed {

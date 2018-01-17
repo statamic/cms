@@ -7,6 +7,9 @@ use Statamic\Contracts\Permissions\UserGroupFactory as UserGroupFactoryContract;
 
 class UserGroupFactory implements UserGroupFactoryContract
 {
+    protected $data;
+    protected $id;
+
     /**
      * Create a user group
      *
@@ -16,23 +19,30 @@ class UserGroupFactory implements UserGroupFactoryContract
      */
     public function create($data, $uuid = null)
     {
+        $this->data = $data;
+
         $group = $this->group();
 
-        $uuid = $uuid ?: Helper::makeUuid();
-        $group->uuid($uuid);
+        $this->id = $uuid ?: Helper::makeUuid();
+        $group->uuid($this->id);
 
-        $group->title(array_get($data, 'title'));
-        $group->slug(array_get($data, 'slug'));
+        $group->title(array_get($this->data, 'title'));
+        $group->slug(array_get($this->data, 'slug'));
 
-        foreach (array_get($data, 'users', []) as $user) {
+        foreach ($this->getUsers() as $user) {
             $group->addUser($user);
         }
 
-        foreach (array_get($data, 'roles', []) as $role) {
+        foreach (array_get($this->data, 'roles', []) as $role) {
             $group->addRole($role);
         }
 
         return $group;
+    }
+
+    protected function getUsers()
+    {
+        return array_get($this->data, 'users', []);
     }
 
     /**

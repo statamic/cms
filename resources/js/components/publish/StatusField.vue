@@ -94,13 +94,6 @@ export default {
             if (!this.allowStatuses) return 'icon-status-live';
 
             return locale.is_published ? 'icon-status-live' : 'icon-status-hidden';
-
-            if (locale.has_content && locale.is_published) {
-                return 'icon-status-live';
-            } else if (locale.has_content && !locale.is_published) {
-                return 'icon-status-off';
-            }
-            return 'icon-status-hidden';
         }
 
     }

@@ -2,7 +2,7 @@
    MAIN CONTROL PANEL LAYOUT
    ========================================================================== */
 
-html, body {
+   html, body {
     height: 100%;
 }
 
@@ -19,19 +19,13 @@ body > svg { display: none; }
 .application-grid {
     display: grid;
     grid-template-columns: 200px auto;
-}
 
-@media (max-width: 980px) {
-    .application-grid {
-        grid-template-columns: 140px 1fr auto;
-    }
-}
-
-@media (max-width: $screen-xs-max) {
-    .application-grid {
+    &.hide-nav {
         display: block;
-        padding-left: 0;
-        padding-right: 0;
+
+        > .nav-main {
+            display: none;
+        }
     }
 }
 
@@ -39,10 +33,29 @@ body > svg { display: none; }
 	position: relative;
 	display: flex;
     align-items: center;
-    justify-content: space-between;
 	padding: 24px;
     margin-bottom: 8px;
 	font-size: 14px;
+
+    .logo {
+        display: block;
+        margin-right: 88px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        svg {
+            height: 20px;
+            width: 90px;
+        }
+    }
+
+    .version {
+        color: rgba(#6D868C, .5);
+        font-size: 10px;
+        left: 5px;
+        position: relative;
+        bottom: -3px;
+    }
 
     #typeahead {
         @extend .z-depth-1;
@@ -66,6 +79,7 @@ body > svg { display: none; }
 
     .head-links {
         position: relative;
+        margin-left: auto;
     }
 }
 
@@ -75,6 +89,26 @@ body > svg { display: none; }
     padding: 8px 24px;
     font-size: 14px;
     color: #fff;
+}
+
+@media (max-width: 980px) {
+    .application-grid {
+        grid-template-columns: 140px 1fr auto;
+    }
+
+    .cp-head .logo {
+        margin-right: 28px;
+    }
+}
+
+@media (max-width: $screen-xs-max) {
+    .application-grid {
+        display: block;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .cp-head .logo { display: none; }
 }
 
 

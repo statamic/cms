@@ -46,8 +46,10 @@
     "dropzone": "Dropzone"
   },
   "dependencies": {
+    "@shopify/draggable": "^1.0.0-beta.3",
     "bootstrap-sass": "^3.3.7",
     "marked-plaintext": "0.0.2",
+    "medium-editor": "^5.23.2",
     "tippy.js": "^1.2.1"
   }
 }

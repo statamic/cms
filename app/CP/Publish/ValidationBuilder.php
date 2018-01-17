@@ -38,7 +38,7 @@ class ValidationBuilder
     /**
      * Build the validation rules and attributes
      *
-     * @return void
+     * @return self
      */
     public function build()
     {
@@ -47,8 +47,10 @@ class ValidationBuilder
         $field_validation_data = $this->getFieldValidationData($this->fieldset->fields());
 
         $this->rules = array_merge($fieldtype_rules, $field_validation_data['rules']);
-        
+
         $this->attributes = $field_validation_data['attributes'];
+
+        return $this;
     }
 
     /**

@@ -11,7 +11,7 @@ export default {
     methods: {
         flashExistingMessages() {
             this.flash.forEach(
-                ({type, message}) => this.setFlashMessage(type, message)
+                ({ type, message }) => this.setFlashMessage(message, { theme: type })
             );
         },
 

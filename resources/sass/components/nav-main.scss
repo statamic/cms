@@ -1,27 +1,6 @@
 .nav-main {
     @extend .no-select;
-    overflow-y: auto;
     z-index: 102;
-
-    .logo {
-        display: block;
-        margin: 24px 24px 40px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        svg {
-            height: 20px;
-            width: 90px;
-        }
-    }
-
-    .version {
-        color: rgba(#6D868C, .5);
-        font-size: 10px;
-        left: 5px;
-        position: relative;
-        bottom: -3px;
-    }
 
     .badge {
         position: relative;
@@ -37,6 +16,8 @@
         flex-basis: auto;
         padding: 0;
         width: 100%;
+        position: sticky;
+        top: 24px;
 
         li {
             a:hover .icon,
@@ -296,7 +277,9 @@
     body.nav-visible {
         nav.nav-main {
             left: 0;
+            top: 0;
             min-width: 240px;
+            padding-top: 16px;
         }
         .content { opacity: 0.5; }
     }
