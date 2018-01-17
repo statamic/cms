@@ -6,7 +6,7 @@
 
 <body id="statamic" :class="{ 'nav-visible': navVisible }">
 
-      @if ($is_trial || $is_unlicensed)
+      {{-- @if ($is_trial || $is_unlicensed)
             <div class="site-status-stripe flexy">
                   <div class="fill">
                         @if ($is_trial) {{ t('trial_mode_badge') }} @elseif ($is_unlicensed){{ t('unlicensed') }} @endif
@@ -14,7 +14,7 @@
                   <a href="{{ route('licensing') }}" class="btn btn-small mr-16">{{ t('add_license_key')  }}</a>
                   <a href="https://statamic.com/buy" class="btn btn-primary btn-small" target="_blank">{{ t('buy_now')  }}</a>
             </div>
-      @endif
+      @endif --}}
 
       {!! inline_svg('sprite') !!}
 
@@ -35,8 +35,8 @@
             </div>
       </div>
 
-      @include('partials.shortcuts')
-      @include('partials.alerts')
+      {{-- @include('partials.shortcuts') --}}
+      {{-- @include('partials.alerts') --}}
       @include('partials.global-header')
 
       <div class="application-grid @yield('content-class')">
