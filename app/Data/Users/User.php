@@ -313,6 +313,16 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
     }
 
     /**
+     * Get the name of the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'id';
+    }
+
+    /**
      * Get the password for the user.
      *
      * @return string
