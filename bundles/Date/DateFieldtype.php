@@ -3,7 +3,7 @@
 namespace Statamic\Addons\Date;
 
 use Carbon\Carbon;
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class DateFieldtype extends Fieldtype
 {

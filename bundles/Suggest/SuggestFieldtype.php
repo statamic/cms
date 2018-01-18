@@ -3,7 +3,7 @@
 namespace Statamic\Addons\Suggest;
 
 use Statamic\Exceptions\FatalException;
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class SuggestFieldtype extends Fieldtype
 {

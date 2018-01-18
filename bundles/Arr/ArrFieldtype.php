@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Arr;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class ArrFieldtype extends Fieldtype
 {

@@ -200,15 +200,24 @@ class Fieldtype implements FieldtypeInterface
 
     public function getConfigFieldset()
     {
-        $addon = $this->getAddon();
-        $path = 'config/fieldtype-fieldset.yaml';
-
-        $fields = $addon->hasFile($path) ? YAML::parse($addon->getFile($path)) : [];
-
-        $fieldset = Fieldset::create('config', compact('fields'));
+        $fieldset = Fieldset::create('config', $this->fieldsetContents());
         $fieldset->type('fieldtype');
 
         return $fieldset;
+    }
+
+    /**
+     * Get the config fieldset's contents.
+     *
+     * An array of what would normally be written in YAML if it were a regular
+     * fieldset. The resulting fieldset object created will be used by the
+     * Fieldset Builder when configuring an instance of this fieldtype.
+     *
+     * @return array
+     */
+    public function fieldsetContents()
+    {
+        return [];
     }
 
     /**

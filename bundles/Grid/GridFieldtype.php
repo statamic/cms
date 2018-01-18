@@ -4,7 +4,7 @@ namespace Statamic\Addons\Grid;
 
 use Statamic\API\Helper;
 use Statamic\CP\Fieldset;
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 
 class GridFieldtype extends Fieldtype

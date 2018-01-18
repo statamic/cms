@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Partial;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class PartialFieldtype extends Fieldtype
 {

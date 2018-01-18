@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Redactor;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class RedactorFieldtype extends Fieldtype
 {

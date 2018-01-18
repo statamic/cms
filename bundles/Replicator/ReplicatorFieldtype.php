@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Replicator;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 
 class ReplicatorFieldtype extends Fieldtype

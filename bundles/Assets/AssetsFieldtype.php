@@ -3,7 +3,7 @@
 namespace Statamic\Addons\Assets;
 
 use Statamic\API\Helper;
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class AssetsFieldtype extends Fieldtype
 {

@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Select;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class SelectFieldtype extends Fieldtype
 {
