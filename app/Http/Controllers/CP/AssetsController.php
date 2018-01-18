@@ -168,7 +168,7 @@ class AssetsController extends CpController
             $assets->put($url, $asset);
         }
 
-        return $assets;
+        return $assets->toArray();
     }
 
     public function store()
