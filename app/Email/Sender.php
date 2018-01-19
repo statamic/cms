@@ -85,17 +85,15 @@ class Sender
             return $this->getAutomagicEmail();
         }
 
-        $disk = $this->location ? null : 'theme';
-
-        $location = $this->location ?: 'templates/email/';
+        $location = $this->location ?: resource_path('views/email/');
 
         $path = Path::assemble($location, $this->message->template() . '.html');
 
-        if (! File::disk($disk)->exists($path)) {
+        if (! File::exists($path)) {
             return $this->parseFallbackEmailTemplates();
         }
 
-        $raw_template = File::disk($disk)->get($path);
+        $raw_template = File::get($path);
 
         // Split out the text version and the html versions
         $separator = Config::get('mail.separator', '---');
