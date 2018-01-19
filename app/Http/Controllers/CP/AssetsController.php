@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Exception;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\API\Arr;
 use Statamic\API\Asset;
 use Statamic\API\AssetContainer;
@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Statamic\Assets\AssetCollection;
 use Statamic\CP\Publish\ProcessesFields;
 use Statamic\CP\Publish\ValidationBuilder;
-use Statamic\Presenters\PaginationPresenter;
 
 class AssetsController extends CpController
 {
@@ -79,7 +78,7 @@ class AssetsController extends CpController
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $assets = $assets->slice($offset, $perPage);
-        // $paginator = new LengthAwarePaginator($assets, $totalAssetCount, $perPage, $currentPage);
+        $paginator = new LengthAwarePaginator($assets, $totalAssetCount, $perPage, $currentPage);
 
         $assets = $this->supplementAssetsForDisplay($assets);
 
@@ -101,11 +100,11 @@ class AssetsController extends CpController
             'pagination' => [
                 'totalItems' => $totalAssetCount,
                 'itemsPerPage' => $perPage,
-                'totalPages'    => 1, //$paginator->lastPage(),
-                'currentPage'   => 1, //$paginator->currentPage(),
-                // 'prevPage'      => $paginator->previousPageUrl(),
-                // 'nextPage'      => $paginator->nextPageUrl(),
-                // 'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
+                'totalPages'    => $paginator->lastPage(),
+                'currentPage'   => $paginator->currentPage(),
+                'prevPage'      => $paginator->previousPageUrl(),
+                'nextPage'      => $paginator->nextPageUrl(),
+                'segments'      => array_get($paginator->renderArray(), 'segments')
             ]
         ];
     }

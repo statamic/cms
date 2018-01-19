@@ -13,7 +13,7 @@ use Statamic\Extend\Tags;
 use Statamic\Extend\Management\FilterLoader;
 use Statamic\Data\Content\ContentCollection;
 use Statamic\Presenters\PaginationPresenter;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\SiteHelpers\Filters as SiteHelperFilters;
 
 class CollectionTags extends Tags
@@ -518,8 +518,8 @@ class CollectionTags extends Tags
             'current_page'   => $paginator->currentPage(),
             'prev_page'      => $paginator->previousPageUrl(),
             'next_page'      => $paginator->nextPageUrl(),
-            'auto_links'     => $paginator->render(),
-            'links'          => $paginator->render(new PaginationPresenter($paginator))
+            'auto_links'     => $paginator->render('pagination::default'),
+            'links'          => $paginator->renderArray()
         ];
 
         $this->collection = $paginator->getCollection();

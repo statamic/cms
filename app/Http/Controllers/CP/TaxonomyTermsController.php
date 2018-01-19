@@ -6,8 +6,7 @@ use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Taxonomy;
 use Statamic\API\Term;
-use Statamic\Presenters\PaginationPresenter;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 /**
  * Controller for the taxonomies listing
@@ -86,20 +85,20 @@ class TaxonomyTermsController extends CpController
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $terms = $terms->slice($offset, $perPage);
-        // $paginator = new LengthAwarePaginator($terms, $totalTermCount, $perPage, $currentPage);
+        $paginator = new LengthAwarePaginator($terms, $totalTermCount, $perPage, $currentPage);
 
         return [
-            'items' => $terms,
+            'items' => $terms->toArray(),
             'columns' => $columns,
-            // 'pagination' => [
-            //     'totalItems' => $totalTermCount,
-            //     'itemsPerPage' => $perPage,
-            //     'totalPages'    => $paginator->lastPage(),
-            //     'currentPage'   => $paginator->currentPage(),
-            //     'prevPage'      => $paginator->previousPageUrl(),
-            //     'nextPage'      => $paginator->nextPageUrl(),
-            //     'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
-            // ]
+            'pagination' => [
+                'totalItems' => $totalTermCount,
+                'itemsPerPage' => $perPage,
+                'totalPages'    => $paginator->lastPage(),
+                'currentPage'   => $paginator->currentPage(),
+                'prevPage'      => $paginator->previousPageUrl(),
+                'nextPage'      => $paginator->nextPageUrl(),
+                'segments'      => array_get($paginator->renderArray(), 'segments')
+            ]
         ];
     }
 
