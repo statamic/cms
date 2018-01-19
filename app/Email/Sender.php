@@ -58,11 +58,9 @@ class Sender
                 }
             }
 
-            if (empty($from = $this->message->from())) {
-                // If $from is an empty array, it means no email was specified, so we'll fall back to the defaults.
-                $from = [Config::get('email.from_email'), Config::get('email.from_name')];
+            if (! empty($from = $this->message->from())) {
+                $m->from($from[0], $from[1]);
             }
-            $m->from($from[0], $from[1]);
 
             if (! empty($reply = $this->message->replyTo())) {
                 $m->replyTo($reply[0], $reply[1]);
