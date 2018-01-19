@@ -167,6 +167,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('{addon}/settings', 'AddonsController@saveSettings');
     });
 
+    Route::post('addons/suggest/suggestions', '\Statamic\Addons\Suggest\SuggestController@suggestions');
+
     Route::get('updater', 'UpdaterController@index')->name('updater');
     Route::get('updater/{version}', 'UpdaterController@update')->name('updater.update');
 
