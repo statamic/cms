@@ -131,4 +131,81 @@ class ThemeTagsTest extends TestCase
             $this->tag('{{ theme:js src="foo" cache_bust="true" }}')
         );
     }
+
+    /** @test */
+    function gets_versioned_filename_for_mix()
+    {
+        File::shouldReceive('get')
+            ->with(public_path('mix-manifest.json'))
+            ->andReturn('{"/js/foo.js": "/js/foo.js?id=12345"}');
+
+        $this->assertEquals(
+            '/js/foo.js?id=12345',
+            $this->tag('{{ theme:js src="foo" version="true" }}')
+        );
+    }
+
+    /** @test */
+    public function gets_versioned_filename_for_elixir()
+    {
+        File::shouldReceive('get')
+            ->with(public_path('mix-manifest.json'))
+            ->andReturnNull();
+
+        File::shouldReceive('get')
+            ->with(public_path('build/rev-manifest.json'))
+            ->andReturn('{"js/foo.js": "js/foo-12345.js"}');
+
+        $this->assertEquals(
+            '/build/js/foo-12345.js',
+            $this->tag('{{ theme:js src="foo" version="true" }}')
+        );
+    }
+
+    /** @test */
+    function gets_regular_filename_if_file_isnt_in_mix_manifest()
+    {
+        File::shouldReceive('get')
+            ->with(public_path('mix-manifest.json'))
+            ->andReturn('{"/js/foo.js": "/js/foo.js?id=12345"}');
+
+        $this->assertEquals(
+            '/js/non-versioned-file.js',
+            $this->tag('{{ theme:js src="non-versioned-file" version="true" }}')
+        );
+    }
+
+    /** @test */
+    function gets_regular_filename_if_file_isnt_in_elixir_manifest()
+    {
+        File::shouldReceive('get')
+            ->with(public_path('mix-manifest.json'))
+            ->andReturnNull();
+
+        File::shouldReceive('get')
+            ->with(public_path('build/rev-manifest.json'))
+            ->andReturn('{"js/foo.js": "js/foo-12345.js"}');
+
+        $this->assertEquals(
+            '/js/non-versioned-file.js',
+            $this->tag('{{ theme:js src="non-versioned-file" version="true" }}')
+        );
+    }
+
+    /** @test */
+    function gets_regular_filename_if_manifests_dont_exist()
+    {
+        File::shouldReceive('get')
+            ->with(public_path('mix-manifest.json'))
+            ->andReturnNull();
+
+        File::shouldReceive('get')
+            ->with(public_path('build/rev-manifest.json'))
+            ->andReturnNull();
+
+        $this->assertEquals(
+            '/js/foo.js',
+            $this->tag('{{ theme:js src="foo" version="true" }}')
+        );
+    }
 }

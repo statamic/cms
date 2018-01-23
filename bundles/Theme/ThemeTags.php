@@ -188,18 +188,34 @@ class ThemeTags extends Tags
 
     private function versioned($type, $file)
     {
-        $manifest_path = 'build/rev-manifest.json';
-        $file = "{$type}/{$file}.{$type}";
+        list($manifest, $method) = $this->getManifestAndMethod();
+        $manifest = json_decode($manifest, true);
 
-        if (! $manifest = $this->blink->get('manifest')) {
-            $manifest = json_decode(File::disk('theme')->get($manifest_path), true);
-            $this->blink->put('manifest', $manifest);
+        // Mix prepends filenames with slashes.
+        // We'll remove them to make it the same as Elixir.
+        $manifest = collect($manifest)->mapWithKeys(function ($path, $key) {
+            return [ltrim($key, '/') => ltrim($path, '/')];
+        });
+
+        if (! $manifest->has($file = "{$type}/{$file}.{$type}")) {
+            return '/' . $file;
         }
 
-        if (isset($manifest[$file])) {
-            return '/build/'.$manifest[$file];
+        return $method === 'elixir'
+            ? '/build/' . $manifest->get($file)
+            : $manifest->get($file);
+    }
+
+    private function getManifestAndMethod()
+    {
+        if ($manifest = File::get(public_path('mix-manifest.json'))) {
+            return [$manifest, 'mix'];
         }
 
-        return '/' . $file;
+        if ($manifest = File::get(public_path('build/rev-manifest.json'))) {
+            return [$manifest, 'elixir'];
+        }
+
+        return [null, null];
     }
 }
