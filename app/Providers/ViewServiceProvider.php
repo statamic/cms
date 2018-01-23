@@ -30,6 +30,9 @@ class ViewServiceProvider extends LaravelViewServiceProvider
     public function boot()
     {
         // $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'statamic');
+
+        tap($this->app['view'])
+            ->composer('partials.scripts', \Statamic\Http\ViewComposers\FieldtypeJsComposer::class);
     }
 
     /**
