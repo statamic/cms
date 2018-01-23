@@ -119,4 +119,16 @@ class ThemeTagsTest extends TestCase
             $this->tag('{{ theme:output src="package.json" }}')
         );
     }
+
+    public function testAppendsTimestampForCacheBusting()
+    {
+        File::shouldReceive('lastModified')
+            ->with(public_path('/js/foo.js'))
+            ->andReturn('12345');
+
+        $this->assertEquals(
+            '/js/foo.js?v=12345',
+            $this->tag('{{ theme:js src="foo" cache_bust="true" }}')
+        );
+    }
 }

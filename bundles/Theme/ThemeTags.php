@@ -176,7 +176,7 @@ class ThemeTags extends Tags
         );
 
         if ($this->getBool('cache_bust')) {
-            $url .= '?v=' . File::disk('theme')->lastModified($path);
+            $url .= '?v=' . File::lastModified(public_path($path));
         }
 
         if (! $this->getBool('absolute')) {
