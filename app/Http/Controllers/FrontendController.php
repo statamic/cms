@@ -203,7 +203,7 @@ class FrontendController extends Controller
         if ($this->data instanceof Route && Str::contains($this->data->template()[0], 'Controller@')) {
             list($controller, $method) = explode('@', $this->data->template()[0]);
 
-            $controller = "Statamic\\SiteHelpers\\$controller";
+            $controller = app()->getNamespace() . "Http\\Controllers\\{$controller}";
 
             if (! class_exists($controller)) {
                 return $this->notFoundResponse($url);
