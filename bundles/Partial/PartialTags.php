@@ -16,8 +16,12 @@ class PartialTags extends Tags
         // an argument, but fall back to the studly version just in case.
         $src = $this->get('src', array_get($arguments, 0, $this->tag_method));
 
-        $partial = File::disk('theme')->get("partials/{$src}.html");
-        
+        $partialPath = config('theming.dedicated_view_directories')
+            ? resource_path("partials/{$src}.html")
+            : resource_path("views/{$src}.html");
+
+        $partial = File::get($partialPath);
+
         // Allow front matter in these suckers
         $parsed = Parse::frontMatter($partial);
         $variables = array_get($parsed, 'data', []);

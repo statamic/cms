@@ -121,7 +121,11 @@ class ThemeTags extends Tags
     {
         $src = $this->get('src');
 
-        $partial = File::disk('theme')->get("partials/{$src}.html");
+        $partialPath = config('theming.dedicated_view_directories')
+            ? resource_path("partials/{$src}.html")
+            : resource_path("views/{$src}.html");
+
+        $partial = File::get($partialPath);
 
         // Allow front matter in these suckers
         $parsed = Parse::frontMatter($partial);
