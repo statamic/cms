@@ -18,6 +18,9 @@ class AppServiceProvider extends ServiceProvider
                 $this->app['config']["cache.stores.file"]['path']
             ));
         });
+
+        $this->app[\Illuminate\Contracts\Http\Kernel::class]
+             ->pushMiddleware(\Statamic\Http\Middleware\PersistStache::class);
     }
 
     public function register()
