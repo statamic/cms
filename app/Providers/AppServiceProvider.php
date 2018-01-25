@@ -27,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'statamic');
+
+        $this->publishes([
+            __DIR__.'/../../resources/dist' => public_path('resources/cp')
+        ], 'statamic');
     }
 
     public function register()
