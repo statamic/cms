@@ -17,7 +17,7 @@ class AssetContainersController extends CpController
 {
     public function manage()
     {
-        return view('assets.containers.manage', [
+        return view('statamic::assets.containers.manage', [
             'title' => 'Assets'
         ]);
     }
@@ -45,7 +45,7 @@ class AssetContainersController extends CpController
 
     public function create()
     {
-        return view('assets.containers.create', [
+        return view('statamic::assets.containers.create', [
             'title' => 'Creating Asset Container'
         ]);
     }
@@ -63,7 +63,7 @@ class AssetContainersController extends CpController
     {
         $container = AssetContainer::find($uuid);
 
-        return view('assets.containers.edit', [
+        return view('statamic::assets.containers.edit', [
             'title'     => t('editing_asset_container'),
             'container' => $container
         ]);

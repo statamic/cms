@@ -29,7 +29,7 @@ class TaxonomyTermsController extends CpController
 
         $title = Taxonomy::whereHandle($group)->title();
 
-        return view('taxonomies.terms', [
+        return view('statamic::taxonomies.terms', [
             'title' => $title,
             'group' => $group,
             'group_title' => $title,

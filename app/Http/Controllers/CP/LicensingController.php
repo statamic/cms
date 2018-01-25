@@ -47,7 +47,7 @@ class LicensingController extends CpController
 
         $this->listAddons();
 
-        return view('licensing.index', [
+        return view('statamic::licensing.index', [
             'messages' => $messages,
             'items' => $this->items
         ]);

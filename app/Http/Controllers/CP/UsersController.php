@@ -44,7 +44,7 @@ class UsersController extends CpController
             'title' => 'Users'
         ];
 
-        return view('users.index', $data);
+        return view('statamic::users.index', $data);
     }
 
     /**
@@ -105,7 +105,7 @@ class UsersController extends CpController
 
         $data = $this->populateWithBlanks($fieldset);
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'             => [],
             'is_new'            => true,
             'content_data'      => $data,
@@ -154,7 +154,7 @@ class UsersController extends CpController
         $data['user_groups'] = $this->user->groups()->keys();
         $data['status'] = $this->user->status();
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'             => [],
             'is_new'            => false,
             'content_data'      => $data,

@@ -17,7 +17,7 @@ class RolesController extends CpController
     {
         $this->authorize('super');
 
-        return view('roles.index', [
+        return view('statamic::roles.index', [
             'title' => 'Roles'
         ]);
     }
@@ -69,7 +69,7 @@ class RolesController extends CpController
             'selected' => $this->getPermissions($role)
         ];
 
-        return view('roles.edit', $data);
+        return view('statamic::roles.edit', $data);
     }
 
     private function getContentTitles()
@@ -142,7 +142,7 @@ class RolesController extends CpController
             'selected' => []
         ];
 
-        return view('roles.create', $data);
+        return view('statamic::roles.create', $data);
     }
 
     public function store()

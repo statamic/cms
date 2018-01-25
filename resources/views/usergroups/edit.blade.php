@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('statamic::layout')
 
 @section('content')
 
@@ -13,7 +13,7 @@
 
         <hr>
 
-        @include('usergroups.partials.form', [
+        @include('statamic::usergroups.partials.form', [
             'group_title' => $group->title(),
             'group_slug' => $group->slug()
         ])

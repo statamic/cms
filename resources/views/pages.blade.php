@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('statamic::layout')
 
 @section('content')
 <page-tree inline-template v-cloak>

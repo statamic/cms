@@ -31,7 +31,7 @@ class PublishPageController extends PublishController
 
         $fieldset = $request->query('fieldset', $parent->fieldset()->name());
 
-        return view('publish', [
+        return view('statamic::publish', [
             'title'             => t('create_page'),
             'uuid'              => null,
             'uri'               => null,
@@ -70,7 +70,7 @@ class PublishPageController extends PublishController
         $page   = $page->in($locale)->get();
         $data   = $this->addBlankFields($page->fieldset(), $page->processedData());
 
-        return view('publish', [
+        return view('statamic::publish', [
             'is_new'            => false,
             'content_data'      => $data,
             'content_type'      => 'page',

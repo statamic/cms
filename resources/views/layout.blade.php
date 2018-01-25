@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-      @include('partials.head')
+      @include('statamic::partials.head')
 </head>
 
 <body id="statamic" :class="{ 'nav-visible': navVisible }">
@@ -35,12 +35,12 @@
             </div>
       </div>
 
-      {{-- @include('partials.shortcuts') --}}
-      {{-- @include('partials.alerts') --}}
-      @include('partials.global-header')
+      {{-- @include('statamic::partials.shortcuts') --}}
+      {{-- @include('statamic::partials.alerts') --}}
+      @include('statamic::partials.global-header')
 
       <div class="application-grid @yield('content-class')">
-            @include('partials.nav-main')
+            @include('statamic::partials.nav-main')
 
             <div class="content">
                   <div class="page-wrapper">
@@ -67,7 +67,7 @@
                 }];
             @endif
       </script>
-      @include('partials.scripts')
+      @include('statamic::partials.scripts')
       @yield('scripts')
 </body>
 </html>

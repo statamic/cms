@@ -46,7 +46,7 @@ class PagesController extends CpController
             'home' => $home_data
         ];
 
-        return view('pages', $data);
+        return view('statamic::pages', $data);
     }
 
     /**

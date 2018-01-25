@@ -16,6 +16,6 @@ class SnippetsController extends CpController
             'title' => 'Snippets'
         ];
 
-        return view('snippets', $data);
+        return view('statamic::snippets', $data);
     }
 }

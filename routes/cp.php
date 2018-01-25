@@ -1,5 +1,7 @@
 <?php
 
+use Statamic\Http\Middleware\CP\Configurable;
+
 Route::group(['prefix' => 'auth'], function () {
     Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
     Route::post('login', 'Auth\LoginController@login');
@@ -143,7 +145,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
         Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
 
-        Route::group(['middleware' => 'configurable'], function () {
+        Route::group(['middleware' => Configurable::class], function () {
             Route::get('/', 'FieldsetController@index')->name('fieldsets');
             Route::get('/create', 'FieldsetController@create')->name('fieldset.create');
             Route::post('/update-layout/{fieldset}', 'FieldsetController@updateLayout')->name('fieldset.update-layout');
@@ -157,12 +159,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('fieldtypes', 'FieldtypesController@index')->name('fieldtypes');
 
-    Route::group(['prefix' => 'addons', 'middleware' => 'configurable'], function () {
+    Route::group(['prefix' => 'addons', 'middleware' => Configurable::class], function () {
         Route::get('/', 'AddonsController@index')->name('addons');
         Route::get('get', 'AddonsController@get')->name('addons.get');
     });
 
-    Route::group(['prefix' => 'addons', 'middleware' => 'configurable'], function () {
+    Route::group(['prefix' => 'addons', 'middleware' => Configurable::class], function () {
         Route::get('{addon}/settings', 'AddonsController@settings')->name('addon.settings');
         Route::post('{addon}/settings', 'AddonsController@saveSettings');
     });

@@ -19,7 +19,7 @@ class DashboardController extends CpController
      */
     public function index(WidgetLoader $loader)
     {
-        return view('dashboard', [
+        return view('statamic::dashboard', [
             'widgets' => $this->getWidgets($loader)
         ]);
     }

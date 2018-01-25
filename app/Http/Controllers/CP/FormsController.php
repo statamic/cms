@@ -23,7 +23,7 @@ class FormsController extends CpController
             'forms' => Form::all()
         ];
 
-        return view('forms.index', $data);
+        return view('statamic::forms.index', $data);
     }
 
     public function get()
@@ -43,7 +43,7 @@ class FormsController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('forms.show', compact('form'));
+        return view('statamic::forms.show', compact('form'));
     }
 
     public function getFormSubmissions($form)
@@ -200,7 +200,7 @@ class FormsController extends CpController
     {
         $this->access('super');
 
-        return view('forms.create', [
+        return view('statamic::forms.create', [
             'title' => t('creating_formset')
         ]);
     }
@@ -238,7 +238,7 @@ class FormsController extends CpController
 
         $form = Form::get($form);
 
-        return view('forms.edit', compact('form'));
+        return view('statamic::forms.edit', compact('form'));
     }
 
     public function update($form)
@@ -388,6 +388,6 @@ class FormsController extends CpController
 
         $this->sanitizeSubmission($submission);
 
-        return view('forms.submission', compact('form', 'submission'));
+        return view('statamic::forms.submission', compact('form', 'submission'));
     }
 }

@@ -1,4 +1,4 @@
-@extends('outside')
+@extends('statamic::outside')
 
 @section('title')
     <h1>{{ $title }}</h1>

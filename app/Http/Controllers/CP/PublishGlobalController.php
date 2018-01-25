@@ -35,7 +35,7 @@ class PublishGlobalController extends PublishController
 
         $data = $this->addBlankFields($global->fieldset(), $global->processedData());
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'             => $extra,
             'is_new'            => false,
             'content_data'      => $data,

@@ -8,7 +8,7 @@
             </li>
             @foreach ($nav->children() as $item)
                 <li class="section">{{ $item->title() }}</li>
-                @include('partials.nav-main-items', ['items' => $item->children()])
+                @include('statamic::partials.nav-main-items', ['items' => $item->children()])
             @endforeach
         </ul>
     </nav>

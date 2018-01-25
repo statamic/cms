@@ -26,7 +26,7 @@ class FieldsetController extends CpController
             'title' => 'Fieldsets'
         ];
 
-        return view('fieldsets.index', $data);
+        return view('statamic::fieldsets.index', $data);
     }
 
     public function get()
@@ -61,7 +61,7 @@ class FieldsetController extends CpController
 
         $title = 'Editing ' . $name . '.yaml';
 
-        return view('fieldsets.edit', compact('title', 'fieldset'));
+        return view('statamic::fieldsets.edit', compact('title', 'fieldset'));
     }
 
     /**
@@ -406,7 +406,7 @@ class FieldsetController extends CpController
 
     public function create()
     {
-        return view('fieldsets.create', [
+        return view('statamic::fieldsets.create', [
             'title' => 'Create fieldset'
         ]);
     }

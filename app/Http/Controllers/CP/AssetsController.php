@@ -49,7 +49,7 @@ class AssetsController extends CpController
 
         $title = translate('cp.browsing_assets');
 
-        return view('assets.browse', compact('title', 'container', 'folder'));
+        return view('statamic::assets.browse', compact('title', 'container', 'folder'));
     }
 
     /**

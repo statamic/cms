@@ -20,14 +20,14 @@ class GlobalsController extends CpController
             return redirect()->route('globals.edit', $globals->first()->slug());
         }
 
-        return view('globals.index', [
+        return view('statamic::globals.index', [
             'title' => t('cp.globals')
         ]);
     }
 
     public function manage()
     {
-        return view('globals.configure', [
+        return view('statamic::globals.configure', [
             'title' => t('cp.globals')
         ]);
     }
@@ -45,7 +45,7 @@ class GlobalsController extends CpController
 
     public function create()
     {
-        return view('globals.create', [
+        return view('statamic::globals.create', [
             'title' => translate('cp.create_global_set')
         ]);
     }
@@ -91,7 +91,7 @@ class GlobalsController extends CpController
     {
         $global = GlobalSet::whereHandle($global);
 
-        return view('globals.edit', compact('global'));
+        return view('statamic::globals.edit', compact('global'));
     }
 
     public function update($global)

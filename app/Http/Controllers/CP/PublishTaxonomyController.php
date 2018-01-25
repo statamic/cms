@@ -38,7 +38,7 @@ class PublishTaxonomyController extends PublishController
             'route' => $group->route()
         ];
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'             => $extra,
             'is_new'            => true,
             'content_data'      => $data,
@@ -90,7 +90,7 @@ class PublishTaxonomyController extends PublishController
         $data['title'] = $term->title();
         $data['slug'] = $term->slug();
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'             => $extra,
             'is_new'            => false,
             'content_data'      => $data,

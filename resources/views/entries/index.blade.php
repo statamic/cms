@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('statamic::layout')
 @section('content-class', 'publishing')
 
 @section('content')

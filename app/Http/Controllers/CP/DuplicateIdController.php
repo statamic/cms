@@ -13,7 +13,7 @@ class DuplicateIdController extends CpController
 {
     public function index(TheStache $stache)
     {
-        return view('resolve-duplicate-ids', [
+        return view('statamic::resolve-duplicate-ids', [
             'title' => t('duplicate_id_title'),
             'duplicates' => $stache->duplicates()
         ]);

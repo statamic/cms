@@ -1,4 +1,4 @@
-@extends('outside')
+@extends('statamic::outside')
 
 @section('content')
 

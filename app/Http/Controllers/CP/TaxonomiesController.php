@@ -29,14 +29,14 @@ class TaxonomiesController extends CpController
             return redirect()->route('terms.show', reset($groups)->path());
         }
 
-        return view('taxonomies.index', [
+        return view('statamic::taxonomies.index', [
             'title'   => 'Taxonomies'
         ]);
     }
 
     public function manage()
     {
-        return view('taxonomies.manage', [
+        return view('statamic::taxonomies.manage', [
             'title'   => 'Taxonomies'
         ]);
     }
@@ -65,7 +65,7 @@ class TaxonomiesController extends CpController
 
     public function create()
     {
-        return view('taxonomies.create', [
+        return view('statamic::taxonomies.create', [
             'title' => trans('cp.create_taxonomy'),
         ]);
     }
@@ -103,7 +103,7 @@ class TaxonomiesController extends CpController
     {
         $group = Taxonomy::whereHandle($group);
 
-        return view('taxonomies.edit', [
+        return view('statamic::taxonomies.edit', [
             'title' => 'Updating ' . $group->title(),
             'group' => $group
         ]);

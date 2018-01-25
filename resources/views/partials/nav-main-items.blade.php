@@ -17,7 +17,7 @@
 
         @if (! $item->children()->isEmpty())
             <ul>
-                @include('partials.nav-main-items', ['items' => $item->children()])
+                @include('statamic::partials.nav-main-items', ['items' => $item->children()])
             </ul>
         @endif
     </li>

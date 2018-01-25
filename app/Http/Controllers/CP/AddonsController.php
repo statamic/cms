@@ -11,7 +11,7 @@ class AddonsController extends CpController
 {
     public function index()
     {
-        return view('addons.index', [
+        return view('statamic::addons.index', [
             'title' => 'Addons'
         ]);
     }

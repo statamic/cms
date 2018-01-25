@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        @include('partials.head')
+        @include('statamic::partials.head')
     </head>
 
     <body id="statamic" class="outside">
@@ -14,7 +14,7 @@
 
                         @yield('title')
 
-                        @include('partials.flash')
+                        @include('statamic::partials.flash')
 
                         @yield('content')
 
@@ -24,8 +24,8 @@
         </div>
 
      </div>
-        <script>Statamic.translations = {!! $translations !!};</script>
-        @include('partials.scripts')
+        {{-- <script>Statamic.translations = {!! $translations !!};</script> --}}
+        @include('statamic::partials.scripts')
         @yield('scripts')
     </body>
 </html>

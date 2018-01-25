@@ -12,7 +12,7 @@ class UserGroupsController extends CpController
     {
         $this->access('super');
 
-        return view('usergroups.index', [
+        return view('statamic::usergroups.index', [
             'title' => 'Roles'
         ]);
     }
@@ -69,7 +69,7 @@ class UserGroupsController extends CpController
         $data = compact('group', 'roles', 'users');
         $data['title'] = 'Edit group';
 
-        return view('usergroups.edit', $data);
+        return view('statamic::usergroups.edit', $data);
     }
 
     public function update($group)
@@ -114,7 +114,7 @@ class UserGroupsController extends CpController
             'users' => []
         ];
 
-        return view('usergroups.create', $data);
+        return view('statamic::usergroups.create', $data);
     }
 
     public function store()

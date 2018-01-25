@@ -19,7 +19,7 @@ class UpdaterController extends CpController
         $response = $client->get('https://outpost.statamic.com/v2/changelog');
         $releases = json_decode($response->getBody());
 
-        return view('updater.index', [
+        return view('statamic::updater.index', [
             'title' => 'Updater',
             'releases' => $releases,
             'latest' => $releases[0]
@@ -36,7 +36,7 @@ class UpdaterController extends CpController
     {
         $this->access('updater:update');
 
-        return view('updater.update', [
+        return view('statamic::updater.update', [
             'title' => 'Update',
             'version' => $version,
         ]);

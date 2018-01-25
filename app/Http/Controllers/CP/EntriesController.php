@@ -55,7 +55,7 @@ class EntriesController extends CpController
 
         $reorderable = $collection->order() === 'number' && $collection->count() <= Config::get('cp.pagination_size');
 
-        return view('entries.index', [
+        return view('statamic::entries.index', [
             'collection' => $collection,
             'title' => $collection->title(),
             'sort' => $sort,

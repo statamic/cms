@@ -27,14 +27,14 @@ class CollectionsController extends CpController
             return redirect()->route('entries.show', reset($collections)->path());
         }
 
-        return view('collections.index', [
+        return view('statamic::collections.index', [
             'title'   => 'Collections'
         ]);
     }
 
     public function manage()
     {
-        return view('collections.manage', [
+        return view('statamic::collections.manage', [
             'title'   => 'Collections'
         ]);
     }
@@ -63,7 +63,7 @@ class CollectionsController extends CpController
 
     public function create()
     {
-        return view('collections.create', [
+        return view('statamic::collections.create', [
             'title' => 'Creating collection'
         ]);
     }
@@ -72,7 +72,7 @@ class CollectionsController extends CpController
     {
         $collection = Collection::whereHandle($collection);
 
-        return view('collections.edit', [
+        return view('statamic::collections.edit', [
             'title' => 'Editing collection',
             'collection' => $collection
         ]);

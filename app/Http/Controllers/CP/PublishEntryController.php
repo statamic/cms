@@ -43,7 +43,7 @@ class PublishEntryController extends PublishController
             'route'      => $collection->route()
         ];
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'             => $extra,
             'is_new'            => true,
             'content_data'      => $data,
@@ -104,7 +104,7 @@ class PublishEntryController extends PublishController
 
         $data = $this->addBlankFields($entry->fieldset(), $entry->processedData());
 
-        return view('publish', [
+        return view('statamic::publish', [
             'extra'              => $extra,
             'is_new'             => false,
             'content_data'       => $data,

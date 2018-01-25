@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('statamic::layout')
 
 @section('content')
 
@@ -10,7 +10,7 @@
             <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
         </div>
 
-        @include('roles.partials.form', [
+        @include('statamic::roles.partials.form', [
             'role_title' => $role->title(),
             'role_slug' => $role->slug()
         ])
