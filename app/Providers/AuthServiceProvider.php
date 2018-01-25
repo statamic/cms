@@ -5,21 +5,12 @@ namespace Statamic\Providers;
 use Statamic\Config\Roles;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Permissions\Permissions;
+use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\FileUserProvider;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * The policy mappings for the application.
-     *
-     * @var array
-     */
-    protected $policies = [
-        'App\Model' => 'App\Policies\ModelPolicy',
-    ];
-
     public function register()
     {
         $this->app->singleton('permissions', function () {
@@ -40,8 +31,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(GateContract $gate, Permissions $permissions)
     {
-        $this->registerPolicies();
-
         Auth::provider('file', function () {
             return new FileUserProvider;
         });
