@@ -360,6 +360,6 @@ class Helper
      */
     public function makeUuid()
     {
-        return (string) \Uuid::generate(4);
+        return (string) \Webpatser\Uuid\Uuid::generate(4);
     }
 }
