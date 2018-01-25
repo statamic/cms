@@ -14,4 +14,5 @@ Route::group(['prefix' => Config::get('assets.image_manipulation.route')], funct
  * Front-end
  * All front-end website requests go through a single controller method.
  */
-Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('site')->middleware(['staticcache']);
+Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('site')
+     ->middleware(\Statamic\StaticCaching\Middleware\Cache::class);
