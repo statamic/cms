@@ -6,7 +6,6 @@
         "php": ">=7.0.0",
         "danielstjules/stringy": "dev-master",
         "fideloper/proxy": "~4.0",
-        "funkjedi/composer-include-files": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*",
         "laravelcollective/html": "5.6.*",
@@ -28,7 +27,10 @@
         "psr-4": {
             "Statamic\\": "app/",
             "Statamic\\Addons\\": "bundles/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -43,9 +45,6 @@
         "optimize-autoloader": true
     },
     "extra": {
-        "include_files": [
-            "app/helpers.php"
-        ]
     },
     "repositories": [
         {
