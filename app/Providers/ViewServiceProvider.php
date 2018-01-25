@@ -27,12 +27,6 @@ class ViewServiceProvider extends LaravelViewServiceProvider
         $this->app->singleton(Store::class);
     }
 
-    public function boot()
-    {
-        tap($this->app['view'])
-            ->composer('partials.scripts', \Statamic\Http\ViewComposers\FieldtypeJsComposer::class);
-    }
-
     /**
      * Create a new Factory Instance.
      *
