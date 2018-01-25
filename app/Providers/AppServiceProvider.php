@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PersistStache::class);
 
+        $this->app->booted(function () {
+            $this->loadRoutesFrom(__DIR__.'/../../routes/routes.php');
+        });
+
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'statamic');
     }
 
