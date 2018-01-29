@@ -9,6 +9,7 @@ use Illuminate\Console\Application as Artisan;
 class ConsoleServiceProvider extends ServiceProvider
 {
     protected $commands = [
+        Commands\InstallCommand::class,
         Commands\DiscoverAddonPackages::class,
     ];
 
