@@ -98,7 +98,9 @@ class Traverser
      */
     private function setAllFiles()
     {
-        $files = $this->filesystem->getFiles($this->driver->getFilesystemRoot(), $this->driver->traverseRecursively());
+        $files = $this->filesystem->exists($root = $this->driver->getFilesystemRoot())
+            ? $this->filesystem->getFiles($root, $this->driver->traverseRecursively())
+            : [];
 
         $this->files = collect($files)->map(function ($path) {
             return [
