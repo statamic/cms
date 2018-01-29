@@ -44,6 +44,11 @@
         "optimize-autoloader": true
     },
     "extra": {
+        "laravel": {
+            "providers": [
+                "Statamic\\Providers\\StatamicServiceProvider"
+            ]
+        }
     },
     "repositories": [
         {
