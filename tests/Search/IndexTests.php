@@ -10,6 +10,8 @@ trait IndexTests
     /** @test */
     public function search_event_gets_emitted()
     {
+        $this->markTestSkipped();
+
         Event::fake();
 
         $this->beforeSearched();
