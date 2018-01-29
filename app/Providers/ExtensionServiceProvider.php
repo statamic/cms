@@ -152,7 +152,11 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerAppTags()
     {
-        foreach ($this->app['files']->files(app_path('Tags')) as $file) {
+        if (! $this->app['files']->exists($tagsPath = app_path('Tags'))) {
+            return;
+        }
+
+        foreach ($this->app['files']->files($tagsPath) as $file) {
             $tag = snake_case($class = $file->getBasename('.php'));
             $this->app['statamic.tags'][$tag] = "App\\Tags\\{$class}";
         }
@@ -201,7 +205,11 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerAppModifiers()
     {
-        foreach ($this->app['files']->files(app_path('Modifiers')) as $file) {
+        if (! $this->app['files']->exists($modifiersPath = app_path('Modifiers'))) {
+            return;
+        }
+
+        foreach ($this->app['files']->files($modifiersPath) as $file) {
             $modifier = snake_case($class = $file->getBasename('.php'));
             $this->app['statamic.modifiers'][$modifier] = "App\\Modifiers\\{$class}";
         }
