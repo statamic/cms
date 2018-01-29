@@ -9,6 +9,8 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private $root = __DIR__.'/../..';
+
     public function boot()
     {
         // We have our own extension of Laravel's file-based cache driver.
@@ -23,13 +25,13 @@ class AppServiceProvider extends ServiceProvider
              ->pushMiddleware(\Statamic\Http\Middleware\PersistStache::class);
 
         $this->app->booted(function () {
-            $this->loadRoutesFrom(__DIR__.'/../../routes/routes.php');
+            $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
 
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'statamic');
+        $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
         $this->publishes([
-            __DIR__.'/../../resources/dist' => public_path('resources/cp')
+            "{$this->root}/resources/dist" => public_path('resources/cp')
         ], 'statamic');
     }
 
