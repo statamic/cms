@@ -23,6 +23,16 @@ class FlysystemAdapter extends AbstractAdapter
         return $path;
     }
 
+    public function exists($path = null)
+    {
+        // Flysystem wouldn't have let us get this far if the root directory didn't already exist.
+        if ($path === '/' || $path === null) {
+            return true;
+        }
+
+        return parent::exists($path);
+    }
+
     public function getFiles($path, $recursive = false)
     {
         if (! $this->exists($path)) {
