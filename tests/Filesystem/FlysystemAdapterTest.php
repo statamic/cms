@@ -9,7 +9,7 @@ use Statamic\Filesystem\FilesystemAdapter;
 use League\Flysystem\Filesystem as Flysystem;
 use Illuminate\Filesystem\FilesystemAdapter as IlluminateFilesystemAdapter;
 
-class FlysystemAdapterTest extends \PHPUnit\Framework\TestCase
+class FlysystemAdapterTest extends TestCase
 {
     use FilesystemAdapterTests;
 
