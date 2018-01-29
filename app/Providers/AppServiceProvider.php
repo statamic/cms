@@ -30,6 +30,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
+        collect(['assets', 'cp', 'routes', 'system', 'theming', 'users'])->each(function ($config) {
+            $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
+            $this->publishes(["{$this->root}/config/$config.php" => config_path("statamic/$config.php")], 'statamic');
+        });
+
         $this->publishes([
             "{$this->root}/resources/dist" => public_path('resources/cp')
         ], 'statamic');
