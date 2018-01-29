@@ -44,6 +44,10 @@ abstract class ServiceProvider extends LaravelServiceProvider
      */
     public function registerRoutes($path)
     {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
         $routes = require $path;
 
         if ($web = array_get($routes, 'web')) {
@@ -67,6 +71,10 @@ abstract class ServiceProvider extends LaravelServiceProvider
      */
     public function registerWebRoutes($routes)
     {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
         $this->registerRouteGroup($routes);
     }
 
@@ -78,6 +86,10 @@ abstract class ServiceProvider extends LaravelServiceProvider
      */
     public function registerCpRoutes($routes)
     {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
         $this->registerRouteGroup($routes, [
             'prefix' => config('statamic.cp.route') . '/' . $this->getAddon()->slug(),
         ]);
@@ -91,6 +103,10 @@ abstract class ServiceProvider extends LaravelServiceProvider
      */
     public function registerActionRoutes($routes)
     {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
         $this->registerRouteGroup($routes, [
             'prefix' => config('statamic.routes.action') . '/' . $this->getAddon()->slug()
         ]);
@@ -161,5 +177,10 @@ abstract class ServiceProvider extends LaravelServiceProvider
     public function registerFieldtype(string $fieldtype, string $class)
     {
         $this->app['statamic.fieldtypes'][$fieldtype] = $class;
+    }
+
+    private function addonDiscovered()
+    {
+        return $this->getAddon() !== null;
     }
 }
