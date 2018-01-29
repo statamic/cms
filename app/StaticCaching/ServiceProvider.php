@@ -46,7 +46,7 @@ class ServiceProvider extends LaravelServiceProvider
 
     private function getStaticCachingConfig()
     {
-        $config = config('cache.static_caching');
+        $config = config('statamic.static_caching');
 
         $config['base_url'] = $this->app['request']->root();
         $config['locale'] = site_locale();
