@@ -88,7 +88,7 @@ class FormsController extends CpController
 
         // Set up the paginator, since we don't want to display all the entries.
         $totalSubmissionCount = $submissions->count();
-        $perPage = Config::get('cp.pagination_size');
+        $perPage = Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $submissions = $submissions->slice($offset, $perPage);

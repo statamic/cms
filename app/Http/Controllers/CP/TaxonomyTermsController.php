@@ -81,7 +81,7 @@ class TaxonomyTermsController extends CpController
 
         // Set up the paginator, since we don't want to display all the assets.
         $totalTermCount = $terms->count();
-        $perPage = Config::get('cp.pagination_size');
+        $perPage = Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $terms = $terms->slice($offset, $perPage);

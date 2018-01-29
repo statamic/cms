@@ -31,7 +31,7 @@ class CollectionWidget extends Widget
 
         $title = $this->get('title', $collection->title());
 
-        $format = $this->get('date_format', Config::get('cp.date_format'));
+        $format = $this->get('date_format', Config::get('statamic.cp.date_format'));
 
         $button = array_get(
                 $collection->fieldset()->contents(),

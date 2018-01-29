@@ -19,7 +19,7 @@ trait PartialTests
     /** @test */
     function gets_partials_from_partials_subdirectory()
     {
-        config(['theming.dedicated_view_directories' => true]);
+        config(['statamic.theming.dedicated_view_directories' => true]);
         File::shouldReceive('get')->with(resource_path('partials/mypartial.html'))->andReturn('the partial content');
 
         $this->assertEquals('the partial content', $this->partialTag('mypartial'));

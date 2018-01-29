@@ -13,7 +13,7 @@ class Application extends Laravel
      */
     public function toEleven()
     {
-        if (! $memoryLimit = config('system.php_max_memory_limit')) {
+        if (! $memoryLimit = config('statamic.system.php_max_memory_limit')) {
             $memoryLimit = -1;
         }
 

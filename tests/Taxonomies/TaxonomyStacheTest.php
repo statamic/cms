@@ -107,7 +107,7 @@ class TaxonomyStacheTest extends TestCase
 
     public function test_that_term_uris_get_registered()
     {
-        Config::set('routes.taxonomies.tags', '/tags/{slug}');
+        Config::set('statamic.routes.taxonomies.tags', '/tags/{slug}');
 
         $this->stache->addUris('tags', 'foo');
 
@@ -130,11 +130,11 @@ class TaxonomyStacheTest extends TestCase
 
     private function registerLocalizedTerms()
     {
-        Config::set('system.locales', [
+        Config::set('statamic.system.locales', [
             'en' => [], 'fr' => [], 'de' => []
         ]);
 
-        Config::set('routes.taxonomies.tags', [
+        Config::set('statamic.routes.taxonomies.tags', [
             'en' => '/tags/{slug}/{field}',
             'fr' => '/fr-tags/{slug}/{field}',
             'de' => '/de-tags/{slug}/{field}'
@@ -168,7 +168,7 @@ class TaxonomyStacheTest extends TestCase
 
     public function test_that_syncing_terms_updates_uris_and_titles()
     {
-        Config::set('routes.taxonomies.tags', '/tags/{slug}');
+        Config::set('statamic.routes.taxonomies.tags', '/tags/{slug}');
 
         $this->stache->associateDataWithTerm('tags', 'bar', 'entry1');
         $this->stache->associateDataWithTerm('tags', 'baz', 'entry1');
@@ -190,7 +190,7 @@ class TaxonomyStacheTest extends TestCase
 
     public function test_that_removing_data_removes_associations_uris_and_titles_where_necessary()
     {
-        Config::set('routes.taxonomies.tags', '/tags/{slug}');
+        Config::set('statamic.routes.taxonomies.tags', '/tags/{slug}');
 
         $this->stache->associateDataWithTerm('tags', 'foo', 1);
         $this->stache->associateDataWithTerm('tags', 'bar', 1);

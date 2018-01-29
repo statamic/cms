@@ -1036,8 +1036,8 @@ class Parser
 
         // This is important, it's pretty unclear by the documentation
         // what the default value is on <= 5.3.6
-        if (Config::get('system.parser_backtrack_limit')) {
             ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
+        if (Config::get('statamic.system.parser_backtrack_limit')) {
         }
     }
 

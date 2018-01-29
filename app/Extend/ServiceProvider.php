@@ -79,7 +79,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     public function registerCpRoutes($routes)
     {
         $this->registerRouteGroup($routes, [
-            'prefix' => config('cp.route') . '/' . $this->getAddon()->slug(),
+            'prefix' => config('statamic.cp.route') . '/' . $this->getAddon()->slug(),
         ]);
     }
 
@@ -92,7 +92,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     public function registerActionRoutes($routes)
     {
         $this->registerRouteGroup($routes, [
-            'prefix' => config('routes.action') . '/' . $this->getAddon()->slug()
+            'prefix' => config('statamic.routes.action') . '/' . $this->getAddon()->slug()
         ]);
     }
 

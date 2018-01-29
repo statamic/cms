@@ -37,16 +37,16 @@ class GlideServiceProvider extends ServiceProvider
         $this->app->singleton(Server::class, function () {
             $presets = Config::getImageManipulationPresets();
 
-            if (config('cp.enabled')) {
+            if (config('statamic.cp.enabled')) {
                 $presets = array_merge($presets, Image::getCpImageManipulationPresets());
             }
 
             return ServerFactory::create([
                 'source'   => base_path(), // this gets overriden on the fly by the image generator
                 'cache'    => storage_path('glide'),
-                'base_url' => Config::get('assets.image_manipulation.route', 'img'),
+                'base_url' => Config::get('statamic.assets.image_manipulation.route', 'img'),
                 'response' => new LaravelResponseFactory(app('request')),
-                'driver'   => Config::get('assets.image_manipulation.driver'),
+                'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
                 'cache_with_file_extensions' => true,
                 'presets' => $presets,
             ]);
@@ -62,16 +62,16 @@ class GlideServiceProvider extends ServiceProvider
 
     private function getBuilder()
     {
-        $route = Config::get('assets.image_manipulation.route');
+        $route = Config::get('statamic.assets.image_manipulation.route');
 
-        if (Config::get('assets.image_manipulation.cached')) {
+        if (Config::get('statamic.assets.image_manipulation.cached')) {
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
                 'route' => URL::prependSiteUrl($route)
             ]);
         }
 
         return new GlideUrlBuilder([
-            'key' => (Config::get('assets.image_manipulation.secure')) ? Config::getAppKey() : null,
+            'key' => (Config::get('statamic.assets.image_manipulation.secure')) ? Config::getAppKey() : null,
             'route' => $route
         ]);
     }

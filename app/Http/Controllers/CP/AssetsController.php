@@ -74,7 +74,7 @@ class AssetsController extends CpController
 
         // Set up the paginator, since we don't want to display all the assets.
         $totalAssetCount = $assets->count();
-        $perPage = Config::get('cp.pagination_size');
+        $perPage = Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $assets = $assets->slice($offset, $perPage);
@@ -139,7 +139,7 @@ class AssetsController extends CpController
 
             // Set some values for better listing formatting.
             $asset->set('size_formatted', Str::fileSizeForHumans($asset->size(), 0));
-            $asset->set('last_modified_formatted', $asset->lastModified()->format(Config::get('cp.date_format')));
+            $asset->set('last_modified_formatted', $asset->lastModified()->format(Config::get('statamic.cp.date_format')));
         }
 
         return $assets;

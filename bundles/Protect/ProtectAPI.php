@@ -18,7 +18,7 @@ class ProtectAPI extends API
 
         // Get the global protection configuration. This will be used for both site
         // wide protection, and merging into page specific protection schemas.
-        $config = Config::get('system.protect', []);
+        $config = Config::get('statamic.system.protect', []);
 
         // If a type has been specified in the config, then it should be site-wide.
         if ($type = array_get($config, 'type')) {

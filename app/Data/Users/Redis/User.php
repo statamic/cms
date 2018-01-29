@@ -37,7 +37,7 @@ class User extends FileUser
      */
     protected function shouldWriteFile()
     {
-        return Config::get('users.redis_write_file');
+        return Config::get('statamic.users.redis_write_file');
     }
 
     /**

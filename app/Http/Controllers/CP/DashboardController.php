@@ -26,7 +26,7 @@ class DashboardController extends CpController
 
     private function getWidgets($loader)
     {
-        return collect(Config::get('cp.widgets', []))->map(function ($config) use ($loader) {
+        return collect(Config::get('statamic.cp.widgets', []))->map(function ($config) use ($loader) {
             $widget = $loader->load(array_get($config, 'type'), $config);
 
             return [

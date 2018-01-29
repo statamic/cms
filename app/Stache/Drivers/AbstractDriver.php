@@ -200,7 +200,7 @@ abstract class AbstractDriver implements Driver
      */
     public function ensureUniqueId($item)
     {
-        if (! Config::get('system.ensure_unique_ids')) {
+        if (! Config::get('statamic.system.ensure_unique_ids')) {
             return;
         }
 

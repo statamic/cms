@@ -59,7 +59,7 @@ class Config
      */
     public function getAppKey()
     {
-        return self::get('system.app_key');
+        return self::get('statamic.system.app_key');
     }
 
     /**
@@ -69,7 +69,7 @@ class Config
      */
     public function getLicenseKey()
     {
-        $key = self::get('system.license_key');
+        $key = self::get('statamic.system.license_key');
 
         if (! $key || $key == '') {
             return null;
@@ -90,7 +90,7 @@ class Config
             $locale = site_locale();
         }
 
-        return self::get('system.locales.' . $locale . '.full', 'en_US');
+        return self::get('statamic.system.locales.' . $locale . '.full', 'en_US');
     }
 
     /**
@@ -118,7 +118,7 @@ class Config
             $locale = site_locale();
         }
 
-        return self::get('system.locales.' . $locale . '.name', 'English');
+        return self::get('statamic.system.locales.' . $locale . '.name', 'English');
     }
 
     /**
@@ -128,7 +128,7 @@ class Config
      */
     public function getLocales()
     {
-        return array_keys(self::get('system.locales'));
+        return array_keys(self::get('statamic.system.locales'));
     }
 
     /**
@@ -142,7 +142,7 @@ class Config
             return 'en';
         }
 
-        $locales = self::get('system.locales');
+        $locales = self::get('statamic.system.locales');
 
         return key($locales);
     }
@@ -159,7 +159,7 @@ class Config
             $locale = site_locale();
         }
 
-        $locales = array_keys(self::get('system.locales'));
+        $locales = array_keys(self::get('statamic.system.locales'));
 
         return array_values(array_diff($locales, [$locale]));
     }
@@ -172,7 +172,7 @@ class Config
      */
     public function getSiteUrl($locale = null)
     {
-        $locales = self::get('system.locales');
+        $locales = self::get('statamic.system.locales');
 
         $locale = $locale ?: site_locale();
 
@@ -186,7 +186,7 @@ class Config
      */
     public function getRoutes()
     {
-        return self::get('routes');
+        return self::get('statamic.routes');
     }
 
     /**
@@ -196,6 +196,6 @@ class Config
      */
     public function getImageManipulationPresets()
     {
-        return config('assets.image_manipulation.presets', []);
+        return config('statamic.assets.image_manipulation.presets', []);
     }
 }

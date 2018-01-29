@@ -50,7 +50,7 @@ class PageTest extends TestCase
 
     public function testGetsLayout()
     {
-        $this->assertEquals(config('theming.views.layout'), $this->page->layout());
+        $this->assertEquals(config('statamic.theming.views.layout'), $this->page->layout());
 
         $this->page->set('layout', 'my-layout');
 

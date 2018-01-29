@@ -180,7 +180,7 @@ class StacheServiceProvider extends ServiceProvider
         }
 
         // Is this a Glide route? We don't want to update for those.
-        $glide_route = ltrim(Str::ensureRight(Config::get('assets.image_manipulation.route'), '/'), '/');
+        $glide_route = ltrim(Str::ensureRight(Config::get('statamic.assets.image_manipulation.route'), '/'), '/');
         if (Str::startsWith($this->request->path(), $glide_route)) {
             return false;
         }
@@ -233,6 +233,6 @@ class StacheServiceProvider extends ServiceProvider
             File::delete($lock);
         }
 
-        Config::set('system.ensure_unique_ids', false);
+        Config::set('statamic.system.ensure_unique_ids', false);
     }
 }

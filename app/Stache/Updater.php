@@ -222,7 +222,7 @@ class Updater
 
             if (! $id = array_get($data, 'id')) {
                 throw new \Exception(
-                    "The localized item located at [$path] is missing an `id` 
+                    "The localized item located at [$path] is missing an `id`
                     value which should match the ID from the default locale."
                 );
             }
@@ -496,7 +496,7 @@ class Updater
         foreach ($this->repo->repos() as $repo) {
             // Get the routes. If there's no route defined, we're done here.
             $section = ($this->driver->key() === 'entries') ? 'collections' : 'taxonomies';
-            if (! $routes = Config::get("routes.{$section}.{$repo->key()}")) {
+            if (! $routes = Config::get("statamic.routes.{$section}.{$repo->key()}")) {
                 continue;
             }
 

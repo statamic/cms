@@ -71,7 +71,7 @@ class UsersController extends CpController
 
         // Set up the paginator, since we don't want to display all the users.
         $totalUserCount = $users->count();
-        $perPage = Config::get('cp.pagination_size');
+        $perPage = Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $users = $users->slice($offset, $perPage);
@@ -142,7 +142,7 @@ class UsersController extends CpController
 
         $data = $this->populateWithBlanks($this->user);
 
-        if (Config::get('users.login_type') === 'email') {
+        if (Config::get('statamic.users.login_type') === 'email') {
             $data['email'] = $this->user->email();
         } else {
             $data['username'] = $this->user->username();

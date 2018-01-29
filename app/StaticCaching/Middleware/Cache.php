@@ -39,7 +39,7 @@ class Cache
      */
     public function terminate($request, $response)
     {
-        if (! Config::get('caching.static_caching_enabled')) {
+        if (! Config::get('statamic.caching.static_caching_enabled')) {
             return;
         }
 

@@ -65,7 +65,7 @@ class EntryFactory extends ContentFactory implements EntryFactoryContract
         if ($this->path) {
             $entry->dataType(pathinfo($this->path)['extension']);
         } else {
-            $entry->dataType(Config::get('system.default_extension'));
+            $entry->dataType(Config::get('statamic.system.default_extension'));
         }
 
         $entry = $this->identify($entry);

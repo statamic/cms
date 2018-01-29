@@ -1,7 +1,7 @@
 <?php
 
 Route::middleware('web')
-    ->prefix(config('cp.route', 'cp'))
+    ->prefix(config('statamic.cp.route', 'cp'))
     ->namespace('Statamic\Http\Controllers\CP')
     ->group(__DIR__.'/cp.php');
 

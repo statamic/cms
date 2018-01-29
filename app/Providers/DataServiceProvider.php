@@ -95,7 +95,7 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(\Statamic\Contracts\Data\Users\User::class, function () {
-            $driver = Config::get('users.driver');
+            $driver = Config::get('statamic.users.driver');
 
             if ($driver === 'eloquent') {
                 $class = \Statamic\Data\Users\Eloquent\User::class;
@@ -124,7 +124,7 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(\Statamic\Contracts\Permissions\UserGroup::class, function () {
-            $driver = Config::get('users.driver');
+            $driver = Config::get('statamic.users.driver');
 
             if ($driver === 'eloquent') {
                 $class = \Statamic\Permissions\Eloquent\UserGroup::class;
@@ -138,7 +138,7 @@ class DataServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(\Statamic\Contracts\Permissions\UserGroupFactory::class, function () {
-            if (Config::get('users.driver') === 'redis') {
+            if (Config::get('statamic.users.driver') === 'redis') {
                 $class = \Statamic\Permissions\Redis\UserGroupFactory::class;
             } else {
                 $class = \Statamic\Permissions\File\UserGroupFactory::class;
@@ -168,7 +168,7 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(\Statamic\Contracts\Data\Services\UsersService::class, function () {
-            $class = (Config::get('users.driver') === 'eloquent')
+            $class = (Config::get('statamic.users.driver') === 'eloquent')
                 ? \Statamic\Data\Services\Eloquent\UsersService::class
                 : \Statamic\Data\Services\UsersService::class;
 

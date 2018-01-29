@@ -290,7 +290,7 @@ trait Extensible
     public function eventUrl($url, $relative = true)
     {
         $url = URL::tidy(
-            URL::prependSiteUrl(config('routes.action') . '/' . $this->getAddon()->slug() . '/' . $url)
+            URL::prependSiteUrl(config('statamic.routes.action', '!') . '/' . $this->getAddon()->slug() . '/' . $url)
         );
 
         if ($relative) {

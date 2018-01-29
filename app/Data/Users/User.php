@@ -54,7 +54,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function email($email = null)
     {
-        $login = Config::get('users.login_type');
+        $login = Config::get('statamic.users.login_type');
 
         if (is_null($email)) {
             return ($login === 'email')
@@ -102,7 +102,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
             throw new \Exception('You cant set the path of a file.');
         }
 
-        if (Config::get('users.login_type') === 'email') {
+        if (Config::get('statamic.users.login_type') === 'email') {
             if (! $path = $this->email()) {
                 throw new \Exception('Cannot get the path of a user without an email.');
             }
@@ -165,7 +165,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
     protected function toSavableArray()
     {
         return tap($this->data(), function (&$data) {
-            if (Config::get('users.login_type') === 'email') {
+            if (Config::get('statamic.users.login_type') === 'email') {
                 unset($data['email']);
             }
 
@@ -339,7 +339,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function getAvatar($size = 64)
     {
-        return Config::get('users.enable_gravatar') ? gravatar($this->email(), $size) : 'INSERT FALLBACK';
+        return Config::get('statamic.users.enable_gravatar') ? gravatar($this->email(), $size) : 'INSERT FALLBACK';
     }
 
     /**
@@ -475,7 +475,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
     public function originalPath()
     {
         if (! $path = $this->original['attributes']['username']) {
-            if (Config::get('users.login_type') === 'email') {
+            if (Config::get('statamic.users.login_type') === 'email') {
                 throw new \Exception('Cannot get the path of a user without an email.');
             } else {
                 throw new \Exception('Cannot get the path of a user without a username.');

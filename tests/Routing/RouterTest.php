@@ -61,6 +61,8 @@ class RouterTest extends TestCase
     /** @test */
     public function standardizes_routes()
     {
+        config(['statamic.system.locales.en.url' => '/']);
+
         $router = new Router;
 
         $routes = [

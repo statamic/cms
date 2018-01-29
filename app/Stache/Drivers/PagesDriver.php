@@ -75,7 +75,7 @@ class PagesDriver extends AbstractDriver
         // More than 2 slashes in the path means it's nested inside a parent folder.
         // We'll look up the parent's URL which should already be in the Stache.
         if (substr_count($path, '/') > 2) {
-            $parent_path = Path::popLastSegment(Path::popLastSegment($path)) . '/index.' . Config::get('system.default_extension');
+            $parent_path = Path::popLastSegment(Path::popLastSegment($path)) . '/index.' . Config::get('statamic.system.default_extension');
             $repo = $this->stache->repo('pages');
             $parent = $repo->getItem($repo->getIdByPath($parent_path));
             $uri = $parent->in($locale)->uri();

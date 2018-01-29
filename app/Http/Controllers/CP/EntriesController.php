@@ -53,7 +53,7 @@ class EntriesController extends CpController
             $sort_order = $collection->get('sort_dir', 'asc');
         }
 
-        $reorderable = $collection->order() === 'number' && $collection->count() <= Config::get('cp.pagination_size');
+        $reorderable = $collection->order() === 'number' && $collection->count() <= Config::get('statamic.cp.pagination_size');
 
         return view('statamic::entries.index', [
             'collection' => $collection,
@@ -107,7 +107,7 @@ class EntriesController extends CpController
             // Add a formatted date to each entry that will be used as the the displayed value.
             // We name this date_col_header to make it clearer in the translation files what
             // you are actually translating. The field names end up as the header string.
-            $format = Config::get('cp.date_format');
+            $format = Config::get('statamic.cp.date_format');
             $entries->supplement('date_col_header', function ($entry) use ($format) {
                 return $entry->date()->format($format);
             });
@@ -143,7 +143,7 @@ class EntriesController extends CpController
 
         // Set up the paginator, since we don't want to display all the entries.
         $totalEntryCount = $entries->count();
-        $perPage = Config::get('cp.pagination_size');
+        $perPage = Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $entries = $entries->slice($offset, $perPage);

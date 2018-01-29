@@ -128,7 +128,7 @@ class LicensingController extends CpController
 
     private function setStatamicLicenseKey($key)
     {
-        Config::set('system.license_key', $key);
+        Config::set('statamic.system.license_key', $key);
         Config::save();
     }
 

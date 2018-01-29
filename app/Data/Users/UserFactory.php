@@ -48,7 +48,7 @@ class UserFactory implements UserFactoryContract
      */
     public function email($email)
     {
-        if (Config::get('users.login_type') === 'email') {
+        if (Config::get('statamic.users.login_type') === 'email') {
             $this->username = $email;
         } else {
             $this->email = $email;
@@ -66,7 +66,7 @@ class UserFactory implements UserFactoryContract
         $user->data($this->data);
         $user->username($this->username);
 
-        if (Config::get('users.login_type') === 'username') {
+        if (Config::get('statamic.users.login_type') === 'username') {
             $user->email($this->email);
         }
 

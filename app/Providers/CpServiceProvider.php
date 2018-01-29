@@ -8,7 +8,7 @@ class CpServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if (! config('cp.enabled')) {
+        if (! config('statamic.cp.enabled')) {
             return;
         }
 
@@ -21,7 +21,7 @@ class CpServiceProvider extends ServiceProvider
 
     public function register()
     {
-        if (! config('cp.enabled')) {
+        if (! config('statamic.cp.enabled')) {
             return;
         }
 

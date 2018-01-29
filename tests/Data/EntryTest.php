@@ -45,24 +45,24 @@ class EntryTest extends TestCase
     {
         $this->expectException('Statamic\Exceptions\InvalidEntryTypeException');
 
-        Config::set('routes.collections.blog', '/blog/{year}/{slug}');
+        Config::set('statamic.routes.collections.blog', '/blog/{year}/{slug}');
 
         $this->entry->url();
     }
 
     public function testGetsUrl()
     {
-        Config::set('system.locales', [
+        Config::set('statamic.system.locales', [
             'en' => ['name' => 'English', 'url' => 'http://talons-beard.dev/']
         ]);
 
-        Config::set('routes.collections.blog', '/blog/{slug}');
+        Config::set('statamic.routes.collections.blog', '/blog/{slug}');
 
         $this->entry->order('2015-02-01');
 
         $this->assertEquals('/blog/post', $this->entry->url());
 
-        Config::set('routes.collections.blog', '/blog/{year}/{month}/{day}/{slug}');
+        Config::set('statamic.routes.collections.blog', '/blog/{year}/{month}/{day}/{slug}');
 
         $this->assertEquals('/blog/2015/02/01/post', $this->entry->url());
         $this->assertEquals('http://talons-beard.dev/blog/2015/02/01/post', $this->entry->absoluteUrl());
@@ -126,7 +126,7 @@ class EntryTest extends TestCase
 
     public function testGetsLayout()
     {
-        $this->assertEquals(config('theming.views.layout'), $this->entry->layout());
+        $this->assertEquals(config('statamic.theming.views.layout'), $this->entry->layout());
 
         $this->entry->set('layout', 'my-layout');
 

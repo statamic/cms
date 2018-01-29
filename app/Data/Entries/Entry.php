@@ -245,8 +245,8 @@ class Entry extends Content implements EntryContract
         if (is_null($template)) {
             return [
                 $this->getWithCascade('template'), // gets `template` from the entry, and falls back to what's in folder.yaml
-                config('theming.views.entry'),
-                config('theming.views.default')
+                config('statamic.theming.views.entry'),
+                config('statamic.theming.views.default')
             ];
         }
 
@@ -268,7 +268,7 @@ class Entry extends Content implements EntryContract
             }
 
             // Lastly, return a default
-            return config('theming.views.layout');
+            return config('statamic.theming.views.layout');
         }
 
         $this->set('layout', $layout);
@@ -301,14 +301,14 @@ class Entry extends Content implements EntryContract
         }
 
         // Then the default content fieldset
-        $fieldset = config('theming.fieldsets.' . $this->contentType());
+        $fieldset = config('statamic.theming.fieldsets.' . $this->contentType());
         $path = settings_path('fieldsets/'.$fieldset.'.yaml');
         if (File::exists($path)) {
             return Fieldset::get($fieldset);
         }
 
         // Finally the default fieldset
-        return Fieldset::get(config('theming.fieldsets.default'));
+        return Fieldset::get(config('statamic.theming.fieldsets.default'));
     }
 
     /**

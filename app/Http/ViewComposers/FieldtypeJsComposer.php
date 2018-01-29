@@ -45,7 +45,7 @@ class FieldtypeJsComposer
     {
         $str = '<script>Statamic.redactorSettings = ';
 
-        $configs = collect(Config::get('system.redactor', []))->keyBy('name')->map(function ($config) {
+        $configs = collect(Config::get('statamic.system.redactor', []))->keyBy('name')->map(function ($config) {
             return $config['settings'];
         })->all();
 

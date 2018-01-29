@@ -168,7 +168,7 @@ class Form implements FormContract
      */
     public function dateFormat()
     {
-        return $this->formset()->get('date_format', Config::get('cp.date_format'));
+        return $this->formset()->get('date_format', Config::get('statamic.cp.date_format'));
     }
 
     /**

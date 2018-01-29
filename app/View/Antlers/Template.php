@@ -29,7 +29,7 @@ class Template
 
         $data = array_merge($context, $variables);
 
-        return $parser->parse($str, $data, ['Statamic\View\Antlers\Engine', 'renderTag'], Config::get('theming.allow_php'));
+        return $parser->parse($str, $data, ['Statamic\View\Antlers\Engine', 'renderTag'], Config::get('statamic.theming.allow_php'));
     }
 
     /**

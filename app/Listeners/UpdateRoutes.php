@@ -21,18 +21,18 @@ class UpdateRoutes
 
     public function removeCollectionRoutes(CollectionDeleted $event)
     {
-        $routes = collect(Config::get('routes.collections'))->except($event->collection)->all();
+        $routes = collect(Config::get('statamic.routes.collections'))->except($event->collection)->all();
 
-        Config::set('routes.collections', $routes);
+        Config::set('statamic.routes.collections', $routes);
 
         Config::save();
     }
 
     public function removeTaxonomyRoutes(TaxonomyDeleted $event)
     {
-        $routes = collect(Config::get('routes.taxonomies'))->except($event->taxonomy)->all();
+        $routes = collect(Config::get('statamic.routes.taxonomies'))->except($event->taxonomy)->all();
 
-        Config::set('routes.taxonomies', $routes);
+        Config::set('statamic.routes.taxonomies', $routes);
 
         Config::save();
     }

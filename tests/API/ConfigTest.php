@@ -13,11 +13,13 @@ class ConfigTest extends TestCase
         $config->set([
             'foo' => 'bar',
             'myscope' => ['baz' => 'qux'],
-            'system' => [
-                'locales' => [
-                    'en' => ['name' => 'English'],
-                    'fr' => ['name' => 'French'],
-                    'de' => ['name' => 'German']
+            'statamic' => [
+                'system' => [
+                    'locales' => [
+                        'en' => ['name' => 'English'],
+                        'fr' => ['name' => 'French'],
+                        'de' => ['name' => 'German']
+                    ]
                 ]
             ]
         ]);

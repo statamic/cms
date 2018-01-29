@@ -16,7 +16,7 @@ class PartialTags extends Tags
         // an argument, but fall back to the studly version just in case.
         $src = $this->get('src', array_get($arguments, 0, $this->tag_method));
 
-        $partialPath = config('theming.dedicated_view_directories')
+        $partialPath = config('statamic.theming.dedicated_view_directories')
             ? resource_path("partials/{$src}.html")
             : resource_path("views/{$src}.html");
 

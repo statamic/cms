@@ -192,7 +192,7 @@ class Page extends Content implements PageContract
         $builder = app('Statamic\Contracts\Data\Content\PathBuilder')
             ->page()
             ->uri(array_get($data, 'uri', $this->uri()))
-            ->extension(array_get($data, 'data_type', $this->dataType() ?: Config::get('system.default_extension')))
+            ->extension(array_get($data, 'data_type', $this->dataType() ?: Config::get('statamic.system.default_extension')))
             ->published(array_get($data, 'published', $this->published()))
             ->defaultPublished(array_get($data, 'default_published', $this->in(default_locale())->published()))
             ->order(array_get($data, 'order', $this->order()))
@@ -328,7 +328,7 @@ class Page extends Content implements PageContract
         if (is_null($template)) {
             return [
                 $this->getWithCascade('template'), // gets `template` from the entry, and falls back to what's in folder.yaml
-                config('theming.views.page')
+                config('statamic.theming.views.page')
             ];
         }
 
@@ -350,7 +350,7 @@ class Page extends Content implements PageContract
             }
 
             // Lastly, return a default
-            return config('theming.views.layout');
+            return config('statamic.theming.views.layout');
         }
 
         $this->set('layout', $layout);
@@ -467,14 +467,14 @@ class Page extends Content implements PageContract
         }
 
         // Then the default content fieldset
-        $fieldset = config('theming.fieldsets.' . $this->contentType());
+        $fieldset = config('statamic.theming.fieldsets.' . $this->contentType());
         $path = resource_path('fieldsets/'.$fieldset.'.yaml');
         if (File::exists($path)) {
             return Fieldset::get($fieldset);
         }
 
         // Finally the default fieldset
-        return Fieldset::get(config('theming.fieldsets.default'));
+        return Fieldset::get(config('statamic.theming.fieldsets.default'));
     }
 
     /**

@@ -48,7 +48,7 @@ class LocalesTags extends Tags
      */
     private function getLocales()
     {
-        return collect(Config::get('system.locales'))->map(function ($locale, $key) {
+        return collect(Config::get('statamic.system.locales'))->map(function ($locale, $key) {
             return $this->getLocale($key);
         })->pipe(function ($locales) {
             return $this->sort($locales);
@@ -65,7 +65,7 @@ class LocalesTags extends Tags
      */
     private function getLocale($key)
     {
-        $locale = Config::get("system.locales.{$key}");
+        $locale = Config::get("statamic.system.locales.{$key}");
         $locale['key'] = $key;
         return $locale;
     }

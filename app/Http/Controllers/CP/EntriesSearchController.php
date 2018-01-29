@@ -24,7 +24,7 @@ class EntriesSearchController extends CpController
         }
 
         if (Collection::whereHandle($collection)->order() === 'date') {
-            $format = Config::get('cp.date_format');
+            $format = Config::get('statamic.cp.date_format');
             $entries->supplement('date_col_header', function ($entry) use ($format) {
                 return $entry->date()->format($format);
             });

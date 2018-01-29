@@ -53,7 +53,7 @@ class UserRegistrar
     public function create()
     {
         $user = User::create()
-            ->username($this->request->input(Config::get('users.login_type')))
+            ->username($this->request->input(Config::get('statamic.users.login_type')))
             ->with($this->userData())
             ->get();
 
@@ -101,7 +101,7 @@ class UserRegistrar
         array_set($fields, 'username.validate', $username_rules);
 
         // If the login type is email, we'll change the "username" field to "email".
-        if (Config::get('users.login_type') === 'email') {
+        if (Config::get('statamic.users.login_type') === 'email') {
             $fields['email'] = array_merge($fields['email'], $fields['username']);
             unset($fields['username']);
         }
@@ -134,7 +134,7 @@ class UserRegistrar
             return (in_array($key, $this->whitelistedFields())) ? $value : null;
         })->filter()->all();
 
-        if ($roles = Config::get('users.new_user_roles')) {
+        if ($roles = Config::get('statamic.users.new_user_roles')) {
             $data['roles'] = Helper::ensureArray($roles);
         }
 

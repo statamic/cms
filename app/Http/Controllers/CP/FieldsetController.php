@@ -95,7 +95,7 @@ class FieldsetController extends CpController
 
         if ($fieldset->name() === 'user') {
             // If logging in using emails, make sure there is no username field.
-            if (Config::get('users.login_type') === 'email') {
+            if (Config::get('statamic.users.login_type') === 'email') {
                 $array['fields'] = collect($array['fields'])->reject(function ($field) {
                     return $field['name'] === 'username';
                 })->values()->all();

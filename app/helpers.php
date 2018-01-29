@@ -150,7 +150,7 @@ function format_url($url)
 
 function cp_route($route, $params = [])
 {
-    if (! config('cp.enabled')) {
+    if (! config('statamic.cp.enabled')) {
         return null;
     }
 
@@ -167,7 +167,7 @@ function markdown($content)
 {
     $parser = new MarkdownExtra;
 
-    if (Config::get('theming.markdown_hard_wrap')) {
+    if (Config::get('statamic.theming.markdown_hard_wrap')) {
         $parser->hard_wrap = true;
     }
 

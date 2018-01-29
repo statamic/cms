@@ -385,7 +385,7 @@ class FrontendController extends Controller
     {
         $this->loadKeyVars();
 
-        $template = Str::removeLeft(Path::assemble(config('theming.errors_directory'), '404'), '/');
+        $template = Str::removeLeft(Path::assemble(config('statamic.theming.errors_directory'), '404'), '/');
 
         $route = new ExceptionRoute($url, [
             'response_code' => 404,
@@ -442,7 +442,7 @@ class FrontendController extends Controller
         $this->adjustResponseContentType();
 
         // Add a powered-by header, but only if it's cool with them.
-        if (Config::get('system.send_powered_by_header')) {
+        if (Config::get('statamic.system.send_powered_by_header')) {
             $this->response->header('X-Powered-By', 'Statamic');
         }
 

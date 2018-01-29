@@ -18,7 +18,7 @@ class UserGroup extends FileUserGroup
 
         // If writing user files has been disabled, we will be
         // relying on the users that are stored in the Stache.
-        if (! Config::get('users.redis_write_file')) {
+        if (! Config::get('statamic.users.redis_write_file')) {
             unset($arr['users']);
         }
 

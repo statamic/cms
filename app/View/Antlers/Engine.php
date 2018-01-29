@@ -105,7 +105,7 @@ class Engine implements EngineInterface
         foreach (Helper::ensureArray($this->data['layout']) as $layout) {
             $path = resource_path() . '/';
 
-            $path .= config('theming.dedicated_view_directories')
+            $path .= config('statamic.theming.dedicated_view_directories')
                 ? 'layouts'
                 : 'views'; // @todo: Make dynamic since it's possible it could be changed.
 

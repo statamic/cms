@@ -68,7 +68,7 @@ class PasswordReset
 
         $this->user->save();
 
-        $url = $this->base_url ?: config('routes.action').'/user/reset';
+        $url = $this->base_url ?: config('statamic.routes.action').'/user/reset';
         $url .= "?user={$this->user->id()}&code={$code}";
 
         return URL::makeAbsolute(URL::prependSiteUrl($url));

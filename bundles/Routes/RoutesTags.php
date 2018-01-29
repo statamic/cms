@@ -15,7 +15,7 @@ class RoutesTags extends Tags
      */
     public function index()
     {
-        $rules = Config::get('routes.routes');
+        $rules = Config::get('statamic.routes.routes');
 
         $routes = [];
 

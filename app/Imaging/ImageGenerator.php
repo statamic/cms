@@ -153,7 +153,7 @@ class ImageGenerator
         $defaults = [];
 
         // Enable automatic cropping
-        if (Config::get('assets.auto_crop') && $this->asset) {
+        if (Config::get('statamic.assets.auto_crop') && $this->asset) {
             $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
         }
 

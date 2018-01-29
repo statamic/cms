@@ -121,7 +121,7 @@ class ThemeTags extends Tags
     {
         $src = $this->get('src');
 
-        $partialPath = config('theming.dedicated_view_directories')
+        $partialPath = config('statamic.theming.dedicated_view_directories')
             ? resource_path("partials/{$src}.html")
             : resource_path("views/{$src}.html");
 

@@ -55,7 +55,7 @@ class GlideController extends Controller
 
         // If the auto crop setting is enabled, we will attempt to resolve an asset from the
         // given path in order to get its focal point. A little overhead for convenience.
-        if (Config::get('assets.auto_crop')) {
+        if (Config::get('statamic.assets.auto_crop')) {
             if ($asset = Asset::find(Str::ensureLeft($path, '/'))) {
                 return $this->createResponse($this->generateBy('asset', $asset));
             }
@@ -137,7 +137,7 @@ class GlideController extends Controller
     private function validateSignature()
     {
         // If secure images aren't enabled, don't bother validating the signature.
-        if (! Config::get('assets.image_manipulation.secure')) {
+        if (! Config::get('statamic.assets.image_manipulation.secure')) {
             return;
         }
 

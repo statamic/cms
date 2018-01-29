@@ -170,7 +170,7 @@ class ExtensibleTest extends TestCase
     {
         // How these urls work needs some grapes.
 
-        config(['system.locales.en.url' => 'http://example.com']);
+        config(['statamic.system.locales.en.url' => 'http://example.com']);
 
         $addon = new Extension;
         $this->assertEquals('/!/bar/foo', $addon->eventUrl('foo'));

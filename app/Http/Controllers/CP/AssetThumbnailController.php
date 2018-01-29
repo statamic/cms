@@ -137,8 +137,8 @@ class AssetThumbnailController extends Controller
      */
     private function getPlaceholderResponse()
     {
-        $maxWidth = Config::get('assets.thumbnails.max_width');
-        $maxHeight = Config::get('assets.thumbnails.max_height');
+        $maxWidth = Config::get('statamic.assets.thumbnails.max_width');
+        $maxHeight = Config::get('statamic.assets.thumbnails.max_height');
 
         if ($this->asset->width() < $maxWidth && $this->asset->height() < $maxHeight) {
             return;

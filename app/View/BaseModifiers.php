@@ -1449,7 +1449,7 @@ class BaseModifiers extends Modifier
      */
     public function sanitize($value)
     {
-        return htmlspecialchars($value, ENT_QUOTES, Config::get('system.charset', 'UTF-8'), false);
+        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
     }
 
     /**
@@ -1861,7 +1861,7 @@ class BaseModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = array_get($params, 0, Config::get('system.timezone'));
+        $timezone = array_get($params, 0, Config::get('statamic.system.timezone'));
 
         return carbon($value)->tz($timezone);
     }

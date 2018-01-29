@@ -225,7 +225,7 @@ class PagesController extends CpController
         $files = collect_files(Folder::disk('content')->getFiles('pages'))->removeHidden();
 
         if ($files->isEmpty()) {
-            $path = 'pages/index.' . Config::get('system.default_extension');
+            $path = 'pages/index.' . Config::get('statamic.system.default_extension');
             $yaml = YAML::dump(['title' => 'Home', 'id' => Helper::makeUuid()]);
             File::disk('content')->put($path, $yaml);
         }

@@ -497,7 +497,7 @@ abstract class Data implements DataContract
                 $content = textile($content);
         }
 
-        if (Config::get('theming.smartypants')) {
+        if (Config::get('statamic.theming.smartypants')) {
             $content = smartypants($content);
         }
 

@@ -28,13 +28,13 @@ class Route
     {
         return [
             $this->get('template'),
-            config('theming.views.default')
+            config('statamic.theming.views.default')
         ];
     }
 
     public function layout()
     {
-        return $this->get('layout', config('theming.views.layout'));
+        return $this->get('layout', config('statamic.theming.views.layout'));
     }
 
     public function url()
