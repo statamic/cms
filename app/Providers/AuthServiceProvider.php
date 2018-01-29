@@ -53,7 +53,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $roles = $this->app->make('Statamic\Config\Roles');
 
-        foreach (config('auth.roles') as $id => $data) {
+        foreach (config('statamic.users.roles') as $id => $data) {
             $roles[$id] = app('Statamic\Contracts\Permissions\RoleFactory')->create($data, $id);
         }
     }
