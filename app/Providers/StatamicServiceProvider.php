@@ -15,6 +15,7 @@ class StatamicServiceProvider extends AggregateServiceProvider
     protected $providers = [
         ViewServiceProvider::class,
         AppServiceProvider::class,
+        ConsoleServiceProvider::class,
         CollectionsServiceProvider::class,
         DataServiceProvider::class,
         FilesystemServiceProvider::class,
