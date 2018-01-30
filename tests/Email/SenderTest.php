@@ -32,8 +32,8 @@ class SenderTest extends TestCase
         $this->assertEquals(1, $this->getMessages()->count());
         $this->seeMessageFrom('jane@sender.com');
         $this->seeMessageFor('john@recipient.com');
-        $this->assertMessageHtml("<strong>foo</strong>: bar<br><br>\n<strong>baz</strong>: qux<br><br>\n\n");
-        $this->assertMessageText("foo: bar\nbaz: qux\n");
+        $this->assertMessageHtml("<strong>foo</strong>: bar<br><br>\n<strong>baz</strong>: qux<br><br>");
+        $this->assertMessageText("foo: bar\nbaz: qux");
     }
 
     /** @test */
@@ -57,7 +57,7 @@ class SenderTest extends TestCase
         $this->assertEquals(1, $this->getMessages()->count());
         $this->seeMessageFrom('jane@sender.com');
         $this->seeMessageFor('john@recipient.com');
-        $this->assertMessageHtml("html version <b>foo</b>: bar\n");
+        $this->assertMessageHtml("html version <b>foo</b>: bar");
         $this->assertMessageText("text version foo: bar");
     }
 
@@ -80,17 +80,17 @@ class SenderTest extends TestCase
         $this->assertEquals(1, $this->getMessages()->count());
         $this->seeMessageFrom('jane@sender.com');
         $this->seeMessageFor('john@recipient.com');
-        $this->assertMessageHtml("html email content\n");
+        $this->assertMessageHtml("html email content");
         $this->assertMessageText('text email content');
     }
 
     protected function assertMessageHtml($html)
     {
-        $this->assertEquals($html, $this->lastMessage()->getBody());
+        $this->assertEquals(trim($html), trim($this->lastMessage()->getBody()));
     }
 
     protected function assertMessageText($text)
     {
-        $this->assertEquals($text, $this->lastMessage()->getBody('text'));
+        $this->assertEquals(trim($text), trim($this->lastMessage()->getBody('text')));
     }
 }
