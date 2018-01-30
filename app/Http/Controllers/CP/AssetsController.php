@@ -60,7 +60,7 @@ class AssetsController extends CpController
     public function json()
     {
         // Crank it up because generating the images will take some power.
-        app()->toEleven();
+        Helper::toEleven();
 
         // Get the path from the request, and normalize it.
         $path = $this->request->path;
@@ -173,7 +173,7 @@ class AssetsController extends CpController
     public function store()
     {
         // Crank it up because generating an image may take some power.
-        app()->toEleven();
+        Helper::toEleven();
 
         if (! $this->request->hasFile('file')) {
             return response()->json($this->request->file('file')->getErrorMessage(), 400);

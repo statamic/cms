@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Statamic\API\File;
 use Statamic\API\Config;
 use League\Glide\Server;
+use Statamic\API\Helper;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Twistor\Flysystem\GuzzleAdapter;
@@ -125,7 +126,7 @@ class ImageGenerator
      */
     private function generate($image)
     {
-        app()->toEleven();
+        Helper::toEleven();
 
         $this->applyDefaultManipulations();
 
