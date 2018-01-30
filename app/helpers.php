@@ -235,6 +235,11 @@ function translate($id, array $parameters = [])
     return trans($id, $parameters);
 }
 
+function translate_choice($id, $number, array $parameters = [])
+{
+    return trans_choice($id, $number, $parameters);
+}
+
 
 if (! function_exists('array_filter_use_both')) {
     /**
