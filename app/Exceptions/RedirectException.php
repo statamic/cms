@@ -11,6 +11,11 @@ class RedirectException extends \Exception
 
     protected $code = 302;
 
+    public function render()
+    {
+        return redirect($this->getUrl(), $this->getCode());
+    }
+
     public function getUrl()
     {
         return $this->url;
