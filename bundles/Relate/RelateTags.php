@@ -21,7 +21,7 @@ class RelateTags extends CollectionTags
 
         $this->collection = collect_content();
 
-        $values = Helper::ensureArray(array_get($this->context, $var, []));
+        $values = Helper::ensureArray(array_get_colon($this->context, $var, []));
 
         foreach ($values as $value) {
             $content = $this->getRelation($value);

@@ -113,7 +113,7 @@ class Modify implements \IteratorAggregate
      */
     public function __call($method, $args)
     {
-        $this->value = $this->modify($method, array_get($args, 0));
+        $this->value = $this->modify($method, array_get_colon($args, 0));
 
         return $this;
     }

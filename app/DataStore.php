@@ -63,7 +63,7 @@ class DataStore
      */
     public function isScope($scope)
     {
-        return (bool) array_get($this->data, $scope);
+        return (bool) array_get_colon($this->data, $scope);
     }
 
     /**
@@ -78,7 +78,7 @@ class DataStore
 
         $variables = $this->parseEnv($variables, $scope);
 
-        $existing = array_get($this->data, $scope, []);
+        $existing = array_get_colon($this->data, $scope, []);
 
         array_set($this->data, $scope, Arr::combineRecursive($existing, $variables));
     }
@@ -108,12 +108,12 @@ class DataStore
             return $default;
         }
 
-        return array_get($this->data, $scope);
+        return array_get_colon($this->data, $scope);
     }
 
     public function getEnvInScope($scope, $default = [])
     {
-        return array_get($this->env, $scope, $default);
+        return array_get_colon($this->env, $scope, $default);
     }
 
     public function mergeIntoEnv($variables, $scope = null)

@@ -61,7 +61,7 @@ class CollectionTags extends Tags
             return $this->collect($collection);
         }
 
-        $collection = array_get($this->context, 'collection');
+        $collection = array_get_colon($this->context, 'collection');
 
         if ($collection instanceof ContentCollection) {
             return $this->collect($collection);

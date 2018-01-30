@@ -199,7 +199,7 @@ class Tree
         // Sort the tree
         if ($this->sort) {
             uasort($data, function ($one, $two) {
-                return Helper::compareValues(array_get($one, $this->sort), array_get($two, $this->sort));
+                return Helper::compareValues(array_get_colon($one, $this->sort), array_get_colon($two, $this->sort));
             });
         }
 

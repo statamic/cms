@@ -21,7 +21,7 @@ class RequestAdapter
 
     public function input($key, $default = null)
     {
-        return array_get($this->data, $key, $default);
+        return array_get_colon($this->data, $key, $default);
     }
 
     public function __get($key)

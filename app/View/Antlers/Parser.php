@@ -365,7 +365,7 @@ class Parser
                 // if ($name != 'content' && isset($data[$name])) {
 
                 // is this not the content tag, and is the value known?
-                if (array_get($data, $name)) {
+                if (array_get_colon($data, $name)) {
                     // it is, are there parameters?
                     if (isset($match[2])) {
                         // there are, make a backup of our $data
@@ -391,7 +391,7 @@ class Parser
 
                     // Parameter-style modifier time
                     // Probably should do an extraction here...
-                    $replacement = array_get($data, $name);
+                    $replacement = array_get_colon($data, $name);
 
                     foreach ($parameters as $modifier => $parameters) {
                         $replacement = $this->runModifier($modifier, $replacement, explode('|', $parameters), $data);
@@ -520,7 +520,7 @@ class Parser
             if ($name != "content" && !$replacement) {
 
                 // is the callback a variable in our data set?
-                if ($values = array_get($data, $name)) {
+                if ($values = array_get_colon($data, $name)) {
 
                     // is this a tag-pair?
                     if (is_array($values)) {
@@ -793,13 +793,13 @@ class Parser
             // check to see if the recursive variable we're looking for is set
             // within the current data for this run-through, if it isn't, just
             // abort and return the text
-            if (!array_get($this->callbackData, $array_key)) {
+            if (!array_get_colon($this->callbackData, $array_key)) {
                 return $text;
             }
             // </statamic>
 
             $next_tag    = null;
-            $children    = array_get($this->callbackData, $array_key);
+            $children    = array_get_colon($this->callbackData, $array_key);
 
             // <statamic>
             // if the array key is scoped, we'll add a scope to the array
@@ -1204,7 +1204,7 @@ class Parser
         if ($modifiers) {
             foreach ($modifiers as $modifier) {
                 $modifier_bits = explode(':', $modifier);
-                $data = $this->runModifier(array_get($modifier_bits, 0), $data, array_slice($modifier_bits, 1), $context);
+                $data = $this->runModifier(array_get_colon($modifier_bits, 0), $data, array_slice($modifier_bits, 1), $context);
             }
         }
         // </statamic>
@@ -1311,7 +1311,7 @@ class Parser
         $parts = explode("|", $key);
 
         return [
-            array_get($parts, 0),
+            array_get_colon($parts, 0),
             (array) array_slice($parts, 1)
         ];
     }

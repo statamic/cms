@@ -17,7 +17,7 @@ class GetContentTags extends CollectionTags
      */
     public function __call($method, $args)
     {
-        $from = array_get($this->context, $this->tag_method);
+        $from = array_get_colon($this->context, $this->tag_method);
 
         return $this->index($from);
     }

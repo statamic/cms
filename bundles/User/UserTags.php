@@ -19,7 +19,7 @@ class UserTags extends Tags
      */
     public function __call($method, $args)
     {
-        $id = array_get($this->context, $method);
+        $id = array_get_colon($this->context, $method);
 
         if (! $user = User::find($id)) {
             return;

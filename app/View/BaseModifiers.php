@@ -42,8 +42,8 @@ class BaseModifiers extends Modifier
     {
         if (! is_array($value)) return $value;
 
-        $glue         = array_get($params, 0, '&');
-        $oxford_comma = array_get($params, 1, false);
+        $glue         = array_get_colon($params, 0, '&');
+        $oxford_comma = array_get_colon($params, 1, false);
 
         return Helper::makeSentenceList($value, $glue, $oxford_comma);
     }
@@ -58,7 +58,7 @@ class BaseModifiers extends Modifier
     public function scopeAs($value, $params)
     {
         if ( is_array($value)) {
-            $as = array_get($params, 0);
+            $as = array_get_colon($params, 0);
 
             foreach ($value as $key => $data) {
               $value[$key][$as] = $data;
@@ -89,7 +89,7 @@ class BaseModifiers extends Modifier
      */
     public function at($value, $params)
     {
-        return Stringy::at($value, array_get($params, 0));
+        return Stringy::at($value, array_get_colon($params, 0));
     }
 
     /**
@@ -209,13 +209,13 @@ class BaseModifiers extends Modifier
      */
     public function contains($haystack, $params, $context)
     {
-        $needle = array_get($context, $params[0], $params[0]);
+        $needle = array_get_colon($context, $params[0], $params[0]);
 
         if (is_array($haystack)) {
             return in_array($needle, $haystack);
         }
 
-        return Stringy::contains($haystack, $needle, array_get($params, 1, false));
+        return Stringy::contains($haystack, $needle, array_get_colon($params, 1, false));
     }
 
     /**
@@ -229,7 +229,7 @@ class BaseModifiers extends Modifier
      */
     public function containsAll($value, $params, $context)
     {
-        $needles = array_get($context, $params[0], $params);
+        $needles = array_get_colon($context, $params[0], $params);
 
         return Stringy::containsAll($value, $needles);
     }
@@ -267,7 +267,7 @@ class BaseModifiers extends Modifier
      */
     public function countSubstring($value, $params)
     {
-        return Stringy::countSubstr($value, array_get($params, 0), array_get($params, 1, false));
+        return Stringy::countSubstr($value, array_get_colon($params, 0), array_get_colon($params, 1, false));
     }
 
     /**
@@ -293,7 +293,7 @@ class BaseModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return carbon($value)->diffInDays(array_get($params, 0));
+        return carbon($value)->diffInDays(array_get_colon($params, 0));
     }
 
     /**
@@ -372,7 +372,7 @@ class BaseModifiers extends Modifier
      */
     public function endsWith($value, $params)
     {
-        return Stringy::endsWith($value, array_get($params, 0), false);
+        return Stringy::endsWith($value, array_get_colon($params, 0), false);
     }
 
     /**
@@ -385,7 +385,7 @@ class BaseModifiers extends Modifier
      */
     public function ensureLeft($value, $params)
     {
-        return Stringy::ensureLeft($value, array_get($params, 0));
+        return Stringy::ensureLeft($value, array_get_colon($params, 0));
     }
 
     /**
@@ -397,7 +397,7 @@ class BaseModifiers extends Modifier
      */
     public function ensureRight($value, $params)
     {
-        return Stringy::ensureRight($value, array_get($params, 0));
+        return Stringy::ensureRight($value, array_get_colon($params, 0));
     }
 
     /**
@@ -423,7 +423,7 @@ class BaseModifiers extends Modifier
     {
         if (is_array($value)) return $value;
 
-        $breaker = array_get($params, 0, '<!--more-->');
+        $breaker = array_get_colon($params, 0, '<!--more-->');
 
         return strstr($value, $breaker, true);
     }
@@ -437,7 +437,7 @@ class BaseModifiers extends Modifier
      */
     public function explode($value, $params)
     {
-        return explode(array_get($params, 0), $value);
+        return explode(array_get_colon($params, 0), $value);
     }
 
     /**
@@ -474,10 +474,10 @@ class BaseModifiers extends Modifier
     public function first($value, $params)
     {
         if (is_array($value)) {
-            return array_get($value, 0);
+            return array_get_colon($value, 0);
         }
 
-        return Stringy::first($value, array_get($params, 0));
+        return Stringy::first($value, array_get_colon($params, 0));
     }
 
     /**
@@ -522,7 +522,7 @@ class BaseModifiers extends Modifier
      */
     public function format($value, $params)
     {
-        return carbon($value)->format(array_get($params, 0));
+        return carbon($value)->format(array_get_colon($params, 0));
     }
 
     /**
@@ -534,7 +534,7 @@ class BaseModifiers extends Modifier
      */
     public function formatLocalized($value, $params)
     {
-        return carbon($value)->formatLocalized(array_get($params, 0));
+        return carbon($value)->formatLocalized(array_get_colon($params, 0));
     }
 
     /**
@@ -546,9 +546,9 @@ class BaseModifiers extends Modifier
      */
     public function formatNumber($value, $params)
     {
-        $precision = array_get($params, 0, 0);
-        $dec_point = array_get($params, 1, '.');
-        $thousands_sep = array_get($params, 2, ',');
+        $precision = array_get_colon($params, 0, 0);
+        $dec_point = array_get_colon($params, 1, '.');
+        $thousands_sep = array_get_colon($params, 2, ',');
 
         $number = floatval(str_replace(',', '', $value));
 
@@ -581,7 +581,7 @@ class BaseModifiers extends Modifier
     {
         // If the requested value is an array, we'll just grab the first one.
         if (is_array($value)) {
-            $value = array_get($value, 0);
+            $value = array_get_colon($value, 0);
         }
 
         // If the requested value (it should be an ID) doesn't exist, we'll just
@@ -591,11 +591,11 @@ class BaseModifiers extends Modifier
         }
 
         // Get the requested variable, which is the first parameter.
-        $var = array_get($params, 0);
+        $var = array_get_colon($params, 0);
 
         // Convert the item to an array, since we'll want access to all the
         // supplemented data. Then grab the requested variable from there.
-        if ($arrayValue = array_get($item->toArray(), $var)) {
+        if ($arrayValue = array_get_colon($item->toArray(), $var)) {
             return $arrayValue;
         }
 
@@ -618,7 +618,7 @@ class BaseModifiers extends Modifier
      */
     public function gravatar($value, $params)
     {
-        return gravatar($value, array_get($params, 0));
+        return gravatar($value, array_get_colon($params, 0));
     }
 
     /**
@@ -665,7 +665,7 @@ class BaseModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return carbon($value)->diffInHours(array_get($params, 0));
+        return carbon($value)->diffInHours(array_get_colon($params, 0));
     }
 
     /**
@@ -696,7 +696,7 @@ class BaseModifiers extends Modifier
             $params = [join('|', $params)];
         }
 
-        return implode(array_get($params, 0, ', '), $value);
+        return implode(array_get_colon($params, 0, ', '), $value);
     }
 
     /**
@@ -708,7 +708,7 @@ class BaseModifiers extends Modifier
      */
     public function inArray($value, $params, $context)
     {
-        $needle = array_get($context, $params[0], $params);
+        $needle = array_get_colon($context, $params[0], $params);
 
         if (is_array($needle) && count($needle) === 1) {
             $needle = $needle[0];
@@ -726,8 +726,8 @@ class BaseModifiers extends Modifier
      */
     public function insert($value, $params)
     {
-        $substring = array_get($params, 0);
-        $position = array_get($params, 1);
+        $substring = array_get_colon($params, 0);
+        $position = array_get_colon($params, 1);
 
         return Stringy::insert($value, $substring, $position);
     }
@@ -742,7 +742,7 @@ class BaseModifiers extends Modifier
      */
     public function isAfter($value, $params, $context)
     {
-        $date = carbon(array_get($context, $params[0], $params[0]));
+        $date = carbon(array_get_colon($context, $params[0], $params[0]));
 
         return carbon($value)->gt($date);
     }
@@ -779,7 +779,7 @@ class BaseModifiers extends Modifier
      */
     public function isBefore($value, $params, $context)
     {
-        $date = carbon(array_get($context, $params[0], $params[0]));
+        $date = carbon(array_get_colon($context, $params[0], $params[0]));
 
         return carbon($value)->lt($date);
     }
@@ -794,8 +794,8 @@ class BaseModifiers extends Modifier
      */
     public function isBetween($value, $params, $context)
     {
-        $date1 = carbon(array_get($context, $params[0], $params[0]));
-        $date2 = carbon(array_get($context, $params[1], $params[1]));
+        $date1 = carbon(array_get_colon($context, $params[0], $params[0]));
+        $date2 = carbon(array_get_colon($context, $params[1], $params[1]));
 
         return carbon($value)->between($date1, $date2);
     }
@@ -957,7 +957,7 @@ class BaseModifiers extends Modifier
             return array_pop($value);
         }
 
-        return Stringy::last($value, array_get($params, 0));
+        return Stringy::last($value, array_get_colon($params, 0));
     }
 
     /**
@@ -991,7 +991,7 @@ class BaseModifiers extends Modifier
      */
     public function limit($value, $params)
     {
-        return array_slice($value, 0, array_get($params, 0, 0));
+        return array_slice($value, 0, array_get_colon($params, 0, 0));
     }
 
     /**
@@ -1042,7 +1042,7 @@ class BaseModifiers extends Modifier
      */
     public function macro($value, $params, $context)
     {
-        $macro = array_get($params, 0);
+        $macro = array_get_colon($params, 0);
 
         return collect(Theme::getMacro($macro))->map(function ($params, $name) {
             return compact('name', 'params');
@@ -1084,7 +1084,7 @@ class BaseModifiers extends Modifier
      */
     public function merge($value, $params, $context)
     {
-        $to_merge = (array) array_get($context, $params[0], $context);
+        $to_merge = (array) array_get_colon($context, $params[0], $context);
 
         return array_merge($value, $to_merge);
     }
@@ -1099,7 +1099,7 @@ class BaseModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return carbon($value)->diffInMinutes(array_get($params, 0));
+        return carbon($value)->diffInMinutes(array_get_colon($params, 0));
     }
 
     /**
@@ -1111,7 +1111,7 @@ class BaseModifiers extends Modifier
      */
     public function mod($value, $params, $context)
     {
-        $number = array_get($context, $params[0], $params[0]);
+        $number = array_get_colon($context, $params[0], $params[0]);
 
         return ($value % $number);
     }
@@ -1127,7 +1127,7 @@ class BaseModifiers extends Modifier
      */
     public function modifyDate($value, $params)
     {
-        return carbon($value)->modify(array_get($params, 0));
+        return carbon($value)->modify(array_get_colon($params, 0));
     }
 
     /**
@@ -1140,7 +1140,7 @@ class BaseModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return carbon($value)->diffInMonths(array_get($params, 0));
+        return carbon($value)->diffInMonths(array_get_colon($params, 0));
     }
 
     /**
@@ -1236,7 +1236,7 @@ class BaseModifiers extends Modifier
             $params = [join('|', $params)];
         }
 
-        return implode(array_get($params, 0, '|'), $value);
+        return implode(array_get_colon($params, 0, '|'), $value);
     }
 
     /**
@@ -1248,7 +1248,7 @@ class BaseModifiers extends Modifier
      */
     public function offset($value, $params)
     {
-        return array_slice($value, array_get($params, 0, 0));
+        return array_slice($value, array_get_colon($params, 0, 0));
     }
 
     /**
@@ -1274,7 +1274,7 @@ class BaseModifiers extends Modifier
      */
     public function partial($value, $params, $context)
     {
-        $name = array_get($context, $params[0], $params[0]);
+        $name = array_get_colon($context, $params[0], $params[0]);
 
         $partial = 'partials/' . $name . '.html';
 
@@ -1291,10 +1291,10 @@ class BaseModifiers extends Modifier
      */
     public function plural($value, $params, $context)
     {
-        $count = array_get($params, 0);
+        $count = array_get_colon($params, 0);
 
         if ( ! is_numeric($count)) {
-            $count = (int) array_get($context, $count);
+            $count = (int) array_get_colon($context, $count);
         }
 
         return Str::plural($value, $count);
@@ -1322,7 +1322,7 @@ class BaseModifiers extends Modifier
     {
         $words = mb_str_word_count(strip_tags($value));
 
-        return ceil($words / array_get($params, 0, 200));
+        return ceil($words / array_get_colon($params, 0, 200));
     }
 
     /**
@@ -1334,7 +1334,7 @@ class BaseModifiers extends Modifier
      */
     public function regexReplace($value, $params)
     {
-        return Stringy::regexReplace($value, array_get($params, 0), array_get($params, 1));
+        return Stringy::regexReplace($value, array_get_colon($params, 0), array_get_colon($params, 1));
     }
 
     /**
@@ -1347,7 +1347,7 @@ class BaseModifiers extends Modifier
      */
     public function relative($value, $params)
     {
-        $remove_modifiers = array_get($params, 0, false);
+        $remove_modifiers = array_get_colon($params, 0, false);
 
         return carbon($value)->diffForHumans(null, $remove_modifiers);
     }
@@ -1361,7 +1361,7 @@ class BaseModifiers extends Modifier
      */
     public function removeLeft($value, $params)
     {
-        return Stringy::removeLeft($value, array_get($params, 0));
+        return Stringy::removeLeft($value, array_get_colon($params, 0));
     }
 
     /**
@@ -1373,7 +1373,7 @@ class BaseModifiers extends Modifier
      */
     public function removeRight($value, $params)
     {
-        return Stringy::removeRight($value, array_get($params, 0));
+        return Stringy::removeRight($value, array_get_colon($params, 0));
     }
 
     /**
@@ -1385,7 +1385,7 @@ class BaseModifiers extends Modifier
      */
     public function repeat($value, $params)
     {
-        return str_repeat($value, (int) array_get($params, 0, 1));
+        return str_repeat($value, (int) array_get_colon($params, 0, 1));
     }
 
     /**
@@ -1397,7 +1397,7 @@ class BaseModifiers extends Modifier
      */
     public function replace($value, $params)
     {
-        return Stringy::replace($value, array_get($params, 0), array_get($params, 1));
+        return Stringy::replace($value, array_get_colon($params, 0), array_get_colon($params, 1));
     }
 
     /**
@@ -1423,7 +1423,7 @@ class BaseModifiers extends Modifier
      */
     public function round($value, $params)
     {
-        return round($value, (int) array_get($params, 0, 0));
+        return round($value, (int) array_get_colon($params, 0, 0));
     }
 
     /**
@@ -1438,7 +1438,7 @@ class BaseModifiers extends Modifier
      */
     public function safeTruncate($value, $params)
     {
-        return Stringy::safeTruncate($value, array_get($params, 0, 200), array_get($params, 1, ''));
+        return Stringy::safeTruncate($value, array_get_colon($params, 0, 200), array_get_colon($params, 1, ''));
     }
 
     /**
@@ -1461,7 +1461,7 @@ class BaseModifiers extends Modifier
      */
     public function scope($value, $params)
     {
-        $scope = array_get($params, 0, 'tag');
+        $scope = array_get_colon($params, 0, 'tag');
 
         return Arr::addScope($value, $scope);
     }
@@ -1477,23 +1477,23 @@ class BaseModifiers extends Modifier
     public function segment($value, $params, $context)
     {
         // Which segment?
-        $segment = array_get($params, 0, 1);
+        $segment = array_get_colon($params, 0, 1);
 
         // Support a variable name
         if (! is_numeric($segment)) {
-            $segment = array_get($context, $segment);
+            $segment = array_get_colon($context, $segment);
         }
 
         $url = parse_url($value);
 
         // Get everything after a possible domain
         // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(array_get($url, 'path'), '/');
+        $uris = Stringy::ensureLeft(array_get_colon($url, 'path'), '/');
 
         //Boom
         $segments = explode('/', $uris);
 
-        return array_get($segments, $segment);
+        return array_get_colon($segments, $segment);
     }
 
     /**
@@ -1506,7 +1506,7 @@ class BaseModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return carbon($value)->diffInSeconds(array_get($params, 0));
+        return carbon($value)->diffInSeconds(array_get_colon($params, 0));
     }
 
     /**
@@ -1520,8 +1520,8 @@ class BaseModifiers extends Modifier
     {
         if (! is_array($value)) return $value;
 
-        $glue         = array_get($params, 0, 'and');
-        $oxford_comma = array_get($params, 1, true);
+        $glue         = array_get_colon($params, 0, 'and');
+        $oxford_comma = array_get_colon($params, 1, true);
 
         return Helper::makeSentenceList($value, $glue, $oxford_comma);
     }
@@ -1599,7 +1599,7 @@ class BaseModifiers extends Modifier
      */
     public function smartypants($value, $params)
     {
-        return smartypants($value, array_get($params, 0 , 1));
+        return smartypants($value, array_get_colon($params, 0 , 1));
     }
 
     /**
@@ -1611,8 +1611,8 @@ class BaseModifiers extends Modifier
      */
     public function sort($value, $params)
     {
-        $key = array_get($params, 0);
-        $is_descending = strtolower(array_get($params, 1)) == 'desc';
+        $key = array_get_colon($params, 0);
+        $is_descending = strtolower(array_get_colon($params, 1)) == 'desc';
 
         if ($key === 'random') {
             return $this->shuffle($value);
@@ -1637,7 +1637,7 @@ class BaseModifiers extends Modifier
      */
     public function startsWith($value, $params)
     {
-        return Stringy::startsWith($value, array_get($params, 0), false);
+        return Stringy::startsWith($value, array_get_colon($params, 0), false);
     }
 
     /**
@@ -1649,7 +1649,7 @@ class BaseModifiers extends Modifier
      */
     public function stripTags($value, $params, $context)
     {
-        $tag_var = array_get($params, 0);
+        $tag_var = array_get_colon($params, 0);
 
         // When used in a macro without specifying any tags, the tag list will just be the boolean
         // value `true`. In that case, we'll use an empty to indicate "all the tags". Otherwise,
@@ -1657,7 +1657,7 @@ class BaseModifiers extends Modifier
         if ($tag_var === true) {
             $tags = [];
         } else {
-            $tags = ($tag_var) ? array_get($context, $tag_var, $params) : $params;
+            $tags = ($tag_var) ? array_get_colon($context, $tag_var, $params) : $params;
         }
 
         return Helper::stripTags($value, (array) $tags);
@@ -1686,7 +1686,7 @@ class BaseModifiers extends Modifier
      */
     public function substr($value, $params)
     {
-        return Stringy::substr($value, array_get($params, 0), array_get($params, 1));
+        return Stringy::substr($value, array_get_colon($params, 0), array_get_colon($params, 1));
     }
 
     /**
@@ -1697,7 +1697,7 @@ class BaseModifiers extends Modifier
      */
     public function sum($value, $params)
     {
-        return collect($value)->sum(array_get($params, 0, null));
+        return collect($value)->sum(array_get_colon($params, 0, null));
     }
 
     /**
@@ -1709,7 +1709,7 @@ class BaseModifiers extends Modifier
      */
     public function surround($value, $params)
     {
-        return Stringy::surround($value, array_get($params, 0));
+        return Stringy::surround($value, array_get_colon($params, 0));
     }
 
     /**
@@ -1733,7 +1733,7 @@ class BaseModifiers extends Modifier
     public function table($value, $params)
     {
         $rows = $value;
-        $parse_markdown = bool(array_get($params, 0));
+        $parse_markdown = bool(array_get_colon($params, 0));
 
         $html = '<table>';
 
@@ -1809,7 +1809,7 @@ class BaseModifiers extends Modifier
      */
     public function toSpaces($value, $params)
     {
-        return Stringy::toSpaces($value, array_get($params, 0, 4));
+        return Stringy::toSpaces($value, array_get_colon($params, 0, 4));
     }
 
     /**
@@ -1822,7 +1822,7 @@ class BaseModifiers extends Modifier
      */
     public function toTabs($value, $params)
     {
-        return Stringy::toTabs($value, array_get($params, 0, 4));
+        return Stringy::toTabs($value, array_get_colon($params, 0, 4));
     }
 
     /**
@@ -1846,7 +1846,7 @@ class BaseModifiers extends Modifier
      */
     public function truncate($value, $params)
     {
-        return Stringy::truncate($value, array_get($params, 0), array_get($params, 1, ''));
+        return Stringy::truncate($value, array_get_colon($params, 0), array_get_colon($params, 1, ''));
     }
 
     /**
@@ -1861,7 +1861,7 @@ class BaseModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = array_get($params, 0, Config::get('statamic.system.timezone'));
+        $timezone = array_get_colon($params, 0, Config::get('statamic.system.timezone'));
 
         return carbon($value)->tz($timezone);
     }
@@ -1944,7 +1944,7 @@ class BaseModifiers extends Modifier
      */
     public function unique($value, $params)
     {
-        return collect($value)->unique(array_get($params, 0))->toArray();
+        return collect($value)->unique(array_get_colon($params, 0))->toArray();
     }
 
     /**
@@ -1956,7 +1956,7 @@ class BaseModifiers extends Modifier
     public function url($value)
     {
         if (is_array($value)) {
-            $value = array_get($value, 0);
+            $value = array_get_colon($value, 0);
         }
 
         if (! $item = Asset::find($value)) {
@@ -1978,7 +1978,7 @@ class BaseModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return carbon($value)->diffInWeeks(array_get($params, 0));
+        return carbon($value)->diffInWeeks(array_get_colon($params, 0));
     }
 
     /**
@@ -1991,8 +1991,8 @@ class BaseModifiers extends Modifier
      */
     public function where($value, $params)
     {
-        $key = array_get($params, 0);
-        $val = array_get($params, 1);
+        $key = array_get_colon($params, 0);
+        $val = array_get_colon($params, 1);
 
         $collection = collect($value)->whereLoose($key, $val);
 
@@ -2020,7 +2020,7 @@ class BaseModifiers extends Modifier
     public function wrap($value, $params)
     {
         $attributes = '';
-        $tag = array_get($params, 0);
+        $tag = array_get_colon($params, 0);
 
         // Emmet-esque classes
         // You may specify "tag.class.class.class" etc.
@@ -2053,7 +2053,7 @@ class BaseModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return carbon($value)->diffInYears(array_get($params, 0));
+        return carbon($value)->diffInYears(array_get_colon($params, 0));
     }
 
     /**
@@ -2115,6 +2115,6 @@ class BaseModifiers extends Modifier
         // from a value in the context. This allows users to specify a variable name.
         return (is_numeric($number))
             ? $number
-            : array_get($context, $number, $number);
+            : array_get_colon($context, $number, $number);
     }
 }

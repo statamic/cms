@@ -31,7 +31,7 @@ class GetValueTags extends Tags
         }
 
         // Get the value out of the context. If it doesn't exist, fall back to an empty array.
-        $field_value = array_get($context, $variable, []);
+        $field_value = array_get_colon($context, $variable, []);
 
         // The whole purpose of this tag is to get values from an array. If the field
         // is actually a string, we'll need to handle it a little differently.
@@ -65,7 +65,7 @@ class GetValueTags extends Tags
             $keep = true;
 
             foreach ($filters as $key => $value) {
-                if (array_get($item, $key) != $value) {
+                if (array_get_colon($item, $key) != $value) {
                     $keep = false;
                 }
             }

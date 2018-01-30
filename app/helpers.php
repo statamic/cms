@@ -23,8 +23,7 @@ function log_todo()
     }
 }
 
-
-if (! function_exists('array_get')) {
+if (! function_exists('array_get_colon')) {
     /**
      * Get an item from an array using "dot" or "colon" notation.
      *
@@ -33,7 +32,7 @@ if (! function_exists('array_get')) {
      * @param  mixed  $default
      * @return mixed
      */
-    function array_get($array, $key, $default = null)
+    function array_get_colon($array, $key, $default = null)
     {
         if ($key) {
             $key = str_replace(':', '.', $key);

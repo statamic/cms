@@ -22,6 +22,6 @@ class Theme
 
         $macros = array_reindex(YAML::parse(File::get($path)));
 
-        return array_get($macros, $macro);
+        return array_get_colon($macros, $macro);
     }
 }
