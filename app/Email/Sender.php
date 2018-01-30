@@ -44,11 +44,11 @@ class Sender
         list($html_body, $text_body) = $this->parseEmailTemplate();
 
         $data = ['html_body' => $html_body];
-        $view = 'email.html';
+        $view = 'statamic::email.html';
 
         if ($text_body) {
             $data['text_body'] = $text_body;
-            $view = [$view, 'email.text'];
+            $view = [$view, 'statamic::email.text'];
         }
 
         $this->mailer->send($view, $data, function ($m) {

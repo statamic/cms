@@ -22,8 +22,6 @@ class SenderTest extends TestCase
     /** @test */
     function automagic_mail_gets_sent()
     {
-        $this->markTestIncomplete();
-
         Email::create()
             ->to('john@recipient.com')
             ->from('jane@sender.com')
@@ -41,8 +39,6 @@ class SenderTest extends TestCase
     /** @test */
     function mail_gets_sent_using_text_html_hybrid_template()
     {
-        $this->markTestIncomplete();
-
         File::shouldReceive('exists')
             ->with($templatePath = resource_path('views/email/my-email.html'))
             ->andReturnTrue();
@@ -68,8 +64,6 @@ class SenderTest extends TestCase
     /** @test */
     function mail_gets_sent_with_fallback_view_if_specified_one_doesnt_exist()
     {
-        $this->markTestIncomplete();
-
         $this->withFakeViews();
         tap($this->mockViewEngine, function ($m) {
             $m->shouldReceive('get')->with('email.built-in-view-html', Mockery::any())->andReturn('html email content');
