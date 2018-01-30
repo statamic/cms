@@ -96,6 +96,15 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     /**
+     * Widgets bundled with Statamic.
+     *
+     * @var array
+     */
+    protected $bundledWidgets = [
+        'collection', 'template', 'updater',
+    ];
+
+    /**
      * Register any application services.
      *
      * @return void
@@ -111,6 +120,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerTags();
         $this->registerModifiers();
         $this->registerFieldtypes();
+        $this->registerWidgets();
     }
 
     /**
@@ -241,6 +251,31 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
             $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
+        }
+    }
+
+    /**
+     * Register widgets.
+     *
+     * @return void
+     */
+    protected function registerWidgets()
+    {
+        $this->app->instance('statamic.widgets', collect());
+
+        $this->registerBundledWidgets();
+    }
+
+    /**
+     * Register bundled widgets.
+     *
+     * @return void
+     */
+    protected function registerBundledWidgets()
+    {
+        foreach ($this->bundledWidgets as $widget) {
+            $studly = studly_case($widget);
+            $this->app['statamic.widgets'][$widget] = "Statamic\\Addons\\{$studly}\\{$studly}Widget";
         }
     }
 }
