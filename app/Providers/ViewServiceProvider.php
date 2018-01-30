@@ -87,10 +87,6 @@ class ViewServiceProvider extends LaravelViewServiceProvider
      */
     public function registerViewFinder()
     {
-        $paths = config('view.paths');
-        array_unshift($paths, realpath(__DIR__ . '/../../resources/views'));
-        config(['view.paths' => $paths]);
-
         $this->app->bind('view.finder', function ($app) {
             return new FileViewFinder($app['files'], $app['config']['view.paths']);
         });
