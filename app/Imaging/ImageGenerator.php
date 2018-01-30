@@ -175,7 +175,7 @@ class ImageGenerator
             $mime = $this->asset->disk()->mimeType($path);
         } else {
             $path = $this->path;
-            $mime = File::mimeType(STATAMIC_ROOT.'/'.$this->path);
+            $mime = File::mimeType(public_path($this->path));
         }
 
         if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
