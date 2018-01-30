@@ -1994,7 +1994,7 @@ class BaseModifiers extends Modifier
         $key = array_get_colon($params, 0);
         $val = array_get_colon($params, 1);
 
-        $collection = collect($value)->whereLoose($key, $val);
+        $collection = collect($value)->where($key, $val);
 
         return $collection->all();
     }
