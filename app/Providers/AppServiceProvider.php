@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\DataStore;
+use Statamic\Routing\Router;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +45,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton('Statamic\DataStore', function() {
             return new DataStore;
+        });
+
+        $this->app->bind(Router::class, function () {
+            return new Router(config('statamic.routes.routes', []));
         });
     }
 }
