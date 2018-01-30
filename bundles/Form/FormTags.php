@@ -232,6 +232,10 @@ class FormTags extends CollectionTags
      */
     private function addToDebugBar($data)
     {
+        if (! function_exists('debug_bar')) {
+            return;
+        }
+
         $debug = [];
         $debug[$this->formsetName] = $data;
 
