@@ -19,7 +19,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledTags = [
-        'asset', 'assets', 'cache', 'can', 'collection', 'dump', 'entries', 'env', 'form',
+        'asset', 'assets', 'cache', 'can', 'collection', 'dump', 'entries', 'env',
         'get_content', 'get_files', 'get_value', 'glide', 'in', 'is', 'link', 'locales',
         'markdown', 'member', 'nav', 'not_found', 'oauth', 'obfuscate', 'pages', 'parent',
         'partial', 'path', 'protect', 'redirect', 'relate', 'rotate', 'routes', 'search',
@@ -44,7 +44,7 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected $bundledFieldtypes = [
         'arr', 'asset_container', 'asset_folder', 'assets', 'bard', 'checkboxes', 'collection', 'collections',
-        'date', 'fields', 'fieldset', 'form', 'grid', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
+        'date', 'fields', 'fieldset', 'grid', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
         'revealer', 'section', 'select', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_password', 'user_roles', 'video', 'yaml',
@@ -151,6 +151,8 @@ class ExtensionServiceProvider extends ServiceProvider
         foreach ($this->bundledTagAliases as $alias => $actual) {
             $this->app['statamic.tags'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Tags";
         }
+
+        $this->app['statamic.tags']['form'] = \Statamic\Forms\Tags::class;
     }
 
     /**
@@ -252,6 +254,8 @@ class ExtensionServiceProvider extends ServiceProvider
         foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
             $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
+
+        $this->app['statamic.fieldtypes']['form'] = \Statamic\Forms\Fieldtype::class;
     }
 
     /**
@@ -277,5 +281,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $studly = studly_case($widget);
             $this->app['statamic.widgets'][$widget] = "Statamic\\Addons\\{$studly}\\{$studly}Widget";
         }
+
+        $this->app['statamic.widgets']['form'] = \Statamic\Forms\Widget::class;
     }
 }

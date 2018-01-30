@@ -10,6 +10,10 @@ Route::group(['prefix' => Config::get('statamic.assets.image_manipulation.route'
     Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
 });
 
+Route::group(['prefix' => config('statamic.routes.action')], function () {
+    Route::post('form/create', 'FormController@create');
+});
+
 /**
  * Front-end
  * All front-end website requests go through a single controller method.

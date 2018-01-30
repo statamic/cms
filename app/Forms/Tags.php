@@ -1,14 +1,15 @@
 <?php
 
-namespace Statamic\Addons\Form;
+namespace Statamic\Forms;
 
-use Statamic\API\Crypt;
+use Statamic\API\URL;
 use Statamic\API\Form;
+use Statamic\API\Crypt;
 use DebugBar\DebugBarException;
 use DebugBar\DataCollector\ConfigCollector;
 use Statamic\Addons\Collection\CollectionTags;
 
-class FormTags extends CollectionTags
+class Tags extends CollectionTags
 {
     /**
      * @var string
@@ -53,7 +54,7 @@ class FormTags extends CollectionTags
             $data['errors'] = $this->getErrorMessages();
         }
 
-        if ($this->flash->exists("form.{$this->formsetName}.success")) {
+        if (session()->exists("form.{$this->formsetName}.success")) {
             $data['success'] = true;
         }
 
@@ -118,7 +119,7 @@ class FormTags extends CollectionTags
             return false;
         }
 
-        return $this->flash->exists("form.{$formset}.success");
+        return session()->has("form.{$formset}.success");
     }
 
     /**
@@ -129,7 +130,7 @@ class FormTags extends CollectionTags
     public function submission()
     {
         if ($this->success()) {
-            return $this->flash->get('submission')->toArray();
+            return session('submission')->toArray();
         }
     }
 
@@ -251,5 +252,12 @@ class FormTags extends CollectionTags
             // Collector doesn't exist yet. We'll create it.
             $collector = debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
         }
+    }
+
+    public function eventUrl($url, $relative = true)
+    {
+        return URL::prependSiteUrl(
+            config('statamic.routes.action') . '/form/' . $url
+        );
     }
 }

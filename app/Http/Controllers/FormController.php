@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\Form;
+namespace Statamic\Http\Controllers;
 
 use Carbon\Carbon;
 use Statamic\API\Form;
@@ -9,21 +9,16 @@ use Statamic\API\Email;
 use Statamic\API\Parse;
 use Statamic\API\Config;
 use Statamic\API\Request;
-use Statamic\Extend\Listener;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\RedirectResponse;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\PublishException;
+use Statamic\Http\Controllers\Controller;
 use Statamic\Exceptions\SilentFormFailureException;
 
-class FormListener extends Listener
+class FormController extends Controller
 {
-    public $events = [
-        'Form.create' => 'create',
-        'Form.submission.created' => 'sendEmails'
-    ];
-
     /**
      * Handle a create form submission request
      *
@@ -69,7 +64,7 @@ class FormListener extends Listener
         $submission->save();
 
         // Emit an event after the submission has been created.
-        $this->emitEvent('submission.created', $submission);
+        event('Form.submission.created', $submission);
 
         return $this->formSuccess($params, $submission);
     }
@@ -96,8 +91,8 @@ class FormListener extends Listener
 
         $response = ($redirect) ? redirect($redirect) : back();
 
-        $this->flash->put("form.{$submission->formset()->name()}.success", true);
-        $this->flash->put('submission', $submission);
+        session()->flash("form.{$submission->formset()->name()}.success", true);
+        session()->flash('submission', $submission);
 
         return $response;
     }
@@ -129,85 +124,6 @@ class FormListener extends Listener
     }
 
     /**
-     * Trigger sending of emails after a form submission.
-     *
-     * @param  Submission $submission
-     */
-    public function sendEmails(Submission $submission)
-    {
-        $config = $submission->formset()->get('email', []);
-
-        // Ensure its an array of emails
-        $config = (isset($config['to'])) ? [$config] : $config;
-
-        foreach ($config as $c) {
-            $this->sendEmail($submission, $c);
-        }
-    }
-
-    /**
-     * Send an email
-     *
-     * @param  Submission $submission
-     * @param  array      $config
-     * @return void
-     */
-    private function sendEmail(Submission $submission, array $config)
-    {
-        $email = Email::create();
-
-        $config = $this->parseConfig($config, $submission->toArray());
-
-        $email->to($config['to']);
-
-        if ($from = array_get($config, 'from')) {
-            $email->from($from);
-        }
-
-        if ($reply_to = array_get($config, 'reply_to')) {
-            $email->replyTo($reply_to);
-        }
-
-        if ($cc = array_get($config, 'cc')) {
-            $email->cc($cc);
-        }
-
-        if ($bcc = array_get($config, 'bcc')) {
-            $email->bcc($bcc);
-        }
-
-        if ($subject = array_get($config, 'subject')) {
-            $email->subject($subject);
-        }
-
-        if ($template = array_get($config, 'template')) {
-            $email->template($template)
-                ->with(array_merge($this->loadKeyVars(), $submission->toArray()));
-
-        } else {
-            $email->automagic()->with($submission->toArray());
-        }
-
-        $email->send();
-    }
-
-    /**
-     * Parse the config values as templates so submission values may be used within them.
-     *
-     * @param  array  $config
-     * @param  array  $data
-     * @return array
-     */
-    private function parseConfig(array $config, array $data)
-    {
-        foreach ($config as $key => &$value) {
-            $value = Parse::template(Parse::env($value), $data);
-        }
-
-        return $config;
-    }
-
-    /**
      * Run the `submission:creating` event.
      *
      * This allows the submission to be short-circuited before it gets saved and show errors.
@@ -224,7 +140,7 @@ class FormListener extends Listener
     {
         $errors = [];
 
-        $responses = $this->emitEvent('submission.creating', $submission);
+        $responses = event('Form.submission.creating', $submission);
 
         foreach ($responses as $response) {
             // Ignore any non-arrays
@@ -243,21 +159,5 @@ class FormListener extends Listener
         }
 
         return [$errors, $submission];
-    }
-
-    /**
-     * Bring in a couple common global vars that might be needed in the email template
-     *
-     * @return array
-     */
-    private function loadKeyVars()
-    {
-        return [
-                'site_url'   => Config::getSiteUrl(),
-                'date'       => Carbon::now(),
-                'now'        => Carbon::now(),
-                'today'      => Carbon::now(),
-                'locale'     => site_locale()
-        ];
     }
 }

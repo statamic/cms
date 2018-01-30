@@ -152,7 +152,7 @@ class Formset implements FormsetContract
      */
     public function save()
     {
-        $path = settings_path("formsets/{$this->name()}.yaml");
+        $path = config('statamic.forms.formsets') . "/{$this->name()}.yaml";
 
         $data = array_filter([
             'title' => $this->title(),

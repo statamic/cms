@@ -20,7 +20,7 @@ class Form
     {
         $form = self::create($name);
 
-        $path = resource_path("formsets/{$name}.yaml");
+        $path = config('statamic.forms.formsets') . "/{$name}.yaml";
 
         if (! File::exists($path)) {
             return;
@@ -43,7 +43,7 @@ class Form
     public function all()
     {
         $forms = [];
-        $files = Folder::getFilesByType(settings_path('formsets'), 'yaml');
+        $files = Folder::getFilesByType(config('statamic.forms.formsets'), 'yaml');
 
         foreach ($files as $file) {
             $filename = pathinfo($file)['filename'];
@@ -70,7 +70,7 @@ class Form
     public function getAllFormsets()
     {
         $forms = [];
-        $files = Folder::getFilesByType(settings_path('formsets'), 'yaml');
+        $files = Folder::getFilesByType(config('statamic.forms.formsets'), 'yaml');
 
         foreach ($files as $file) {
             $filename = pathinfo($file)['filename'];

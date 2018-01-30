@@ -139,6 +139,22 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('{username}/send-reset-email', 'UsersController@sendResetEmail');
     });
 
+
+    Route::group(['prefix' => 'forms'], function () {
+        Route::get('/', 'FormsController@index')->name('forms');
+        Route::get('get', 'FormsController@get')->name('forms.get');
+        Route::get('create', 'FormsController@create')->name('form.create');
+        Route::post('/', 'FormsController@store')->name('form.store');
+        Route::get('{form}', 'FormsController@show')->name('form.show');
+        Route::get('{form}/submissions', 'FormsController@getFormSubmissions')->name('form.submissions');
+        Route::get('{form}/edit', 'FormsController@edit')->name('form.edit');
+        Route::get('{form}/get', 'FormsController@getForm')->name('form.get');
+        Route::post('{form}', 'FormsController@update')->name('form.update');
+        Route::get('{form}/submission/{submission}', 'FormsController@submission')->name('form.submission.show');
+        Route::get('{form}/submission/{submission}/delete', 'FormsController@deleteSubmission')->name('form.submission.delete');
+        Route::get('{form}/export/{type}', 'FormsController@export')->name('form.export');
+    });
+
     Route::get('system/templates/get', 'CpController@templates');
 
     Route::group(['prefix' => 'fieldsets'], function () {
@@ -180,7 +196,6 @@ Route::group(['middleware' => 'auth'], function () {
 
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');
-Route::get('/forms', function () { return ''; })->name('forms');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
 Route::get('/assets.container.edit', function () { return ''; })->name('assets.container.edit');
@@ -191,7 +206,6 @@ Route::get('/taxonomy.edit', function () { return ''; })->name('taxonomy.edit');
 Route::get('/taxonomy.create', function () { return ''; })->name('taxonomy.create');
 Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
 Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
-Route::get('/form.show', function () { return ''; })->name('form.show');
 Route::get('/login.reset', function () { return ''; })->name('login.reset');
 
 Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');

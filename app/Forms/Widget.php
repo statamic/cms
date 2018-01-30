@@ -1,14 +1,14 @@
 <?php
 
-namespace Statamic\Addons\Form;
+namespace Statamic\Forms;
 
 use Statamic\API\Str;
 use Statamic\API\Form;
 use Statamic\API\File;
 use Statamic\API\Metrics;
-use Statamic\Extend\Widget;
+use Statamic\Extend\Widget as BaseWidget;
 
-class FormWidget extends Widget
+class Widget extends BaseWidget
 {
     public function html()
     {
@@ -28,6 +28,6 @@ class FormWidget extends Widget
             'title'       => $this->get('title', $form->title())
         ];
 
-        return $this->view('widget', $data);
+        return view('statamic::forms.widget', $data);
     }
 }

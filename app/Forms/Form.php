@@ -49,14 +49,15 @@ class Form implements FormContract
     public function submissions()
     {
         $submissions = collect();
+        $directory = config('statamic.forms.submissions') . '/' . $this->name();
 
-        $files = Folder::disk('storage')->getFilesByType("forms/{$this->name()}", 'yaml');
+        $files = Folder::getFilesByType($directory, 'yaml');
 
         foreach ($files as $file) {
             $submission = $this->createSubmission();
             $submission->id(pathinfo($file)['filename']);
             $submission->unguard();
-            $submission->data(YAML::parse(File::disk('storage')->get($file)));
+            $submission->data(YAML::parse(File::get($file)));
 
             $submissions->push($submission);
         }

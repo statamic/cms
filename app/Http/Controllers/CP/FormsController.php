@@ -8,9 +8,8 @@ use Statamic\API\File;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\Exceptions\FatalException;
-use Statamic\Presenters\PaginationPresenter;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Statamic\Forms\Presenters\UploadedFilePresenter;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 class FormsController extends CpController
 {
@@ -104,7 +103,7 @@ class FormsController extends CpController
                 'currentPage'   => $paginator->currentPage(),
                 'prevPage'      => $paginator->previousPageUrl(),
                 'nextPage'      => $paginator->nextPageUrl(),
-                'segments'      => array_get($paginator->render(new PaginationPresenter($paginator)), 'segments')
+                'segments'      => array_get($paginator->renderArray(), 'segments')
             ]
         ];
     }

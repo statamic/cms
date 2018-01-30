@@ -3,6 +3,8 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Statamic\API\YAML;
+use Statamic\API\File;
 use Statamic\API\Helper;
 use Statamic\API\Storage;
 use Statamic\Exceptions\PublishException;
@@ -214,9 +216,7 @@ class Submission implements SubmissionContract
             }
 
             // Define the attribute (friendly name) so it doesn't appear as field.fieldname
-            $attributes[$field_name] = translate('cp.attribute_field_name', [
-                'attribute' => array_get($field_config, 'display', $field_name),
-            ]);
+            $attributes[$field_name] = array_get($field_config, 'display', $field_name);
         }
 
         $validator = app('validator')->make($data, $rules, [], $attributes);
@@ -266,9 +266,7 @@ class Submission implements SubmissionContract
      */
     public function save()
     {
-        $filename = 'forms/' . $this->formset()->name() . '/' . $this->id();
-
-        Storage::putYAML($filename, $this->data());
+        File::put($this->getPath(), YAML::dump($this->data()));
     }
 
     /**
@@ -276,7 +274,7 @@ class Submission implements SubmissionContract
      */
     public function delete()
     {
-        Storage::delete($this->getPath());
+        File::delete($this->getPath());
     }
 
     /**
@@ -286,7 +284,7 @@ class Submission implements SubmissionContract
      */
     public function getPath()
     {
-        return 'forms/' . $this->formset()->name() . '/' . $this->id() . '.yaml';
+        return config('statamic.forms.submissions') . '/' . $this->formset()->name() . '/' . $this->id() . '.yaml';
     }
 
     /**
