@@ -533,14 +533,18 @@ function format_update($string)
     return $string;
 }
 
-function start_measure()
-{
-    // make things work until debug bar is back
+if (! function_exists('start_measure')) {
+    function start_measure()
+    {
+        // Prevent errors if debug bar is not installed.
+    }
 }
 
-function stop_measure()
-{
-    // make things work until debug bar is back
+if (! function_exists('stop_measure')) {
+    function stop_measure()
+    {
+        // Prevent errors if debug bar is not installed.
+    }
 }
 
 if (!function_exists('mb_str_word_count')) {
