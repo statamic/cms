@@ -11,7 +11,7 @@ class FileViewFinder extends LaravelFileViewFinder
      *
      * @var array
      */
-    protected $extensions = ['blade.php', 'php', 'antlers.html'];
+    protected $extensions = ['antlers.html', 'antlers.php', 'blade.php', 'php'];
 
     /**
      * Add a location to the finder.

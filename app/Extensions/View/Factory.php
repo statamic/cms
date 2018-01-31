@@ -12,8 +12,9 @@ class Factory extends ViewFactory
      * @var array
      */
     protected $extensions = [
+        'antlers.html' => 'antlers',
+        'antlers.php' => 'antlers',
         'blade.php' => 'blade',
         'php' => 'php',
-        'antlers.html' => 'antlers'
     ];
 }

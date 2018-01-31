@@ -17,11 +17,12 @@ class Parse
      * @param       $str        String to parse
      * @param array $variables  Variables to use
      * @param array $context    Contextual variables to also use
+     * @param bool  $php        Whether PHP should be allowed
      * @return string
      */
-    public function template($str, $variables = [], $context = [])
+    public function template($str, $variables = [], $context = [], $php = false)
     {
-        return Antlers::parse($str, $variables, $context);
+        return Antlers::parse($str, $variables, $context, $php);
     }
 
     /**
@@ -31,11 +32,12 @@ class Parse
      * @param array   $data        Variables to use, in a multidimensional array
      * @param bool    $supplement  Whether to supplement with contextual values
      * @param array   $context     Contextual variables to also use
+     * @param bool    $php         Whether PHP should be allowed
      * @return string
      */
-    public function templateLoop($content, $data, $supplement = true, $context = [])
+    public function templateLoop($content, $data, $supplement = true, $context = [], $php = false)
     {
-        return Antlers::parseLoop($content, $data, $supplement, $context);
+        return Antlers::parseLoop($content, $data, $supplement, $context, $php);
     }
 
     /**

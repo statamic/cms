@@ -15,9 +15,10 @@ class Template
      * @param       $str        String to parse
      * @param array $variables  Variables to use
      * @param array $context    Contextual variables to also use
+     * @param bool  $php        Whether PHP should be allowed
      * @return string
      */
-    public static function parse($str, $variables = [], $context = [])
+    public static function parse($str, $variables = [], $context = [], $php = false)
     {
         $parser = new Parser;
 
@@ -29,7 +30,7 @@ class Template
 
         $data = array_merge($context, $variables);
 
-        return $parser->parse($str, $data, ['Statamic\View\Antlers\Engine', 'renderTag'], Config::get('statamic.theming.allow_php'));
+        return $parser->parse($str, $data, ['Statamic\View\Antlers\Engine', 'renderTag'], $php);
     }
 
     /**
@@ -41,7 +42,7 @@ class Template
      * @param array   $context
      * @return string
      */
-    public static function parseLoop($content, $data, $supplement, $context)
+    public static function parseLoop($content, $data, $supplement, $context, $php = false)
     {
         $output = '';
         $i      = 1;
@@ -57,7 +58,7 @@ class Template
                 $item['total_results'] = $total;
             }
 
-            $output .= self::parse($content, $item, $context);
+            $output .= self::parse($content, $item, $context, $php);
             $i++;
         }
 

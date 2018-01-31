@@ -17,19 +17,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Allow PHP in templates
-    |--------------------------------------------------------------------------
-    |
-    | By default, any PHP code is escaped inside templates for security reasons.
-    | We recommend creating tags or modifiers to allow custom functionality,
-    | but if absolutely necessary, you can enable this and go rogue.
-    |
-    */
-
-    'allow_php' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Markdown Hard Wrapping
     |--------------------------------------------------------------------------
     |

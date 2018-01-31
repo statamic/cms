@@ -67,7 +67,12 @@ class Engine implements EngineInterface
         $this->store->merge($template_front_matter);
 
         // Render the template
-        $rendered_template = Parse::template($raw_template, $this->store->getAll());
+        $rendered_template = Parse::template(
+            $raw_template,
+            $this->store->getAll(),
+            [],
+            Str::endsWith($this->path, '.php')
+        );
 
         // The template will get injected into the layout's {{ template_content }} tag
         $this->store->merge(['template_content' => $rendered_template]);
