@@ -109,7 +109,7 @@ class Engine implements EngineInterface
                 ? 'layouts'
                 : 'views'; // @todo: Make dynamic since it's possible it could be changed.
 
-            $path .= "/{$layout}.html";
+            $path .= "/{$layout}.antlers.html";
 
             if (File::exists($path)) {
                 return File::get($path);

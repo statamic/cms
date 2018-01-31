@@ -14,6 +14,6 @@ class Factory extends ViewFactory
     protected $extensions = [
         'blade.php' => 'blade',
         'php' => 'php',
-        'html' => 'antlers'
+        'antlers.html' => 'antlers'
     ];
 }
