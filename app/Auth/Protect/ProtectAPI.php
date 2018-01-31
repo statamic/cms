@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic\Addons\Protect;
+namespace Statamic\Auth\Protect;
 
 use Statamic\API\Arr;
 use Statamic\API\URL;
 use Statamic\API\Config;
 use Statamic\Extend\API;
 
-class ProtectAPI extends API
+class ProtectAPI
 {
     /**
      * @param mixed $data

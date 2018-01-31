@@ -12,6 +12,7 @@ Route::group(['prefix' => Config::get('statamic.assets.image_manipulation.route'
 
 Route::group(['prefix' => config('statamic.routes.action')], function () {
     Route::post('form/create', 'FormController@create');
+    Route::post('protect/password', 'ProtectController@password');
 
     Route::group(['prefix' => 'user'], function () {
         Route::post('login', 'UserController@login');

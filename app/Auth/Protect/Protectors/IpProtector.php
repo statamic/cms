@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\Protect\Protectors;
+namespace Statamic\Auth\Protect\Protectors;
 
 class IpProtector extends AbstractProtector
 {

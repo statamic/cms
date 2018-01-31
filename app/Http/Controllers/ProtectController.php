@@ -1,16 +1,11 @@
 <?php
 
-namespace Statamic\Addons\Protect;
+namespace Statamic\Http\Controllers;
 
-use Statamic\Extend\Listener;
-use Statamic\Addons\Protect\Protectors\PasswordProtector;
+use Statamic\Auth\Protect\Protectors\PasswordProtector;
 
-class ProtectListener extends Listener
+class ProtectController extends Controller
 {
-    public $events = [
-        'Protect.password' => 'password',
-    ];
-
     /**
      * @var PasswordProtector
      */
@@ -19,14 +14,14 @@ class ProtectListener extends Listener
     public function password()
     {
         if (! $token = $this->getTokenData()) {
-            $this->flash->put('error', 'Invalid or expired token.');
+            session()->flash('error', 'Invalid or expired token.');
             return back();
         }
 
         $this->protector = new PasswordProtector($this->getUrl(), $this->getScheme());
 
         if (! $this->protector->isValidPassword($this->getPassword())) {
-            $this->flash->put('error', 'Incorrect password.');
+            session()->flash('error', 'Incorrect password.');
             return back();
         }
 

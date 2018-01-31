@@ -18,6 +18,7 @@ use Statamic\CP\Publish\SneakPeek;
 use Statamic\Routing\ExceptionRoute;
 use Statamic\Contracts\Data\LocalizedData;
 use DebugBar\DataCollector\ConfigCollector;
+use Statamic\Auth\Protect\ProtectAPI;
 
 /**
  * The front-end controller
@@ -361,7 +362,7 @@ class FrontendController extends Controller
 
     private function protect()
     {
-        return addon('Protect')->protect($this->data);
+        return (new ProtectAPI)->protect($this->data);
     }
 
     public function setUpDebugBar()

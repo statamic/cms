@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Addons\Protect;
+namespace Statamic\Auth\Protect;
 
-use Statamic\Addons\Protect\Protectors\Protector;
-use Statamic\Addons\Protect\Protectors\IpProtector;
-use Statamic\Addons\Protect\Protectors\NullProtector;
-use Statamic\Addons\Protect\Protectors\PasswordProtector;
-use Statamic\Addons\Protect\Protectors\LoggedInProtector;
+use Statamic\Auth\Protect\Protectors\Protector;
+use Statamic\Auth\Protect\Protectors\IpProtector;
+use Statamic\Auth\Protect\Protectors\NullProtector;
+use Statamic\Auth\Protect\Protectors\PasswordProtector;
+use Statamic\Auth\Protect\Protectors\LoggedInProtector;
 
 class ProtectorManager
 {

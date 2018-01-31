@@ -1,11 +1,12 @@
 <?php
 
-namespace Statamic\Addons\Protect;
+namespace Statamic\Auth\Protect;
 
+use Statamic\API\URL;
 use Statamic\API\Request;
-use Statamic\Extend\Tags;
+use Statamic\Extend\Tags as BaseTags;
 
-class ProtectTags extends Tags
+class Tags extends BaseTags
 {
     /**
      * Password form
@@ -23,11 +24,21 @@ class ProtectTags extends Tags
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
         $html .= $this->parse([
-            'error' => $this->flash->get('error')
+            'error' => session()->get('error')
         ]);
 
         $html .= '</form>';
 
         return $html;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function eventUrl($url, $relative = false)
+    {
+        return URL::prependSiteUrl(
+            config('statamic.routes.action') . '/protect/' . $url
+        );
     }
 }
