@@ -115,8 +115,8 @@ class Sender
      */
     private function parseFallbackEmailTemplates()
     {
-        $html_view = 'email.'.$this->message->template().'-html';
-        $text_view = 'email.'.$this->message->template().'-text';
+        $html_view = 'statamic::email.'.$this->message->template().'-html';
+        $text_view = 'statamic::email.'.$this->message->template().'-text';
 
         return [
             view($html_view, $this->message->data())->__toString(),
