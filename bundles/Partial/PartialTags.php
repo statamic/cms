@@ -17,10 +17,14 @@ class PartialTags extends Tags
         $src = $this->get('src', array_get_colon($arguments, 0, $this->tag_method));
 
         $partialPath = config('statamic.theming.dedicated_view_directories')
-            ? resource_path("partials/{$src}.html")
-            : resource_path("views/{$src}.html");
+            ? resource_path("partials/{$src}.antlers")
+            : resource_path("views/{$src}.antlers");
 
-        $partial = File::get($partialPath);
+        if (! $partial = File::get($partialPath.'.html')) {
+            if ($partial = File::get($partialPath.'.php')) {
+                $php = true;
+            }
+        }
 
         // Allow front matter in these suckers
         $parsed = Parse::frontMatter($partial);
@@ -31,6 +35,6 @@ class PartialTags extends Tags
         // Since 2.5, parameters need to be prefixed with a colon in order to read from the field.
         $variables = array_merge($this->context, $variables, $this->parameters);
 
-        return Parse::template($template, $variables);
+        return Parse::template($template, $variables, [], $php ?? false);
     }
 }
