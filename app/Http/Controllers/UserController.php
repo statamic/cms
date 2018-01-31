@@ -1,25 +1,18 @@
 <?php
 
-namespace Statamic\Addons\User;
+namespace Statamic\Http\Controllers;
 
 use Statamic\API\Auth;
 use Statamic\API\User;
 use Statamic\API\Request;
-use Statamic\Extend\Listener;
+use Statamic\Extend\Controller;
+use Statamic\Auth\PasswordReset;
+use Statamic\Auth\UserRegistrar;
 use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Data\Users\User as UserContract;
 
-class UserListener extends Listener
+class UserController extends Controller
 {
-    public $events = [
-        'user.reset' => 'reset',
-        'User.reset' => 'reset',
-        'User.forgot' => 'forgot',
-        'User.login' => 'login',
-        'User.logout' => 'logout',
-        'User.register' => 'register'
-    ];
-
     private $request;
 
     /**

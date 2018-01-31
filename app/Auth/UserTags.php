@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Addons\User;
+namespace Statamic\Auth;
 
+use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Request;
 use Statamic\Extend\Tags;
@@ -366,16 +367,13 @@ class UserTags extends Tags
     }
 
     /**
-     * Generate an event url but ensures its from the User namespace
-     * since this might be called from a Member tag.
-     *
      * {@inheritdoc}
      */
     public function eventUrl($url, $relative = false)
     {
-        $url = parent::eventUrl($url, $relative);
-
-        return str_replace('/Member', '/User', $url);
+        return URL::prependSiteUrl(
+            config('statamic.routes.action') . '/user/' . $url
+        );
     }
 
     /**

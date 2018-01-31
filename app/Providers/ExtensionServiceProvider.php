@@ -23,7 +23,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'get_content', 'get_files', 'get_value', 'glide', 'in', 'is', 'link', 'locales',
         'markdown', 'member', 'nav', 'not_found', 'oauth', 'obfuscate', 'pages', 'parent',
         'partial', 'path', 'protect', 'redirect', 'relate', 'rotate', 'routes', 'search',
-        'section', 'taxonomy', 'theme', 'trans', 'trans_choice', 'user', 'users', 'widont', 'yields',
+        'section', 'taxonomy', 'theme', 'trans', 'trans_choice', 'users', 'widont', 'yields',
     ];
 
     /**
@@ -153,6 +153,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         $this->app['statamic.tags']['form'] = \Statamic\Forms\Tags::class;
+        $this->app['statamic.tags']['user'] = \Statamic\Auth\UserTags::class;
     }
 
     /**

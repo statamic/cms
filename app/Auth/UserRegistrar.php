@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\User;
+namespace Statamic\Auth;
 
 use Validator;
 use Statamic\API\User;
