@@ -36,6 +36,8 @@ class Engine implements EngineInterface
      */
     private $store;
 
+    private $layoutUsesPhp = false;
+
     /**
      * Create a new AntlersEngine instance
      *
@@ -78,7 +80,7 @@ class Engine implements EngineInterface
         $this->store->merge(['template_content' => $rendered_template]);
 
         // Render the layout
-        $rendered_layout = Parse::template($raw_layout, $this->store->getAll());
+        $rendered_layout = Parse::template($raw_layout, $this->store->getAll(), [], $this->layoutUsesPhp);
 
         // Anything that was avoided with {{ noparse }} tags, put them back in now that we're done
         $html = Parser::injectNoparse($rendered_layout);
@@ -114,10 +116,15 @@ class Engine implements EngineInterface
                 ? 'layouts'
                 : 'views'; // @todo: Make dynamic since it's possible it could be changed.
 
-            $path .= "/{$layout}.antlers.html";
+            $path .= "/{$layout}.antlers";
 
-            if (File::exists($path)) {
-                return File::get($path);
+            if (File::exists($path.'.html')) {
+                return File::get($path.'.html');
+            }
+
+            if (File::exists($path.'.php')) {
+                $this->layoutUsesPhp = true;
+                return File::get($path.'.php');
             }
         }
 
