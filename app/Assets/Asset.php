@@ -583,7 +583,7 @@ class Asset extends Data implements AssetContract
         }
 
         // Then the default asset fieldset
-        return Fieldset::get(config('statamic.statamic.theming.fieldsets.asset'));
+        return Fieldset::get(config('statamic.theming.fieldsets.asset'));
     }
 
     /**
