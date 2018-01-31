@@ -77,7 +77,7 @@ return [
     'php_max_memory_limit' => null,
 
     'charset' => 'UTF-8',
-    'parser_backtrack_limit',
+    // 'parser_backtrack_limit' => null,
     'timezone' => 'UTC',
     'protect' => [],
 
