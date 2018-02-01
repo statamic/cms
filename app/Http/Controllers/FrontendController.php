@@ -184,16 +184,6 @@ class FrontendController extends Controller
             return $this->notFoundResponse($url);
         }
 
-        // Perform a redirect if this is a vanity URL
-        if ($vanity = $this->vanityRedirect($url)) {
-            return $vanity;
-        }
-
-        // Perform a redirect if this URL has moved permanent
-        if ($permanent = $this->permanentRedirect($url)) {
-            return $permanent;
-        }
-
         // Attempt to find the data for this URL. It might be content,
         // a route, or nada. If there's nothing, we'll send a 404.
         $this->data = $this->getDataForUri($url);
@@ -327,36 +317,6 @@ class FrontendController extends Controller
             }
 
             return redirect($redirect);
-        }
-    }
-
-    /**
-     * Perform a vanity redirect
-     *
-     * @param  string $url URL to test
-     * @return null|RedirectResponse  A redirect if a vanity route exists, or nothing.
-     */
-    private function vanityRedirect($url)
-    {
-        $routes = array_get(Config::getRoutes(), 'vanity', []);
-
-        if (array_key_exists($url, $routes)) {
-            return redirect($routes[$url]);
-        }
-    }
-
-    /**
-     * Perform a vanity redirect
-     *
-     * @param  string $url URL to test
-     * @return null|RedirectResponse  A redirect if a vanity route exists, or nothing.
-     */
-    private function permanentRedirect($url)
-    {
-        $routes = array_get(Config::getRoutes(), 'redirect', []);
-
-        if (array_key_exists($url, $routes)) {
-            return redirect($routes[$url], 301);
         }
     }
 
