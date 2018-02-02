@@ -15,6 +15,20 @@ use Statamic\Filesystem\FilesystemAdapter;
 
 class FrontendTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        config(['statamic.sites' => [
+            'default' => 'en',
+            'sites' => [
+                'en' => [
+                    'url' => 'http://localhost/',
+                ]
+            ]
+        ]]);
+    }
+
     /** @test */
     function vanity_routes_get_redirected()
     {
