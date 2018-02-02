@@ -421,4 +421,13 @@ class FrontendController extends Controller
     {
         return '/';
     }
+
+    public function removeIgnoredSegments($uri)
+    {
+        $ignore = config('statamic.routes.ignore', []);
+
+        return collect(explode('/', $uri))->reject(function ($segment) use ($ignore) {
+            return in_array($segment, $ignore);
+        })->implode('/');
+    }
 }
