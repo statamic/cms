@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\DataStore;
+use Statamic\Sites\Sites;
 use Statamic\Routing\Router;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
@@ -33,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
-        collect(['assets', 'cp', 'forms', 'routes', 'static_caching', 'system', 'theming', 'users'])->each(function ($config) {
+        collect(['assets', 'cp', 'forms', 'routes', 'static_caching', 'sites', 'system', 'theming', 'users'])->each(function ($config) {
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
             $this->publishes(["{$this->root}/config/$config.php" => config_path("statamic/$config.php")], 'statamic');
         });
@@ -51,6 +52,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(Router::class, function () {
             return new Router(config('statamic.routes.routes', []));
+        });
+
+        $this->app->bind(Sites::class, function () {
+            return new Sites(config('statamic.sites'));
         });
     }
 }
