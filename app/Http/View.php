@@ -150,8 +150,8 @@ class View
     private function errorLayoutShouldBeUsed()
     {
         $customLayout = config('statamic.theming.dedicated_view_directories')
-            ? 'layouts/error.html'
-            : 'views/errors/layout.html';
+            ? 'layouts/error.antlers.html'
+            : 'views/errors/layout.antlers.html';
 
         return $this->data instanceof ExceptionRoute
             && File::exists(resource_path($customLayout));
