@@ -7,6 +7,7 @@ use Statamic\API\URL;
 use Statamic\API\Path;
 use Statamic\API\User;
 use Statamic\API\Event;
+use Statamic\API\Site;
 use Statamic\Http\View;
 use Statamic\API\Config;
 use Statamic\API\Folder;
@@ -156,18 +157,18 @@ class FrontendController extends Controller
     /**
      * Handles all URLs
      *
-     * URL: /{segments}
-     *
-     * @param string $segments
      * @return string
      */
-    public function index($segments = '/')
+    public function index(Request $request)
     {
         // Create a response now so that we can modify it.
         $this->response = response('');
 
-        $segments = $this->parseUrl($segments);
-        $url = URL::tidy('/' . preg_replace('#^'.$this->siteRoot().'#', '', '/'.$segments));
+        $site = Site::current();
+
+        $url = $site->relativePath($request->getUri());
+
+        $url = $this->removeIgnoredSegments($url);
 
         // Are we sneaking a peek?
         if ($this->peeking = $this->request->has('preview')) {
@@ -180,7 +181,7 @@ class FrontendController extends Controller
         }
 
         // Prevent continuing if we're looking for a missing favicon
-        if ($segments === 'favicon.ico') {
+        if ($url === '/favicon.ico') {
             return $this->notFoundResponse($url);
         }
 
@@ -241,23 +242,6 @@ class FrontendController extends Controller
         $this->modifyResponse();
 
         return $this->response;
-    }
-
-    /**
-     * Parse the URL segments
-     *
-     * @param string $segments
-     * @return array
-     */
-    private function parseUrl($segments)
-    {
-        // Remove ignored segments
-        $segments = explode('/', $segments);
-        $ignore = array_get(Config::getRoutes(), 'ignore', []);
-        $remove_segments = array_intersect_key($ignore, $segments);
-        $segments = join('/', array_diff($segments, $remove_segments));
-
-        return $segments;
     }
 
     /**
@@ -415,11 +399,6 @@ class FrontendController extends Controller
         // Allow addons to modify the response. They can add headers, modify the content, etc.
         // The event will get the Response object as a payload, which they simply need to modify.
         event('response.created', $this->response);
-    }
-
-    private function siteRoot()
-    {
-        return '/';
     }
 
     public function removeIgnoredSegments($uri)
