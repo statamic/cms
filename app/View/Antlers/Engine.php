@@ -3,16 +3,11 @@
 namespace Statamic\View\Antlers;
 
 use Statamic\API\Str;
-use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Parse;
-use Statamic\DataStore;
-use Statamic\API\Helper;
-use Statamic\API\Config;
 use Statamic\Exceptions;
-use Statamic\View\Antlers\Parser;
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Extend\Management\TagLoader;
-use Statamic\Exceptions\FileNotFoundException;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 
 class Engine implements EngineInterface
@@ -25,27 +20,25 @@ class Engine implements EngineInterface
     private $data;
 
     /**
-     * Full path to the view/template
+     * Full path to the view
      *
      * @var string
      */
     private $path;
 
     /**
-     * @var DataStore
+     * @var Filesystem
      */
-    private $store;
-
-    private $layoutUsesPhp = false;
+    private $filesystem;
 
     /**
      * Create a new AntlersEngine instance
      *
-     * @param DataStore $store
+     * @param Filesystem $filesystem
      */
-    public function __construct(DataStore $store)
+    public function __construct(Filesystem $filesystem)
     {
-        $this->store = $store;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -57,35 +50,24 @@ class Engine implements EngineInterface
      */
     public function get($path, array $data = [])
     {
-        $this->path = $path;
-        $this->data = $data;
+        $contents = $this->getContents($path);
 
-        // Get the view contents, along with any front-matter.
-        list($layout_front_matter, $raw_layout) = $this->extractFrontMatter($this->loadLayout());
-        list($template_front_matter, $raw_template) = $this->extractFrontMatter($this->loadTemplate());
+        list($frontMatter, $contents) = $this->extractFrontMatter($contents);
 
-        // Merge in any view level data
-        $this->store->merge($layout_front_matter);
-        $this->store->merge($template_front_matter);
-
-        // Render the template
-        $rendered_template = Parse::template(
-            $raw_template,
-            $this->store->getAll(),
+        $contents = Parse::template(
+            $contents,
+            array_merge($data, $frontMatter),
             [],
-            Str::endsWith($this->path, '.php')
+            Str::endsWith($path, '.php')
         );
 
-        // The template will get injected into the layout's {{ template_content }} tag
-        $this->store->merge(['template_content' => $rendered_template]);
-
-        // Render the layout
-        $rendered_layout = Parse::template($raw_layout, $this->store->getAll(), [], $this->layoutUsesPhp);
-
         // Anything that was avoided with {{ noparse }} tags, put them back in now that we're done
-        $html = Parser::injectNoparse($rendered_layout);
+        return Parser::injectNoparse($contents);
+    }
 
-        return $html;
+    protected function getContents($path)
+    {
+        return $this->filesystem->get($path);
     }
 
     /**
@@ -99,48 +81,6 @@ class Engine implements EngineInterface
         $parsed = Parse::frontMatter($contents);
 
         return [$parsed['data'], $parsed['content']];
-    }
-
-    /**
-     * Gets the raw contents of the layout
-     *
-     * @return string
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    private function loadLayout()
-    {
-        foreach (Helper::ensureArray($this->data['layout']) as $layout) {
-            $path = resource_path() . '/';
-
-            $path .= config('statamic.theming.dedicated_view_directories')
-                ? 'layouts'
-                : 'views'; // @todo: Make dynamic since it's possible it could be changed.
-
-            $path .= "/{$layout}.antlers";
-
-            if (File::exists($path.'.html')) {
-                return File::get($path.'.html');
-            }
-
-            if (File::exists($path.'.php')) {
-                $this->layoutUsesPhp = true;
-                return File::get($path.'.php');
-            }
-        }
-
-        // If there's no layout file available, we're not going to be getting very far. Let's
-        // throw an exception here to kill the request. It doesn't make sense to continue.
-        throw new FileNotFoundException("Layout [{$this->data['layout']}] doesn't exist.");
-    }
-
-    /**
-     * Gets the raw contents of the template
-     *
-     * @return string
-     */
-    private function loadTemplate()
-    {
-        return File::get($this->path);
     }
 
     /**

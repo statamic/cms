@@ -77,7 +77,7 @@ class ViewServiceProvider extends LaravelViewServiceProvider
     public function registerAntlersEngine($resolver)
     {
         $resolver->register('antlers', function () {
-            return new AntlersEngine(app('Statamic\DataStore'));
+            return new AntlersEngine($this->app['files']);
         });
 
         $this->app->singleton('Statamic\View\Antlers\Parser', function () {
