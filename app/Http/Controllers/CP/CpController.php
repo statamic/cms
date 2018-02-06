@@ -71,6 +71,6 @@ class CpController extends Controller
      */
     public function pageNotFound()
     {
-        abort(404);
+        return response()->view('statamic::errors.404', [], 404);
     }
 }
