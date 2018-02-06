@@ -2,27 +2,29 @@
 
 namespace Tests;
 
-use Mockery;
-use Statamic\API\File;
 use Statamic\API\User;
 use Statamic\API\Page;
 use Statamic\API\Role;
-use Statamic\API\Taxonomy;
 use Statamic\Stache\Stache;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use Statamic\Filesystem\FilesystemAdapter;
 
 class FrontendTest extends TestCase
 {
+    use FakesViews;
+
     public function setUp()
     {
         parent::setUp();
+
+        $this->withStandardFakeViews();
 
         config(['statamic.sites' => [
             'default' => 'en',
             'sites' => [
                 'en' => [
+                    'name' => 'English',
+                    'locale' => 'en_US',
                     'url' => 'http://localhost/',
                 ]
             ]
@@ -48,6 +50,8 @@ class FrontendTest extends TestCase
     /** @test */
     function pages_get_protected()
     {
+        $this->markTestIncomplete(); // need to implement whole site protection
+
         $page = $this->createPage('/');
 
         config(['statamic.system.protect' => [
@@ -60,12 +64,9 @@ class FrontendTest extends TestCase
     /** @test */
     function drafts_are_not_visible()
     {
-        $this->fakeTemplate();
-        $this->fakeErrorTemplate();
-
+        $this->withStandardFakeErrorViews();
         $page = $this->createPage('/about');
         $page->published(false);
-        $this->mockPageToArray(['path' => 'pages/_about/index.md']);
 
         $this->get('/about')->assertStatus(404);
     }
@@ -73,20 +74,20 @@ class FrontendTest extends TestCase
     /** @test */
     function drafts_are_visible_if_logged_in_with_correct_permission()
     {
-        $this->fakeTemplate();
         $this->fakeRoles(['draft_viewer' => ['permissions' => ['content:view_drafts_on_frontend']]]);
         $user = User::create()->with(['roles' => ['draft_viewer']])->get();
 
         $page = $this->createPage('/about');
         $page->published(false);
         $page->set('content', 'Testing 123');
-        $this->mockPageToArray(['path' => 'pages/_about/index.md']);
 
-        $this
+        $response = $this
             ->actingAs($user)
             ->get('/about')
             ->assertStatus(200)
-            ->assertSee('Testing 123');
+            ->assertHeader('X-Statamic-Draft', true);
+
+        $this->assertEquals('Testing 123', $response->content());
     }
 
     /** @test */
@@ -98,17 +99,14 @@ class FrontendTest extends TestCase
     /** @test */
     function live_preview_overrides_data()
     {
-        $this->fakeTemplate();
+        $this->markTestIncomplete(); // todo: live preview
+
         $this->fakeRoles(['cp_accessor' => ['permissions' => ['cp:access']]]);
         $user = User::create()->with(['roles' => ['cp_accessor']])->get();
 
         $page = $this->createPage('/about');
         $page->set('content', 'Testing 123');
         $page->set('fieldset', 'default');
-        $this->mockPageToArray(['path' => 'pages/about/index.md']);
-
-        File::shouldReceive('exists')->with($fieldsetPath = 'resources/fieldsets/default.yaml')->andReturnTrue();
-        File::shouldReceive('get')->with($fieldsetPath)->andReturn("fields:\n  content:\n    type: text");
 
         $this
             ->actingAs($user)
@@ -120,33 +118,64 @@ class FrontendTest extends TestCase
     /** @test */
     function key_variables_key_added()
     {
-        $this->withoutExceptionHandling();
-        $this->fakeTemplate();
-
         $page = $this->createPage('/');
-        $this->mockPageToArray(['path' => 'pages/index.md']);
 
-        $this->get('/')->assertStatus(200);
+        $response = $this->get('/')->assertStatus(200);
 
         $keys = [
             'site_url', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today', 'locale',
             'locale_name', 'locale_full', 'locale_url', 'get', 'post', 'get_post', 'old', 'response_code',
-            'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'settings',
+            'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
         ];
 
+        $cascade = $this->app['Statamic\Cascade']->toArray();
+
         foreach ($keys as $key) {
-            $this->assertArrayHasKey($key, datastore()->getScope('cascade'));
+            $this->assertArrayHasKey($key, $cascade);
         }
+    }
+
+    /** @test */
+    function only_content_gets_automatically_parsed_as_markdown()
+    {
+        $this->fakeView->rawContents('layout', '{{ template_content }}');
+        $this->fakeView->rawContents('default', '{{ content }}{{ subtitle }}');
+
+        $this->createPage('/', [
+            'path' => 'pages/index.md',
+            'with' => [
+                'content' => '# Foo *Bar*',
+                'subtitle' => '# Foo *Bar*',
+            ]
+        ]);
+
+        $response = $this->get('/');
+
+        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
+    }
+
+    /** @test */
+    function content_gets_automatically_parsed_as_textile()
+    {
+        $this->fakeView->rawContents('default', '{{ content }}{{ subtitle }}');
+
+        $this->createPage('/', [
+            'path' => 'pages/index.textile',
+            'with' => [
+                'content' => 'h1. Foo *Bar*',
+                'subtitle' => 'h1. Foo *Bar*',
+            ]
+        ]);
+
+        $response = $this->get('/');
+
+        $this->assertEquals("<h1>Foo <strong>Bar</strong></h1>h1. Foo *Bar*", trim($response->content()));
     }
 
     /** @test */
     function changes_content_type_to_xml()
     {
-        $this->fakeTemplate();
-        $this->mockPageToArray(['path' => 'pages/index.md']);
-
-        $page = $this->createPage('/');
-        $page->set('content_type', 'xml');
+        $this->createPage('/', ['with' => ['content_type' => 'xml']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
         $this->get('/')->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
@@ -155,11 +184,7 @@ class FrontendTest extends TestCase
     /** @test */
     function changes_content_type_to_atom()
     {
-        $this->fakeTemplate();
-        $this->mockPageToArray(['path' => 'pages/index.md']);
-
-        $page = $this->createPage('/');
-        $page->set('content_type', 'atom');
+        $this->createPage('/', ['with' => ['content_type' => 'atom']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
         $this->get('/')->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
@@ -168,11 +193,7 @@ class FrontendTest extends TestCase
     /** @test */
     function changes_content_type_to_json()
     {
-        $this->fakeTemplate();
-        $this->mockPageToArray(['path' => 'pages/index.md']);
-
-        $page = $this->createPage('/');
-        $page->set('content_type', 'json');
+        $this->createPage('/', ['with' => ['content_type' => 'json']]);
 
         $this->get('/')->assertHeader('Content-Type', 'application/json');
     }
@@ -180,11 +201,7 @@ class FrontendTest extends TestCase
     /** @test */
     function changes_content_type_to_text()
     {
-        $this->fakeTemplate();
-        $this->mockPageToArray(['path' => 'pages/index.md']);
-
-        $page = $this->createPage('/');
-        $page->set('content_type', 'text');
+        $this->createPage('/', ['with' => ['content_type' => 'text']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
         $this->get('/')->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
@@ -193,11 +210,8 @@ class FrontendTest extends TestCase
     /** @test */
     function sends_powered_by_header_if_enabled()
     {
-        $this->fakeTemplate();
         config(['statamic.system.send_powered_by_header' => true]);
-
-        $page = $this->createPage('/');
-        $this->mockPageToArray(['path' => 'pages/index.md']);
+        $this->createPage('/');
 
         $this->get('/')->assertHeader('X-Powered-By', 'Statamic');
     }
@@ -205,11 +219,8 @@ class FrontendTest extends TestCase
     /** @test */
     function doesnt_send_powered_by_header_if_disabled()
     {
-        $this->fakeTemplate();
         config(['statamic.system.send_powered_by_header' => false]);
-
-        $page = $this->createPage('/');
-        $this->mockPageToArray(['path' => 'pages/index.md']);
+        $this->createPage('/');
 
         $this->get('/')->assertHeaderMissing('X-Powered-By', 'Statamic');
     }
@@ -217,14 +228,12 @@ class FrontendTest extends TestCase
     /** @test */
     function headers_can_be_set_in_content()
     {
-        $this->fakeTemplate();
-        $this->mockPageToArray(['path' => 'pages/index.md']);
-
-        $page = $this->createPage('/');
-        $page->set('headers', [
-            'X-Some-Header' => 'Foo',
-            'X-Another-Header' => 'Bar'
-        ]);
+        $page = $this->createPage('/', ['with' => [
+            'headers' => [
+                'X-Some-Header' => 'Foo',
+                'X-Another-Header' => 'Bar'
+            ]
+        ]]);
 
         $this->get('/')
             ->assertHeader('X-Some-Header', 'Foo')
@@ -235,17 +244,15 @@ class FrontendTest extends TestCase
     function event_is_emitted_when_response_is_created()
     {
         Event::fake();
-        $this->fakeTemplate();
-        $this->mockPageToArray(['path' => 'pages/index.md']);
 
         $page = $this->createPage('/');
         $page->set('headers', ['X-Foo' => 'Bar']);
 
         $this->get('/')->assertStatus(200);
 
-        Event::assertDispatched('response.created', function ($event, $response) {
-            return $response instanceof Response
-                && $response->headers->has('X-Foo');
+        Event::assertDispatched('Statamic\Events\ResponseCreated', function ($event) {
+            return $event->response instanceof Response
+                && $event->response->headers->has('X-Foo');
         });
     }
 
@@ -263,29 +270,63 @@ class FrontendTest extends TestCase
         $this->assertEquals('/foo/baz/flux', $class->removeIgnoredSegments('/foo/bar/baz/qux/flux'));
     }
 
-    private function createPage($url)
+    /** @test */
+    function routes_pointing_to_controllers_should_render()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function routes_pointing_to_invalid_controller_should_render_404()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function a_redirect_key_in_the_page_data_should_redirect()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function a_redirect_key_with_a_404_value_should_404()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function debug_bar_shows_cascade_variables_if_enabled()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function the_404_page_is_treated_like_a_template()
+    {
+        $this->markTestIncomplete();
+
+        // all the key variables from the cascade are available
+        // and they're in the debugbar
+        // the 'response_code' key var is 404
+    }
+
+    private function createPage($url, $factoryAttributes = [])
     {
         $id = 'test-page-id';
         $path = $url . '/index.md';
-        $page = Page::create($url)->id($id)->get();
+
+        $page = Page::create($url)->id($id);
+
+        foreach ($factoryAttributes as $attrKey => $attrValue) {
+            $page->$attrKey($attrValue);
+        }
+
+        $page = $page->get();
+
         $stache = $this->app->make(Stache::class);
         $stache->repo('pages')->setPath($id, $path)->setUri($id, $url)->setItem($id, $page);
         $stache->repo('pagestructure')->setUri($id, $url)->setPath($id, $path)->setItem($id, $page->structure());
         return $page;
-    }
-
-    private function fakeTemplate($template = 'default', $content = '{{ content }}')
-    {
-        Taxonomy::shouldReceive('all')->andReturn(collect());
-        File::shouldReceive('exists')->with($layout = resource_path('views/layout.antlers.html'))->andReturnTrue();
-        File::shouldReceive('get')->with($layout)->andReturn('{{ template_content }}');
-        File::shouldReceive('get')->with(resource_path("views/{$template}.antlers.html"))->andReturn($content);
-    }
-
-    private function fakeErrorTemplate($code = '404')
-    {
-        File::shouldReceive('exists')->with(resource_path('views/errors/layout.antlers.html'))->andReturnFalse();
-        File::shouldReceive('get')->with(resource_path("views/errors/{$code}.antlers.html"))->andReturn('The error template.');
     }
 
     private function fakeRoles($roles)
@@ -295,15 +336,5 @@ class FrontendTest extends TestCase
         });
 
         Role::shouldReceive('all')->andReturn($roles);
-    }
-
-    /**
-     * When a page is loaded, it converts the content to an array.
-     * Some operations in this will need to access the filesystem. For example, getting the last modified time.
-     */
-    private function mockPageToArray(array $attrs)
-    {
-        File::shouldReceive('disk')->with('content')->andReturn($fs = Mockery::mock(FilesystemAdapter::class));
-        $fs->shouldReceive('lastModified')->with($attrs['path'])->andReturn(time());
     }
 }

@@ -8,11 +8,13 @@ use Statamic\API\Parse;
 use Statamic\API\Str;
 use Statamic\API\Term;
 use Statamic\API\Taxonomy;
+use Statamic\Http\Responses\DataResponse;
 use Statamic\Exceptions\UuidExistsException;
 use Statamic\Exceptions\UrlNotFoundException;
+use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Data as DataContract;
 
-abstract class Data implements DataContract
+abstract class Data implements DataContract, Responsable
 {
     /**
      * The target/active locale
@@ -761,5 +763,10 @@ abstract class Data implements DataContract
 
             $this->supplements[$taxonomy_handle] = $terms->all();
         });
+    }
+
+    public function toResponse($request)
+    {
+        return (new DataResponse($this))->toResponse($request);
     }
 }

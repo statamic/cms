@@ -2,10 +2,11 @@
 
 namespace Statamic\Data;
 
+use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Data as DataContract;
 use Statamic\Contracts\Data\LocalizedData as LocalizedDataContract;
 
-class LocalizedData implements LocalizedDataContract
+class LocalizedData implements LocalizedDataContract, Responsable
 {
     /**
      * @var string
@@ -91,5 +92,10 @@ class LocalizedData implements LocalizedDataContract
     public function toArray()
     {
         return $this->call('toArray');
+    }
+
+    public function toResponse($request)
+    {
+        return $this->call('toResponse', [$request]);
     }
 }

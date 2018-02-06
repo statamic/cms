@@ -26,7 +26,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PersistStache::class)
              ->pushMiddleware(\Statamic\Http\Middleware\PermanentRedirects::class)
-             ->pushMiddleware(\Statamic\Http\Middleware\VanityRedirects::class);
+             ->pushMiddleware(\Statamic\Http\Middleware\VanityRedirects::class)
+             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
 
         $this->app->booted(function () {
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
