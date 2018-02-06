@@ -17,6 +17,22 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    function gets_name()
+    {
+        $site = new Site('en', ['name' => 'English']);
+
+        $this->assertEquals('English', $site->name());
+    }
+
+    /** @test */
+    function gets_locale()
+    {
+        $site = new Site('en', ['locale' => 'en_US']);
+
+        $this->assertEquals('en_US', $site->locale());
+    }
+
+    /** @test */
     function gets_url()
     {
         $site = new Site('en', ['url' => 'http://test.com/']);

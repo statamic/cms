@@ -21,6 +21,16 @@ class Site
         return $this->handle;
     }
 
+    public function name()
+    {
+        return $this->config['name'];
+    }
+
+    public function locale()
+    {
+        return $this->config['locale'];
+    }
+
     public function url()
     {
         return $this->config['url'];
