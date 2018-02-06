@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Cascade;
 use Statamic\View\Store;
 use Statamic\View\Modify;
 use Statamic\View\Antlers\Parser;
@@ -25,6 +26,10 @@ class ViewServiceProvider extends LaravelViewServiceProvider
         parent::register();
 
         $this->app->singleton(Store::class);
+
+        $this->app->singleton(Cascade::class, function ($app) {
+            return new Cascade($app['request'], \Statamic\API\Site::current());
+        });
     }
 
     /**
