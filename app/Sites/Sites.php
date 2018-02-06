@@ -16,6 +16,16 @@ class Sites
         $this->sites = $this->toSites($config['sites']);
     }
 
+    public function all()
+    {
+        return $this->sites;
+    }
+
+    public function get($handle)
+    {
+        return $this->sites->get($handle);
+    }
+
     public function findByUrl($url)
     {
         $url = Str::ensureRight($url, '/');
