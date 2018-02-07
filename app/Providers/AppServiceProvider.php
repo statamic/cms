@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
             return new Router(config('statamic.routes.routes', []));
         });
 
-        $this->app->bind(Sites::class, function () {
+        $this->app->singleton(Sites::class, function () {
             return new Sites(config('statamic.sites'));
         });
     }
