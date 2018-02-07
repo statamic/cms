@@ -3,6 +3,7 @@
 namespace Statamic\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
 
 class PoweredByHeader
 {
@@ -17,7 +18,7 @@ class PoweredByHeader
     {
         $response = $next($request);
 
-        if (config('statamic.system.send_powered_by_header')) {
+        if (config('statamic.system.send_powered_by_header') && $response instanceof Response) {
             $response->header('X-Powered-By', 'Statamic');
         }
 
