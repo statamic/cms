@@ -38,7 +38,7 @@ class ContentTest extends TestCase
 
     public function test_that_a_url_can_get_retrieved()
     {
-        Config::set('statamic.system.locales.en.url', 'http://foo.com/');
+        Config::set('statamic.sites.sites.en.url', 'http://foo.com/');
 
         $this->assertEquals('/about', $this->page->url());
         $this->assertEquals('http://foo.com/about', $this->page->absoluteUrl());

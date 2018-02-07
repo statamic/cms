@@ -52,7 +52,7 @@ class EntryTest extends TestCase
 
     public function testGetsUrl()
     {
-        Config::set('statamic.system.locales', [
+        Config::set('statamic.sites.sites', [
             'en' => ['name' => 'English', 'url' => 'http://talons-beard.dev/']
         ]);
 

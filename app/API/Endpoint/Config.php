@@ -3,6 +3,7 @@
 namespace Statamic\API\Endpoint;
 
 use Statamic\API\Str;
+use Statamic\API\Site;
 
 /**
  * Interacting with the configuration
@@ -68,6 +69,11 @@ class Config
         return $key;
     }
 
+    public function getSite($locale)
+    {
+        return Site::get($locale ?? site_locale());
+    }
+
     /**
      * Get the current locale's full code for date string translations
      *
@@ -76,11 +82,7 @@ class Config
      */
     public function getFullLocale($locale = null)
     {
-        if (is_null($locale)) {
-            $locale = site_locale();
-        }
-
-        return self::get('statamic.system.locales.' . $locale . '.full', 'en_US');
+        return $this->getSite($locale)->locale();
     }
 
     /**
@@ -91,9 +93,7 @@ class Config
      */
     public function getShortLocale($locale = null)
     {
-        $full = str_replace('_', '-', self::getFullLocale($locale));
-
-        return explode('-', $full)[0];
+        return $this->getSite($locale)->shortLocale();
     }
 
     /**
@@ -104,11 +104,7 @@ class Config
      */
     public function getLocaleName($locale = null)
     {
-        if (is_null($locale)) {
-            $locale = site_locale();
-        }
-
-        return self::get('statamic.system.locales.' . $locale . '.name', 'English');
+        return $this->getSite($locale)->name();
     }
 
     /**
@@ -118,7 +114,7 @@ class Config
      */
     public function getLocales()
     {
-        return array_keys(self::get('statamic.system.locales'));
+        return array_keys($this->get('statamic.sites.sites'));
     }
 
     /**
@@ -128,13 +124,7 @@ class Config
      */
     public function getDefaultLocale()
     {
-        if (env('APP_ENV') === 'testing') {
-            return 'en';
-        }
-
-        $locales = self::get('statamic.system.locales');
-
-        return key($locales);
+        return config('statamic.sites.default');
     }
 
     /**
@@ -149,9 +139,7 @@ class Config
             $locale = site_locale();
         }
 
-        $locales = array_keys(self::get('statamic.system.locales'));
-
-        return array_values(array_diff($locales, [$locale]));
+        return array_values(array_diff($this->getLocales(), [$locale]));
     }
 
     /**
@@ -162,11 +150,7 @@ class Config
      */
     public function getSiteUrl($locale = null)
     {
-        $locales = self::get('statamic.system.locales');
-
-        $locale = $locale ?: site_locale();
-
-        return Str::ensureRight(array_get($locales, $locale.'.url'), '/');
+        return $this->getSite($locale)->url();
     }
 
     /**

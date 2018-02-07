@@ -40,7 +40,7 @@ class UrlTest extends TestCase
 
     public function testPrependsSiteUrl()
     {
-        Config::set('statamic.system.locales.en.url', 'http://site.com/');
+        Config::set('statamic.sites.sites.en.url', 'http://site.com/');
 
         $this->assertEquals(
             'http://site.com/foo',
@@ -50,7 +50,7 @@ class UrlTest extends TestCase
 
     public function testPrependsSiteUrlWithController()
     {
-        Config::set('statamic.system.locales.en.url', 'http://site.com/index.php/');
+        Config::set('statamic.sites.sites.en.url', 'http://site.com/index.php/');
 
         $this->assertEquals(
             'http://site.com/index.php/foo',
@@ -63,7 +63,7 @@ class UrlTest extends TestCase
         // Override with what would be used on a normal request.
         request()->server->set('SCRIPT_NAME', '/index.php');
 
-        Config::set('statamic.system.locales.en.url', 'http://site.com/index.php/');
+        Config::set('statamic.sites.sites.en.url', 'http://site.com/index.php/');
 
         $this->assertEquals(
             'http://site.com/foo',
@@ -73,7 +73,7 @@ class UrlTest extends TestCase
 
     public function testDeterminesExternalUrl()
     {
-        Config::set('statamic.system.locales.en.url', 'http://this-site.com/');
+        Config::set('statamic.sites.sites.en.url', 'http://this-site.com/');
         $this->assertTrue(URL::isExternalUrl('http://that-site.com'));
         $this->assertTrue(URL::isExternalUrl('http://that-site.com/'));
         $this->assertTrue(URL::isExternalUrl('http://that-site.com/some-slug'));
