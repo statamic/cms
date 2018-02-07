@@ -37,6 +37,32 @@ class SitesTest extends TestCase
     }
 
     /** @test */
+    function can_reinitialize_sites_by_reproviding_the_config()
+    {
+        $this->sites->setConfig([
+            'default' => 'foo',
+            'sites' => [
+                'foo' => [],
+                'bar' => [],
+            ]
+        ]);
+
+        $this->assertEquals('foo', $this->sites->get('foo')->handle());
+        $this->assertEquals('bar', $this->sites->get('bar')->handle());
+        $this->assertArrayNotHasKey('en', $this->sites->all());
+        $this->assertArrayNotHasKey('fr', $this->sites->all());
+        $this->assertArrayNotHasKey('de', $this->sites->all());
+    }
+
+    /** @test */
+    function can_change_specific_config_items()
+    {
+        $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
+
+        $this->assertEquals('http://foobar.com/', $this->sites->get('en')->url());
+    }
+
+    /** @test */
     function gets_site_by_handle()
     {
         tap($this->sites->get('en'), function ($site) {

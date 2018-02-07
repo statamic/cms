@@ -4,17 +4,16 @@ namespace Statamic\Sites;
 
 use Statamic\API\Str;
 
-
 class Sites
 {
+    protected $config;
     protected $default;
     protected $sites;
     protected $current;
 
     public function __construct($config)
     {
-        $this->default = $config['default'];
-        $this->sites = $this->toSites($config['sites']);
+        $this->setConfig($config);
     }
 
     public function all()
@@ -46,6 +45,20 @@ class Sites
     public function setCurrent($site)
     {
         $this->current = $this->get($site);
+    }
+
+    public function setConfig($key, $value = null)
+    {
+        // If no value is provided, then the key must've been the entire config.
+        // Otherwise, we should just replace the specific key in the config.
+        if (is_null($value)) {
+            $this->config = $key;
+        } else {
+            array_set($this->config, $key, $value);
+        }
+
+        $this->default = $this->config['default'];
+        $this->sites = $this->toSites($this->config['sites']);
     }
 
     protected function toSites($config)
