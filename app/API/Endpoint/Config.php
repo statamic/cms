@@ -69,7 +69,7 @@ class Config
         return $key;
     }
 
-    public function getSite($locale)
+    public function getSite($locale = null)
     {
         return Site::get($locale ?? site_locale());
     }
