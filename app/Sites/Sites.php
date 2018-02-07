@@ -9,6 +9,7 @@ class Sites
 {
     protected $default;
     protected $sites;
+    protected $current;
 
     public function __construct($config)
     {
@@ -37,7 +38,14 @@ class Sites
 
     public function current()
     {
-        return $this->findByUrl(request()->getUri());
+        return $this->current
+            ?? $this->findByUrl(request()->getUri())
+            ?? $this->get($this->default);
+    }
+
+    public function setCurrent($site)
+    {
+        $this->current = $this->get($site);
     }
 
     protected function toSites($config)

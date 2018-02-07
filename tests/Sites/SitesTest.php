@@ -53,4 +53,14 @@ class SitesTest extends TestCase
         $this->assertEquals('fr', $this->sites->findByUrl('http://fr.test.com/something')->handle());
         $this->assertNull($this->sites->findByUrl('http://unknownsite.com'));
     }
+
+    /** @test */
+    function current_site_can_be_explicitly_set()
+    {
+        $this->assertEquals('en', $this->sites->current()->handle());
+
+        $this->sites->setCurrent('fr');
+
+        $this->assertEquals('fr', $this->sites->current()->handle());
+    }
 }
