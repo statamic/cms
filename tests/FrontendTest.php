@@ -139,8 +139,8 @@ class FrontendTest extends TestCase
     /** @test */
     function only_content_gets_automatically_parsed_as_markdown()
     {
-        $this->fakeView->rawContents('layout', '{{ template_content }}');
-        $this->fakeView->rawContents('default', '{{ content }}{{ subtitle }}');
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', '{{ content }}{{ subtitle }}');
 
         $this->createPage('/', [
             'path' => 'pages/index.md',
@@ -158,7 +158,7 @@ class FrontendTest extends TestCase
     /** @test */
     function content_gets_automatically_parsed_as_textile()
     {
-        $this->fakeView->rawContents('default', '{{ content }}{{ subtitle }}');
+        $this->viewShouldReturnRaw('default', '{{ content }}{{ subtitle }}');
 
         $this->createPage('/', [
             'path' => 'pages/index.textile',

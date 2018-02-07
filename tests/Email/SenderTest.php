@@ -65,8 +65,8 @@ class SenderTest extends TestCase
     function mail_gets_sent_with_fallback_view_if_specified_one_doesnt_exist()
     {
         $this->withFakeViews();
-        $this->fakeView->renderedContents('statamic::email.built-in-view-html', 'html email content');
-        $this->fakeView->renderedContents('statamic::email.built-in-view-text', 'text email content');
+        $this->viewShouldReturnRendered('statamic::email.built-in-view-html', 'html email content');
+        $this->viewShouldReturnRendered('statamic::email.built-in-view-text', 'text email content');
 
         Email::create()
             ->to('john@recipient.com')
