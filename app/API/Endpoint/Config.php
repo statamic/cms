@@ -43,16 +43,6 @@ class Config
     }
 
     /**
-     * Save the config
-     *
-     * @return void
-     */
-    public function save()
-    {
-        self::config()->save();
-    }
-
-    /**
      * Get the app key
      *
      * @return string
