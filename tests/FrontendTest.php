@@ -5,6 +5,7 @@ namespace Tests;
 use Statamic\API\User;
 use Statamic\API\Page;
 use Statamic\API\Role;
+use Statamic\API\Site;
 use Statamic\Stache\Stache;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
@@ -19,7 +20,7 @@ class FrontendTest extends TestCase
 
         $this->withStandardFakeViews();
 
-        config(['statamic.sites' => [
+        Site::setConfig([
             'default' => 'en',
             'sites' => [
                 'en' => [
@@ -28,7 +29,7 @@ class FrontendTest extends TestCase
                     'url' => 'http://localhost/',
                 ]
             ]
-        ]]);
+        ]);
     }
 
     /** @test */

@@ -1,6 +1,7 @@
 <?php namespace Tests\Routing;
 
 use Tests\TestCase;
+use Statamic\API\Site;
 use Statamic\Routing\Route;
 use Statamic\Routing\Router;
 
@@ -61,7 +62,7 @@ class RouterTest extends TestCase
     /** @test */
     public function standardizes_routes()
     {
-        config(['statamic.sites.sites.en.url' => '/']);
+        Site::setConfig('sites.en.url', '/');
 
         $router = new Router;
 

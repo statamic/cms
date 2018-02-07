@@ -2,11 +2,12 @@
 
 namespace Tests\Data;
 
-use Statamic\API\Entries;
-use Statamic\API\Entry;
-use Statamic\Stache\Stache;
 use Tests\TestCase;
+use Statamic\API\Site;
+use Statamic\API\Entry;
 use Statamic\API\Config;
+use Statamic\API\Entries;
+use Statamic\Stache\Stache;
 
 class EntryTest extends TestCase
 {
@@ -52,8 +53,11 @@ class EntryTest extends TestCase
 
     public function testGetsUrl()
     {
-        Config::set('statamic.sites.sites', [
-            'en' => ['name' => 'English', 'url' => 'http://talons-beard.dev/']
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'url' => 'http://talons-beard.dev/']
+            ]
         ]);
 
         Config::set('statamic.routes.collections.blog', '/blog/{slug}');

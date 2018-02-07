@@ -4,6 +4,7 @@ namespace Tests\Extend;
 
 use Tests\TestCase;
 use Statamic\API\Path;
+use Statamic\API\Site;
 use Statamic\API\Config;
 use Statamic\Extend\Addon;
 use Statamic\Config\Addons;
@@ -170,7 +171,7 @@ class ExtensibleTest extends TestCase
     {
         // How these urls work needs some grapes.
 
-        config(['statamic.sites.sites.en.url' => 'http://example.com']);
+        Site::setConfig('sites.en.url', 'http://example.com');
 
         $addon = new Extension;
         $this->assertEquals('/!/bar/foo', $addon->eventUrl('foo'));

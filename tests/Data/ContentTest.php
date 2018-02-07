@@ -2,9 +2,10 @@
 
 namespace Tests\Data;
 
-use Statamic\API\Config;
 use Tests\TestCase;
 use Statamic\API\Page;
+use Statamic\API\Site;
+use Statamic\API\Config;
 
 class ContentTest extends TestCase
 {
@@ -38,7 +39,7 @@ class ContentTest extends TestCase
 
     public function test_that_a_url_can_get_retrieved()
     {
-        Config::set('statamic.sites.sites.en.url', 'http://foo.com/');
+        Site::setConfig('sites.en.url', 'http://foo.com/');
 
         $this->assertEquals('/about', $this->page->url());
         $this->assertEquals('http://foo.com/about', $this->page->absoluteUrl());

@@ -168,13 +168,13 @@ class ConfigTest extends TestCase
 
     private function fakeSiteConfig()
     {
-        config(['statamic.sites' => [
+        \Statamic\API\Site::setConfig([
             'default' => 'en',
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
                 'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
                 'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/']
             ]
-        ]]);
+        ]);
     }
 }
