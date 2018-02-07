@@ -49,7 +49,7 @@ class Config
      */
     public function getAppKey()
     {
-        return self::get('statamic.system.app_key');
+        return $this->get('app.key');
     }
 
     /**
@@ -59,7 +59,7 @@ class Config
      */
     public function getLicenseKey()
     {
-        $key = self::get('statamic.system.license_key');
+        $key = $this->get('statamic.system.license_key');
 
         if (! $key || $key == '') {
             return null;
@@ -176,7 +176,7 @@ class Config
      */
     public function getRoutes()
     {
-        return self::get('statamic.routes');
+        return $this->get('statamic.routes');
     }
 
     /**
