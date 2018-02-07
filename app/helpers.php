@@ -3,6 +3,7 @@
 use Statamic\API\URL;
 use Statamic\API\Str;
 use Statamic\API\Path;
+use Statamic\API\Config;
 use Statamic\Extend\Addon;
 use Michelf\MarkdownExtra;
 use Illuminate\Support\Arr;
@@ -50,8 +51,7 @@ if (! function_exists('array_get_colon')) {
  */
 function default_locale()
 {
-    log_todo();
-    return 'en';
+    return Config::getDefaultLocale();
 }
 
 function path($from, $extra = null)
