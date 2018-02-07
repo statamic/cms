@@ -3,6 +3,7 @@
 use Statamic\API\URL;
 use Statamic\API\Str;
 use Statamic\API\Path;
+use Statamic\API\Site;
 use Statamic\API\Config;
 use Statamic\Extend\Addon;
 use Michelf\MarkdownExtra;
@@ -83,10 +84,10 @@ function temp_path($path = null)
 function site_locale($locale = null)
 {
     if ($locale) {
-        return config(['app.locale' => $locale]);
+        return Site::setCurrent($locale);
     }
 
-    return config('app.locale');
+    return Site::current()->handle();
 }
 
 /**
