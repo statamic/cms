@@ -33,6 +33,14 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    function gets_short_locale()
+    {
+        $this->assertEquals('en', (new Site('en', ['locale' => 'en']))->shortLocale());
+        $this->assertEquals('en', (new Site('en', ['locale' => 'en_US']))->shortLocale());
+        $this->assertEquals('en', (new Site('en', ['locale' => 'en-US']))->shortLocale());
+    }
+
+    /** @test */
     function gets_url()
     {
         $site = new Site('en', ['url' => 'http://test.com/']);

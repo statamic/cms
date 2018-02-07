@@ -31,6 +31,11 @@ class Site
         return $this->config['locale'];
     }
 
+    public function shortLocale()
+    {
+        return explode('-', str_replace('_', '-', $this->locale()))[0];
+    }
+
     public function url()
     {
         return $this->config['url'];
