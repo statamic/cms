@@ -2,10 +2,11 @@
 
 namespace Statamic\Tests\Data;
 
+use Tests\TestCase;
 use Statamic\Data\Pages\Page;
 use Statamic\Data\LocalizedData;
 
-class LocalizedDataTest extends \PHPUnit\Framework\TestCase
+class LocalizedDataTest extends TestCase
 {
     protected $page;
     protected $localized;
