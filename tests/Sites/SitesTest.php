@@ -9,6 +9,13 @@ use Illuminate\Support\Collection;
 
 class SitesTest extends TestCase
 {
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
+    }
+
     public function setUp()
     {
         parent::setUp();
@@ -88,5 +95,21 @@ class SitesTest extends TestCase
         $this->sites->setCurrent('fr');
 
         $this->assertEquals('fr', $this->sites->current()->handle());
+    }
+
+    /** @test */
+    function gets_site_from_url_when_using_relative_urls()
+    {
+        $sites = new Sites([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['url' => '/'],
+                'fr' => ['url' => '/fr/'],
+            ],
+        ]);
+
+        $this->assertEquals('en', $sites->findByUrl('http://absolute-url-resolved-from-request.com/something')->handle());
+        $this->assertEquals('fr', $sites->findByUrl('http://absolute-url-resolved-from-request.com/fr/something')->handle());
+        $this->assertNull($sites->findByUrl('http://unknownsite.com'));
     }
 }

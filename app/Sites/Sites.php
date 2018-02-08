@@ -31,7 +31,7 @@ class Sites
         $url = Str::ensureRight($url, '/');
 
         return collect($this->sites)->filter(function ($site) use ($url) {
-            return Str::startsWith($url, $site->url());
+            return Str::startsWith($url, $site->absoluteUrl());
         })->sortByDesc->url()->first();
     }
 

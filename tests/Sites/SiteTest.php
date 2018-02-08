@@ -8,6 +8,13 @@ use Statamic\Sites\Sites;
 
 class SiteTest extends TestCase
 {
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
+    }
+
     /** @test */
     function gets_handle()
     {
@@ -49,6 +56,37 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    function gets_absolute_url()
+    {
+        $this->assertEquals(
+            'http://a-defined-absolute-url.com/',
+            (new Site('en', ['url' => 'http://a-defined-absolute-url.com/']))->absoluteUrl()
+        );
+
+        $this->assertEquals(
+            'http://absolute-url-resolved-from-request.com/',
+            (new Site('en', ['url' => '/']))->absoluteUrl()
+        );
+
+        $this->assertEquals(
+            'http://absolute-url-resolved-from-request.com/fr/',
+            (new Site('en', ['url' => '/fr/']))->absoluteUrl()
+        );
+
+        $this->get('/something');
+
+        $this->assertEquals(
+            'http://absolute-url-resolved-from-request.com/',
+            (new Site('en', ['url' => '/']))->absoluteUrl()
+        );
+
+        $this->assertEquals(
+            'http://absolute-url-resolved-from-request.com/fr/',
+            (new Site('en', ['url' => '/fr/']))->absoluteUrl()
+        );
+    }
+
+    /** @test */
     function gets_path()
     {
         tap(new Site('en', ['url' => 'http://test.com/']), function ($site) {
@@ -67,6 +105,18 @@ class SiteTest extends TestCase
             $this->assertEquals('/', $site->relativePath('http://subdomain.test.com/'));
             $this->assertEquals('/foo', $site->relativePath('http://subdomain.test.com/foo'));
             $this->assertEquals('/foo/bar', $site->relativePath('http://subdomain.test.com/foo/bar'));
+        });
+
+        tap(new Site('en', ['url' => '/']), function ($site) {
+            $this->assertEquals('/', $site->relativePath('http://absolute-url-resolved-from-request.com/'));
+            $this->assertEquals('/foo', $site->relativePath('http://absolute-url-resolved-from-request.com/foo'));
+            $this->assertEquals('/foo/bar', $site->relativePath('http://absolute-url-resolved-from-request.com/foo/bar'));
+        });
+
+        tap(new Site('fr', ['url' => '/fr/']), function ($site) {
+            $this->assertEquals('/', $site->relativePath('http://absolute-url-resolved-from-request.com/fr/'));
+            $this->assertEquals('/foo', $site->relativePath('http://absolute-url-resolved-from-request.com/fr/foo'));
+            $this->assertEquals('/foo/bar', $site->relativePath('http://absolute-url-resolved-from-request.com/fr/foo/bar'));
         });
     }
 }

@@ -41,10 +41,26 @@ class Site
         return $this->config['url'];
     }
 
+    public function absoluteUrl()
+    {
+        if (Str::startsWith($url = $this->url(), '/')) {
+            return Str::ensureLeft($url, $this->removePath(request()->getUri()));
+        }
+
+        return $url;
+    }
+
     public function relativePath($url)
     {
-        $path = Str::removeLeft($url, $this->url());
+        $path = Str::removeLeft($url, $this->absoluteUrl());
 
         return Str::ensureLeft($path, '/');
+    }
+
+    private function removePath($url)
+    {
+        $parsed = parse_url($url);
+
+        return $parsed['scheme'] . '://' . $parsed['host'];
     }
 }
