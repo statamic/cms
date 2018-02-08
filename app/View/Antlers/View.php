@@ -10,22 +10,34 @@ class View
     protected $layout;
     protected $template;
 
-    public function data($data)
+    public function data($data = null)
     {
+        if (! $data) {
+            return $this->data;
+        }
+
         $this->data = $data;
 
         return $this;
     }
 
-    public function layout($layout)
+    public function layout($layout = null)
     {
+        if (! $layout) {
+            return $this->layout;
+        }
+
         $this->layout = $layout;
 
         return $this;
     }
 
-    public function template($template)
+    public function template($template = null)
     {
+        if (! $template) {
+            return $this->template;
+        }
+
         $this->template = $template;
 
         return $this;

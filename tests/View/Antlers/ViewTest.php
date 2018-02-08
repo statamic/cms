@@ -31,4 +31,28 @@ class ViewTest extends TestCase
             return $event->view === $view;
         });
     }
+
+    /** @test */
+    function gets_data()
+    {
+        $view = (new View)->data(['foo' => 'bar']);
+
+        $this->assertEquals(['foo' => 'bar'], $view->data());
+    }
+
+    /** @test */
+    function gets_template()
+    {
+        $view = (new View)->template('foo');
+
+        $this->assertEquals('foo', $view->template());
+    }
+
+    /** @test */
+    function gets_layout()
+    {
+        $view = (new View)->layout('foo');
+
+        $this->assertEquals('foo', $view->layout());
+    }
 }
