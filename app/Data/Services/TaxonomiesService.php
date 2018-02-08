@@ -54,6 +54,6 @@ class TaxonomiesService
      */
     private function disk($type = null)
     {
-        return ($type === 'folder') ? Folder::disk('content') : File::disk('content');
+        return Folder::disk('content');
     }
 }
