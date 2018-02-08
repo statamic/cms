@@ -17,8 +17,7 @@
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~6.0",
-        "statamic/statamic": "*",
+        "orchestra/testbench": "3.6",
         "tightenco/mailthief": "dev-master"
     },
     "autoload": {
@@ -48,11 +47,5 @@
                 "Statamic\\Providers\\StatamicServiceProvider"
             ]
         }
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../statamic"
-        }
-    ]
+    }
 }

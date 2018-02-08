@@ -2,17 +2,24 @@
 
 namespace Tests;
 
-use Statamic\Testing\TestCase as BaseTestCase;
-
-abstract class TestCase extends BaseTestCase
+class TestCase extends \Orchestra\Testbench\TestCase
 {
-    /**
-     * The path to the bootstrap/app.php file
-     *
-     * @return string
-     */
-    protected function bootstrapAppFile()
+    protected function getPackageProviders($app)
     {
-        return __DIR__ . '/../vendor/statamic/statamic/bootstrap/app.php';
+        return ['Statamic\Providers\StatamicServiceProvider'];
+    }
+
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        $configs = [
+            'assets', 'cp', 'forms', 'routes', 'static_caching',
+            'sites', 'system', 'theming', 'users'
+        ];
+
+        foreach ($configs as $config) {
+            $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
+        }
     }
 }
