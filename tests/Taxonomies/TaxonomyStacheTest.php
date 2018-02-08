@@ -3,8 +3,10 @@
 namespace Tests\Taxonomies;
 
 use Tests\TestCase;
-use Statamic\API\Config;
 use Statamic\API\Term;
+use Statamic\API\Config;
+use Statamic\API\Taxonomy;
+use Statamic\Stache\Stache;
 use Statamic\Stache\Staches\TaxonomyStache;
 
 class TaxonomyStacheTest extends TestCase
@@ -18,7 +20,21 @@ class TaxonomyStacheTest extends TestCase
     {
         parent::setUp();
 
+        $this->createTaxonomy('tags');
+
         $this->stache = new TaxonomyStache;
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('statamic.sites', [
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
     }
 
     public function test_that_data_is_associated_with_a_new_term()
@@ -130,10 +146,6 @@ class TaxonomyStacheTest extends TestCase
 
     private function registerLocalizedTerms()
     {
-        Config::set('statamic.system.locales', [
-            'en' => [], 'fr' => [], 'de' => []
-        ]);
-
         Config::set('statamic.routes.taxonomies.tags', [
             'en' => '/tags/{slug}/{field}',
             'fr' => '/fr-tags/{slug}/{field}',
@@ -209,5 +221,14 @@ class TaxonomyStacheTest extends TestCase
         $this->assertEquals(1, $this->stache->getAssociations('tags/foo')->count());
         $this->assertEquals(0 , $this->stache->getAssociations('tags/bar')->count());
         $this->assertArrayNotHasKey('tags/bar', $this->stache->getAssociations()->all());
+    }
+
+
+    private function createTaxonomy($handle)
+    {
+        $taxonomy = Taxonomy::create($handle);
+        $stache = $this->app->make(Stache::class);
+        $stache->repo('taxonomies')->setPath($handle, $handle.'.yaml')->setItem($handle, $taxonomy);
+        return $taxonomy;
     }
 }
