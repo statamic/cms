@@ -11,14 +11,7 @@ class TaxonomiesService
 {
     public function all()
     {
-        return collect(
-            Folder::disk('content')->getFilesByType('taxonomies', 'yaml')
-        )->map(function ($path) {
-            $handle = pathinfo($path)['filename'];
-            return $this->handle($handle);
-        })->keyBy(function ($taxonomy) {
-            return $taxonomy->path();
-        });
+        return app('stache')->repo('taxonomies')->getItems();
     }
 
     public function handle($handle)
@@ -38,9 +31,7 @@ class TaxonomiesService
 
     public function exists($handle)
     {
-        return $this->disk()->exists(
-            $this->path($handle)
-        );
+        return $this->all()->has($handle);
     }
 
     private function path($handle)

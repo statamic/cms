@@ -40,7 +40,8 @@ class TaxonomiesDriver extends AbstractDriver
         return [
             'meta' => [
                 'paths' => $repo->getPaths()->all()
-            ]
+            ],
+            'items' => ['data' => $repo->getItems()]
         ];
     }
 

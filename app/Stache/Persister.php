@@ -70,8 +70,8 @@ class Persister
         $this->keys = collect(Cache::get('stache::keys', []));
 
         // Persist the taxonomies
-        $this->store('taxonomies/data', $this->stache->taxonomies->toPersistableArray());
-        $this->keys[] = 'taxonomies/data';
+        $this->store('taxonomies/terms', $this->stache->taxonomies->toPersistableArray());
+        $this->keys[] = 'taxonomies/terms';
 
         // Loop through all the item objects which each driver has organized
         // into folders. These are separate because it has the potential to

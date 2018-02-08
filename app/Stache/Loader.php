@@ -54,7 +54,7 @@ class Loader
             }
         });
 
-        $this->stache->taxonomies->load($this->fetch('taxonomies/data'));
+        $this->stache->taxonomies->load($this->fetch('taxonomies/terms'));
     }
 
     /**

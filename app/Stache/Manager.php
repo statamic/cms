@@ -13,6 +13,7 @@ class Manager
      * @var array
      */
     protected $drivers = [
+        'Taxonomies',
         'Pages',
         'PageFolders',
         'PageStructure',
@@ -22,7 +23,6 @@ class Manager
         'Users',
         'UserGroups',
         'AssetContainers',
-        'Taxonomies',
     ];
 
     /**
