@@ -156,6 +156,7 @@ class Cascade
             'site' => $siteHandle = $this->site->handle(),
             'site_name' => $siteName = $this->site->name(),
             'site_locale' => $siteLocale = $this->site->locale(),
+            'site_short_locale' => $this->site->shortLocale(),
             'site_url' => $siteUrl = $this->site->url(),
             'homepage' => $siteUrl,
             'locale' => $siteHandle,
