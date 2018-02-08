@@ -81,4 +81,8 @@ return [
     'timezone' => 'UTC',
     'protect' => [],
 
+    'stache' => [
+        'always_update' => true,
+    ]
+
 ];

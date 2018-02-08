@@ -178,7 +178,7 @@ class StacheServiceProvider extends ServiceProvider
     private function shouldUpdateStache()
     {
         // Always-updating settings is off? Short-circuit here. Don't update.
-        if (! Config::get('cache.stache.always_update', true)) {
+        if (! Config::get('system.stache.always_update', true)) {
             return false;
         }
 
