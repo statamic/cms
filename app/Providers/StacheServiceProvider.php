@@ -75,7 +75,10 @@ class StacheServiceProvider extends ServiceProvider
      */
     private function registerManager()
     {
-        $class = (app()->environment() === 'testing') ? StacheTestManager::class : Manager::class;
+        // todo: Temporary workaround so we can test with a real stache in one single test class.
+        $class = (app()->environment() === 'testing' && !array_get($GLOBALS, 'need_real_stache_for_testing_kthx'))
+            ? StacheTestManager::class
+            : Manager::class;
 
         $manager = new $class(
             $this->stache,

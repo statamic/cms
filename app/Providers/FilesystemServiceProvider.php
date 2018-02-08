@@ -21,6 +21,12 @@ class FilesystemServiceProvider extends ServiceProvider
             'storage' => storage_path('statamic'),
         ];
 
+        // todo:
+        if (app()->environment() === 'testing') {
+            $paths['content'] = statamic_path('tests/fixtures/content');
+            $paths['users'] = statamic_path('tests/fixtures/users');
+        }
+
         foreach ($paths as $key => $path) {
             $this->app->bind("filesystems.paths.$key", function () use ($path) {
                 return $path;
