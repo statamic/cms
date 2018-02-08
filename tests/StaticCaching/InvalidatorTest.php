@@ -13,6 +13,15 @@ use Statamic\Events\Stache\RepositoryItemInserted;
 
 class InvalidatorTest extends \PHPUnit\Framework\TestCase
 {
+    public function tearDown()
+    {
+        if ($container = \Mockery::getContainer()) {
+            $this->addToAssertionCount($container->mockery_getExpectationCount());
+        }
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function non_content_in_event_will_do_nothing()
     {
