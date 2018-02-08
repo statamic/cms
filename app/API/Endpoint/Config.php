@@ -114,7 +114,7 @@ class Config
      */
     public function getLocales()
     {
-        return array_keys($this->get('statamic.sites.sites'));
+        return Site::all()->keys()->all();
     }
 
     /**
