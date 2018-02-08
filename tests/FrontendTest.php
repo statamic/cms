@@ -19,17 +19,6 @@ class FrontendTest extends TestCase
         parent::setUp();
 
         $this->withStandardFakeViews();
-
-        Site::setConfig([
-            'default' => 'en',
-            'sites' => [
-                'en' => [
-                    'name' => 'English',
-                    'locale' => 'en_US',
-                    'url' => 'http://localhost/',
-                ]
-            ]
-        ]);
     }
 
     /** @test */

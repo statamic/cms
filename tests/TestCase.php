@@ -22,4 +22,15 @@ class TestCase extends \Orchestra\Testbench\TestCase
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
     }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        // We changed the default sites setup but the tests assume defaults like the following.
+        $app['config']->set('statamic.sites', [
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',]
+            ]
+        ]);
+    }
 }
