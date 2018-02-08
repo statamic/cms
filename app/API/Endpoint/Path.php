@@ -19,8 +19,7 @@ class Path
      */
     public function makeRelative($path)
     {
-        $base = base_path();
-
+        $base = self::resolve(base_path());
         $path = self::resolve($path);
 
         if (strpos($path, $base) === 0) {
