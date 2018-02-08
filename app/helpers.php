@@ -216,7 +216,7 @@ function sanitize_array($array, $antlers = true)
 
     foreach ($array as $key => $value) {
         $key = htmlentities($key);
-        $result[$key] = sanitize($value);
+        $result[$key] = sanitize($value, $antlers);
     }
 
     return $result;
