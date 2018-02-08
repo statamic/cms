@@ -40,6 +40,10 @@ class FrontendController extends Controller
 
         $url = $this->removeIgnoredSegments($url);
 
+        if (str_contains($url, '?')) {
+            $url = substr($url, 0, strpos($url, '?'));
+        }
+
         if ($data = $this->getDataForUri($url)) {
             return $data;
         }

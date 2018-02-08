@@ -49,6 +49,48 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    function page_is_displayed()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> {{ content }}');
+
+        $page = $this->createPage('/about', [
+            'path' => 'pages/index.md',
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the *about* page.',
+                'template' => 'some_template',
+            ]
+        ]);
+
+        $response = $this->get('/about')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the <em>about</em> page.</p>', trim($response->content()));
+    }
+
+    /** @test */
+    function page_is_displayed_with_query_string()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> {{ content }}');
+
+        $page = $this->createPage('/about', [
+            'path' => 'pages/index.md',
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the *about* page.',
+                'template' => 'some_template',
+            ]
+        ]);
+
+        $response = $this->get('/about?some=querystring')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the <em>about</em> page.</p>', trim($response->content()));
+    }
+
+    /** @test */
     function pages_get_protected()
     {
         $this->markTestIncomplete(); // need to implement whole site protection
