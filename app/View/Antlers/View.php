@@ -2,6 +2,8 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\Events\ViewRendered;
+
 class View
 {
     protected $data;
@@ -35,6 +37,10 @@ class View
             'template_content' => view($this->template, $this->data)
         ]);
 
-        return view($this->layout, $data)->render();
+        $contents = view($this->layout, $data)->render();
+
+        ViewRendered::dispatch($this);
+
+        return $contents;
     }
 }
