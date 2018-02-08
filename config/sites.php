@@ -29,7 +29,7 @@ return [
     'sites' => [
 
         'default' => [
-            'name' => 'Statamic',
+            'name' => config('app.name'),
             'locale' => 'en_US',
             'url' => '/',
         ]
