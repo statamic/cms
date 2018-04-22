@@ -2,10 +2,12 @@
 
 namespace Statamic\Routing;
 
-use Statamic\API\Config;
 use Statamic\API\URL;
+use Statamic\API\Config;
+use Statamic\Http\Responses\DataResponse;
+use Illuminate\Contracts\Support\Responsable;
 
-class Route
+class Route implements Responsable
 {
     private $uri;
     private $data;
@@ -70,5 +72,15 @@ class Route
         }
 
         return [];
+    }
+
+    public function published()
+    {
+        return true;
+    }
+
+    public function toResponse($request)
+    {
+        return (new DataResponse($this))->toResponse($request);
     }
 }
