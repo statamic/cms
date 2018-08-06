@@ -183,7 +183,6 @@ EOT;
     /** @test */
     function it_deletes_items_for_each_deleted_file()
     {
-        $this->stache->keys(['test-store-key/data']);
         Cache::shouldReceive('get')->with('stache::timestamps/test-store-key', [])->andReturn([
             $this->tempDir.'/deleted.txt' => now()->subdays(2)->timestamp,
         ]);
