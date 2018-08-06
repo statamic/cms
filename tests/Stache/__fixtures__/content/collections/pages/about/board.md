@@ -1,0 +1,3 @@
+---
+id: board
+title: Board

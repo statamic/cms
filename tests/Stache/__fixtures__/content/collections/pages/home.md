@@ -1,0 +1,3 @@
+---
+id: home
+title: Home

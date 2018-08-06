@@ -1,0 +1,8 @@
+title: Pages
+route: '{slug}'
+tree:
+  - home #  (/)
+  - about # (/about)
+    - board # (/about/board)
+      - directors # (/about/board/directors)
+  - blog # (/blog)

@@ -1,0 +1,3 @@
+---
+id: blog
+title: Blog
