@@ -24,7 +24,7 @@ class EntriesStoreTest extends TestCase
     {
         $files = Traverser::traverse($this->store);
 
-        $this->assertEquals([
+        $this->assertEquals(collect([
             $this->directory.'/alphabetical/alpha.md',
             $this->directory.'/alphabetical/bravo.md',
             $this->directory.'/alphabetical/zulu.md',
@@ -39,7 +39,7 @@ class EntriesStoreTest extends TestCase
             $this->directory.'/pages/blog.md',
             $this->directory.'/pages/contact.md',
             $this->directory.'/pages/home.md',
-        ], $files->keys()->all());
+        ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
 
         // Sanity check. These files should exist but not be included.
         $this->assertTrue(file_exists($this->directory.'/blog.yaml'));
