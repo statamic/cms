@@ -12,7 +12,7 @@ class Store
             return $this->directory;
         }
 
-        $this->directory = $directory;
+        $this->directory = str_finish($directory, '/');
 
         return $this;
     }
