@@ -154,7 +154,6 @@ abstract class BasicStore extends Store
     }
 
     abstract public function key();
-    abstract public function getItemsFromCache($cache);
 
     public function getCacheableMeta()
     {
@@ -166,11 +165,32 @@ abstract class BasicStore extends Store
 
     public function getCacheableItems()
     {
-        return $this->items->map->toCacheableArray()->all();
+        return $this->items->map(function ($item) {
+            return method_exists($item, 'toCacheableArray') ? $item->toCacheableArray() : $item;
+        })->all();
+    }
+
+    public function cache()
+    {
+        Cache::forever($this->getItemsCacheKey(), $this->getCacheableItems());
+
+        Cache::forever($this->getMetaCacheKey(), $this->getCacheableMeta());
     }
 
     protected function getItemsCacheKey()
     {
         return 'stache::items/' . $this->key();
+    }
+
+    protected function getMetaCacheKey()
+    {
+        return 'stache::meta/' . $this->key();
+    }
+
+    public function getMetaFromCache()
+    {
+        if ($meta = Cache::get($this->getMetaCacheKey())) {
+            return [$this->key() => $meta];
+        }
     }
 }

@@ -223,6 +223,52 @@ class BasicStoreTest extends TestCase
         $this->assertNull($this->store->getItem('123'));
         $this->assertEquals($this->store, $return);
     }
+
+    /** @test */
+    function it_caches_items_and_meta_data()
+    {
+        $this->store->setPath('1', '/path/to/one.txt');
+        $this->store->setSiteUri('en', '1', '/one');
+        $this->store->setItem('1', new class {
+            public function toCacheableArray() {
+                return 'converted using toCacheableArray';
+            }
+        });
+
+        $this->store->setPath('2', '/path/to/two.txt');
+        $this->store->setSiteUri('en', '2', '/two');
+        $this->store->setSiteUri('fr', '2', '/deux');
+        $this->store->setItem('2', ['item' => 'two']);
+        Cache::shouldReceive('forever')->once()->with('stache::items/test', [
+            '1' => 'converted using toCacheableArray',
+            '2' => ['item' => 'two'],
+        ]);
+        Cache::shouldReceive('forever')->once()->with('stache::meta/test', [
+            'paths' => [
+                '1' => '/path/to/one.txt',
+                '2' => '/path/to/two.txt',
+            ],
+            'uris' => [
+                'en' => [
+                    '1' => '/one',
+                    '2' => '/two'
+                ],
+                'fr' => [
+                    '2' => '/deux'
+                ]
+            ]
+        ]);
+
+        $this->store->cache();
+    }
+
+    /** @test */
+    function gets_meta_data_from_cache_in_a_format_suitable_for_collection_mapWithKeys_method()
+    {
+        Cache::shouldReceive('get')->with('stache::meta/test')->once()->andReturn('what was in the cache');
+
+        $this->assertEquals(['test' => 'what was in the cache'], $this->store->getMetaFromCache());
+    }
 }
 
 class TestBasicStore extends BasicStore
