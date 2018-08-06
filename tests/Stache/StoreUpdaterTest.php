@@ -38,7 +38,6 @@ class StoreUpdaterTest extends TestCase
             }
             public function createItemFromFile($path, $contents) { return require($path); }
             public function getItemKey($item) { return $item->id(); }
-            public function cache() { }
         };
         $this->stache->registerStore($this->store);
         $this->updater = (new StoreUpdater(new Filesystem))->store($this->store);
@@ -172,6 +171,8 @@ EOT;
         ]));
 
         Cache::shouldReceive('forever')->once()->with('stache::timestamps/test-store-key', $traversedFiles);
+        Cache::shouldReceive('forever')->once()->with('stache::items/test-store-key', \Mockery::any());
+        Cache::shouldReceive('forever')->once()->with('stache::meta/test-store-key', \Mockery::any());
 
         $this->assertEquals('Item title', $this->store->getItem('123')->data()['title']);
 
@@ -229,7 +230,7 @@ EOT;
     }
 
     /** @test */
-    function timestamps_do_not_get_persisted_if_there_are_no_changes()
+    function nothing_should_get_cached_if_there_are_no_changes()
     {
         touch($this->tempDir.'/test.txt', $timestamp = now()->subDays(1)->timestamp);
         Traverser::shouldReceive('traverse')->andReturn(collect([
@@ -240,7 +241,7 @@ EOT;
         ]);
         Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([]);
 
-        Cache::shouldNotReceive('forever')->with('stache::timestamps/test-store-key');
+        Cache::shouldNotReceive('forever');
 
         $this->updater->update();
     }

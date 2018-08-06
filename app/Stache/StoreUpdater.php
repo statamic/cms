@@ -36,15 +36,6 @@ class StoreUpdater
             ?? collect(Cache::get($this->timestampsCacheKey(), []));
     }
 
-    protected function cacheTimestamps()
-    {
-        $files = $this->files()->all();
-
-        if ($files !== $this->timestamps()->all()) {
-            Cache::forever($this->timestampsCacheKey(), $files);
-        }
-    }
-
     protected function timestampsCacheKey()
     {
         return 'stache::timestamps/' . $this->store->key();
@@ -96,24 +87,12 @@ class StoreUpdater
 
     protected function cache()
     {
-        $this->cacheTimestamps();
-        $this->cacheMeta();
-        $this->cacheItems();
-    }
+        if ($this->modifiedFiles()->isEmpty() && $this->deletedFiles()->isEmpty()) {
+            return;
+        }
 
-    protected function cacheMeta()
-    {
-        Cache::forever(
-            'stache::' . $this->store->key() . '/meta',
-            $this->store->getCacheableMeta()
-        );
-    }
+        Cache::forever($this->timestampsCacheKey(), $this->files()->all());
 
-    protected function cacheItems()
-    {
-        Cache::forever(
-            'stache::' . $this->store->key() . '/data',
-            $this->store->getCacheableItems()
-        );
+        $this->store->cache();
     }
 }
