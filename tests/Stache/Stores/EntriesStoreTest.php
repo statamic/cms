@@ -7,6 +7,7 @@ use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
+use Statamic\Contracts\Data\Entries\Entry;
 
 class EntriesStoreTest extends TestCase
 {
@@ -49,15 +50,57 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_makes_entry_instances_from_cache()
     {
-        $this->markTestIncomplete();
-        // It should use Statamic\API\Entry::create()
+        $cache = collect([
+            '1' => [
+                'attributes' => [
+                    'slug' => 'test',
+                    'collection' => 'blog',
+                    'order' => '1',
+                    'published' => true,
+                    'data_type' => 'md',
+                ],
+                'data' => [
+                    'en' => [
+                        'id' => '1',
+                        'title' => 'Test Entry',
+                    ],
+                    'fr' => [
+                        'id' => '1',
+                        'title' => 'Le Test Entry',
+                    ]
+                ]
+            ]
+        ]);
+
+        $items = $this->store->getItemsFromCache($cache);
+
+        $this->assertCount(1, $items);
+        tap($items->first(), function ($entry) {
+            $this->assertInstanceOf(Entry::class, $entry);
+            $this->assertEquals('1', $entry->id());
+            $this->assertEquals('Test Entry', $entry->get('title'));
+            $this->assertEquals('Le Test Entry', $entry->in('fr')->get('title'));
+            $this->assertEquals('test', $entry->slug());
+            $this->assertEquals('1', $entry->order());
+            $this->assertTrue($entry->published());
+        });
     }
 
     /** @test */
     function it_makes_entry_instances_from_files()
     {
-        $this->markTestIncomplete();
-        // It should use Statamic\API\Entry::create()
+        $item = $this->store->createItemFromFile(
+            $this->directory.'/blog/2017-01-02.my-post.md',
+            "id: 123\ntitle: Example\nfoo: bar"
+        );
+
+        $this->assertInstanceOf(Entry::class, $item);
+        $this->assertEquals('123', $item->id());
+        $this->assertEquals('Example', $item->get('title'));
+        $this->assertEquals(['id' => '123', 'title' => 'Example', 'foo' => 'bar'], $item->data());
+        $this->assertEquals('2017-01-02', $item->order());
+        $this->assertEquals('my-post', $item->slug());
+        $this->assertTrue($item->published());
     }
 
     /** @test */

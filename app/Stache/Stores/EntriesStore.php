@@ -15,7 +15,29 @@ class EntriesStore extends AggregateStore
 
     public function getItemsFromCache($cache)
     {
-        dd('todo CollectionsStore@getItemsFromCache', $cache);
+        return $cache->map(function ($item, $id) {
+            $attr = $item['attributes'];
+            $data = $item['data'][default_locale()];
+            unset($data['id']);
+
+            $entry = Entry::create($attr['slug'])
+                ->id($id)
+                ->with($data)
+                ->collection($attr['collection'])
+                ->order(array_get($attr, 'order'))
+                ->published(array_get($attr, 'published'))
+                ->get();
+
+            if (count($item['data']) > 1) {
+                foreach ($item['data'] as $locale => $data) {
+                    $entry->dataForLocale($locale, $data);
+                }
+
+                $entry->syncOriginal();
+            }
+
+            return $entry;
+        });
     }
 
     public function getCacheableMeta()
@@ -44,8 +66,8 @@ class EntriesStore extends AggregateStore
         return Entry::create($slug)
             ->collection($collection)
             ->with($data)
-            ->published(true) // @todo
-            ->order(null) // @todo
+            ->published(app('Statamic\Contracts\Data\Content\StatusParser')->entryPublished($path))
+            ->order(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path))
             ->get();
     }
 
