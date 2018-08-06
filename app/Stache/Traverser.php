@@ -19,6 +19,8 @@ class Traverser
             throw new \Exception("Store [{$store->key()}] does not have a directory defined.");
         }
 
+        $dir = rtrim($dir, '/');
+
         return collect($this->filesystem->allFiles($dir))
             ->filter(function ($item) use ($store) {
                 return $store->filter($item);
