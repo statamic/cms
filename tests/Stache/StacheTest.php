@@ -13,6 +13,7 @@ class StacheTest extends TestCase
     public function setUp()
     {
         $this->stache = new Stache;
+        $this->stache->setBootstrapper($this->bootstrapper = new CountableFakeBootstrapper);
     }
 
     /** @test */
@@ -115,5 +116,64 @@ class StacheTest extends TestCase
 
         $this->assertEquals($one, $this->stache->store('entries::one'));
         $this->assertEquals($two, $this->stache->store('entries::two'));
+    }
+
+    /** @test */
+    function it_does_not_boot_more_than_once()
+    {
+        $this->assertFalse($this->stache->hasBooted());
+
+        $return = $this->stache->boot();
+
+        $this->assertTrue($this->stache->hasBooted());
+        $this->assertEquals($this->stache, $return);
+
+        $return = $this->stache->boot();
+
+        $this->assertEquals(1, $this->bootstrapper->boots);
+        $this->assertEquals($this->stache, $return);
+    }
+
+    /** @test */
+    function stache_is_booted_on_demand_when_attempting_to_access_stores()
+    {
+        $this->assertFalse($this->stache->hasBooted());
+
+        $this->stache->stores();
+
+        $this->assertTrue($this->stache->hasBooted());
+    }
+
+    /** @test */
+    function stache_is_booted_on_demand_when_attempting_to_access_a_single_store()
+    {
+        $this->assertFalse($this->stache->hasBooted());
+
+        $this->stache->store('one');
+
+        $this->assertTrue($this->stache->hasBooted());
+    }
+
+    /** @test */
+    function stache_is_booted_on_demand_when_attempting_to_access_an_aggregate_stores_child_store()
+    {
+        $this->stache->sites(['en']); // stores expect the stache to have site(s)
+        $store = new EntriesStore($this->stache);
+        $one = $store->store('one');
+        $this->stache->registerStore($store);
+        $this->assertFalse($this->stache->hasBooted());
+
+        $this->stache->store('entries::one');
+
+        $this->assertTrue($this->stache->hasBooted());
+    }
+}
+
+class CountableFakeBootstrapper
+{
+    public $boots = 0;
+    public function boot()
+    {
+        $this->boots++;
     }
 }

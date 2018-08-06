@@ -9,6 +9,8 @@ class Stache
     const TEMP_COLD = 'cold';
     const TEMP_WARM = 'warm';
 
+    protected $bootstrapper;
+    protected $booted = false;
     protected $temperature;
     protected $sites;
     protected $meta;
@@ -100,6 +102,8 @@ class Stache
 
     public function stores()
     {
+        $this->boot();
+
         return $this->stores;
     }
 
@@ -107,10 +111,10 @@ class Stache
     {
         if (str_contains($key, '::')) {
             list($parent, $child) = explode('::', $key);
-            return $this->stores->get($parent)->store($child);
+            return $this->stores()->get($parent)->store($child);
         }
 
-        return $this->stores->get($key);
+        return $this->stores()->get($key);
     }
 
     public function load()
@@ -122,6 +126,23 @@ class Stache
 
     public function boot()
     {
-        (new Bootstrapper)->boot($this);
+        if (! $this->booted) {
+            $this->booted = true;
+            tap($this->bootstrapper ?? new Bootstrapper)->boot($this);
+        }
+
+        return $this;
+    }
+
+    public function setBootstrapper($bootstrapper)
+    {
+        $this->bootstrapper = $bootstrapper;
+
+        return $this;
+    }
+
+    public function hasBooted()
+    {
+        return $this->booted;
     }
 }
