@@ -5,6 +5,7 @@ namespace Tests\Stache;
 use Statamic\Stache\Stache;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\CollectionsStore;
 
 class StacheTest extends TestCase
@@ -101,5 +102,18 @@ class StacheTest extends TestCase
             $this->assertInstanceOf(CollectionsStore::class, $stores->first());
             $this->assertInstanceOf(CollectionsStore::class, $this->stache->store('collections'));
         });
+    }
+
+    /** @test */
+    function an_aggregate_stores_child_store_can_be_retrieved_directly()
+    {
+        $this->stache->sites(['en']); // stores expect the stache to have site(s)
+        $store = new EntriesStore($this->stache);
+        $one = $store->store('one');
+        $two = $store->store('two');
+        $this->stache->registerStore($store);
+
+        $this->assertEquals($one, $this->stache->store('entries::one'));
+        $this->assertEquals($two, $this->stache->store('entries::two'));
     }
 }

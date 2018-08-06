@@ -105,6 +105,11 @@ class Stache
 
     public function store($key)
     {
+        if (str_contains($key, '::')) {
+            list($parent, $child) = explode('::', $key);
+            return $this->stores->get($parent)->store($child);
+        }
+
         return $this->stores->get($key);
     }
 
