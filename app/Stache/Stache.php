@@ -6,8 +6,8 @@ use Statamic\Stache\Stores\Store;
 
 class Stache
 {
-    const TEMP_COLD = 0;
-    const TEMP_WARM = 1;
+    const TEMP_COLD = 'cold';
+    const TEMP_WARM = 'warm';
 
     protected $temperature;
     protected $sites;
