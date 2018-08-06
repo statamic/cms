@@ -75,7 +75,6 @@ class TraverserTest extends TestCase
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
         $store = new class($stache) extends BasicStore {
             public function key() { }
-            public function getItemsFromCache($cache) { }
             public function filter($file) {
                 PHPUnit::assertInstanceOf(SplFileInfo::class, $file);
                 return $file->getExtension() === 'txt';

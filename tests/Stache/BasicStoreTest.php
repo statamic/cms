@@ -231,9 +231,4 @@ class TestBasicStore extends BasicStore
     {
         return 'test';
     }
-
-    public function getItemsFromCache($cache)
-    {
-        return $cache;
-    }
 }

@@ -16,4 +16,9 @@ class Store
 
         return $this;
     }
+
+    public function getItemsFromCache($cache)
+    {
+        return $cache;
+    }
 }

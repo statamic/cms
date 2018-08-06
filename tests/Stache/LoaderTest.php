@@ -26,12 +26,10 @@ class LoaderTest extends TestCase
 
         $this->stache->registerStore(new class($this->stache) extends BasicStore {
             public function key() { return 'one'; }
-            public function getItemsFromCache($cache) { }
         });
 
         $this->stache->registerStore(new class($this->stache) extends BasicStore {
             public function key() { return 'two'; }
-            public function getItemsFromCache($cache) { }
         });
     }
 

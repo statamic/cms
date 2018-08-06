@@ -11,11 +11,6 @@ class CollectionsStore extends BasicStore
         return 'collections';
     }
 
-    public function getItemsFromCache($cache)
-    {
-        dd('todo CollectionsStore@getItemsFromCache', $cache);
-    }
-
     public function createItemFromFile($path, $contents)
     {
         $id = pathinfo($path, PATHINFO_FILENAME);
