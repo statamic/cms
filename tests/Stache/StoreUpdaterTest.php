@@ -31,7 +31,7 @@ class StoreUpdaterTest extends TestCase
                         public function __construct($data) { $this->data = $data; }
                         public function id() { return $this->data()['id']; }
                         public function data() { return $this->data; }
-                        public function uri() { return '/test'; }
+                        public function uri() { return $this->data()['uri']; }
                         public function toCacheableArray() { return $this->data(); }
                     };
                 });
@@ -150,8 +150,8 @@ class StoreUpdaterTest extends TestCase
 <?php
 return new class {
     public function id() { return $this->data()['id']; }
-    public function data() { return ['title' => 'Item title updated', 'id' => '123']; }
-    public function uri() { return '/test'; }
+    public function data() { return ['title' => 'Item title updated', 'id' => '123', 'uri' => '/updated-uri']; }
+    public function uri() { return $this->data()['uri']; }
     public function toCacheableArray() { return $this->data(); }
 };
 EOT;
@@ -163,7 +163,7 @@ EOT;
         ]);
 
         Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([
-            '123' => ['title' => 'Item title', 'id' => '123'],
+            '123' => ['title' => 'Item title', 'id' => '123', 'uri' => '/existing-uri'],
         ]);
 
         Traverser::shouldReceive('traverse')->once()->andReturn(collect($traversedFiles = [
@@ -179,6 +179,31 @@ EOT;
         $this->updater->update();
 
         $this->assertEquals('Item title updated', $this->store->getItem('123')->data()['title']);
+        $this->assertEquals('/updated-uri', $this->store->getSiteUri('en', '123'));
+    }
+
+    /** @test */
+    function it_doesnt_add_uris_if_the_object_doesnt_have_uri_method()
+    {
+        $contents = <<<'EOT'
+<?php
+return new class {
+    public function id() { return $this->data()['id']; }
+    public function data() { return ['title' => 'Item title updated', 'id' => '123', 'uri' => '/updated-uri']; }
+
+    // This method is explicitly *not* here.
+    // public function uri() { }
+};
+EOT;
+        file_put_contents($this->tempDir.'/test.txt', $contents);
+
+        Traverser::shouldReceive('traverse')->once()->andReturn(collect($traversedFiles = [
+            $this->tempDir.'/test.txt' => now()->subDays(1)->timestamp,
+        ]));
+
+        $this->updater->update();
+
+        $this->assertNull($this->store->getSiteUri('en', '123'));
     }
 
     /** @test */

@@ -69,10 +69,13 @@ class StoreUpdater
 
             $this->store
                 ->setItem($key, $item)
-                ->setPath($key, $path)
-                ->forEachSite(function ($site, $store) use ($item, $key) {
+                ->setPath($key, $path);
+
+            if (method_exists($item, 'uri')) {
+                $this->store->forEachSite(function ($site, $store) use ($item, $key) {
                     $store->setSiteUri($site, $key, $item->uri());
                 });
+            }
         }
 
         foreach ($this->deletedFiles() as $path) {
