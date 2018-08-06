@@ -5,6 +5,7 @@ namespace Tests\Stache;
 use Tests\TestCase;
 use Statamic\Stache\Loader;
 use Statamic\Stache\Stache;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\BasicStore;
 use Statamic\Stache\EmptyStacheException;
@@ -146,5 +147,71 @@ class LoaderTest extends TestCase
             [56 => '/cinco/seis', 78 => '/siete/ocho'],
             $this->stache->store('two')->getSiteUris('es')->all()
         );
+    }
+
+    /** @test */
+    function gets_meta_data_from_cache()
+    {
+        $stache = (new Stache)->sites(['en']);
+        $stache->registerStore(new class($stache) extends BasicStore {
+            public function key()
+            {
+                return 'one';
+            }
+            public function getMetaFromCache()
+            {
+                return ['one' => 'first meta data'];
+            }
+        });
+        $stache->registerStore(new class($stache) extends BasicStore {
+            public function key()
+            {
+                return 'two';
+            }
+            public function getMetaFromCache()
+            {
+                return ['two' => 'second meta data'];
+            }
+        });
+        $loader = new Loader($stache);
+
+        $meta = $loader->getMetaFromCache();
+
+        $this->assertInstanceOf(Collection::class, $meta);
+        $this->assertEquals([
+            'one' => 'first meta data',
+            'two' => 'second meta data',
+        ], $meta->all());
+    }
+
+    /** @test */
+    function a_store_with_no_meta_data_throws_an_exception()
+    {
+        $this->expectException(EmptyStacheException::class);
+
+        $stache = (new Stache)->sites(['en']);
+        $stache->registerStore(new class($stache) extends BasicStore {
+            public function key()
+            {
+                return 'one';
+            }
+            public function getMetaFromCache()
+            {
+                return ['one' => 'first meta data'];
+            }
+        });
+        $stache->registerStore(new class($stache) extends BasicStore {
+            public function key()
+            {
+                return 'two';
+            }
+            public function getMetaFromCache()
+            {
+                return [];
+            }
+        });
+        $loader = new Loader($stache);
+
+        $loader->getMetaFromCache();
     }
 }

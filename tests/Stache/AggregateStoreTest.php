@@ -192,6 +192,84 @@ class AggregateStoreTest extends TestCase
         $this->assertEquals('/url-in-fr', $this->store->getSiteUri('fr', 'one::123'));
         $this->assertEquals($this->store, $return);
     }
+
+    /** @test */
+    function it_caches_items_and_meta_data()
+    {
+        $this->store->setPath('one::1', '/path/to/one.txt');
+        $this->store->setSiteUri('en', 'one::1', '/one');
+        $this->store->setItem('one::1', new class {
+            public function toCacheableArray() {
+                return 'converted using toCacheableArray';
+            }
+        });
+
+        $this->store->setPath('one::2', '/path/to/two.txt');
+        $this->store->setSiteUri('en', 'one::2', '/two');
+        $this->store->setSiteUri('fr', 'one::2', '/deux');
+        $this->store->setItem('one::2', ['item' => 'two']);
+
+        $this->store->setPath('two::3', '/path/to/three.txt');
+        $this->store->setSiteUri('en', 'two::3', '/three');
+        $this->store->setSiteUri('fr', 'two::3', '/trois');
+        $this->store->setItem('two::3', ['item' => 'three']);
+
+        Cache::shouldReceive('forever')->with('stache::meta/test-keys', ['one', 'two']);
+
+        Cache::shouldReceive('forever')->once()->with('stache::items/test::one', [
+            '1' => 'converted using toCacheableArray',
+            '2' => ['item' => 'two'],
+        ]);
+        Cache::shouldReceive('forever')->once()->with('stache::meta/test::one', [
+            'paths' => [
+                '1' => '/path/to/one.txt',
+                '2' => '/path/to/two.txt',
+            ],
+            'uris' => [
+                'en' => [
+                    '1' => '/one',
+                    '2' => '/two'
+                ],
+                'fr' => [
+                    '2' => '/deux'
+                ]
+            ]
+        ]);
+
+        Cache::shouldReceive('forever')->once()->with('stache::items/test::two', [
+            '3' => ['item' => 'three']
+        ]);
+        Cache::shouldReceive('forever')->once()->with('stache::meta/test::two', [
+            'paths' => [
+                '3' => '/path/to/three.txt',
+            ],
+            'uris' => [
+                'en' => [
+                    '3' => '/three',
+                ],
+                'fr' => [
+                    '3' => '/trois'
+                ]
+            ]
+        ]);
+
+        $this->store->cache();
+    }
+
+    /** @test */
+    function gets_meta_data_from_cache_in_a_format_suitable_for_collection_mapWithKeys_method()
+    {
+        $this->store->store('one');
+        $this->store->store('two');
+        Cache::shouldReceive('get')->with('stache::meta/test-keys')->once()->andReturn(['one', 'two']);
+        Cache::shouldReceive('get')->with('stache::meta/test::one')->once()->andReturn('first child stores cache');
+        Cache::shouldReceive('get')->with('stache::meta/test::two')->once()->andReturn('second child stores cache');
+
+        $this->assertEquals([
+            'test::one' => 'first child stores cache',
+            'test::two' => 'second child stores cache'
+        ], $this->store->getMetaFromCache());
+    }
 }
 
 class TestAggregateStore extends AggregateStore

@@ -124,4 +124,25 @@ abstract class AggregateStore extends Store
 
         return $this;
     }
+
+    public function cache()
+    {
+        $this->stores->each->cache();
+
+        Cache::forever($this->getMetaKeysCacheKey(), $this->stores->keys()->all());
+    }
+
+    public function getMetaFromCache()
+    {
+        $keys = Cache::get($this->getMetaKeysCacheKey());
+
+        return collect($keys)->mapWithKeys(function ($store) {
+            return $this->store($store)->getMetaFromCache();
+        })->all();
+    }
+
+    protected function getMetaKeysCacheKey()
+    {
+        return 'stache::meta/' . $this->key() . '-keys';
+    }
 }

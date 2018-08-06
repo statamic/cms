@@ -15,11 +15,9 @@ class Loader
 
     public function load()
     {
-        if (! $meta = $this->get('meta')) {
-            throw new EmptyStacheException;
-        }
+        $meta = $this->getMetaFromCache();
 
-        collect($meta)->each(function ($data, $key) {
+        $meta->each(function ($data, $key) {
             $this->stache->store($key)
                 ->setPaths($data['paths'])
                 ->setUris($data['uris']);
@@ -28,8 +26,14 @@ class Loader
         $this->stache->meta($meta);
     }
 
-    protected function get($key)
+    public function getMetaFromCache()
     {
-        return Cache::get("stache::$key");
+        return $this->stache->stores()->mapWithKeys(function ($store) {
+            if ($meta = $store->getMetaFromCache()) {
+                return $meta;
+            }
+
+            throw new EmptyStacheException;
+        });
     }
 }
