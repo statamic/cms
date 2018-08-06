@@ -111,11 +111,11 @@ class AggregateStoreTest extends TestCase
     /** @test */
     function it_gets_all_items()
     {
-        Cache::shouldReceive('get')->with('stache::test::one/data')->andReturn($items = [
+        Cache::shouldReceive('get')->with('stache::items/test::one')->andReturn($items = [
             '123' => ['title' => 'Store One Item One'],
             '456' => ['title' => 'Store One Item Two'],
         ]);
-        Cache::shouldReceive('get')->with('stache::test::two/data')->andReturn($items = [
+        Cache::shouldReceive('get')->with('stache::items/test::two')->andReturn($items = [
             '789' => ['title' => 'Store Two Item One'],
             '101' => ['title' => 'Store Two Item Two'],
         ]);

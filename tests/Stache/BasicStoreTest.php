@@ -117,7 +117,7 @@ class BasicStoreTest extends TestCase
     /** @test */
     function items_can_be_loaded()
     {
-        Cache::shouldReceive('get')->with('stache::test/data')->andReturn($items = [
+        Cache::shouldReceive('get')->with('stache::items/test')->andReturn($items = [
             // These items are irrelevant here. The test for the content
             // of these are driven out in the individual store tests.
             '123' => ['title' => 'Item one'],
@@ -137,7 +137,7 @@ class BasicStoreTest extends TestCase
     /** @test */
     function items_are_an_empty_collection_if_theres_nothing_in_the_cache()
     {
-        Cache::shouldReceive('get')->with('stache::test/data')->andReturnNull();
+        Cache::shouldReceive('get')->with('stache::items/test')->andReturnNull();
 
         $return = $this->store->load();
 
@@ -172,7 +172,7 @@ class BasicStoreTest extends TestCase
     /** @test */
     function items_are_loaded_on_demand()
     {
-        Cache::shouldReceive('get')->with('stache::test/data')->andReturn([
+        Cache::shouldReceive('get')->with('stache::items/test')->andReturn([
             // These items are irrelevant here. The test for the content
             // of these are driven out in the individual store tests.
             '123' => ['title' => 'Item one'],
@@ -194,7 +194,7 @@ class BasicStoreTest extends TestCase
     {
         $one = ['title' => 'Item one'];
         $two = ['title' => 'Item two'];
-        Cache::shouldReceive('get')->with('stache::test/data')->andReturn(['123' => $one, '456' => $two]);
+        Cache::shouldReceive('get')->with('stache::items/test')->andReturn(['123' => $one, '456' => $two]);
 
         $this->assertEquals($one, $this->store->getItem('123'));
         $this->assertEquals($two, $this->store->getItem('456'));
@@ -215,7 +215,7 @@ class BasicStoreTest extends TestCase
     function it_removes_an_item_by_key()
     {
         $item = ['title' => 'Item one'];
-        Cache::shouldReceive('get')->with('stache::test/data')->andReturn(['123' => $item]);
+        Cache::shouldReceive('get')->with('stache::items/test')->andReturn(['123' => $item]);
         $this->assertEquals($item, $this->store->getItem('123'));
 
         $return = $this->store->removeItem('123');

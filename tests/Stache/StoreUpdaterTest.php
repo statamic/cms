@@ -163,7 +163,7 @@ EOT;
             $this->tempDir.'/test.txt' => $existingTimestamp,
         ]);
 
-        Cache::shouldReceive('get')->with('stache::test-store-key/data')->andReturn([
+        Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([
             '123' => ['title' => 'Item title', 'id' => '123'],
         ]);
 
@@ -187,7 +187,7 @@ EOT;
         Cache::shouldReceive('get')->with('stache::timestamps/test-store-key', [])->andReturn([
             $this->tempDir.'/deleted.txt' => now()->subdays(2)->timestamp,
         ]);
-        Cache::shouldReceive('get')->with('stache::test-store-key/data')->andReturn([
+        Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([
             '123' => ['title' => 'Item title', 'id' => '123'],
         ]);
         Cache::shouldReceive('forever');
@@ -219,7 +219,7 @@ EOT;
             $this->tempDir.'/test.txt' => now()->subDays(1)->timestamp,
         ]));
         Cache::shouldReceive('get')->with('stache::timestamps/test-store-key', [])->andReturn([]);
-        Cache::shouldReceive('get')->with('stache::test-store-key/data')->andReturn([]);
+        Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([]);
         Cache::shouldReceive('forever')->once()->with('stache::timestamps/test-store-key', [
             $this->tempDir.'/test.txt' => now()->subDays(1)->timestamp,
         ]);
@@ -239,7 +239,7 @@ EOT;
         Cache::shouldReceive('get')->with('stache::timestamps/test-store-key', [])->andReturn([
             $this->tempDir.'/test.txt' => $timestamp,
         ]);
-        Cache::shouldReceive('get')->with('stache::test-store-key/data')->andReturn([]);
+        Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([]);
 
         Cache::shouldNotReceive('forever')->with('stache::timestamps/test-store-key');
 

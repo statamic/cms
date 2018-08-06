@@ -125,7 +125,7 @@ abstract class BasicStore extends Store
             return $this;
         }
 
-        $cache = Cache::get('stache::' . $this->key() . '/data');
+        $cache = Cache::get($this->getItemsCacheKey());
 
         $this->items = $this->getItemsFromCache(collect($cache));
 
@@ -167,5 +167,10 @@ abstract class BasicStore extends Store
     public function getCacheableItems()
     {
         return $this->items->map->toCacheableArray()->all();
+    }
+
+    protected function getItemsCacheKey()
+    {
+        return 'stache::items/' . $this->key();
     }
 }
