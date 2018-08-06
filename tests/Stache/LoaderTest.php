@@ -90,8 +90,8 @@ class LoaderTest extends TestCase
             $this->stache->store('one')->getPaths()->all()
         );
 
-        $this->assertEquals([
-            56 => 'five/six.md', 78 => 'seven/eight.md'],
+        $this->assertEquals(
+            [56 => 'five/six.md', 78 => 'seven/eight.md'],
             $this->stache->store('two')->getPaths()->all()
         );
     }
@@ -138,8 +138,8 @@ class LoaderTest extends TestCase
             $this->stache->store('one')->getSiteUris('es')->all()
         );
 
-        $this->assertEquals([
-            56 => '/five/six', 78 => '/seven/eight'],
+        $this->assertEquals(
+            [56 => '/five/six', 78 => '/seven/eight'],
             $this->stache->store('two')->getSiteUris('en')->all()
         );
 
