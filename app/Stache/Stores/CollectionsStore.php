@@ -2,7 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Stache\Fakes\YAML;
+use Statamic\API\YAML;
+use Statamic\API\Collection;
 
 class CollectionsStore extends BasicStore
 {
@@ -16,20 +17,9 @@ class CollectionsStore extends BasicStore
         $id = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
 
-        // @TODO: Change this to Collection::create() etc once brought into Statamic.
-        $fakeCollection = new class($id, $data) {
-            protected $data;
-            protected $id;
-            function __construct($id, $data) {
-                $this->id = $id;
-                $this->data = $data;
-            }
-            public function id() { return $this->id; }
-            public function uri() { return null; }
-            public function toCacheableArray() { }
-        };
-
-        return $fakeCollection;
+        $collection = Collection::create($id);
+        $collection->data($data);
+        return $collection;
     }
 
     public function getItemKey($item, $path)

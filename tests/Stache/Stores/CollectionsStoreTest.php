@@ -7,6 +7,8 @@ use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\API\Collection as CollectionAPI;
+use Statamic\Contracts\Data\Entries\Collection;
 
 class CollectionsStoreTest extends TestCase
 {
@@ -51,15 +53,23 @@ class CollectionsStoreTest extends TestCase
     /** @test */
     function it_makes_collection_instances_from_cache()
     {
-        $this->markTestIncomplete();
-        // It should use Statamic\API\Collection::create()
+        $collection = CollectionAPI::create('example');
+
+        $items = $this->store->getItemsFromCache([$collection]);
+
+        $this->assertCount(1, $items);
+        $this->assertInstanceOf(Collection::class, reset($items));
     }
 
     /** @test */
     function it_makes_collection_instances_from_files()
     {
-        $this->markTestIncomplete();
-        // It should use Statamic\API\Collection::create()
+        $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
+
+        $this->assertInstanceOf(Collection::class, $item);
+        $this->assertEquals('example', $item->path());
+        $this->assertEquals('Example', $item->title());
+        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
     }
 
     /** @test */
