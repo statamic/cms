@@ -34,6 +34,23 @@ class TestCase extends \Orchestra\Testbench\TestCase
         ]);
     }
 
+    protected function assertEveryItem($items, $callback)
+    {
+        if ($items instanceof \Illuminate\Support\Collection) {
+            $items = $items->all();
+        }
+
+        $passes = 0;
+
+        foreach ($items as $item) {
+            if ($callback($item)) {
+                $passes++;
+            }
+        }
+
+        $this->assertEquals(count($items), $passes, 'Failed asserting that every item passes.');
+    }
+
     protected function assertEveryItemIsInstanceOf($class, $items)
     {
         if ($items instanceof \Illuminate\Support\Collection) {
