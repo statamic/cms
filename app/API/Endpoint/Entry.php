@@ -2,8 +2,6 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Data\Services\EntriesService;
-
 class Entry
 {
     /**
@@ -13,7 +11,7 @@ class Entry
      */
     private function service()
     {
-        return app(EntriesService::class);
+        return app(\Statamic\Contracts\Data\Repositories\EntryRepository::class);
     }
 
     /**
@@ -38,14 +36,16 @@ class Entry
     }
 
     /**
-     * Get entries in a collection
+     * Get entries in one or more collections.
      *
-     * @param string $collection
+     * @param string|array $collection  Either a collection handle, or an array of collection handles.
      * @return \Statamic\Data\Entries\EntryCollection
      */
     public function whereCollection($collection)
     {
-        return self::service()->collection($collection);
+        return is_array($collection)
+            ? $this->service()->whereInCollection($collection)
+            : $this->service()->whereCollection($collection);
     }
 
     /**
