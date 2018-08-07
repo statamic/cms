@@ -101,6 +101,15 @@ class Stache
         return $this;
     }
 
+    public function registerStores($stores)
+    {
+        foreach ($stores as $store) {
+            $this->registerStore($store);
+        }
+
+        return $this;
+    }
+
     public function stores()
     {
         $this->boot();

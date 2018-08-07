@@ -106,6 +106,28 @@ class StacheTest extends TestCase
     }
 
     /** @test */
+    function multiple_stores_can_be_registered_at_once()
+    {
+        $this->stache->sites(['en']); // store expects the stache to have site(s)
+        $this->assertTrue($this->stache->stores()->isEmpty());
+
+        $return = $this->stache->registerStores([
+            new CollectionsStore($this->stache),
+            new EntriesStore($this->stache)
+        ]);
+
+        $this->assertEquals($this->stache, $return);
+        tap($this->stache->stores(), function ($stores) {
+            $this->assertEquals(2, $stores->count());
+            $this->assertEquals(['collections', 'entries'], $stores->keys()->all());
+            $this->assertInstanceOf(CollectionsStore::class, $stores['collections']);
+            $this->assertInstanceOf(EntriesStore::class, $stores['entries']);
+            $this->assertInstanceOf(CollectionsStore::class, $this->stache->store('collections'));
+            $this->assertInstanceOf(EntriesStore::class, $this->stache->store('entries'));
+        });
+    }
+
+    /** @test */
     function an_aggregate_stores_child_store_can_be_retrieved_directly()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)

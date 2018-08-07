@@ -23,10 +23,9 @@ class StacheServiceProvider extends ServiceProvider
 
         $stache->sites(['en']); // @todo
 
-        $stache->registerStore(
-            (new Stores\EntriesStore($stache))->directory(base_path('content/collections/'))
-        );
-
-        $stache->boot();
+        $stache->registerStores([
+            (new Stores\CollectionsStore($stache))->directory(base_path('content/collections/')),
+            (new Stores\EntriesStore($stache))->directory(base_path('content/collections/')),
+        ]);
     }
 }
