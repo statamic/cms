@@ -2,7 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Data\Services\CollectionsService;
+use Statamic\Contracts\Data\Repositories\CollectionRepository;
 
 class Collection
 {
@@ -13,7 +13,7 @@ class Collection
      */
     public function all()
     {
-        return app(CollectionsService::class)->all()->sortBy(function ($collection) {
+        return app(CollectionRepository::class)->all()->sortBy(function ($collection) {
             return $collection->title();
         });
     }
@@ -36,7 +36,7 @@ class Collection
      */
     public function whereHandle($handle)
     {
-        return app(CollectionsService::class)->handle($handle);
+        return app(CollectionRepository::class)->findByHandle($handle);
     }
 
     /**

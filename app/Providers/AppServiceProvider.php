@@ -24,7 +24,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
-             ->pushMiddleware(\Statamic\Http\Middleware\PersistStache::class)
              ->pushMiddleware(\Statamic\Http\Middleware\PermanentRedirects::class)
              ->pushMiddleware(\Statamic\Http\Middleware\VanityRedirects::class)
              ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
@@ -58,5 +57,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(Sites::class, function () {
             return new Sites(config('statamic.sites'));
         });
+
+        $this->app->bind(
+            \Statamic\Contracts\Data\Repositories\CollectionRepository::class,
+            \Statamic\Stache\Repositories\CollectionRepository::class
+        );
     }
 }
