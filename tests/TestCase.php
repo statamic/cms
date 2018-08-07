@@ -33,4 +33,21 @@ class TestCase extends \Orchestra\Testbench\TestCase
             ]
         ]);
     }
+
+    protected function assertEveryItemIsInstanceOf($class, $items)
+    {
+        if ($items instanceof \Illuminate\Support\Collection) {
+            $items = $items->all();
+        }
+
+        $matches = 0;
+
+        foreach ($items as $item) {
+            if ($item instanceof $class) {
+                $matches++;
+            }
+        }
+
+        $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of ' . $class);
+    }
 }
