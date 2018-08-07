@@ -1,3 +1,3 @@
 ---
-id: directors
+id: pages-directors
 title: Directors

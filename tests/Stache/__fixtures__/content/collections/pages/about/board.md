@@ -1,3 +1,3 @@
 ---
-id: board
+id: pages-board
 title: Board

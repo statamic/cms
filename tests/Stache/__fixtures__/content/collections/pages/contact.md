@@ -1,3 +1,3 @@
 ---
-id: contact
+id: pages-contact
 title: Contact

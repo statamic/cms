@@ -1,3 +1,3 @@
 ---
-id: home
+id: pages-home
 title: Home

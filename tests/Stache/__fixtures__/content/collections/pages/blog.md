@@ -1,3 +1,3 @@
 ---
-id: blog
+id: pages-blog
 title: Blog

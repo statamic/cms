@@ -1,3 +1,3 @@
 ---
-id: about
+id: pages-about
 title: About
