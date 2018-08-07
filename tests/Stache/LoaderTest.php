@@ -23,7 +23,7 @@ class LoaderTest extends TestCase
 
     private function createTestStache()
     {
-        $this->stache = (new Stache)->sites(['en', 'es']);
+        $this->stache = (new Stache)->sites(['en', 'es'])->disableBooting();
 
         $this->stache->registerStore(new class($this->stache) extends BasicStore {
             public function key() { return 'one'; }
@@ -152,7 +152,7 @@ class LoaderTest extends TestCase
     /** @test */
     function gets_meta_data_from_cache()
     {
-        $stache = (new Stache)->sites(['en']);
+        $stache = (new Stache)->sites(['en'])->disableBooting();
         $stache->registerStore(new class($stache) extends BasicStore {
             public function key()
             {
@@ -189,7 +189,7 @@ class LoaderTest extends TestCase
     {
         $this->expectException(EmptyStacheException::class);
 
-        $stache = (new Stache)->sites(['en']);
+        $stache = (new Stache)->sites(['en'])->disableBooting();
         $stache->registerStore(new class($stache) extends BasicStore {
             public function key()
             {

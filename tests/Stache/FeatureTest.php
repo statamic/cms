@@ -19,10 +19,10 @@ class FeatureTest extends TestCase
     {
         parent::setUp();
 
-        $this->stache = $this->app->make('stache');
-        $this->stache->store('collections')->directory(__DIR__.'/__fixtures__/content/collections');
-        $this->stache->store('entries')->directory(__DIR__.'/__fixtures__/content/collections');
-        $this->stache->boot();
+        $this->stache = $this->app->make('stache')->withoutBooting(function ($stache) {
+            $stache->store('collections')->directory(__DIR__.'/__fixtures__/content/collections');
+            $stache->store('entries')->directory(__DIR__.'/__fixtures__/content/collections');
+        });
     }
 
     /** @test */

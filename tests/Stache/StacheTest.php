@@ -167,6 +167,42 @@ class StacheTest extends TestCase
 
         $this->assertTrue($this->stache->hasBooted());
     }
+
+    /** @test */
+    function booting_can_be_disabled_and_reenabled()
+    {
+        $this->assertFalse($this->stache->hasBooted());
+
+        $return = $this->stache->disableBooting();
+        $this->stache->boot();
+        $this->assertFalse($this->stache->hasBooted());
+        $this->assertEquals(0, $this->bootstrapper->boots);
+        $this->assertEquals($this->stache, $return);
+
+        $return = $this->stache->enableBooting();
+        $this->stache->boot();
+        $this->assertTrue($this->stache->hasBooted());
+        $this->assertEquals(1, $this->bootstrapper->boots);
+        $this->assertEquals($this->stache, $return);
+    }
+
+    /** @test */
+    function callback_can_be_run_without_booting_the_stache()
+    {
+        $this->assertFalse($this->stache->hasBooted());
+
+        $callbackRan = false;
+        $return = $this->stache->withoutBooting(function ($stache) use (&$callbackRan) {
+            $this->assertEquals($this->stache, $stache);
+            $this->stache->boot();
+            $callbackRan = true;
+        });
+
+        $this->assertTrue($callbackRan);
+        $this->assertFalse($this->stache->hasBooted());
+        $this->assertEquals(0, $this->bootstrapper->boots);
+        $this->assertEquals($this->stache, $return);
+    }
 }
 
 class CountableFakeBootstrapper

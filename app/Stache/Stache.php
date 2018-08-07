@@ -10,6 +10,7 @@ class Stache
     const TEMP_WARM = 'warm';
 
     protected $bootstrapper;
+    protected $shouldBoot = true;
     protected $booted = false;
     protected $temperature;
     protected $sites;
@@ -126,7 +127,7 @@ class Stache
 
     public function boot()
     {
-        if (! $this->booted) {
+        if ($this->shouldBoot && !$this->booted) {
             $this->booted = true;
             tap($this->bootstrapper ?? new Bootstrapper)->boot($this);
         }
@@ -144,5 +145,28 @@ class Stache
     public function hasBooted()
     {
         return $this->booted;
+    }
+
+    public function withoutBooting($callback)
+    {
+        $this->disableBooting();
+        $callback($this);
+        $this->enableBooting();
+
+        return $this;
+    }
+
+    public function disableBooting()
+    {
+        $this->shouldBoot = false;
+
+        return $this;
+    }
+
+    public function enableBooting()
+    {
+        $this->shouldBoot = true;
+
+        return $this;
     }
 }
