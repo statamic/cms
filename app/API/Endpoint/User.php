@@ -2,7 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Contracts\Data\Services\UsersService;
+use Statamic\Contracts\Data\Repositories\UserRepository;
 
 class User
 {
@@ -13,7 +13,7 @@ class User
      */
     public function all()
     {
-        return app(UsersService::class)->all();
+        return $this->repo()->all();
     }
 
     /**
@@ -24,7 +24,7 @@ class User
      */
     public function find($id)
     {
-        return app(UsersService::class)->id($id);
+        return $this->repo()->find($id);
     }
 
     /**
@@ -35,7 +35,7 @@ class User
      */
     public function whereUsername($username)
     {
-        return app(UsersService::class)->username($username);
+        return $this->repo()->username($username);
     }
 
     /**
@@ -46,7 +46,7 @@ class User
      */
     public function whereEmail($email)
     {
-        return app(UsersService::class)->email($email);
+        return $this->repo()->email($email);
     }
 
     /**
@@ -58,7 +58,7 @@ class User
      */
     public function whereOAuth($provider, $id)
     {
-        return app(UsersService::class)->oauth($provider, $id);
+        return $this->repo()->oauth($provider, $id);
     }
 
     /**
@@ -130,5 +130,10 @@ class User
         \Log::notice('User::email() is deprecated. Use User::whereEmail()');
 
         return self::whereEmail($email);
+    }
+
+    protected function repo()
+    {
+        return app(UserRepository::class);
     }
 }

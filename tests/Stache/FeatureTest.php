@@ -3,6 +3,7 @@
 namespace Tests\Stache;
 
 use Tests\TestCase;
+use Statamic\API\User;
 use Statamic\API\Entry;
 use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
@@ -22,11 +23,12 @@ class FeatureTest extends TestCase
         parent::setUp();
 
         $this->stache = $this->app->make('stache')->withoutBooting(function ($stache) {
-            $dir = __DIR__.'/__fixtures__/content';
-            $stache->store('collections')->directory($dir . '/collections');
-            $stache->store('entries')->directory($dir . '/collections');
-            $stache->store('globals')->directory($dir . '/globals');
-            $stache->store('asset-containers')->directory($dir . '/assets');
+            $dir = __DIR__.'/__fixtures__';
+            $stache->store('collections')->directory($dir . '/content/collections');
+            $stache->store('entries')->directory($dir . '/content/collections');
+            $stache->store('globals')->directory($dir . '/content/globals');
+            $stache->store('asset-containers')->directory($dir . '/content/assets');
+            $stache->store('users')->directory($dir . '/users');
         });
     }
 
@@ -77,5 +79,20 @@ class FeatureTest extends TestCase
     {
         $this->assertEquals('Main Assets', AssetContainer::find('main')->data()['title']);
         $this->assertEquals('Another Asset Container', AssetContainer::find('another')->data()['title']);
+    }
+
+    /** @test */
+    function it_gets_users()
+    {
+        $this->assertEquals(2, User::all()->count());
+    }
+
+    /** @test */
+    function it_gets_a_user()
+    {
+        $user = User::find('users-john');
+        $this->assertEquals('users-john', $user->id());
+        $this->assertEquals('John Smith', $user->get('name'));
+        $this->assertEquals('john@example.com', $user->email());
     }
 }
