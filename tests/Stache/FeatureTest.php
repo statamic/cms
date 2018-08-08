@@ -5,6 +5,7 @@ namespace Tests\Stache;
 use Tests\TestCase;
 use Statamic\API\User;
 use Statamic\API\Entry;
+use Statamic\API\Content;
 use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
@@ -94,5 +95,19 @@ class FeatureTest extends TestCase
         $this->assertEquals('users-john', $user->id());
         $this->assertEquals('John Smith', $user->get('name'));
         $this->assertEquals('john@example.com', $user->email());
+    }
+
+    /** @test */
+    function it_gets_content()
+    {
+        $this->assertEquals(
+            14, // 14 entries
+            Content::all()->count()
+        );
+
+        $this->assertEquals('Christmas', Content::find('blog-christmas')->get('title'));
+        // @TODO: terms and pages
+
+        $this->assertNull(Content::find('unknown'));
     }
 }

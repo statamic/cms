@@ -9,8 +9,8 @@ use Statamic\API\Helper;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
 use Statamic\API\PageFolder;
-use Statamic\Data\Services\ContentService;
 use Statamic\Data\Services\PageStructureService;
+use Statamic\Contracts\Data\Repositories\ContentRepository;
 
 class Content
 {
@@ -21,7 +21,7 @@ class Content
      */
     public function all()
     {
-        return app(ContentService::class)->all();
+        return $this->repo()->all();
     }
 
     /**
@@ -32,7 +32,7 @@ class Content
      */
     public function find($id)
     {
-        return app(ContentService::class)->id($id);
+        return $this->repo()->find($id);
     }
 
     /**
@@ -52,7 +52,7 @@ class Content
         $collection = collect_content();
 
         foreach ($uris as $uri) {
-            $collection->push(app(ContentService::class)->uri($uri));
+            $collection->push($this->repo()->uri($uri));
         }
 
         return ($is_array) ? $collection : $collection->first();
@@ -66,7 +66,7 @@ class Content
      */
     public function exists($id)
     {
-        return app(ContentService::class)->exists($id);
+        return $this->repo()->exists($id);
     }
 
     /**
@@ -77,7 +77,7 @@ class Content
      */
     public function uriExists($uri)
     {
-        return app(ContentService::class)->uriExists($uri);
+        return $this->repo()->uriExists($uri);
     }
 
     /**
@@ -100,5 +100,10 @@ class Content
         $locale = null
     ) {
         return app(PageStructureService::class)->tree($uri, $depth, $entries, $drafts, $exclude, $locale);
+    }
+
+    protected function repo()
+    {
+        return app(ContentRepository::class);
     }
 }
