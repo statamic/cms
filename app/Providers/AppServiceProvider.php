@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
-        collect(['assets', 'cp', 'forms', 'routes', 'static_caching', 'sites', 'system', 'theming', 'users'])->each(function ($config) {
+        collect(['assets', 'cp', 'forms', 'routes', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'])->each(function ($config) {
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
             $this->publishes(["{$this->root}/config/$config.php" => config_path("statamic/$config.php")], 'statamic');
         });
@@ -58,24 +58,14 @@ class AppServiceProvider extends ServiceProvider
             return new Sites(config('statamic.sites'));
         });
 
-        $this->app->bind(
-            \Statamic\Contracts\Data\Repositories\EntryRepository::class,
-            \Statamic\Stache\Repositories\EntryRepository::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Repositories\CollectionRepository::class,
-            \Statamic\Stache\Repositories\CollectionRepository::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Repositories\GlobalRepository::class,
-            \Statamic\Stache\Repositories\GlobalRepository::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Repositories\AssetContainerRepository::class,
-            \Statamic\Stache\Repositories\AssetContainerRepository::class
-        );
+        collect([
+            \Statamic\Contracts\Data\Repositories\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
+            \Statamic\Contracts\Data\Repositories\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
+            \Statamic\Contracts\Data\Repositories\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
+            \Statamic\Contracts\Data\Repositories\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
+            \Statamic\Contracts\Data\Repositories\UserRepository::class => \Statamic\Stache\Repositories\UserRepository::class,
+        ])->each(function ($concrete, $abstract) {
+            $this->app->bind($abstract, $concrete);
+        });
     }
 }

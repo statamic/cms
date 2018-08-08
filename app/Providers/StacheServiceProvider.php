@@ -23,11 +23,8 @@ class StacheServiceProvider extends ServiceProvider
 
         $stache->sites(['en']); // @todo
 
-        $stache->registerStores([
-            (new Stores\CollectionsStore($stache))->directory(base_path('content/collections/')),
-            (new Stores\EntriesStore($stache))->directory(base_path('content/collections/')),
-            (new Stores\GlobalsStore($stache))->directory(base_path('content/globals/')),
-            (new Stores\AssetContainersStore($stache))->directory(base_path('content/assets/')),
-        ]);
+        $stache->registerStores(collect(config('statamic.stache.stores'))->map(function ($config) {
+            return app($config['class'])->directory($config['directory']);
+        })->all());
     }
 }
