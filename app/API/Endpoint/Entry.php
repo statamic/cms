@@ -22,7 +22,7 @@ class Entry
      */
     public function find($id)
     {
-        return self::service()->id($id);
+        return self::service()->find($id);
     }
 
     /**
