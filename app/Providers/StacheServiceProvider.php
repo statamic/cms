@@ -26,6 +26,7 @@ class StacheServiceProvider extends ServiceProvider
         $stache->registerStores([
             (new Stores\CollectionsStore($stache))->directory(base_path('content/collections/')),
             (new Stores\EntriesStore($stache))->directory(base_path('content/collections/')),
+            (new Stores\GlobalsStore($stache))->directory(base_path('content/globals/')),
         ]);
     }
 }

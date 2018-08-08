@@ -4,6 +4,7 @@ namespace Tests\Stache;
 
 use Tests\TestCase;
 use Statamic\API\Entry;
+use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
 use Statamic\Stache\Fakes\YAML;
@@ -20,8 +21,10 @@ class FeatureTest extends TestCase
         parent::setUp();
 
         $this->stache = $this->app->make('stache')->withoutBooting(function ($stache) {
-            $stache->store('collections')->directory(__DIR__.'/__fixtures__/content/collections');
-            $stache->store('entries')->directory(__DIR__.'/__fixtures__/content/collections');
+            $dir = __DIR__.'/__fixtures__/content';
+            $stache->store('collections')->directory($dir . '/collections');
+            $stache->store('entries')->directory($dir . '/collections');
+            $stache->store('globals')->directory($dir . '/globals');
         });
     }
 
@@ -46,5 +49,18 @@ class FeatureTest extends TestCase
     function it_gets_entry()
     {
         $this->assertEquals('Christmas', Entry::find('blog-christmas')->get('title'));
+    }
+
+    /** @test */
+    function it_gets_all_globals()
+    {
+        $this->assertEquals(2, GlobalSet::all()->count());
+    }
+
+    /** @test */
+    function it_gets_globals()
+    {
+        $this->assertEquals('Bar', GlobalSet::find('globals-global')->get('foo'));
+        $this->assertEquals('555-1234', GlobalSet::find('globals-contact')->get('phone'));
     }
 }
