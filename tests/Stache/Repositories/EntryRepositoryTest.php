@@ -107,8 +107,6 @@ class EntryRepositoryTest extends TestCase
     /** @test */
     function it_gets_entry_by_id()
     {
-        $this->markTestIncomplete();
-
         $entry = $this->repo->find('alphabetical-bravo');
 
         $this->assertInstanceOf(Entry::class, $entry);

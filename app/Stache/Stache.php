@@ -178,4 +178,16 @@ class Stache
 
         return $this;
     }
+
+    public function idMap()
+    {
+        return collect($this->stores())->mapWithKeys(function ($store) {
+            return $store->getIdMap();
+        });
+    }
+
+    public function getStoreById($id)
+    {
+        return $this->store($this->idMap()->get($id));
+    }
 }

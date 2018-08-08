@@ -49,6 +49,13 @@ abstract class AggregateStore extends Store
         return $this;
     }
 
+    public function getIdMap()
+    {
+        return $this->stores->mapWithKeys(function ($store) {
+            return $store->getIdMap();
+        });
+    }
+
     protected function extractKeys($string)
     {
         return explode('::', $string);

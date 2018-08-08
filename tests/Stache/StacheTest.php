@@ -225,6 +225,53 @@ class StacheTest extends TestCase
         $this->assertEquals(0, $this->bootstrapper->boots);
         $this->assertEquals($this->stache, $return);
     }
+
+    /** @test */
+    function it_gets_a_map_of_ids_to_the_stores()
+    {
+        $this->stache->sites(['en']); // stores expect the stache to have site(s)
+        $this->stache->registerStore(new class($this->stache) extends CollectionsStore {
+            public function key() { return 'one'; }
+            public function getIdMap() { return collect(['id-1' => 'one', 'id-2' => 'one']); }
+        });
+        $this->stache->registerStore(new class($this->stache) extends CollectionsStore {
+            public function key() { return 'two'; }
+            public function getIdMap() { return collect(['id-3' => 'two', 'id-4' => 'two']); }
+        });
+        $this->stache->registerStore(new class($this->stache) extends CollectionsStore {
+            public function key() { return 'three'; }
+            public function getIdMap() { return collect(['id-5' => 'three::one', 'id-6' => 'three::two']); }
+        });
+
+        $this->assertEquals([
+            'id-1' => 'one',
+            'id-2' => 'one',
+            'id-3' => 'two',
+            'id-4' => 'two',
+            'id-5' => 'three::one',
+            'id-6' => 'three::two',
+        ], $this->stache->idMap()->all());
+    }
+
+    /** @test */
+    function it_gets_a_store_by_id()
+    {
+        $this->stache->sites(['en']); // stores expect the stache to have site(s)
+        $entriesStore = new EntriesStore($this->stache);
+        $entriesOne = $entriesStore->store('one');
+        $entriesTwo = $entriesStore->store('two');
+        $this->stache->registerStores([
+            $collectionsStore = new CollectionsStore($this->stache),
+            $entriesStore
+        ]);
+        $entriesOne->setPath('123', '/onetwothree.md');
+        $entriesTwo->setPath('456', '/fourfivesix.md');
+        $collectionsStore->setPath('789', '/seveneightnine.md');
+
+        $this->assertEquals($entriesOne, $this->stache->getStoreById('123'));
+        $this->assertEquals($entriesTwo, $this->stache->getStoreById('456'));
+        $this->assertEquals($collectionsStore, $this->stache->getStoreById('789'));
+    }
 }
 
 class CountableFakeBootstrapper

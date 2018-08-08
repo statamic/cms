@@ -269,6 +269,17 @@ class BasicStoreTest extends TestCase
 
         $this->assertEquals(['test' => 'what was in the cache'], $this->store->getMetaFromCache());
     }
+
+    /** @test */
+    function it_gets_a_map_of_ids_to_the_stores()
+    {
+        $this->store->setPaths(['123' => '/path/to/one.md', '456' => '/path/to/two.md']);
+
+        $this->assertEquals([
+            '123' => 'test',
+            '456' => 'test',
+        ], $this->store->getIdMap()->all());
+    }
 }
 
 class TestBasicStore extends BasicStore

@@ -3,15 +3,18 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
+use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
 use Statamic\Contracts\Data\Repositories\EntryRepository as RepositoryContract;
 
 class EntryRepository implements RepositoryContract
 {
+    protected $stache;
     protected $store;
 
     public function __construct(Stache $stache)
     {
+        $this->stache = $stache;
         $this->store = $stache->store('entries');
     }
 
@@ -30,5 +33,14 @@ class EntryRepository implements RepositoryContract
         return collect_entries($handles)->flatMap(function ($collection) {
             return $this->whereCollection($collection);
         });
+    }
+
+    public function find($id): ?Entry
+    {
+        if (! $store = $this->stache->getStoreById($id)) {
+            return null;
+        }
+
+        return $store->getItem($id);
     }
 }

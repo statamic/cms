@@ -41,4 +41,10 @@ class FeatureTest extends TestCase
         $this->assertEquals(6, Entry::whereCollection('pages')->count());
         $this->assertEquals(5, Entry::whereCollection(['alphabetical', 'blog'])->count());
     }
+
+    /** @test */
+    function it_gets_entry()
+    {
+        $this->assertEquals('Christmas', Entry::find('blog-christmas')->get('title'));
+    }
 }

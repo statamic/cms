@@ -270,6 +270,20 @@ class AggregateStoreTest extends TestCase
             'test::two' => 'second child stores cache'
         ], $this->store->getMetaFromCache());
     }
+
+    /** @test */
+    function it_gets_a_map_of_ids_to_the_stores()
+    {
+        $this->store->setPaths([
+            'one::123' => '/path/to/one.md',
+            'two::456' => '/path/to/two.md'
+        ]);
+
+        $this->assertEquals([
+            '123' => 'test::one',
+            '456' => 'test::two',
+        ], $this->store->getIdMap()->all());
+    }
 }
 
 class TestAggregateStore extends AggregateStore

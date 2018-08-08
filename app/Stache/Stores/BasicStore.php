@@ -97,6 +97,13 @@ abstract class BasicStore extends Store
         return $this;
     }
 
+    public function getIdMap()
+    {
+        return $this->paths->keys()->mapWithKeys(function ($id) {
+            return [$id => $this->key()];
+        });
+    }
+
     public function getItems()
     {
         return $this->load()->items;
