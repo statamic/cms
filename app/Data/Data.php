@@ -692,12 +692,7 @@ abstract class Data implements DataContract, Responsable
         return $this;
     }
 
-    /**
-     * Get a representation of the object in its simplest form suitable for serialization
-     *
-     * @return array
-     */
-    public function shrinkWrap()
+    public function toCacheableArray()
     {
         return [
             'attributes' => $this->attributes,
