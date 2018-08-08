@@ -67,5 +67,10 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Data\Repositories\GlobalRepository::class,
             \Statamic\Stache\Repositories\GlobalRepository::class
         );
+
+        $this->app->bind(
+            \Statamic\Contracts\Data\Repositories\AssetContainerRepository::class,
+            \Statamic\Stache\Repositories\AssetContainerRepository::class
+        );
     }
 }

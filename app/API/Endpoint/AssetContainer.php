@@ -2,8 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Data\Services\AssetContainersService;
 use Statamic\Contracts\Assets\AssetContainerFactory;
+use Statamic\Contracts\Data\Repositories\AssetContainerRepository;
 
 class AssetContainer
 {
@@ -14,7 +14,7 @@ class AssetContainer
      */
     public function all()
     {
-        return app(AssetContainersService::class)->all();
+        return $this->repo()->all();
     }
 
     /**
@@ -25,7 +25,7 @@ class AssetContainer
      */
     public function find($id)
     {
-        return app(AssetContainersService::class)->id($id);
+        return $this->repo()->findByHandle($id);
     }
 
     /**
@@ -50,5 +50,10 @@ class AssetContainer
     public function create($driver = null)
     {
         return app(AssetContainerFactory::class)->create($driver);
+    }
+
+    protected function repo()
+    {
+        return app(AssetContainerRepository::class);
     }
 }

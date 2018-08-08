@@ -8,6 +8,7 @@ use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
 use Statamic\Stache\Fakes\YAML;
+use Statamic\API\AssetContainer;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\BasicStore;
 use Statamic\Stache\Stores\EntriesStore;
@@ -25,6 +26,7 @@ class FeatureTest extends TestCase
             $stache->store('collections')->directory($dir . '/collections');
             $stache->store('entries')->directory($dir . '/collections');
             $stache->store('globals')->directory($dir . '/globals');
+            $stache->store('asset-containers')->directory($dir . '/assets');
         });
     }
 
@@ -62,5 +64,18 @@ class FeatureTest extends TestCase
     {
         $this->assertEquals('Bar', GlobalSet::find('globals-global')->get('foo'));
         $this->assertEquals('555-1234', GlobalSet::find('globals-contact')->get('phone'));
+    }
+
+    /** @test */
+    function it_gets_asset_containers()
+    {
+        $this->assertEquals(2, AssetContainer::all()->count());
+    }
+
+    /** @test */
+    function it_gets_an_asset_container()
+    {
+        $this->assertEquals('Main Assets', AssetContainer::find('main')->data()['title']);
+        $this->assertEquals('Another Asset Container', AssetContainer::find('another')->data()['title']);
     }
 }
