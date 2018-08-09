@@ -76,4 +76,14 @@ class CollectionTest extends TestCase
         $this->assertEquals('{slug}', $collection->route());
         $this->assertEquals($collection, $return);
     }
+
+    /** @test */
+    function it_saves_the_collection_through_the_api()
+    {
+        $collection = new Collection;
+        $collection->data(['foo' => 'bar']);
+        CollectionAPI::shouldReceive('save')->with($collection)->once();
+
+        $collection->save();
+    }
 }
