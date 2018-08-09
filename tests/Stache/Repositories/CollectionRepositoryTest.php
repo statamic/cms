@@ -82,7 +82,7 @@ class CollectionRepositoryTest extends TestCase
         $this->repo->save($collection);
 
         $this->assertNotNull($item = $this->repo->findByHandle('new'));
-        $this->assertEquals(['foo' => 'bar'], $collection->data());
+        $this->assertEquals(['foo' => 'bar'], $item->data());
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }
