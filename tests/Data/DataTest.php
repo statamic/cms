@@ -2,21 +2,22 @@
 
 namespace Tests\Data;
 
-use Statamic\Data\Pages\Page as PageObj;
+use Statamic\Data\Entries\Entry as EntryObj;
 use Tests\TestCase;
-use Statamic\API\Page;
+use Statamic\API\Entry;
 
 class DataTest extends TestCase
 {
-    /** @var  PageObj */
+    /** @var  EntryObj */
     protected $page;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->page = Page::create('/about')
-            ->path('site/content/pages/about/index.md')
+        $this->page = Entry::create('about')
+            ->collection('pages')
+            ->path('collections/pages/about/index.md')
             ->with([
                 'title' => 'Test',
                 'foo' => 'bar',
@@ -44,16 +45,16 @@ class DataTest extends TestCase
 
     public function test_that_methods_are_chainable()
     {
-        $this->assertInstanceOf(PageObj::class, $this->page->set('foo', 'bar'));
-        $this->assertInstanceOf(PageObj::class, $this->page->remove('foo'));
-        $this->assertInstanceOf(PageObj::class, $this->page->data([]));
-        $this->assertInstanceOf(PageObj::class, $this->page->syncOriginal());
-        $this->assertInstanceOf(PageObj::class, $this->page->dataType('md'));
-        $this->assertInstanceOf(PageObj::class, $this->page->content('foo'));
-        $this->assertInstanceOf(PageObj::class, $this->page->path('foo'));
-        $this->assertInstanceOf(PageObj::class, $this->page->id('foo'));
-        $this->assertInstanceOf(PageObj::class, $this->page->setSupplement('foo', 'bar'));
-        $this->assertInstanceOf(PageObj::class, $this->page->removeSupplement('foo', 'bar'));
+        $this->assertInstanceOf(EntryObj::class, $this->page->set('foo', 'bar'));
+        $this->assertInstanceOf(EntryObj::class, $this->page->remove('foo'));
+        $this->assertInstanceOf(EntryObj::class, $this->page->data([]));
+        $this->assertInstanceOf(EntryObj::class, $this->page->syncOriginal());
+        $this->assertInstanceOf(EntryObj::class, $this->page->dataType('md'));
+        $this->assertInstanceOf(EntryObj::class, $this->page->content('foo'));
+        // $this->assertInstanceOf(EntryObj::class, $this->page->path('foo')); // @TODO ?
+        $this->assertInstanceOf(EntryObj::class, $this->page->id('foo'));
+        $this->assertInstanceOf(EntryObj::class, $this->page->setSupplement('foo', 'bar'));
+        $this->assertInstanceOf(EntryObj::class, $this->page->removeSupplement('foo', 'bar'));
     }
 
     public function testEnsuresUuid()

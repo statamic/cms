@@ -3,7 +3,7 @@
 namespace Statamic\Tests\Data;
 
 use Tests\TestCase;
-use Statamic\Data\Pages\Page;
+use Statamic\Data\Entries\Entry;
 use Statamic\Data\LocalizedData;
 
 class LocalizedDataTest extends TestCase
@@ -45,7 +45,7 @@ class LocalizedDataTest extends TestCase
     }
 }
 
-class SamplePage extends Page
+class SamplePage extends Entry
 {
     public function url($url = null)
     {

@@ -3,7 +3,7 @@
 namespace Tests\Data;
 
 use Tests\TestCase;
-use Statamic\API\Page;
+use Statamic\API\Entry;
 use Statamic\API\Site;
 use Statamic\API\Config;
 
@@ -16,8 +16,9 @@ class ContentTest extends TestCase
     {
         parent::setUp();
 
-        $this->page = Page::create('/about')
-            ->path('pages/about/index.md')
+        $this->page = Entry::create('about')
+            ->collection('pages')
+            ->path('collections/pages/about.md')
             ->with([
                 'title' => 'Test',
                 'foo' => 'bar',
@@ -26,7 +27,7 @@ class ContentTest extends TestCase
 
     public function testGetsFolder()
     {
-        $this->assertEquals('about', $this->page->folder());
+        $this->assertEquals('pages', $this->page->folder());
     }
 
     public function testChangesStatus()
@@ -39,6 +40,8 @@ class ContentTest extends TestCase
 
     public function test_that_a_url_can_get_retrieved()
     {
+        $this->markTestIncomplete();
+
         Site::setConfig('sites.en.url', 'http://foo.com/');
 
         $this->assertEquals('/about', $this->page->url());

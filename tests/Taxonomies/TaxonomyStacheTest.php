@@ -18,6 +18,8 @@ class TaxonomyStacheTest extends TestCase
 
     public function setUp()
     {
+        $this->markTestSkipped();
+
         parent::setUp();
 
         $this->createTaxonomy('tags');

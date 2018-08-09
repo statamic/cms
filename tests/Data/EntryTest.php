@@ -22,9 +22,9 @@ class EntryTest extends TestCase
         $collection = Entries::createCollection('blog');
         $collection->data(['order' => 'date', 'template' => 'blog/post']);
         $this->app->make(Stache::class)
-            ->repo('collections')
-            ->setPath('blog', 'collections/blog/folder.yaml')
-            ->setItem('blog', $collection);
+            ->store('collections')
+            ->setItem('blog', $collection)
+            ->setPath('blog', 'collections/blog.yaml');
 
         $this->entry = Entry::create('post')->collection('blog')->with([
             'title' => 'Test',

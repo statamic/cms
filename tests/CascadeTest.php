@@ -294,9 +294,17 @@ class CascadeTest extends TestCase
     /** @test */
     function it_hydrates_page_data()
     {
-        $vars = ['foo' => 'bar', 'baz' => 'qux'];
+        // Add a collection to the stache
+        $collection = \Statamic\API\Collection::create('example');
+        $this->app->make(Stache::class)
+            ->store('collections')
+            ->setItem('example', $collection)
+            ->setPath('example', 'collections/example.yaml');
 
-        $page = \Statamic\API\Page::create('/test')->with($vars)->get();
+        $page = \Statamic\API\Entry::create('test')
+            ->collection('example')
+            ->with($vars = ['foo' => 'bar', 'baz' => 'qux'])
+            ->get();
         $cascade = $this->cascade()->withContent($page);
 
         tap($cascade->hydrate()->toArray(), function ($cascade) use ($vars) {
@@ -334,7 +342,19 @@ class CascadeTest extends TestCase
     function page_data_overrides_globals()
     {
         $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.
-        $page = \Statamic\API\Page::create('/test')->with(['foo' => 'foo defined in page'])->get();
+
+        // Add a collection to the stache
+        $collection = \Statamic\API\Collection::create('example');
+        $this->app->make(Stache::class)
+            ->store('collections')
+            ->setItem('example', $collection)
+            ->setPath('example', 'collections/example.yaml');
+
+        $page = \Statamic\API\Entry::create('test')
+            ->collection('example')
+            ->with(['foo' => 'foo defined in page'])
+            ->get();
+
         $this->createGlobal('global', ['foo' => 'foo defined in global']);
 
         $cascade = $this->cascade()->withContent($page);
@@ -364,7 +384,7 @@ class CascadeTest extends TestCase
         $global = GlobalSet::create($handle)->with($data)->get();
 
         $this->app->make(Stache::class)
-            ->repo('globals')
+            ->store('globals')
             ->setPath($handle, "globals/{$handle}.yaml")
             ->setItem($handle, $global);
     }

@@ -16,6 +16,8 @@ class FrontendTest extends TestCase
 
     public function setUp()
     {
+        $this->markTestSkipped(); // until pages return
+
         parent::setUp();
 
         $this->withStandardFakeViews();

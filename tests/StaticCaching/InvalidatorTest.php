@@ -106,6 +106,8 @@ class InvalidatorTest extends \PHPUnit\Framework\TestCase
     /** @test */
     public function page_urls_get_invalidated()
     {
+        $this->markTestSkipped(); // until pages return!
+
         $cacher = $this->cacherSpy([
             'static_caching_invalidation' => [
                 'pages' => [

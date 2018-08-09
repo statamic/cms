@@ -26,7 +26,7 @@ class UrlBuilderTest extends TestCase
         $collection = Entries::createCollection('blog');
         $collection->data(['order' => 'date']);
         $this->app->make(Stache::class)
-            ->repo('collections')
+            ->store('collections')
             ->setPath('blog', 'collections/blog/folder.yaml')
             ->setItem('blog', $collection);
 

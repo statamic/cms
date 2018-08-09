@@ -295,6 +295,8 @@ class ParserTest extends TestCase
 
     public function testTermsAreConvertedToArrays()
     {
+        $this->markTestSkipped(); // Until taxonomies are reimplemented.
+
         Taxonomy::shouldReceive('whereHandle')->with('tags')->andReturn(
             new \Statamic\Data\Taxonomies\Taxonomy
         );
