@@ -61,4 +61,19 @@ class CollectionTest extends TestCase
             $this->assertEquals('alphabetical', $collection->order());
         });
     }
+
+    /** @test */
+    function it_puts_the_route_in_the_data()
+    {
+        $collection = new Collection;
+        $collection->data(['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $collection->data());
+        $this->assertNull($collection->route());
+
+        $return = $collection->route('{slug}');
+
+        $this->assertEquals(['foo' => 'bar', 'route' => '{slug}'], $collection->data());
+        $this->assertEquals('{slug}', $collection->route());
+        $this->assertEquals($collection, $return);
+    }
 }

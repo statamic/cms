@@ -26,16 +26,6 @@ class Collection extends DataFolder implements CollectionContract
     protected $last_modified;
 
     /**
-     * @var string|null
-     */
-    protected $route;
-
-    /**
-     * @var string|null
-     */
-    protected $original_route;
-
-    /**
      * @return int
      */
     public function count()
@@ -115,12 +105,6 @@ class Collection extends DataFolder implements CollectionContract
     public function save()
     {
         CollectionAPI::save($this);
-
-        // If the route was modified, update routes.yaml
-        if ($this->route && ($this->original_route !== $this->route)) {
-            Config::set('statamic.routes.collections.'.$this->path(), $this->route());
-            Config::save();
-        }
     }
 
     /**
@@ -185,14 +169,12 @@ class Collection extends DataFolder implements CollectionContract
     public function route($route = null)
     {
         if (is_null($route)) {
-            return $this->route ?: array_get(Config::getRoutes(), 'collections.'.$this->path());
+            return $this->get('route');
         }
 
-        if (! $this->original_route) {
-            $this->original_route = $this->route();
-        }
+        $this->set('route', $route);
 
-        $this->route = $route;
+        return $this;
     }
 
     /**
