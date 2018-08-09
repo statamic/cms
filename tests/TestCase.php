@@ -15,7 +15,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $configs = [
             'assets', 'cp', 'forms', 'routes', 'static_caching',
-            'sites', 'system', 'theming', 'users'
+            'sites', 'stache', 'system', 'theming', 'users'
         ];
 
         foreach ($configs as $config) {
@@ -32,6 +32,12 @@ class TestCase extends \Orchestra\Testbench\TestCase
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',]
             ]
         ]);
+
+        $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
+        $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
+        $app['config']->set('statamic.stache.stores.users.directory', __DIR__.'/__fixtures__/users');
     }
 
     protected function assertEveryItem($items, $callback)
