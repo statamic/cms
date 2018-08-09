@@ -130,17 +130,17 @@ class Collection extends DataFolder implements CollectionContract
      */
     public function order()
     {
-        $order = $this->get('order', 'alphabetical');
+        $order = $this->get('order');
 
-        if (in_array($order, ['numeric', 'numerical', 'numbers', 'numbered'])) {
-            $order = 'number';
+        if (in_array($order, ['number', 'numeric', 'numerical', 'numbers', 'numbered'])) {
+            return 'number';
         }
 
-        if ($order === 'alpha') {
-            $order = 'alphabetical';
+        if ($order === 'date') {
+            return 'date';
         }
 
-        return $order;
+        return 'alphabetical';
     }
 
     /**
