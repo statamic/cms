@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\Site;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores;
 use Illuminate\Support\ServiceProvider;
@@ -21,7 +22,7 @@ class StacheServiceProvider extends ServiceProvider
     {
         $stache = $this->app->make(Stache::class);
 
-        $stache->sites(['en']); // @todo
+        $stache->sites(Site::all()->keys()->all());
 
         $stache->registerStores(collect(config('statamic.stache.stores'))->map(function ($config) {
             return app($config['class'])->directory($config['directory']);
