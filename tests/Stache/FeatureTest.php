@@ -128,4 +128,18 @@ class FeatureTest extends TestCase
         );
         @unlink($path);
     }
+
+    /** @test */
+    function saving_a_global_set_writes_it_to_file()
+    {
+        $global = GlobalSet::create('new')
+            ->with(['foo' => 'bar'])
+            ->save();
+
+        $this->assertStringEqualsFile(
+            $path = __DIR__.'/__fixtures__/content/globals/new.yaml',
+            "foo: bar\n"
+        );
+        @unlink($path);
+    }
 }

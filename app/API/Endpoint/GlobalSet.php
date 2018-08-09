@@ -4,6 +4,7 @@ namespace Statamic\API\Endpoint;
 
 use Statamic\Contracts\Data\Globals\GlobalFactory;
 use Statamic\Contracts\Data\Repositories\GlobalRepository;
+use Statamic\Contracts\Data\Globals\GlobalSet as GlobalContract;
 
 class GlobalSet
 {
@@ -50,6 +51,11 @@ class GlobalSet
         return $this->repo()->all()->sortBy(function ($global) {
             return $global->title();
         });
+    }
+
+    public function save(GlobalContract $global)
+    {
+        $this->repo()->save($global);
     }
 
     protected function repo()

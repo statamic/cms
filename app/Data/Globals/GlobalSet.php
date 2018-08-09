@@ -4,6 +4,7 @@ namespace Statamic\Data\Globals;
 
 use Statamic\API\Fieldset;
 use Statamic\API\Path;
+use Statamic\API\GlobalSet as GlobalSetAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalContract;
 use Statamic\Data\Content\Content;
 
@@ -196,5 +197,10 @@ class GlobalSet extends Content implements GlobalContract
         $fieldset->type('global');
 
         return $fieldset;
+    }
+
+    public function save()
+    {
+        GlobalSetAPI::save($this);
     }
 }

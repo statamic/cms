@@ -5,6 +5,7 @@ namespace Tests\Stache\Repositories;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
+use Statamic\API\GlobalSet as GlobalSetAPI;
 use Statamic\Data\Globals\GlobalCollection;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Stache\Repositories\GlobalRepository;
@@ -17,7 +18,8 @@ class GlobalRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
-        $stache->registerStore((new GlobalsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/globals'));
+        $this->directory = __DIR__.'/../__fixtures__/content/globals';
+        $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
 
         $this->repo = new GlobalRepository($stache);
     }
@@ -75,5 +77,23 @@ class GlobalRepositoryTest extends TestCase
         });
 
         $this->assertNull($this->repo->findByHandle('unknown'));
+    }
+
+    /** @test */
+    function it_saves_a_global_to_the_stache_and_to_a_file()
+    {
+        $global = GlobalSetAPI::create('new')
+            ->with(['id' => 'id-new', 'foo' => 'bar', 'baz' => 'qux'])
+            ->get();
+        $global->in('fr')->set('foo', 'le bar');
+        $this->assertNull($this->repo->findByHandle('new'));
+
+        $this->repo->save($global);
+
+        $this->assertNotNull($item = $this->repo->find('id-new'));
+        $this->assertEquals(['id' => 'id-new', 'foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data());
+        $this->assertEquals(['foo' => 'le bar'], $item->in('fr')->data());
+        $this->assertFileExists($this->directory.'/new.yaml');
+        @unlink($this->directory.'/new.yaml');
     }
 }

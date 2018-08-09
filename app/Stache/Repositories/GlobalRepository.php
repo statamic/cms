@@ -31,4 +31,11 @@ class GlobalRepository implements RepositoryContract
     {
         return $this->find($this->store->getIdByHandle($handle));
     }
+
+    public function save(GlobalSet $global)
+    {
+        $this->store->setItem($global->id(), $global);
+
+        $this->store->save($global);
+    }
 }

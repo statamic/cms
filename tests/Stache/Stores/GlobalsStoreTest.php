@@ -96,4 +96,23 @@ class GlobalsStoreTest extends TestCase
         $this->assertEquals('123', $this->store->getIdByHandle('test'));
         $this->assertEquals('456', $this->store->getIdByHandle('nested'));
     }
+
+    /** @test */
+    function it_saves_to_disk()
+    {
+        $global = GlobalsAPI::create('new')
+            ->with(['id' => 'id-new', 'foo' => 'bar', 'baz' => 'qux'])
+            ->get();
+
+        $global->in('fr')
+            ->set('foo', 'le bar')
+            ->set('baz', 'qux'); // identical to default to test it doesnt get saved
+
+        $this->store->save($global);
+
+        $this->assertStringEqualsFile(
+            $this->tempDir.'/new.yaml',
+            "id: id-new\nfoo: bar\nbaz: qux\nfr:\n  foo: 'le bar'\n"
+        );
+    }
 }
