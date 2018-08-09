@@ -19,7 +19,6 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     protected $subscribe = [
-        \Statamic\Stache\Listeners\UpdateItem::class,
         \Statamic\Data\Taxonomies\TermTracker::class,
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
         \Statamic\StaticCaching\Invalidator::class,
