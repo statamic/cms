@@ -110,4 +110,22 @@ class FeatureTest extends TestCase
 
         $this->assertNull(Content::find('unknown'));
     }
+
+    /** @test */
+    function saving_a_collection_writes_it_to_file()
+    {
+        $collection = Collection::create('new');
+        $collection->data([
+            'title' => 'New Collection',
+            'order' => 'date',
+            'foo' => 'bar'
+        ]);
+        $collection->save();
+
+        $this->assertStringEqualsFile(
+            $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
+            "title: 'New Collection'\norder: date\nfoo: bar\n"
+        );
+        @unlink($path);
+    }
 }

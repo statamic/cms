@@ -16,7 +16,8 @@ class EntryRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
-        $stache->registerStore((new EntriesStore($stache))->directory(__DIR__.'/../__fixtures__/content/collections'));
+        $this->app->instance(Stache::class, $stache);
+        $stache->registerStore((new EntriesStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'));
 
         $this->repo = new EntryRepository($stache);
     }

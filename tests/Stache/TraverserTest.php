@@ -73,7 +73,7 @@ class TraverserTest extends TestCase
 
         $stache = Mockery::mock(Stache::class);
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
-        $store = new class($stache) extends BasicStore {
+        $store = new class($stache, app('files')) extends BasicStore {
             public function key() { }
             public function filter($file) {
                 PHPUnit::assertInstanceOf(SplFileInfo::class, $file);

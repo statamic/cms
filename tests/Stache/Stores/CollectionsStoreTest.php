@@ -19,7 +19,7 @@ class CollectionsStoreTest extends TestCase
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new CollectionsStore($stache))->directory($this->tempDir);
+        $this->store = (new CollectionsStore($stache, app('files')))->directory($this->tempDir);
     }
 
     function tearDown()
@@ -79,5 +79,20 @@ class CollectionsStoreTest extends TestCase
             'test',
             $this->store->getItemKey('irrelevant', '/path/to/test.yaml')
         );
+    }
+
+    /** @test */
+    function it_saves_to_disk()
+    {
+        $collection = CollectionAPI::create('new');
+        $collection->data([
+            'title' => 'New Collection',
+            'order' => 'date',
+            'foo' => 'bar'
+        ]);
+
+        $this->store->save($collection);
+
+        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', "title: 'New Collection'\norder: date\nfoo: bar\n");
     }
 }

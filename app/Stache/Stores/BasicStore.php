@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Filesystem\Filesystem;
 
 abstract class BasicStore extends Store
 {
@@ -12,10 +13,12 @@ abstract class BasicStore extends Store
     protected $uris;
     protected $items;
     protected $loaded = false;
+    protected $files;
 
-    public function __construct(Stache $stache)
+    public function __construct(Stache $stache, Filesystem $files)
     {
         $this->stache = $stache;
+        $this->files = $files;
 
         $this->paths = collect();
         $this->uris = collect();

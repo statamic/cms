@@ -19,7 +19,7 @@ class AssetContainersStoreTest extends TestCase
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new AssetContainersStore($stache))->directory($this->tempDir);
+        $this->store = (new AssetContainersStore($stache, app('files')))->directory($this->tempDir);
     }
 
     function tearDown()

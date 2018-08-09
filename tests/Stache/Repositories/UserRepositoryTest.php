@@ -16,7 +16,7 @@ class UserRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
-        $stache->registerStore((new UsersStore($stache))->directory(__DIR__.'/../__fixtures__/users'));
+        $stache->registerStore((new UsersStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/users'));
 
         $this->repo = new UserRepository($stache);
     }

@@ -25,4 +25,11 @@ class CollectionRepository implements RepositoryContract
     {
         return $this->store->getItem($handle);
     }
+
+    public function save(Collection $collection)
+    {
+        $this->store->setItem($collection->path(), $collection);
+
+        $this->store->save($collection);
+    }
 }

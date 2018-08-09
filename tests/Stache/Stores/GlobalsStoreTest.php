@@ -20,7 +20,7 @@ class GlobalsStoreTest extends TestCase
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new GlobalsStore($stache))->directory($this->tempDir);
+        $this->store = (new GlobalsStore($stache, app('files')))->directory($this->tempDir);
     }
 
     function tearDown()

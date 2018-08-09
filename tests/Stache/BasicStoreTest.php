@@ -17,7 +17,7 @@ class BasicStoreTest extends TestCase
             ->sites(['en', 'fr'])
             ->keys(['test/data']);
 
-        $this->store = new TestBasicStore($stache);
+        $this->store = new TestBasicStore($stache, app('files'));
     }
 
     /** @test */

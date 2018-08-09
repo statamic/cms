@@ -25,11 +25,11 @@ class LoaderTest extends TestCase
     {
         $this->stache = (new Stache)->sites(['en', 'es'])->disableBooting();
 
-        $this->stache->registerStore(new class($this->stache) extends BasicStore {
+        $this->stache->registerStore(new class($this->stache, app('files')) extends BasicStore {
             public function key() { return 'one'; }
         });
 
-        $this->stache->registerStore(new class($this->stache) extends BasicStore {
+        $this->stache->registerStore(new class($this->stache, app('files')) extends BasicStore {
             public function key() { return 'two'; }
         });
     }
@@ -153,7 +153,7 @@ class LoaderTest extends TestCase
     function gets_meta_data_from_cache()
     {
         $stache = (new Stache)->sites(['en'])->disableBooting();
-        $stache->registerStore(new class($stache) extends BasicStore {
+        $stache->registerStore(new class($stache, app('files')) extends BasicStore {
             public function key()
             {
                 return 'one';
@@ -163,7 +163,7 @@ class LoaderTest extends TestCase
                 return ['one' => 'first meta data'];
             }
         });
-        $stache->registerStore(new class($stache) extends BasicStore {
+        $stache->registerStore(new class($stache, app('files')) extends BasicStore {
             public function key()
             {
                 return 'two';
@@ -190,7 +190,7 @@ class LoaderTest extends TestCase
         $this->expectException(EmptyStacheException::class);
 
         $stache = (new Stache)->sites(['en'])->disableBooting();
-        $stache->registerStore(new class($stache) extends BasicStore {
+        $stache->registerStore(new class($stache, app('files')) extends BasicStore {
             public function key()
             {
                 return 'one';
@@ -200,7 +200,7 @@ class LoaderTest extends TestCase
                 return ['one' => 'first meta data'];
             }
         });
-        $stache->registerStore(new class($stache) extends BasicStore {
+        $stache->registerStore(new class($stache, app('files')) extends BasicStore {
             public function key()
             {
                 return 'two';

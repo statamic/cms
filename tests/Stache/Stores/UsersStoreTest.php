@@ -19,7 +19,7 @@ class UsersStoreTest extends TestCase
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new UsersStore($stache))->directory($this->tempDir);
+        $this->store = (new UsersStore($stache, app('files')))->directory($this->tempDir);
     }
 
     function tearDown()

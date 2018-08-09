@@ -10,6 +10,7 @@ use Statamic\API\Folder;
 use Statamic\API\Fieldset;
 use Statamic\Data\DataFolder;
 use Statamic\Events\Data\CollectionDeleted;
+use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
 class Collection extends DataFolder implements CollectionContract
@@ -113,9 +114,7 @@ class Collection extends DataFolder implements CollectionContract
      */
     public function save()
     {
-        $path = 'collections/' . $this->path() . '/folder.yaml';
-
-        File::disk('content')->put($path, YAML::dump($this->data()));
+        CollectionAPI::save($this);
 
         // If the route was modified, update routes.yaml
         if ($this->route && ($this->original_route !== $this->route)) {

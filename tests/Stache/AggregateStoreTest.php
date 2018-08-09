@@ -19,7 +19,9 @@ class AggregateStoreTest extends TestCase
             ->sites(['en', 'fr'])
             ->keys(['test/data']);
 
-        $this->store = new TestAggregateStore($stache);
+        $this->app->instance(Stache::class, $stache);
+
+        $this->store = new TestAggregateStore($stache, app('files'));
     }
 
     /** @test */

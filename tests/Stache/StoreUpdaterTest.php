@@ -22,7 +22,7 @@ class StoreUpdaterTest extends TestCase
         }
 
         $this->stache = (new Stache)->sites(['en', 'es']);
-        $this->store = new class($this->stache) extends BasicStore {
+        $this->store = new class($this->stache, app('files')) extends BasicStore {
             public function key() { return 'test-store-key'; }
             public function getItemsFromCache($cache) {
                 return $cache->map(function ($item) {

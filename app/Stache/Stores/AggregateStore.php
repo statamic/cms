@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Closure;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\ChildStore;
@@ -10,6 +11,7 @@ abstract class AggregateStore extends Store
 {
     protected $stache;
     protected $stores;
+    protected $childStoreCreator;
 
     public function __construct(Stache $stache)
     {
@@ -20,10 +22,28 @@ abstract class AggregateStore extends Store
     public function store($key)
     {
         if (! $this->stores->has($key)) {
-            $this->stores->put($key, new ChildStore($this, $this->stache, $key));
+            $this->stores->put($key, $this->createChildStore($key));
         }
 
         return $this->stores->get($key);
+    }
+
+    protected function createChildStore($key)
+    {
+        $store = $this->childStoreCreator
+            ? call_user_func($this->childStoreCreator)
+            : app(ChildStore::class);
+
+        return $store
+            ->setKey($key)
+            ->setParent($this);
+    }
+
+    public function setChildStoreCreator(Closure $callback)
+    {
+        $this->childStoreCreator = $callback;
+
+        return $this;
     }
 
     public function stores()

@@ -17,7 +17,7 @@ class GlobalRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
-        $stache->registerStore((new GlobalsStore($stache))->directory(__DIR__.'/../__fixtures__/content/globals'));
+        $stache->registerStore((new GlobalsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/globals'));
 
         $this->repo = new GlobalRepository($stache);
     }

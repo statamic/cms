@@ -5,6 +5,8 @@ namespace Tests\Stache;
 use Statamic\Stache\Stache;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\CollectionsStore;
 
@@ -94,7 +96,9 @@ class StacheTest extends TestCase
         $this->stache->sites(['en']); // store expects the stache to have site(s)
         $this->assertTrue($this->stache->stores()->isEmpty());
 
-        $return = $this->stache->registerStore(new CollectionsStore($this->stache));
+        $return = $this->stache->registerStore(
+            new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class))
+        );
 
         $this->assertEquals($this->stache, $return);
         tap($this->stache->stores(), function ($stores) {
@@ -112,8 +116,8 @@ class StacheTest extends TestCase
         $this->assertTrue($this->stache->stores()->isEmpty());
 
         $return = $this->stache->registerStores([
-            new CollectionsStore($this->stache),
-            new EntriesStore($this->stache)
+            new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class)),
+            new EntriesStore($this->stache, \Mockery::mock(Filesystem::class))
         ]);
 
         $this->assertEquals($this->stache, $return);
@@ -131,7 +135,9 @@ class StacheTest extends TestCase
     function an_aggregate_stores_child_store_can_be_retrieved_directly()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $store = new EntriesStore($this->stache);
+        $store = (new EntriesStore($this->stache))->setChildStoreCreator(function () {
+            return new ChildStore($this->stache, \Mockery::mock(Filesystem::class));
+        });
         $one = $store->store('one');
         $two = $store->store('two');
         $this->stache->registerStore($store);
@@ -180,7 +186,9 @@ class StacheTest extends TestCase
     function stache_is_booted_on_demand_when_attempting_to_access_an_aggregate_stores_child_store()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $store = new EntriesStore($this->stache);
+        $store = (new EntriesStore($this->stache))->setChildStoreCreator(function () {
+            return new ChildStore($this->stache, \Mockery::mock(Filesystem::class));
+        });
         $one = $store->store('one');
         $this->stache->registerStore($store);
         $this->assertFalse($this->stache->hasBooted());
@@ -230,15 +238,15 @@ class StacheTest extends TestCase
     function it_gets_a_map_of_ids_to_the_stores()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $this->stache->registerStore(new class($this->stache) extends CollectionsStore {
+        $this->stache->registerStore(new class($this->stache, \Mockery::mock(Filesystem::class)) extends CollectionsStore {
             public function key() { return 'one'; }
             public function getIdMap() { return collect(['id-1' => 'one', 'id-2' => 'one']); }
         });
-        $this->stache->registerStore(new class($this->stache) extends CollectionsStore {
+        $this->stache->registerStore(new class($this->stache, \Mockery::mock(Filesystem::class)) extends CollectionsStore {
             public function key() { return 'two'; }
             public function getIdMap() { return collect(['id-3' => 'two', 'id-4' => 'two']); }
         });
-        $this->stache->registerStore(new class($this->stache) extends CollectionsStore {
+        $this->stache->registerStore(new class($this->stache, \Mockery::mock(Filesystem::class)) extends CollectionsStore {
             public function key() { return 'three'; }
             public function getIdMap() { return collect(['id-5' => 'three::one', 'id-6' => 'three::two']); }
         });
@@ -257,11 +265,13 @@ class StacheTest extends TestCase
     function it_gets_a_store_by_id()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $entriesStore = new EntriesStore($this->stache);
+        $entriesStore = (new EntriesStore($this->stache))->setChildStoreCreator(function () {
+            return new ChildStore($this->stache, \Mockery::mock(Filesystem::class));
+        });
         $entriesOne = $entriesStore->store('one');
         $entriesTwo = $entriesStore->store('two');
         $this->stache->registerStores([
-            $collectionsStore = new CollectionsStore($this->stache),
+            $collectionsStore = new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class)),
             $entriesStore
         ]);
         $entriesOne->setPath('123', '/onetwothree.md');

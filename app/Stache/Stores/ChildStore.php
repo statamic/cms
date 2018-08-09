@@ -7,12 +7,18 @@ class ChildStore extends BasicStore
     protected $parent;
     protected $key;
 
-    public function __construct($parent, $stache, $key)
+    public function setParent(AggregateStore $parent)
     {
-        parent::__construct($stache);
-
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function setKey($key)
+    {
         $this->key = $key;
+
+        return $this;
     }
 
     public function key()

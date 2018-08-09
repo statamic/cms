@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Data\Entries\Collection;
 use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\API\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -16,7 +17,8 @@ class CollectionRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
-        $stache->registerStore((new CollectionsStore($stache))->directory(__DIR__.'/../__fixtures__/content/collections'));
+        $this->directory = __DIR__.'/../__fixtures__/content/collections';
+        $stache->registerStore((new CollectionsStore($stache, app('files')))->directory($this->directory));
 
         $this->repo = new CollectionRepository($stache);
     }
@@ -68,5 +70,20 @@ class CollectionRepositoryTest extends TestCase
         });
 
         $this->assertNull($this->repo->findByHandle('unknown'));
+    }
+
+    /** @test */
+    function it_saves_a_collection_to_the_stache_and_to_a_file()
+    {
+        $collection = CollectionAPI::create('new');
+        $collection->data(['foo' => 'bar']);
+        $this->assertNull($this->repo->findByHandle('new'));
+
+        $this->repo->save($collection);
+
+        $this->assertNotNull($item = $this->repo->findByHandle('new'));
+        $this->assertEquals(['foo' => 'bar'], $collection->data());
+        $this->assertTrue(file_exists($this->directory.'/new.yaml'));
+        @unlink($this->directory.'/new.yaml');
     }
 }
