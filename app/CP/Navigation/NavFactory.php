@@ -49,11 +49,12 @@ class NavFactory
             }
         }
 
-        if ($this->access('taxonomies:*:view')) {
-            if ($sub = $this->buildTaxonomiesNav()) {
-                $nav->add($sub);
-            }
-        }
+        // TODO: Bring back with taxonomies
+        // if ($this->access('taxonomies:*:view')) {
+        //     if ($sub = $this->buildTaxonomiesNav()) {
+        //         $nav->add($sub);
+        //     }
+        // }
 
         if ($this->access('assets:*:view')) {
             if (! AssetContainer::all()->isEmpty()) {
@@ -162,15 +163,16 @@ class NavFactory
             );
         }
 
-        $duplicates = app('stache')->duplicates();
-        if (! $duplicates->isEmpty()) {
-            $nav->add(
-                $this->item('resolve_duplicates')
-                     ->route('resolve-duplicate-ids')
-                     ->title(__('Duplicate IDs'))
-                     ->badge($duplicates->count())
-            );
-        }
+        // TODO: Bring this back once we have duplicate id tracking in the stache
+        // $duplicates = app('stache')->duplicates();
+        // if (! $duplicates->isEmpty()) {
+        //     $nav->add(
+        //         $this->item('resolve_duplicates')
+        //              ->route('resolve-duplicate-ids')
+        //              ->title(__('Duplicate IDs'))
+        //              ->badge($duplicates->count())
+        //     );
+        // }
 
         return $nav;
     }
