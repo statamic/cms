@@ -42,7 +42,7 @@ class YAML
      */
     public function dump($data, $content = false)
     {
-        $yaml = SymfonyYaml::dump($data, 2, 2);
+        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
         if ($content) {
             $fenced = "---".PHP_EOL . $yaml . "---".PHP_EOL;
