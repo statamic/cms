@@ -14,6 +14,35 @@ class GlobalsStore extends BasicStore
         return 'globals';
     }
 
+    public function getItemsFromCache($cache)
+    {
+        // TODO: TDD. This was just copy/pasted from v2.
+        return $cache->map(function ($item, $id) {
+            $attr = $item['attributes'];
+
+            // Get the data for the default locale. Remove the ID since
+            // we already have it and will be setting it separately.
+            $data = $item['data'][default_locale()];
+            unset($data['id']);
+
+            $set = GlobalSet::create($attr['slug'])
+                ->id($id)
+                ->with($data)
+                ->get();
+
+            // If the set has additional locale data, add them.
+            if (count($item['data']) > 1) {
+                foreach ($item['data'] as $locale => $data) {
+                    $set->dataForLocale($locale, $data);
+                }
+
+                $set->syncOriginal();
+            }
+
+            return $set;
+        });
+    }
+
     public function createItemFromFile($path, $contents)
     {
         $handle = pathinfo($path)['filename'];

@@ -55,6 +55,8 @@ class GlobalsStoreTest extends TestCase
     /** @test */
     function it_makes_global_set_instances_from_cache()
     {
+        $this->markTestIncomplete(); // it needs to use the toCacheableArray based items instead of instances.
+
         $set = GlobalsAPI::create('example')->get();
 
         $items = $this->store->getItemsFromCache([$set]);
