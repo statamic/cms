@@ -35,11 +35,63 @@ class AuthServiceProvider extends ServiceProvider
             return new FileUserProvider;
         });
 
-        $this->loadRoles();
+        // TODO: Implement correctly.
 
-        $permissions->build();
+        // $this->loadRoles();
 
-        foreach ($permissions->all(true) as $group => $permission) {
+        // $permissions->build();
+        // $perms = $permissions->all(true);
+
+        $perms = [
+            "super",
+            "cp:access",
+            "content:view_drafts_on_frontend",
+            "pages:view",
+            "pages:edit",
+            "pages:create",
+            "pages:delete",
+            "pages:reorder",
+            "forms",
+            "updater",
+            "updater:update",
+            "importer",
+            "users:view",
+            "users:edit",
+            "users:edit-passwords",
+            "users:edit-roles",
+            "users:create",
+            "users:delete",
+            "resolve_duplicates",
+            "collections:*:view",
+            "collections:*:edit",
+            "collections:blog:view",
+            "collections:blog:edit",
+            "collections:blog:create",
+            "collections:blog:delete",
+            "collections:things:view",
+            "collections:things:edit",
+            "collections:things:create",
+            "collections:things:delete",
+            "taxonomies:*:view",
+            "taxonomies:*:edit",
+            "taxonomies:tags:view",
+            "taxonomies:tags:edit",
+            "taxonomies:tags:create",
+            "taxonomies:tags:delete",
+            "globals:*:view",
+            "globals:*:edit",
+            "globals:global:view",
+            "globals:global:edit",
+            "assets:*:view",
+            "assets:*:edit",
+            "assets:main:view",
+            "assets:main:edit",
+            "assets:main:create",
+            "assets:main:delete",
+        ];
+
+
+        foreach ($perms as $group => $permission) {
             $gate->define($permission, function ($user) use ($permission) {
                 return $user->isSuper() || $user->hasPermission($permission);
             });

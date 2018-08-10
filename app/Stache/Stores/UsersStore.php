@@ -12,6 +12,17 @@ class UsersStore extends BasicStore
         return 'users';
     }
 
+    public function getItemsFromCache($cache)
+    {
+        // TODO: TDD
+        return $cache->map(function ($item) {
+            return User::create()
+                ->username($item['attributes']['username'])
+                ->with($item['data'][default_locale()])
+                ->get();
+        });
+    }
+
     public function createItemFromFile($path, $contents)
     {
         $data = YAML::parse($contents);
@@ -21,10 +32,10 @@ class UsersStore extends BasicStore
             ->with($data)
             ->get();
 
-        // @TODO: TDD
-        // if ($rawPassword = array_get($data, 'password')) {
-        //     $user->securePassword(true, true);
-        // }
+        // TODO: TDD
+        if ($rawPassword = array_get($data, 'password')) {
+            $user->securePassword(true, true);
+        }
 
         return $user;
     }

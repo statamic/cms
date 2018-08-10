@@ -25,4 +25,12 @@ class UserRepository implements RepositoryContract
     {
         return $this->store->getItem($id);
     }
+
+    public function username($username)
+    {
+        // TODO: TDD
+        return $this->store->getItems()->first(function ($user) use ($username) {
+            return $user->username() === $username;
+        });
+    }
 }
