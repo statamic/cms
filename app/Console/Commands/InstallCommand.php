@@ -71,6 +71,7 @@ class InstallCommand extends Command
     protected function publish()
     {
         $this->call('vendor:publish', ['--tag' => 'statamic']);
+        $this->call('vendor:publish', ['--tag' => 'statamic-cp', '--force' => true]);
 
         return $this;
     }

@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->publishes([
             "{$this->root}/resources/dist" => public_path('resources/cp')
-        ], 'statamic');
+        ], 'statamic-cp');
     }
 
     public function register()
