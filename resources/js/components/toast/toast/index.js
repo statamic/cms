@@ -44,7 +44,7 @@ export default {
             return `transform: translateY(${this.options.directionOfJumping}${this.position * 100}%)`
         }
     },
-    ready() {
+    mounted() {
         setTimeout(() => {
             this.isShow = true
         }, 50)

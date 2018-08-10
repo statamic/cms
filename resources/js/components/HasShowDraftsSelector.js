@@ -17,7 +17,7 @@ export default {
 
     },
 
-    ready() {
+    mounted() {
         this.showDrafts = this.getInitialShowDrafts();
     },
 

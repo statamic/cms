@@ -3,45 +3,47 @@
    ========================================================================== */
 
 form {
-	ul,li {
-		list-style: none;
-		padding: 3px 0;
-	}
+    ul,li {
+        list-style: none;
+        padding: 3px 0;
+    }
 }
 
 fieldset {
-	margin-bottom: 16px;
+    margin-bottom: 16px;
 }
 
 label {
-	font-weight: normal;
+    font-weight: normal;
     color: #333;
     font-size: 14px;
+    display: block;
 }
 
 .form-group.tight {
-	margin-bottom: 8px;
+    margin-bottom: 8px;
 }
 
 .form-control,
 textarea,
 input {
-	color: $color_gray_dark;
-	padding: 7px 10px;
+    color: $color_gray_dark;
+    padding: 7px 10px;
+    width: 100%;
 
-	&,
-	&[type="checkbox"] + label:before,
-	&[type="radio"] + label:before {
-		background: $color_gray_input;
-		border: none;
-		border-radius: 3px;
+    &,
+    &[type="checkbox"] + label:before,
+    &[type="radio"] + label:before {
+        background: $color_gray_input;
+        border: none;
+        border-radius: 3px;
 
-		@include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
+        @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
 
         .replicator-fieldtype & {
             background: #fff;
         }
-	}
+    }
 
     &.code {
         font-family: $font_monospace;
@@ -53,96 +55,96 @@ input {
     &[type="search"],
     &[type="email"],
     &[type="number"] {
-		height: 32px;
-	}
+        height: 32px;
+    }
 
-	&[type="checkbox"] {
+    &[type="checkbox"] {
         opacity: 0;
         position: absolute;
         left: -9999px;
 
 
-		& + label {
+        & + label {
 
-			&:before {
-				content: "";
-				cursor: pointer;
-				display: inline-block;
-				height: 20px;
-				margin: 0 8px 0 0;
-				vertical-align: middle;
-				width: 20px;
-			}
-			&.pull-right {
-				float: none !important;
-				display: block;
-				margin: 0;
+            &:before {
+                content: "";
+                cursor: pointer;
+                display: inline-block;
+                height: 20px;
+                margin: 0 8px 0 0;
+                vertical-align: middle;
+                width: 20px;
+            }
+            &.float-right {
+                float: none !important;
+                display: block;
+                margin: 0;
 
-				&:before {
-					float: right;
-					margin: 0;
-				}
-			}
-		}
-		&:checked + label:before {
-			@include background('../img/checkmark.png', 11px 8px, $color_gray_input, center);
-		}
+                &:before {
+                    float: right;
+                    margin: 0;
+                }
+            }
+        }
+        &:checked + label:before {
+            background: $color_gray_input url('../img/checkmark.svg') center center no-repeat;
+        }
         &:focus + label:before {
             border: 1px solid $brand-primary;
         }
-	}
+    }
 
-	&[type="radio"] {
+    &[type="radio"] {
         opacity: 0;
         position: absolute;
         left: -9999px;
 
-		& + label {
-			cursor: pointer;
+        & + label {
+            cursor: pointer;
 
-			&:before {
-				border-radius: 14px;
-				content: "";
-				display: inline-block;
-				height: 22px;
-				margin-right: 8px;
-				vertical-align: -7px;
-				width: 22px;
-			}
-		}
-		&:checked + label:before {
-			@include background('../img/checked-radio-default.png', 10px 10px, $color_gray_input, center);
+            &:before {
+                border-radius: 14px;
+                content: "";
+                display: inline-block;
+                height: 22px;
+                margin-right: 8px;
+                vertical-align: -7px;
+                width: 22px;
+            }
+        }
+        &:checked + label:before {
+            @include background('../img/checked-radio-default.png', 10px 10px, $color_gray_input, center);
 
-			.replicator-fieldtype & { background-color: #fff; }
-		}
+            .replicator-fieldtype & { background-color: #fff; }
+        }
         &:focus + label:before {
             border: 1px solid $brand-primary;
         }
 
-		&.radio-small {
-			& + label {
-				color: $color_gray_light;
+        &.radio-small {
+            & + label {
+                color: $color_gray_light;
 
-				&:before {
-					height: 14px;
-					vertical-align: -3px;
-					width: 14px;
-				}
-			}
+                &:before {
+                    height: 14px;
+                    vertical-align: -3px;
+                    width: 14px;
+                }
+            }
 
-			&:checked + label {
-				color: $color_gray_dark;
-			}
-			&:checked + label:before {
-				@include background('../img/checked-radio.png', 8px 8px, $color_gray_input, center);
-			}
-		}
-	}
+            &:checked + label {
+                color: $color_gray_dark;
+            }
+            &:checked + label:before {
+                @include background('../img/checked-radio.png', 8px 8px, $color_gray_input, center);
+            }
+        }
+    }
 
-	&.alt {
-		background: $color_search_alt;
-		box-shadow: none;
-	}
+    &.alt {
+        background: $color_search_alt;
+        box-shadow: none;
+    }
 
     &.mono {
         font-family: $font_monospace;
@@ -155,79 +157,84 @@ textarea.form-control {
 }
 
 label .required {
-	color: $color_red;
-	font-style: normal;
+    color: $color_red;
+    font-style: normal;
+
+    + .localizable-icon {
+        margin-left: 5px;
+    }
 }
 
 select {
-	appearance: none;
-	-khtml-appearance: none;
-	-webkit-appearance: none;
+    appearance: none;
+    -khtml-appearance: none;
+    -webkit-appearance: none;
 
-	cursor: pointer;
-	left: 0;
-	opacity: 0;
-	position: absolute;
-	top: 0;
-	width: 100%;
-	z-index: 2;
+    cursor: pointer;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
 }
 
 .select {
-	cursor: pointer;
-	display: inline-block;
-	max-width: 300px;
-	max-height: 32px;
-	padding-right: 32px;
-	position: relative;
-	width: 100%;
-	white-space: nowrap;
+    cursor: pointer;
+    display: inline-block;
+    max-width: 300px;
+    max-height: 32px;
+    padding-right: 32px;
+    position: relative;
+    width: 100%;
+    white-space: nowrap;
 
-	&:after {
-		content: "";
-		display: block;
-		height: 9px;
-		right: 0;
-		position: absolute;
-		top: 10px;
-		width: 20px;
-		z-index: 0;
+    &:after {
+        content: "";
+        display: block;
+        height: 9px;
+        right: 0;
+        position: absolute;
+        top: 12px;
+        width: 20px;
+        z-index: 0;
 
-		@include background('../img/select.png', 20px 9px, transparent, right center);
-	}
+        @include background('../img/select.png', 20px 9px, transparent, right center);
+    }
 
-	&:before {
-		content: attr(data-content);
-		display: inline-block;
-		text-overflow: ellipsis;
+    &:before {
+        content: attr(data-content);
+        display: inline-block;
+        text-overflow: ellipsis;
         width: 80%;
-	}
+    }
 
-	&.select-full {
-		max-width: 100%;
-		width: 100%;
-	}
+    &.select-full {
+        max-width: 100%;
+        width: 100%;
+    }
 
-	span.status {
-		border-radius: 7px;
-		display: inline-block;
-		float: left;
-		height: 7px;
-		margin-right: 10px;
-		position: relative;
-		top: 6px;
-		width: 7px;
-	}
+    span.status {
+        border-radius: 7px;
+        display: inline-block;
+        float: left;
+        height: 7px;
+        margin-right: 10px;
+        position: relative;
+        top: 6px;
+        width: 7px;
+    }
 
-	span.status-draft {
-		background: $color_gray_light;
-	}
-	span.status-hidden {
-		border: solid 1px $color_gray_light;
-	}
-	span.status-live {
-		background: $color_green;
-	}
+    span.status-draft {
+        background: $color_gray_light;
+    }
+    span.status-hidden {
+        border: solid 1px $color_gray_light;
+    }
+    span.status-live {
+        background: $color_green;
+    }
 }
 
 input[type="file"] {
@@ -256,19 +263,19 @@ input.slug {
 }
 
 .faux-checkbox {
-	cursor: pointer;
-	display: inline-block;
-	height: 20px;
-	margin: 0 8px 0 0;
-	vertical-align: middle;
-	width: 20px;
-	background: $color_gray_input;
-	border-radius: 2px;
-	@include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    margin: 0 8px 0 0;
+    vertical-align: middle;
+    width: 20px;
+    background: $color_gray_input;
+    border-radius: 2px;
+    @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
 
-	&.checked {
-		@include background('../img/checkmark.png', 11px 8px, $color_gray_input, center);
-	}
+    &.checked {
+        background: $color_gray_input url('../img/checkmark.svg') center center no-repeat;
+    }
 }
 
 .filter-control {
@@ -278,7 +285,7 @@ input.slug {
     line-height: 1.5;
     position: relative;
 
-	&.search { height: 34px !important; }
+    &.search { height: 34px !important; }
 }
 
 
@@ -287,37 +294,34 @@ input.slug {
   ========================================================================== */
 
 .form-group {
-	margin-bottom: 32px;
+    @apply .p-3 .m-0;
 
-	// .form-inline & { min-width: 200px; }
-
-    .col-md-8 & { margin-bottom: 48px; }
+    label {
+        font-weight: 500;
+    }
 
     .help-block {
-		color: $color_gray_light;
-		font-size: 13px;
-		margin-top: -5px;
+        color: $color_gray_light;
+        font-size: 13px;
+        margin-top: -5px;
         a {
             color: $color_red;
             &:hover { color: #000; }
         }
-	}
+    }
+
     .input-with-loader + .help-block {
         margin-top: 0;
     }
 
-	.list-group .list-group-item { padding: 8px 16px; }
-
-    .list-group .form-group { margin-bottom: 24px; }
-
-	&.form-grid,
-	.form-grid {
-		input,
-		textarea {
-			background: none;
-			box-shadow: none;
-		}
-	}
+    &.form-grid,
+    .form-grid {
+        input,
+        textarea {
+            background: none;
+            box-shadow: none;
+        }
+    }
 }
 
 .form-group.inline {
@@ -326,7 +330,7 @@ input.slug {
     padding: 0 !important;
     margin: 0 !important;
 
-	.form-group { flex-basis: auto; }
+    .form-group { flex-basis: auto; }
 
     .major { flex: 1; }
 }

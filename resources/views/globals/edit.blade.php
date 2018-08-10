@@ -5,7 +5,7 @@
     <form method="post" action="{{ route('globals.update', $global->slug()) }}">
         {!! csrf_field() !!}
 
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ t('configuring_global_set') }}: {{ $global->title() }}</h1>
                 <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
             </div>

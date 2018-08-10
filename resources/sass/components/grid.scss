@@ -88,7 +88,7 @@
             padding: 10px;
             border-right: 1px solid $border;
             border-top: none;
-            width: 25%;
+            min-width: 25%;
             font-weight: 500;
         }
     }
@@ -96,8 +96,9 @@
     .form-control,
     textarea,
     input {
-        background-color: #fff;
+        background-color: #fff !important;
         box-shadow: none;
+        border: none;
         padding: 10px;
         height: auto;
         &:hover { background-color: #fafafa; }
@@ -189,7 +190,7 @@
 .replicator-fieldtype {
     .grid-field, .table-field {
         > table > thead > tr > th { background: #fff; }
-        > table > thead > tr > th.row-controls { background: $bg; }
+        > table > tbody > tr > td:not(.row-controls) { background: #fff; }
 
         input { border: none;  }
     }

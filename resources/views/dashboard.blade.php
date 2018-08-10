@@ -2,19 +2,18 @@
 @section('content-class', 'dashboard')
 
 @section('content')
-    <div class="flexy mb-24">
-        <h1 class="fill">{{ __('Dashboard') }}</h1>
+    <div class="flexy mb-3">
+        <h1 class="fill">{{ t('dashboard') }}</h1>
+        @can('super')
+            <a href="{{ route('settings.edit', 'cp')}}" class="btn btn-white">{{ t('manage_widgets') }}</a>
+        @endcan
     </div>
 
-    @if ($widgets->isEmpty())
-        <p>{{ __('No widgets. Configure widgets in config/cp.php') }}</p>
-    @else
-        <div class="widgets">
-            @foreach($widgets as $widget)
-                <div class="widget {{ array_get($widget, 'width', 'half')}}">
-                    {!! $widget['html'] !!}
-                </div>
-            @endforeach
-        </div>
-    @endif
+    <div class="widgets">
+        @foreach($widgets as $widget)
+            <div class="widget {{ array_get($widget, 'width', 'half')}}">
+                {!! $widget['html'] !!}
+            </div>
+        @endforeach
+    </div>
 @stop

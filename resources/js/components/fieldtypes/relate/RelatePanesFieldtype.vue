@@ -7,7 +7,7 @@
                 <input type="text"
                        class="form-control relate-search"
                        placeholder="Filter"
-                       v-el:filter
+                       ref="filter"
                        v-model="search"
                        @keydown.enter="selectActive"
                        @keyup.up="goUp"
@@ -29,7 +29,7 @@
 
         <div class="relate-pane pane-selections">
             <div class="pane-header">Selected</div>
-            <div class="relate-items" v-el:sortable>
+            <div class="relate-items" ref="sortable">
                 <div class="item" v-for="item in selected">
                     <span class="item-remove" @click.prevent="remove(item)">&times;</span>
                     {{{ item.text }}}
@@ -102,7 +102,7 @@ export default {
         initSortable: function() {
             var self = this;
 
-            $(this.$els.sortable).sortable({
+            $(this.$refs.sortable).sortable({
                 axis: 'y',
                 placeholder: 'item-placeholder',
                 forcePlaceholderSize: true,
@@ -156,13 +156,13 @@ export default {
         },
 
         focus() {
-            this.$els.filter.focus();
+            this.$refs.filter.focus();
         }
 
     },
 
 
-    ready() {
+    mounted() {
         this.initSortable();
 
         this.$watch('search', function() {
@@ -173,18 +173,10 @@ export default {
 
         this.$watch('data', function() {
             this.$nextTick(function() {
-                $(this.$els.sortable).sortable('refresh');
+                $(this.$refs.sortable).sortable('refresh');
             });
         })
     }
 
 }
 </script>
-
-
-
-
-
-
-
-

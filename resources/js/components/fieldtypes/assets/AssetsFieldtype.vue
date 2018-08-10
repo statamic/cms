@@ -4,7 +4,7 @@
         :class="{
             'max-files-reached': maxFilesReached,
             'empty': ! assets.length,
-            'solo drag-handle': soloAsset
+            'solo': soloAsset,
         }"
         @dragover="dragOver"
         @dragleave="dragStop"
@@ -21,7 +21,7 @@
 
         <template v-if="!loading">
 
-            <div class="manage-assets" v-if="!maxFilesReached">
+            <div class="manage-assets" v-if="!maxFilesReached" :class="{'bard-drag-handle': isInBardField}">
 
                 <div v-if="!containerSpecified">
                     <i class="icon icon-warning"></i>
@@ -51,7 +51,7 @@
 
                     <button
                         type="button"
-                        class="delete-bard-set btn btn-icon pull-right"
+                        class="delete-bard-set btn btn-icon float-right"
                         v-if="isInBardField"
                         @click.prevent="$dispatch('asset-field.delete-bard-set')">
                         <span class="icon icon-trash"></span>
@@ -61,7 +61,7 @@
             </div>
 
             <uploader
-                v-ref:uploader
+                v-ref=uploader
                 v-if="containerSpecified && !showSelector"
                 :dom-element="uploadElement"
                 :container="container"
@@ -77,7 +77,7 @@
 
             <template v-if="expanded && ! soloAsset">
 
-                <div class="asset-grid-listing" v-if="displayMode === 'grid'" v-el:assets>
+                <div class="asset-grid-listing" v-if="displayMode === 'grid'" ref="assets">
 
                     <asset-tile
                         v-for="asset in assets"
@@ -90,7 +90,7 @@
                 <div class="asset-table-listing" v-if="displayMode === 'list'">
 
                     <table>
-                        <tbody v-el:assets>
+                        <tbody ref="assets">
                             <tr is="assetRow"
                                 v-for="asset in assets"
                                 :asset="asset"
@@ -103,7 +103,7 @@
 
             </template>
 
-            <div class="asset-solo-container" v-if="expanded && soloAsset" v-el:assets>
+            <div class="asset-solo-container" v-if="expanded && soloAsset" ref="assets">
                 <asset-tile
                     v-for="asset in assets"
                     :asset="asset"
@@ -318,6 +318,12 @@ export default {
                 this.loading = false;
 
                 this.$nextTick(() => {
+                    // Juggle the data to make parent components notice something changed.
+                    // This makes nested replicators generate new preview text.
+                    const data = this.data;
+                    this.data = [];
+                    this.data = data;
+
                     this.sortable();
                     this.bindChangeWatcher();
                 });
@@ -381,7 +387,7 @@ export default {
         sortable() {
             if (this.maxFiles === 1) return;
 
-            $(this.$els.assets).sortable({
+            $(this.$refs.assets).sortable({
                 items: '> :not(.ghost)',
                 start: (e, ui) => {
                     ui.item.data('start', ui.item.index());
@@ -428,7 +434,7 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         this.displayMode = this.isInsideGridField
             ? 'list'
             : this.config.mode || 'grid';

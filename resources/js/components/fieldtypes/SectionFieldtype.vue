@@ -1,5 +1,5 @@
 <script>
-module.exports = {
+export default {
     props: ['name', 'data', 'config']
 };
 </script>

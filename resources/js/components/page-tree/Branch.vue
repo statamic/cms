@@ -1,37 +1,41 @@
 <template>
-    <li class="branch" :class="{ draft: !published }">
-        <div class="branch-row">
-            <div class="page-indent">
-            <span :class="{'page-toggle': true, toggleable: hasChildren}" v-on:click="toggle">
-                <i v-if="hasChildren" :class="{ 'icon': true, 'icon-chevron-down': true, 'collapsed': collapsed }"></i>
-                <i v-if="url == '/'" class="icon icon-home"></i>
-            </span>
-                <span class="page-move drag-handle" v-if="!home"></span>
-                <span class="page-unmovable" v-if="home"></span>
-                <span class="indent-arrow" v-if="!home"></span>
+    <li class="branch" :class="{ draft: !published }" :data-depth="depth">
+        <div class="branch-row w-full flex items-center">
+
+            <div v-if="home" class="w-6 home-handle">
+                <i class="icon icon-home mx-auto opacity-25"></i>
             </div>
 
-            <div class="page-text">
-                <a :href="editUrl" class="page-title">{{ title }}</a>
-                <a :href="editUrl" class="page-url">{{ url }}</a>
-            </div>
+            <div v-if="!home && sortable" :class="['page-move drag-handle w-6 h-full', {'cursor-not-allowed opacity-50': isSingleTopLevelPage}]"></div>
 
-            <div class="page-extras">
-                <div class="page-entries" v-if="hasEntries">
-                    <i class="icon icon-documents"></i>
+            <div class="flex items-center flex-1 p-1">
+
+                <div class="page-text">
+                    <a :href="editUrl" class="page-title">{{ title }}</a>
+                    <a :href="editUrl" class="page-url">{{ url }}</a>
+                </div>
+
+                <div class="w-6 opacity-25 hover:opacity-50 page-toggle-container ml-px" v-if="hasChildren">
+                    <div :class="{'page-toggle': true, toggleable: hasChildren}" v-on:click="toggle">
+                        <i :class="{ 'icon': true, 'icon-chevron-down': true, 'collapsed': collapsed }"></i>
+                    </div>
+                </div>
+
+                <div class="has-collection flex items-center pl-2" v-if="hasEntries">
+                    <svg-icon name="entries" class="pr-1 text-grey h-6 w-6"></svg-icon>
                     <a :href="createEntryUrl">{{ translate('cp.add') }}</a>
-                    {{ translate('cp.or') }}
+                    <span class="mx-sm text-grey text-xxs">{{ translate('cp.or') }}</span>
                     <a :href="entriesUrl">{{ translate('cp.edit') }}</a>
                 </div>
             </div>
 
-            <div class="branch-meta">
+            <div class="branch-meta flex items-center pr-1">
                 <div class="page-actions" v-if="can('pages:create') || can('pages:delete')">
-                    <a :href="url" :title="url" class="page-action" target="_blank">
-                        <i class="icon icon-link"></i>
+                    <a :href="url" :title="url" class="page-action text-grey-dark px-sm bloop" target="_blank">
+                        <svg-icon name="visit" class="opacity-25 hover:opacity-75 h-4 w-4"></svg-icon>
                     </a>
-                    <div class="btn-group page-action action-more">
-                        <i class="icon icon-dots-three-vertical" data-toggle="dropdown"></i>
+                    <div class="btn-group page-action action-more px-sm">
+                        <i class="icon icon-dots-three-vertical opacity-25 hover:opacity-75" data-toggle="dropdown"></i>
                         <ul class="dropdown-menu">
                             <li v-if="can('pages:create')"><a href="" @click.prevent="createPage">{{ translate('cp.create_page_button') }}</a></li>
                             <li v-if="can('super')">
@@ -50,7 +54,8 @@
         <branches :pages="childPages"
                   :depth="depth + 1"
                   :parent-url="url"
-                  :collapsed.sync="collapsed"
+                  :collapsed="collapsed"
+                  :sortable="sortable"
                   v-if="!home">
         </branches>
     </li>
@@ -83,13 +88,18 @@ export default {
         home: {
             type: Boolean,
             default: false
-        }
+        },
+        sortable: Boolean
     },
 
     computed: {
 
         hasChildren: function() {
             return this.childPages.length;
+        },
+
+        isSingleTopLevelPage() {
+            return this.$parent.pages.length === 1 && this.depth === 1;
         }
 
     },
@@ -101,7 +111,7 @@ export default {
         },
 
         createPage: function() {
-            this.$dispatch('pages.create', this.url);
+            this.$eventHub.$emit('pages.create', this.url);
         },
 
         deletePage: function() {
@@ -118,7 +128,7 @@ export default {
                 self.$http.post(cp_url('pages/delete'), { uuid: self.uuid }).success(function() {
                     self.$parent.pages.splice(self.branchIndex, 1);
 
-                    this.$dispatch('page.deleted');
+                    this.$eventHub.$emit('page.deleted');
                 });
             });
         },
@@ -130,11 +140,11 @@ export default {
         },
 
         mountCollection: function () {
-            this.$dispatch('pages.mount', this.uuid);
+            this.$eventHub.$emit('pages.mount', this.uuid);
         },
 
         unmountCollection: function () {
-            this.$dispatch('pages.unmount', this.uuid);
+            this.$eventHub.$emit('pages.unmount', this.uuid);
         }
 
     }

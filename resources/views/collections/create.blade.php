@@ -5,7 +5,7 @@
     <form method="post" action="{{ route('collection.store') }}">
         {!! csrf_field() !!}
 
-        <div class="flexy mb-24">
+        <div class="flexy mb-3">
             <h1 class="fill">{{ translate('cp.create_collection') }}</h1>
             <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
         </div>
@@ -38,13 +38,20 @@
 
                 <div class="form-group">
                     <label class="block">{{ t('fieldset') }}</label>
+                    <small class="help-block">{{ t('collection_fieldset_instructions') }}</small>
                     <fieldset-fieldtype name="fieldset" data="{{ old('fieldset') }}"></fieldset-fieldtype>
+                </div>
+
+                <div class="form-group">
+                    <label class="block">{{ trans_choice('cp.templates', 1) }}</label>
+                    <small class="help-block">{{ t('collection_template_instructions') }}</small>
+                    <template-fieldtype name="template" data="{{ old('template') }}"></template-fieldtype>
                 </div>
 
                 <div class="form-group">
                     <label class="block">{{ t('route') }}</label>
                     <small class="help-block">{{ t('collection_route_instructions') }}</small>
-                    <input type="text" name="route" class="form-control" value="{{ old('route') }}">
+                    <routes-fieldtype :data="{{ old('routes', '[]') }}" name="routes"></routes-fieldtype>
                 </div>
 
             </div>

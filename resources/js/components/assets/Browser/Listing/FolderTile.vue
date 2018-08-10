@@ -4,7 +4,7 @@
          @click.prevent="selectFolder(folder.path)">
 
         <div class="asset-thumb-container">
-            <file-icon type="div" extension="folder"></file-icon>
+            <file-icon extension="folder"></file-icon>
         </div>
 
         <div class="asset-meta">

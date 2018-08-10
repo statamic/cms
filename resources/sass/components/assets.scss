@@ -91,7 +91,6 @@
     justify-content: space-between;
     padding: 0; // negate the .card padding
     position: relative;
-    overflow: hidden;
 
     .asset-browser-sidebar {
         padding: 20px;
@@ -115,9 +114,9 @@
     .breadcrumbs {
         margin-top: 0;
         border-radius: 0 0 3px 3px;
-        position: absolute;
         border-bottom: none;
         bottom: 0;
+        height: 30px;
         width: 100%;
     }
 }
@@ -179,7 +178,7 @@
 }
 
 .asset-browser-content {
-    padding-bottom: 29px; // account for the breadcrumbs
+    position: relative;
 }
 
 .asset-browser-sidebar {
@@ -467,7 +466,7 @@
 
     .asset-meta {
         padding-top: 8px;
-        font-size: 13px;
+        font-size: 12px;
         color: $color_gray_light;
         white-space: nowrap;
         overflow: hidden;
@@ -508,11 +507,14 @@
         background-position: 50% 50%;
         background-repeat: no-repeat;
         padding-bottom: 100%;
+        height: 150px;
+        width: 150px;
     }
 
     .svg-icon {
         height: 150px;
         width: 150px;
+        margin: 0 auto;
     }
 }
 
@@ -663,6 +665,8 @@
     .asset-browser-content {
         overflow: auto;
         height: auto;
+        max-height: 100%;
+        flex: 1;
     }
 
     .asset-browser {
@@ -671,7 +675,6 @@
         margin: 0;
         max-height: 100%;
         min-height: 50%;
-        height: 100%;
 
         // The publish form has styles that cascade into here.
         // We'll just undo those.
@@ -691,8 +694,12 @@
     left: 0;
     bottom: 0;
     padding: 30px;
-    background: rgba(#333, .8);
+    background: rgba($color_dark_blue, .33);
     z-index: 1000;
+
+    .asset-selector {
+        border-radius: 4px;
+    }
 
     .modal-footer {
         box-shadow: 0 -2px 10px rgba(0,0,0,.05);
@@ -711,13 +718,15 @@
     left: 0;
     bottom: 0;
     padding: 30px;
-    background: rgba(#333, .8);
+    background: rgba($color_dark_blue, .33);
     z-index: 1000;
     will-change: transform;
+    cursor: auto;
 
     .asset-editor {
         height: 100%;
         box-shadow: 0 0 15px rgba(black, .5);
+        border-radius: 4px;
     }
 }
 
@@ -774,6 +783,7 @@
         border-left: 1px solid $border;
         padding: 10px 30px;
         color: $color_gray_light;
+        cursor: text;
 
         &.one-line {
             display: flex;
@@ -913,10 +923,6 @@
             background: linear-gradient(to bottom, rgba(white, 0), white);
         }
     }
-
-    .publish-fields {
-        padding: 15px 30px;
-    }
 }
 
 
@@ -995,7 +1001,7 @@
 /* Responsive
   ========================================================================== */
 
-@media all and (max-width: $screen-xs-max) {
+@media all and (max-width: 768px) {
   .assets-fieldtype {
       .manage-assets {
           text-align: center;

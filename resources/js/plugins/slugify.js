@@ -1,10 +1,15 @@
-exports.install = function(Vue, options) {
+import { slugify } from 'transliterations';
 
-    Vue.prototype.$slugify = function(text, glue) {
-        return slug(text, {
-            replacement: glue || '-',
-            lower: true
-        });
-    };
+export default {
+
+    install(Vue, options) {
+
+        Vue.prototype.$slugify = function(text, glue) {
+            return slugify(text, {
+                separator: glue || '-'
+            });
+        };
+
+    }
 
 };

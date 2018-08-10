@@ -8,6 +8,14 @@ export default {
         };
     },
 
+    computed: {
+
+        autoSlugPublishFieldsComponent() {
+            return this.$parent.$parent;
+        }
+
+    },
+
     methods: {
 
         autoSlug(from, to) {
@@ -21,14 +29,14 @@ export default {
 
             // Whenever the "to" field is modified. ie, when the slug field is edited...
             this.$watch(to, (slug) => {
-                const fromVal = this.$parent.fieldData[from] || '';
+                const fromVal = this.autoSlugPublishFieldsComponent.data[from] || '';
                 // Mark it modified if the slug matches the slugified version. This allows
                 // the automatic slugification to recommence if the slug is modified to
                 this.autoSlugOptions.isActive = slug === this.$slugify(fromVal);
             });
 
             // Whenever the "from" field is modified. ie, when the watched field is edited...
-            this.$parent.$watch(`fieldData.${from}`, (value) => {
+            this.autoSlugPublishFieldsComponent.$watch(`data.${from}`, (value) => {
                 if (!this.autoSlugOptions.isActive) return;
                 this[to] = this.$slugify(value);
             });

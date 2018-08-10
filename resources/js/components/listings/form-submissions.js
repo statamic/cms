@@ -18,17 +18,17 @@ module.exports = {
                 partials: {
                     cell: `
                         <a v-if="$index === 0" :href="item.edit_url">
-                            {{ item[column.label] }}
+                            {{ item[column.value] }}
                         </a>
                         <template v-else>
-                            {{{ item[column.label] }}}
+                            {{{ item[column.value] }}}
                         </template>`
                 }
             }
         }
     },
 
-    ready: function () {
+    mounted() {
         if (this.can('super')) {
             this.addActionPartial();
         }

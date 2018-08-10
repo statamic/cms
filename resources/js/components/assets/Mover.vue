@@ -60,7 +60,7 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         this.selectedFolder = this.folder;
     },
 

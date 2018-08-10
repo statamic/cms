@@ -1,31 +1,26 @@
 import Condition from './Condition.js';
 
-module.exports = {
+export default {
     data: function() {
-        return { conditions: [] };
-    },
-
-    watch: {
-        fieldData: {
-            deep: true,
-            handler: function(data) {
-                this.runConditionals(data);
-            },
-        },
-
-        fields: function() {
-            this.watchFields();
-        },
+        return {
+            conditions: [],
+            hiddenFields: []
+        };
     },
 
     methods: {
-        runConditionals: function(data) {
+        evaluateConditions() {
             this.conditions.forEach(condition => {
-                condition.passes = condition.validate(data);
+                condition.passes = condition.validate(this.contentData);
             });
+
+            this.hiddenFields = _.chain(this.fieldset.fields())
+                .filter(field => !this.isVisible(field))
+                .map(field => field.name)
+                .value();
         },
 
-        peekaboo: function(field) {
+        isVisible: function(field) {
             const condition = this.conditions.find(
                 condition => condition.id === field.name
             );
@@ -41,10 +36,14 @@ module.exports = {
             return condition.passes;
         },
 
-        watchFields: function() {
-            this.conditions = this.fields
+        initConditions: function() {
+            this.conditions = this.fieldset.fields()
                 .filter(field => field.show_when !== undefined || field.hide_when !== undefined)
                 .map(field => new Condition(field.name, this.condition(field)));
+
+            this.evaluateConditions();
+
+            this.$watch('contentData', data => this.evaluateConditions(data), { deep: true });
         },
 
         condition: function(field) {

@@ -2,7 +2,7 @@
 
 @section('content')
 
-        <div class="flexy mb-24">
+        <div class="flexy mb-3">
             <h1 class="fill">{{ translate('cp.nav_forms') }}</h1>
             @can('super')
                 <a href="{{ route('form.create') }}" class="btn btn-primary">{{ t('create_form') }}</a>
@@ -10,7 +10,7 @@
         </div>
 
         @if(count($forms) == 0)
-        <div class="card"
+        <div class="card">
             <div class="no-results">
                 <span class="icon icon-download"></span>
                 <h2>{{ trans_choice('cp.forms', 2) }}</h2>

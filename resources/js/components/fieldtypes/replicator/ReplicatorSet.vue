@@ -1,7 +1,7 @@
 <template>
 
     <div class="list-group">
-        <div class="list-group-item group-header drag-handle" :class="{'collapsed': isHidden}" v-on:dblclick="toggle">
+        <div class="list-group-item group-header pl-3 drag-handle" :class="{'collapsed': isHidden}" v-on:dblclick="toggle">
             <div class="flexy">
                 <div class="fill">
                     <div class="flexy baseline">
@@ -26,10 +26,9 @@
                 </div>
             </div>
         </div>
-        <div class="list-group-item" v-show="!isHidden">
-            <div class="row">
-                <div v-for="field in config.fields" class="{{ colClass(field.width) }}">
-                    <div class="form-group {{ field.type }}-fieldtype">
+        <div class="list-group-item p-0" v-show="!isHidden">
+            <div class="publish-fields">
+                <div v-for="field in config.fields" :class="fieldClasses(field)">
                         <label class="block" v-if="hasMultipleFields" :class="{'bold': field.bold}">
                             <template v-if="field.display">{{ field.display }}</template>
                             <template v-if="!field.display">{{ field.name | capitalize }}</template>
@@ -38,12 +37,11 @@
 
                         <small class="help-block" v-if="field.instructions" v-html="field.instructions | markdown"></small>
 
-                        <component :is="field.type + '-fieldtype'"
+                        <component :is="componentName(field.type)"
                                    :name="parentName + '.' + index + '.' + field.name"
                                    :data.sync="data[field.name]"
                                    :config="field">
                         </component>
-                    </div>
                 </div>
             </div>
         </div>

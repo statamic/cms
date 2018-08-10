@@ -5,7 +5,7 @@
             <div class="form-group">
                 <label>{{ translate('cp.focal_point_label') }}</label>
                 <small class="help-block">{{ translate('cp.focal_point_instructions') }}</small>
-                <div class="focal-point-image">
+                <div class="focal-point-image inline-block">
                     <img :src="image" @click="define" />
                     <div class="focal-point-reticle" :style="{ top: y+'%', left: x+'%' }"></div>
                 </div>
@@ -66,7 +66,7 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         const initial = this.data || '50-50';
         const coords = initial.split('-');
         this.x = coords[0];

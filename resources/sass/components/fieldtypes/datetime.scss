@@ -1,26 +1,16 @@
 
 .daterange {
 	outline: none;
-	@include form-control-focus;
-
-	.icon {
-		position: absolute;
-		z-index: 20;
-		color: rgba(0,0,0,.3);
-	}
-
-	.icon-calendar {
-		top: 5px;
-		right: 10px;
-		pointer-events: none;
-	}
-
 	.icon-remove { right: 32px; }
-	.dr-calendar { max-width: 250px; }
+
+    .dr-calendar { max-width: 250px; }
+
+    .dr-active, .dr-input {
+        z-index: 1;
+    }
 }
 
 .datetime .icon-remove, .time-fieldtype .icon-remove {
-	top: 8px;
 	cursor: pointer;
 	background: rgba(0, 0, 0, 0.1);
 	font-size: 15px;
@@ -28,7 +18,14 @@
 	padding: 0px 4px 2px;
 	border-radius: 50%;
 	color: #777;
+    height: 18px;
+    width: 18px;
+    margin-right: 8px;
 	text-shadow: 0 1px 1px #FFF;
+}
+
+.daterange--single .dr-input .dr-dates {
+    min-width: 60px;
 }
 
 .time-fieldtype {
@@ -54,7 +51,7 @@
 	}
 
 	.icon-remove:focus {
-		@include form-control-focus;
+        
 	}
 }
 
@@ -71,12 +68,14 @@
 
 /* === Inside a Grid === */
 
-.grid-field .date-fieldtype {
+.grid-mode-table .date-fieldtype {
     .daterange .icon {
         top: 8px;
     }
 
     .btn.add-time { top: 8px; }
+
+    .dr-input { border: 0 !important; }
 
     .col-time {
         padding: 0 10px;
@@ -86,7 +85,7 @@
             text-align: center;
         }
         .colon {
-            background: #f8f8f8;
+            background: #fff;
             margin: 0;
             padding: 8px 5px;
         }

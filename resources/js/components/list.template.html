@@ -28,7 +28,7 @@
                 <a href="" v-on:click="saveOrder(list.actions.reorder.endpoint, $event)" class="btn" v-show="reordering">{{ translate('cp.save_order') }}</a>
             </template>
         </div>
-        <input type="text" :placeholder="'Search ' + type" v-on:keydown.esc="reset" v-model="search" name="query" class="search pull-right">
+        <input type="text" :placeholder="'Search ' + type" v-on:keydown.esc="reset" v-model="search" name="query" class="search float-right">
     </div>
 
     <table v-if="!loading && list.rows && list.rows.length" class="sortable control">

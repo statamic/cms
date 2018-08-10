@@ -7,7 +7,10 @@ module.exports = {
     },
 
     props: {
-        fields: Array
+        fields: {
+            type: Array,
+            default: []
+        },
     },
 
     data: function() {
@@ -87,7 +90,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.enableSorting();
     }
 

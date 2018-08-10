@@ -84,7 +84,7 @@
     #publish-controls,
     .sticky-wrapper,
     #sticky-wrapper {
-        display: none;
+        display: none !important;
     }
 
     .sneak-peek-header {
@@ -122,29 +122,6 @@
         box-shadow: none;
         border-radius: 0;
     }
-
-    .form-group, #publish-meta .form-group {
-        padding-left: 16px;
-        padding-right: 16px;
-        margin-bottom: 16px;
-    }
-
-    .publish-main, .publish-meta {
-        width: 100%;
-        float: none;
-        margin: 0;
-        padding: 0;
-        border: 0;
-    }
-
-    #publish-meta .card {
-        margin-bottom: 0;
-        border-radius: 0;
-    }
-
-    .publish-meta { padding: 16px 0; }
-    .publish-meta .form-group { margin-top: 16px; }
-    .publish-meta .form-group:first-child { margin-top: 0px; }
 
     .publish-fields .form-group {
         flex-basis: 100%;

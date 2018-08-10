@@ -3,17 +3,13 @@
         <div v-if="loading" class="loading loading-basic">
             <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
         </div>
-        <p v-if="!loading && !canEdit" class="form-control-static">
-            <template v-for="role in selectedRoleNames">
-                {{ role }}<template v-if="$index !== selectedRoleNames.length-1">,</template>
-            </template>
-        </p>
-        <div class="user_roles-fieldtype" v-if="!loading && canEdit">
+        <div class="user_roles-fieldtype" v-if="!loading">
             <relate-fieldtype :data.sync="data"
                               :name="name"
                               :config="config"
                               :suggestions-prop="roles"
-                              v-ref:relate>
+                              :disabled="!canEdit"
+                              v-ref=relate>
             </relate-fieldtype>
         </div>
     </div>
@@ -36,7 +32,7 @@ export default {
     computed: {
 
         canEdit: function() {
-            return Vue.can('super');
+            return Vue.can('users:edit-roles');
         },
 
         selectedRoleNames: function() {
@@ -67,7 +63,7 @@ export default {
 
     },
 
-    ready: function() {
+    mounted() {
         this.getRoles();
     }
 

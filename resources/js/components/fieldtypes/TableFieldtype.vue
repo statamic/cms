@@ -36,7 +36,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -190,7 +190,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         if ( ! this.data) {
             this.data = [];
         }

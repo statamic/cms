@@ -28,7 +28,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -51,7 +51,7 @@ module.exports = {
 
         },
 
-        editItem: function(index) {
+        editItem: function(index, event) {
             event.preventDefault();
 
             this.editing = index;
@@ -111,7 +111,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         var self = this,
             start = '';
 

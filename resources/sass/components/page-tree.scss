@@ -1,103 +1,59 @@
-$branchHeight: 38px;
-$branchIndent: 25px;
-$treeIndent: 70px;
-$branchHoverBg: rgba(black,.025);
+/* ==========================================================================
+   THE PAGE TREE
+   ========================================================================== */
 
 .page-tree {
-    @extend .z-depth-1;
-    position: relative;
-    background: white;
-    border-radius: 3px;
-    padding-left: $treeIndent;
+    @apply .relative;
 
-    ul.branches {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        border-top: 1px solid $color_border;
-        margin-left: $branchIndent;
-        outline: rgba(black, .01);
-    }
-
-    // The top level list
-    > ul.branches {
-        margin-left: 0;
-    }
-
-    ul.empty {
-        border: 0;
-
-        // When a branch is being dragged into an empty list, we'll need that border back.
-        .branch {
-            border-top: 1px solid $color_border;
-        }
+    .branch {
+        @apply .mt-px .flex .flex-wrap;
     }
 
     .branch-row {
-        border-top: 1px solid $color_border;
-        font-size: 13px;
-        position: relative;
+        @apply .relative .text-xs .bg-white .shadow .rounded;
     }
 
-    // Remove the border on the top items.
-    // Also remove it on the second, when the first is being dragged.
-    li:first-child > .branch-row,
-    li.branch-dragged:first-child + li > .branch-row {
-        border-top: 0;
+    // Dragging placeholder
+    .branch-placeholder {
+        @apply .text-green .my-sm;
+    }
+
+    // The branch being dragged
+    .branch-dragged {
+        display: none;
+    }
+
+    ul.branches {
+        @apply .m-0 .p-0 .w-full .list-reset;
+        .branch {
+            @apply .ml-3;
+        }
+    }
+
+    ul.branches.depth-1 > .branch { margin-left: 0; }
+
+    .drag-handle {
+        @apply .rounded-l;
+        cursor: grab;
+        &:active { cursor: grabbing; }
+    }
+
+    .page-move {
+        background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
+        border-right: 1px solid $color_border;
+        &:hover { @apply .bg-bg; }
     }
 
     .page-text {
-        display: inline-block;
-        vertical-align: middle;
-        padding: 10px 0 10px 10px;
+        @apply .ml-sm;
     }
 
     .page-url {
         display: none;
     }
 
-    .page-extras {
-        display: inline-block;
-        vertical-align: middle;
-        color: #ccc;
-    }
-
-    .page-entries {
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    .page-entries {
-        margin-left: 12px;
-    }
-
-    .page-entries .icon {
-        margin-right: 4px;
-    }
-
-    .page-entries a {
-        padding: 5px 2px;
-    }
-
-    .branch-meta {
-        float: right;
-    }
-
     .page-actions {
-        float: right;
-        padding: 7px 10px 0 0;
-
-        i {
-            font-size: 16px;
-            color: rgba(0,0,0,.1);
-            cursor: pointer;
-        }
-    }
-
-    .page-action {
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 5px;
+        @apply .flex .items-center;
     }
 
     .action-more i {
@@ -108,83 +64,37 @@ $branchHoverBg: rgba(black,.025);
         transform: rotate(90deg);
     }
 
-    .page-indent {
-        position: absolute;
-        top: -1px;
-        left: 0;
-        height: $branchHeight + 1;
-        border-top: 1px solid $color_border;
+    .page-toggle {
+        user-select: none;
 
-        .page-toggle {
-            position: absolute;
-            top: 0;
-            left: 20px;
-            width: 30px;
-            height: $branchHeight;
-            text-align: center;
-            border-right: 1px solid $color_border;
-            background: rgba(black, .02);
-            user-select: none;
+        &.toggleable { cursor: pointer; }
+        .icon { transition: 0.1s all ease; }
+        .collapsed { transform: rotate(-90deg); }
+    }
 
-            &.toggleable {
-                cursor: pointer;
-            }
+    .page-toggle {
+        user-select: none;
 
-            .icon {
-                display: inline-block;
-                position: relative;
-                top: 12px;
-                left: 0;
-                font-size: 13px;
-                color: #777;
-                transition: 0.1s all ease;
-            }
+        &.toggleable { cursor: pointer; }
+        .icon { transition: 0.1s all ease; }
+        .collapsed { transform: rotate(-90deg); }
+    }
 
-            .collapsed {
-                transform: rotate(-90deg);
-            }
-        }
-
-        .page-move,
-        .page-unmovable {
-            background: rgba(black, .02);
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: $branchHeight;
-            width: 20px;
-        }
-
-        .indent-arrow {
-            display: block;
-            width: 11px;
-            height: 10px;
-            background: url('../img/page-arrow.png');
-            position: absolute;
-            top: 13px;
-            right: 2px;
-        }
+    .indent-arrow {
+        display: block;
+        background: url('../img/page-arrow.png') center no-repeat;
+        height: 10px;
+        width: 11px;
     }
 
     // Each nesting gets a bigger indent
-    $indent: $treeIndent;
-    @for $i from 1 through 10 {
-        .depth-#{$i} > .branch > .branch-row > .page-indent {
+    $indent: 24px;
+    @for $i from 2 through 10 {
+        .depth-#{$i} .branch-row .page-indent {
             width: $indent;
             left: -#{$indent};
-            $indent: $indent + $branchIndent;
-        }
-    }
-
-    .branch-row:hover {
-        background: $branchHoverBg;
-
-        .page-indent {
-            background: $branchHoverBg;
-        }
-
-        .page-actions i {
-            color: $color_gray_light;
+            padding-left: $indent - 24px;
+            $indent: $indent + 24px;
         }
     }
 
@@ -193,14 +103,9 @@ $branchHoverBg: rgba(black,.025);
         .page-text {
             font-size: 14px;
             font-weight: 500;
-            padding-top: 9px; // negate the font size increase
         }
-        .indent-arrow {
-            display: none;
-        }
-        .page-move {
-            display: block;
-        }
+        .indent-arrow { display: none; }
+        .page-move { display: block; }
     }
 
     // Collapsed branches
@@ -218,85 +123,23 @@ $branchHoverBg: rgba(black,.025);
         }
     }
 
-    // The branch being dragged
-    .branch-dragged {
-        //display: none;
-        background: #fff;
-        position: absolute;
-        z-index: 200;
-        box-shadow: 0 0 2px 2px rgba(63,63,68,.3),0 4px 8px rgba(63,63,68,.15);
-        border-radius: 2px;
-        border: 0;
-        opacity: 0.9;
-        width: auto !important;
-        height: auto !important;
-
-        .page-text {
-            padding: 3px 5px !important;
-            font-weight: normal !important;
-            font-size: 13px !important;
-        }
-
-        .branch-row {
-            border: 0;
-        }
-
-        .page-indent, .page-extras, .page-actions, ul {
-            display: none !important;
-        }
-    }
-
-    // Only if the tree is sortable
-    &.tree-sortable {
-        .drag-handle {
-            cursor: move;
-            cursor: grab;
-            &:active {
-                cursor: grabbing;
-            }
-        }
-
-        .page-indent .page-move {
-            background: rgba(black, .02) url('../img/drag-dots.gif') center center no-repeat;
-            border-right: 1px solid $color_border;
-        }
-    }
-
-    // Dragging placeholder
-    .branch-placeholder {
-        .page-text {
-            color: $color_green;
-        }
-    }
-
     // URL mode
     &.show-urls {
-        .page-title {
-            display: none;
-        }
-        .page-url {
-            display: block;
-        }
+        .page-title { display: none; }
+        .page-url { display: block; }
     }
 
     // Drafts
-    .draft  .page-title {
+    .draft .page-title {
         color: rgba($brand-darker, .5);
         &:hover { color: rgba($brand-darker, .75); }
     }
 
     // Saving overlay
     .saving {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        @apply .absolute .pin .flex .items-center .rounded;
         z-index: 200;
         background: rgba(white, .7);
-        display: flex;
-        align-items: center;
-        border-radius: 3px;
 
         .inner {
             text-align: center;
@@ -311,7 +154,7 @@ $branchHoverBg: rgba(black,.025);
         }
     }
 
-    // The home branch is different too
+    // The home branch needs individual attention
     .tree-home {
         margin: 0;
         border: 0;
@@ -326,10 +169,12 @@ $branchHoverBg: rgba(black,.025);
             font-weight: 500;
         }
 
-        .page-indent {
-            width: $treeIndent;
-            left: -$treeIndent;
-            border-top: 1px solid transparent;
+        .home-handle {
+            @apply .flex .rounded-l .items-center .h-full .border-r .bg-bg-light;
+        }
+
+        .icon-home {
+            font-size: 12px;
         }
     }
 }
@@ -337,6 +182,6 @@ $branchHoverBg: rgba(black,.025);
 
 // When dragging
 .page-tree-dragging {
-    cursor: move;
-    cursor: rabbing;
+    cursor: grabbing;
+    @apply select-none;
 }

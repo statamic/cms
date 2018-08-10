@@ -10,6 +10,8 @@
                 <li class="section">{{ $item->title() }}</li>
                 @include('statamic::partials.nav-main-items', ['items' => $item->children()])
             @endforeach
+            <li class="md:hidden"><a href="{{ route('account') }}">{{ t('profile') }}</a></li>
+            <li class="md:hidden"><a href="{{ route('logout') }}">{{ t('sign_out') }}</a></li>
         </ul>
     </nav>
 @stop

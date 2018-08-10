@@ -8,7 +8,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     props: ['data', 'config', 'name'],
 
@@ -27,7 +27,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.$http.get(cp_url('system/themes/get'), function(data) {
             var options = [];
             _.each(data, function(theme) {

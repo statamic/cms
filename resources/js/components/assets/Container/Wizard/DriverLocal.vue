@@ -9,7 +9,7 @@
         </div>
         <small class="help-block" v-if="showResolvedPath">
             <span>
-                {{ translate('cp.path_resolves_to', { path: resolvedPath  }) }}
+                {{ translate('cp.path_resolves_to', { path: resolvedPath }) }}
                 <span v-show="resolvedPathExists" class="text-success">{{ translate('cp.path_exists') }}</span>
                 <span v-else class="text-danger">{{ translate('cp.path_does_not_exist') }}</span>
             </span>
@@ -24,18 +24,17 @@
             <span v-show="resolvingUrl" class="icon-resolving icon icon-circular-graph animation-spin"></span>
         </div>
         <small class="help-block" v-if="showResolvedUrl">
-            URL resolves to: {{ resolvedUrl }}
-            <span class="text-success" v-show="validUrl">Valid URL.</span>
-            <span class="text-danger" v-else>Invalid URL.</span>
+            {{ translate('cp.url_resolves_to', { path: resolvedUrl }) }}
+            <span class="text-success" v-show="validUrl">{{ translate('cp.valid_url') }}.</span>
+            <span class="text-danger" v-else>{{ translate('cp.invalid_url') }}</span>
         </small>
     </div>
 
     <div class="form-group" v-if="!editing">
-        <button class="btn btn-default" @click="submit" :disabled="!canContinue">Next Step</button>
+        <button class="btn btn-default" @click="submit" :disabled="!canContinue">{{ translate('cp.next_step') }}</button>
     </div>
 
 </template>
-
 
 <style lang="scss">
     .input-with-loader {
@@ -48,7 +47,6 @@
         }
     }
 </style>
-
 
 <script>
     export default {
@@ -97,7 +95,7 @@
         },
 
 
-        ready() {
+        mounted() {
             if (this.editing) {
                 // For whatever reason, it doesn't work unless there's a timeout. ¯\_(ツ)_/¯
                 setTimeout(() => this.resolvePath(), 0);

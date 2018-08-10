@@ -1,7 +1,7 @@
 import HasLocaleSelector from '../HasLocaleSelector';
 import HasShowDraftsSelector from '../HasShowDraftsSelector';
 
-module.exports = {
+export default {
 
     mixins: [HasLocaleSelector, HasShowDraftsSelector, Dossier],
 
@@ -48,7 +48,7 @@ module.exports = {
 
     },
 
-    ready: function () {
+    mounted() {
         this.addActionPartial();
         this.bindLocaleWatcher();
         this.bindShowDraftsWatcher();

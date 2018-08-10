@@ -1,18 +1,18 @@
 <template>
     <div class="tag-fieldtype-wrapper">
-        <input type="text" v-el:tags :value="data" />
+        <input type="text" ref="tags" :value="data" />
     </div>
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
-    ready: function () {
+    mounted() {
         var self = this;
 
-        $(this.$els.tags).selectize({
+        $(this.$refs.tags).selectize({
             delimiter: ',',
             persist: false,
             plugins: ['drag_drop', 'remove_button'],
@@ -34,7 +34,7 @@ module.exports = {
     methods: {
 
         focus() {
-            this.$els.tags.selectize.focus();
+            this.$refs.tags.selectize.focus();
         }
 
     }

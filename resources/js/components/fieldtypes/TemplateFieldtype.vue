@@ -9,7 +9,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     props: ['data', 'config', 'name'],
 
@@ -28,7 +28,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.$http.get(cp_url('system/templates/get'), function(data) {
             var options = [{ value: null, text: '' }];
             _.each(data, function(template) {

@@ -1,7 +1,11 @@
-exports.install = function(Vue, options) {
+export default {
 
-    Vue.prototype.resource_url = function(url) {
-        return resource_url(url);
-    };
+    install(Vue, options) {
+
+        Vue.prototype.resource_url = function(url) {
+            return resource_url(url);
+        };
+
+    }
 
 };

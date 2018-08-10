@@ -5,7 +5,7 @@ module.exports = {
     data: function() {
         return {
             ajax: {
-                get: cp_url('fieldsets/get'),
+                get: cp_url('fieldsets-json'),
                 delete: cp_url('fieldsets/delete')
             },
             tableOptions: {
@@ -16,18 +16,21 @@ module.exports = {
                 sortOrder: 'asc',
                 partials: {
                     cell: `
-                        <a v-if="$index === 0" :href="item.edit_url">
-                            {{ item[column.label] }}
+                        <a v-if="$index === 0" :href="item.edit_url" class="has-status-icon">
+                            <span class="status status-{{ (item.hidden) ? 'hidden' : 'live' }}"
+                                  v-tip :tip-text="(item.hidden) ? translate('cp.hidden') : translate('cp.published')"
+                            ></span>
+                            {{ item[column.value] }}
                         </a>
                         <template v-else>
-                            {{ item[column.label] }}
+                            {{ item[column.value] }}
                         </template>`
                 }
             }
         }
     },
 
-    ready: function () {
+    mounted() {
         this.addActionPartial();
     },
 

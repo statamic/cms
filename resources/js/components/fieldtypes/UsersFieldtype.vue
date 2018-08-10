@@ -5,7 +5,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     props: {
         name: String,
@@ -20,7 +20,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         Vue.set(this.config, 'type', 'users');
     }
 };

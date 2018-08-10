@@ -1,11 +1,25 @@
-#typeahead {
+.global-search {
+    @extend .z-depth-1;
+    border-radius: 4px;
+    background: #fff;
+    padding: 0 8px;
+    width: 100%;
+    max-width: 400px;
+    margin-right: 16px;
     position: relative;
     display: flex;
     align-items: center;
 
-    input {
+    .search-input {
         padding-left: 5px;
         height: 32px;
+        background: #fff;
+		font-size: 14px;
+        max-width: 400px;
+        width: 100%;
+		&:focus {
+			outline: 0;
+		}
     }
 
     ul {

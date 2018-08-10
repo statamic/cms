@@ -1,31 +1,3 @@
-/*!
- *  Lang.js for Laravel localization in JavaScript.
- *
- *  @version 1.1.0
- *  @license MIT
- *  @site    https://github.com/rmariuzzo/Laravel-JS-Localization
- *  @author  rmariuzzo
- */
-
-'use strict';
-
-(function(root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
-        // AMD support.
-        define([], factory);
-    } else if (typeof exports === 'object') {
-        // NodeJS support.
-        module.exports = new(factory())();
-    } else {
-        // Browser global support.
-        root.Lang = new(factory())();
-    }
-
-}(this, function() {
-
-    // Constructor //
-
     var Lang = function() {
     };
 
@@ -246,6 +218,4 @@
         return false;
     };
 
-    return Lang;
-
-}));
+    export default new Lang;

@@ -1,7 +1,7 @@
 export default {
 
     props: {
-        data: {},
+        value: {},
         config: {},
         name: {},
         leaveAlert: {
@@ -40,24 +40,24 @@ export default {
 
     },
 
-    ready() {
-        if (this.autoBindChangeWatcher) {
-            this.bindChangeWatcher();
-        }
+    mounted() {
+        // if (this.autoBindChangeWatcher) {
+        //     this.bindChangeWatcher();
+        // }
     },
 
     methods: {
 
-        bindChangeWatcher() {
-            if (!this.leaveAlert) return;
-            if (this.changeWatcherIsBound) return;
-
-            this.$watch('data', function () {
-                this.$dispatch('changesMade', true);
-            }, { deep: this.changeWatcherWatchDeep });
-
-            this.changeWatcherIsBound = true;
-        },
+        // bindChangeWatcher() {
+        //     if (!this.leaveAlert) return;
+        //     if (this.changeWatcherIsBound) return;
+        //
+        //     this.$watch('data', function () {
+        //         this.$dispatch('changesMade', true);
+        //     }, { deep: this.changeWatcherWatchDeep });
+        //
+        //     this.changeWatcherIsBound = true;
+        // },
 
         getReplicatorPreviewText() {
             return this.data;

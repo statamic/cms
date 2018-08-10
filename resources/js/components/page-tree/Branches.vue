@@ -1,7 +1,8 @@
 <template>
     <ul :class="classes">
-        <branch v-for="page in pages"
-                :branch-index="$index"
+        <branch v-for="(page, index) in pages"
+                :key="page.id"
+                :branch-index="index"
                 :uuid="page.id"
                 :title="page.title || page.slug"
                 :url="buildUrl(page.slug)"
@@ -11,8 +12,9 @@
                 :entries-url="page.entries_url"
                 :create-entry-url="page.create_entry_url"
                 :child-pages="page.items"
-                :collapsed.sync="page.collapsed"
+                :collapsed="page.collapsed"
                 :depth="depth"
+                :sortable="sortable"
         ></branch>
     </ul>
 </template>
@@ -27,7 +29,8 @@ export default {
             type: String,
             default: ''
         },
-        collapsed: Boolean
+        collapsed: Boolean,
+        sortable: Boolean
     },
 
     computed: {

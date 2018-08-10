@@ -7,17 +7,22 @@
         top: -2px;
     }
 
+    ul:first-child {
+        flex: 1;
+        flex-shrink: 0;
+        flex-basis: auto;
+        max-height: 100vh;
+        overflow-y: auto;
+        position: sticky;
+        top: 24px;
+    }
+
     // Generic list styles
     ul {
         list-style: none;
         margin: 16px 0;
-        flex: 1;
-        flex-shrink: 0;
-        flex-basis: auto;
         padding: 0;
         width: 100%;
-        position: sticky;
-        top: 24px;
 
         li {
             a:hover .icon,
@@ -246,18 +251,17 @@
     }
 }
 
-@media (max-width: 980px) and (min-width: $screen-xs-max ) {
+@media (max-width: 980px) and (min-width: 768px ) {
     .nav-main .version { display: none; }
 }
 
 // small screen styles
-@media (max-width: $screen-xs-max) {
+@media (max-width: 768px) {
     body {
         padding-left: 0;
         transition: all 0.2s ease;
     }
 
-    #statamic-logo path { fill: #fff; }
 
     nav.nav-main {
         background: #fff;
@@ -272,6 +276,10 @@
 
     .nav-mobile {
         display: flex;
+
+        .logo svg path {
+            fill: #fff;
+        }
     }
 
     body.nav-visible {
@@ -282,14 +290,5 @@
             padding-top: 16px;
         }
         .content { opacity: 0.5; }
-    }
-
-    .stuck .card.sticky {
-        // if you cant beat 'em, join 'em. sticky is difficult to adjust
-        // when responsive. just make it not sticky for now.
-        position: static !important;
-        margin: 0;
-        box-shadow: none;
-        border-bottom: 1px solid $color_border;
     }
 }

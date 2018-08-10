@@ -51,7 +51,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.validate();
     }
 

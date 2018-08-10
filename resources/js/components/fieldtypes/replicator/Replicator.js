@@ -10,7 +10,7 @@ export default {
         };
     },
 
-    ready() {
+    mounted() {
         this.accordionMode = this.getAccordionModeFromStorage();
 
         if (this.accordionMode) this.collapseAll();

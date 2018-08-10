@@ -1,7 +1,7 @@
 <template>
 
     <div class="asset-uploader">
-        <input type="file" multiple="multiple" class="hide" v-el:native-file-field>
+        <input type="file" multiple="multiple" class="hide" ref="native-file-field">
     </div>
 
 </template>
@@ -34,12 +34,15 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         this.bindUploader();
     },
 
 
-    destroyed() {
+    // Using beforeDestroy instead of destroy, since the destroy hook didn't seem to
+    // get called at all sometimes when using `npm run production`. Works fine when
+    // using `npm run dev`. beforeDestroy works fine in both cases. ¯\_(ツ)_/¯
+    beforeDestroy() {
         $(this.domElement).unbind().removeData();
     },
 
@@ -67,7 +70,7 @@ export default {
          * Open the native file browser
          */
         browse() {
-            $(this.$els.nativeFileField).click();
+            $(this.$refs.nativeFileField).click();
         },
 
         /**

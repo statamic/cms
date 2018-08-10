@@ -22,14 +22,14 @@ module.exports = {
                         <a :href="item.terms_url">{{ item.title }}</a>
 
                         <a href="{{ item.create_url }}" v-if="can('taxonomies:'+item.id+':create')"
-                           class="btn btn-icon btn-primary pull-right"><span class="icon icon-plus"></span>
+                           class="btn btn-icon btn-primary float-right"><span class="icon icon-plus"></span>
                         </a>`
                 }
             }
         }
     },
 
-    ready: function () {
+    mounted() {
         if (this.can('super')) {
             this.addActionPartial();
         }

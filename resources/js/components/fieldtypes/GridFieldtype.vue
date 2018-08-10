@@ -20,7 +20,7 @@
 			<tr v-for="(rowIndex, row) in data" :class="{excess: isExcessive(rowIndex)}">
 				<td v-for="field in config.fields">
 					<div class="{{ field.type }}-fieldtype">
-						<component :is="field.type + '-fieldtype'"
+						<component :is="componentName(field.type)"
 						           :name="name + '.' + rowIndex + '.' + field.name"
 						           :data.sync="row[field.name]"
 						           :config="field">
@@ -37,16 +37,15 @@
 
 	<div v-if="hasData && stacked" class="grid-stacked">
 		<div class="list-group" v-for="(rowIndex, row) in data">
-			<div class="list-group-item group-header drag-handle">
+			<div class="list-group-item group-header pl-3 drag-handle">
 				<div class="flexy">
 					<label class="fill">{{ rowIndex + 1 }}</label>
 					<i class="icon icon-cross" v-on:click="deleteRow(rowIndex)"></i>
 				</div>
 			</div>
-			<div class="list-group-item">
-				<div class="row">
-					<div v-for="field in config.fields" class="{{ colClass(field.width )}}">
-						<div class="form-group {{ field.type }}-fieldtype">
+			<div class="list-group-item p-0">
+				<div class="publish-fields">
+					<div v-for="field in config.fields" :class="stackedFieldClasses(field)">
 							<label class="block">
 								<template v-if="field.display">{{ field.display }}</template>
 								<template v-if="!field.display">{{ field.name | capitalize }}</template>
@@ -55,12 +54,11 @@
 
 							<small class="help-block" v-if="field.instructions" v-html="field.instructions | markdown"></small>
 
-							<component :is="field.type + '-fieldtype'"
+							<component :is="componentName(field.type)"
 							           :name="name + '.' + rowIndex + '.' + field.name"
 							           :data.sync="row[field.name]"
 							           :config="field">
 							</component>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -68,7 +66,7 @@
 	</div>
 
 	<template v-if="canAddRows">
-		<button type="button" class="btn btn-default add-row" @click="addRow" v-el:add-row-button>
+		<button type="button" class="btn btn-default add-row" @click="addRow" ref="add-row-button">
 			{{ addRowButton }} <i class="icon icon-plus icon-right"></i>
 		</button>
 	</template>
@@ -79,7 +77,7 @@
 <script>
 var Vue = require('vue');
 
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -90,13 +88,15 @@ module.exports = {
             min_rows: this.config.min_rows || 0,
             max_rows: this.config.max_rows || false,
             autoBindChangeWatcher: false,
-            changeWatcherWatchDeep: false
+            changeWatcherWatchDeep: false,
+            containerWidth: null
         };
     },
 
     computed: {
         stacked: function() {
-            return this.config.mode === 'stacked' || this.$root.isPreviewing;
+            if (this.containerWidth < 600) return true;
+            return this.config.mode === 'stacked';
         },
 
         hasData: function() {
@@ -120,7 +120,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         // Initialize with an empty array if there's no data.
         if (! this.data) {
             this.data = [];
@@ -135,8 +135,8 @@ module.exports = {
             for (var i = 1; i <= rows_to_add; i++) this.addRow();
         }
 
-
-        this.initSortable();
+        this.trackContainerWidth();
+        this.$nextTick(() => this.initSortable());
         this.bindChangeWatcher();
 
         // Re-initialize sortable when the stacking mode changes
@@ -236,18 +236,11 @@ module.exports = {
             }
         },
 
-        /**
-         * Bootstrap Column Width class
-         * Takes a percentage based integer and converts it to a bootstrap column number
-         * eg. 100 => 12, 50 => 6, etc.
-         */
-        colClass: function(width) {
-            if (this.$root.isPreviewing) {
-                return 'col-md-12';
-            }
-
-            width = width || 100;
-            return 'col-md-' + Math.round(width / 8.333);
+        stackedFieldClasses: function(field) {
+            return [
+                `form-group p-2 m-0 ${field.type}-fieldtype`,
+                tailwind_width_class(field.width),
+            ];
         },
 
         gridColWidth: function(width) {
@@ -268,8 +261,32 @@ module.exports = {
             if (this.hasData) {
                 this.$children[0].focus();
             } else {
-                this.$els.addRowButton.focus();
+                this.$refs.addRowButton.focus();
             }
+        },
+
+        trackContainerWidth() {
+            const update = () => { this.containerWidth = this.$el.parentElement.clientWidth };
+            const throttled = _.throttle(update, 100);
+            update();
+
+            this.$root.$on('livepreview.opened', throttled);
+            this.$root.$on('livepreview.closed', throttled);
+            this.$root.$on('livepreview.resizing', throttled);
+            this.$root.$on('publish.section.changed', throttled);
+            addEventListener('resize', throttled);
+
+            this.$once('hook:beforeDestroy', () => {
+                window.removeEventListener('resize', throttled)
+                this.$root.$off('livepreview.opened', throttled);
+                this.$root.$off('livepreview.closed', throttled);
+                this.$root.$off('livepreview.resizing', throttled);
+                this.$root.$off('publish.section.changed', throttled);
+            });
+        },
+
+        componentName(type) {
+            return type.replace('.', '-') + '-fieldtype';
         }
     }
 };

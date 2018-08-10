@@ -16,7 +16,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.$http.get(this.$parent.url('permissions')).success(function(response) {
             this.success = response.success;
             this.unwritable = response.unwritable;

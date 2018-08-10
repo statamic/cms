@@ -5,7 +5,7 @@
     <configure-asset-container-listing inline-template v-cloak>
         <div>
 
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ t('manage_asset_containers') }}</h1>
                 <a href="{{ route('assets.container.create') }}" class="btn btn-primary">{{ translate('cp.new_asset_container') }}</a>
             </div>

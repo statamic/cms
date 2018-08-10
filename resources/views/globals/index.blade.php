@@ -4,8 +4,8 @@
 
     <globals-listing inline-template v-cloak>
         <div>
-            <div class="flexy sticky mb-24">
-                <h1 class="fill">{{ t('global_sets') }}</h1>
+            <div class="flex items-center mb-3">
+                <h1 class="flex-1">{{ t('global_sets') }}</h1>
                 @can('super')
                     <a href="{{ route('globals.manage') }}" class="btn">{{ translate('cp.manage_global_sets') }}</a>
                 @endcan

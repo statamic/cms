@@ -38,29 +38,29 @@ module.exports = {
 
         metricsGridConfig: function() {
             return {
-                add_row: 'Metric',
+                add_row: translate('cp.formset_metrics_grid_add_row'),
                 mode: 'stacked',
                 fields: [
                     {
                         name: 'type',
-                        display: 'Metric Type',
+                        display: translate('cp.formset_metrics_grid_type_field'),
                         width: 25,
                         type: 'select',
                         options: [
-                            { value: 'sum', text: 'Sum' },
-                            { value: 'total', text: 'Total' },
-                            { value: 'average', text: 'Average' }
+                            { value: 'sum', text: translate('cp.formset_metrics_grid_type_option_sum') },
+                            { value: 'total', text: translate('cp.formset_metrics_grid_type_option_total') },
+                            { value: 'average', text: translate('cp.formset_metrics_grid_type_option_average') }
                         ]
                     },
                     {
                         name: 'label',
-                        display: 'Label',
+                        display: translate('cp.formset_metrics_grid_label_field'),
                         type: 'text',
                         width: 75
                     },
                     {
                         name: 'params',
-                        display: 'Parameters',
+                        display: translate('cp.formset_metrics_grid_params_field'),
                         type: 'array'
                     }
                 ]
@@ -69,14 +69,40 @@ module.exports = {
 
         emailGridConfig: function() {
             return {
-                add_row: 'Email',
+                add_row: translate('cp.formset_emails_grid_add_row'),
                 mode: 'stacked',
                 fields: [
-                    { name: 'to', display: 'Recipient (To)', type: 'text', width: 50, instructions: 'Email address of the recipient.' },
-                    { name: 'from', display: 'Sender (From)', type: 'text', width: 50, instructions: 'Leave blank to fall back to the site default.' },
-                    { name: 'reply_to', display: 'Reply to', type: 'text' },
-                    { name: 'subject', display: 'Subject', type: 'text', instructions: 'Email subject line.' },
-                    { name: 'template', display: 'Template', type: 'text', instructions: 'Leave blank to use an automagic email.' }
+                    {
+                        name: 'to',
+                        display: translate('cp.formset_emails_grid_to_field'),
+                        type: 'text',
+                        width: 50,
+                        instructions: translate('cp.formset_emails_grid_to_instructions')
+                    },
+                    {
+                        name: 'from',
+                        display: translate('cp.formset_emails_grid_from_field'),
+                        type: 'text',
+                        width: 50,
+                        instructions: translate('cp.formset_emails_grid_from_instructions')
+                    },
+                    {
+                        name: 'reply_to',
+                        display: translate('cp.formset_emails_grid_reply_to_field'),
+                        type: 'text'
+                    },
+                    {
+                        name: 'subject',
+                        display: translate('cp.formset_emails_grid_subject_field'),
+                        type: 'text',
+                        instructions: translate('cp.formset_emails_grid_subject_instructions')
+                    },
+                    {
+                        name: 'template',
+                        display: translate('cp.formset_emails_grid_template_field'),
+                        type: 'text',
+                        instructions: translate('cp.formset_emails_grid_template_instructions')
+                    }
                 ]
             };
         }
@@ -122,7 +148,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         if (this.create) {
             this.getBlankFormset();
         } else {

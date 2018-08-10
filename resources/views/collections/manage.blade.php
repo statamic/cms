@@ -4,7 +4,7 @@
 
     <configure-collection-listing inline-template v-cloak>
         <div>
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ t('manage_collections') }}</h1>
                 <a href="{{ route('collection.create') }}" class="btn btn-primary">{{ translate('cp.create_collection_button') }}</a>
             </div>

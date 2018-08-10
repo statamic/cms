@@ -93,7 +93,7 @@ export default {
 
     },
 
-    ready() {
+    mounted() {
         if (! this.data) {
             this.data = { type: null, style: 'standard', custom: null, conditions: [] };
         }

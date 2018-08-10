@@ -19,6 +19,10 @@ export default {
                 return this.data.replace('watch?v=', 'embed/');
             }
 
+            if (this.data.includes('youtu.be')) {
+                return this.data.replace('youtu.be', 'www.youtube.com/embed');
+            }
+
             if (this.data.includes('vimeo')) {
                 return this.data.replace('/vimeo.com', '/player.vimeo.com/video');
             }
@@ -27,7 +31,7 @@ export default {
         },
 
         isEmbeddable() {
-            return this.data.includes('youtube') || this.data.includes('vimeo');
+            return this.data.includes('youtube') || this.data.includes('vimeo') || this.data.includes('youtu.be');
         },
 
         isVideo() {

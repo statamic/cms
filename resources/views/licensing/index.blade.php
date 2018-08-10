@@ -2,55 +2,53 @@
 
 @section('content')
 
-    <div class="flexy mb-24">
-        <h1 class="fill">Licensing</h1>
-        <a href="{{ route('licensing.refresh') }}" class="btn btn-primary">Refresh</a>
-    </div>
+    <div class="md:flex justify-between items-center mb-3">
+        <h1 class="fill">{{ t('license_keys') }}</h1>
 
-    @if (count($messages))
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($messages as $message)
-                    <li>{!! $message !!}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+        <a href="https://statamic.com/account/licenses" target="_blank" class="text-xs md:ml-2">
+            {{ t('license_statamic_link') }} &rarr;
+        </a>
+    </div>
 
     <form method="POST" action="{{ route('licensing.update') }}">
         {{ csrf_field() }}
 
-        <div class="card flush">
+        <div class="card flush dossier-for-mobile">
 
             <table class="dossier">
                 <thead>
                     <tr>
-                        <th class="checkbox-col"></th>
                         <th>{{ trans_choice('cp.items', 1) }}</th>
                         <th>{{ t('license_key') }}</th>
+                        <th>{{ trans_choice('cp.statuses', 1) }}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($items as $item)
-                        <tr {{ $item['valid'] ? '' : 'class="text-danger"' }}>
-                            <td>
-                                @if ($item['valid'])
-                                    <span class="icon icon-check text-success"></span>
-                                @else
-                                    <span class="icon icon-cross text-danger"></span>
-                                @endif
+
+                    @foreach ($licenses as $license)
+                        <tr>
+                            <td class="first-cell">{{ $license->name() }}</td>
+                            <td width="320">
+                                <input type="text" class="form-control font-mono text-xs" name="{{ $license->id() }}" value="{{ $license->key() }}">
                             </td>
-                            <td>{{ $item['name'] }}</td>
-                            <td>
-                                <input type="text" class="form-control" name="{{ $item['id'] }}" value="{{ $item['key'] }}">
+                            <td class="text-xs mt-1 text-grey">
+                                @if ($license->status())
+                                    <span class="{{ $license->status()['status'] == 'positive' ? 'text-green' : 'text-red' }}">
+                                    {{ $license->status()['message'] }}
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
+
                 </tbody>
             </table>
         </div>
 
-        <button class="btn btn-primary">{{ t('save') }}</button>
+        <div>
+            <button class="btn btn-primary">{{ t('save') }}</button>
+            <a href="{{ route('licensing.refresh') }}" class="btn ml-1">{{ t('refresh') }}</a>
+        </div>
 
     </form>
 

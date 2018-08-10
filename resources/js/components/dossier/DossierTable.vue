@@ -1,6 +1,6 @@
 <template>
     <div class="dossier-table-wrapper">
-        <table class="dossier">
+        <table :class="['dossier', { 'has-checkboxes': hasCheckboxes }]">
             <thead v-if="hasHeaders">
                 <tr>
                     <th class="checkbox-col" v-if="hasCheckboxes">
@@ -10,10 +10,10 @@
 
                     <th v-for="column in columns"
                         @click="sortBy(column)"
-                        :class="['column-' + column.label, {'active': isColumnActive(column), 'column-sortable': !isSearching} ]"
+                        :class="['column-' + column.value, {'active': isColumnActive(column), 'column-sortable': !isSearching, 'extra-col': column.extra} ]"
+                        :style="{ width: tableColWidth(column.width) }"
                     >
-                        <template v-if="column.translation">{{ column.translation }}</template>
-                        <template v-else>{{ translate('cp.'+column.label) }}</template>
+                        {{ column.header }}
                         <i v-if="isColumnActive(column)"
                            class="icon icon-chevron-{{ sortOrder === 'asc' ? 'up' : 'down' }}"></i>
                     </th>
@@ -21,7 +21,7 @@
                     <th class="column-actions" v-if="hasActions"></th>
                 </tr>
             </thead>
-            <tbody v-el:tbody>
+            <tbody ref="tbody">
                 <tr v-for="item in items">
 
                     <td class="checkbox-col" v-if="hasCheckboxes && !reordering">
@@ -35,7 +35,14 @@
                         </div>
                     </td>
 
-                    <td v-for="column in columns" class="cell-{{ column.field }}">
+                    <td v-for="(i, column) in columns" :class="[
+                        `cell-${column.value}`, {
+                            'extra-col': column.extra,
+                            'empty-col': !item[column.value],
+                            'first-cell': i === 0
+                        }]
+                    ">
+                        <span class="column-label">{{ column.header }}</span>
                         <partial name="cell"></partial>
                     </td>
 
@@ -56,10 +63,10 @@
         </table>
 
         <div v-if="showBulkActions" :class="{ 'bulk-actions': true, 'no-checkboxes': !hasCheckboxes }">
-          <button type="button" class="btn action" @click="uncheckAllItems">
-            {{ translate('cp.uncheck_all') }}
-          </button>
-          <button type="button" class="btn btn-delete action" @click.prevent="call('deleteMultiple', 'foo', 'bar')">
+            <button type="button" class="btn action" @click="uncheckAllItems">
+                {{ translate('cp.uncheck_all') }}
+            </button>
+            <button type="button" class="btn btn-delete action" @click.prevent="call('deleteMultiple', 'foo', 'bar')">
                 {{ translate('cp.delete') }} {{ checkedItems.length }} {{ translate_choice('cp.items', checkedItems.length)}}
             </button>
         </div>
@@ -76,13 +83,13 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     props: ['options', 'items', 'isSearching'],
 
     data: function () {
         return {
-            columns: [],
+            columns: this.$parent.columns,
             reordering: false
         }
     },
@@ -91,15 +98,17 @@ module.exports = {
         // The default cell markup will be a link to the edit_url with a status symbol
         // if it's the first cell. Remaining cells just get the label.
         cell: `
-            <a v-if="$index === 0" :href="item.edit_url">
-                <span class="status status-{{ (item.published) ? 'live' : 'hidden' }}"
+            <span :class="{ 'has-status-icon': $index === 0 }">
+                <span v-if="$index === 0" class="status status-{{ (item.published) ? 'live' : 'hidden' }}"
                       :title="(item.published) ? translate('cp.published') : translate('cp.draft')"
                 ></span>
-                {{ item[column.label] }}
-            </a>
-            <template v-else>
-                {{ item[column.label] }}
-            </template>
+                <a v-if="column.link" :href="item.edit_url" class="has-status-icon">
+                    {{{ formatValue(item[column.value]) }}}
+                </a>
+                <template v-else>
+                    {{{ formatValue(item[column.value]) }}}
+                </template>
+            </span>
         `
     },
 
@@ -170,12 +179,6 @@ module.exports = {
         });
     },
 
-    ready: function() {
-        this.columns = this.$parent.columns;
-
-        this.setColumns();
-    },
-
     methods: {
         registerPartials: function () {
             var self = this;
@@ -185,22 +188,10 @@ module.exports = {
             });
         },
 
-        setColumns: function () {
-            var columns = [];
-            _.each(this.columns, function (column) {
-                if (typeof column === 'object') {
-                    columns.push({ label: column.label, field: column.field, translation: column.translation });
-                } else {
-                    columns.push({ label: column, field: column });
-                }
-            });
-            this.columns = columns;
-        },
-
         sortBy: function (col) {
             if (this.isSearching) return;
 
-            let sort = col.field;
+            let sort = col.value;
             let sortOrder = 'desc';
 
             // If the current sort order was clicked again, change the direction.
@@ -234,7 +225,7 @@ module.exports = {
 
             self.reordering = true;
 
-            $(this.$els.tbody).sortable({
+            $(this.$refs.tbody).sortable({
                 axis: 'y',
                 revert: 175,
                 placeholder: 'placeholder',
@@ -257,7 +248,7 @@ module.exports = {
 
         disableReorder: function () {
             this.reordering = false;
-            $(this.$els.tbody).sortable('destroy');
+            $(this.$refs.tbody).sortable('destroy');
         },
 
         saveOrder: function () {
@@ -286,7 +277,24 @@ module.exports = {
         isColumnActive(col) {
             if (this.isSearching) return false;
 
-            return col.field === this.$parent.sort;
+            return col.value === this.$parent.sort;
+        },
+
+        tableColWidth: function(width) {
+            if (! width || width === 100) return;
+            if (typeof width === 'string' && width.endsWith('px')) return width;
+            return `${width}%`;
+        },
+
+        formatValue(value) {
+            if (value && typeof value === 'object' && !Array.isArray() && value.thumbnail) {
+                let html = `<span class="img"><img src="${value.thumbnail}" alt="${value.value}" />`;
+                if (value.value) html += `<span>${value.value}</span>`;
+                html += `</span>`;
+                return html;
+            }
+
+            return Array.isArray(value) ? value.join(', ') : value;
         }
     },
 

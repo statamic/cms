@@ -1,7 +1,11 @@
-exports.install = function(Vue, options) {
+export default {
 
-    Vue.prototype.cp_url = function(url) {
-        return cp_url(url);
-    };
+    install(Vue, options) {
+
+        Vue.prototype.cp_url = function(url) {
+            return cp_url(url);
+        };
+
+    }
 
 };

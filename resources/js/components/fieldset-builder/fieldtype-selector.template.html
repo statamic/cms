@@ -1,9 +1,0 @@
-<div class="fieldtype-selector">
-	<div class="select" :class="{ 'select--active': isActive }" :data-content="fieldtypeSelectionText">
-		<select v-model="fieldtypeSelection" tabindex="0" @focus="isActive = true" @blur="isActive = false">
-            <option v-for="option in fieldtypesSelectOptions" :value="option.value" :disabled="option.disabled">{{ option.text }}</option>
-        </select>
-	</div>
-
-	<button type="button" class="btn btn-default" v-on:click="addField" :disabled="!fieldtypeSelection"><i class="icon icon-plus"></i></button>
-</div>

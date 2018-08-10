@@ -15,7 +15,7 @@
         </div>
 
         <div v-if="showSidebar" class="asset-browser-sidebar">
-            <h4>Containers</h4>
+            <h4>{{ translate('cp.containers') }}</h4>
             <div v-for="c in containers" class="sidebar-item" :class="{ 'active': container.id == c.id }">
                 <a @click="selectContainer(c.id)">
                     {{ c.title }}
@@ -26,7 +26,7 @@
         <div class="asset-browser-main" v-if="initialized">
 
             <div class="asset-browser-header">
-                <h1 class="mb-24">
+                <h1 class="mb-3">
                     <template v-if="isSearching">
                         {{ translate('cp.search_results') }}
                     </template>
@@ -45,16 +45,16 @@
                 </h1>
 
                 <input type="text"
-                    class="search filter-control mb-24"
+                    class="search filter-control mb-3"
                     placeholder="{{ translate('cp.search') }}..."
                     v-model="searchTerm"
                     debounce="500" />
 
                 <div class="asset-browser-actions flexy wrap">
 
-                    <slot name="contextual-actions" v-if="selectedAssets.length"></slot>
+                    <slot name="contextual-actions"></slot>
 
-                    <div class="btn-group action mb-24">
+                    <div class="btn-group action mb-3">
                         <button type="button"
                                 class="btn btn-icon"
                                 :class="{'depressed': displayMode == 'grid'}"
@@ -69,7 +69,7 @@
                         </button>
                     </div>
 
-                    <div class="btn-group action mb-24" v-if="canEdit">
+                    <div class="btn-group action mb-3" v-if="canEdit">
                         <button type="button"
                                 class="btn"
                                 v-if="!restrictNavigation && !isSearching"
@@ -86,7 +86,7 @@
             <div class="asset-browser-content">
 
                 <uploader
-                    v-ref:uploader
+                    ref="uploader"
                     :dom-element="uploadElement"
                     :container="container.id"
                     :path="path"
@@ -108,6 +108,7 @@
                     :loading="loading"
                     :selected-assets="selectedAssets"
                     :restrict-navigation="restrictNavigation"
+                    :is-searching="isSearching"
                     @folder-selected="folderSelected"
                     @folder-editing="editFolder"
                     @folder-deleted="folderDeleted"
@@ -116,19 +117,13 @@
                     @asset-editing="editAsset"
                     @asset-deleting="deleteAsset"
                     @assets-dragged-to-folder="assetsDraggedToFolder"
-                    @asset-doubleclicked="assetDoubleclicked">
+                    @asset-doubleclicked="assetDoubleclicked"
+                    @sorted="sortBy">
                 </component>
 
-                <div class="no-results" v-if="isEmpty">
-                    <template v-if="isSearching">
-                        <span class="icon icon-magnifying-glass"></span>
-                        <h2>{{ translate('cp.no_search_results') }}</h2>
-                    </template>
-                    <template v-else>
-                        <span class="icon icon-folder"></span>
-                        <h2>{{ translate('cp.asset_folder_empty_heading') }}</h2>
-                        <h3>{{ translate('cp.asset_folder_empty') }}</h3>
-                    </template>
+                <div class="no-results" v-if="isSearching && isEmpty">
+                    <svg-icon name="folder-search-empty" class="h-16 w-16 mx-auto"></svg-icon>
+                    <h2>{{ translate('cp.no_search_results') }}</h2>
                 </div>
 
                 <pagination
@@ -139,13 +134,13 @@
                     @selected="paginationPageSelected">
                 </pagination>
 
-                <breadcrumbs
-                    v-if="!restrictNavigation && !isSearching"
-                    :path="path"
-                    @navigated="folderSelected">
-                </breadcrumbs>
-
             </div>
+
+            <breadcrumbs
+                v-if="!restrictNavigation && !isSearching"
+                :path="path"
+                @navigated="folderSelected">
+            </breadcrumbs>
 
             <asset-editor
                 v-if="showAssetEditor"
@@ -185,7 +180,7 @@
 <script>
 import DetectsFileDragging from '../../DetectsFileDragging';
 
-module.exports = {
+export default {
 
     components: {
         GridListing: require('./Listing/GridListing.vue'),
@@ -230,7 +225,9 @@ module.exports = {
             showFolderCreator: false,
             editedFolderPath: null,
             editorHasChild: false,
-            isSearching: false
+            isSearching: false,
+            sort: 'title',
+            sortOrder: 'asc'
         }
     },
 
@@ -261,7 +258,7 @@ module.exports = {
         },
 
         canEdit: function() {
-            return this.can('assets'+ this.container +':edit')
+            return this.can('assets:'+ this.container.id +':edit')
         },
 
         showSidebar() {
@@ -316,7 +313,7 @@ module.exports = {
     },
 
 
-    ready() {
+    mounted() {
         this.path = this.selectedPath;
 
         // We need all the containers since they'll be displayed in the sidebar. This will also load
@@ -426,7 +423,9 @@ module.exports = {
             this.$http.post(cp_url('assets/browse'), {
                 container: this.container.id,
                 path: this.path,
-                page: this.selectedPage
+                page: this.selectedPage,
+                sort: this.sort,
+                dir: this.sortOrder
             }).success((response) => {
                 this.assets = response.assets;
                 this.folders = response.folders;
@@ -462,6 +461,7 @@ module.exports = {
         folderSelected(path) {
             // Trigger re-loading of assets in the selected folder.
             this.path = path;
+            this.selectedPage = 1;
 
             // Trigger an event so the parent can do something.
             // eg. The asset manager would want to change the browser URL.
@@ -551,6 +551,7 @@ module.exports = {
          * Close the asset editor.
          */
         closeAssetEditor() {
+            this.$dispatch('modal.close');
             this.editedAssetId = null;
         },
 
@@ -654,7 +655,22 @@ module.exports = {
                 this.loadAssets();
                 this.selectedAssets = [];
             });
-        }
+        },
+
+        sortBy(sort) {
+            if (this.isSearching) return;
+
+            let sortOrder = 'asc';
+
+            // If the current sort order was clicked again, change the direction.
+            if (this.sort === sort) {
+                sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+            }
+
+            this.sort = sort;
+            this.sortOrder = sortOrder;
+            this.loadAssets();
+        },
 
     }
 

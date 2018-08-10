@@ -37,6 +37,7 @@ class LoginController extends CpController
         $data = [
             'title' => translate('cp.login'),
             // 'oauth' => OAuth::enabled() && !empty(OAuth::providers()),
+            'oauth' => false,
             'referer' => $request->referer
         ];
 

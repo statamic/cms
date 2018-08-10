@@ -4,19 +4,8 @@
       @include('statamic::partials.head')
 </head>
 
-<body id="statamic" :class="{ 'nav-visible': navVisible }">
-
-      {{-- @if ($is_trial || $is_unlicensed)
-            <div class="site-status-stripe flexy">
-                  <div class="fill">
-                        @if ($is_trial) {{ t('trial_mode_badge') }} @elseif ($is_unlicensed){{ t('unlicensed') }} @endif
-                  </div>
-                  <a href="{{ route('licensing') }}" class="btn btn-small mr-16">{{ t('add_license_key')  }}</a>
-                  <a href="https://statamic.com/buy" class="btn btn-primary btn-small" target="_blank">{{ t('buy_now')  }}</a>
-            </div>
-      @endif --}}
-
-      {!! inline_svg('sprite') !!}
+<body>
+    <div id="statamic">
 
       <nav class="nav-mobile">
           <a href="{{ route('cp') }}" class="logo">
@@ -35,8 +24,7 @@
             </div>
       </div>
 
-      {{-- @include('statamic::partials.shortcuts') --}}
-      {{-- @include('statamic::partials.alerts') --}}
+      @include('statamic::partials.alerts')
       @include('statamic::partials.global-header')
 
       <div class="application-grid @yield('content-class')">
@@ -52,22 +40,40 @@
                   </div>
             </div>
 
-            <vue-toast v-ref:toast></vue-toast>
+            <portal to="modals" v-if="showLoginModal">
+                <login-modal
+                      username="{{ \Statamic\API\User::getCurrent()->username() }}"
+                      @closed="showLoginModal = false"
+                ></login-modal>
+            </portal>
+
+            <portal to="modals" v-if="showShortcuts">
+                <shortcuts-modal
+                    :show="showShortcuts"
+                    @close="showShortcuts = false">
+                </shortcuts-modal>
+            </portal>
+
+            <vue-toast ref="toast"></vue-toast>
+
+            <portal-target name="modals"></portal-target>
       </div>
+  </div>
 
-      <script>
-            {{--  Statamic.translations = {!! $translations !!};  --}}
-            Statamic.permissions = '{!! $permissions !!}';
-            Statamic.version = '{!! STATAMIC_VERSION !!}';
+<script>
+    Statamic.translations = {!! $translations !!};
+    Statamic.permissions = '{!! $permissions !!}';
+    Statamic.version = '{!! STATAMIC_VERSION !!}';
 
-            @if(session()->has('success'))
-                Statamic.flash = [{
-                    type:    'success',
-                    message: '{{ session()->get('success') }}',
-                }];
-            @endif
-      </script>
-      @include('statamic::partials.scripts')
-      @yield('scripts')
+    @if(session()->has('success'))
+        Statamic.flash = [{
+            type:    'success',
+            message: '{{ session()->get('success') }}',
+        }];
+    @endif
+</script>
+@include('statamic::partials.scripts')
+@yield('scripts')
+
 </body>
 </html>

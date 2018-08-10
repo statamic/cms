@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 class NotificationBus {
     constructor(instance) {
         this.instance = instance;

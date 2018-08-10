@@ -47,9 +47,6 @@ table {
 			border-radius: 7px;
 			display: inline-block;
 			height: 7px;
-			margin-right: 10px;
-			position: relative;
-			top: -1px;
 			width: 7px;
 		}
 
@@ -138,13 +135,28 @@ table {
 
 .column-sortable {
 	cursor: pointer;
-	&:hover {
-        padding-bottom: 10px !important;
-        border-bottom: 2px solid $brand-secondary;
+	position: relative;
+
+	&:before {
+		content: "";
+		position: absolute;
+		bottom: -1px;
+		left: 0;
+		right: 0;
+		height: 2px;
 	}
+
+	&:hover:before {
+        background: $brand-secondary;
+	}
+	&.active:before {
+        background: $brand-primary;
+    }
 	.icon {
-		position: relative;
-		top: 2px;
+        position: relative;
+        float: right;
+        top: 6px;
+        right: 5px;
 	}
 
 	.icon, .icon:before {

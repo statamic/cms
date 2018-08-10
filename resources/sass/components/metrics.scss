@@ -1,11 +1,12 @@
 .metrics {
-    display: flex;
-    margin: 0 -1% 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    resize: horizontal;
+    grid-gap: 16px;
 }
 
 .metric {
-    flex: 1;
-    margin: 0 1%;
+
 }
 
 .mini-chart {

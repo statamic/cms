@@ -2,14 +2,24 @@
 
     <div class="asset-table-listing">
 
-        <table v-if="hasResults">
+        <table v-if="!isSearching || (isSearching && hasResults)">
 
             <thead>
                 <tr>
                     <th></th>
-                    <th class="title-col">{{ translate('cp.title') }}</th>
-                    <th class="size-col extra-col">{{ translate('cp.filesize') }}</th>
-                    <th class="modified-col extra-col">{{ translate('cp.date_modified') }}</th>
+                    <th
+                        v-for="column in columns"
+                        :class="{
+                            'extra-col': column.extra,
+                            'active': isColumnActive(column),
+                            'column-sortable': !isSearching
+                        }"
+                        @click="$emit('sorted', column.field)"
+                    >
+                        {{ column.label }}
+                        <i v-if="isColumnActive(column)"
+                           class="icon icon-chevron-{{ sortOrder === 'asc' ? 'up' : 'down' }}"></i>
+                    </th>
                     <th class="column-actions"></th>
                 </tr>
             </thead>
@@ -75,6 +85,37 @@ export default {
     },
 
 
+    data() {
+        return {
+            columns: [
+                {
+                    field: 'title',
+                    label: translate('cp.title'),
+                },
+                {
+                    field: 'size',
+                    label: translate('cp.filesize'),
+                    extra: true
+                },
+                {
+                    field: 'lastModified',
+                    label: translate('cp.date_modified'),
+                    extra: true
+                }
+            ]
+        }
+    },
+
+
+    computed: {
+
+        sortOrder() {
+            return this.$parent.sortOrder;
+        }
+
+    },
+
+
     methods: {
         closeDropdowns: function(context) {
             this.$broadcast('close-dropdown', context);
@@ -88,6 +129,12 @@ export default {
             if (asset == '') return;
 
             this.$emit('assets-dragged-to-folder', folder);
+        },
+
+        isColumnActive(col) {
+            if (this.isSearching) return false;
+
+            return col.field === this.$parent.sort;
         }
 
     }

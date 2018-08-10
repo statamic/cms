@@ -38,7 +38,7 @@ module.exports = {
         enableSorting: function() {
             var self = this;
 
-            $(this.$els.tbody).sortable({
+            $(this.$refs.tbody).sortable({
                 axis: 'y',
                 revert: 175,
                 placeholder: 'placeholder',
@@ -73,7 +73,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.root = Boolean(this.root || false);
 
         this.enableSorting();

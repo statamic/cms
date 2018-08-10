@@ -35,6 +35,21 @@
                 </div>
 
                 <div class="asset-editor-meta-actions">
+                    <a @click.prevent="open" title="{{ translate('cp.open') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 23">
+                          <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
+                            <path d="m20.121 18.882 2.121-2.121.00000003-.00000003c.781207-.780931.781431-2.04729.00049994-2.8285-.780931-.781207-2.04729-.781431-2.8285-.00049994l-2.121 2.122"/>
+                            <path d="m15.878 17.468-2.12 2.121.00000014-.00000014c-.781483.780931-.781931 2.04752-.00100025 2.829.780931.781483 2.04752.781931 2.829.00100028l2.121-2.119"/>
+                            <path d="m19.77 16.41-3.54 3.53"/>
+                            <path d="m2 5.18h20"/>
+                            <path d="m5 2.926h-.00000001c-.138071.00000001-.25.111929-.25.25.00000001.138071.111929.25.25.25.138071-.00000001.25-.111929.25-.25v.00000001c0-.138071-.111929-.25-.25-.25"/>
+                            <path d="m7 2.926h-.00000001c-.138071.00000001-.25.111929-.25.25.00000001.138071.111929.25.25.25.138071-.00000001.25-.111929.25-.25v.00000001c0-.138071-.111929-.25-.25-.25"/>
+                            <path d="m9 2.926h-.00000001c-.138071.00000001-.25.111929-.25.25.00000001.138071.111929.25.25.25.138071-.00000001.25-.111929.25-.25v.00000001c0-.138071-.111929-.25-.25-.25"/>
+                            <path d="m10 17.176h-6-.00000009c-1.10457-.00000005-2-.895431-2-2v-12 .0000003c-.00000017-1.10457.89543-2 2-2h16-.00000009c1.10457-.00000005 2 .89543 2 2v6"/>
+
+                          </g>
+                        </svg>
+                    </a>
                     <a @click.prevent="download" title="{{ translate('cp.download') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="23" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
@@ -43,7 +58,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click.prevent="close" {{ translate('cp.close') }}>
+                    <a @click.prevent="close" title="{{ translate('cp.close') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.545)">
                             <path d="M16 0L.160533333 15.8389333M16 15.8389333L.160533333 0"/>
@@ -117,10 +132,11 @@
                         </div>
 
                         <publish-fields
-                            :uuid="asset.id"
-                            :field-data="fields"
-                            :fieldset-name="asset.fieldset"
-                            :focus="true">
+                            :fields="publishFields"
+                            :data.sync="fields"
+                            :errors="errors"
+                            :autofocus="true"
+                            :regular-title-field="true">
                         </publish-fields>
                     </div>
 
@@ -179,13 +195,15 @@
 
 
 <script>
+import Fieldset from '../../publish/Fieldset';
+
 export default {
 
     components: {
         FocalPointEditor: require('./FocalPointEditor.vue'),
         Renamer: require('./Renamer.vue'),
         Mover: require('../Mover.vue'),
-        PublishFields: require('../../publish/fields'),
+        PublishFields: require('../../publish/Fields.vue'),
     },
 
 
@@ -207,6 +225,7 @@ export default {
             saving: false,
             asset: null,
             fields: null,
+            publishFields: null,
             showFocalPointEditor: false,
             showRenamer: false,
             showMover: false,
@@ -236,7 +255,7 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         this.load();
     },
 
@@ -264,6 +283,24 @@ export default {
             this.$http.get(url).success((response) => {
                 this.asset = response.asset;
                 this.fields = response.fields;
+                this.getFieldset();
+            });
+        },
+
+        /**
+         * Load the fieldset
+         */
+        getFieldset() {
+            const url = cp_url(`fieldsets-json/${this.asset.fieldset}`);
+
+            this.$http.get(url).success((response) => {
+                // Flatten fields from all sections into one array.
+                const fieldset = new Fieldset(response);
+                this.publishFields = _.chain(fieldset.sections)
+                    .map(section => section.fields)
+                    .flatten(true)
+                    .value();
+
                 this.loading = false;
             });
         },
@@ -368,6 +405,10 @@ export default {
         assetMoved(asset, folder) {
             this.asset = asset;
             this.$emit('moved', asset, folder)
+        },
+
+        open() {
+            window.open(this.asset.url, '_blank');
         },
 
         download() {

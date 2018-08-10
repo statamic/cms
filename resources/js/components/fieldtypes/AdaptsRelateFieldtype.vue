@@ -2,7 +2,7 @@
 
     <div>
         <relate-fieldtype
-            v-ref:relate
+            v-ref=relate
             :data.sync="data"
             :name="name"
             :config="config">

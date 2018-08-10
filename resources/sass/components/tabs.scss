@@ -1,20 +1,33 @@
 .tabs {
-    @extend .card;
-    @extend .flush;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    @extend .z-depth-1;
+    @apply .bg-white .flex .w-full .overflow-hidden;
+    border-radius: 4px;
     text-align: center;
-    width: 100%;
+    height: 48px;
 
     a {
-        display: block;
-        font-size: 14px;
-        padding: 15px 20px;
+        @apply .bg-bg-lighter .w-full .h-full .min-h-full .relative .flex-1 .flex .items-center .justify-center;
+        line-height: 1.25;
+        font-size: 15px;
+        padding: 4px 8px;
+        box-shadow: inset -1px 0 #e6ebf1;
     }
 
     a.active {
         color: $brand-primary;
-        border-bottom: 2px solid $brand-primary;
+        background-color: #fff;
+        box-shadow: $brand-primary 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
     }
+
+    a.has-error {
+        color: $color_red;
+
+        &.active {
+            box-shadow: $color_red 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .tabs a { font-size: 13px; }
 }

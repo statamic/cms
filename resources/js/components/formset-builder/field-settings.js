@@ -10,7 +10,7 @@ module.exports = {
         };
     },
 
-    ready: function() {
+    mounted() {
         var self = this;
 
         // For new fields, we'll slugify the display name into the field name.

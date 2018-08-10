@@ -9,7 +9,7 @@
                 <th class="row-controls"></th>
             </tr>
         </thead>
-        <tbody v-el:tbody>
+        <tbody ref="tbody">
             <tr v-for="field in fields">
                 <td class="col-handle"><input type="text" class="code" v-model="field.name" :disabled="field.name === 'title'" tabindex="0" /></td>
                 <td class="col-display"><input type="text" v-model="field.display" tabindex="0" /></td>

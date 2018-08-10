@@ -15,7 +15,7 @@
             <div class="form-group">
                 <input type="text" autofocus
                        class="form-control"
-                       v-el:input
+                       ref="input"
                        v-model="filename"
                        @keyup.esc="cancel"
                        @keyup.enter="save" />
@@ -57,7 +57,7 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         this.filename = this.asset.filename;
     },
 
@@ -86,7 +86,7 @@ export default {
             }).error((response) => {
                 this.saving = false;
                 this.errors = response;
-                this.$els.input.focus();
+                this.$refs.input.focus();
             })
         },
 

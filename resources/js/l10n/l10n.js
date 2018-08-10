@@ -1,8 +1,7 @@
 // Bring in the Lang library
-global.Lang = require('./lang');
+import Lang from './lang';
 
-// Global aliases
-global.translate = function(key, replacements) {
+window.translate = function(key, replacements) {
     var message = Lang.get(key, replacements);
 
     if (message === key) {
@@ -12,7 +11,7 @@ global.translate = function(key, replacements) {
     return message;
 };
 
-global.translate_choice = function(key, count, replacements) {
+window.translate_choice = function(key, count, replacements) {
     return Lang.choice(key, count, replacements);
 };
 

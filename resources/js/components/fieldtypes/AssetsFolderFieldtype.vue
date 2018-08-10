@@ -9,7 +9,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -94,7 +94,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         // If a container prop has been provided, we simply need to get the folders.
         // Otherwise, bootstrap this field so it will work with a sibling container field.
         if (this.config.container) {

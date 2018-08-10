@@ -8,10 +8,10 @@
             </select-fieldtype>
         </td>
         <td :colspan="isFirst ? 2 : null" class="pl-0" width="40%">
-            <input type="text" v-model="handle" placeholder="Field" v-el:handle />
+            <input type="text" v-model="handle" placeholder="Field" ref="handle" />
         </td>
         <td>
-            <select multiple v-el:values></select>
+            <select multiple ref="values"></select>
         </td>
         <td class="row-controls text-center" width="32px">
                 <a class="icon icon-cross delete mt-8" @click="$emit('deleted')"></a>
@@ -45,7 +45,7 @@ export default {
 
     },
 
-    ready() {
+    mounted() {
         this.selectizeHandles();
         this.selectizeValues();
     },
@@ -57,7 +57,7 @@ export default {
                 return { value: val, text: val };
             });
 
-            $(this.$els.values).selectize({
+            $(this.$refs.values).selectize({
                 items: this.values,
                 options: options,
                 create: true,
@@ -86,7 +86,7 @@ export default {
         },
 
         initSelectize(fields) {
-            $(this.$els.handle).selectize({
+            $(this.$refs.handle).selectize({
                 maxItems: 1,
                 options: this.cleanFields(fields),
                 valueField: 'name',
@@ -97,7 +97,7 @@ export default {
 
         getFields() {
             return JSON.parse(JSON.stringify(
-                this.$parent.$parent.$parent.$parent.fields // todo: Do this the right way.
+                this.$parent.$parent.$parent.$parent.$parent.fields // todo: Do this the right way.
             ));
         },
 

@@ -3,11 +3,17 @@
    ========================================================================== */
 
 .card {
-    @extend .z-depth-2;
+    @extend .z-depth-1;
     background: white;
     border-radius: 4px;
     margin-bottom: 24px;
     padding: 16px;
+}
+
+@media (max-width: 375px) {
+    .card {
+        padding: 8px;
+    }
 }
 
 .card.flat-bottom {

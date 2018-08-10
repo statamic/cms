@@ -16,7 +16,7 @@ export default {
 
     },
 
-    ready() {
+    mounted() {
         this.locale = this.getInitialLocale();
     },
 

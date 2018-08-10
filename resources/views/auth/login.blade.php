@@ -1,10 +1,9 @@
 @extends('statamic::outside')
 
 @section('content')
+    <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
 
-    <login inline-template {{--:show-email-login="!{{ bool_str($oauth) }}"--}} :show-email-login="true" v-cloak>
-
-        {{--  @if ($oauth)
+        @if ($oauth)
             <div class="login-oauth-providers">
                 @foreach (Statamic\API\OAuth::providers() as $provider => $data)
                     <div class="provider">
@@ -22,39 +21,39 @@
                     {{ t('login_with', ['provider' => t(\Statamic\API\Config::get('users.login_type'))]) }}
                 </a>
             </div>
-        @endif  --}}
+        @endif
 
         <form method="POST" v-show="showEmailLogin" class="email-login">
             {!! csrf_field() !!}
 
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
-            <div class="form-group">
+            <div class="mb-4">
                 <label>
                 @if (\Statamic\API\Config::get('users.login_type') === 'email')
                     {{ trans_choice('cp.emails', 1) }}
                 @else
-                    {{ trans('cp.username') }}
+                    {{ t('username') }}
                 @endif
                 </label>
                 <input type="text" class="form-control" name="username" value="{{ old('username') }}" autofocus>
             </div>
 
-            <div class="form-group">
-                <label>{{ trans_choice('cp.passwords', 1) }}</label>
+            <div class="mb-4">
+                <label>{{ t('password') }}</label>
                 <input type="password" class="form-control" name="password" id="password">
             </div>
 
-            <div class="form-group">
+            <div class="mb-4">
                 <input type="checkbox" class="form-control" name="remember" id="checkbox-0">
                 <label for="checkbox-0" class="normal">{{ trans('cp.remember_me') }}</label>
             </div>
 
             <div>
-                <button type="submit" class="btn btn-primary btn-block">{{ trans('cp.login') }}</button>
-                {{--  @if (! $oauth)  --}}
-                    <small class="block mt-16"><a href="{{ route('login.reset')}}">{{ t('forgot_password')}}</a></small>
-                {{--  @endif  --}}
+                <button type="submit" class="btn btn-primary block w-full">{{ t('login') }}</button>
+                @if (! $oauth)
+                    <small class="block mt-2"><a href="{{ route('login.reset')}}">{{ t('forgot_password')}}</a></small>
+                @endif
             </div>
         </form>
     </login>

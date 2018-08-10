@@ -1,6 +1,7 @@
 <div class="vue-toast-manager_container" :class="classesOfPosition">
   <vue-toast
-      v-for="toast in toasts"
+      v-for="(toast, index) in toasts"
+      :key="index"
       :message="toast.message"
       :options="toast.options"
       :destroyed.sync="toast.isDestroyed"

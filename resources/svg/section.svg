@@ -1,0 +1,27 @@
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+     x="0px" y="0px" width="15px" height="16px" viewBox="0 0 15 16" style="enable-background:new 0 0 15 16;" xml:space="preserve">
+<style type="text/css">
+    .st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<defs>
+</defs>
+<g>
+    <path class="st0" d="M3,3.5H1C0.7,3.5,0.5,3.3,0.5,3V1c0-0.3,0.2-0.5,0.5-0.5h2c0.3,0,0.5,0.2,0.5,0.5v2C3.5,3.3,3.3,3.5,3,3.5z"/>
+    <path class="st0" d="M3,15.5H1c-0.3,0-0.5-0.2-0.5-0.5v-2c0-0.3,0.2-0.5,0.5-0.5h2c0.3,0,0.5,0.2,0.5,0.5v2
+        C3.5,15.3,3.3,15.5,3,15.5z"/>
+    <path class="st0" d="M14,3.5h-2c-0.3,0-0.5-0.2-0.5-0.5V1c0-0.3,0.2-0.5,0.5-0.5h2c0.3,0,0.5,0.2,0.5,0.5v2
+        C14.5,3.3,14.3,3.5,14,3.5z"/>
+    <path class="st0" d="M14,15.5h-2c-0.3,0-0.5-0.2-0.5-0.5v-2c0-0.3,0.2-0.5,0.5-0.5h2c0.3,0,0.5,0.2,0.5,0.5v2
+        C14.5,15.3,14.3,15.5,14,15.5z"/>
+    <line class="st0" x1="3.5" y1="1.5" x2="11.5" y2="1.5"/>
+    <line class="st0" x1="13.5" y1="3.5" x2="13.5" y2="12.5"/>
+    <line class="st0" x1="11.5" y1="14.5" x2="3.5" y2="14.5"/>
+    <line class="st0" x1="1.5" y1="12.5" x2="1.5" y2="3.5"/>
+    <g>
+        <path class="st0" d="M4.5,6c0-0.8,0.7-1.5,1.5-1.5h3c0.8,0,1.5,0.7,1.5,1.5"/>
+        <line class="st0" x1="7.5" y1="4.5" x2="7.5" y2="11.5"/>
+        <line class="st0" x1="5.5" y1="11.5" x2="9.5" y2="11.5"/>
+    </g>
+</g>
+</svg>

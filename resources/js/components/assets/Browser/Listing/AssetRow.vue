@@ -13,17 +13,13 @@
             </div>
         </td>
 
-        <td class="title-col">
-            <span v-if="asset.title !== asset.filename" :title="asset.basename">{{ asset.title }}</span>
-            <span v-else>{{ asset.basename }}</span>
-        </td>
-
+        <td class="title-col">{{ asset.title || asset.basename }}</td>
         <td class="size-col extra-col">{{ asset.size_formatted }}</td>
         <td class="modifed-col extra-col">{{ asset.last_modified_formatted }}</td>
 
         <td class="column-actions">
 
-            <div class="btn-group action-more" :class="{ open: showActionsDropdown }" v-if="canEdit">
+            <div class="btn-group action-more" :class="{ open: showActionsDropdown }" v-if="canEdit" v-on-clickaway="away">
                 <button type="button" class="btn-more dropdown-toggle" @click.prevent.stop="toggleActions">
                     <i class="icon icon-dots-three-vertical"></i>
                 </button>

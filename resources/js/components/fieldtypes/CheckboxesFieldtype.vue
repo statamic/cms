@@ -13,7 +13,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -23,7 +23,7 @@ module.exports = {
         };
     },
 
-    ready: function() {
+    mounted() {
         if (typeof this.config === 'string') {
             this.config = JSON.parse(this.config);
         }

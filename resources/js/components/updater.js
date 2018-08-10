@@ -55,7 +55,7 @@ module.exports = {
     watch: {
         updated(updated) {
             if (updated) {
-                this.$els.audio.play();
+                this.$refs.audio.play();
             }
         }
     },

@@ -1,4 +1,8 @@
+import { mixin as clickaway } from 'vue-clickaway';
+
 export default {
+    mixins: [ clickaway ],
+
     data () {
         return {
             showActionsDropdown: false
@@ -21,5 +25,9 @@ export default {
 
             this.showActionsDropdown = !this.showActionsDropdown;
         },
+
+        away() {
+            this.showActionsDropdown = false;
+        }
     },
 }

@@ -8,9 +8,11 @@
         :can-delete="{{ bool_str(\Statamic\API\User::getCurrent()->can('taxonomies:'.$group.':delete')) }}">
 
         <div class="listing term-listing">
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ $group_title }}</h1>
-                <div class="controls">
+                <div class="controls flex items-center">
+                    <dossier-sort-selector v-if="columns.length > 0" class="mr-1"></dossier-sort-selector>
+
                     @can("taxonomies:{$group}:create")
                         <a href="{{ route('term.create', $group) }}" class="btn btn-primary">
                             {{ trans('cp.create_taxonomy_term_button', ['term' => str_singular($group_title)]) }}
@@ -19,7 +21,7 @@
                 </div>
             </div>
 
-            <div class="card flush">
+            <div class="card flush dossier-for-mobile">
                 <template v-if="noItems">
                     <div class="no-results">
                         <span class="icon icon-documents"></span>

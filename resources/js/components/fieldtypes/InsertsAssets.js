@@ -26,7 +26,7 @@ export default {
         }
     },
 
-    ready() {
+    mounted() {
         this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
     },
 

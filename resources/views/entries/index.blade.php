@@ -1,5 +1,4 @@
 @extends('statamic::layout')
-@section('content-class', 'publishing')
 
 @section('content')
 
@@ -18,32 +17,34 @@
 
         <div class="listing entry-listing">
 
-            <div class="flexy mb-24">
-                <h1 class="fill">{{ $collection->title() }}</h1>
-                <div class="controls flexy">
+            <div class="flex flex-wrap justify-between lg_flex-no-wrap items-center mb-3">
+                <h1 class="flex-1 mb-8 lg_mb-0">{{ $collection->title() }}</h1>
+                <div class="controls flex items-center w-full lg:w-auto">
                     @can("collections:{$collection->path()}:create")
                         <template v-if="! reordering">
-                            <search :keyword.sync="searchTerm"></search>
+                            <search :keyword.sync="searchTerm" class="w-full lg_w-auto"></search>
 
-                            <div class="btn-group ml-8">
+                            <dossier-sort-selector v-if="columns.length > 0" class="ml-1"></dossier-sort-selector>
+
+                            <div class="btn-group ml-1">
                                 <select-fieldtype :data.sync="showDrafts" :options="draftOptions"></select-fieldtype>
                             </div>
 
-                            <div class="btn-group ml-8" v-if="locales.length > 1">
+                            <div class="btn-group ml-1" v-if="locales.length > 1">
                                 <select-fieldtype :data.sync="locale" :options="locales"></select-fieldtype>
                             </div>
 
-                            <button type="button" @click="enableReorder" class="btn ml-8" v-if="reorderable">
+                            <button type="button" @click="enableReorder" class="btn ml-1" v-if="reorderable">
                                 {{ t('reorder') }}
                             </button>
 
-                            <a href="{{ route('entry.create', $collection->path()) }}" class="btn btn-primary ml-8">{{ t('create_entry_button') }}</a>
+                            <a href="{{ route('entry.create', $collection->path()) }}" class="btn btn-primary ml-1">{{ t('create_entry_button') }}</a>
                         </template>
                         <template v-else>
-                            <button type="button" @click="cancelOrder" class="btn ml-8">
+                            <button type="button" @click="cancelOrder" class="btn ml-1">
                                 {{ t('cancel') }}
                             </button>
-                            <button type="button" @click="saveOrder" class="btn btn-primary ml-8">
+                            <button type="button" @click="saveOrder" class="btn btn-primary ml-1">
                                 {{ t('save_order') }}
                             </button>
                         </template>
@@ -51,7 +52,7 @@
                 </div>
             </div>
 
-            <div class="card flush">
+            <div class="card flush dossier-for-mobile">
                 <template v-if="noItems">
                     <div class="info-block">
                         <template v-if="isSearching">

@@ -1,11 +1,11 @@
 <template>
     <div class="bard-fieldtype-wrapper replicator" :class="{'bard-fullscreen': fullScreenMode, 'no-sets': !hasSets }">
 
-        <div class="bard-blocks" v-if="isReady" v-el:blocks>
+        <div class="bard-blocks" v-if="isReady" ref="blocks">
             <component
                 :is="block.type === 'text' ? 'BardText' : 'BardSet'"
                 v-for="(index, block) in data"
-                v-ref:set
+                v-ref=set
                 :class="{ 'divider-at-start': canShowDividerAtStart(index), 'divider-at-end': canShowDividerAtEnd(index) }"
                 :key="index"
                 :data="block"
@@ -16,8 +16,6 @@
                 @set-inserted="setInserted"
                 @deleted="deleteSet"
                 @source-toggled="toggleSource"
-                @deleted-at-end="deleteNextSet"
-                @backspaced-at-start="deletePreviousSet"
                 @arrow-up-at-start="goToPreviousTextField"
                 @arrow-down-at-end="goToNextTextField"
                 @text-updated="updateText"
@@ -85,7 +83,7 @@ export default {
         };
     },
 
-    ready() {
+    mounted() {
         if (! this.data) {
             this.data = [{type: 'text', text: '<p><br></p>'}];
         }
@@ -210,9 +208,9 @@ export default {
         },
 
         draggable() {
-            const draggable = new Draggable(this.$els.blocks, {
+            const draggable = new Draggable(this.$refs.blocks, {
                 draggable: '.bard-block',
-                handle: '.drag-handle',
+                handle: '.bard-drag-handle',
                 mirror: {
                     xAxis: false,
                     constrainDimensions: true
@@ -229,6 +227,8 @@ export default {
             });
 
             draggable.on('drag:move', (e) => {
+                if (!e.originalEvent) return; // Sometimes this is undefined for whatever reason.
+
                 const target = e.originalEvent.target;
 
                 if (target.classList.contains('bard-drop-area-inner') || target.classList.contains('bard-divider')) {
@@ -372,18 +372,6 @@ export default {
             if (block) {
                 this.$nextTick(() => this.getBlock(index - 1).focusAt(focus));
             }
-        },
-
-        deleteNextSet(index) {
-            if (index === this.data.length-1) return;
-
-            this.getBlock(index + 1).delete();
-        },
-
-        deletePreviousSet(index) {
-            if (index === 0) return;
-
-            this.getBlock(index - 1).delete();
         },
 
         goToPreviousTextField(index) {

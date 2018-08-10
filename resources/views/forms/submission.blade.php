@@ -2,8 +2,8 @@
 
 @section('content')
 
-    <div class="flexy mb-24">
-        <a href="{{ route('form.show', $submission->form->name) }}" class="btn icon round mr-16">&larr;</a>
+    <div class="flexy mb-3">
+        <a href="{{ route('form.show', $submission->form->name) }}" class="btn icon round mr-2">&larr;</a>
         <h1>{{ translate_choice('cp.submissions', 1) }}</h1>
     </div>
 
@@ -18,7 +18,7 @@
                     <th>{{ array_get($field, 'display', $name) }}</th>
                     <td>
                         @if(! is_array($submission->get($name)))
-                            {!! $submission->get($name) !!}
+                            {!! strip_tags($submission->get($name), '<a>') !!}
                         @else
                             <table>
                                 @foreach($submission->get($name) as $key => $value)

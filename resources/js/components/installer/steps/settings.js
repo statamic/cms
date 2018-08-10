@@ -2,6 +2,8 @@ module.exports = {
 
     template: require('./settings.template.html'),
 
+    props: ['timezone'],
+
     data: function() {
         return {
             loading: false,
@@ -12,7 +14,8 @@ module.exports = {
                 full: 'en_US',
                 name: 'English',
                 url: document.location.origin+'/'
-            }]
+            }],
+            timezones: this.getTimezones()
         }
     },
 
@@ -20,7 +23,8 @@ module.exports = {
         formData: function() {
             return {
                 debug: this.debug,
-                locales: this.locales
+                locales: this.locales,
+                timezone: this.timezone[0]
             };
         }
     },
@@ -39,6 +43,16 @@ module.exports = {
                     }.bind(this), 1000);
                 }
             });
+        },
+
+        getTimezones() {
+            let timezones = [];
+
+            _.each(require('./timezones'), (tz) => {
+                timezones.push({ text: tz, value: tz });
+            });
+
+            return timezones;
         }
     }
 

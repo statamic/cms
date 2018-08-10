@@ -1,34 +1,17 @@
+.publishing .page-wrapper {
+    padding: 0;
+
+    .publish-errors {
+        margin: 0 24px 24px;
+        padding: 16px 0;
+    }
+}
+
 .publish-form {
     position: relative;
 
     .loading-blocker {
         padding-top: 50px;
-        border-radius: 3px;
-    }
-
-    &.stuck {
-        // account for the shift when the header becomes sticky and removed from flow.
-        padding-top: 57px;
-    }
-}
-
-.publish-form {
-    h1 .icon {
-        font-size: 21px;
-        color: #bbb;
-        margin-right: 5px;
-        position: relative;
-        top: 3px;
-    }
-
-    .locale {
-        float: left;
-        font-size: 12px;
-        background: #fff;
-        border: 1px solid #ccc;
-        padding: 1px 5px;
-        margin: 9px 5px 0;
-        display: inline-block;
         border-radius: 3px;
     }
 }
@@ -48,10 +31,6 @@
 
 }
 
-#publish-fields .title-field {
-    display: none;
-}
-
 code.parent-url {
     padding: 0 0 3px 0;
     display: block;
@@ -60,37 +39,12 @@ code.parent-url {
     color: $color_gray_light;
 }
 
-#publish-meta {
-
-    input { width: 100%; }
-
-    .meta-fields {
-        align-items: flex-start;
-        justify-content: flex-start;
-    }
-
-    .form-group {
-        padding: 8px;
-    }
-}
-
 .publish-fields {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    align-items: stretch;
-    padding-bottom: 32px;
 
     .form-group {
-        flex-basis: 100%;
-        padding: 8px;
-
-        &.width-100 { flex-basis: 100%; }
-        &.width-75 { flex-basis: 75%; }
-        &.width-66 { flex-basis: 66.6%; }
-        &.width-50 { flex-basis: 50%; }
-        &.width-33 { flex-basis: 33.3%; }
-        &.width-25 { flex-basis: 25%; }
+        width: 100%;
 
         > label,
         .field-inner > label {
@@ -107,205 +61,50 @@ code.parent-url {
         color: $color_red;
     }
 
-    // Being dragged
-    .ui-sortable-helper {
-        .field-inner {
-            box-shadow: 0 10px 10px -5px rgba(black, 0.08);
-            background: white;
-            opacity: 1;
-        }
-    }
-
-    // Drop position
-    .ui-sortable-placeholder {
-        visibility: visible !important;
-        position: relative;
-
-        .field-inner {
-            background: rgba(black, .02);
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
-        }
-    }
-}
-
-.editing-layout {
-
-    .publish-meta {
-        opacity: .2;
-    }
-
-    .publish-fields > .form-group {
-        margin-bottom: 0;
-        transition: width 0.2s ease;
-    }
-
     .field-inner {
         position: relative;
-        padding: 15px;
     }
 
-}
-
-.field-mask {
-    position: absolute;
-    z-index: 99;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    background: rgba(white, 0);
-    box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.1), 0 1px 2px rgba(63, 63, 68, 0.1);
-    cursor: move;
-    background: rgba(white, .75);
-    border-color: $border;
-    border-radius: 3px;
-
-    &:hover {
-        background: rgba($brand-primary, .75);
-        border-color: $brand-primary;
-        .select { display: block; }
-    }
-
-    .field-actions {
-        position: absolute;
-        top: 12px;
-        right: 15px;
-        color: $color_gray_light;
-    }
-
-    i {
-        margin-left: 3px;
-    }
-
-    .gear { cursor: pointer; }
-
-    .select {
+    .read-only-overlay {
         position: absolute;
         top: 0;
-        right: 24px;
-        width: 60px;
-        height: 32px;
-        font-size: 11px;
-        padding: 3px 5px 0 7px;
-
-        &:after {
-            width: 11px;
-            background-position: 0 center;
-        }
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 100;
+        cursor: not-allowed;
+        background: rgba(white, 0.3);
     }
 }
 
-@media (max-width: $screen-xs-max) {
-
-    #publish-meta {
-        .form-group, .form-group.inline {
-            flex-basis: 100%;
-            flex-wrap: wrap;
-
-            .form-group { flex-basis: 100%; }
-            &:last-child { margin-bottom: 0; }
-        }
-    }
+.publish-sidebar {
+    flex-basis: 40%;
 }
 
-@mixin makepublishsidebar {
-    #publish-form {
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        &.no-meta {
-            display: block;
-        }
-    }
-
-    #publish-fields .title-field { display: block; }
-    #publish-meta .title-field { display: none; }
-
-    #publish-controls,
-    #publish-controls-sticky-wrapper { flex-basis: 100%; }
-
-    #publish-fields { width: 100%; }
-
-    #publish-fields {
-        flex-basis: 70%;
-        width: auto;
-    }
-
-    #publish-meta {
-        order: 3;
-        flex-basis: 30%;
-        padding-left: 30px;
-
-        .form-group, .form-group.inline {
-            flex-basis: 100%;
-            flex-wrap: wrap;
-
-            .form-group { flex-basis: 100%; }
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    .publish-errors {
-        flex-basis: 100%;
-    }
+.sneak-peek-editing .publish-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
-
-@media (min-width: 1400px) {
-    body:not(.sneak-peeking) {
-        @include makepublishsidebar;
-    }
-}
-
-.content-type-user {
-    @include makepublishsidebar;
-}
-
-
 
 
 /* Sticky Header
   ========================================================================== */
 
-  .stacked.stuck {
-      border-radius: 2px;
-      border: none;
+  .sticky {
+      background: linear-gradient($bg 95%, rgba($bg, 0));
+      position: sticky;
+      top: 0;
+      padding: 12px 24px 16px;
+      margin: -16px 0 8px !important;
+      z-index: 102;
   }
-
-  .stuck .sticky {
-      @extend .card;
-      margin-left: 224px;
-      margin-right: 24px;
-      border-bottom: 0;
-
-      #publish-title,
-      .controls { margin-bottom: 0 !important; }
-  }
-
-
 
 
   /* Responsive
     ========================================================================== */
 
 @media (max-width: 980px) {
-
-  #publish-controls {
-      h1 { display: none; }
-  }
-
-  .stuck .sticky {
-      margin-left: 164px;
-      border-radius: 0;
-      text-align: center;
-  }
 
   .publish-fields .form-group {
       flex-basis: 100%;

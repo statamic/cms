@@ -1,47 +1,59 @@
 <template>
 
-    <div class="form-group" :class="{ 'locale-status-field major': multipleLocales }">
+    <div class="mr-2">
 
         <template v-if="singleLocale && allowStatuses">
-            <label class="block">{{ translate('cp.published') }}</label>
-            <toggle-fieldtype :data.sync="status"></toggle-fieldtype>
+            <button class="btn btn-default status-field" @click.prevent="status = !status">
+                <span class="mr-8 icon-status {{ status ? 'icon-status-live' : 'icon-status-hidden' }}"></span>
+                {{ status ? translate('cp.published') : translate('cp.draft') }}
+            </button>
         </template>
 
-        <template v-if="multipleLocales">
-            <label class="block">{{ translate_choice('cp.locales', 2) }}</label>
-            <div class="locale-item" v-for="locale in locales">
-                <template v-if="locale.is_active">
-                    <span v-if="!allowStatuses" class="icon-status icon-status-live"></span>
-                    {{ locale.label }}
-                    <span v-if="locale.is_active" class="check">✔</span>
-                    <toggle-fieldtype v-if="allowStatuses" :data.sync="status"></toggle-fieldtype>
-                </template>
-                <template v-else>
-                    <span class="icon-status {{ statusClass(locale) }}"></span>
-                    <a :href="locale.url">{{ locale.label }}</a>
-                </template>
+        <div class="locale-status-field" :class="{ open: isShowingLocales }" v-if="multipleLocales">
+            <button class="btn btn-default dropdown-toggle" @click.prevent="isShowingLocales = !isShowingLocales">
+                <span class="mr-8 icon-status {{ status ? 'icon-status-live' : 'icon-status-hidden' }}"></span>
+                {{ currentLocaleLabel }}
+            </button>
+            <div class="dropdown-menu">
+                <div class="locale-item" v-for="locale in locales">
+                    <template v-if="locale.is_active">
+                        <span v-if="!allowStatuses" class="icon-status icon-status-live"></span>
+                        {{ locale.label }}
+                        <toggle-fieldtype v-if="allowStatuses" :data.sync="status"></toggle-fieldtype>
+                    </template>
+                    <template v-else>
+                        <span class="icon-status {{ statusClass(locale) }}"></span>
+                        <a :href="locale.url">{{ locale.label }}</a>
+                    </template>
+                </div>
             </div>
-        </template>
+        </div>
 
     </div>
 
 </template>
 
-
 <style lang="scss">
+
     .locale-status-field {
+        position: relative;
+
+        .dropdown-menu {
+            padding: 15px;
+        }
+
         .locale-item {
             font-size: 14px;
             padding: 5px 15px 5px 0;
             border-top: 1px solid #eee;
 
+            &:first-child {
+                border-top: 0;
+            }
+
             .icon-status {
                 float: right;
                 margin-top: 7px;
-            }
-            .check {
-                margin-left: 5px;
-                color: #aaa;
             }
         }
         .toggle-fieldtype-wrapper {
@@ -67,6 +79,18 @@
             width: 34px;
         }
     }
+
+    .status-field .icon-status {
+        position: relative;
+        top: -1px;
+    }
+
+    @media (max-width: 768px) {
+        .locale-status-field .dropdown-menu {
+            left: 0;
+            right: auto;
+        }
+    }
 </style>
 
 
@@ -76,6 +100,12 @@ export default {
 
     props: ['locale', 'locales', 'status', 'allowStatuses'],
 
+    data() {
+        return {
+            isShowingLocales: false,
+        }
+    },
+
     computed: {
 
         singleLocale() {
@@ -84,6 +114,10 @@ export default {
 
         multipleLocales() {
             return ! this.singleLocale;
+        },
+
+        currentLocaleLabel() {
+            return _.find(this.locales, { name: this.locale }).label;
         }
 
     },

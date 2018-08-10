@@ -1,17 +1,21 @@
+@tailwind preflight;
+
+@tailwind components;
+
 // Base
+@import "core/normalize";
 @import "core/fonts";
 @import "core/mixins";
 @import "core/variables";
 @import "core/animation";
 
 // Vendors
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
-@import "sweetalert";
+// @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "node_modules/sweetalert/dist/sweetalert";
 @import "vendors/codemirror";
 @import "vendors/date-picker";
 @import "vendors/redactor";
 @import "vendors/selectize";
-@import "vendors/trix";
 @import "vendors/luminous";
 @import "vendors/tippy";
 @import "vendors/medium-editor";
@@ -25,6 +29,7 @@
 @import "elements/buttons";
 @import "elements/badges";
 @import "elements/columns";
+@import "elements/dropdowns";
 @import "elements/forms";
 @import "elements/graphics";
 @import "elements/icons";
@@ -53,6 +58,7 @@
 @import "components/preview";
 @import "components/lists";
 @import "components/tabs";
+@import "components/filters";
 @import "components/updates";
 @import "components/roles";
 @import "components/focal-point";
@@ -69,7 +75,6 @@
 @import "components/fieldtypes/markdown";
 @import "components/fieldtypes/grid-replicator";
 @import "components/fieldtypes/redactor";
-@import "components/fieldtypes/trix";
 @import "components/fieldtypes/yaml";
 @import "components/fieldtypes/relate";
 @import "components/fieldtypes/environment";
@@ -78,3 +83,5 @@
 @import "components/fieldtypes/tags";
 @import "components/fieldtypes/revealer";
 @import "components/fieldtypes/bard";
+
+@tailwind utilities;

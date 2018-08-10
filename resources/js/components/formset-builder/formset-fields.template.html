@@ -8,7 +8,7 @@
                 <th class="row-controls"></th>
             </tr>
         </thead>
-        <tbody class="sortable" v-el:tbody>
+        <tbody class="sortable" ref="tbody">
             <tr v-for="field in fields">
                 <td class="col-handle"><input type="text" class="code" v-model="field.name" /></td>
                 <td class="col-display"><input type="text" v-model="field.display" /></td>

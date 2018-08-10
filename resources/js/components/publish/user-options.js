@@ -7,11 +7,11 @@ module.exports = {
     methods: {
 
         sendResetEmail: function() {
-            var error = 'Email not sent. Please check your logs.';
+            var error = translate('cp.password_reset_email_not_sent');
 
             this.$http.get(cp_url('users/'+this.username+'/send-reset-email')).success(function (data) {
                 if (data.success) {
-                    this.$dispatch('setFlashSuccess', 'Email sent.')
+                    this.$dispatch('setFlashSuccess', translate('cp.email_sent'))
                 } else {
                     this.$dispatch('setFlashError', error)
                 }
@@ -21,7 +21,7 @@ module.exports = {
         },
 
         copyResetLink: function() {
-            var error = 'There was a problem generating the link. Please check your logs.';
+            var error = translate('cp.copy_password_reset_link_failed');
 
             this.$http.get(cp_url('users/'+this.username+'/reset-url')).success(function (data) {
                 if (data.success) {

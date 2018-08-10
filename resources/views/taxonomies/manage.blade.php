@@ -5,7 +5,7 @@
     <configure-taxonomies-listing inline-template v-cloak>
         <div>
 
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ t('manage_taxonomies') }}</h1>
                 @can('super')
                     <a href="{{ route('taxonomy.create') }}" class="btn btn-primary">{{ translate('cp.create_taxonomy_button') }}</a>

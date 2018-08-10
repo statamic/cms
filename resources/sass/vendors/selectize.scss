@@ -109,10 +109,16 @@
 }
 .selectize-control.plugin-remove_button .remove-single {
   position: absolute;
-  right: 28px;
-  top: 6px;
-  font-size: 23px;
+  right: 8px;
+  top: 0px;
+  font-size: 16px;
+  opacity: .5;
+  &:hover {
+      opacity: 1;
+      color: #4e5e73;
+  }
 }
+
 .selectize-control {
   position: relative;
 }
@@ -195,7 +201,7 @@
 .selectize-input > input {
   display: inline-block !important;
   padding: 0 !important;
-  min-height: 0 !important;
+  min-height: 26px !important;
   max-height: none !important;
   max-width: 100% !important;
   margin: 0 2px 0 0 !important;
@@ -237,6 +243,7 @@
   box-sizing: content-box;
   box-shadow: 0 0 0 0.5px rgba(49,49,93,.03), 0 2px 5px 0 rgba(49,49,93,.1), 0 1px 2px 0 rgba(0,0,0,.08);
   border-radius: 0 0 3px 3px;
+  min-width: 240px;
 }
 .selectize-dropdown [data-selectable] {
   cursor: pointer;
@@ -259,6 +266,7 @@
   color: #303030;
   background: #ffffff;
   cursor: default;
+  font-weight: bold;
 }
 .selectize-dropdown .active {
   background-color: #f5fafd;
@@ -326,12 +334,29 @@
 
 .grid-fieldtype .grid-table .selectize-input {
     background: #fff;
-    box-shadow: none;
-    padding: 10px;
+    box-shadow: none !important;
+    padding: 6px 10px 0;
     border-radius: 0;
-    height: auto;
+
+    &.dropdown-active::before {
+        display: none;
+    }
 }
 
+.grid-fieldtype .grid-table .selectize-control.single .selectize-input {
+    overflow: hidden;
+    height: 40px !important;
+    line-height: 40px !important;
+
+    &:after {
+        top: 16px;
+    }
+
+    > .item {
+        height: 40px;
+        line-height: 40px;
+    }
+}
 
 
 

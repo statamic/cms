@@ -1,4 +1,6 @@
-module.exports = {
+import autosize from 'autosize';
+
+export default {
     bind: function() {
         setTimeout(function() {
             autosize(this.el);

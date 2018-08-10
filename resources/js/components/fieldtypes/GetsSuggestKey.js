@@ -9,7 +9,7 @@ export default {
          */
         suggestKey() {
             let config = _.omit(this.config, [
-                'display', 'instructions', 'max_items', 'localizable', 'required', 'name'
+                'display', 'instructions', 'max_items', 'localizable', 'required', 'name', 'placeholder'
             ]);
 
             return JSON.stringify(config);

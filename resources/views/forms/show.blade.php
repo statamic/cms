@@ -7,17 +7,17 @@
 
         <div class="form-submission-listing">
 
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ $form->title() }}</h1>
 
                 @can('super')
-                <a href="{{ route('form.edit', ['form' => $form->name()]) }}" class="btn mr-8">{{ t('configure') }}</a>
+                <a href="{{ route('form.edit', ['form' => $form->name()]) }}" class="btn mr-1">{{ t('configure') }}</a>
                 @endcan
 
                 <div class="btn-group">
                     <a href="{{ route('form.export', ['type' => 'csv', 'form' => $form->name()]) }}?download=true"
-                       type="button" class="btn btn-default">{{ t('export') }}</a>
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                       class="btn">{{ t('export') }}</a>
+                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="caret"></span>
                         <span class="sr-only">{{ translate('cp.toggle_dropdown') }}</span>
                     </button>
@@ -29,17 +29,15 @@
             </div>
 
             @if (! empty($form->metrics()))
-            <div class="card">
-                    <div class="metrics">
-                        @foreach($form->metrics() as $metric)
-                            <div class="metric simple">
-                                <div class="count">
-                                    <small>{{ $metric->label() }}</small>
-                                    <h2>{{ $metric->result() }}</h2>
-                                </div>
-                            </div>
-                        @endforeach
+            <div class="metrics mb-3">
+                @foreach($form->metrics() as $metric)
+                    <div class="card metric m-0 simple">
+                        <div class="count">
+                            <small>{{ $metric->label() }}</small>
+                            <h2>{{ $metric->result() }}</h2>
+                        </div>
                     </div>
+                @endforeach
             </div>
             @endif
 
@@ -51,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="card flush" v-else>
+            <div class="card flush dossier-for-mobile" v-else>
                 <div class="loading" v-if="loading">
                     <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
                 </div>

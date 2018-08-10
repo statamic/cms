@@ -1,0 +1,42 @@
+.filter {
+    background: $bg;
+    padding: 10px 8px 14px;
+    margin-bottom: 24px;
+    text-align: center;
+    border-radius: 9999px;
+
+    a {
+        color: $color_gray_upload;
+        font-size: 13px;
+        margin: 0 4px;
+        padding: 8px;
+        position: relative;
+    }
+
+    a.active, a:hover {
+        color: $color_gray_dark;
+    }
+
+    a.active:after {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: $color_red;
+        opacity: .9;
+        position: absolute;
+        left: 50%;
+        margin-left: -1px;
+        bottom: 1px;
+    }
+
+    a.no-dot:after {
+        display: none;
+    }
+
+    a .icon {
+        position: relative;
+        top: 2px;
+    }
+}

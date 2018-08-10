@@ -24,7 +24,7 @@
                             <th class="row-controls"></th>
                         </tr>
                     </thead>
-                    <tbody v-el:tbody>
+                    <tbody ref="tbody">
                         <tr v-for="(rowIndex, row) in data">
                             <td>
                                 <input type="text" class="form-control" v-model="row.value" />
@@ -51,11 +51,11 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
-    ready: function() {
+    mounted() {
         this.data = this.data || [];
 
         if (this.componentType === 'keyed') {
@@ -102,7 +102,7 @@ module.exports = {
             var self = this;
             var start = '';
 
-            $(this.$els.tbody).sortable({
+            $(this.$refs.tbody).sortable({
                 axis: "y",
                 revert: 175,
                 handle: '.drag-handle',

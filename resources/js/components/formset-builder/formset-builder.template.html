@@ -1,69 +1,76 @@
 <div>
-    <div class="card sticky flat-bottom">
-        <div class="head">
-            <h1 class="pull-left" v-if="create">
-                {{ translate('cp.create_formset') }}
-            </h1>
+    <div class="sticky flexy mb-3 full-width">
+        <h1 class="fill" v-if="create">
+            {{ translate('cp.create_formset') }}
+        </h1>
 
-            <h1 class="pull-left" v-if="!create">
-                {{ translate('cp.editing_formset') }}:
-                <strong>{{ formsetTitle }}</strong>
-            </h1>
+        <h1 class="fill" v-if="!create">
+            {{ translate('cp.editing_formset') }}:
+            <strong>{{ formsetTitle }}</strong>
+        </h1>
 
-            <button type="button" class="btn btn-primary pull-right" v-on:click="save()">{{ translate('cp.save') }}</button>
+        <button type="button" class="btn btn-primary" v-on:click="save()">{{ translate('cp.save') }}</button>
+    </div>
+
+    <div class="px-3">
+        <div class="card p-3">
+            <div v-if="loading && !errorMessage" class="loading">
+                <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            </div>
+
+            <div v-if="errorMessage" class="alert alert-danger">
+                <p>{{ errorMessage }}</p>
+            </div>
+
+            <div class="fieldset-builder" v-if="! loading">
+
+                <div class="form-group">
+                    <label class="block">{{ translate('cp.title') }}</label>
+                    <small class="help-block">{{ translate('cp.formset_title_instructions') }}</small>
+                    <input type="text" class="form-control" v-model="formset.title" autofocus="autofocus" />
+                </div>
+
+                <div class="form-group" v-if="create">
+                    <label class="block">{{ translate('cp.slug') }}</label>
+                    <small class="help-block">{{ translate('cp.formset_slug_instructions') }}</small>
+                    <input type="text" class="form-control" v-model="slug" />
+                </div>
+
+                <div class="form-group">
+                    <label class="block">{{ translate_choice('cp.metrics', 2) }}</label>
+                    <small class="help-block">{{ translate('cp.formset_metrics_instructions') }}</small>
+                    <grid-fieldtype :data.sync="formset.metrics" :config="metricsGridConfig"></grid-fieldtype>
+                </div>
+
+                <div class="form-group">
+                    <label class="block">{{ translate_choice('cp.emails', 2) }}</label>
+                    <small class="help-block">{{ translate('cp.formset_emails_instructions') }}</small>
+                    <grid-fieldtype :data.sync="formset.email" :config="emailGridConfig"></grid-fieldtype>
+                </div>
+
+                <div class="form-group">
+                    <label class="block">{{ translate('cp.formset_honeypot_field') }}</label>
+                    <small class="help-block">{{ translate('cp.formset_honeypot_instructions') }} <a href="https://docs.statamic.com/forms#honeypot">{{ translate('cp.formset_honeypot_link') }}</a></small>
+                    <input type="text" class="form-control" v-model="formset.honeypot" />
+                </div>
+
+                <div class="form-group">
+                    <label class="block">{{ translate('cp.formset_store_field') }}</label>
+                    <small class="help-block">{{ translate('cp.formset_store_instructions') }}</small>
+                    <toggle-fieldtype :data.sync="formset.store"></toggle-fieldtype>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card p-3" v-if="!loading">
+            <div class="head clearfix">
+                <h2 class="m-0">{{ translate_choice('cp.fields', 2) }}</h2>
+                <small class="help-block">{{ translate('cp.formset_fields_instructions') }}</small>
+            </div>
+
+            <formset-fields-builder :fields="formset.fields"></formset-fields-builder>
         </div>
     </div>
 
-    <div class="card flat-top">
-        <div v-if="loading && !errorMessage" class="loading">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
-        </div>
-
-        <div v-if="errorMessage" class="alert alert-danger">
-            <p>{{ errorMessage }}</p>
-        </div>
-
-        <div class="fieldset-builder" v-if="! loading">
-
-            <div class="form-group">
-                <label class="block">{{ translate('cp.title') }}</label>
-                <small class="help-block">{{ translate('cp.formset_title_instructions') }}</small>
-                <input type="text" class="form-control" v-model="formset.title" autofocus="autofocus" />
-            </div>
-
-            <div class="form-group" v-if="create">
-                <label class="block">{{ translate('cp.slug') }}</label>
-                <small class="help-block">{{ translate('cp.formset_slug_instructions') }}</small>
-                <input type="text" class="form-control" v-model="slug" />
-            </div>
-
-            <div class="form-group">
-                <label class="block">{{ translate_choice('cp.metrics', 2) }}</label>
-                <small class="help-block">{{ translate('cp.formset_metrics_instructions') }}</small>
-                <grid-fieldtype :data.sync="formset.metrics" :config="metricsGridConfig"></grid-fieldtype>
-            </div>
-
-            <div class="form-group">
-                <label class="block">{{ translate_choice('cp.emails', 2) }}</label>
-                <small class="help-block">{{ translate('cp.formset_emails_instructions') }}</small>
-                <grid-fieldtype :data.sync="formset.email" :config="emailGridConfig"></grid-fieldtype>
-            </div>
-
-            <div class="form-group">
-                <label class="block">{{ translate('cp.formset_honeypot_field') }}</label>
-                <small class="help-block">{{ translate('cp.formset_honeypot_instructions') }} <a href="https://docs.statamic.com/forms#honeypot">{{ translate('cp.formset_honeypot_link') }}</a></small>
-                <input type="text" class="form-control" v-model="formset.honeypot" />
-            </div>
-
-        </div>
-    </div>
-
-    <div class="card" v-if="!loading">
-        <div class="head clearfix">
-            <h2>{{ translate_choice('cp.fields', 2) }}</h2>
-            <small class="help-block">{{ translate('cp.formset_fields_instructions') }}</small>
-        </div>
-
-        <formset-fields-builder :fields="formset.fields"></formset-fields-builder>
-    </div>
 </div>

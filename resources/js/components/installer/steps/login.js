@@ -10,7 +10,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.$http.post(this.$parent.url('login'), {
             id: this.userId
         }).success(function(response) {

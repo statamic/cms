@@ -9,7 +9,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -33,7 +33,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.$http.get(cp_url('assets/containers/get'), function(data) {
             var options = (this.allowBlank) ? [{ value: null, text: '', }] : [];
 

@@ -15,7 +15,7 @@
                               :name="name"
                               :config="config"
                               :suggestions-prop="groups"
-                              v-ref:relate>
+                              v-ref=relate>
             </relate-fieldtype>
         </div>
     </div>
@@ -69,7 +69,7 @@ export default {
 
     },
 
-    ready: function() {
+    mounted() {
         this.getGroups();
     }
 };

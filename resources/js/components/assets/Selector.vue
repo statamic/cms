@@ -13,7 +13,7 @@
                 @asset-doubleclicked="select">
 
                 <template slot="contextual-actions" v-if="browserSelections.length">
-                    <button class="btn action mb-24" @click="browserSelections = []">{{ translate('cp.uncheck_all') }}</button>
+                    <button class="btn action mb-3" @click="browserSelections = []">{{ translate('cp.uncheck_all') }}</button>
                 </template>
 
             </asset-browser>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
     props: {
         container: String,
         folder: String,
@@ -83,6 +83,7 @@ module.exports = {
          */
         close() {
             this.$emit('closed');
+            this.$dispatch('modal.close');
         },
 
         /**
@@ -92,6 +93,10 @@ module.exports = {
             this.browserSelections = selections;
         }
 
+    },
+
+    mounted() {
+        this.$dispatch('modal.open');
     }
 
 };

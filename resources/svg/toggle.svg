@@ -1,0 +1,17 @@
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+     x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+        .st0{fill-rule:evenodd;clip-rule:evenodd;fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<defs>
+</defs>
+<g>
+    <path class="st0" d="M12.2,7H3.8C2,7,0.5,5.5,0.5,3.8l0,0C0.5,2,2,0.5,3.8,0.5h8.5c1.8,0,3.2,1.5,3.2,3.2l0,0C15.5,5.5,14,7,12.2,7
+        z"/>
+    <path class="st0" d="M12.2,15.5H3.8c-1.8,0-3.2-1.5-3.2-3.2l0,0C0.5,10.5,2,9,3.8,9h8.5c1.8,0,3.2,1.5,3.2,3.2l0,0
+        C15.5,14,14,15.5,12.2,15.5z"/>
+    <circle class="st0" cx="3.8" cy="3.8" r="1.2"/>
+    <circle class="st0" cx="12.2" cy="12.2" r="1.2"/>
+</g>
+</svg>

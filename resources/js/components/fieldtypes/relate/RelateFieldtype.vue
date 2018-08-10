@@ -7,17 +7,18 @@
 
         <relate-tags
             v-if="!loading && (tags || single)"
-            v-ref:tags
+            v-ref=tags
             :data.sync="data"
             :suggestions="suggestions"
             :max-items="maxItems"
             :create="canCreate"
-            :name="name">
+            :name="name"
+            :disabled="disabled">
         </relate-tags>
 
         <relate-panes
             v-if="!loading && panes && !single"
-            v-ref:panes
+            v-ref=panes
             :data.sync="data"
             :suggestions="suggestions"
             :max-items="maxItems"
@@ -32,7 +33,7 @@ import RelatePanes from './RelatePanesFieldtype.vue'
 import RelateTags from './RelateTagsFieldtype.vue'
 import GetsSuggestKey from '../GetsSuggestKey';
 
-module.exports = {
+export default {
 
     mixins: [Fieldtype, GetsSuggestKey],
 
@@ -41,7 +42,10 @@ module.exports = {
         'relate-tags': RelateTags
     },
 
-    props: ['suggestionsProp'],
+    props: [
+        'suggestionsProp',
+        'disabled'
+    ],
 
     data: function() {
         return {
@@ -152,7 +156,7 @@ module.exports = {
 
     },
 
-    ready: function() {
+    mounted() {
         if (!this.data) {
             this.data = [];
         }

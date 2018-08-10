@@ -33,7 +33,7 @@
 
         <template slot="footer">
             <button type="button" class="btn" @click="close">{{ translate('cp.close') }}</button>
-            <button type="button" class="btn btn-primary btn-small" @click="save">{{ translate('cp.save') }}</button>
+            <button type="button" class="btn btn-primary" @click="save">{{ translate('cp.save') }}</button>
         </template>
     </modal>
 
@@ -146,7 +146,7 @@ export default {
 
     },
 
-    ready: function() {
+    mounted() {
         this.getFolder();
     }
 

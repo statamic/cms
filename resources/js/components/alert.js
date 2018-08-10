@@ -10,7 +10,7 @@ module.exports = {
         button: { type: Boolean, default: true }
     },
 
-    ready: function() {
+    mounted() {
         swal.setDefaults({ confirmButtonColor: '#748885' });
 
         // @UX: We might not even need/want the button when auto-timing out.

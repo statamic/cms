@@ -1,8 +1,4 @@
 <script>
-Mousetrap = require('mousetrap');
-
-// Mousetrap Bind Global
-(function(a){var c={},d=a.prototype.stopCallback;a.prototype.stopCallback=function(e,b,a,f){return this.paused?!0:c[a]||c[f]?!1:d.call(this,e,b,a)};a.prototype.bindGlobal=function(a,b,d){this.bind(a,b,d);if(a instanceof Array)for(b=0;b<a.length;b++)c[a[b]]=!0;else c[a]=!0};a.init()})(Mousetrap);
 
 import Branch from './Branch.vue';
 import Branches from './Branches.vue';
@@ -30,7 +26,6 @@ export default {
             showUrls: false,
             show: "urls",
             pages: [],
-            arePages: true
         }
     },
 
@@ -48,15 +43,20 @@ export default {
 
         hasChildren() {
             return _.some(this.pages, page => page.items.length);
+        },
+
+        isSortable() {
+            return Vue.can('pages:reorder');
         }
 
     },
 
-    ready: function() {
+    mounted() {
         this.getPages();
         this.bindLocaleWatcher();
         this.bindShowDraftsWatcher();
-        Mousetrap.bindGlobal('mod+s', (e) => {
+
+        this.$mousetrap.bind('mod+s', (e) => {
             e.preventDefault();
             this.save();
         });
@@ -69,38 +69,33 @@ export default {
             this.loading = true;
             var url = cp_url('/pages/get?locale='+this.locale+'&drafts='+(this.showDrafts ? 1 : 0));
 
-            this.$http.get(url, function(data) {
-                this.arePages = data.pages.length > 0;
-                this.pages = data.pages;
-                this.loading = false;
-
-                this.$nextTick(function() {
-                    this.initSortable();
-                });
+            this.axios.get(url)
+                .then(response => {
+                    this.pages = response.data.pages;
+                    this.loading = false;
+                    this.$nextTick(function() {
+                        this.initSortable();
+                    });
             });
         },
 
         initSortable: function() {
-            if (this.pages.length < 2 || ! Vue.can('pages:reorder')) {
+            if (! this.isSortable) {
                 return;
             }
-
-            $('.page-tree').addClass('tree-sortable');
 
             var self = this;
             var draggedIndex, draggedPage, draggedInstance;
 
-            var placeholder = '' +
-                    '<li class="branch branch-placeholder">' +
-                    '<div class="branch-row depth-{{ depth }}">' +
-                    '<div class="page-indent">' +
-                    '<span class="page-toggle"></span>' +
-                    '<span class="page-move drag-handle"></span>' +
-                    '<span class="indent-arrow"></span>' +
-                    '</div>' +
-                    '<div class="page-text">&nbsp;</div>' +
-                    '</div>' +
-                    '</li>';
+            var placeholder = `
+                    <li class="branch branch-placeholder">
+                        <div :class="'branch-row w-full flex items-center depth-' + depth">
+                            <div class="page-move drag-handle w-6 h-full"></div>
+                            <div class="flex p-1 items-center flex-1">
+                                <div class="page-text">&nbsp;</div>
+                            </div>
+                        </div>
+                    </li>`;
 
             $(this.$el).find('.page-tree > ul + ul').nestedSortable({
                 containerSelector: 'ul',
@@ -109,6 +104,13 @@ export default {
                 placeholder: placeholder,
                 bodyClass: 'page-tree-dragging',
                 draggedClass: 'branch-dragged',
+                onMousedown: function ($item, _super, event) {
+                    // Prevent dragging a lone top level page.
+                    var branch = $item[0].__vue__;
+                    var depth = parseInt($item[0].dataset.depth);
+                    if (branch.$parent.pages.length === 1 && depth === 1) return false;
+                    return true;
+                },
                 onDragStart: function($item, container, _super, event) {
                     // Grab the original page we're dragging now so we can move it later.
                     var branch = $item[0].__vue__;
@@ -125,6 +127,7 @@ export default {
                     _super($item, container);
                 },
                 onDrop: function($item, container, _super, event) {
+                    self.$refs.click.play();
                     self.changed = true;
 
                     // Remove the page from its original place
@@ -168,10 +171,12 @@ export default {
         },
 
         expandAll: function() {
+            this.$refs.card_set.play();
             this.toggleAll(false);
         },
 
         collapseAll: function() {
+            this.$refs.card_drop.play();
             this.toggleAll(true);
         },
 
@@ -199,39 +204,36 @@ export default {
         },
 
         save: function() {
-            var self = this;
+            this.saving = true;
 
-            self.saving = true;
+            let pages = JSON.parse(JSON.stringify(this.pages));
+            pages = this.updateOrderIndexes(pages);
 
-            var pages = JSON.parse(JSON.stringify(self.pages));
-            pages = self.updateOrderIndexes(pages);
-
-            this.$http.post(cp_url('/pages'), { pages: pages }).success(function(data) {
-                self.getPages();
-                self.changed = false;
-                self.saving = false;
-                self.$dispatch('setFlashSuccess', translate('cp.pages_reordered'))
+            this.axios.post(cp_url('/pages'), { pages: pages })
+            .then(response => {
+                this.getPages();
+                this.changed = false;
+                this.saving = false;
+                this.$eventHub.$emit('setFlashSuccess', translate('cp.pages_reordered'))
             });
         },
 
         updateOrderIndexes: function(pages) {
-            var self = this;
 
-            return _.map(pages, function(item, i) {
+            return _.map(pages, (item, i) => {
                 // Recursively iterate over any children
                 if (item.items.length) {
-                    item.items = self.updateOrderIndexes(item.items);
+                    item.items = this.updateOrderIndexes(item.items);
                 }
 
-                // We need the 1-based indexes
-                item.order = i + 1;
+                item.order = i++; // We need non-zero-based indexes
 
                 return item;
             });
         },
 
         createPage: function(parent) {
-            this.$broadcast('pages.create', parent);
+            this.$eventHub.$emit('pages.create', parent);
         },
 
         onShowDraftsChanged() {
@@ -246,21 +248,19 @@ export default {
 
     events: {
         'pages.create': function(parent) {
-            this.$broadcast('pages.create', parent);
+            this.$eventHub.$emit('pages.create', parent);
         },
         'pages.mount': function(id) {
-            this.$broadcast('pages.mount', id);
+            this.$eventHub.$emit('pages.mount', id);
         },
         'pages.unmount': function(id) {
             this.saving = true;
-            this.$broadcast('pages.unmount', id);
+            this.$eventHub.$emit('pages.unmount', id);
         },
         'page.deleted': function () {
             if (this.pages.length > 1) {
                 return;
             }
-
-            $('.page-tree').removeClass('tree-sortable');
 
             $(this.$el).find('.page-tree > ul + ul').nestedSortable('destroy');
         }
@@ -268,7 +268,7 @@ export default {
 
     watch: {
         changed(changed) {
-            this.$dispatch('changesMade', changed);
+            this.$eventHub.$emit('changesMade', changed);
         }
     }
 

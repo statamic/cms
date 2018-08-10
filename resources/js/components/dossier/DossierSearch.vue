@@ -10,7 +10,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
     props: ['keyword'],
     methods: {
         reset: function() {

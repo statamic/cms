@@ -5,9 +5,9 @@
     <configure-globals-listing inline-template v-cloak>
         <div>
 
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ t('manage_global_sets') }}</h1>
-                <a href="{{ route('globals.create') }}" class="btn btn-primary pull-right">{{ translate('cp.create_global_set_button') }}</a>
+                <a href="{{ route('globals.create') }}" class="btn btn-primary float-right">{{ translate('cp.create_global_set_button') }}</a>
             </div>
 
             <div class="card" v-if="noItems">

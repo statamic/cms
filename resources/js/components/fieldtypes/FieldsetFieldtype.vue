@@ -9,15 +9,15 @@
 
             <div class="input-group" v-show="creating">
                 <input type="text"
-                       v-el:create-field
+                       ref="create-field"
                        class="form-control"
                        v-model="newFieldsetName"
-                       @keyup.enter="create"
-                       @keyup.esc="cancelAdd"
+                       @keydown.enter.prevent="create"
+                       @keydown.esc="cancelAdd"
                 />
                 <div class="input-group-btn">
-                    <button class="btn btn-primary" @click="create" :disabled="storePending">{{ translate('cp.create') }}</button>
-                    <button class="btn btn-default" @click="cancelAdd">{{ translate('cp.cancel') }}</button>
+                    <button class="btn btn-primary" @click.prevent="create" :disabled="storePending">{{ translate('cp.create') }}</button>
+                    <button class="btn btn-default" @click.prevent="cancelAdd">{{ translate('cp.cancel') }}</button>
                 </div>
             </div>
 
@@ -25,10 +25,10 @@
                 <select-fieldtype :name="name" :data.sync="data" :config="selectConfig"></select-fieldtype>
 
                 <span class="input-group-btn">
-                    <button class="btn" @click="add" v-if="canAdd">
+                    <button class="btn" @click.prevent="add" v-if="canAdd">
                         <span class="icon icon-plus"></span>
                     </button>
-                    <button class="btn" @click="refresh">
+                    <button class="btn" @click.prevent="refresh">
                         <span class="icon icon-cycle"></span>
                     </button>
                 </span>
@@ -41,7 +41,7 @@
 
 <script>
 
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -73,7 +73,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.getFieldsets();
     },
 
@@ -81,7 +81,7 @@ module.exports = {
 
         add() {
             this.creating = true;
-            this.$nextTick(() => this.$els.createField.focus());
+            this.$nextTick(() => this.$refs.createField.focus());
         },
 
         cancelAdd() {
@@ -95,10 +95,10 @@ module.exports = {
             this.storePending = true;
 
             this.$http.post(cp_url('fieldsets/quick'), { name: this.newFieldsetName }).success((response) => {
-                this.refresh();
                 this.data = this.newFieldsetName;
                 this.storePending = false;
                 this.cancelAdd();
+                this.refresh();
             });
         },
 
@@ -108,7 +108,7 @@ module.exports = {
         },
 
         getFieldsets() {
-            var url = cp_url('fieldsets/get');
+            var url = cp_url('fieldsets-json');
             var params = {};
 
             if (this.url) {

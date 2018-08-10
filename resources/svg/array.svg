@@ -1,0 +1,18 @@
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+     x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+    .st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<defs>
+</defs>
+<g>
+    <path class="st0" d="M15,12.5H7c-0.3,0-0.5,0.2-0.5,0.5v2c0,0.3,0.2,0.5,0.5,0.5h8c0.3,0,0.5-0.2,0.5-0.5v-2
+        C15.5,12.7,15.3,12.5,15,12.5z"/>
+    <path class="st0" d="M15,7.5H7C6.7,7.5,6.5,7.7,6.5,8v2c0,0.3,0.2,0.5,0.5,0.5h8c0.3,0,0.5-0.2,0.5-0.5V8C15.5,7.7,15.3,7.5,15,7.5
+        z"/>
+    <path class="st0" d="M9,0.5H1C0.7,0.5,0.5,0.7,0.5,1v2c0,0.3,0.2,0.5,0.5,0.5h8c0.3,0,0.5-0.2,0.5-0.5V1C9.5,0.7,9.3,0.5,9,0.5z"/>
+    <path class="st0" d="M4.5,3.5v1c0,0.6,0.4,1,1,1h3c0.6,0,1,0.4,1,1v1"/>
+    <line class="st0" x1="11.5" y1="10.5" x2="11.5" y2="12.5"/>
+</g>
+</svg>

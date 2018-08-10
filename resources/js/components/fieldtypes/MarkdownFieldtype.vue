@@ -31,14 +31,14 @@
 
         <div class="mode-wrap mode-{{ mode }}">
             <div class="markdown-writer"
-                 v-el:writer
+                 ref="writer"
                  v-show="mode == 'write'"
                  @dragover="draggingFile = true"
                  @dragleave="draggingFile = false"
                  @drop="draggingFile = false"
                  @keydown="shortcut">
 
-                <div class="editor" v-el:codemirror></div>
+                <div class="editor" ref="codemirror"></div>
 
                 <div class="helpers" v-if="cheatsheet || assetsEnabled">
                     <div class="markdown-cheatsheet-helper" v-if="cheatsheet">
@@ -71,7 +71,7 @@
         ></selector>
 
         <uploader
-            v-ref:uploader
+            v-ref=uploader
             v-if="! showAssetSelector"
             :dom-element="uploadElement"
             :container="container"
@@ -107,7 +107,7 @@ require('codemirror/mode/clike/clike');
 require('codemirror/mode/php/php');
 require('codemirror/mode/yaml/yaml');
 
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -419,11 +419,27 @@ module.exports = {
         },
 
         getReplicatorPreviewText() {
-            return marked(this.data || '', { renderer: new PlainTextRenderer });
+            return marked(this.data || '', { renderer: new PlainTextRenderer })
+                .replace(/<\/?[^>]+(>|$)/g, "");
         },
 
         focus() {
             this.codemirror.focus();
+        },
+
+        trackHeightUpdates() {
+            const update = () => { window.dispatchEvent(new Event('resize')) };
+            const throttled = _.throttle(update, 100);
+
+            this.$root.$on('livepreview.opened', throttled);
+            this.$root.$on('livepreview.closed', throttled);
+            this.$root.$on('livepreview.resizing', throttled);
+
+            this.$once('hook:beforeDestroy', () => {
+                this.$root.$off('livepreview.opened', throttled);
+                this.$root.$off('livepreview.closed', throttled);
+                this.$root.$off('livepreview.resizing', throttled);
+            });
         }
 
     },
@@ -454,10 +470,10 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         var self = this;
 
-        self.codemirror = CodeMirror(this.$els.codemirror, {
+        self.codemirror = CodeMirror(this.$refs.codemirror, {
             value: self.data || '',
             mode: 'gfm',
             dragDrop: false,
@@ -482,6 +498,8 @@ module.exports = {
                 self.codemirror.doc.setValue(val);
             }
         });
+
+        this.trackHeightUpdates();
     }
 
 };

@@ -27,7 +27,7 @@ export default {
         setFlashMessage(message, opts) {
             this.toast.showToast(message, {
                 theme:    opts.theme,
-                timeLife: opts.timeout || null,
+                timeLife: opts.timeout || 5000,
                 closeBtn: opts.hasOwnProperty('dismissible') ? opts.dismissible : true,
             });
         },
@@ -47,7 +47,7 @@ export default {
         },
     },
 
-    ready() {
+    mounted() {
         this.bindToastNotifications();
         this.flashExistingMessages();
     },

@@ -24,7 +24,7 @@ module.exports = {
         }
     },
 
-    ready() {
+    mounted() {
         this.summary = Statamic.ImportSummary;
     },
 

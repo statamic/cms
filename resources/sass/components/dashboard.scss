@@ -3,6 +3,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 32px;
+    margin-bottom: 64px;
 }
 
 .widget {
@@ -24,6 +25,7 @@
 @media all and (max-width: 900px) {
     .dashboard .widgets {
         display: block;
+        margin-bottom: 32px;
     }
 
     .dashboard .widget { margin-bottom: 32px; }

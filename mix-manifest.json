@@ -1,0 +1,12 @@
+{
+    "/resources/dist/js/bootstrap.js": "/resources/dist/js/bootstrap.js",
+    "/resources/dist/css/cp.css": "/resources/dist/css/cp.css",
+    "/resources/dist/js/bootstrap.js.map": "/resources/dist/js/bootstrap.js.map",
+    "/resources/dist/css/cp.css.map": "/resources/dist/css/cp.css.map",
+    "/resources/dist/js/vendor.js": "/resources/dist/js/vendor.js",
+    "/resources/dist/js/vendor.js.map": "/resources/dist/js/vendor.js.map",
+    "/resources/dist/js/app.js": "/resources/dist/js/app.js",
+    "/resources/dist/js/app.js.map": "/resources/dist/js/app.js.map",
+    "/resources/dist/js/manifest.js": "/resources/dist/js/manifest.js",
+    "/resources/dist/js/manifest.js.map": "/resources/dist/js/manifest.js.map"
+}

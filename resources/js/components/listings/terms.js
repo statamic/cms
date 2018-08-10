@@ -20,7 +20,7 @@ module.exports = {
         }
     },
 
-    ready: function () {
+    mounted() {
         this.addActionPartial();
     },
 

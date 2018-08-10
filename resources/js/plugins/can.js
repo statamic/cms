@@ -26,14 +26,18 @@ var can = function(permission) {
     return _.contains(permissions, permission);
 };
 
-exports.install = function(Vue, options) {
+export default {
 
-    Vue.prototype.can = function(permission) {
-        return can(permission);
-    };
+    install(Vue, options) {
 
-    Vue.can = function(permission) {
-        return can(permission);
-    };
+        Vue.prototype.can = function(permission) {
+            return can(permission);
+        };
+
+        Vue.can = function(permission) {
+            return can(permission);
+        };
+
+    }
 
 };

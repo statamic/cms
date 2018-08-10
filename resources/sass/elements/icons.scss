@@ -10,7 +10,7 @@
 .icon-left { margin-right: 10px; }
 .icon-right { margin-left: 10px; }
 
-.icon-status {
+.icon-status, .little-dot {
 	border-radius: 7px;
 	display: inline-block;
 	height: 7px;
@@ -26,13 +26,33 @@
 .icon-status-live {
 	background: $color_green;
 }
+.icon-status-error {
+	background: $color_red;
+}
+.icon-status-warning {
+    @apply .bg-yellow-dark;
+}
 
 .icon-large {
     font-size: 42px;
 }
 
+.icon-user-initials {
+    background: $color_dark_blue;
+    height: 32px;
+    width: 32px;
+	color: #fff;
+	display: block;
+	text-align: center;
+	line-height: 32px;
+}
 
 .svg-icon {
+
+	&.using-svg {
+		@apply .flex .items-center;
+	}
+
 	svg {
 		width: 100%;
 		height: 100%;

@@ -1,11 +1,11 @@
 <template>
-    <modal :show.sync="show" :saving="saving" :loading="loading" class="modal-small">
+    <modal :show="show" :saving="saving" :loading="loading" class="modal-small">
         <template slot="header">{{ translate('cp.mount_collection') }}</template>
 
         <template slot="body">
             <ul class="chooser">
                 <li v-for="collection in collections">
-                    <a href='' @click.prevent="mount(collection.value)">{{ collection.text }}</a>
+                    <a @click.prevent="mount(collection.value)">{{ collection.text }}</a>
                 </li>
             </ul>
         </template>
@@ -25,6 +25,7 @@
                 show: false,
                 saving: false,
                 loading: true,
+                collections: [],
                 fieldsets: []
             }
         },

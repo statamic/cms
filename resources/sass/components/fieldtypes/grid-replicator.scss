@@ -2,7 +2,7 @@
    GRID & REPLICATOR
    ========================================================================== */
 
-   .grid-field, .replicator-fieldtype {
+.grid-field, .replicator-fieldtype {
 
     .form-group {
         padding: 0;
@@ -18,13 +18,9 @@
             background: #fff;
         }
 
-        label {
+        &.group-header label {
             margin-bottom: 0;
         }
-    }
-
-    .list-group-item + .list-group-item {
-        padding-top: 20px;
     }
 
 }
@@ -92,6 +88,14 @@
         max-width: 360px;
 
         .sneak-peeking & {
+            max-width: 160px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .replicator, .grid-fieldtype .grid-stacked {
+        .replicator-set-summary {
             max-width: 160px;
         }
     }

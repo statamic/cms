@@ -2,7 +2,7 @@
 import DossierTable from './DossierTable.vue'
 import Paginates from '../Paginates'
 
-module.exports = {
+export default {
 
     mixins: [Paginates],
 
@@ -53,7 +53,7 @@ module.exports = {
 
     },
 
-    ready: function () {
+    mounted() {
         this.getItems();
     },
 
@@ -77,11 +77,11 @@ module.exports = {
         getItems: function () {
             this.$http.get(this.ajax.get, this.getParameters, function(data, status, request) {
                 this.items = data.items;
-                this.columns = data.columns;
+                this.columns = this.parseColumns(data.columns);
                 this.loading = false;
                 this.pagination = data.pagination;
             }).error(function() {
-                alert('There was a problem retrieving data. Check your logs for more details.');
+                this.$notify.error(translate('cp.error_fetching_data'));
             });
         },
 
@@ -90,7 +90,7 @@ module.exports = {
                 this.items = data;
                 this.loading = false;
             }).error(function() {
-                alert('There was a problem retrieving data. Check your logs for more details.');
+                this.$notify.error(translate('cp.error_fetching_data'));
             });
         },
 
@@ -166,6 +166,33 @@ module.exports = {
                 this.loading = true;
                 this.getItems();
                 this.reordering = false;
+            });
+        },
+
+        parseColumns(columns) {
+            // If a link column hasn't been explicitly defined, we'll make the first column the link.
+            const linkColumnUndefined = _.findWhere(columns, { link: true }) === undefined;
+
+            return _.map(columns, function (column, i) {
+                if (typeof column === 'string') {
+                    column = { value: column };
+                };
+
+                // If the header text isn't provided, it should fall back to the field
+                // name. If using a dot-notated field for relationships, we'll use
+                // the first part, which is the field name in the parent item.
+                let headerFallback = column.value;
+                if (column.value.includes('.')) {
+                    headerFallback = column.value.split('.')[0];
+                }
+
+                return {
+                    value: column.value,
+                    header: translate(`cp.${column.header || headerFallback}`),
+                    extra: column.extra,
+                    width: column.width,
+                    link: column.link || (linkColumnUndefined && i == 0)
+                };
             });
         }
     }

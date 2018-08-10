@@ -19,17 +19,17 @@ module.exports = {
                             <span class="icon icon-documents"></span>
                             {{ item.entries }}
                         </div>
-                        <a :href="item.entries_url">{{ item.title }}</a>
+                        <a :href="item.entries_url" v-text="item.title"></a>
 
-                        <a href="{{ item.create_url }}" v-if="can('collections:'+item.id+':create')"
-                           class="btn btn-icon btn-primary pull-right"><span class="icon icon-plus"></span>
+                        <a :href="item.create_url" v-if="can('collections:'+item.id+':create')"
+                           class="btn btn-icon btn-primary float-right"><span class="icon icon-plus"></span>
                        </a>`
                 }
             }
         }
     },
 
-    ready: function () {
+    mounted() {
         if (this.can('super')) {
             this.addActionPartial();
         }
@@ -38,7 +38,7 @@ module.exports = {
     methods: {
         addActionPartial: function () {
             var str = `
-                <li><a :href="item.edit_url">{{ translate('cp.edit') }}</a></li>
+                <li><a :href="item.edit_url" v-text="translate('cp.edit')"></a></li>
             `;
 
             this.tableOptions.partials.actions = str;

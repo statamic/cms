@@ -70,7 +70,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         //
     }
 

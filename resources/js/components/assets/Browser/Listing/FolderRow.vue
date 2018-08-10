@@ -19,7 +19,7 @@
 
         <td class="column-actions">
 
-            <div class="btn-group action-more" :class="{ open: showActionsDropdown }">
+            <div class="btn-group action-more" :class="{ open: showActionsDropdown }" v-on-clickaway="away">
 
                 <button type="button" class="btn-more dropdown-toggle"
                         aria-haspopup="true" aria-expanded="false"

@@ -21,7 +21,7 @@
                 <div class="asset-thumb" v-if="isImage">
                     <img :src="asset.thumbnail">
                 </div>
-                <file-icon v-else type="div" :extension="asset.extension"></file-icon>
+                <file-icon v-else :extension="asset.extension"></file-icon>
             </template>
         </div>
 

@@ -2,9 +2,9 @@
     <div class="radio-fieldtype-wrapper">
         <ul :class="[
             'list-unstyled',
-            config.inline ? 'list-inline' : ''
+            config.inline ? 'list-inline mb-0' : ''
         ]">
-            <li v-for="option in config.options">
+            <li v-for="option in config.options" :class="{ 'mb-0 mr-2': config.inline }">
                 <input type="radio" v-model="data" :value="option.value" :id="name + '-' + $index" />
                 <label :for="name + '-' + $index">{{ option.text }}</label>
             </li>
@@ -13,7 +13,7 @@
 </template>
 
 <script>
-module.exports = {
+export default {
     mixins: [Fieldtype],
 
     methods: {

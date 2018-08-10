@@ -1,6 +1,6 @@
 <template>
     <div class="redactor-fieldtype-wrapper">
-        <textarea v-el:redactor :name="name" v-model="data"></textarea>
+        <textarea ref="redactor" :name="name" v-model="data"></textarea>
         <selector v-if="showAssetSelector"
                   :container="container"
                   :folder="folder"
@@ -15,7 +15,7 @@
 <script>
 import InsertsAssets from '../InsertsAssets';
 
-module.exports = {
+export default {
 
     components: {
         selector: require('../../assets/Selector.vue')
@@ -35,27 +35,27 @@ module.exports = {
         },
 
         insertLink: function(url, text) {
-            const selection = $(this.$els.redactor).redactor('selection.getHtml');
+            const selection = $(this.$refs.redactor).redactor('selection.getHtml');
 
             if (selection) {
                 text = selection;
             }
 
-            $(this.$els.redactor).redactor(
+            $(this.$refs.redactor).redactor(
                 'insert.html',
                 '<a href="' + url + '">' + text + '</a>'
             );
         },
 
         insertImage: function(url, text) {
-            $(this.$els.redactor).redactor(
+            $(this.$refs.redactor).redactor(
                 'insert.html',
                 '<img src="' + url + '" alt="' + text + '" />'
             );
         },
 
         appendImage: function(url, text) {
-            var $r = $(this.$els.redactor);
+            var $r = $(this.$refs.redactor);
 
             var code = $r.redactor('code.get');
 
@@ -66,7 +66,7 @@ module.exports = {
         },
 
         appendLink: function(url, text) {
-            var $r = $(this.$els.redactor);
+            var $r = $(this.$refs.redactor);
 
             var code = $r.redactor('code.get');
 
@@ -120,13 +120,13 @@ module.exports = {
         getReplicatorPreviewText() {
             if (! this.data) return '';
 
-            return $(this.$els.redactor)
+            return $(this.$refs.redactor)
                 .redactor('clean.getTextFromHtml', this.data)
                 .replace(/\n/g, ' ');
         },
 
         focus() {
-            $(this.$els.redactor).redactor('focus.setEnd');
+            $(this.$refs.redactor).redactor('focus.setEnd');
         },
 
         /**
@@ -137,7 +137,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         var womp = this;
 
         var defaults = {
@@ -167,7 +167,7 @@ module.exports = {
             settings.plugins.push('assets');
         }
 
-        $(this.$els.redactor).redactor(settings);
+        $(this.$refs.redactor).redactor(settings);
     }
 };
 </script>

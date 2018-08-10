@@ -14,17 +14,17 @@ module.exports = {
                 partials: {
                     cell: `
                         <a v-if="$index === 0" :href="item.edit_url">
-                            {{ item[column.label] }}
+                            {{ item[column.value] }}
                         </a>
                         <template v-else>
-                            {{ item[column.label] }}
+                            {{ item[column.value] }}
                         </template>`
                 }
             }
         }
     },
 
-    ready: function () {
+    mounted() {
         this.addActionPartial();
     },
 
@@ -32,7 +32,7 @@ module.exports = {
         addActionPartial: function () {
             var str = '';
 
-            if (this.can('users:manage')) {
+            if (this.can('users:edit')) {
                 str += `<li><a :href="item.edit_url">{{ translate('cp.edit') }}</a></li>`;
             }
 

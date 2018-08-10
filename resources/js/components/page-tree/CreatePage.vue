@@ -1,20 +1,22 @@
 <template>
-    <modal :show.sync="show" :saving="saving" :loading="loading" class="modal-small">
-        <template slot="header">{{ translate('cp.choose_page_type') }}</template>
+    <div>
+        <modal :show="show" :saving="saving" :loading="loading" class="modal-small" :dismissible="true">
+            <template slot="header">{{ translate('cp.choose_page_type') }}</template>
 
-        <template slot="body">
-            <ul class="chooser">
-                <li v-for="fieldset in fieldsets">
-                    <a href='' @click.prevent="create(fieldset.value)">{{ fieldset.text }}</a>
-                </li>
-            </ul>
-        </template>
+            <template slot="body">
+                <ul class="chooser">
+                    <li v-for="fieldset in fieldsets">
+                        <a @click.prevent="create(fieldset.value)">{{ fieldset.text }}</a>
+                    </li>
+                </ul>
+            </template>
 
-        <template slot="footer">
-            <div class="pull-left">{{ translate('cp.parent_page') }}: <code>{{ parent }}</code></div>
-            <button type="button" class="btn" @click="cancel">{{ translate('cp.cancel') }}</button>
-        </template>
-    </modal>
+            <template slot="footer">
+                <div class="float-left">{{ translate('cp.parent_page') }}: <code>{{ parent }}</code></div>
+                <button type="button" class="btn" @click="cancel">{{ translate('cp.cancel') }}</button>
+            </template>
+        </modal>
+    </div>
 </template>
 
 <script>
@@ -32,21 +34,17 @@ export default {
         }
     },
 
-    events: {
-        'pages.create': function(parent) {
-            this.loading = true;
-            this.show = true;
-            this.parent = parent;
-            this.getFieldsets();
-        }
+    created() {
+        this.$eventHub.$on('pages.create', this.getFieldsets);
     },
 
     methods: {
+
         cancel: function() {
             this.show = false;
         },
 
-        create: function(fieldset) {
+        create(fieldset) {
             let parent = (this.parent === '/') ? '' : this.parent;
 
             let url = cp_url('pages/create' + parent + '?fieldset=' + fieldset);
@@ -58,13 +56,15 @@ export default {
             window.location = url;
         },
 
-        getFieldsets: function() {
-            var url = cp_url('fieldsets/get?url='+this.parent+'&hidden=false');
+        getFieldsets(parent) {
+            this.parent = parent;
+            let endpoint = cp_url('fieldsets-json?url='+this.parent+'&hidden=false');
+            let self = this;
 
-            this.$http.get(url, function(data) {
+            this.axios.get(endpoint).then(function(response) {
                 var fieldsets = [];
 
-                _.each(data.items, function(fieldset) {
+                _.each(response.data.items, function(fieldset) {
                     fieldsets.push({
                         value: fieldset.uuid,
                         text: fieldset.title
@@ -81,8 +81,15 @@ export default {
                     return fieldset.text;
                 });
 
-                this.fieldsets = fieldsets;
-                this.loading = false;
+                self.fieldsets = fieldsets;
+                self.loading = false;
+
+                // If there's only one fieldset, don't make the user have to pick it.
+                if (self.fieldsets.length <= 1) {
+                    self.create(self.fieldsets[0].value);
+                } else {
+                    self.show = true;
+                }
             });
         }
     }

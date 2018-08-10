@@ -458,3 +458,131 @@
 .icon-youko:before { content: "\EB9B" }
 .icon-youtube-with-circle:before { content: "\EB9C" }
 .icon-youtube:before { content: "\EB9D" }
+
+// Font Awesome for MediumEditor
+
+@font-face {
+  font-family: 'fontawesome';
+  src:
+    url('../fonts/fontawesome.ttf?hj1qzi') format('truetype'),
+    url('../fonts/fontawesome.woff?hj1qzi') format('woff'),
+    url('../fonts/fontawesome.svg?hj1qzi#fontawesome') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+[class^="fa-"], [class*=" fa-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'fontawesome' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fa-check:before {
+  content: "\f00c";
+}
+.fa-close:before {
+  content: "\f00d";
+}
+.fa-remove:before {
+  content: "\f00d";
+}
+.fa-times:before {
+  content: "\f00d";
+}
+.fa-bold:before {
+  content: "\f032";
+}
+.fa-italic:before {
+  content: "\f033";
+}
+.fa-align-left:before {
+  content: "\f036";
+}
+.fa-align-center:before {
+  content: "\f037";
+}
+.fa-align-right:before {
+  content: "\f038";
+}
+.fa-align-justify:before {
+  content: "\f039";
+}
+.fa-list:before {
+  content: "\f03a";
+}
+.fa-dedent:before {
+  content: "\f03b";
+}
+.fa-outdent:before {
+  content: "\f03b";
+}
+.fa-indent:before {
+  content: "\f03c";
+}
+.fa-image:before {
+  content: "\f03e";
+}
+.fa-photo:before {
+  content: "\f03e";
+}
+.fa-picture-o:before {
+  content: "\f03e";
+}
+.fa-chain:before {
+  content: "\f0c1";
+}
+.fa-link:before {
+  content: "\f0c1";
+}
+.fa-list-ul:before {
+  content: "\f0ca";
+}
+.fa-list-ol:before {
+  content: "\f0cb";
+}
+.fa-strikethrough:before {
+  content: "\f0cc";
+}
+.fa-underline:before {
+  content: "\f0cd";
+}
+.fa-quote-right:before {
+  content: "\f10e";
+}
+.fa-code:before {
+  content: "\f121";
+}
+.fa-superscript:before {
+  content: "\f12b";
+}
+.fa-subscript:before {
+  content: "\f12c";
+}
+.fa-eraser:before {
+  content: "\f12d";
+}
+.fa-file-image-o:before {
+  content: "\f1c5";
+}
+.fa-file-photo-o:before {
+  content: "\f1c5";
+}
+.fa-file-picture-o:before {
+  content: "\f1c5";
+}
+.fa-header:before {
+  content: "\f1dc";
+}
+.fa-paint-brush:before {
+  content: "\f1fc";
+}

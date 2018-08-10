@@ -2,14 +2,14 @@
     <div class="toggle-fieldtype-wrapper">
         <div class="toggle-container" :class="{ 'on': isOn }" @click="toggle">
             <div class="toggle-slider">
-                <div class="toggle-knob" tabindex="0" @keyup.prevent.space.enter="toggle" v-el:knob tabindex="0"></div>
+                <div class="toggle-knob" tabindex="0" @keyup.prevent.space.enter="toggle" ref="knob" tabindex="0"></div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -37,12 +37,12 @@ module.exports = {
             this.data = !this.data;
         },
         focus() {
-            this.$els.knob.focus();
+            this.$refs.knob.focus();
         }
     },
-    ready() {
+    mounted() {
         if (this.data === null) {
-            this.data = false;
+            this.data = this.config.default || false;
         }
 
         this.bindChangeWatcher();

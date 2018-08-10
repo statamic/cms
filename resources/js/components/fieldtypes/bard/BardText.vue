@@ -27,14 +27,14 @@
             class="bard-source"
             v-model="text"
             v-show="showSource"
-            v-el:source
+            ref="source"
             rows="1"
         ></textarea>
 
         <div
             class="bard-editor"
             v-show="!showSource"
-            v-el:input
+            ref="input"
         ></div>
 
         <selector v-if="showAssetSelector"
@@ -54,7 +54,9 @@
 
 <script>
 
+    import autosize from 'autosize';
     import AutoList from './AutoList';
+    import AutoHR from 'medium-editor-autohr';
     import InsertsAssets from '../InsertsAssets';
 
     export default {
@@ -76,18 +78,18 @@
                 optionsTopPosition: 0,
                 focusedElement: null,
                 dropped: { sibling: null, position: null },
-                text: this.data.text
+                text: this.data.text || ''
             };
         },
 
         computed: {
 
             field() {
-                return this.$els.input
+                return this.$refs.input
             },
 
             sourceField() {
-                return this.$els.source;
+                return this.$refs.source;
             },
 
             isBlank() {
@@ -131,7 +133,7 @@
 
         },
 
-        ready() {
+        mounted() {
             autosize(this.sourceField);
 
             this.initMedium();
@@ -199,12 +201,35 @@
                 this.text = this.editor.getContent();
             },
 
+            localizeButtons(buttons) {
+                let localizations = {
+                    'bold':   'bold',
+                    'italic': 'italic',
+                    'anchor': 'link',
+                    'h2':     'h2',
+                    'h3':     'h3',
+                    'quote':  'blockquote',
+                }
+
+                return buttons.map((button) => {
+                    if (! localizations.hasOwnProperty(button)) {
+                        return button;
+                    }
+
+                    return {
+                        name: button,
+                        aria: translate('cp.' + localizations[button]),
+                    };
+                })
+            },
+
             initMedium() {
-                let buttons = this.$parent.config.buttons || ['bold', 'italic', 'anchor', 'h2', 'h3', 'quote'];
+                let buttons = this.localizeButtons(this.$parent.config.buttons || ['bold', 'italic', 'anchor', 'unorderedlist', 'orderedlist', 'h2', 'h3', 'quote']);
 
                 let extensions = Object.assign({
                     imageDragging: {},
-                    autolist: new AutoList
+                    autolist: new AutoList,
+                    autohr: new AutoHR
                 }, _.map(Statamic.MediumEditorExtensions, ext => new ext));
 
                 if (this.$parent.config.container) {
@@ -213,9 +238,18 @@
                 }
 
                 let opts = {
-                    toolbar: { buttons },
-                    autoLink: true,
-                    placeholder: false,
+                    toolbar:        { buttons },
+                    buttonLabels:   'fontawesome',
+                    autoLink:       this.$parent.config.autolink || false,
+                    placeholder:    false,
+                    paste:          { forcePlainText: this.$parent.config.force_plain_text, cleanPastedHTML: this.$parent.config.clean_pasted_html },
+                    spellcheck:     this.$parent.config.spellcheck || true,
+                    targetBlank:    this.$parent.config.target_blank || false,
+                    linkValidation: this.$parent.config.link_validation || false,
+                    anchor: {
+                        placeholderText: translate('cp.paste_or_type_link'),
+                        aria: translate('cp.link'),
+                    },
                     extensions
                 };
 
@@ -252,12 +286,8 @@
                 });
 
                 this.editor.subscribe('editableKeydownDelete', e => {
-                    const pos = this.editor.exportSelection();
-
-                    if (e.key === 'Backspace') {
-                        if (pos.start === 0 && pos.end === 0) this.$emit('backspaced-at-start', this.index);
-                    } else if (e.key === 'Delete') {
-                        if (pos.start === this.plainText().length && pos.end === this.plainText().length) this.$emit('deleted-at-end', this.index);
+                    if (this.isBlank) {
+                        this.$emit('deleted', this.index);
                     }
                 });
 
@@ -268,10 +298,12 @@
                     if (!isUp && !isDown) return;
 
                     const pos = this.editor.exportSelection();
+                    const isInFirstElement = !this.editor.getSelectedParentElement().previousSibling;
+                    const isInLastElement = !this.editor.getSelectedParentElement().nextSibling;
 
-                    if (isUp && pos.start === 0 && pos.end === 0) {
+                    if (isUp && pos.start === 0 && pos.end === 0 && isInFirstElement) {
                         this.$emit('arrow-up-at-start', this.index);
-                    } else if (isDown && pos.start === this.plainText().length && pos.end === this.plainText().length) {
+                    } else if (isDown && pos.start === this.plainText().length && pos.end === this.plainText().length && isInLastElement) {
                         this.$emit('arrow-down-at-end', this.index);
                     }
                 });
@@ -283,7 +315,7 @@
                     name: 'assets',
                     tagNames: ['a'],
                     contentDefault: '<span class="icon icon-images"></span>',
-                    aria: 'Assets',
+                    aria: translate('cp.nav_assets'),
                     handleClick: function () {
                         let toolbar = this.base.getExtensionByName('toolbar');
                         if (toolbar) toolbar.hideToolbar();

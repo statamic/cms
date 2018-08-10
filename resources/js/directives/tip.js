@@ -1,18 +1,20 @@
-module.exports = {
+import tippy from 'tippy.js';
 
-    params: ['tipText'],
+export default {
 
-    update() {
-        if (! this.params.tipText) return;
-
-        this.el.setAttribute('title', this.params.tipText);
-
-        tippy(this.el, {
-            size: 'small',
-            animateFill: false,
-            theme: 'light',
-            performance: true
-        });
-    }
+    // params: ['tipText'],
+    //
+    // update() {
+    //     if (! this.params.tipText) return;
+    //
+    //     this.el.setAttribute('title', this.params.tipText);
+    //
+    //     tippy(this.el, {
+    //         size: 'small',
+    //         animateFill: false,
+    //         theme: 'light',
+    //         performance: true
+    //     });
+    // }
 
 }

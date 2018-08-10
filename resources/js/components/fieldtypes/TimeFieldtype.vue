@@ -1,7 +1,7 @@
 <template>
     <div class="time-template-wrapper">
         <input class="form-control"
-            type="number" min="00" max="23" v-model="hour" v-el:hour
+            type="number" min="00" max="23" v-model="hour" ref="hour"
             @keydown.up.prevent="incrementHour(1)"
             @keydown.down.prevent="incrementHour(-1)"
             @keydown.esc="clear"
@@ -11,7 +11,7 @@
         />
         <span class="colon">:</span>
         <input class="form-control"
-            type="number" min="00" max="59" v-model="minute" v-el:minute
+            type="number" min="00" max="59" v-model="minute" ref="minute"
             @keydown.up.prevent="incrementMinute(1)"
             @keydown.down.prevent="incrementMinute(-1)"
             @keydown.esc="clear"
@@ -29,7 +29,7 @@
 
 <script>
 
-module.exports = {
+export default {
 
     mixins: [Fieldtype],
 
@@ -127,11 +127,11 @@ module.exports = {
         },
 
         focusMinute: function() {
-            $(this.$els.minute).focus().select();
+            $(this.$refs.minute).focus().select();
         },
 
         focus() {
-            this.$els.hour.focus();
+            this.$refs.hour.focus();
         }
     }
 };

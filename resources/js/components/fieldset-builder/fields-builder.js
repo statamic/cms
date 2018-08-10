@@ -46,6 +46,7 @@ module.exports = {
 
             field.type = field.name;
             field.name = 'field_' + count;
+            field.id = 'field_' + count;
             field.display = 'Field ' + count;
             field.instructions = null;
             field.isNew = true;
@@ -66,6 +67,8 @@ module.exports = {
                 this.fields.push(field);
                 this.selectedField = count - 1;
             }
+
+            this.$emit('field-added', field);
         },
 
         selectField: function(index) {
@@ -75,6 +78,7 @@ module.exports = {
 
         deleteField: function(index) {
             this.selectedField = null;
+            this.$emit('field-deleted', this.fields[index].id);
             this.fields.splice(index, 1);
         },
 
@@ -100,7 +104,7 @@ module.exports = {
 
     },
 
-    ready: function() {
+    mounted() {
         this.fields = this.fields || [];
         this.root = Boolean(this.root || false);
         this.ensureTitleIsFirst();

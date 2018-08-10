@@ -16,7 +16,7 @@
     <template v-if="!loading && !valid">
         <p v-html="licenseKeyInstructions"></p>
 
-        <div class="form-group">
+        <div class="form-group px-0">
             <p v-if="!valid && keySubmitted" class="license-error">
             <small class="help-block">{{ translate('cp.license_invalid') }}</small>
             </p>

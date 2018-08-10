@@ -15,7 +15,7 @@
         </td>
         <td>
             <span @dblclick="edit">
-                <span v-if="asset.title !== asset.filename" :title="asset.basename">{{ asset.title }}</span>
+                <span v-if="asset.title !== asset.filename" :title="asset.basename">{{ asset.title || asset.filename }}</span>
                 <span v-else>{{ asset.basename }}</span>
             </span>
         </td>

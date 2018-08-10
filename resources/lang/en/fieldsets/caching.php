@@ -18,7 +18,8 @@ return [
    'static_caching_length_instruct' => 'How long should each page be cached, in minutes. This only applies when using the "cache" type.',
 
    'static_caching_type' => 'Caching Type',
-   'static_caching_type_instruct' => 'Saving to file will generate html files at `static`, and you will need to set up your htaccess.
+   'static_caching_type_instruct' => 'Saving to file will generate html files at `static`, and you will need to set up rewrite rules on your server.
+                                      <a href="https://docs.statamic.com/caching#static-page" target="_blank">Read more</a>.  
                                       Otherwise, the standard cache will be used.',
 
     'static_caching_file_path' => 'Static Files Path',

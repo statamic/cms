@@ -6,7 +6,7 @@
         {!! csrf_field() !!}
 
         <div class="publish-form">
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ translate('cp.editing_taxonomy') }}</h1>
                 <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
             </div>

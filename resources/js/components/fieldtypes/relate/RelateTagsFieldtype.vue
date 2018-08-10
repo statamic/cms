@@ -1,6 +1,6 @@
 <template>
 
-    <select v-el:tags multiple tabindex="0" ></select>
+    <select ref="tags" multiple tabindex="0" ></select>
 
     <input type="hidden" :name="name" :value="data|json" class="form-control" />
 
@@ -14,11 +14,11 @@ export default {
         'suggestions',
         'maxItems',
         'create',
-        'name'
+        'name',
+        'disabled'
     ],
 
-
-    ready() {
+    mounted() {
 
         let self = this;
 
@@ -27,7 +27,7 @@ export default {
             this.data = [this.data];
         }
 
-        $(this.$els.tags).selectize({
+        $(this.$refs.tags).selectize({
             options: this.suggestions,
             items: this.data,
             maxItems: this.maxItems,
@@ -38,13 +38,17 @@ export default {
             create: this.create
         });
 
+        if (this.disabled) {
+            this.$refs.tags.selectize.disable();
+        }
+
     },
 
 
     methods: {
 
         focus() {
-            this.$els.tags.selectize.focus();
+            this.$refs.tags.selectize.focus();
         }
 
     }

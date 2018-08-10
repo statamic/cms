@@ -5,7 +5,7 @@
     <asset-container-listing inline-template v-cloak>
         <div>
 
-            <div class="flexy mb-24">
+            <div class="flexy mb-3">
                 <h1 class="fill">{{ translate('cp.nav_assets') }}</h1>
 
                 @can('super')

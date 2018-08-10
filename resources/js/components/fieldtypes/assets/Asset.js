@@ -1,3 +1,5 @@
+import Luminous from 'luminous-lightbox';
+
 export default {
 
     components: {
@@ -72,7 +74,7 @@ export default {
     },
 
 
-    ready() {
+    mounted() {
         this.makeZoomable();
     }
 

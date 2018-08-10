@@ -183,7 +183,7 @@ module.exports = {
         }
     },
 
-    ready: function() {
+    mounted() {
         this.$http.get(this.endpoint, function(data, status, request) {
             this.list = data;
             this.loading = false;

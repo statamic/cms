@@ -120,7 +120,7 @@
         },
 
 
-        ready() {
+        mounted() {
             this.setDefaults();
         },
 
