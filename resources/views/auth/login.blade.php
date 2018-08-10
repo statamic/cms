@@ -29,30 +29,30 @@
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
             <div class="mb-4">
-                <label>
+                <label class="block mb-1">
                 @if (\Statamic\API\Config::get('users.login_type') === 'email')
                     {{ trans_choice('cp.emails', 1) }}
                 @else
-                    {{ t('username') }}
+                    {{ __('Username') }}
                 @endif
                 </label>
                 <input type="text" class="form-control" name="username" value="{{ old('username') }}" autofocus>
             </div>
 
             <div class="mb-4">
-                <label>{{ t('password') }}</label>
+                <label>{{ __('Password') }}</label>
                 <input type="password" class="form-control" name="password" id="password">
             </div>
 
             <div class="mb-4">
                 <input type="checkbox" class="form-control" name="remember" id="checkbox-0">
-                <label for="checkbox-0" class="normal">{{ trans('cp.remember_me') }}</label>
+                <label for="checkbox-0" class="normal">{{ __('Remember me') }}</label>
             </div>
 
             <div>
                 <button type="submit" class="btn btn-primary block w-full">{{ t('login') }}</button>
                 @if (! $oauth)
-                    <small class="block mt-2"><a href="{{ route('login.reset')}}">{{ t('forgot_password')}}</a></small>
+                    <small class="block mt-2"><a href="{{ route('login.reset')}}">{{ __('Forgot password?') }}</a></small>
                 @endif
             </div>
         </form>

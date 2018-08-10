@@ -9663,6 +9663,7 @@ label {
   font-weight: normal;
   color: #333;
   font-size: 14px;
+  display: block;
 }
 
 .form-group.tight {
@@ -9678,6 +9679,7 @@ textarea,
 input {
   color: #32325d;
   padding: 7px 10px;
+  width: 100%;
 }
 
 .form-control,
