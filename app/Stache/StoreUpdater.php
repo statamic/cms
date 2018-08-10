@@ -63,6 +63,8 @@ class StoreUpdater
 
     public function update()
     {
+        $this->store->load(); // TODO: TDD
+
         foreach ($this->modifiedFiles() as $path) {
             $item = $this->store->createItemFromFile($path, $this->filesystem->get($path));
             $key = $this->store->getItemKey($item, $path);
