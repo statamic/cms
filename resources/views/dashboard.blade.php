@@ -5,7 +5,7 @@
     <div class="flexy mb-3">
         <h1 class="fill">{{ t('dashboard') }}</h1>
         @can('super')
-            <a href="{{ route('settings.edit', 'cp')}}" class="btn btn-white">{{ t('manage_widgets') }}</a>
+            {{-- <a href="{{ route('settings.edit', 'cp')}}" class="btn btn-white">{{ t('manage_widgets') }}</a> --}}
         @endcan
     </div>
 

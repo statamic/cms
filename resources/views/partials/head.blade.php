@@ -12,12 +12,12 @@
 <link rel="icon" type="image/png" href="{{ cp_resource_url('img/favicon.png') }}" sizes="16x16" />
 <script>
     var Statamic = {
-        'siteRoot': '{!! SITE_ROOT !!}',
-        'cpRoot': '{!! $cp_root !!}',
+        'siteRoot': '{!! site_root() !!}',
+        'cpRoot': '{!! cp_root() !!}',
         'urlPath': '/{!! request()->path() !!}',
         'resourceUrl': '{!! cp_resource_url('/') !!}',
-        'locales': {!! json_encode(Statamic\API\Config::get('system.locales')) !!},
-        'markdownHardWrap': {{ bool_str(Statamic\API\Config::get('theming.markdown_hard_wrap')) }},
+        'locales': {!! json_encode(Statamic\API\Config::get('statamic.system.locales')) !!},
+        'markdownHardWrap': {{ bool_str(Statamic\API\Config::get('statamic.theming.markdown_hard_wrap')) }},
         'conditions': {},
         'MediumEditorExtensions': {},
         'flash': [],
