@@ -40,21 +40,6 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Pages\PageFactory::class,
-            \Statamic\Data\Pages\PageFactory::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Pages\PageFolder::class,
-            \Statamic\Data\Pages\PageFolder::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Pages\PageTreeReorderer::class,
-            \Statamic\Data\Pages\PageTreeReorderer::class
-        );
-
-        $this->app->bind(
             \Statamic\Contracts\Data\Entries\EntryFactory::class,
             \Statamic\Data\Entries\EntryFactory::class
         );
