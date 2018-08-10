@@ -16,6 +16,11 @@ return [
             'directory' => base_path('content/collections'),
         ],
 
+        'structures' => [
+            'class' => Stores\StructuresStore::class,
+            'directory' => base_path('content/structures'),
+        ],
+
         'globals' => [
             'class' => Stores\GlobalsStore::class,
             'directory' => base_path('content/globals'),

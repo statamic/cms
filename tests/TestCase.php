@@ -35,6 +35,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/__fixtures__/content/collections');
         $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
+        $app['config']->set('statamic.stache.stores.structures.directory', __DIR__.'/__fixtures__/content/structures');
         $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
         $app['config']->set('statamic.stache.stores.users.directory', __DIR__.'/__fixtures__/users');

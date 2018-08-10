@@ -65,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Data\Repositories\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
             \Statamic\Contracts\Data\Repositories\UserRepository::class => \Statamic\Stache\Repositories\UserRepository::class,
             \Statamic\Contracts\Data\Repositories\ContentRepository::class => \Statamic\Stache\Repositories\ContentRepository::class,
+            \Statamic\Contracts\Data\Repositories\StructureRepository::class => \Statamic\Stache\Repositories\StructureRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->bind($abstract, $concrete);
         });

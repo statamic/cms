@@ -1,8 +1,14 @@
 title: Pages
-route: '{slug}'
+route: '{parent_uri}/{slug}'
+root: pages-home
 tree:
-  - home #  (/)
-  - about # (/about)
-    - board # (/about/board)
-      - directors # (/about/board/directors)
-  - blog # (/blog)
+  -
+    page: pages-about # (/about)
+    children:
+      -
+        page: pages-board # (/about/board)
+        children:
+          -
+            page: pages-directors # (/about/board/directors)
+  -
+    page: pages-blog # (/blog)

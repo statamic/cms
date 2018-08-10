@@ -15,6 +15,11 @@ class DataServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(
+            \Statamic\Contracts\Data\Structures\Structure::class,
+            \Statamic\Data\Structures\Structure::class
+        );
+
+        $this->app->bind(
             \Statamic\Contracts\Data\Content\OrderParser::class,
             \Statamic\Data\Content\OrderParser::class
         );

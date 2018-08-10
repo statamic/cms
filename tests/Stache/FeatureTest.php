@@ -7,6 +7,7 @@ use Statamic\API\User;
 use Statamic\API\Entry;
 use Statamic\API\Content;
 use Statamic\API\GlobalSet;
+use Statamic\API\Structure;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
 use Statamic\Stache\Fakes\YAML;
@@ -27,6 +28,7 @@ class FeatureTest extends TestCase
             $dir = __DIR__.'/__fixtures__';
             $stache->store('collections')->directory($dir . '/content/collections');
             $stache->store('entries')->directory($dir . '/content/collections');
+            $stache->store('structures')->directory($dir . '/content/structures');
             $stache->store('globals')->directory($dir . '/content/globals');
             $stache->store('asset-containers')->directory($dir . '/content/assets');
             $stache->store('users')->directory($dir . '/users');
@@ -95,6 +97,20 @@ class FeatureTest extends TestCase
         $this->assertEquals('users-john', $user->id());
         $this->assertEquals('John Smith', $user->get('name'));
         $this->assertEquals('john@example.com', $user->email());
+    }
+
+    /** @test */
+    function it_gets_structures()
+    {
+        $this->assertEquals(2, Structure::all()->count());
+    }
+
+    /** @test */
+    function it_gets_a_structure()
+    {
+        $structure = Structure::find('pages');
+        $this->assertEquals('pages', $structure->handle());
+        // @TODO: Some more assertions
     }
 
     /** @test */
