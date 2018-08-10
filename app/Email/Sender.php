@@ -74,7 +74,7 @@ class Sender
      * Parses an email template
      *
      * @return array
-     * @todo Support front-matter in templates.
+     * TODO: Support front-matter in templates.
      */
     private function parseEmailTemplate()
     {

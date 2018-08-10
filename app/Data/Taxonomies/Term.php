@@ -117,7 +117,7 @@ class Term extends Content implements TermContract
     public function path($path = null)
     {
         if (! is_null($path)) {
-            dd('todo: set a terms path in term@path'); // @todo
+            dd('todo: set a terms path in term@path'); // TODO:
         }
 
         if (isset($this->attributes['path'])) {
@@ -403,7 +403,7 @@ class Term extends Content implements TermContract
 
         $this->supplements['default_slug'] = $this->defaultSlug();
         $this->supplements['title'] = $this->title();
-        $this->supplements['taxonomy_group'] = $this->taxonomyName(); // @todo: remove
+        $this->supplements['taxonomy_group'] = $this->taxonomyName(); // TODO: remove
         $this->supplements['taxonomy'] = $this->taxonomyName();
         $this->supplements['count'] = $this->count();
         $this->supplements['relation_count'] = $this->count();

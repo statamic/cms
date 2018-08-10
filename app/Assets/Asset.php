@@ -113,7 +113,7 @@ class Asset extends Data implements AssetContract
      */
     public function localizedPath($locale)
     {
-        // @todo
+        // TODO:
         dd('todo asset@localizedpath');
     }
 
@@ -501,7 +501,7 @@ class Asset extends Data implements AssetContract
 
         event(new AssetUploaded($this));
 
-        // Legacy/Deprecated. @todo: Remove in 2.3
+        // Legacy/Deprecated. TODO: Remove in 2.3
         event('asset.uploaded', $path);
     }
 
@@ -593,7 +593,7 @@ class Asset extends Data implements AssetContract
      */
     public function originalPath()
     {
-        // @todo
+        // TODO:
         dd('todo: extend data@originalPath');
     }
 
@@ -605,7 +605,7 @@ class Asset extends Data implements AssetContract
      */
     public function originalLocalizedPath($locale)
     {
-        // @todo
+        // TODO:
         dd('todo: extend data@localizedPath');
     }
 

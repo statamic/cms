@@ -61,8 +61,8 @@ class GlobalsStore extends BasicStore
         // subsequent locales to be nested under their key.
         $data = collect($default)->merge($data);
 
-        // @TODO: Change ->slug() to ->handle()
-        // @TODO: Let the GlobalSet object output the path, if one is already set.
+        // TODO: Change ->slug() to ->handle()
+        // TODO: Let the GlobalSet object output the path, if one is already set.
         // It's possible that an existing file was saved in a subdirectory, for example.
         // We'll want to maintain that.
         $path = $this->directory . '/' . $global->slug() . '.yaml';

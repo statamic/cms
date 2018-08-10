@@ -268,7 +268,7 @@ class FolderAccessor
     public function deleteEmptySubfolders($folder)
     {
         // Only adapters with a concept of folders can use this
-        // @todo: Add a conditional here that will bail out for adapters with no folders
+        // TODO: Add a conditional here that will bail out for adapters with no folders
 
         // Grab all the folders
         $folders = $this->getFoldersRecursively($folder);

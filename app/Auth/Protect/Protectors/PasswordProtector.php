@@ -71,7 +71,7 @@ class PasswordProtector extends AbstractProtector
 
     protected function getPasswordFormUrl()
     {
-        $default = '/'; // @todo
+        $default = '/'; // TODO:
 
         return array_get($this->scheme, 'form_url', $default);
     }

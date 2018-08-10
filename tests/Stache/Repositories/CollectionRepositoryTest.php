@@ -33,7 +33,7 @@ class CollectionRepositoryTest extends TestCase
         $this->assertEveryItemIsInstanceOf(Collection::class, $collections);
 
         $ordered = $collections->sortBy->path()->values();
-        $this->assertEquals(['alphabetical', 'blog', 'numeric', 'pages'], $ordered->map->path()->all()); // @TODO: Support ->handle() or ->id()
+        $this->assertEquals(['alphabetical', 'blog', 'numeric', 'pages'], $ordered->map->path()->all()); // TODO: Support ->handle() or ->id()
         $this->assertEquals(['Alphabetical', 'Blog', 'Numeric', 'Pages'], $ordered->map->title()->all());
         $this->assertEquals(['alphabetical', 'date', 'number', 'alphabetical'], $ordered->map->order()->all());
     }

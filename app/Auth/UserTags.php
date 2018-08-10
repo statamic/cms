@@ -239,7 +239,7 @@ class UserTags extends Tags
         $code = Request::get('code');
 
         if (! $user = User::find($id)) {
-            dd('Invalid user'); // @todo make better.
+            dd('Invalid user'); // TODO: make better.
         }
 
         $resetter = new PasswordReset;

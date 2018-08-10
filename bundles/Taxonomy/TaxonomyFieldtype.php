@@ -99,7 +99,7 @@ class TaxonomyFieldtype extends RelateFieldtype
     private function normalizeTermInTaxonomyField($value, $taxonomy)
     {
         // If the string contains a slash, it's already an ID. We just want the slug.
-        // @todo Handle values with slashes that aren't IDs. Sometimes people just want a slash in a value.
+        // TODO: Handle values with slashes that aren't IDs. Sometimes people just want a slash in a value.
         if (Str::contains($value, '/')) {
             return explode('/', $value)[1];
         }
@@ -117,7 +117,7 @@ class TaxonomyFieldtype extends RelateFieldtype
     private function normalizeTermInRelationalField($value, $taxonomy)
     {
         // If the value contains a slash, it's probably already a term ID.
-        // @todo Handle values with slashes that aren't IDs. Sometimes people just want a slash in a value.
+        // TODO: Handle values with slashes that aren't IDs. Sometimes people just want a slash in a value.
         if (Str::contains($value, '/')) {
             return $value;
         }

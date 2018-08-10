@@ -81,7 +81,7 @@ class StructuresStoreTest extends TestCase
         $this->assertCount(1, $items);
         $item = $items->first();
         $this->assertInstanceOf(Structure::class, $item);
-        // @TODO: Some more assertions
+        // TODO: Some more assertions
     }
 
     /** @test */
@@ -130,7 +130,7 @@ EOT;
                 ],
             ]
         ], $item->data());
-        // @TODO: Some more assertions
+        // TODO: Some more assertions
     }
 
     /** @test */

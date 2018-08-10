@@ -37,7 +37,7 @@ class UserController extends Controller
     private function getResetForm()
     {
         if (! $user = User::find($this->request->query('user'))) {
-            dd('Invalid user'); // @todo Do this nicer.
+            dd('Invalid user'); // TODO: Do this nicer.
         }
 
         $resetter = new PasswordReset;
@@ -54,7 +54,7 @@ class UserController extends Controller
     private function postResetForm()
     {
         if (! $user = User::find($this->request->input('user'))) {
-            dd('Invalid user'); // @todo Do this nicer.
+            dd('Invalid user'); // TODO: Do this nicer.
         }
 
         $resetter = new PasswordReset;

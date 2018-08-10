@@ -8,7 +8,7 @@ use Statamic\API\URL;
 use Statamic\API\Fieldset;
 
 /**
- * @todo  For the methods `create` and `edit`, not sure which is much cleaner,
+ * TODO:  For the methods `create` and `edit`, not sure which is much cleaner,
  *        building the `submit_url` from there or building it from the view
  *        {{ route("{$content_type}.save") }}.
  */

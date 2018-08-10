@@ -110,7 +110,7 @@ class FeatureTest extends TestCase
     {
         $structure = Structure::find('pages');
         $this->assertEquals('pages', $structure->handle());
-        // @TODO: Some more assertions
+        // TODO: Some more assertions
     }
 
     /** @test */
@@ -122,7 +122,7 @@ class FeatureTest extends TestCase
         );
 
         $this->assertEquals('Christmas', Content::find('blog-christmas')->get('title'));
-        // @TODO: terms and pages
+        // TODO: terms and pages
 
         $this->assertNull(Content::find('unknown'));
     }

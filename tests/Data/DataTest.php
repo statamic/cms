@@ -51,7 +51,7 @@ class DataTest extends TestCase
         $this->assertInstanceOf(EntryObj::class, $this->page->syncOriginal());
         $this->assertInstanceOf(EntryObj::class, $this->page->dataType('md'));
         $this->assertInstanceOf(EntryObj::class, $this->page->content('foo'));
-        // $this->assertInstanceOf(EntryObj::class, $this->page->path('foo')); // @TODO ?
+        // $this->assertInstanceOf(EntryObj::class, $this->page->path('foo')); // TODO: ?
         $this->assertInstanceOf(EntryObj::class, $this->page->id('foo'));
         $this->assertInstanceOf(EntryObj::class, $this->page->setSupplement('foo', 'bar'));
         $this->assertInstanceOf(EntryObj::class, $this->page->removeSupplement('foo', 'bar'));

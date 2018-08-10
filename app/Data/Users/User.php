@@ -123,7 +123,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function localizedPath($locale)
     {
-        // @todo
+        // TODO:
         dd('todo user@localizedpath');
     }
 
@@ -493,7 +493,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function originalLocalizedPath($locale)
     {
-        // @todo
+        // TODO:
         dd('todo: extend data@localizedPath');
     }
 

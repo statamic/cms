@@ -35,7 +35,7 @@ class GlobalRepositoryTest extends TestCase
 
         $ordered = $sets->sortBy->path()->values();
         $this->assertEquals(['globals-contact', 'globals-global'], $ordered->map->id()->all());
-        $this->assertEquals(['contact', 'global'], $ordered->map->slug()->all()); // @TODO: Change to handle()
+        $this->assertEquals(['contact', 'global'], $ordered->map->slug()->all()); // TODO: Change to handle()
         $this->assertEquals(['Contact Details', 'General'], $ordered->map->title()->all());
     }
 
@@ -45,14 +45,14 @@ class GlobalRepositoryTest extends TestCase
         tap($this->repo->find('globals-global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-global', $set->id());
-            $this->assertEquals('global', $set->slug()); // @TODO: Change to handle()
+            $this->assertEquals('global', $set->slug()); // TODO: Change to handle()
             $this->assertEquals('General', $set->title());
         });
 
         tap($this->repo->find('globals-contact'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-contact', $set->id());
-            $this->assertEquals('contact', $set->slug()); // @TODO: Change to handle()
+            $this->assertEquals('contact', $set->slug()); // TODO: Change to handle()
             $this->assertEquals('Contact Details', $set->title());
         });
 
@@ -65,14 +65,14 @@ class GlobalRepositoryTest extends TestCase
         tap($this->repo->findByHandle('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-global', $set->id());
-            $this->assertEquals('global', $set->slug()); // @TODO: Change to handle()
+            $this->assertEquals('global', $set->slug()); // TODO: Change to handle()
             $this->assertEquals('General', $set->title());
         });
 
         tap($this->repo->findByHandle('contact'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-contact', $set->id());
-            $this->assertEquals('contact', $set->slug()); // @TODO: Change to handle()
+            $this->assertEquals('contact', $set->slug()); // TODO: Change to handle()
             $this->assertEquals('Contact Details', $set->title());
         });
 

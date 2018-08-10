@@ -571,7 +571,7 @@ class Parser
                 } else {
                     // nope, this must be a (plugin) callback
                     if (is_null($callback)) {
-                        // @todo what does this do?
+                        // TODO: what does this do?
                         $text = $this->createExtraction('__variables_not_callbacks', $text, $text, $text);
                     } elseif (! empty($cb_data[$name])) {
                         // value not found in the data block, so we check the

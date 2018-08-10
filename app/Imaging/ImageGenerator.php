@@ -158,7 +158,7 @@ class ImageGenerator
             $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
         }
 
-        // @todo: Allow user defined defaults and merge them in here.
+        // TODO: Allow user defined defaults and merge them in here.
 
         $this->server->setDefaults($defaults);
     }

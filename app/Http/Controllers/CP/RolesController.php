@@ -30,7 +30,7 @@ class RolesController extends CpController
             $roles[] = [
                 'title' => $role->title(),
                 'edit_url' => route('user.role', $key),
-                'uuid' => $role->uuid(), // @todo: remove.
+                'uuid' => $role->uuid(), // TODO: remove.
                 'id' => $role->uuid()
             ];
         }

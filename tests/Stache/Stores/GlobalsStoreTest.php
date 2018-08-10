@@ -70,7 +70,7 @@ class GlobalsStoreTest extends TestCase
 
         $this->assertInstanceOf(GlobalSet::class, $item);
         $this->assertEquals('globals-example', $item->id());
-        $this->assertEquals('example', $item->slug()); // @TODO: Change to handle
+        $this->assertEquals('example', $item->slug()); // TODO: Change to handle
         $this->assertEquals('Example', $item->title());
         $this->assertEquals(['id' => 'globals-example', 'title' => 'Example', 'foo' => 'bar'], $item->data());
     }

@@ -71,7 +71,7 @@ class ValidationBuilder
 
             // Grid recursion
             if ($fieldtype->getAddonClassName() === 'Grid') {
-                // @todo
+                // TODO:
 
                 // $fs = Fieldset::create('temp', $fieldtype->getFieldConfig());
                 //
@@ -84,7 +84,7 @@ class ValidationBuilder
 
             // Replicator recursion
             if ($fieldtype->getAddonClassName() === 'Replicator') {
-                // @todo
+                // TODO:
             }
         }
 
@@ -117,7 +117,7 @@ class ValidationBuilder
 
             // Grid recursion
             if (array_get($field_config, 'type', 'text') === 'grid') {
-                // @todo
+                // TODO:
 
                 // $grid_data = $this->getFieldValidationData(
                 //     array_get($field_config, 'fields', []),
@@ -136,7 +136,7 @@ class ValidationBuilder
 
             // Replicator recursion
             if (array_get($field_config, 'type', 'text') === 'replicator') {
-                // @todo
+                // TODO:
             }
 
         }

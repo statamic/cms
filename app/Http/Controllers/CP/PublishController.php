@@ -65,7 +65,7 @@ abstract class PublishController extends CpController
      * This can also be implemented to the child components so an event can be
      * triggered specific to that content.
      *
-     * @todo We can refactor this out to `update()` and `post()` later on but
+     * TODO: We can refactor this out to `update()` and `post()` later on but
      *       we'll need to refactor `publish.js` as well since it only targets
      *       POST requests.
      *

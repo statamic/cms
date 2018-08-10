@@ -32,7 +32,7 @@ class Entry extends Content implements EntryContract
     public function path($path = null)
     {
         if (! is_null($path)) {
-            dd('todo: set an entrys path in entry@path'); // @todo
+            dd('todo: set an entrys path in entry@path'); // TODO:
         }
 
         if (isset($this->attributes['path'])) {
