@@ -31,7 +31,7 @@
             <div class="mb-4">
                 <label class="block mb-1">
                 @if (\Statamic\API\Config::get('users.login_type') === 'email')
-                    {{ trans_choice('cp.emails', 1) }}
+                    {{ __('Email') }}
                 @else
                     {{ __('Username') }}
                 @endif
@@ -50,7 +50,7 @@
             </div>
 
             <div>
-                <button type="submit" class="btn btn-primary block w-full">{{ t('login') }}</button>
+                <button type="submit" class="btn btn-primary block w-full">{{ __('Login') }}</button>
                 @if (! $oauth)
                     <small class="block mt-2"><a href="{{ route('login.reset')}}">{{ __('Forgot password?') }}</a></small>
                 @endif
