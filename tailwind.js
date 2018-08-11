@@ -19,6 +19,7 @@ var colors = {
     'yellow':       '#fbfab0',
     'yellow-dark':  '#d8cd1b',
     'white':        '#ffffff',
+    'pink':         '#ff269e'
 }
 
 var units = {

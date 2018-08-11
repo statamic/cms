@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    @apply font-sans w-full bg-bg text-grey-darker text-base;
+    @apply .w-full .bg-bg;
 }
 
 *, *::before, *::after {

@@ -1,17 +1,11 @@
 body {
+    @apply .font-sans .text-grey-darker .text-base;
     font-variant: common-ligatures tabular-nums;
 }
 
 h1 {
-	font-size: 24px;
-    font-weight: 300;
-	margin: 0;
-    -webkit-font-smoothing: antialiased;
-
-	strong {
-		color: $color_gray_dark;
-		font-weight: normal;
-	}
+    @apply text-2xl font-normal m-0 antialiased;
+    letter-spacing: -0.013;
 }
 
 h2 { font-size: 18px; }
@@ -20,16 +14,16 @@ h3 { font-size: 16px; }
 a {
     color: #4e5e73;
     cursor: pointer;
-	&:hover {
-		color: $brand-primary;
-		text-decoration: none;
-	}
+    &:hover {
+        color: $brand-primary;
+        text-decoration: none;
+    }
 }
 
 a:hover,
 a:active,
 a:focus {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 .subhead {
