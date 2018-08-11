@@ -9,7 +9,7 @@
 
       <nav class="nav-mobile">
           <a href="{{ route('cp') }}" class="logo">
-              {!! svg('statamic-logo') !!}
+              {!! svg('statamic-wordmark') !!}
           </a>
           <a @click.prevent="toggleNav" class="toggle">
               <span class="icon icon-menu"></span>

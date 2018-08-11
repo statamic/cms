@@ -5,9 +5,7 @@
     </head>
     <body class="outside">
         <div id="statamic">
-            <div class="logo">{!! inline_svg('statamic-mark') !!}</div>
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
         {{-- <script>Statamic.translations = {!! $translations !!};</script> --}}
         @include('statamic::partials.scripts')

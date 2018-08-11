@@ -42,7 +42,7 @@ body > svg { display: none; }
 
     .logo {
         display: block;
-        height: 32px;
+        height: 40px;
         width: 200px;
         display: flex;
         align-items: center;
@@ -194,17 +194,14 @@ body > svg { display: none; }
 .outside {
     background: #12c2e9;
     background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
-    padding-top: 48px;
-    padding-left: 0;
+    padding: 80px 8px 8px;
 
     label {
         color: #596498;
     }
 
     .box {
-        width: 320px;
-        padding: 24px;
-        border-radius: 8px;
+        @apply .max-w-xs .p-3 .rounded-lg;
         box-shadow:
             rgba(50, 50, 93, .4) 0 12px 34px,
             rgba(0, 0, 0, .1) 0 3px 4px,
@@ -217,22 +214,21 @@ body > svg { display: none; }
         }
     }
 
-    .btn-primary {
+    .btn {
+        @apply .text-shadow .text-white .border-0;
         background: linear-gradient(45deg, #f64f59, #c471ed);
-        height: 40px;
-        line-height: 40px;
-        font-size: 14px;
         box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
-        border: none;
-
+        &:hover {
+            background: linear-gradient(45deg, mix(black, #f64f59, 5%), mix(black, #c471ed, 5%));
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
+        }
     }
 
-    .logo {
-        svg {
-            width: 120px;
-            margin: 0 auto 32px;
-            display: block;
-            path { fill: rgba(0,0,0,.25); }
+    .logo svg {
+        @apply h-6 block mx-auto mb-7 mb-4 w-auto;
+        path {
+            fill: rgba(0,0,0,.25);
         }
     }
 }

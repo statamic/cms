@@ -1,6 +1,9 @@
 @extends('statamic::outside')
 
 @section('content')
+<div class="logo">
+    {!! inline_svg('statamic-wordmark') !!}
+</div>
 <div class="box card mx-auto">
     <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
 
@@ -24,7 +27,7 @@
             </div>
         @endif
 
-        <form method="POST" v-show="showEmailLogin" class="email-login">
+        <form method="POST" v-show="showEmailLogin" class="email-login select-none">
             {!! csrf_field() !!}
 
             <input type="hidden" name="referer" value="{{ $referer }}" />
@@ -44,14 +47,12 @@
                 <label class="mb-1">{{ __('Password') }}</label>
                 <input type="password" class="form-control" name="password" id="password">
             </div>
-
-            <div class="mb-4">
-                <input type="checkbox" class="form-control" name="remember" id="checkbox-0">
-                <label for="checkbox-0" class="normal">{{ __('Remember me') }}</label>
-            </div>
-
-            <div>
-                <button type="submit" class="btn btn-primary block w-full">{{ __('Login') }}</button>
+            <div class="flex justify-between items-center">
+                <label for="remember_me" class="flex items-center">
+                    <input type="checkbox" name="remember" id="remember_me">
+                    <span class="ml-1">{{ __('Remember me') }}</span>
+                </label>
+                <button type="submit" class="btn">{{ __('Login') }}</button>
             </div>
         </form>
     </login>

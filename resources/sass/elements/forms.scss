@@ -18,31 +18,24 @@ label {
     color: #333;
     font-size: 14px;
     display: block;
+    line-height: 1;
+}
+
+input[type="checkbox"] {
+    font-size: 18px;
 }
 
 .form-group.tight {
     margin-bottom: 8px;
 }
 
-.form-control,
-textarea,
-input {
-    color: $color_gray_dark;
-    padding: 7px 10px;
-    width: 100%;
+.form-control {
+    @apply .text-sm .w-full .rounded .border-0 .bg-grey-lighter .shadow-inner;
 
-    &,
-    &[type="checkbox"] + label:before,
-    &[type="radio"] + label:before {
-        background: $color_gray_input;
-        border: none;
-        border-radius: 3px;
+    padding: 8px 10px;
 
-        @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
-
-        .replicator-fieldtype & {
-            background: #fff;
-        }
+    .replicator-fieldtype & {
+        background: #fff;
     }
 
     &.code {
@@ -51,95 +44,12 @@ input {
         color: $color_red;
     }
 
-    &[type="text"],
-    &[type="search"],
-    &[type="email"],
-    &[type="number"] {
-        height: 32px;
-    }
-
-    &[type="checkbox"] {
-        opacity: 0;
-        position: absolute;
-        left: -9999px;
-
-
-        & + label {
-
-            &:before {
-                content: "";
-                cursor: pointer;
-                display: inline-block;
-                height: 20px;
-                margin: 0 8px 0 0;
-                vertical-align: middle;
-                width: 20px;
-            }
-            &.float-right {
-                float: none !important;
-                display: block;
-                margin: 0;
-
-                &:before {
-                    float: right;
-                    margin: 0;
-                }
-            }
-        }
-        &:checked + label:before {
-            background: $color_gray_input url('../img/checkmark.svg') center center no-repeat;
-        }
-        &:focus + label:before {
-            border: 1px solid $brand-primary;
-        }
-    }
-
-    &[type="radio"] {
-        opacity: 0;
-        position: absolute;
-        left: -9999px;
-
-        & + label {
-            cursor: pointer;
-
-            &:before {
-                border-radius: 14px;
-                content: "";
-                display: inline-block;
-                height: 22px;
-                margin-right: 8px;
-                vertical-align: -7px;
-                width: 22px;
-            }
-        }
-        &:checked + label:before {
-            @include background('../img/checked-radio-default.png', 10px 10px, $color_gray_input, center);
-
-            .replicator-fieldtype & { background-color: #fff; }
-        }
-        &:focus + label:before {
-            border: 1px solid $brand-primary;
-        }
-
-        &.radio-small {
-            & + label {
-                color: $color_gray_light;
-
-                &:before {
-                    height: 14px;
-                    vertical-align: -3px;
-                    width: 14px;
-                }
-            }
-
-            &:checked + label {
-                color: $color_gray_dark;
-            }
-            &:checked + label:before {
-                @include background('../img/checked-radio.png', 8px 8px, $color_gray_input, center);
-            }
-        }
-    }
+    // &[type="text"],
+    // &[type="search"],
+    // &[type="email"],
+    // &[type="number"] {
+    //     height: 32px;
+    // }
 
     &.alt {
         background: $color_search_alt;
@@ -165,20 +75,20 @@ label .required {
     }
 }
 
-select {
-    appearance: none;
-    -khtml-appearance: none;
-    -webkit-appearance: none;
-
-    cursor: pointer;
-    left: 0;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-}
+// select {
+//     appearance: none;
+//     -khtml-appearance: none;
+//     -webkit-appearance: none;
+//
+//     cursor: pointer;
+//     left: 0;
+//     opacity: 0;
+//     position: absolute;
+//     top: 0;
+//     width: 100%;
+//     height: 100%;
+//     z-index: 2;
+// }
 
 .select {
     cursor: pointer;
