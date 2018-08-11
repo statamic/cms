@@ -1,5 +1,7 @@
 @extends('statamic::outside')
 
 @section('content')
-    <h1 class="text-5xl font-thin opacity-50 text-center">{{ __('Page Not Found') }}</h1>
+    <div class="min-h-screen flex items-center justify-center">
+        <h1 class="text-3xl tracking-tight mb-5 opacity-50 text-center">{{ __('Page Not Found') }}</h1>
+    </div>
 @endsection

@@ -190,39 +190,22 @@ body > svg { display: none; }
     }
 }
 
-// @todo: extract
+.fieldtype-hidden {
+    display: none;
+}
+
+.head .btn-icon {
+    margin-right: 10px;
+}
+
+
+// OUTSIDE
+
 .outside {
-    background: #12c2e9;
-    background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
-    padding: 80px 8px 8px;
+    @apply .bg-bg .px-1 .min-h-screen;
 
     label {
         color: #596498;
-    }
-
-    .box {
-        @apply .max-w-xs .p-3 .rounded-lg;
-        box-shadow:
-            rgba(50, 50, 93, .4) 0 12px 34px,
-            rgba(0, 0, 0, .1) 0 3px 4px,
-            inset rgba(108, 167, 234, .2) -5px 5px 30px,
-            inset rgba(241, 84, 106, .2) 5px -5px 30px;
-        transition: .12s ease-out;
-        &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 35px 78px 0 rgba(50, 50, 93, .5), 0 4px 5px rgba(0, 0, 0, .15);
-        }
-    }
-
-    .btn {
-        @apply .text-shadow .text-white .border-0;
-        background: linear-gradient(45deg, #f64f59, #c471ed);
-        box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
-        &:hover {
-            background: linear-gradient(45deg, mix(black, #f64f59, 5%), mix(black, #c471ed, 5%));
-            color: #fff;
-            box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
-        }
     }
 
     .logo svg {
@@ -233,10 +216,8 @@ body > svg { display: none; }
     }
 }
 
-.fieldtype-hidden {
-    display: none;
-}
 
-.head .btn-icon {
-    margin-right: 10px;
+.outside.rad-mode {
+    background: #12c2e9;
+    background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
 }

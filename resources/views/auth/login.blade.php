@@ -1,10 +1,12 @@
 @extends('statamic::outside')
+@section('body_class', 'rad-mode')
 
 @section('content')
-<div class="logo">
+<div class="logo pt-7">
     {!! inline_svg('statamic-wordmark') !!}
 </div>
-<div class="box card mx-auto">
+
+<div class="card auth-card mx-auto">
     <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
 
         @if ($oauth)
@@ -18,7 +20,7 @@
                 @endforeach
             </div>
 
-            <div class="login-or">or</div>
+            <div class="text-center italic mx-1">or</div>
 
             <div class="login-with-email" v-if="! showEmailLogin">
                 <a class="btn btn-block" @click.prevent="showEmailLogin = true">
@@ -52,14 +54,14 @@
                     <input type="checkbox" name="remember" id="remember_me">
                     <span class="ml-1">{{ __('Remember me') }}</span>
                 </label>
-                <button type="submit" class="btn">{{ __('Login') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Login') }}</button>
             </div>
         </form>
     </login>
 </div>
 @if (! $oauth)
     <div class="w-full text-center mt-2">
-        <a href="{{ route('login.reset')}}" class="text-white text-sm text-shadow opacity-75 hover:opacity-100">
+        <a href="{{ route('login.reset')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}
         </a>
     </div>

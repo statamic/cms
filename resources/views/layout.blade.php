@@ -1,4 +1,5 @@
 <!doctype html>
+{{-- TODO: Set lang with current translation --}}
 <html lang="en">
 <head>
       @include('statamic::partials.head')
