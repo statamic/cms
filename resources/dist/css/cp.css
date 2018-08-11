@@ -1017,6 +1017,68 @@ th {
   padding: 0;
 }
 
+/* Inter UI
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/Inter-UI/Inter-UI-Regular.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 400;
+  src: url("../fonts/Inter-UI/Inter-UI-Italic.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-Italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: normal;
+  font-weight: 500;
+  src: url("../fonts/Inter-UI/Inter-UI-Medium.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-Medium.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 500;
+  src: url("../fonts/Inter-UI/Inter-UI-MediumItalic.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-MediumItalic.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/Inter-UI/Inter-UI-Bold.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 700;
+  src: url("../fonts/Inter-UI/Inter-UI-BoldItalic.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-BoldItalic.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: normal;
+  font-weight: 900;
+  src: url("../fonts/Inter-UI/Inter-UI-Black.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-Black.woff") format("woff");
+}
+
+@font-face {
+  font-family: 'Inter UI';
+  font-style: italic;
+  font-weight: 900;
+  src: url("../fonts/Inter-UI/Inter-UI-BlackItalic.woff2") format("woff2"), url("../fonts/Inter-UI/Inter-UI-BlackItalic.woff") format("woff");
+}
+
+/* Entypo
+   ========================================================================== */
+
 @font-face {
   font-family: "entypo";
   src: url("../fonts/entypo.eot");
@@ -8126,11 +8188,11 @@ body {
 }
 
 body {
-  background: #f1f5f9;
-  color: #32325d;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  font-size: 16px;
+  font-family: Inter UI, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue;
   width: 100%;
+  background-color: #f1f5f9;
+  color: #32325d;
+  font-size: 16px;
 }
 
 *,
@@ -8420,9 +8482,12 @@ body > svg {
   margin-right: 10px;
 }
 
+body {
+  font-variant: common-ligatures tabular-nums;
+}
+
 h1 {
   font-size: 24px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-weight: 300;
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -8458,7 +8523,7 @@ a:focus {
 }
 
 .subhead {
-  font: 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-size: 11px;
   letter-spacing: .1em;
   text-transform: uppercase;
 }
@@ -8947,7 +9012,6 @@ td .btn-icon {
 
 .btn-upload strong {
   color: #919191;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-weight: normal;
   text-transform: uppercase;
 }
@@ -10082,7 +10146,6 @@ table .handle {
 .grid-field > table > tbody > tr > th,
 .table-field > table > tbody > tr > th {
   border-top: solid 1px #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-size: 14px;
   text-transform: none;
 }
@@ -10300,10 +10363,6 @@ table.control .stat .nav-main > ul > li > a:before {
 .flush table.control tr th:first-child,
 .flush table.dossier tr th:first-child {
   padding-left: 30px;
-}
-
-.sweet-alert {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 .sweet-alert button {
@@ -15091,7 +15150,7 @@ code.parent-url {
 
 .update-release ul .label {
   display: inline-block;
-  font: 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-size: 11px;
   margin-right: 10px;
   text-transform: uppercase;
   width: 60px;
@@ -16314,7 +16373,6 @@ tr.excess input[type="radio"] + label:before {
   z-index: 10;
   border: 1px solid #e0e0e0;
   padding: 2px 5px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   color: #ccc;
@@ -18051,22 +18109,14 @@ tr.excess input[type="radio"] + label:before {
 }
 
 .font-sans {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue !important;
-}
-
-.font-thin {
-  font-weight: 200 !important;
-}
-
-.font-light {
-  font-weight: 300 !important;
+  font-family: Inter UI, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue !important;
 }
 
 .font-normal {
   font-weight: 400 !important;
 }
 
-.font-semibold {
+.font-medium {
   font-weight: 500 !important;
 }
 
@@ -18074,24 +18124,24 @@ tr.excess input[type="radio"] + label:before {
   font-weight: 700 !important;
 }
 
-.hover\:font-thin:hover {
-  font-weight: 200 !important;
-}
-
-.hover\:font-light:hover {
-  font-weight: 300 !important;
+.font-black {
+  font-weight: 900 !important;
 }
 
 .hover\:font-normal:hover {
   font-weight: 400 !important;
 }
 
-.hover\:font-semibold:hover {
+.hover\:font-medium:hover {
   font-weight: 500 !important;
 }
 
 .hover\:font-bold:hover {
   font-weight: 700 !important;
+}
+
+.hover\:font-black:hover {
+  font-weight: 900 !important;
 }
 
 .h-1 {

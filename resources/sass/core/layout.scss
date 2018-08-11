@@ -7,11 +7,7 @@ html, body {
 }
 
 body {
-    background: $bg;
-    color: $color_gray_dark;
-    font-family: $font;
-    font-size: 16px;
-    width: 100%;
+    @apply font-sans w-full bg-bg text-grey-darker text-base;
 }
 
 *, *::before, *::after {
@@ -194,6 +190,7 @@ body > svg { display: none; }
     }
 }
 
+// @todo: extract
 .outside {
     background: #12c2e9;
     background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);

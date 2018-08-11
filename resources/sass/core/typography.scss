@@ -1,6 +1,9 @@
+body {
+    font-variant: common-ligatures tabular-nums;
+}
+
 h1 {
 	font-size: 24px;
-    font-family: $font;
     font-weight: 300;
 	margin: 0;
     -webkit-font-smoothing: antialiased;
@@ -30,7 +33,7 @@ a:focus {
 }
 
 .subhead {
-    font: 11px $font;
+    font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
 }
