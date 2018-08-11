@@ -2,7 +2,7 @@
 
     <div class="logo">
         <a href="{{ route('cp') }}" class="flex items-center">
-              {!! inline_svg('statamic-wordmark') !!}
+              @svg('statamic-wordmark')
               <span class="version" v-cloak>@{{ version }}</span>
         </a>
     </div>
@@ -24,12 +24,13 @@
             @else
                 <div class="icon-user-initials round ml-8 z-depth-1">{{ \Statamic\API\User::getCurrent()->userInitials() }}</div>
             @endif --}}
+            <div class="icon-user-initials rounded-full text-xxs bg-pink z-depth-1">ME</div>
         </a>
         <ul class="dropdown-menu hide md:block">
-            <li><a href="{{ route('account') }}">{{ t('profile') }}</a></li>
-            <li><a href="{{ route('account.password') }}">{{ t('change_password') }}</a></li>
+            <li><a href="{{ route('account') }}">{{ __('My Account') }}</a></li>
+            <li><a href="{{ route('account.password') }}">{{ __('Change Password') }}</a></li>
             <li class="divider"></li>
-            <li><a href="{{ route('logout') }}">{{ t('sign_out') }}</a></li>
+            <li><a href="{{ route('logout') }}">{{ __('Sign Out') }}</a></li>
         </ul>
     </div>
 

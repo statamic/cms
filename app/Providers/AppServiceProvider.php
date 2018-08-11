@@ -2,10 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\File;
 use Statamic\DataStore;
 use Statamic\Sites\Sites;
+use Stringy\StaticStringy;
 use Statamic\Routing\Router;
 use Statamic\Extensions\FileStore;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
@@ -42,6 +45,13 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             "{$this->root}/resources/dist" => public_path('resources/cp')
         ], 'statamic-cp');
+
+        Blade::directive('svg', function ($expression) {
+            $file = trim($expression, "'");
+            return StaticStringy::collapseWhitespace(
+                File::get(statamic_path("resources/dist/svg/{$file}.svg"))
+            );
+        });
     }
 
     public function register()
