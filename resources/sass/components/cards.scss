@@ -36,7 +36,7 @@
 .card .head,
 .card .actions {
     @include clearfix;
-    @extend .no-select;
+    @apply select-none;
 }
 
 .card.flush {

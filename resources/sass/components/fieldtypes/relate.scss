@@ -1,5 +1,5 @@
 .relate-fieldtype {
-    @extend .no-select;
+    @apply select-none;
 
     .relate-search {
         background: #fff;

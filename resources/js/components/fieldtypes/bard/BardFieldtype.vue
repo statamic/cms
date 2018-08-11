@@ -35,7 +35,7 @@
 
         <div class="bard-field-title" v-text="config.display"></div>
 
-        <div class="bard-field-options no-select">
+        <div class="bard-field-options select-none">
             <a @click="toggleSource" :class="{ active: showSource }" v-if="allowSource"><i class="icon icon-code"></i></a>
             <a @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></a>
         </div>

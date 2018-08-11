@@ -292,7 +292,7 @@
 	position: relative;
 
     table {
-        @extend .no-select;
+        @apply select-none;
         margin: 0;
     }
 

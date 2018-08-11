@@ -1,5 +1,5 @@
 .nav-main {
-    @extend .no-select;
+    @apply select-none;
     z-index: 102;
 
     .badge {

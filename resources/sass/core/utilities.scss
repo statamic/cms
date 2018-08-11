@@ -23,23 +23,23 @@
   ========================================================================== */
 
 .loading {
-	text-align: center;
-	padding: 20px 0;
+    text-align: center;
+    padding: 20px 0;
 
-	.icon {
-		display: block;
-		margin-bottom: 5px;
-	}
+    .icon {
+        display: block;
+        margin-bottom: 5px;
+    }
 
-	&.loading-basic {
-		text-align: left;
-		padding: 0;
+    &.loading-basic {
+        text-align: left;
+        padding: 0;
 
-		.icon {
-			display: inline-block;
-			margin: -2px 5px 0 0;
-		}
-	}
+        .icon {
+            display: inline-block;
+            margin: -2px 5px 0 0;
+        }
+    }
 }
 
 .flexy {
@@ -61,57 +61,39 @@
 }
 
 .loading-blocker {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 10; // arbitrary to make it appear over the fields
-	background: rgba(white, .7);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10; // arbitrary to make it appear over the fields
+    background: rgba(white, .7);
 }
 
 // Saving overlay
 .saving {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 200;
-	background: rgba(white, .9);
-	display: flex;
-	align-items: center;
-	border-radius: 3px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    background: rgba(white, .9);
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
 
-	.inner {
-		text-align: center;
-		padding: 40px;
-		margin: 0 auto;
-	}
+    .inner {
+        text-align: center;
+        padding: 40px;
+        margin: 0 auto;
+    }
 
-	i {
-		position: relative;
-		top: -1px;
-		margin-right: 10px;
-	}
-}
-
-.no-select {
-	-webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.you-can-select-this {
-    -webkit-touch-callout: text !important;
-    -webkit-user-select: text !important;
-    -khtml-user-select: text !important;
-    -moz-user-select: text !important;
-    -ms-user-select: text !important;
-    user-select: text !important;
+    i {
+        position: relative;
+        top: -1px;
+        margin-right: 10px;
+    }
 }
 
 

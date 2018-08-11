@@ -55,7 +55,7 @@ table {
 		span.status-live { background: $color_green; }
 	}
 	.handle {
-        @extend .no-select;
+        @apply select-none;
 	    cursor: ns-resize;
 	}
 }
@@ -174,7 +174,7 @@ table {
 }
 
 table.control {
-    @extend .no-select;
+    @apply select-none;
 }
 
 table.dossier,
@@ -184,7 +184,7 @@ table.control {
 		// font-size: 16px;
 	}
 	thead tr {
-		@extend .no-select;
+		@apply select-none;
 		border-bottom: 1px solid $color_border;
 	}
     .stat {
