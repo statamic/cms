@@ -30,8 +30,12 @@
         }
     }
 
+    .input-text {
+        @apply .rounded-lg;
+    }
+
     .btn-primary {
-        @apply .text-shadow .text-white .border-0;
+        @apply .text-shadow .text-white .border-0 .rounded-md;
         background: linear-gradient(45deg, #f64f59, #c471ed);
         box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
         &:hover {

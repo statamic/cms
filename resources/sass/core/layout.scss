@@ -199,8 +199,10 @@ body > svg { display: none; }
 }
 
 
-// OUTSIDE
+/* Outside the Control Panel
+  ========================================================================== */
 
+// Uses "business mode" by default
 .outside {
     @apply .bg-bg .px-1 .min-h-screen;
 
@@ -216,7 +218,7 @@ body > svg { display: none; }
     }
 }
 
-
+ // Rad mode for the more playful
 .outside.rad-mode {
     background: #12c2e9;
     background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
