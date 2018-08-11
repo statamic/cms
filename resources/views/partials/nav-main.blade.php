@@ -2,8 +2,8 @@
     <nav class="nav-main">
         <ul class="mt-0">
             <li class="nav-dashboard {{ request()->is('cp') ? 'visible active' : '' }}">
-                <a href="{{ route('dashboard') }}" title="{{ translate('cp.nav_dashboard') }}">
-                    <span class="title">{{ translate('cp.nav_dashboard') }}</span>
+                <a href="{{ route('dashboard') }}" title="{{ __('Dashboard') }}">
+                    <span class="title">{{ __('Dashboard') }}</span>
                 </a>
             </li>
             @foreach ($nav->children() as $item)

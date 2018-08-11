@@ -61,7 +61,7 @@
   </div>
 
 <script>
-    Statamic.translations = {!! $translations !!};
+    // Statamic.translations = {{-- $translations --}};
     Statamic.permissions = '{!! $permissions !!}';
     Statamic.version = '{!! STATAMIC_VERSION !!}';
 

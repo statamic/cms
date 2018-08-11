@@ -1,7 +1,7 @@
 @extends('statamic::outside')
 
 @section('content')
-<div class="box card mx-auto" @yield('box-attributes')>
+<div class="box card mx-auto">
     <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
 
         @if ($oauth)

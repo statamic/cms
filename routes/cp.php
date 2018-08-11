@@ -207,5 +207,7 @@ Route::get('/taxonomy.create', function () { return ''; })->name('taxonomy.creat
 Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
 Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
 Route::get('/login.reset', function () { return ''; })->name('login.reset');
+Route::get('/search', function () { return ''; })->name('search.global');
+Route::get('/account/password', function () { return ''; })->name('account.password');
 
 Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');
