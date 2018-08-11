@@ -2,151 +2,10 @@
    UTILITES
    ========================================================================== */
 
-
-/* Margins
-  ========================================================================== */
-
-.mb-8 { margin-bottom: 8px !important; }
-.mb-16 { margin-bottom: 16px !important; }
-.mb-24 { margin-bottom: 24px !important; }
-.mb-32 { margin-bottom: 32px !important; }
-.mb-40 { margin-bottom: 40px !important; }
-.mb-64 { margin-bottom: 64px !important; }
-.mb-120 { margin-bottom: 120px !important; }
-
-.ml-8 { margin-left: 8px !important; }
-.ml-16 { margin-left: 16px !important; }
-.ml-24 { margin-left: 24px !important; }
-.ml-32 { margin-left: 32px !important; }
-.ml-40 { margin-left: 40px !important; }
-.ml-64 { margin-left: 64px !important; }
-.ml-120 { margin-left: 120px !important; }
-
-.mr-8 { margin-right: 8px !important; }
-.mr-16 { margin-right: 16px !important; }
-.mr-24 { margin-right: 24px !important; }
-.mr-32 { margin-right: 32px !important; }
-.mr-40 { margin-right: 40px !important; }
-.mr-64 { margin-right: 64px !important; }
-.mr-120 { margin-right: 120px !important; }
-
-.mt-8 { margin-top: 8px !important; }
-.mt-16 { margin-top: 16px !important; }
-.mt-24 { margin-top: 24px !important; }
-.mt-32 { margin-top: 32px !important; }
-.mt-40 { margin-top: 40px !important; }
-.mt-64 { margin-top: 64px !important; }
-.mt-120 { margin-top: 120px !important; }
-
-.mh-0 { margin-left: 0px !important; margin-right: 0px !important; }
-.mh-8 { margin-left: 8px !important; margin-right: 8px !important; }
-.mh-16 { margin-left: 16px !important; margin-right: 16px !important; }
-.mh-24 { margin-left: 24px !important; margin-right: 24px !important; }
-.mh-32 { margin-left: 32px !important; margin-right: 32px !important; }
-.mh-64 { margin-left: 64px !important; margin-right: 64px !important; }
-.mh-120 { margin-left: 120px !important; margin-right: 120px !important; }
-
-.mv-0 { margin-top: 0px !important; margin-bottom: 0px !important; }
-.mv-8 { margin-top: 8px !important; margin-bottom: 8px !important; }
-.mv-16 { margin-top: 16px !important; margin-bottom: 16px !important; }
-.mv-24 { margin-top: 24px !important; margin-bottom: 24px !important; }
-.mv-32 { margin-top: 32px !important; margin-bottom: 32px !important; }
-.mv-64 { margin-top: 64px !important; margin-bottom: 64px !important; }
-.mv-120 { margin-top: 120px !important; margin-bottom: 120px !important; }
-
-
-
-
-/* Padding
-  ========================================================================== */
-
-.pb-8 { padding-bottom: 8px !important; }
-.pb-16 { padding-bottom: 16px !important; }
-.pb-24 { padding-bottom: 24px !important; }
-.pb-32 { padding-bottom: 32px !important; }
-.pb-40 { padding-bottom: 40px !important; }
-.pb-64 { padding-bottom: 64px !important; }
-.pb-120 { padding-bottom: 120px !important; }
-
-.pl-8 { padding-left: 8px !important; }
-.pl-16 { padding-left: 16px !important; }
-.pl-24 { padding-left: 24px !important; }
-.pl-32 { padding-left: 32px !important; }
-.pl-40 { padding-left: 40px !important; }
-.pl-64 { padding-left: 64px !important; }
-.pl-120 { padding-left: 120px !important; }
-
-.pr-8 { padding-right: 8px !important; }
-.pr-16 { padding-right: 16px !important; }
-.pr-24 { padding-right: 24px !important; }
-.pr-32 { padding-right: 32px !important; }
-.pr-40 { padding-right: 40px !important; }
-.pr-64 { padding-right: 64px !important; }
-.pr-120 { padding-right: 120px !important; }
-
-.pt-8 { padding-top: 8px !important; }
-.pt-16 { padding-top: 16px !important; }
-.pt-24 { padding-top: 24px !important; }
-.pt-32 { padding-top: 32px !important; }
-.pt-40 { padding-top: 40px !important; }
-.pt-64 { padding-top: 64px !important; }
-.pt-120 { padding-top: 120px !important; }
-
-.ph-0 { padding-left: 0 !important; padding-right: 0px !important; }
-.ph-8 { padding-left: 8px !important; padding-right: 8px !important; }
-.ph-16 { padding-left: 16px !important; padding-right: 16px !important; }
-.ph-24 { padding-left: 24px !important; padding-right: 24px !important; }
-.ph-32 { padding-left: 32px !important; padding-right: 32px !important; }
-.ph-64 { padding-left: 64px !important; padding-right: 64px !important; }
-.ph-120 { padding-left: 120px !important; padding-right: 120px !important; }
-
-.pv-0 { padding-top: 0 !important; padding-bottom: 0px !important; }
-.pv-8 { padding-top: 8px !important; padding-bottom: 8px !important; }
-.pv-16 { padding-top: 16px !important; padding-bottom: 16px !important; }
-.pv-24 { padding-top: 24px !important; padding-bottom: 24px !important; }
-.pv-32 { padding-top: 32px !important; padding-bottom: 32px !important; }
-.pv-64 { padding-top: 64px !important; padding-bottom: 64px !important; }
-.pv-120 { padding-top: 120px !important; padding-bottom: 120px !important; }
-
-.pad-0 { padding: 0px !important; }
-.pad-8 { padding: 8px !important; }
-.pad-16 { padding: 16px !important; }
-.pad-24 { padding: 24px !important; }
-.pad-32 { padding: 32px !important; }
-.pad-64 { padding: 64px !important; }
-.pad-120 { padding: 120px !important; }
-
-
-
-
 /* Visibility
    ========================================================================== */
 
 [v-cloak] { display: none; }
-
-.o1 { opacity: .1; }
-.o2 { opacity: .2; }
-.o3 { opacity: .3; }
-.o4 { opacity: .4; }
-.o5 { opacity: .5; }
-.o6 { opacity: .6; }
-.o7 { opacity: .7 }
-.o8 { opacity: .8; }
-.o9 { opacity: .9; }
-.o { opacity: 1; }
-
-
-
-
-/* Font Size
-   ========================================================================== */
-
-.fs-11 { font-size: 11px !important; }
-.fs-12 { font-size: 12px !important; }
-.fs-13 { font-size: 13px !important; }
-
-
-
 
 /* Color
    ========================================================================== */
@@ -156,18 +15,12 @@
 
 .bg-faint { background: $bg; }
 
+.text-shadow {
+    text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
 
 /* Misc
   ========================================================================== */
-
-.round { border-radius: 50% !important; }
-
-.border-top { border-top: solid 1px $color_border; }
-
-.col-centered {
-    float: none;
-    margin: 0 auto;
-}
 
 .loading {
 	text-align: center;
@@ -261,30 +114,6 @@
     user-select: text !important;
 }
 
-.clickable {
-    cursor: pointer;
-}
-
-a:hover,
-a:active,
-a:focus {
-	text-decoration: none;
-}
-
-.mono { font-family: $font_monospace; }
-.bold { font-weight: bold; }
-.italic { font-weight: italic; }
-
-.red { color: $color_red; }
-.bg-red { background-color: $color_red; }
-
-.mt { margin-top: 24px; }
-.mb { margin-bottom: 24px; }
-
-.full-height { height: 100%; }
-.full-width { width: 100%; }
-.hide-overflow { overflow: hidden; }
-.pad { padding: 16px; }
 
 .help-block { width: 100%; }
 
