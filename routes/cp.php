@@ -134,9 +134,9 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('{group}', 'UserGroupsController@update')->name('user.group');
         });
 
-        Route::get('{username}', ['uses' => 'UsersController@edit', 'as' => 'user.edit']);
-        Route::get('{username}/reset-url', 'UsersController@getResetUrl');
-        Route::get('{username}/send-reset-email', 'UsersController@sendResetEmail');
+        Route::get('{username}', 'UsersController@edit')->name('user.edit');
+        Route::get('{username}/reset-url', 'UsersController@getResetUrl')->name('user.reset.url');
+        Route::get('{username}/send-reset-email', 'UsersController@sendResetEmail')->name('user.reset.email');
     });
 
 

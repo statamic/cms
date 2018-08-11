@@ -11,15 +11,15 @@
 
 // Vendors
 // @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
-@import "node_modules/sweetalert/dist/sweetalert";
 @import "vendors/codemirror";
 @import "vendors/date-picker";
-@import "vendors/redactor";
-@import "vendors/selectize";
 @import "vendors/luminous";
-@import "vendors/tippy";
 @import "vendors/medium-editor";
 @import "vendors/medium-editor-theme";
+@import "vendors/redactor";
+@import "vendors/selectize";
+@import "vendors/sweetalert";
+@import "vendors/tippy";
 
 @import "core/utilities";
 @import "core/layout";

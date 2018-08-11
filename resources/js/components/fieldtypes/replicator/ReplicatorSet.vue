@@ -5,7 +5,7 @@
             <div class="flexy">
                 <div class="fill">
                     <div class="flexy baseline">
-                        <label @click="toggle" class="clickable">{{ display }}</label>
+                        <label @click="toggle" class="cursor-pointer">{{ display }}</label>
                         <div v-if="isHidden">
                             <small class="replicator-set-summary fill" v-html="collapsedPreview"></small>
                         </div>

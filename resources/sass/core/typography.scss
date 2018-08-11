@@ -23,6 +23,12 @@ a {
 	}
 }
 
+a:hover,
+a:active,
+a:focus {
+	text-decoration: none;
+}
+
 .subhead {
     font: 11px $font;
     letter-spacing: .1em;
