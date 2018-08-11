@@ -157,6 +157,7 @@ module.exports = {
         '2xl': '24px',
         '3xl': '32px',
         '4xl': '48px',
+        '5xl': '60px',
     },
 
 
@@ -175,6 +176,7 @@ module.exports = {
     */
 
     fontWeights: {
+        'thin':      200,
         'light':     300,
         'normal':    400,
         'semibold':  500,

@@ -1,6 +1,7 @@
 @extends('statamic::outside')
 
 @section('content')
+<div class="box card mx-auto" @yield('box-attributes')>
     <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
 
         @if ($oauth)
@@ -29,7 +30,7 @@
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
             <div class="mb-4">
-                <label class="block mb-1">
+                <label class="mb-1">
                 @if (\Statamic\API\Config::get('users.login_type') === 'email')
                     {{ __('Email') }}
                 @else
@@ -40,7 +41,7 @@
             </div>
 
             <div class="mb-4">
-                <label>{{ __('Password') }}</label>
+                <label class="mb-1">{{ __('Password') }}</label>
                 <input type="password" class="form-control" name="password" id="password">
             </div>
 
@@ -51,11 +52,16 @@
 
             <div>
                 <button type="submit" class="btn btn-primary block w-full">{{ __('Login') }}</button>
-                @if (! $oauth)
-                    <small class="block mt-2"><a href="{{ route('login.reset')}}">{{ __('Forgot password?') }}</a></small>
-                @endif
             </div>
         </form>
     </login>
+</div>
+@if (! $oauth)
+    <div class="w-full text-center mt-2">
+        <a href="{{ route('login.reset')}}" class="text-white text-sm text-shadow opacity-75 hover:opacity-100">
+            {{ __('Forgot password?') }}
+        </a>
+    </div>
+@endif
 
 @endsection
