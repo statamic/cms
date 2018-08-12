@@ -29,7 +29,7 @@
       @include('statamic::partials.global-header')
 
       <div class="application-grid @yield('content-class')">
-            @include('statamic::partials.nav-main')
+            @include('statamic::partials.nav-main-new')
 
             <div class="content">
                   <div class="page-wrapper">

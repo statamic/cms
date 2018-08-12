@@ -11,8 +11,8 @@
         flex: 1;
         flex-shrink: 0;
         flex-basis: auto;
-        max-height: 100vh;
-        overflow-y: auto;
+        // max-height: 100vh;
+        // overflow-y: auto;
         position: sticky;
         top: 24px;
     }
@@ -196,6 +196,24 @@
 
         a {
             color: $color_gray_dark;
+        }
+    }
+}
+
+.nav-main.new {
+    li {
+        @apply p-0 mb-1;
+
+        a {
+            @apply p-0 flex items-center text-blue-light;
+            &:hover {
+                @apply font-medium text-blue-dark;
+            }
+
+            i {
+                @apply block h-6 p-sm w-6 rounded-full;
+                margin-right: 12px;
+            }
         }
     }
 }
