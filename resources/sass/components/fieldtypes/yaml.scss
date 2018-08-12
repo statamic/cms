@@ -21,8 +21,7 @@
         border-radius: 3px;
 
         .CodeMirror {
-            @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
-            height: auto;
+            @apply .shadow-inner .h-auto;
         }
 
         .CodeMirror-code { min-height: 100px; }

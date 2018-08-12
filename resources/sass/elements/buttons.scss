@@ -10,6 +10,7 @@
     .icon { color: #777; }
 }
 
+
 .btn-danger {
     @include button($color_red, white);
 
@@ -204,12 +205,11 @@ td .btn-icon {
 
 
 .btn-upload {
+    @apply .shadow-inner;
     border: dashed 1px $color_gray_upload;
     color: $color_gray_upload;
     font-size: 11px;
     padding: 6px 20px;
-
-    @include box-shadow(none);
 
     strong {
         color: $color_gray_upload_alt;

@@ -172,22 +172,6 @@ input.slug {
     }
 }
 
-.faux-checkbox {
-    cursor: pointer;
-    display: inline-block;
-    height: 20px;
-    margin: 0 8px 0 0;
-    vertical-align: middle;
-    width: 20px;
-    background: $color_gray_input;
-    border-radius: 2px;
-    @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
-
-    &.checked {
-        background: $color_gray_input url('../img/checkmark.svg') center center no-repeat;
-    }
-}
-
 .filter-control {
     background: #fff;
     border: 1px solid rgba(0,0,0,.15);

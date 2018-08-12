@@ -2,13 +2,9 @@
   ========================================================================== */
 
 .bard-fieldtype-wrapper {
-    position: relative;
+    @apply .shadow-inner .bg-bg .border-0 .py-1 .px-3 .rounded;
     background: $color_gray_input;
     color: $color_gray_dark;
-    border: 0;
-    border-radius: 3px;
-    padding: 8px 24px;
-    @include box-shadow(inset 0px 1px 1px 0px rgba(0,0,0,.1));
 }
 
 .bard-field-options {

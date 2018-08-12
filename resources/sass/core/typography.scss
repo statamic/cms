@@ -1,15 +1,34 @@
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
 body {
-    @apply .font-sans .text-grey-darker .text-base;
+    @apply .font-sans .text-grey-darker .text-base .tracking-normal;
     font-variant: common-ligatures tabular-nums;
 }
 
 h1 {
     @apply text-2xl font-normal m-0 antialiased;
-    letter-spacing: -0.013;
+    letter-spacing: -0.013em;
 }
 
-h2 { font-size: 18px; }
-h3 { font-size: 16px; }
+h2 {
+    @apply text-lg m-0 antialiased font-medium;
+    letter-spacing: -0.008em;
+}
+
+h3 {
+    @apply text-base font-normal antialiased;
+}
+
+h4 {
+    @apply text-sm font-bold antialiased;
+    letter-spacing: 0.001em;
+}
+
+h6 {
+    @apply text-3xs font-bold uppercase tracking-wide antialiased;
+}
 
 a {
     color: #4e5e73;
@@ -30,10 +49,6 @@ a:focus {
     font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
-}
-
-.normal {
-    font-weight: normal !important;
 }
 
 sup {

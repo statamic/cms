@@ -39,21 +39,21 @@ $rem-base: 10px;
   * {
     box-sizing: border-box;
   }
-  
+
   div, span, ul, li {
     margin: 0;
     padding: 0;
     border: 0;
   }
-  
+
   ul {
     list-style: none;
   }
-  
+
   &.dr-active {
     z-index: 10;
   }
-  
+
   .dr-input {
   	@extend .form-control;
     display: flex;
@@ -65,7 +65,7 @@ $rem-base: 10px;
       border-color: $blue;
     }
     &.dr-active {
-     
+
     }
     .dr-dates {
       display: flex;
@@ -217,7 +217,7 @@ $rem-base: 10px;
       }
       .dr-days-of-week-list {
         display: flex;
-        @include linear-gradient(to bottom, white, #f9f9f9);
+        background: linear-gradient(to bottom, white, #f9f9f9);
         font-size: rem(10);
         color: $rat;
         padding: rem(5 0);

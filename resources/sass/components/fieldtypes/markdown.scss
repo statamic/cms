@@ -81,11 +81,9 @@
     }
 
     .CodeMirror {
-        @include input-shadow;
+        @apply .shadow-inner .h-auto .font-mono;
         background: $bg;
-        height: auto;
         line-height: 1.5;
-        font-family: $font_monospace;
         padding: 10px;
         font-size: 13px;
         border-radius: 0 0 3px 3px;

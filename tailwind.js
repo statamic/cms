@@ -175,8 +175,8 @@ module.exports = {
 
     tracking: {
         'tight':  '-0.05em',
-        'normal': '-0.03em',
-        'wide':   '0.07em',
+        'normal': '-0.004em',
+        'wide':   '0.14em',
     },
 
 

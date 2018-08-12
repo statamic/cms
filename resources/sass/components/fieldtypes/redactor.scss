@@ -9,12 +9,7 @@
 }
 
 .redactor-editor {
-    @include input-shadow;
-    background: $bg;
-    padding: 16px;
-    border-radius: 0;
-    border: none;
-    -webkit-font-smoothing: antialiased;
+    @apply .shadow-inner .bg-bg .p-2 .rounded-none .border-0 .antialiased;
 }
 
 .redactor-toolbar {
