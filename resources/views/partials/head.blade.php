@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width">
 <meta id="csrf-token" value="{{ csrf_token() }}" />
 <meta name="robots" content="noindex,nofollow">
-<title>{{ $title or '' }} | Statamic</title>
+<title>@yield('title', $title ?? __('Here')) &#10174; Statamic</title>
 <link href="{{ cp_resource_url('css/cp.css') }}?v={{ STATAMIC_VERSION }}" rel="stylesheet" />
 @if (\Statamic\API\File::exists('site/helpers/cp/override.css'))
     <link href="{{ resource_url('helpers/cp/override.css') }}" rel="stylesheet" />
