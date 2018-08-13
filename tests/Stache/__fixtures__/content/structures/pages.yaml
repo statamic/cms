@@ -3,12 +3,12 @@ route: '{parent_uri}/{slug}'
 root: pages-home
 tree:
   -
-    page: pages-about # (/about)
+    entry: pages-about # (/about)
     children:
       -
-        page: pages-board # (/about/board)
+        entry: pages-board # (/about/board)
         children:
           -
-            page: pages-directors # (/about/board/directors)
+            entry: pages-directors # (/about/board/directors)
   -
-    page: pages-blog # (/blog)
+    entry: pages-blog # (/blog)
