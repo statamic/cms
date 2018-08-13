@@ -11,7 +11,8 @@
     }
 
     li {
-        @apply p-0 mb-1 text-sm;
+        @apply p-0 text-sm;
+        margin-top: 6px;
     }
 
     li a {

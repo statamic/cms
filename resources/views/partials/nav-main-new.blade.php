@@ -1,14 +1,14 @@
 @section('nav-main')
     <nav class="new-nav-main">
         <div class="nav-main-wrapper">
-            <ul>
+            <ul class="mt-sm">
                 <li class="current">
                     <a href="{{ route('dashboard') }}">
                         <i>@svg('new/pie-line-graph-desktop')</i><span>Dashboard</span>
                     </a>
                 </li>
             </ul>
-            <h6 class="mb-1">Content</h6>
+            <h6>Content</h6>
             <ul>
                 <li>
                     <a href="">
@@ -36,7 +36,7 @@
                     </a>
                 </li>
             </ul>
-            <h6 class="mb-1">Tools</h6>
+            <h6>Tools</h6>
             <ul>
                 <li>
                     <a href="">
@@ -54,7 +54,7 @@
                     </a>
                 </li>
             </ul>
-            <h6 class="mb-1">Users</h6>
+            <h6>Users</h6>
             <ul>
                 <li>
                     <a href="">
@@ -72,7 +72,7 @@
                     </a>
                 </li>
             </ul>
-            <h6 class="mb-1">Site</h6>
+            <h6>Site</h6>
             <ul>
                 <li>
                     <a href="">
