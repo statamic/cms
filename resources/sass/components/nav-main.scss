@@ -1,3 +1,7 @@
+/* ==========================================================================
+   THE NAV
+   ========================================================================== */
+
 .nav-main {
     @apply select-none;
     z-index: 102;
@@ -13,7 +17,7 @@
         flex-basis: auto;
         // max-height: 100vh;
         // overflow-y: auto;
-        position: sticky;
+        // position: sticky;
         top: 24px;
     }
 
@@ -200,20 +204,37 @@
     }
 }
 
+
+// New Nav
 .nav-main.new {
+    ul {
+        @apply mt-0 mb-3;
+    }
+
     li {
         @apply p-0 mb-1;
+    }
 
+    li a {
+        @apply p-0 flex items-center text-blue-light;
+
+        &:hover {
+            @apply font-medium text-blue-dark;
+        }
+
+        i {
+            @apply block h-6 p-sm w-6 rounded-full;
+            margin-right: 12px;
+        }
+    }
+
+    li.current {
         a {
-            @apply p-0 flex items-center text-blue-light;
-            &:hover {
-                @apply font-medium text-blue-dark;
-            }
+            @apply text-blue-darker font-medium;
+        }
 
-            i {
-                @apply block h-6 p-sm w-6 rounded-full;
-                margin-right: 12px;
-            }
+        i {
+            @apply bg-white;
         }
     }
 }
