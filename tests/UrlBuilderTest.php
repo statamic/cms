@@ -33,6 +33,7 @@ class UrlBuilderTest extends TestCase
         $this->entry = Entry::create('post')
                       ->collection('blog')
                       ->order('2015-01-02')
+                      ->with(['slashed' => 'foo/bar'])
                       ->get();
 
         $this->entry->in('fr')->set('slug', 'le-post');
@@ -54,5 +55,11 @@ class UrlBuilderTest extends TestCase
     {
         $this->builder->content($this->entry->in('fr'));
         $this->assertEquals('/blog/le-post', $this->builder->build('/blog/{slug}'));
+    }
+
+    public function testKeepsSlashesInValues()
+    {
+        $this->builder->content($this->entry);
+        $this->assertEquals('/blog/foo/bar', $this->builder->build('/blog/{slashed}'));
     }
 }
