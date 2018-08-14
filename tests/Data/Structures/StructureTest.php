@@ -114,6 +114,14 @@ class StructureTest extends TestCase
         ], $this->structure()->uris()->all());
     }
 
+    /** @test */
+    function it_gets_a_page_by_key()
+    {
+        $page = $this->structure()->page('pages-directors');
+
+        $this->assertEquals('Directors', $page->get('title'));
+    }
+
     protected function structure()
     {
         return (new Structure)->data([

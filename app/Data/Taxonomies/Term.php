@@ -240,21 +240,16 @@ class Term extends Content implements TermContract
     }
 
     /**
-     * Get or set the URI
+     * Gets the URI
      *
      * This is the "identifying URL" for lack of a better description.
      * For instance, where `/fr/blog/my-post` would be a URL, `/blog/my-post` would be the URI.
      *
-     * @param string|null $uri
      * @return mixed
      * @throws \Exception
      */
-    public function uri($uri = null)
+    public function uri()
     {
-        if ($uri) {
-            throw new \Exception('Cannot set the URL on an entry directly.');
-        }
-
         $routes = array_get(Config::getRoutes(), 'taxonomies', []);
 
         if (! $route = array_get($routes, $this->taxonomyName())) {

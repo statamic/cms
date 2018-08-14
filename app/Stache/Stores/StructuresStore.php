@@ -68,13 +68,13 @@ class StructuresStore extends BasicStore
         $this->files->put($path, $contents);
     }
 
-    public function getEntryIdFromUri(string $uri): ?string
+    public function getKeyFromUri(string $uri): ?string
     {
-        if (! $key = collect($this->entryUris->first())->flip()->get($uri)) {
-            return null;
+        if ($key = collect($this->entryUris->first())->flip()->get($uri)) {
+            return $key;
         }
 
-        return str_after($key, '::');
+        return null;
     }
 
     public function getCacheableMeta()
@@ -130,7 +130,7 @@ class StructuresStore extends BasicStore
     protected function flushStructureEntryUris($handle)
     {
         foreach ($this->stache->sites() as $site) {
-            $this->entryUris->put($site, $this->entryUris->get($site)->reject(function ($uri, $key) use ($handle) {
+            $this->entryUris->put($site, collect($this->entryUris->get($site))->reject(function ($uri, $key) use ($handle) {
                 return str_before($key, '::') === $handle;
             }));
         }

@@ -86,7 +86,9 @@ class StuctureRepositoryTest extends TestCase
     /** @test */
     function it_gets_an_entry_by_uri()
     {
-        $this->assertEquals('Directors', $this->repo->findEntryByUri('/about/board/directors')->get('title'));
+        $entry = $this->repo->findEntryByUri('/about/board/directors');
+        $this->assertEquals('Directors', $entry->get('title'));
+        $this->assertEquals('/about/board/directors', $entry->uri());
         $this->assertNull($this->repo->findEntryByUri('/unknown'));
     }
 }

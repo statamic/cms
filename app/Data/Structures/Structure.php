@@ -88,4 +88,9 @@ class Structure implements StructureContract
     {
         return $this->data;
     }
+
+    public function page(string $id): ?Page
+    {
+        return $this->flattenedPages()->get($id);
+    }
 }

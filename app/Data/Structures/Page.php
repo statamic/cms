@@ -6,8 +6,7 @@ use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Content\UrlBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
 
-
-class Page
+class Page implements Entry
 {
     protected $entry;
     protected $route;
@@ -86,5 +85,32 @@ class Page
     public function flattenedPages()
     {
         return $this->pages()->flattenedPages();
+    }
+
+    // TODO: tests for these
+
+    public function toArray()
+    {
+        return $this->entry()->toArray();
+    }
+
+    public function editUrl()
+    {
+        return $this->entry()->editUrl();
+    }
+
+    public function fieldset($fieldset = null)
+    {
+        return $this->entry()->fieldset($fieldset);
+    }
+
+    public function in($locale)
+    {
+        return new \Statamic\Data\LocalizedData($locale, $this);
+    }
+
+    public function __call($method, $args)
+    {
+        return call_user_func_array([$this->entry(), $method], $args);
     }
 }

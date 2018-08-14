@@ -324,7 +324,7 @@ EOT;
     }
 
     /** @test */
-    function it_gets_an_entry_id_from_a_uri()
+    function it_gets_a_key_from_a_uri()
     {
         $this->store->setEntryUris([
             'en' => [
@@ -336,11 +336,11 @@ EOT;
             ],
         ]);
 
-        $this->assertEquals('1', $this->store->getEntryIdFromUri('/'));
-        $this->assertEquals('2', $this->store->getEntryIdFromUri('/foo'));
-        $this->assertEquals('3', $this->store->getEntryIdFromUri('/foo/bar'));
-        $this->assertEquals('4', $this->store->getEntryIdFromUri('/baz'));
-        $this->assertEquals('5', $this->store->getEntryIdFromUri('/baz/qux'));
-        $this->assertNull($this->store->getEntryIdFromUri('/unknown'));
+        $this->assertEquals('first::1', $this->store->getKeyFromUri('/'));
+        $this->assertEquals('first::2', $this->store->getKeyFromUri('/foo'));
+        $this->assertEquals('first::3', $this->store->getKeyFromUri('/foo/bar'));
+        $this->assertEquals('second::4', $this->store->getKeyFromUri('/baz'));
+        $this->assertEquals('second::5', $this->store->getKeyFromUri('/baz/qux'));
+        $this->assertNull($this->store->getKeyFromUri('/unknown'));
     }
 }

@@ -122,7 +122,7 @@ abstract class Content extends Data implements ContentContract
         $this->supplements['order']     = $this->order();
 
         if ($this->supplement_taxonomies) {
-            $this->addTaxonomySupplements();
+            // $this->addTaxonomySupplements();
         }
     }
 
@@ -137,7 +137,7 @@ abstract class Content extends Data implements ContentContract
     }
 
     /**
-     * Get or set the URI
+     * Gets the URI
      *
      * This is the "identifying URL" for lack of a better description.
      * For instance, where `/fr/blog/my-post` would be a URL, `/blog/my-post` would be the URI.
@@ -145,7 +145,7 @@ abstract class Content extends Data implements ContentContract
      * @param string|null $uri
      * @return mixed
      */
-    abstract public function uri($uri = null);
+    abstract public function uri();
 
     /**
      * Get the URL

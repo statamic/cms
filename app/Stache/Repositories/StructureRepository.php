@@ -37,9 +37,13 @@ class StructureRepository implements RepositoryContract
     {
         $uri = str_start($uri, '/');
 
-        $id = $this->store->getEntryIdFromUri($uri);
+        if (! $key = $this->store->getKeyFromUri($uri)) {
+            return null;
+        }
 
-        return EntryAPI::find($id);
+        list($handle, $id) = explode('::', $key);
+
+        return $this->find($handle)->page($id);
     }
 
     public function save(Structure $structure)

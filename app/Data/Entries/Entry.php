@@ -139,21 +139,16 @@ class Entry extends Content implements EntryContract
     }
 
     /**
-     * Get or set the URI
+     * Gets the URI
      *
      * This is the "identifying URL" for lack of a better description.
      * For instance, where `/fr/blog/my-post` would be a URL, `/blog/my-post` would be the URI.
      *
-     * @param string|null $uri
      * @return mixed
      * @throws \Exception
      */
-    public function uri($uri = null)
+    public function uri()
     {
-        if ($uri) {
-            throw new \Exception('Cannot set the URI on an entry directly.');
-        }
-
         if ($route = $this->collection()->route()) {
             return app('Statamic\Contracts\Data\Content\UrlBuilder')->content($this)->build($route);
         }
