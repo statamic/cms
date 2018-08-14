@@ -70,7 +70,8 @@ class Entry
      */
     public function whereUri($uri)
     {
-        return $this->service()->findByUri($uri);
+        return app(StructureRepository::class)->findEntryByUri($uri)
+            ?? $this->service()->findByUri($uri);
     }
 
     /**

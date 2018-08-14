@@ -100,6 +100,24 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
+    function it_gets_an_entry_by_uri()
+    {
+        $entry = Entry::whereUri('/numeric/two');
+        $this->assertEquals('numeric-two', $entry->id());
+        $this->assertEquals('Two', $entry->get('title'));
+
+        $this->assertNull(Entry::whereUri('/unknown'));
+    }
+
+    /** @test */
+    function it_gets_an_entry_in_structure_by_uri()
+    {
+        $entry = Entry::whereUri('/about/board/directors');
+        $this->assertEquals('pages-directors', $entry->id());
+        $this->assertEquals('Directors', $entry->get('title'));
+    }
+
+    /** @test */
     function it_gets_structures()
     {
         $this->assertEquals(2, Structure::all()->count());
@@ -125,6 +143,13 @@ class FeatureTest extends TestCase
         // TODO: terms and pages
 
         $this->assertNull(Content::find('unknown'));
+    }
+
+    /** @test */
+    function it_gets_content_by_uri()
+    {
+        $this->assertEquals('One', Content::whereUri('/numeric/one')->get('title'));
+        $this->assertEquals('Directors', Content::whereUri('/about/board/directors')->get('title'));
     }
 
     /** @test */

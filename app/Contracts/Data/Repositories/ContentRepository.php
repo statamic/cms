@@ -9,4 +9,5 @@ interface ContentRepository
 {
     public function all(): ContentCollection;
     public function find($id): ?Content;
+    public function findByUri(string $uri): ?Content;
 }

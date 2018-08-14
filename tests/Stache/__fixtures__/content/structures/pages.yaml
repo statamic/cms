@@ -1,6 +1,6 @@
 title: Pages
 route: '{parent_uri}/{slug}'
-root: pages-home
+parent: pages-home
 tree:
   -
     entry: pages-about # (/about)

@@ -43,19 +43,9 @@ class Content
      */
     public function whereUri($uri)
     {
-        if ($uri === null) {
-            return null;
-        }
-
-        $is_array   = is_array($uri);
-        $uris       = Helper::ensureArray($uri);
-        $collection = collect_content();
-
-        foreach ($uris as $uri) {
-            $collection->push($this->repo()->uri($uri));
-        }
-
-        return ($is_array) ? $collection : $collection->first();
+        // TODO: The old version of this method accepted an array of URIs.
+        // Either support that in here, or make a separate method.
+        return $this->repo()->findByUri($uri);
     }
 
     /**

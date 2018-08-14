@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Statamic\Stache\Stache;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
+use Statamic\Contracts\Data\Repositories\StructureRepository;
 use Statamic\Contracts\Data\Repositories\EntryRepository as RepositoryContract;
 
 class EntryRepository implements RepositoryContract
@@ -46,8 +47,7 @@ class EntryRepository implements RepositoryContract
 
     public function findByUri(string $uri): ?Entry
     {
-        $id = $this->store->getIdFromUri($uri);
-
-        return $this->find($id);
+        return app(StructureRepository::class)->findEntryByUri($uri)
+            ?? $this->find($this->store->getIdFromUri($uri));
     }
 }

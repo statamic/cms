@@ -111,7 +111,7 @@ class StructureTest extends TestCase
             'pages-board' => '/about/board',
             'pages-directors' => '/about/board/directors',
             'pages-blog' => '/blog',
-        ], $this->structure()->flattenedPages()->map->uri()->all());
+        ], $this->structure()->uris()->all());
     }
 
     protected function structure()

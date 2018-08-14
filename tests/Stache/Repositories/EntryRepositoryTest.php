@@ -7,6 +7,8 @@ use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
+use Statamic\Stache\Stores\StructuresStore;
+use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Repositories\EntryRepository;
 
 class EntryRepositoryTest extends TestCase
@@ -17,7 +19,11 @@ class EntryRepositoryTest extends TestCase
 
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
-        $stache->registerStore((new EntriesStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'));
+        $stache->registerStores([
+            (new CollectionsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
+            (new EntriesStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
+            (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+        ]);
 
         $this->repo = new EntryRepository($stache);
     }
@@ -114,5 +120,26 @@ class EntryRepositoryTest extends TestCase
         $this->assertEquals('Bravo', $entry->get('title'));
 
         $this->assertNull($this->repo->find('unknown'));
+    }
+
+    /** @test */
+    function it_gets_entry_by_uri()
+    {
+        $entry = $this->repo->findByUri('/alphabetical/bravo');
+
+        $this->assertInstanceOf(Entry::class, $entry);
+        $this->assertEquals('Bravo', $entry->get('title'));
+
+        $this->assertNull($this->repo->findByUri('/unknown'));
+    }
+
+    /** @test */
+    function it_gets_entry_by_structure_uri()
+    {
+        $entry = $this->repo->findByUri('/about/board/directors');
+
+        $this->assertInstanceOf(Entry::class, $entry);
+        $this->assertEquals('pages-directors', $entry->id());
+        $this->assertEquals('Directors', $entry->get('title'));
     }
 }

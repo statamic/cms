@@ -5,7 +5,9 @@ namespace Tests\Stache\Repositories;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
+use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\StructuresStore;
+use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Contracts\Data\Structures\Structure;
 use Statamic\Stache\Repositories\StructureRepository;
 
@@ -17,7 +19,12 @@ class StuctureRepositoryTest extends TestCase
 
         $stache = (new Stache)->sites(['en']);
         $this->directory = __DIR__.'/../__fixtures__/content/structures';
-        $stache->registerStore((new StructuresStore($stache, app('files')))->directory($this->directory));
+        $stache->registerStores([
+            (new CollectionsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
+            (new EntriesStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
+            (new StructuresStore($stache, app('files')))->directory($this->directory)
+        ]);
+        $this->app->instance(Stache::class, $stache);
 
         $this->repo = new StructureRepository($stache);
     }
@@ -57,14 +64,29 @@ class StuctureRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_structure_to_the_stache_and_to_a_file()
     {
-        $structure = (new \Statamic\Data\Structures\Structure)->handle('new')->data(['foo' => 'bar']);
+        $structure = (new \Statamic\Data\Structures\Structure)->handle('new')->data([
+            'parent' => 'pages-home',
+            'route' => '',
+            'tree' => []
+        ]);
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($structure);
 
         $this->assertNotNull($item = $this->repo->findByHandle('new'));
-        $this->assertEquals(['foo' => 'bar'], $item->data());
+        $this->assertEquals([
+            'parent' => 'pages-home',
+            'route' => '',
+            'tree' => []
+        ], $item->data());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
+    }
+
+    /** @test */
+    function it_gets_an_entry_by_uri()
+    {
+        $this->assertEquals('Directors', $this->repo->findEntryByUri('/about/board/directors')->get('title'));
+        $this->assertNull($this->repo->findEntryByUri('/unknown'));
     }
 }

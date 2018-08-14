@@ -78,4 +78,14 @@ class Structure implements StructureContract
     {
         return $this->pages()->flattenedPages();
     }
+
+    public function uris()
+    {
+        return $this->flattenedPages()->map->uri();
+    }
+
+    public function toCacheableArray()
+    {
+        return $this->data;
+    }
 }

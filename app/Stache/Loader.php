@@ -18,9 +18,7 @@ class Loader
         $meta = $this->getMetaFromCache();
 
         $meta->each(function ($data, $key) {
-            $this->stache->store($key)
-                ->setPaths($data['paths'])
-                ->setUris($data['uris']);
+            $this->stache->store($key)->loadMeta($data);
         });
 
         $this->stache->meta($meta);

@@ -4,6 +4,8 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
+use Statamic\API\Entry as EntryAPI;
+use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Contracts\Data\Structures\Structure;
 use Statamic\Contracts\Data\Repositories\StructureRepository as RepositoryContract;
 
@@ -29,6 +31,15 @@ class StructureRepository implements RepositoryContract
     public function findByHandle($handle): ?Structure
     {
         return $this->store->getItem($handle);
+    }
+
+    public function findEntryByUri(string $uri): ?Entry
+    {
+        $uri = str_start($uri, '/');
+
+        $id = $this->store->getEntryIdFromUri($uri);
+
+        return EntryAPI::find($id);
     }
 
     public function save(Structure $structure)

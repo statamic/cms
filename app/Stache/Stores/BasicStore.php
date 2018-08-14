@@ -210,4 +210,11 @@ abstract class BasicStore extends Store
             return [$this->key() => $meta];
         }
     }
+
+    public function loadMeta($data)
+    {
+        $this
+            ->setPaths($data['paths'])
+            ->setUris($data['uris']);
+    }
 }

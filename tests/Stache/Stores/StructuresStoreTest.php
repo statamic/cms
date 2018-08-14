@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Stores;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
@@ -192,5 +193,154 @@ tree:
 EOT;
 
         $this->assertStringEqualsFile($this->tempDir.'/pages.yaml', $contents);
+    }
+
+    /** @test */
+    function it_adds_entry_uris_to_cacheable_meta()
+    {
+        $structure = Mockery::mock(\Statamic\Data\Structures\Structure::class);
+        $structure->shouldReceive('handle')->andReturn('pages');
+        $structure->shouldReceive('uris')->andReturn(collect([
+            'pages-home' => '/',
+            'pages-about' => '/about',
+            'pages-board' => '/about/board',
+            'pages-directors' => '/about/board/directors',
+            'pages-blog' => '/blog',
+        ]));
+
+        $this->store->setItem('pages', $structure);
+
+        $this->assertEquals([
+            'paths' => [],
+            'uris' => ['en' => []],
+            'entryUris' => [
+                'en' => [
+                    'pages::pages-home' => '/',
+                    'pages::pages-about' => '/about',
+                    'pages::pages-board' => '/about/board',
+                    'pages::pages-directors' => '/about/board/directors',
+                    'pages::pages-blog' => '/blog',
+                ]
+            ]
+        ], $this->store->getCacheableMeta());
+    }
+
+    /** @test */
+    function it_loads_entry_uris_from_meta()
+    {
+        $meta = [
+            'paths' => [],
+            'uris' => ['en' => []],
+            'entryUris' => [
+                'en' => [
+                    'first::1' => '/',
+                    'first::2' => '/foo',
+                    'first::3' => '/foo/bar',
+                    'second::4' => '/baz',
+                    'second::5' => '/baz/qux',
+                ],
+            ]
+        ];
+
+        $this->store->loadMeta($meta);
+
+        $expected = [
+            'first::1' => '/',
+            'first::2' => '/foo',
+            'first::3' => '/foo/bar',
+            'second::4' => '/baz',
+            'second::5' => '/baz/qux',
+        ];
+
+        $this->assertEquals($expected, $this->store->getEntryUris());
+        $this->assertEquals($expected, $this->store->getEntryUris('en'));
+    }
+
+    /** @test */
+    function when_a_structure_is_inserted_it_should_update_the_uris_and_remove_them_when_its_removed()
+    {
+        $structureOne = Mockery::mock(\Statamic\Data\Structures\Structure::class);
+        $structureOne->shouldReceive('handle')->andReturn('one');
+        $structureOne->shouldReceive('uris')->andReturn(collect([
+            '1' => '/foo',
+            '2' => '/foo/bar',
+        ]));
+        $structureTwo = Mockery::mock(\Statamic\Data\Structures\Structure::class);
+        $structureTwo->shouldReceive('handle')->andReturn('two');
+        $structureTwo->shouldReceive('uris')->andReturn(collect([
+            '3' => '/baz',
+            '4' => '/baz/qux',
+        ]));
+
+        $this->assertEquals([], $this->store->getEntryUris()->all());
+
+        $this->store->setItem('one', $structureOne);
+        $this->store->setItem('two', $structureTwo);
+
+        $this->assertEquals([
+            'one::1' => '/foo',
+            'one::2' => '/foo/bar',
+            'two::3' => '/baz',
+            'two::4' => '/baz/qux',
+        ], $this->store->getEntryUris()->all());
+
+        $this->store->removeItem('two');
+
+        $this->assertEquals([
+            'one::1' => '/foo',
+            'one::2' => '/foo/bar'
+        ], $this->store->getEntryUris()->all());
+    }
+
+    /** @test */
+    function removing_an_entry_from_a_structure_should_remove_its_uri()
+    {
+        $structure = Mockery::mock(\Statamic\Data\Structures\Structure::class);
+        $structure->shouldReceive('handle')->andReturn('one');
+        $structure->shouldReceive('uris')->andReturn(
+            collect([ // first time
+                '1' => '/foo',
+                '2' => '/foo/bar',
+            ]),
+            collect([ // second time
+                '1' => '/foo',
+                '3' => '/qux',
+            ])
+        );
+
+        $this->store->setItem('one', $structure);
+
+        $this->assertEquals([
+            'one::1' => '/foo',
+            'one::2' => '/foo/bar',
+        ], $this->store->getEntryUris()->all());
+
+        $this->store->setItem('one', $structure);
+
+        $this->assertEquals([
+            'one::1' => '/foo',
+            'one::3' => '/qux',
+        ], $this->store->getEntryUris()->all());
+    }
+
+    /** @test */
+    function it_gets_an_entry_id_from_a_uri()
+    {
+        $this->store->setEntryUris([
+            'en' => [
+                'first::1' => '/',
+                'first::2' => '/foo',
+                'first::3' => '/foo/bar',
+                'second::4' => '/baz',
+                'second::5' => '/baz/qux',
+            ],
+        ]);
+
+        $this->assertEquals('1', $this->store->getEntryIdFromUri('/'));
+        $this->assertEquals('2', $this->store->getEntryIdFromUri('/foo'));
+        $this->assertEquals('3', $this->store->getEntryIdFromUri('/foo/bar'));
+        $this->assertEquals('4', $this->store->getEntryIdFromUri('/baz'));
+        $this->assertEquals('5', $this->store->getEntryIdFromUri('/baz/qux'));
+        $this->assertNull($this->store->getEntryIdFromUri('/unknown'));
     }
 }

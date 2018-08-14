@@ -1,6 +1,8 @@
 title: Footer
+parent: pages-home
+route: '{slug}'
 tree:
   -
-    page: pages-about
+    entry: pages-about
   -
-    page: pages-contact
+    entry: pages-contact

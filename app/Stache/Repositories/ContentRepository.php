@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Statamic\API\Entry;
 use Statamic\Stache\Stache;
 use Statamic\Contracts\Data\Content\Content;
 use Statamic\Data\Content\ContentCollection;
@@ -19,7 +20,7 @@ class ContentRepository implements RepositoryContract
 
     public function all(): ContentCollection
     {
-        return app(EntryRepository::class)->all();
+        return Entry::all();
     }
 
     public function find($id): ?Content
@@ -29,5 +30,10 @@ class ContentRepository implements RepositoryContract
         }
 
         return $store->getItem($id);
+    }
+
+    public function findByUri(string $uri): ?Content
+    {
+        return Entry::whereUri($uri);
     }
 }
