@@ -144,7 +144,9 @@ abstract class BasicStore extends Store
 
         $cache = Cache::get($this->getItemsCacheKey());
 
-        $this->items = $this->getItemsFromCache(collect($cache));
+        $this->getItemsFromCache(collect($cache))->each(function ($item, $key) {
+            $this->setItem($key, $item);
+        });
 
         $this->markAsLoaded();
 

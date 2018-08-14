@@ -13,11 +13,11 @@ class BasicStoreTest extends TestCase
     {
         parent::setUp();
 
-        $stache = (new Stache)
+        $this->stache = (new Stache)
             ->sites(['en', 'fr'])
             ->keys(['test/data']);
 
-        $this->store = new TestBasicStore($stache, app('files'));
+        $this->store = new TestBasicStore($this->stache, app('files'));
     }
 
     /** @test */
@@ -136,6 +136,14 @@ class BasicStoreTest extends TestCase
     /** @test */
     function items_can_be_loaded()
     {
+        $this->store = new class($this->stache, app('files')) extends TestBasicStore {
+            public $timesSetItemWasCalled = 0;
+            public function setItem($key, $value) {
+                parent::setItem($key, $value);
+                $this->timesSetItemWasCalled++;
+            }
+        };
+
         Cache::shouldReceive('get')->with('stache::items/test')->andReturn($items = [
             // These items are irrelevant here. The test for the content
             // of these are driven out in the individual store tests.
@@ -145,12 +153,18 @@ class BasicStoreTest extends TestCase
 
         $this->assertFalse($this->store->isLoaded());
         $this->assertEquals(0, $this->store->getItemsWithoutLoading()->count());
+        $this->assertEquals(0, $this->store->timesSetItemWasCalled);
 
         $return = $this->store->load();
 
         $this->assertEquals($this->store, $return);
         $this->assertTrue($this->store->isLoaded());
         $this->assertEquals($items, $this->store->getItemsWithoutLoading()->all());
+
+        // Some stores are relying on setItem to be called for every item. For example, the StructuresStore
+        // updates entry URIs whenever a Structure is set into the store. If we just do something like
+        // `$this->items = $items` then the StructuresStore (or maybe something else) could break.
+        $this->assertEquals(2, $this->store->timesSetItemWasCalled);
     }
 
     /** @test */
