@@ -19,11 +19,11 @@ class EntryTest extends TestCase
         parent::setUp();
 
         // Add a blog collection to the stache
-        $collection = Entries::createCollection('blog');
-        $collection->data(['order' => 'date', 'template' => 'blog/post']);
-        $this->app->make(Stache::class)
-            ->store('collections')
-            ->setItem('blog', $collection)
+        $this->collection = Entries::createCollection('blog');
+        $this->collection->data(['order' => 'date', 'template' => 'blog/post']);
+        $this->stache = $this->app->make(Stache::class);
+        $this->stache->store('collections')
+            ->setItem('blog', $this->collection)
             ->setPath('blog', 'collections/blog.yaml');
 
         $this->entry = Entry::create('post')->collection('blog')->with([
@@ -46,7 +46,8 @@ class EntryTest extends TestCase
     {
         $this->expectException('Statamic\Exceptions\InvalidEntryTypeException');
 
-        Config::set('statamic.routes.collections.blog', '/blog/{year}/{slug}');
+        $this->collection->route('/blog/{year}/{slug}');
+        $this->stache->store('collections')->setItem('blog', $this->collection);
 
         $this->entry->url();
     }
@@ -60,13 +61,15 @@ class EntryTest extends TestCase
             ]
         ]);
 
-        Config::set('statamic.routes.collections.blog', '/blog/{slug}');
+        $this->collection->route('/blog/{slug}');
+        $this->stache->store('collections')->setItem('blog', $this->collection);
 
         $this->entry->order('2015-02-01');
 
         $this->assertEquals('/blog/post', $this->entry->url());
 
-        Config::set('statamic.routes.collections.blog', '/blog/{year}/{month}/{day}/{slug}');
+        $this->collection->route('/blog/{year}/{month}/{day}/{slug}');
+        $this->stache->store('collections')->setItem('blog', $this->collection);
 
         $this->assertEquals('/blog/2015/02/01/post', $this->entry->url());
         $this->assertEquals('http://talons-beard.dev/blog/2015/02/01/post', $this->entry->absoluteUrl());

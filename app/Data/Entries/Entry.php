@@ -154,7 +154,6 @@ class Entry extends Content implements EntryContract
             throw new \Exception('Cannot set the URI on an entry directly.');
         }
 
-        // TODO: TDD
         if ($route = $this->collection()->route()) {
             return app('Statamic\Contracts\Data\Content\UrlBuilder')->content($this)->build($route);
         }
