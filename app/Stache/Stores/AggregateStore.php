@@ -143,6 +143,15 @@ abstract class AggregateStore extends Store
         return $this;
     }
 
+    public function getIdFromUri($uri)
+    {
+        foreach ($this->stores() as $store) {
+            if ($match = $store->getIdFromUri($uri)) {
+                return $match;
+            }
+        }
+    }
+
     public function forEachSite($callback)
     {
         $this->stache->sites()->each(function ($site) use ($callback) {

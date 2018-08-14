@@ -1,2 +1,3 @@
 title: Numeric
 order: number
+route: numeric/{slug}

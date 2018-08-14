@@ -43,4 +43,11 @@ class EntryRepository implements RepositoryContract
 
         return $store->getItem($id);
     }
+
+    public function findByUri(string $uri): ?Entry
+    {
+        $id = $this->store->getIdFromUri($uri);
+
+        return $this->find($id);
+    }
 }

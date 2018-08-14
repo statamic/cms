@@ -11,4 +11,5 @@ interface EntryRepository
     public function whereCollection(string $handle): EntryCollection;
     public function whereInCollection(array $handles): EntryCollection;
     public function find($id): ?Entry;
+    public function findByUri(string $uri): ?Entry;
 }

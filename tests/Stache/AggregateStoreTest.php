@@ -286,6 +286,24 @@ class AggregateStoreTest extends TestCase
             '456' => 'test::two',
         ], $this->store->getIdMap()->all());
     }
+
+    /** @test */
+    function it_gets_an_id_from_a_uri()
+    {
+        $this->store->store('one')->setUris([
+            'en' => $enUris = ['123' => '/one', '456' => '/two'],
+            'fr' => $frUris = ['123' => '/un', '456' => '/deux'],
+        ]);
+        $this->store->store('two')->setUris([
+            'en' => $enUris = ['789' => '/three', '101' => '/four'],
+            'fr' => $frUris = ['789' => '/tres', '101' => '/cuatro'],
+        ]);
+
+        $this->assertEquals('123', $this->store->getIdFromUri('/one'));
+        $this->assertEquals('456', $this->store->getIdFromUri('/two'));
+        $this->assertEquals('789', $this->store->getIdFromUri('/three'));
+        $this->assertEquals('101', $this->store->getIdFromUri('/four'));
+    }
 }
 
 class TestAggregateStore extends AggregateStore

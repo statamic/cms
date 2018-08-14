@@ -100,6 +100,13 @@ abstract class BasicStore extends Store
         return $this;
     }
 
+    public function getIdFromUri($uri, $site = null)
+    {
+        $site = $site ?? $this->stache->sites()->first();
+
+        return $this->getSiteUris($site)->filter()->flip()->get($uri);
+    }
+
     public function getIdMap()
     {
         return $this->paths->keys()->mapWithKeys(function ($id) {

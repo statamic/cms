@@ -1,1 +1,2 @@
 title: Alphabetical
+route: 'alphabetical/{slug}'

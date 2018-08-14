@@ -2,6 +2,8 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\Contracts\Data\Repositories\StructureRepository;
+
 class Entry
 {
     /**
@@ -68,7 +70,7 @@ class Entry
      */
     public function whereUri($uri)
     {
-        return self::service()->uri($uri);
+        return $this->service()->findByUri($uri);
     }
 
     /**

@@ -86,6 +86,25 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
+    function it_gets_an_id_from_a_uri()
+    {
+        $this->store->setUris([
+            'en' => $enUris = ['123' => '/one', '456' => '/two'],
+            'fr' => $frUris = ['123' => '/un', '456' => '/deux'],
+        ]);
+
+        $this->assertEquals('123', $this->store->getIdFromUri('/one'));
+        $this->assertEquals('123', $this->store->getIdFromUri('/one', 'en'));
+        $this->assertEquals('123', $this->store->getIdFromUri('/un', 'fr'));
+        $this->assertEquals('456', $this->store->getIdFromUri('/two'));
+        $this->assertEquals('456', $this->store->getIdFromUri('/two', 'en'));
+        $this->assertEquals('456', $this->store->getIdFromUri('/deux', 'fr'));
+        $this->assertNull($this->store->getIdFromUri('/unknown'));
+        $this->assertNull($this->store->getIdFromUri('/unknown', 'en'));
+        $this->assertNull($this->store->getIdFromUri('/unknown', 'fr'));
+    }
+
+    /** @test */
     function it_can_perform_an_action_for_each_site()
     {
         $arguments = [];
