@@ -194,7 +194,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('resolve-duplicate-ids', 'DuplicateIdController@update')->name('resolve-duplicate-ids.update');
 });
 
-Route::view('/sandbox', 'statamic::sandbox');
+Route::view('/playground', 'statamic::playground')->name('playground');
 
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');

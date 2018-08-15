@@ -494,14 +494,27 @@ function collect_users($value = [])
  * Check whether the nav link is active
  *
  * @param string $url
- * @return string
+ * @return bool
  */
 function nav_is($url)
 {
-    $url = preg_replace('/^index\.php\//', '', $url);
-    $current = request()->url();
+    return is_current($url);
+}
 
-    return $url === $current || Str::startsWith($current, $url . '/');
+/**
+ * Returns true if CP URL pattern matches current URL
+ *
+ * @param string $pattern
+ * @return bool
+ */
+function is_current($pattern)
+{
+    return request()->is(config('statamic.cp.route') . '/' . $pattern);
+}
+
+function current_class($pattern)
+{
+    return is_current($pattern) ? 'current' : '';
 }
 
 function format_input_options($options)

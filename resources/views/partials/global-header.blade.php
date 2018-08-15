@@ -20,7 +20,7 @@
 
     <div class="head-links pl-1 flex items-center">
         <div class="dropdown">
-            <a class="h-6 w-6 block p-sm text-grey hover:text-blue-darker" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @svg('new/book-open-text')
             </a>
             <ul class="dropdown-menu">
@@ -43,22 +43,22 @@
                 </li>
             </ul>
         </div>
-        <a class="h-6 w-6 block p-sm text-grey ml-1 hover:text-blue-darker" href="{{ route('site') }}" target="_blank">
+        <a class="h-6 w-6 block p-sm text-grey-light ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank">
             @svg('new/browser-com')
         </a>
         <div class="dropdown">
-            <a class="dropdown-toggle ml-1 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="icon-user-initials rounded-full text-xxs bg-pink z-depth-1">ME</div>
             </a>
             <ul class="dropdown-menu hide md:block">
                 <li class="px-1">
                     <div class="text-base mb-px">dev@statamic.com</div>
-                    <div class="text-xxs mt-px text-grey">Super Admin</div>
+                    <div class="text-xxs mt-px text-grey-light">Super Admin</div>
                 </li>
                 <li class="divider"></li>
                 <li><a href="{{ route('account') }}">{{ __('Profile') }}</a></li>
                 <li><a href="{{ route('account.password') }}">{{ __('Change Password') }}</a></li>
-                <li><a href="{{ route('logout') }}">{{ __('Sign Out') }}</a></li>
+                <li><a href="{{ route('logout') }}">{{ __('Logout') }}</a></li>
             </ul>
         </div>
     </div>
