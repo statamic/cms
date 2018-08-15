@@ -2,6 +2,7 @@
 
 namespace Tests\Stache;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\API\User;
 use Statamic\API\Entry;
@@ -17,6 +18,7 @@ use Statamic\Stache\Stores\BasicStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Contracts\Data\Repositories\StructureRepository;
 
 class FeatureTest extends TestCase
 {
@@ -129,6 +131,18 @@ class FeatureTest extends TestCase
         $structure = Structure::find('pages');
         $this->assertEquals('pages', $structure->handle());
         // TODO: Some more assertions
+    }
+
+    /** @test */
+    function it_saves_structures()
+    {
+        $structure = Structure::find('pages');
+
+        $repo = Mockery::mock(StructureRepository::class);
+        $repo->shouldReceive('save')->with($structure);
+        $this->app->instance(StructureRepository::class, $repo);
+
+        $structure->save();
     }
 
     /** @test */
