@@ -4,7 +4,7 @@ namespace Statamic\Stache;
 
 class Bootstrapper
 {
-    const CONFIG_UPDATE_EVERY_REQUEST_KEY = 'statamic.caching.update_every_request';
+    const CONFIG_UPDATE_EVERY_REQUEST_KEY = 'statamic.stache.update_every_request';
     const CONFIG_GLIDE_ROUTE_KEY = 'statamic.assets.image_manipulation.route';
 
     public function shouldUpdate()

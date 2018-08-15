@@ -4,6 +4,8 @@ use Statamic\Stache\Stores;
 
 return [
 
+    'update_every_request' => true,
+
     'stores' => [
 
         'collections' => [
