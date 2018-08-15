@@ -10,23 +10,14 @@
 }
 
 .dropdown-menu {
-    @extend .z-depth-2;
-    background-color: #fff;
-    position: absolute;
+    @apply bg-white shadow-lg absolute block float-left list-reset p-1 rounded-md;
     top: 100%;
     left: auto;
     right: -5px;
     z-index: 9999;
-    display: none;
-    float: left;
-    margin: 5px 0 0; // override default ul
-    list-style: none;
-    border: solid 1px rgba(0,0,0,.075);
-    border-radius: 4px;
+    margin: 6px 0 0;
     pointer-events: none;
     min-width: 180px;
-    padding: 8px;
-    display: block;
     transform-origin: 50% 10%;
     animation-fill-mode: forwards;
     opacity: 0;
@@ -36,18 +27,11 @@
     background-clip: padding-box;
 
     li > a {
-        border-radius: 3px;
-        display: block;
-        clear: both;
-        font-size: 13px;
-        font-weight: 400;
-        padding: 4px 8px;
-        line-height: 1.5;
+        @apply block rounded text-xs font-normal px-1 py-sm text-blue;
         white-space: nowrap;
 
         &:hover {
-            background: $brand-primary;
-            color: #fff;
+            @apply .bg-blue .text-white;
         }
 
         .icon {

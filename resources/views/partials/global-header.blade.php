@@ -8,30 +8,59 @@
     </div>
 
     <global-search
-        class="flex-1"
+        class="w-96"
         endpoint="{{ route('search.global') }}"
         :limit="10"
     ></global-search>
+    <a>
+        <span class="h-6 w-6 block p-sm mt-px ml-2">
+            @svg('new/add-circle-1')
+        </span>
+    </a>
 
     <div class="head-links pl-1 flex items-center">
-        <a href="{{ route('site') }}" target="_blank" v-cloak v-tip :tip-text="translate('cp.view_site')">
-            <span class="icon icon-popup"></span>
+        <div class="dropdown">
+            <a class="h-6 w-6 block p-sm text-grey hover:text-blue-darker" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @svg('new/book-open-text')
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="https://docs.statamic.com" class="flex items-center">
+                        <span>Documentation</span>
+                        <i class="w-3 block ml-1">@svg('new/expand-6')</i>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://statamic.com/forum" class="flex items-center">
+                        <span>Support</span>
+                        <i class="w-3 block ml-1">@svg('new/expand-6')</i>
+                    </a>
+                </li>
+                <li>
+                    <a @click="showShortcuts = true" class="flex items-center">
+                        <span>Keyboard Shortcuts</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <a class="h-6 w-6 block p-sm text-grey ml-1 hover:text-blue-darker" href="{{ route('site') }}" target="_blank">
+            @svg('new/browser-com')
         </a>
-
-        <a class="dropdown-toggle ml-1 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {{-- @if (\Statamic\API\Config::get('users.enable_gravatar'))
-                <img src="{{ \Statamic\API\User::getCurrent()->getAvatar() }}" alt="" height="32" width="32" class="round ml-8 z-depth-1">
-            @else
-                <div class="icon-user-initials round ml-8 z-depth-1">{{ \Statamic\API\User::getCurrent()->userInitials() }}</div>
-            @endif --}}
-            <div class="icon-user-initials rounded-full text-xxs bg-pink z-depth-1">ME</div>
-        </a>
-        <ul class="dropdown-menu hide md:block">
-            <li><a href="{{ route('account') }}">{{ __('My Account') }}</a></li>
-            <li><a href="{{ route('account.password') }}">{{ __('Change Password') }}</a></li>
-            <li class="divider"></li>
-            <li><a href="{{ route('logout') }}">{{ __('Sign Out') }}</a></li>
-        </ul>
+        <div class="dropdown">
+            <a class="dropdown-toggle ml-1 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="icon-user-initials rounded-full text-xxs bg-pink z-depth-1">ME</div>
+            </a>
+            <ul class="dropdown-menu hide md:block">
+                <li class="px-1">
+                    <div class="text-base mb-px">dev@statamic.com</div>
+                    <div class="text-xxs mt-px text-grey">Super Admin</div>
+                </li>
+                <li class="divider"></li>
+                <li><a href="{{ route('account') }}">{{ __('Profile') }}</a></li>
+                <li><a href="{{ route('account.password') }}">{{ __('Change Password') }}</a></li>
+                <li><a href="{{ route('logout') }}">{{ __('Sign Out') }}</a></li>
+            </ul>
+        </div>
     </div>
 
 </div>
