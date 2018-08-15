@@ -7,7 +7,7 @@
         <table>
             <tbody>
                 <tr is="upload"
-                    v-for="(i, upload) in uploads"
+                    v-for="(upload, i) in uploads"
                     :basename="upload.basename"
                     :extension="upload.extension"
                     :percent="upload.percent"

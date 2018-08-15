@@ -2,7 +2,7 @@
 
     <div class="asset-editor-modal">
 
-    <div class="asset-editor {{ isImage ? 'is-image' : 'is-file' }}">
+    <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
 
         <div v-if="loading" class="loading">
             <div><span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}</div>
@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="asset-editor-meta-actions">
-                    <a @click.prevent="open" title="{{ translate('cp.open') }}">
+                    <a @click="open" :title="translate('cp.open')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
                             <path d="m20.121 18.882 2.121-2.121.00000003-.00000003c.781207-.780931.781431-2.04729.00049994-2.8285-.780931-.781207-2.04729-.781431-2.8285-.00049994l-2.121 2.122"/>
@@ -50,7 +50,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click.prevent="download" title="{{ translate('cp.download') }}">
+                    <a @click="download" :title="translate('cp.download')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="23" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
                             <path d="M21.1219828 6.85714286C21.1219828 6.85714286 20.0297414 6.69642857 18.9655172 6.85714286M3.01724138 6C3.01724138 4.10657143 4.5612069 2.57142857 6.46551724 2.57142857 8.36982759 2.57142857 9.9137931 4.10657143 9.9137931 6"/>
@@ -58,7 +58,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click.prevent="close" title="{{ translate('cp.close') }}">
+                    <a @click="close" title="translate('cp.close')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.545)">
                             <path d="M16 0L.160533333 15.8389333M16 15.8389333L.160533333 0"/>
@@ -87,12 +87,12 @@
                     </div>
 
                     <div class="full-height" v-if="asset.extension == 'pdf'">
-                        <object data="{{ asset.url }}" type="application/pdf" width="100%" height="100%">
+                        <object :data="asset.url" type="application/pdf" width="100%" height="100%">
                         </object>
                     </div>
 
                     <div class="full-height" v-if="asset.is_previewable">
-                        <iframe class="full-height full-width" frameborder="0" src="https://docs.google.com/gview?url={{ asset.permalink }}&embedded=true"></iframe>
+                        <iframe class="full-height full-width" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
                     <div class="editor-file-actions">
@@ -326,7 +326,7 @@ export default {
          */
         selectFocalPoint(point) {
             point = (point === '50-50') ? null : point;
-            this.$set('fields.focus', point);
+            this.$set(this.fields, 'focus', point)
         },
 
         /**

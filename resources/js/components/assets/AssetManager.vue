@@ -10,7 +10,7 @@
             @selections-updated="updateSelections">
 
             <template slot="contextual-actions" v-if="selectedAssets.length">
-                    <button class="btn btn-danger ml-16 mr-2 mb-3" @click="deleteSelected">{{ translate('cp.delete') }}</button>
+                    <button class="btn btn-danger ml-2 mr-2 mb-3" @click="deleteSelected">{{ translate('cp.delete') }}</button>
                     <div class="btn-group mb-3">
                         <button class="btn" @click="selectedAssets = []">{{ translate('cp.uncheck_all') }}</button>
                         <button class="btn" @click="openAssetMover">{{ translate('cp.move') }}</button>
@@ -113,7 +113,8 @@ export default {
          * Delete all the selected assets.
          */
         deleteSelected() {
-            this.$broadcast('delete-assets', this.selectedAssets);
+            //@TODO: Wire up
+            this.$eventHub.$emit('delete-assets', this.selectedAssets);
         },
 
         openAssetMover() {

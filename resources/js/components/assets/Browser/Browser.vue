@@ -46,9 +46,8 @@
 
                 <input type="text"
                     class="search filter-control mb-3"
-                    placeholder="{{ translate('cp.search') }}..."
-                    v-model="searchTerm"
-                    debounce="500" />
+                    :placeholder="translate('cp.search')"
+                    v-model="searchTerm" />
 
                 <div class="asset-browser-actions flexy wrap">
 
@@ -145,7 +144,7 @@
             <asset-editor
                 v-if="showAssetEditor"
                 :id="editedAssetId"
-                :has-child.sync="editorHasChild"
+                :has-child="editorHasChild"
                 @closed="closeAssetEditor"
                 @saved="assetSaved"
                 @deleted="assetDeleted"
@@ -169,10 +168,7 @@
                 @closed="folderEditorClosed"
                 @updated="loadAssets">
             </folder-editor>
-
         </div>
-
-
     </div>
 
 </template>
@@ -329,7 +325,7 @@ export default {
 
         'close-editor': function() {
             if (this.editorHasChild) {
-                return this.$broadcast('close-child-editor');
+                return this.$eventHub.$emit('close-child-editor');
             }
 
             this.showFolderCreator = false;
@@ -383,8 +379,9 @@ export default {
         },
 
         searchTerm(term) {
+
             if (term) {
-                this.search();
+                _.debounce(this.search(), 500);
             } else {
                 this.loadAssets();
             }
@@ -399,7 +396,7 @@ export default {
          * Load asset container data
          */
         loadContainers() {
-            this.$http.get(cp_url('assets/containers/get')).success((response) => {
+            this.axios.get(cp_url('assets/containers/get')).then((response) => {
                 // Set the containers property to a collection of the items in the response.
                 // We are only interested in certain keys, and we want them indexed by
                 // ID to make retrieving container values simpler down the road.
@@ -420,13 +417,13 @@ export default {
         loadAssets(page) {
             this.loadingAssets = true;
 
-            this.$http.post(cp_url('assets/browse'), {
+            this.axios.post(cp_url('assets/browse'), {
                 container: this.container.id,
                 path: this.path,
                 page: this.selectedPage,
                 sort: this.sort,
                 dir: this.sortOrder
-            }).success((response) => {
+            }).then((response) => {
                 this.assets = response.assets;
                 this.folders = response.folders;
                 this.folder = response.folder;
@@ -441,12 +438,12 @@ export default {
         search() {
             this.loadingAssets = true;
 
-            this.$http.post(cp_url('assets/search'), {
+            this.axios.post(cp_url('assets/search'), {
                 term: this.searchTerm,
                 container: this.container.id,
                 folder: this.folder.path,
                 restrictNavigation: this.restrictNavigation
-            }).success((response) => {
+            }).then((response) => {
                 this.isSearching = true;
                 this.assets = response.assets;
                 this.folders = [];
@@ -538,9 +535,9 @@ export default {
                 cancelButtonText: translate('cp.cancel'),
                 showCancelButton: true
             }, () => {
-                const url = cp_url('assets/delete');
+                const endpoint = cp_url('assets/delete');
 
-                this.$http.delete(url, { ids: ids }).success((response) => {
+                this.axios.delete(endpoint, { ids: ids }).then((response) => {
                     this.loadAssets();
                     this.selectedAssets = _(this.selectedAssets).difference(ids);
                 });
@@ -551,7 +548,7 @@ export default {
          * Close the asset editor.
          */
         closeAssetEditor() {
-            this.$dispatch('modal.close');
+            this.$eventHub.$emit('modal.close');
             this.editedAssetId = null;
         },
 
@@ -651,7 +648,7 @@ export default {
                 container: this.container.id
              };
 
-            this.$http.post(url, payload).success((response) => {
+            this.axios.post(url, payload).then((response) => {
                 this.loadAssets();
                 this.selectedAssets = [];
             });

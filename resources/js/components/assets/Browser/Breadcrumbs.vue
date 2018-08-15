@@ -1,9 +1,7 @@
 <template>
 
     <div class="breadcrumbs">
-        <a href=""
-           v-for="(i, part) in pathParts"
-           @click.prevent="selectFolder(i)">
+        <a v-for="(part, i) in pathParts" @click="selectFolder(i)">
             <span class="icon icon-folder"></span>
             {{ part }}
         </a>
