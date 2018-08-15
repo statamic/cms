@@ -25,8 +25,6 @@ class PagesController extends CpController
     {
         $this->access('pages:view');
 
-        $this->ensureHome();
-
         $home = Page::whereUri('/');
 
         $home_data = [
@@ -215,19 +213,5 @@ class PagesController extends CpController
         return [
             'success' => true
         ];
-    }
-
-    /**
-     * Create the home page if it doesn't already exist
-     */
-    private function ensureHome()
-    {
-        $files = collect_files(Folder::disk('content')->getFiles('pages'))->removeHidden();
-
-        if ($files->isEmpty()) {
-            $path = 'pages/index.' . Config::get('statamic.system.default_extension');
-            $yaml = YAML::dump(['title' => 'Home', 'id' => Helper::makeUuid()]);
-            File::disk('content')->put($path, $yaml);
-        }
     }
 }
