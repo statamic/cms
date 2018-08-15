@@ -16,10 +16,10 @@
     }
 
     li a {
-        @apply p-0 flex items-center text-blue-light;
+        @apply p-0 flex items-center text-grey;
 
         &:hover {
-            @apply font-medium text-blue-dark;
+            @apply font-medium text-grey-dark
         }
 
         i {
@@ -29,7 +29,7 @@
     }
 
     li.current a {
-        @apply text-blue-darker font-medium;
+        @apply text-grey-darker font-bold;
 
         i {
             @apply bg-white;
