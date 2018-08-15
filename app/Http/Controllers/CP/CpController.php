@@ -26,8 +26,6 @@ class CpController extends Controller
      */
     public function __construct(Request $request)
     {
-        \Auth::login(\Statamic\API\User::whereUsername('jack'));
-
         $this->request = $request;
     }
 
