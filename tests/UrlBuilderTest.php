@@ -33,7 +33,10 @@ class UrlBuilderTest extends TestCase
         $this->entry = Entry::create('post')
                       ->collection('blog')
                       ->order('2015-01-02')
-                      ->with(['slashed' => 'foo/bar'])
+                      ->with([
+                          'foo' => 'bar',
+                          'slashed' => 'foo/bar'
+                      ])
                       ->get();
 
         $this->entry->in('fr')->set('slug', 'le-post');
@@ -61,5 +64,18 @@ class UrlBuilderTest extends TestCase
     {
         $this->builder->content($this->entry);
         $this->assertEquals('/blog/foo/bar', $this->builder->build('/blog/{slashed}'));
+    }
+
+    function testVariablesCanBeMergedIn()
+    {
+        $this->assertEquals(
+            '/bar/post',
+            $this->builder->build('/{foo}/{slug}')
+        );
+
+        $this->assertEquals(
+            '/baz/post',
+            $this->builder->merge(['foo' => 'baz'])->build('/{foo}/{slug}')
+        );
     }
 }

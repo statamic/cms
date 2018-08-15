@@ -13,6 +13,8 @@ class UrlBuilder implements UrlBuilderContract
      */
     protected $content;
 
+    protected $merged;
+
     /**
      * @param \Statamic\Contracts\Data\Entry|\Statamic\Data\Taxonomies\Term $content
      * @return $this
@@ -25,6 +27,13 @@ class UrlBuilder implements UrlBuilderContract
         }
 
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function merge(array $merged)
+    {
+        $this->merged = $merged;
 
         return $this;
     }
@@ -93,6 +102,10 @@ class UrlBuilder implements UrlBuilderContract
      */
     private function getValue($variable)
     {
+        if ($merged = array_get($this->merged, $variable)) {
+            return $merged;
+        }
+
         // Handle special values like {year}, {month}, and {day}.
         if ($specialValue = $this->getSpecialValue($variable)) {
             return $specialValue;
