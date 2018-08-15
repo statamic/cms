@@ -65,7 +65,7 @@ class StuctureRepositoryTest extends TestCase
     function it_saves_a_structure_to_the_stache_and_to_a_file()
     {
         $structure = (new \Statamic\Data\Structures\Structure)->handle('new')->data([
-            'parent' => 'pages-home',
+            'root' => 'pages-home',
             'route' => '',
             'tree' => []
         ]);
@@ -75,7 +75,7 @@ class StuctureRepositoryTest extends TestCase
 
         $this->assertNotNull($item = $this->repo->findByHandle('new'));
         $this->assertEquals([
-            'parent' => 'pages-home',
+            'root' => 'pages-home',
             'route' => '',
             'tree' => []
         ], $item->data());

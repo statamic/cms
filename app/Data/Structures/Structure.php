@@ -59,7 +59,7 @@ class Structure implements StructureContract
     public function parent()
     {
         return (new Page)
-            ->setEntry($this->data['parent']);
+            ->setEntry($this->data['root']);
     }
 
     public function save()
@@ -72,7 +72,7 @@ class Structure implements StructureContract
         $tree = $this->data['tree'];
 
         if ($this->withParent) {
-            array_unshift($tree, ['entry' => $this->data['parent']]);
+            array_unshift($tree, ['entry' => $this->data['root']]);
         }
 
         return (new Pages)

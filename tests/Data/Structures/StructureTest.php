@@ -147,7 +147,7 @@ class StructureTest extends TestCase
     {
         return (new Structure)->data([
             'route' => '{parent_uri}/{slug}',
-            'parent' => 'pages-home',
+            'root' => 'pages-home',
             'tree' => [
                 [
                     'entry' => 'pages-about',
