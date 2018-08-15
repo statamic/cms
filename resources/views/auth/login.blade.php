@@ -50,7 +50,7 @@
                 <input type="password" class="input-text form-control" name="password" id="password">
             </div>
             <div class="flex justify-between items-center">
-                <label for="remember_me" class="flex items-center">
+                <label for="remember_me" class="flex items-center cursor-pointer">
                     <input type="checkbox" name="remember" id="remember_me">
                     <span class="ml-1">{{ __('Remember me') }}</span>
                 </label>
