@@ -18,6 +18,8 @@ export default {
         MountCollection,
     },
 
+    props: ['url', 'saveUrl', 'structure'],
+
     data: function() {
         return {
             loading: true,
@@ -46,7 +48,7 @@ export default {
         },
 
         isSortable() {
-            return Vue.can('pages:reorder');
+            return Vue.can(`structures:${this.structure}:reorder`);
         }
 
     },
@@ -67,7 +69,7 @@ export default {
         getPages: function() {
             this.pages = [];
             this.loading = true;
-            var url = cp_url('/pages/get?locale='+this.locale+'&drafts='+(this.showDrafts ? 1 : 0));
+            var url = this.url + '?locale='+this.locale+'&drafts='+(this.showDrafts ? 1 : 0);
 
             this.axios.get(url)
                 .then(response => {
@@ -209,7 +211,7 @@ export default {
             let pages = JSON.parse(JSON.stringify(this.pages));
             pages = this.updateOrderIndexes(pages);
 
-            this.axios.post(cp_url('/pages'), { pages: pages })
+            this.axios.patch(this.saveUrl, { pages: pages })
             .then(response => {
                 this.getPages();
                 this.changed = false;
