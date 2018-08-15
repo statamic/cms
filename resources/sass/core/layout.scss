@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    @apply .w-full .bg-bg;
+    @apply .w-full .bg-grey-lightest;
 }
 
 *, *::before, *::after {
@@ -202,7 +202,7 @@ body > svg { display: none; }
 
 // Uses "business mode" by default
 .outside {
-    @apply .bg-bg .px-1 .min-h-screen;
+    @apply .bg-grey-lightest .px-1 .min-h-screen;
 
     label {
         color: #596498;

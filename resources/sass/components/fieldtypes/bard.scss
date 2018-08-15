@@ -2,7 +2,7 @@
   ========================================================================== */
 
 .bard-fieldtype-wrapper {
-    @apply .shadow-inner .bg-bg .border-0 .py-1 .px-3 .rounded;
+    @apply .shadow-inner .bg-grey-lightest .border-0 .py-1 .px-3 .rounded;
     background: $color_gray_input;
     color: $color_gray_dark;
 }

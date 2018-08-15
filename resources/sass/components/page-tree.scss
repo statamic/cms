@@ -41,7 +41,7 @@
     .page-move {
         background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
         border-right: 1px solid $color_border;
-        &:hover { @apply .bg-bg; }
+        &:hover { @apply .bg-grey-lightest; }
     }
 
     .page-text {
@@ -170,7 +170,7 @@
         }
 
         .home-handle {
-            @apply .flex .rounded-l .items-center .h-full .border-r .bg-bg-light;
+            @apply .flex .rounded-l .items-center .h-full .border-r .bg-grey-lightest;
         }
 
         .icon-home {
