@@ -40,7 +40,8 @@ class InstallCommand extends Command
         $this->addons()
              ->createFiles()
              ->publish()
-             ->clearViews();
+             ->clearViews()
+             ->clearCache();
     }
 
     protected function addons()
@@ -80,6 +81,13 @@ class InstallCommand extends Command
     protected function clearViews()
     {
         $this->call('view:clear');
+
+        return $this;
+    }
+
+    protected function clearCache()
+    {
+        $this->call('cache:clear');
 
         return $this;
     }
