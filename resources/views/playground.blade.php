@@ -6,15 +6,20 @@
     </div>
 
     <div class="card p-0 mb-5">
-        <div class="py-1.5 px-2 flex justify-between items-center">
-            <input type="checkbox">
+        <div class="py-1.5 pr-2 flex items-center">
+            <div class="flex flex-1 items-center">
+                <div class="w-10 pl-2">
+                    <input type="checkbox">
+                </div>
+                <input type="text" class="text-sm py-1 outline-none flex-1" placeholder="Search...">
+            </div>
             <button class="btn btn-with-icon antialiased">
                 @svg('new/filter-1') Filter
             </button>
         </div>
         <table class="w-full text-left text-grey">
             <thead class="bg-grey-lightest border-t text-grey-darker uppercase text-xxs tracking-wide">
-                <th class="w-8"></th>
+                <th class="w-10"></th>
                 <th class="font-medium pr-1 py-1.5">Title</th>
                 <th class="font-medium px-1 py-1.5">Author</th>
                 <th class="font-medium px-1 py-1.5">Slug</th>
@@ -22,16 +27,16 @@
                 <th></th>
             </thead>
             <tbody>
-                <tr class="border-t text-sm group" v-for="n in 10">
-                    <td class="p-1.5 opacity-0 group-hover:opacity-100"><input type="checkbox"></td>
+                <tr class="border-t text-sm group hover:bg-grey-lightest ease-quick" v-for="n in 10">
+                    <td class="p-1.5 opacity-0 group-hover:opacity-100 ease-quick"><input type="checkbox"></td>
                     <td class="pr-2 py-1">
                         <div class="flex items-center">
-                            <div class="w-2 h-3 rounded-full bg-green mr-1"></div>
-                            <a href="" class="text-blue-darker hover:text-blue">Another Day in Paradise</a>
+                            <span class="bullet bg-green mr-1"></span>
+                            <a href="" class="text-grey-darker text-md hover:text-blue">Another Day in Paradise</a>
                         </div>
                     </td>
                     <td class="p-1">
-                        <a class="flex items-center text-blue-darker hover:text-blue">
+                        <a class="flex items-center text-grey-darker hover:text-blue">
                             <img src="https://www.biography.com/.image/ar_1:1%2Cc_fill%2Ccs_srgb%2Cg_face%2Cq_auto:good%2Cw_300/MTIwNjA4NjM0MDQyNzQ2Mzgw/hulk-hogan-9542305-1-402.jpg" class="h-6 w-6 rounded-full mr-1">
                             <span>Hulk Hogan</span>
                         </a>

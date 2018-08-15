@@ -54,7 +54,7 @@
     "laravel-mix": "^2.1.11",
     "postcss-import": "^11.1.0",
     "sass-loader": "^7.0.1",
-    "tailwindcss": "^0.6.4",
+    "tailwindcss": "^0.6.5",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^8.7.1",
     "vue-style-loader": "^1.0.0"
