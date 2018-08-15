@@ -8,7 +8,7 @@ class Pages
 {
     protected $tree;
     protected $route;
-    protected $parentUri;
+    protected $parent;
 
     public function setTree(array $tree): self
     {
@@ -24,9 +24,9 @@ class Pages
         return $this;
     }
 
-    public function setParentUri(string $uri): self
+    public function setParent(?Page $parent): self
     {
-        $this->parentUri = $uri;
+        $this->parent = $parent;
 
         return $this;
     }
@@ -35,7 +35,7 @@ class Pages
     {
         return collect($this->tree)->keyBy('entry')->map(function ($branch) {
             return (new Page)
-                ->setParentUri($this->parentUri)
+                ->setParent($this->parent)
                 ->setRoute($this->route)
                 ->setEntry($branch['entry'])
                 ->setChildren($branch['children'] ?? []);

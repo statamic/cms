@@ -42,14 +42,16 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_parent_uri()
+    function it_gets_and_sets_the_parent()
     {
         $page = new Page;
-        $this->assertNull($page->parentUri());
+        $parent = new Page;
+        $this->assertNull($page->parent());
 
-        $return = $page->setParentUri('/parent-uri');
+        $return = $page->setParent($parent);
 
-        $this->assertEquals('/parent-uri', $page->parentUri());
+        $this->assertEquals($parent, $page->parent());
+        $this->assertNotEquals($parent, $page);
         $this->assertEquals($page, $return);
     }
 
@@ -69,14 +71,21 @@ class PageTest extends TestCase
     function it_gets_the_uri()
     {
         $entry = new class extends Entry {
+            public function id($id = null) {
+                return '1';
+            }
             public function slug($slug = null) {
                 return 'entry-slug';
             }
         };
 
+        $parent = Mockery::mock(Page::class);
+        $parent->shouldReceive('id')->andReturn('not-the-entry');
+        $parent->shouldReceive('uri')->andReturn('/the/parent/uri');
+
         $page = (new Page)
             ->setRoute('/foo/{parent_uri}/bar/{slug}')
-            ->setParentUri('/the/parent/uri')
+            ->setParent($parent)
             ->setEntry($entry);
 
         $this->assertEquals('/foo/the/parent/uri/bar/entry-slug', $page->uri());
@@ -107,21 +116,25 @@ class PageTest extends TestCase
     {
         EntryAPI::shouldReceive('find')->with('one')
             ->andReturn(new class extends Entry {
+                public function id($slug = null) { return 'one'; }
                 public function slug($slug = null) { return 'one'; }
             });
 
         EntryAPI::shouldReceive('find')->with('two')
             ->andReturn(new class extends Entry {
+                public function id($slug = null) { return 'two'; }
                 public function slug($slug = null) { return 'two'; }
             });
 
         EntryAPI::shouldReceive('find')->with('three')
             ->andReturn(new class extends Entry {
+                public function id($slug = null) { return 'three'; }
                 public function slug($slug = null) { return 'three'; }
             });
 
         EntryAPI::shouldReceive('find')->with('four')
             ->andReturn(new class extends Entry {
+                public function id($slug = null) { return 'four'; }
                 public function slug($slug = null) { return 'four'; }
             });
 
@@ -140,6 +153,7 @@ class PageTest extends TestCase
         $flattened = $page->flattenedPages();
         $this->assertInstanceOf(Collection::class, $flattened);
         $this->assertCount(4, $flattened);
+        $this->assertEveryItemIsInstanceOf(Page::class, $flattened);
         $this->assertEquals([
             'one' => '/one',
             'two' => '/two',

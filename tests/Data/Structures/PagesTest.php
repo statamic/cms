@@ -2,12 +2,13 @@
 
 namespace Tests\Data\Structures;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Data\Entries\Entry;
 use Illuminate\Support\Collection;
 use Statamic\Data\Structures\Page;
-use Statamic\Data\Structures\Pages;
 use Statamic\API\Entry as EntryAPI;
+use Statamic\Data\Structures\Pages;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class PagesTest extends TestCase
@@ -27,7 +28,6 @@ class PagesTest extends TestCase
     function it_gets_a_list_of_pages()
     {
         $pages = (new Pages)
-            ->setParentUri('')
             ->setRoute('irrelevant')
             ->setTree([
                 ['entry' => 'one', 'children' => [
@@ -58,8 +58,12 @@ class PagesTest extends TestCase
         EntryAPI::shouldReceive('find')->with('one')->andReturn($entryOne);
         EntryAPI::shouldReceive('find')->with('two')->andReturn($entryTwo);
 
+        $parent = Mockery::mock(Page::class);
+        $parent->shouldReceive('id')->andReturn('different-from-the-entries');
+        $parent->shouldReceive('uri')->andReturn('/the-parent');
+
         $pages = (new Pages)
-            ->setParentUri('/the-parent')
+            ->setParent($parent)
             ->setRoute('{parent_uri}/{slug}')
             ->setTree([
                 ['entry' => 'one', 'children' => [
@@ -84,32 +88,40 @@ class PagesTest extends TestCase
     {
         EntryAPI::shouldReceive('find')->with('one')
             ->andReturn(new class extends Entry {
+                public function id($id = null) { return 'one'; }
                 public function slug($slug = null) { return 'one'; }
             });
 
         EntryAPI::shouldReceive('find')->with('one-one')
             ->andReturn(new class extends Entry {
+                public function id($id = null) { return 'one-one'; }
                 public function slug($slug = null) { return 'one-one'; }
             });
 
         EntryAPI::shouldReceive('find')->with('one-two')
             ->andReturn(new class extends Entry {
+                public function id($id = null) { return 'one-two'; }
                 public function slug($slug = null) { return 'one-two'; }
             });
 
         EntryAPI::shouldReceive('find')->with('one-two-one')
             ->andReturn(new class extends Entry {
+                public function id($id = null) { return 'one-two-one'; }
                 public function slug($slug = null) { return 'one-two-one'; }
             });
 
         EntryAPI::shouldReceive('find')->with('two')
             ->andReturn(new class extends Entry {
+                public function id($id = null) { return 'two'; }
                 public function slug($slug = null) { return 'two'; }
             });
 
+        $parent = Mockery::mock(Page::class);
+        $parent->shouldReceive('id')->andReturn('different-from-the-entries');
+        $parent->shouldReceive('uri')->andReturn('/root');
 
         $pages = (new Pages)
-            ->setParentUri('/root')
+            ->setParent($parent)
             ->setRoute('{parent_uri}/{slug}')
             ->setTree([
                 ['entry' => 'one', 'children' => [

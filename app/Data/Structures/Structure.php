@@ -10,6 +10,7 @@ class Structure implements StructureContract
 {
     protected $handle;
     protected $data = [];
+    protected $withParent = true;
 
     public function handle($handle = null)
     {
@@ -68,9 +69,15 @@ class Structure implements StructureContract
 
     public function pages()
     {
+        $tree = $this->data['tree'];
+
+        if ($this->withParent) {
+            array_unshift($tree, ['entry' => $this->data['parent']]);
+        }
+
         return (new Pages)
-            ->setTree($this->data['tree'])
-            ->setParentUri($this->parent()->uri())
+            ->setTree($tree)
+            ->setParent($this->withParent ? $this->parent() : null)
             ->setRoute($this->route());
     }
 
@@ -92,5 +99,12 @@ class Structure implements StructureContract
     public function page(string $id): ?Page
     {
         return $this->flattenedPages()->get($id);
+    }
+
+    public function withoutParent()
+    {
+        $this->withParent = false;
+
+        return $this;
     }
 }

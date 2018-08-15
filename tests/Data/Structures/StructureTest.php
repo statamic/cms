@@ -95,9 +95,18 @@ class StructureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_child_pages()
+    function it_gets_the_child_pages_including_the_parent_by_default()
     {
         $pages = $this->structure()->pages();
+
+        $this->assertInstanceOf(Pages::class, $pages);
+        $this->assertCount(3, $pages->all());
+    }
+
+    /** @test */
+    function it_gets_the_child_pages_without_the_parent()
+    {
+        $pages = $this->structure()->withoutParent()->pages();
 
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(2, $pages->all());
@@ -107,11 +116,23 @@ class StructureTest extends TestCase
     function it_gets_the_page_uris()
     {
         $this->assertEquals([
+            'pages-home' => '/',
             'pages-about' => '/about',
             'pages-board' => '/about/board',
             'pages-directors' => '/about/board/directors',
             'pages-blog' => '/blog',
         ], $this->structure()->uris()->all());
+    }
+
+    /** @test */
+    function it_can_exclude_the_parent()
+    {
+        $this->assertEquals([
+            'pages-about' => '/about',
+            'pages-board' => '/about/board',
+            'pages-directors' => '/about/board/directors',
+            'pages-blog' => '/blog',
+        ], $this->structure()->withoutParent()->uris()->all());
     }
 
     /** @test */

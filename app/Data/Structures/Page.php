@@ -10,7 +10,7 @@ class Page implements Entry
 {
     protected $entry;
     protected $route;
-    protected $parentUri;
+    protected $parent;
     protected $children;
 
     public function setEntry($entry): self
@@ -34,14 +34,14 @@ class Page implements Entry
         return EntryAPI::find($this->entry);
     }
 
-    public function parentUri(): ?string
+    public function parent(): ?Page
     {
-        return $this->parentUri;
+        return $this->parent;
     }
 
-    public function setParentUri(string $uri): self
+    public function setParent(?Page $parent): self
     {
-        $this->parentUri = $uri;
+        $this->parent = $parent;
 
         return $this;
     }
@@ -60,11 +60,18 @@ class Page implements Entry
 
     public function uri()
     {
-        $this->entry()->set('parent_uri', $this->parentUri);
-
         return app(UrlBuilder::class)
-            ->content($this->entry())
+            ->content($this)
+            ->merge([
+                'parent_uri' => $this->parent ? $this->parent->uri() : '',
+                'slug' => $this->isParent() ? '' : $this->slug()
+            ])
             ->build($this->route);
+    }
+
+    protected function isParent()
+    {
+        return $this->entry()->id() === optional($this->parent)->id();
     }
 
     public function setChildren(array $children): self
@@ -78,7 +85,7 @@ class Page implements Entry
     {
         return (new Pages)
             ->setTree($this->children ?? [])
-            ->setParentUri($this->uri())
+            ->setParent($this)
             ->setRoute($this->route);
     }
 
