@@ -1,20 +1,20 @@
 <template>
     <div>
         <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
-            <div class="state-container">
-                <i class="icon icon-magnifying-glass" @click="focus"></i>
+            <div class="state-container w-4 h-4 text-grey-light" @click="focus">
+                <slot name="icon"></slot>
             </div>
 
             <input type="text"
                 autocomplete="off"
-                class="search-input alt"
+                class="search-input"
                 ref="input"
                 v-model="query"
                 @keydown.up.prevent="moveUp"
                 @keydown.down.prevent="moveDown"
                 @keydown.enter.prevent="hit"
                 @keydown.esc.prevent="reset"
-                :placeholder="translate('cp.search')"
+                :placeholder="placeholder"
                 />
 
             <i class="icon icon-cross" v-show="isDirty || searching" @click="reset"></i>
@@ -38,7 +38,8 @@ export default {
 
     props: {
         limit: Number,
-        endpoint: String
+        endpoint: String,
+        placeholder: String
     },
 
     data() {

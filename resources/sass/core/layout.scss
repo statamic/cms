@@ -25,7 +25,7 @@ body > svg { display: none; }
 
 .application-grid {
     display: grid;
-    grid-template-columns: 200px auto;
+    grid-template-columns: config('width.48') auto;
 
     &.hide-nav {
         display: block;
@@ -41,11 +41,8 @@ body > svg { display: none; }
     font-size: 14px;
 
     .logo {
-        display: block;
+        @apply w-48 block flex items-center;
         height: 40px;
-        width: 200px;
-        display: flex;
-        align-items: center;
         svg {
             height: 20px;
             width: 90px;

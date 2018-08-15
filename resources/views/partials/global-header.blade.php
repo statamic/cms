@@ -7,11 +7,12 @@
         </a>
     </div>
 
-    <global-search
-        class="w-96"
-        endpoint="{{ route('search.global') }}"
-        :limit="10"
-    ></global-search>
+    <global-search endpoint="{{ route('search.global') }}" :limit="10" placeholder="{{ __('Search...') }}">
+        <template slot="icon">
+            @svg('new/search')
+        </template>
+    </global-search>
+
     <a>
         <span class="h-6 w-6 block p-sm mt-px ml-2">
             @svg('new/add-circle-1')
