@@ -83,12 +83,7 @@
     margin: 32px 0;
 
     .tabs-outer {
-        @extend .z-depth-1;
-        background: white;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        margin-bottom: 32px;
+        @apply shadow bg-white rounded-md flex items-center mb-4;
 
         a {
             font-size: 16px;
@@ -255,7 +250,7 @@
     }
 
     .section-field.draggable-mirror > .section-field-inner {
-        @extend .z-depth-2;
+        @apply .shadow-lg;
     }
 
     .section-field-inner {
@@ -418,8 +413,7 @@
         margin-left: -10px;
 
         &.draggable-mirror {
-            @extend .z-depth-2;
-            border-radius: 4px;
+            @apply shadow-lg rounded-md;
         }
 
         &.draggable-source--is-dragging {

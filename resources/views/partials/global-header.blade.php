@@ -49,7 +49,7 @@
         </a>
         <div class="dropdown">
             <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <div class="icon-user-initials rounded-full text-xxs bg-pink z-depth-1">ME</div>
+                <div class="icon-user-initials rounded-full text-xxs bg-pink shadow">ME</div>
             </a>
             <ul class="dropdown-menu hide md:block">
                 <li class="px-1">

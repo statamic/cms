@@ -137,8 +137,7 @@ $rem-base: 10px;
     position: absolute;
 
     .dr-calendar {
-      @extend .z-depth-1;
-      background-color: #fff;
+      @apply .shadow bg-white;
       font-size: rem(15);
       border-radius: 0 0 $radius $radius;
       position: relative;

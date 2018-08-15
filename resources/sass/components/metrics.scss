@@ -10,10 +10,7 @@
 }
 
 .mini-chart {
-    background: $color_dark_blue;
-    @extend .z-depth-1;
-    position: relative;
-    border-radius: 3px;
+    @apply shadow bg-grey-dark relative rounded;
     .count {
         overflow: hidden;
         color: #fff;

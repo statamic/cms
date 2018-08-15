@@ -75,17 +75,9 @@
 }
 
 .stack {
-    @extend .z-depth-2;
-    background: white;
-    border-radius: 4px;
-    position: relative;
+    @apply shadow-lg bg-white rounded-md relative text-center flex flex-col items-center justify-center;
     flex-basis: 200px;
     height: 240px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 
     &:after {
         content: '';

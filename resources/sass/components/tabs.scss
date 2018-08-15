@@ -1,8 +1,5 @@
 .tabs {
-    @extend .z-depth-1;
-    @apply .bg-white .flex .w-full .overflow-hidden;
-    border-radius: 4px;
-    text-align: center;
+    @apply .bg-white .shadow .rounded-md .text-center .flex .w-full .overflow-hidden;
     height: 48px;
 
     a {

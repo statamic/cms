@@ -8,27 +8,36 @@ body {
     font-feature-settings: "zero", "ss01";
 }
 
+h1, h2, h3, h4, h5, h6 {
+    @apply .m-0 antialiased;
+}
+
 h1 {
-    @apply text-2xl font-normal m-0 antialiased;
-    letter-spacing: -0.013em;
+    @apply text-2xl font-normal;
+    letter-spacing: -0.014em;
 }
 
 h2 {
-    @apply text-lg m-0 antialiased font-medium;
-    letter-spacing: -0.008em;
+    @apply text-lg font-normal;
+    letter-spacing: -0.01em;
 }
 
 h3 {
-    @apply text-base font-medium antialiased;
+    @apply text-base font-medium;
 }
 
 h4 {
-    @apply text-sm font-bold antialiased;
+    @apply text-sm font-bold;
     letter-spacing: 0.001em;
 }
 
+h5 {
+    @apply text-xs font-bold;
+    letter-spacing: 0.002em;
+}
+
 h6 {
-    @apply text-3xs font-bold uppercase tracking-wide antialiased;
+    @apply text-3xs font-bold uppercase tracking-wide;
 }
 
 a {
@@ -44,6 +53,12 @@ a:hover,
 a:active,
 a:focus {
     text-decoration: none;
+}
+
+.bullet {
+    @apply .inline-block .rounded-full .bg-grey;
+    height: 7px;
+    width: 7px;
 }
 
 .subhead {

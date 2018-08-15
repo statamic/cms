@@ -453,13 +453,10 @@
         text-align: center;
 
         img {
-            @extend .z-depth-1;
+            @apply shadow block w-auto h-auto;
             border: 5px solid #fff;
-            display: block;
             max-height: 150px;
             max-width: 150px;
-            height: auto;
-            width: auto;
             margin: 0 auto;
         }
     }
