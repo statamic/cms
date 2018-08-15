@@ -39,7 +39,8 @@ class InstallCommand extends Command
     {
         $this->addons()
              ->createFiles()
-             ->publish();
+             ->publish()
+             ->clearViews();
     }
 
     protected function addons()
@@ -72,6 +73,13 @@ class InstallCommand extends Command
     {
         $this->call('vendor:publish', ['--tag' => 'statamic']);
         $this->call('vendor:publish', ['--tag' => 'statamic-cp', '--force' => true]);
+
+        return $this;
+    }
+
+    protected function clearViews()
+    {
+        $this->call('view:clear');
 
         return $this;
     }
