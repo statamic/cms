@@ -99,6 +99,7 @@ class NavTags extends Tags
     private function getParams()
     {
         return [
+            'structure'    => $this->get('structure', 'pages'),
             'from'         => Str::ensureLeft($this->get('from', URL::getCurrent()), '/'),
             'depth'        => $this->getInt('max_depth', 2),
             'unpublished'  => $this->getBool('show_unpublished', false),

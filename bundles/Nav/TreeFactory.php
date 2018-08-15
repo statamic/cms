@@ -40,21 +40,10 @@ class TreeFactory
             }
         }
 
-        $tree_content = Content::tree(
-            $this->params['from'],
-            $this->params['depth'],
-            $this->params['entries'],
-            $this->params['unpublished'],
-            $exclude,
-            $this->params['locale']
-        );
+        $tree_content = (new ContentTreeBuilder)->build($this->params);
 
         if (! $tree_content) {
             return new Tree([]);
-        }
-
-        if ($this->params['include_home']) {
-            $tree_content = $this->prependHome($tree_content);
         }
 
         $tree_content = $this->limitAndOffset($tree_content);
