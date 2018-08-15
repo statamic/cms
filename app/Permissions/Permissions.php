@@ -182,4 +182,48 @@ class Permissions
 
         return $structure;
     }
+
+    // TODO: Get rid of this when we implement it correctly.
+    public function temporaryPermissions()
+    {
+        return [
+            "super",
+            "cp:access",
+            "content:view_drafts_on_frontend",
+            "structures:pages:reorder",
+            "forms",
+            "updater",
+            "updater:update",
+            "importer",
+            "users:view",
+            "users:edit",
+            "users:edit-passwords",
+            "users:edit-roles",
+            "users:create",
+            "users:delete",
+            "resolve_duplicates",
+            "collections:*:view",
+            "collections:*:edit",
+            "collections:pages:view",
+            "collections:pages:edit",
+            "collections:pages:create",
+            "collections:pages:delete",
+            "taxonomies:*:view",
+            "taxonomies:*:edit",
+            "taxonomies:tags:view",
+            "taxonomies:tags:edit",
+            "taxonomies:tags:create",
+            "taxonomies:tags:delete",
+            "globals:*:view",
+            "globals:*:edit",
+            "globals:global:view",
+            "globals:global:edit",
+            "assets:*:view",
+            "assets:*:edit",
+            "assets:main:view",
+            "assets:main:edit",
+            "assets:main:create",
+            "assets:main:delete",
+        ];
+    }
 }

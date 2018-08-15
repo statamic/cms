@@ -83,6 +83,9 @@ trait Permissible
      */
     public function permissions()
     {
+        // TODO: Don't hardcode...
+        return app('permissions')->temporaryPermissions();
+
         $permissions = [];
 
         if ($this->isSuper()) {

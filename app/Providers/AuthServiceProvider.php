@@ -42,50 +42,7 @@ class AuthServiceProvider extends ServiceProvider
         // $permissions->build();
         // $perms = $permissions->all(true);
 
-        $perms = [
-            "super",
-            "cp:access",
-            "content:view_drafts_on_frontend",
-            "pages:view",
-            "pages:edit",
-            "pages:create",
-            "pages:delete",
-            "pages:reorder",
-            "forms",
-            "updater",
-            "updater:update",
-            "importer",
-            "users:view",
-            "users:edit",
-            "users:edit-passwords",
-            "users:edit-roles",
-            "users:create",
-            "users:delete",
-            "resolve_duplicates",
-            "collections:*:view",
-            "collections:*:edit",
-            "collections:pages:view",
-            "collections:pages:edit",
-            "collections:pages:create",
-            "collections:pages:delete",
-            "taxonomies:*:view",
-            "taxonomies:*:edit",
-            "taxonomies:tags:view",
-            "taxonomies:tags:edit",
-            "taxonomies:tags:create",
-            "taxonomies:tags:delete",
-            "globals:*:view",
-            "globals:*:edit",
-            "globals:global:view",
-            "globals:global:edit",
-            "assets:*:view",
-            "assets:*:edit",
-            "assets:main:view",
-            "assets:main:edit",
-            "assets:main:create",
-            "assets:main:delete",
-        ];
-
+        $perms = app('permissions')->temporaryPermissions();
 
         foreach ($perms as $group => $permission) {
             $gate->define($permission, function ($user) use ($permission) {
