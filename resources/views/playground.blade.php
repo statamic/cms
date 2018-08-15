@@ -13,12 +13,12 @@
             </button>
         </div>
         <table class="w-full text-left text-grey">
-            <thead class="-light border-t text-grey-darker uppercase text-xxs tracking-wide">
+            <thead class="bg-grey-lightest border-t text-grey-darker uppercase text-xxs tracking-wide">
                 <th class="w-8"></th>
-                <th class="font-medium pr-1 py-1">Title</th>
-                <th class="font-medium p-1">Author</th>
-                <th class="font-medium p-1">Slug</th>
-                <th class="font-medium p-1">Date</th>
+                <th class="font-medium pr-1 py-1.5">Title</th>
+                <th class="font-medium px-1 py-1.5">Author</th>
+                <th class="font-medium px-1 py-1.5">Slug</th>
+                <th class="font-medium px-1 py-1.5">Date</th>
                 <th></th>
             </thead>
             <tbody>
