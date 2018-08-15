@@ -63,9 +63,31 @@ class StructuresStore extends BasicStore
     public function save(Structure $structure)
     {
         $path = $this->directory . '/' . $structure->handle() . '.yaml';
-        $contents = YAML::dump($structure->data());
+        $contents = YAML::dump($this->toSaveableArray($structure));
 
         $this->files->put($path, $contents);
+    }
+
+    protected function toSaveableArray($structure)
+    {
+        $data = $structure->data();
+
+        $data['tree'] = $this->removeEmptyChildren($data['tree']);
+
+        return $data;
+    }
+
+    protected function removeEmptyChildren($array)
+    {
+        return collect($array)->map(function ($item) {
+            $item['children'] = $this->removeEmptyChildren(array_get($item, 'children', []));
+
+            if (empty($item['children'])) {
+                unset($item['children']);
+            }
+
+            return $item;
+        })->all();
     }
 
     public function getKeyFromUri(string $uri): ?string

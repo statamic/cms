@@ -160,14 +160,16 @@ EOT;
                                 'page' => 'pages-board',
                                 'children' => [
                                     [
-                                        'page' => 'pages-directors'
+                                        'page' => 'pages-directors',
+                                        'children' => [] // Empty array is here to test that it gets removed.
                                     ]
                                 ]
                             ]
                         ],
                     ],
                     [
-                        'page' => 'pages-blog'
+                        'page' => 'pages-blog',
+                        'children' => [] // Empty array is here to test that it gets removed.
                     ],
                 ]
             ]);
