@@ -24,7 +24,6 @@ Vue.component('installer', require('../components/installer/installer'));
 Vue.component('updater', require('../components/updater'));
 Vue.component('importer', require('../components/importer/importer'));
 Vue.component('term-listing', require('../components/listings/terms'));
-Vue.component('taxonomies-listing', require('../components/listings/taxonomies'));
 Vue.component('globals-listing', require('../components/listings/globals'));
 Vue.component('user-listing', require('../components/listings/users'));
 Vue.component('user-options', require('../components/publish/user-options'));
