@@ -21,7 +21,7 @@ class StatamicServiceProvider extends AggregateServiceProvider
         FilesystemServiceProvider::class,
         ExtensionServiceProvider::class,
         EventServiceProvider::class,
-        StacheServiceProvider::class,
+        \Statamic\Stache\ServiceProvider::class,
         AuthServiceProvider::class,
         GlideServiceProvider::class,
         \Statamic\StaticCaching\ServiceProvider::class,

@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic\Providers;
+namespace Statamic\Stache;
 
 use Statamic\API\Site;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
-class StacheServiceProvider extends ServiceProvider
+class ServiceProvider extends LaravelServiceProvider
 {
     public function register()
     {
