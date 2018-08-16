@@ -3,8 +3,6 @@
 namespace Statamic\Stache;
 
 use Statamic\API\Site;
-use Statamic\Stache\Stache;
-use Statamic\Stache\Stores;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 class ServiceProvider extends LaravelServiceProvider
