@@ -33,6 +33,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             ]
         ]);
 
+        $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__.'/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/__fixtures__/content/collections');
         $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
         $app['config']->set('statamic.stache.stores.structures.directory', __DIR__.'/__fixtures__/content/structures');

@@ -3,6 +3,8 @@
 namespace Statamic\API\Endpoint;
 
 use Statamic\Data\Services\TaxonomiesService;
+use Statamic\Contracts\Data\Repositories\TaxonomyRepository;
+use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
 class Taxonomy
 {
@@ -13,7 +15,7 @@ class Taxonomy
      */
     public function all()
     {
-        return app(TaxonomiesService::class)->all()->sortBy(function ($taxonomy) {
+        return $this->repo()->all()->sortBy(function ($taxonomy) {
             return $taxonomy->title();
         });
     }
@@ -50,6 +52,11 @@ class Taxonomy
         return self::whereHandle($handle) !== null;
     }
 
+    public function save(TaxonomyContract $taxonomy)
+    {
+        $this->repo()->save($taxonomy);
+    }
+
     /**
      * Create a taxonomy
      *
@@ -64,5 +71,10 @@ class Taxonomy
         $taxonomy->path($slug);
 
         return $taxonomy;
+    }
+
+    protected function repo(): TaxonomyRepository
+    {
+        return app(TaxonomyRepository::class);
     }
 }

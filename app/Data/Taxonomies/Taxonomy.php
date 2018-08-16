@@ -9,6 +9,7 @@ use Statamic\API\Config;
 use Statamic\API\Folder;
 use Statamic\API\Fieldset;
 use Statamic\Data\DataFolder;
+use Statamic\API\Taxonomy as TaxonomyAPI;
 use Statamic\Events\Data\TaxonomyDeleted;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
@@ -123,15 +124,7 @@ class Taxonomy extends DataFolder implements TaxonomyContract
      */
     public function save()
     {
-        $path = 'taxonomies/' . $this->path() . '.yaml';
-
-        File::disk('content')->put($path, YAML::dump($this->data()));
-
-        // If the route was modified, update routes.yaml
-        if ($this->route && ($this->original_route !== $this->route)) {
-            Config::set('statamic.routes.taxonomies.'.$this->path(), $this->route());
-            Config::save();
-        }
+        TaxonomyAPI::save($this);
     }
 
     /**

@@ -7,6 +7,7 @@ use Tests\TestCase;
 use Statamic\API\User;
 use Statamic\API\Entry;
 use Statamic\API\Content;
+use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Structure;
 use Statamic\Stache\Stache;
@@ -28,6 +29,7 @@ class FeatureTest extends TestCase
 
         $this->stache = $this->app->make('stache')->withoutBooting(function ($stache) {
             $dir = __DIR__.'/__fixtures__';
+            $stache->store('taxonomies')->directory($dir . '/content/taxonomies');
             $stache->store('collections')->directory($dir . '/content/collections');
             $stache->store('entries')->directory($dir . '/content/collections');
             $stache->store('structures')->directory($dir . '/content/structures');
@@ -58,6 +60,12 @@ class FeatureTest extends TestCase
     function it_gets_entry()
     {
         $this->assertEquals('Christmas', Entry::find('blog-christmas')->get('title'));
+    }
+
+    /** @test */
+    function it_gets_all_taxonomies()
+    {
+        $this->assertEquals(2, Taxonomy::all()->count());
     }
 
     /** @test */
@@ -180,6 +188,23 @@ class FeatureTest extends TestCase
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
             "title: 'New Collection'\norder: date\nfoo: bar\n"
+        );
+        @unlink($path);
+    }
+
+    /** @test */
+    function saving_a_taxonomy_writes_it_to_file()
+    {
+        $taxonomy = Taxonomy::create('new');
+        $taxonomy->data([
+            'title' => 'New Taxonomy',
+            'foo' => 'bar'
+        ]);
+        $taxonomy->save();
+
+        $this->assertStringEqualsFile(
+            $path = __DIR__.'/__fixtures__/content/taxonomies/new.yaml',
+            "title: 'New Taxonomy'\nfoo: bar\n"
         );
         @unlink($path);
     }

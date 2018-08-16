@@ -8,6 +8,11 @@ return [
 
     'stores' => [
 
+        'taxonomies' => [
+            'class' => Stores\TaxonomiesStore::class,
+            'directory' => base_path('content/taxonomies'),
+        ],
+
         'collections' => [
             'class' => Stores\CollectionsStore::class,
             'directory' => base_path('content/collections'),
