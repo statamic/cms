@@ -56,15 +56,16 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/', 'TaxonomiesController@index')->name('taxonomies');
         Route::get('get', 'TaxonomiesController@get')->name('taxonomies.get');
     });
+    Route::get('configure/taxonomies', 'ConfigureTaxonomiesController@index')->name('taxonomies.configure.index');
 
     Route::group(['prefix' => 'taxonomies/terms'], function () {
         Route::get('/', 'TaxonomyTermsController@index')->name('terms');
         Route::delete('delete', 'TaxonomyTermsController@delete')->name('terms.delete');
-        Route::get('/{collection}/get', 'TaxonomyTermsController@get')->name('terms.get');
-        Route::get('/{collection}/create', 'PublishTaxonomyController@create')->name('term.create');
-        Route::get('/{collection}/{slug}', 'PublishTaxonomyController@edit')->name('term.edit');
+        Route::get('/{taxonomy}/get', 'TaxonomyTermsController@get')->name('terms.get');
+        Route::get('/{taxonomy}/create', 'PublishTaxonomyController@create')->name('term.create');
+        Route::get('/{taxonomy}/{slug}', 'PublishTaxonomyController@edit')->name('term.edit');
         Route::post('publish', 'PublishTaxonomyController@save')->name('taxonomy.save');
-        Route::get('/{collection}', 'TaxonomyTermsController@show')->name('terms.show');
+        Route::get('/{taxonomy}', 'TaxonomyTermsController@show')->name('terms.show');
     });
 
     Route::group(['prefix' => 'globals'], function () {

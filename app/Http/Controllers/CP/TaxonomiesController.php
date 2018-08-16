@@ -19,18 +19,22 @@ class TaxonomiesController extends CpController
      */
     public function index()
     {
-        $this->access('taxonomies:*:view');
+        // $this->access('taxonomies:*:view'); // TODO
 
-        $groups = collect(Taxonomy::all())->filter(function ($taxonomy) {
-            return User::getCurrent()->can("taxonomies:{$taxonomy->path()}:view");
-        })->all();
+        $taxonomies = collect(Taxonomy::all());
+        // TODO: Reinstate filtering out taxonomies the user is not allowed to access
+        // ->filter(function ($taxonomy) {
+        //     return User::getCurrent()->can("taxonomies:{$taxonomy->path()}:view");
+        // })->all();
 
-        if (count($groups) === 1) {
-            return redirect()->route('terms.show', reset($groups)->path());
-        }
+        // TODO: Reinstate the redirect
+        // if (count($taxonomies) === 1) {
+        //     return redirect()->route('terms.show', reset($taxonomies)->path());
+        // }
 
         return view('statamic::taxonomies.index', [
-            'title'   => 'Taxonomies'
+            'title'   => 'Taxonomies',
+            'taxonomies' => $taxonomies
         ]);
     }
 
@@ -39,28 +43,6 @@ class TaxonomiesController extends CpController
         return view('statamic::taxonomies.manage', [
             'title'   => 'Taxonomies'
         ]);
-    }
-
-    public function get()
-    {
-        $groups = [];
-
-        foreach (Taxonomy::all() as $group) {
-            if (! User::getCurrent()->can("taxonomies:{$group->path()}:view")) {
-                continue;
-            }
-
-            $groups[] = [
-                'id'             => $group->path(),
-                'title'          => $group->title(),
-                'taxonomies'     => $group->count(),
-                'edit_url'       => $group->editUrl(),
-                'create_url'     => route('term.create', $group->path()),
-                'terms_url'      => route('terms.show', $group->path())
-            ];
-        }
-
-        return ['columns' => ['title'], 'items' => $groups];
     }
 
     public function create()
