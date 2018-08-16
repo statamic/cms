@@ -52,7 +52,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/{collection}', 'EntriesController@show')->name('entries.show');
     });
 
-    Route::get('/', 'TaxonomiesController@index')->name('taxonomies');
+    Route::get('taxonomies', 'TaxonomiesController@index')->name('taxonomies');
     Route::get('configure/taxonomies', 'ConfigureTaxonomiesController@index')->name('taxonomies.configure.index');
 
     Route::group(['prefix' => 'taxonomies/terms'], function () {
