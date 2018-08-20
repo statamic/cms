@@ -36,4 +36,16 @@ class EloquentPermissibleTest extends TestCase
         return tap(new User)
             ->model(factory(Model::class)->make());
     }
+
+    /** @test */
+    function it_gets_and_checks_permissions()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function it_checks_if_it_has_super_permissions_through_roles_and_groups()
+    {
+        $this->markTestIncomplete();
+    }
 }
