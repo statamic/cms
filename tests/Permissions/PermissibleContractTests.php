@@ -2,8 +2,6 @@
 
 namespace Tests\Permissions;
 
-use Tests\TestCase;
-use Statamic\Data\Users\User;
 use Statamic\Permissions\Role;
 use Statamic\API\Role as RoleAPI;
 use Illuminate\Support\Collection;
@@ -12,22 +10,36 @@ use Statamic\API\UserGroup as UserGroupAPI;
 use Statamic\Contracts\Permissions\Role as RoleContract;
 use Statamic\Contracts\Permissions\UserGroup as UserGroupContract;
 
-class PermissibleTest extends TestCase
+trait PermissibleContractTests
 {
+    abstract protected function createPermissible();
+
     /** @test */
     function it_gets_and_assigns_roles()
     {
         $roleA = new class extends Role {
-            public function handle(string $handle = null) { return 'a'; }
+            public function handle(string $handle = null)
+            {
+                return 'a';
+            }
         };
         $roleB = new class extends Role {
-            public function handle(string $handle = null) { return 'b'; }
+            public function handle(string $handle = null)
+            {
+                return 'b';
+            }
         };
         $roleC = new class extends Role {
-            public function handle(string $handle = null) { return 'c'; }
+            public function handle(string $handle = null)
+            {
+                return 'c';
+            }
         };
         $roleD = new class extends Role {
-            public function handle(string $handle = null) { return 'd'; }
+            public function handle(string $handle = null)
+            {
+                return 'd';
+            }
         };
 
         RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
@@ -35,13 +47,14 @@ class PermissibleTest extends TestCase
         RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
         RoleAPI::shouldReceive('find')->with('d')->andReturn($roleD);
 
-        $user = new User;
+        $user = $this->createPermissible();
         $this->assertInstanceOf(Collection::class, $user->roles());
         $this->assertCount(0, $user->roles());
 
         $return = $user->assignRole([$roleA, 'b']);
         $return = $user->assignRole($roleC);
         $return = $user->assignRole('d');
+        $user->save();
 
         $this->assertInstanceOf(Collection::class, $user->roles());
         $this->assertCount(4, $user->roles());
@@ -59,24 +72,37 @@ class PermissibleTest extends TestCase
     function it_removes_a_role_assignment()
     {
         $roleA = new class extends Role {
-            public function handle(string $handle = null) { return 'a'; }
+            public function handle(string $handle = null)
+            {
+                return 'a';
+            }
         };
         $roleB = new class extends Role {
-            public function handle(string $handle = null) { return 'b'; }
+            public function handle(string $handle = null)
+            {
+                return 'b';
+            }
         };
         $roleC = new class extends Role {
-            public function handle(string $handle = null) { return 'c'; }
+            public function handle(string $handle = null)
+            {
+                return 'c';
+            }
         };
         $roleD = new class extends Role {
-            public function handle(string $handle = null) { return 'd'; }
+            public function handle(string $handle = null)
+            {
+                return 'd';
+            }
         };
 
         RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
 
-        $user = (new User)->assignRole([$roleA, $roleB, $roleC, $roleD]);
+        $user = $this->createPermissible()->assignRole([$roleA, $roleB, $roleC, $roleD]);
 
         $return = $user->removeRole($roleA);
         $user->removeRole(['c', $roleD]);
+        $user->save();
 
         $this->assertEquals(['b' => $roleB], $user->roles()->all());
         $this->assertEquals($user, $return);
@@ -86,16 +112,23 @@ class PermissibleTest extends TestCase
     function it_checks_if_it_has_a_role()
     {
         $roleA = new class extends Role {
-            public function handle(string $handle = null) { return 'a'; }
+            public function handle(string $handle = null)
+            {
+                return 'a';
+            }
         };
         $roleB = new class extends Role {
-            public function handle(string $handle = null) { return 'b'; }
+            public function handle(string $handle = null)
+            {
+                return 'b';
+            }
         };
 
         RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
 
-        $user = new User;
+        $user = $this->createPermissible();
         $user->assignRole($roleA);
+        $user->save();
 
         $this->assertTrue($user->hasRole($roleA));
         $this->assertTrue($user->hasRole('a'));
@@ -107,8 +140,12 @@ class PermissibleTest extends TestCase
     function it_gets_and_checks_permissions()
     {
         $directRole = new class extends Role {
-            public function handle(string $handle = null) { return 'direct'; }
-            public function permissions(): Collection {
+            public function handle(string $handle = null)
+            {
+                return 'direct';
+            }
+            public function permissions(): Collection
+            {
                 return collect([
                     'permission one directly through role',
                     'permission two directly through role',
@@ -116,8 +153,12 @@ class PermissibleTest extends TestCase
             }
         };
         $userGroupRole = new class extends UserGroup {
-            public function handle(string $handle = null) { return 'usergrouprole'; }
-            public function permissions(): Collection {
+            public function handle(string $handle = null)
+            {
+                return 'usergrouprole';
+            }
+            public function permissions(): Collection
+            {
                 return collect([
                     'permission one through user group',
                     'permission two through user group',
@@ -129,9 +170,10 @@ class PermissibleTest extends TestCase
         RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
         UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
 
-        $user = (new User)
+        $user = $this->createPermissible()
             ->assignRole($directRole)
             ->addToGroup($userGroup);
+        $user->save();
 
         $expectedPermissions = [
             'permission one directly through role',
@@ -155,12 +197,24 @@ class PermissibleTest extends TestCase
     function it_checks_if_it_has_super_permissions_through_roles_and_groups()
     {
         $superRole = new class extends Role {
-            public function handle(string $handle = null) { return 'superrole'; }
-            public function isSuper(): bool { return true; }
+            public function handle(string $handle = null)
+            {
+                return 'superrole';
+            }
+            public function isSuper(): bool
+            {
+                return true;
+            }
         };
         $nonSuperRole = new class extends Role {
-            public function handle(string $handle = null) { return 'nonsuperrole'; }
-            public function isSuper(): bool { return false; }
+            public function handle(string $handle = null)
+            {
+                return 'nonsuperrole';
+            }
+            public function isSuper(): bool
+            {
+                return false;
+            }
         };
 
         $superGroup = (new UserGroup)->handle('supergroup')->assignRole($superRole);
@@ -171,10 +225,10 @@ class PermissibleTest extends TestCase
         UserGroupAPI::shouldReceive('find')->with('supergroup')->andReturn($superGroup);
         UserGroupAPI::shouldReceive('find')->with('nonsupergroup')->andReturn($nonSuperGroup);
 
-        $superUserThroughRole = (new User)->assignRole($superRole);
-        $nonSuperUserThroughRole = (new User)->assignRole($nonSuperRole);
-        $superUserThroughGroup = (new User)->addToGroup($superGroup);
-        $nonSuperUserThroughGroup = (new User)->addToGroup($nonSuperGroup);
+        $superUserThroughRole = $this->createPermissible()->assignRole($superRole)->save();
+        $nonSuperUserThroughRole = $this->createPermissible()->assignRole($nonSuperRole)->save();
+        $superUserThroughGroup = $this->createPermissible()->addToGroup($superGroup)->save();
+        $nonSuperUserThroughGroup = $this->createPermissible()->addToGroup($nonSuperGroup)->save();
 
         $this->assertTrue($superUserThroughRole->isSuper());
         $this->assertFalse($nonSuperUserThroughRole->isSuper());
@@ -185,7 +239,7 @@ class PermissibleTest extends TestCase
     /** @test */
     function it_checks_if_it_has_super_permissions_on_itself()
     {
-        $user = new User;
+        $user = $this->createPermissible();
         $this->assertFalse($user->isSuper());
         $return = $user->makeSuper();
         $this->assertTrue($user->isSuper());
@@ -198,7 +252,7 @@ class PermissibleTest extends TestCase
         $groupA = (new UserGroup)->handle('a');
         $groupB = (new UserGroup)->handle('b');
         $groupC = (new UserGroup)->handle('c');
-        $user = new User;
+        $user = $this->createPermissible();
 
         UserGroupAPI::shouldReceive('find')->with('a')->andReturn($groupA);
         UserGroupAPI::shouldReceive('find')->with('b')->andReturn($groupB);
@@ -235,7 +289,7 @@ class PermissibleTest extends TestCase
         $groupA = (new UserGroup)->handle('a');
         $groupB = (new UserGroup)->handle('b');
         $groupC = (new UserGroup)->handle('c');
-        $user = (new User)->addToGroup($groupA);
+        $user = $this->createPermissible()->addToGroup($groupA);
 
         UserGroupAPI::shouldReceive('find')->with('a')->andReturn($groupA);
         UserGroupAPI::shouldReceive('find')->with('b')->andReturn($groupB);
