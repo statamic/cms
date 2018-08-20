@@ -197,7 +197,7 @@ class User extends FileUser
     {
         return (new Roles($this))->all()->map(function ($row) {
             return Role::find($row->role_id);
-        })->keyBy->handle();
+        })->filter()->keyBy->handle();
     }
 
     public function lastModified()

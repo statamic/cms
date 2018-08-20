@@ -14,7 +14,7 @@ trait Permissible
         return collect($this->get('roles', []))
             ->map(function ($role) {
                 return RoleAPI::find($role);
-            })->keyBy->handle();
+            })->filter()->keyBy->handle();
     }
 
     public function assignRole($role)

@@ -46,14 +46,16 @@ trait PermissibleContractTests
         RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
         RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
         RoleAPI::shouldReceive('find')->with('d')->andReturn($roleD);
+        RoleAPI::shouldReceive('find')->with('unknown')->andReturnNull();
 
         $user = $this->createPermissible();
         $this->assertInstanceOf(Collection::class, $user->roles());
         $this->assertCount(0, $user->roles());
 
         $return = $user->assignRole([$roleA, 'b']);
-        $return = $user->assignRole($roleC);
-        $return = $user->assignRole('d');
+        $user->assignRole($roleC);
+        $user->assignRole('d');
+        $user->assignRole('unknown');
         $user->save();
 
         $this->assertInstanceOf(Collection::class, $user->roles());
