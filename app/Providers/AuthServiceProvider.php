@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Permissions\Role;
 use Statamic\Extensions\FileUserProvider;
@@ -30,6 +31,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::provider('file', function () {
             return new FileUserProvider;
+        });
+
+        Gate::before(function ($user, $ability) {
+            return $user->isSuper() ? true : null;
         });
     }
 
