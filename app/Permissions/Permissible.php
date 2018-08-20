@@ -3,146 +3,128 @@
 namespace Statamic\Permissions;
 
 use Statamic\API\Role as RoleAPI;
-use Statamic\Contracts\Permissions\Role;
 use Statamic\API\UserGroup as UserGroupAPI;
-use Statamic\Contracts\Permissions\UserGroup;
-use Statamic\API\Permission as PermissionAPI;
+use Statamic\Contracts\Permissions\Role as RoleContract;
+use Statamic\Contracts\Permissions\UserGroup as UserGroupContract;
 
 trait Permissible
 {
-    /**
-     * @var \Illuminate\Support\Collection
-     */
-    protected $roles = [];
-
-    /**
-     * Get the roles for the user
-     *
-     * @return \Illuminate\Support\Collection
-     */
     public function roles()
     {
-        if ($this->roles) {
-            return $this->roles;
-        }
-
-        // First, get the roles defined on the actual user.
-        $userRoleIds = $this->get('roles', []);
-        $userRoles = RoleAPI::all()->filter(function($role) use ($userRoleIds) {
-            return in_array($role->uuid(), $userRoleIds);
-        });
-
-        // Next, get the roles inherited from the user groups this user belongs to.
-        $groupRoles = $this->groups()->flatMap(function ($group) {
-            return $group->roles();
-        })->filter()->keyBy(function ($role) {
-            return $role->uuid();
-        });
-
-        return $this->roles = $userRoles->merge($groupRoles);
+        return collect($this->get('roles', []))
+            ->map(function ($role) {
+                return RoleAPI::find($role);
+            })->keyBy->handle();
     }
 
-    /**
-     * Does the user have a given role?
-     *
-     * @param string $role
-     * @return bool
-     */
+    public function assignRole($role)
+    {
+        $roles = collect(array_wrap($role))->map(function ($role) {
+            return is_string($role) ? $role : $role->handle();
+        })->all();
+
+        $this->set('roles', array_merge($this->get('roles', []), $roles));
+
+        return $this;
+    }
+
+    public function removeRole($role)
+    {
+        $toBeRemoved = collect(array_wrap($role))->map(function ($role) {
+            return is_string($role) ? $role : $role->handle();
+        });
+
+        $roles = collect($this->get('roles', []))
+            ->diff($toBeRemoved)
+            ->values()
+            ->all();
+
+        $this->set('roles', $roles);
+
+        return $this;
+    }
+
     public function hasRole($role)
     {
-        $role = ($role instanceof Role) ? $role->uuid() : $role;
+        $role = $role instanceof RoleContract ? $role->handle() : $role;
 
         return $this->roles()->has($role);
     }
 
-    /**
-     * Does the user have a given permission?
-     *
-     * @param string $permission
-     * @return bool
-     */
+    public function addToGroup($group)
+    {
+        $groups = collect(array_wrap($group))->map(function ($group) {
+            return is_string($group) ? $group : $group->handle();
+        })->all();
+
+        $this->set('groups', array_merge($this->get('groups', []), $groups));
+
+        return $this;
+    }
+
+    public function removeFromGroup($group)
+    {
+        $toBeRemoved = collect(array_wrap($group))->map(function ($group) {
+            return is_string($group) ? $group : $group->handle();
+        });
+
+        $groups = collect($this->get('groups', []))
+            ->diff($toBeRemoved)
+            ->values()
+            ->all();
+
+        $this->set('groups', $groups);
+
+        return $this;
+    }
+
+    public function groups($groups = null)
+    {
+        if ($groups) {
+            $this->set('groups', []);
+            return $this->addToGroup($groups);
+        }
+
+        return collect($this->get('groups', []))
+            ->map(function ($group) {
+                return UserGroupAPI::find($group);
+            })->keyBy->handle();
+    }
+
+    public function isInGroup($group)
+    {
+        $group = $group instanceof UserGroupContract ? $group->handle() : $group;
+
+        return $this->groups()->has($group);
+    }
+
+    public function permissions()
+    {
+        return $this->groups()->flatMap->roles()
+            ->merge($this->roles())
+            ->flatMap->permissions();
+    }
+
     public function hasPermission($permission)
     {
-        if ($this->get('super') === true) {
+        return $this->permissions()->contains($permission);
+    }
+
+    public function isSuper()
+    {
+        if ($this->get('super')) {
             return true;
         }
 
-        foreach ($this->roles() as $role) {
-            if ($role->hasPermission($permission)) {
-                return true;
-            }
-        }
-
-        return false;
+        return null !== $this->groups()->flatMap->roles()
+            ->merge($this->roles())
+            ->first->isSuper();
     }
 
-    /**
-     * Get all the user's permissions
-     *
-     * @return mixed
-     */
-    public function permissions()
+    public function makeSuper()
     {
-        // TODO: Don't hardcode...
-        return app('permissions')->temporaryPermissions();
+        $this->set('super', true);
 
-        $permissions = [];
-
-        if ($this->isSuper()) {
-            return PermissionAPI::all();
-        }
-
-        foreach ($this->roles() as $role) {
-            $permissions = array_merge($permissions, $role->permissions()->all());
-        }
-
-        return $permissions;
-    }
-
-    /**
-     * Is this a super user?
-     *
-     * @return bool
-     */
-    public function isSuper()
-    {
-        return $this->hasPermission('super');
-    }
-
-    /**
-     * Get the user's groups
-     *
-     * @param array|null $groups
-     * @return \Illuminate\Support\Collection
-     */
-    public function groups($groups = null)
-    {
-        if (is_null($groups)) {
-            return UserGroupAPI::whereUser($this);
-        }
-
-        // Go through all the groups, add the user to any group specified, and remove from the others.
-        foreach (UserGroupAPI::all() as $group_uuid => $group) {
-            if (in_array($group_uuid, $groups)) {
-                $group->addUser($this);
-            } else {
-                $group->removeUser($this);
-            }
-
-            $group->save();
-        }
-    }
-
-    /**
-     * Does this user belong to a given group?
-     *
-     * @param string $group
-     * @return bool
-     */
-    public function inGroup($group)
-    {
-        $group = ($group instanceof UserGroup) ? $group->id() : $group;
-
-        return $this->groups()->has($group);
+        return $this;
     }
 }
