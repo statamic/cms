@@ -156,13 +156,5 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\Submission::class,
             \Statamic\Forms\Submission::class
         );
-
-        $this->app->bind(\Statamic\Contracts\Data\Services\UsersService::class, function () {
-            $class = (Config::get('statamic.users.driver') === 'eloquent')
-                ? \Statamic\Data\Services\Eloquent\UsersService::class
-                : \Statamic\Data\Services\UsersService::class;
-
-            return app($class);
-        });
     }
 }
