@@ -61,7 +61,7 @@
 </div>
 @if (! $oauth)
     <div class="w-full text-center mt-2">
-        <a href="{{ route('login.reset')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
+        <a href="{{ route('statamic.cp.login.reset')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}
         </a>
     </div>

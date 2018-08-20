@@ -11,13 +11,6 @@ class LoginController extends CpController
     use AuthenticatesUsers;
 
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
-
-    /**
      * Create a new controller instance.
      *
      * @return void
@@ -58,5 +51,10 @@ class LoginController extends CpController
     public function username()
     {
         return 'username';
+    }
+
+    public function redirectTo()
+    {
+        return route('statamic.cp.index');
     }
 }

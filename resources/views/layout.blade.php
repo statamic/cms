@@ -9,7 +9,7 @@
     <div id="statamic">
 
       <nav class="nav-mobile">
-          <a href="{{ route('cp') }}" class="logo">
+          <a href="{{ route('statamic.cp.index') }}" class="logo">
               {!! svg('statamic-wordmark') !!}
           </a>
           <a @click.prevent="toggleNav" class="toggle">

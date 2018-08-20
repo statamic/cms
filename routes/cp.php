@@ -1,15 +1,19 @@
 <?php
 
+use Statamic\Http\Middleware\CP\Authenticate;
 use Statamic\Http\Middleware\CP\Configurable;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
     Route::post('login', 'Auth\LoginController@login');
     Route::get('logout', 'Auth\LoginController@logout')->name('logout');
+    Route::get('/login.reset', function () { return ''; })->name('login.reset'); // TODO
 });
 
-Route::group(['middleware' => 'auth'], function () {
-    Route::redirect('/', 'cp/dashboard')->name('cp');
+Route::group([
+    'middleware' => [Authenticate::class, 'can:access cp']
+], function () {
+    Route::redirect('/', 'cp/dashboard')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
     Route::get('licensing', 'LicensingController@index')->name('licensing');
@@ -212,7 +216,6 @@ Route::get('/taxonomy.edit', function () { return ''; })->name('taxonomy.edit');
 Route::get('/taxonomy.create', function () { return ''; })->name('taxonomy.create');
 Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
 Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
-Route::get('/login.reset', function () { return ''; })->name('login.reset');
 Route::get('/search', function () { return ''; })->name('search.global');
 Route::get('/account/password', function () { return ''; })->name('account.password');
 

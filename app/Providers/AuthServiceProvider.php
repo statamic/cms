@@ -36,6 +36,14 @@ class AuthServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->isSuper() ? true : null;
         });
+
+        collect([
+            'access cp',
+        ])->each(function ($ability) {
+            Gate::define($ability, function ($user) use ($ability) {
+                return $user->hasPermission($ability);
+            });
+        });
     }
 
     protected function autoConfigure()

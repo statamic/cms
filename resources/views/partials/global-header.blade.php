@@ -1,13 +1,13 @@
 <div class="cp-head">
 
     <div class="logo">
-        <a href="{{ route('cp') }}" class="flex items-center">
+        <a href="{{ route('statamic.cp.index') }}" class="flex items-center">
               @svg('statamic-wordmark')
               <span class="version" v-cloak>@{{ version }}</span>
         </a>
     </div>
 
-    <global-search endpoint="{{ route('search.global') }}" :limit="10" placeholder="{{ __('Search...') }}">
+    <global-search endpoint="{{ route('statamic.cp.search.global') }}" :limit="10" placeholder="{{ __('Search...') }}">
         <template slot="icon">
             @svg('new/search')
         </template>
@@ -57,9 +57,9 @@
                     <div class="text-xxs mt-px text-grey-light">Super Admin</div>
                 </li>
                 <li class="divider"></li>
-                <li><a href="{{ route('account') }}">{{ __('Profile') }}</a></li>
-                <li><a href="{{ route('account.password') }}">{{ __('Change Password') }}</a></li>
-                <li><a href="{{ route('logout') }}">{{ __('Logout') }}</a></li>
+                <li><a href="{{ route('statamic.cp.account') }}">{{ __('Profile') }}</a></li>
+                <li><a href="{{ route('statamic.cp.account.password') }}">{{ __('Change Password') }}</a></li>
+                <li><a href="{{ route('statamic.cp.logout') }}">{{ __('Logout') }}</a></li>
             </ul>
         </div>
     </div>

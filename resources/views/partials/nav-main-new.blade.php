@@ -3,12 +3,12 @@
         <div class="nav-main-wrapper">
             <ul class="mt-sm">
                 <li class="{{ current_class('dashboard') }}">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('statamic.cp.dashboard') }}">
                         <i>@svg('new/pie-line-graph-desktop')</i><span>Dashboard</span>
                     </a>
                 </li>
                 <li class="{{ current_class('playground') }}">
-                    <a href="{{ route('playground') }}">
+                    <a href="{{ route('statamic.cp.playground') }}">
                         <i>@svg('new/family-outdoors-playhouse-swing')</i><span>Playground</span>
                     </a>
                 </li>
