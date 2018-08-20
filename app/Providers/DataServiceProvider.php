@@ -103,29 +103,10 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Data\Users\UserFactory::class
         );
 
-        $this->app->bind(
-            \Statamic\Contracts\Permissions\Role::class,
-            \Statamic\Permissions\File\Role::class
-        );
-
         $this->app->singleton(
             \Statamic\Contracts\Permissions\RoleFactory::class,
             \Statamic\Permissions\File\RoleFactory::class
         );
-
-        $this->app->bind(\Statamic\Contracts\Permissions\UserGroup::class, function () {
-            $driver = Config::get('statamic.users.driver');
-
-            if ($driver === 'eloquent') {
-                $class = \Statamic\Permissions\Eloquent\UserGroup::class;
-            } elseif ($driver === 'redis') {
-                $class = \Statamic\Permissions\Redis\UserGroup::class;
-            } else {
-                $class = \Statamic\Permissions\File\UserGroup::class;
-            }
-
-            return app($class);
-        });
 
         $this->app->singleton(\Statamic\Contracts\Permissions\UserGroupFactory::class, function () {
             if (Config::get('statamic.users.driver') === 'redis') {

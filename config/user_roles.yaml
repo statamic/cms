@@ -1,0 +1,4 @@
+# admin:
+#   title: Administrator
+#   permissions:
+#     - super

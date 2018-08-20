@@ -2,64 +2,47 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Config\Roles;
 use Illuminate\Support\Facades\Auth;
-use Statamic\Permissions\Permissions;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Contracts\Permissions\Role;
 use Statamic\Extensions\FileUserProvider;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Statamic\Contracts\Permissions\UserGroup;
+use Statamic\Contracts\Permissions\RoleRepository;
 
 class AuthServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->singleton('permissions', function () {
-            return new Permissions;
+        $this->app->bind(Role::class, config('statamic.users.roles.role'));
+
+        $this->app->singleton(RoleRepository::class, function () {
+            return app()
+                ->make(config('statamic.users.roles.repository'))
+                ->path(config('statamic.users.roles.path'));
         });
 
-        $this->app->alias('permissions', 'Statamic\Permissions\Permissions');
-
-        $this->app->singleton('Statamic\Config\Roles', function () {
-            return collect();
-        });
+        $this->app->bind(UserGroup::class, config('statamic.users.groups.group'));
     }
 
-    /**
-     * Register any authentication / authorization services.
-     *
-     * @return void
-     */
-    public function boot(GateContract $gate, Permissions $permissions)
+    public function boot()
     {
+        $this->autoConfigure();
+
         Auth::provider('file', function () {
             return new FileUserProvider;
         });
-
-        // TODO: Implement correctly.
-
-        // $this->loadRoles();
-
-        // $permissions->build();
-        // $perms = $permissions->all(true);
-
-        $perms = app('permissions')->temporaryPermissions();
-
-        foreach ($perms as $group => $permission) {
-            $gate->define($permission, function ($user) use ($permission) {
-                return $user->isSuper() || $user->hasPermission($permission);
-            });
-        }
     }
 
-    /**
-     * Load user roles
-     */
-    public function loadRoles()
+    protected function autoConfigure()
     {
-        $roles = $this->app->make('Statamic\Config\Roles');
-
-        foreach (config('statamic.users.roles') as $id => $data) {
-            $roles[$id] = app('Statamic\Contracts\Permissions\RoleFactory')->create($data, $id);
+        if (! config('statamic.users.auto_configure')) {
+            return;
         }
+
+        config(['auth.providers' => [
+            'users' => [
+                'driver' => 'file',
+            ]
+        ]]);
     }
 }
