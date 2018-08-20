@@ -594,3 +594,13 @@ if (!function_exists('mb_str_word_count')) {
         }
     };
 }
+
+if (! function_exists('back_or_route')) {
+    /**
+     * Redirect back to the previous page, or if there is no referer redirect to a route.
+     */
+    function back_or_route($route)
+    {
+        return request()->header('referer') ? back() : redirect()->route($route);
+    }
+}
