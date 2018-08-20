@@ -4,14 +4,23 @@ namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Structure;
 use Illuminate\Http\Request;
+use Statamic\Exceptions\AuthorizationException;
 
 class StructuresController extends CpController
 {
     public function index()
     {
-        return view('statamic::structures.index', [
-            'structures' => Structure::all()
-        ]);
+        $all = Structure::all();
+
+        $structures = $all->filter(function ($structure) {
+            return request()->user()->can('view', $structure);
+        });
+
+        if ($structures->isEmpty() && $all->count() != $structures->count()) {
+            throw new AuthorizationException('You are not authorized to view any structures.');
+        }
+
+        return view('statamic::structures.index', compact('structures'));
     }
 
     public function edit($structure)

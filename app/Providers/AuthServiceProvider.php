@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Policies;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -12,6 +13,10 @@ use Statamic\Contracts\Permissions\RoleRepository;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        \Statamic\Contracts\Data\Structures\Structure::class => Policies\StructurePolicy::class,
+    ];
+
     public function register()
     {
         $this->app->bind(Role::class, config('statamic.users.roles.role'));
@@ -44,6 +49,10 @@ class AuthServiceProvider extends ServiceProvider
                 return $user->hasPermission($ability);
             });
         });
+
+        foreach ($this->policies as $key => $policy) {
+            Gate::policy($key, $policy);
+        }
     }
 
     protected function autoConfigure()

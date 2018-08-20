@@ -6,7 +6,7 @@
         <h1 class="flex-1">{{ __('Structures') }}</h1>
 
         @can('super')
-            <a href="{{ route('structures.configure.index') }}" class="btn">{{ __('Configure Sections') }}</a>
+            <a href="{{ route('statamic.cp.structures.configure.index') }}" class="btn">{{ __('Configure Sections') }}</a>
         @endcan
     </div>
 
@@ -17,7 +17,7 @@
             <h2>{{ __('Structures') }}</h2>
             <h3>{{ _('There are no structures.') }}</h3>
             @can('super')
-                <a href="{{ route('structures.configure.index') }}" class="btn btn-default btn-lg">{{ __('Configure') }}</a>
+                <a href="{{ route('statamic.cp.structures.configure.index') }}" class="btn btn-default btn-lg">{{ __('Configure') }}</a>
             @endcan
         </div>
     </div>
@@ -34,7 +34,7 @@
                                 <i class="icon icon-documents"></i>
                                 {{ $structure->flattenedPages()->count() }}
                             </div>
-                            <a href="{{ route('structures.edit', $structure->handle()) }}">{{ $structure->title() }}</a>
+                            <a href="{{ route('statamic.cp.structures.edit', $structure->handle()) }}">{{ $structure->title() }}</a>
                         </td>
                     </tr>
                     @endforeach
