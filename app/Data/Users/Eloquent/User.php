@@ -195,15 +195,9 @@ class User extends FileUser
      */
     public function roles()
     {
-        if ($this->roles) {
-            return $this->roles;
-        }
-
-        $roles = (new Roles($this))->all()->map(function ($row) {
+        return (new Roles($this))->all()->map(function ($row) {
             return Role::find($row->role_id);
-        });
-
-        return $this->roles = $roles;
+        })->keyBy->handle();
     }
 
     public function lastModified()
