@@ -163,7 +163,7 @@ class Entry extends Content implements EntryContract
     {
         $slug = $this->in(default_locale())->slug();
 
-        return cp_route('entry.edit', [$this->collectionName(), $slug]);
+        return cp_route('collections.entries.edit', [$this->collectionName(), $slug]);
     }
 
     /**

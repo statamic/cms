@@ -21,6 +21,13 @@ class CollectionsController extends CpController
         return view('statamic::collections.index', compact('collections'));
     }
 
+    public function show($collection)
+    {
+        $collection = Collection::whereHandle($collection);
+
+        return view('statamic::collections.show', compact('collection'));
+    }
+
     public function manage()
     {
         return view('statamic::collections.manage', [

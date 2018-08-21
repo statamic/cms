@@ -31,7 +31,8 @@
                                     <i class="icon icon-documents"></i>
                                     {{ $collection->entries()->count() }}
                                 </div>
-                                <a href="{{ cp_route('collections.edit', $collection->path()) }}">{{ $collection->title() }}</a>
+                                <a href="{{ cp_route('collections.show', $collection->path()) }}">{{ $collection->title() }}</a>
+                                <a href="{{ cp_route('collections.edit', $collection->path()) }}">Edit</a>
 
                                 @can('delete', $collection)
                                     <form method="POST" action="{{ cp_route('collections.destroy', $collection->path()) }}">

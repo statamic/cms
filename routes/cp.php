@@ -22,6 +22,7 @@ Route::group([
 
     Route::resource('structures', 'StructuresController');
     Route::resource('collections', 'CollectionsController');
+    Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
 
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', 'PagesController@pages')->name('pages');
@@ -33,19 +34,6 @@ Route::group([
         Route::get('edit/{url?}', ['uses' => 'PublishPageController@edit', 'as' => 'page.edit'])->where('url', '.*');
         Route::post('mount', ['uses' => 'PagesController@mountCollection', 'as' => 'page.mount']);
         Route::post('duplicate', 'DuplicatePageController@store');
-    });
-
-    Route::group(['prefix' => 'collections/entries'], function () {
-        Route::get('/', 'EntriesController@index')->name('entries');
-        Route::delete('delete', 'EntriesController@delete')->name('entries.delete');
-        Route::get('/{collection}/get', 'EntriesController@get')->name('entries.get');
-        Route::get('/{collection}/search', 'EntriesSearchController@search')->name('entries.search');
-        Route::post('reorder', 'EntriesController@reorder')->name('entries.reorder');
-        Route::get('/{collection}/create', 'PublishEntryController@create')->name('entry.create');
-        Route::post('/{collection}/duplicate', 'DuplicateEntryController@store')->name('entry.duplicate');
-        Route::get('/{collection}/{slug}', ['uses' => 'PublishEntryController@edit', 'as' => 'entry.edit']);
-        Route::post('publish', 'PublishEntryController@save')->name('entry.save');
-        Route::get('/{collection}', 'EntriesController@show')->name('entries.show');
     });
 
     Route::get('taxonomies', 'TaxonomiesController@index')->name('taxonomies');

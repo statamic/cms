@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import EntryListing from '../components/listings/entries';
 
+// TODO: Temporary
+Vue.component('listing-placeholder', require('../components/ListingPlaceholder.vue'));
+
 // Core
 Vue.component('addon-listing', require('../components/listings/addons'));
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
