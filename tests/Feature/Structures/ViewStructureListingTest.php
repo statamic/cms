@@ -127,6 +127,38 @@ class ViewStructureListingTest extends TestCase
             ->assertDontSee('Create Structure');
     }
 
+    /** @test */
+    function delete_button_is_visible_with_permission_to_configure()
+    {
+        API\Structure::shouldReceive('all')->andReturn(collect([
+            'foo' => $this->createStructure('foo'),
+        ]));
+
+        $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
+        $user = API\User::create()->get()->assignRole('test');
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('statamic.cp.structures.index'))
+            ->assertSee('Delete');
+    }
+
+    /** @test */
+    function delete_button_is_not_visible_without_permission_to_configure()
+    {
+        API\Structure::shouldReceive('all')->andReturn(collect([
+            'foo' => $this->createStructure('foo'),
+        ]));
+
+        $this->setTestRoles(['test' => ['access cp', 'view foo structure']]);
+        $user = API\User::create()->get()->assignRole('test');
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('statamic.cp.structures.index'))
+            ->assertDontSee('Delete');
+    }
+
     private function createStructure($handle)
     {
         return tap(Mockery::mock(Structure::class), function ($s) use ($handle) {

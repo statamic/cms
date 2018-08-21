@@ -32,6 +32,12 @@
                                 {{ $structure->flattenedPages()->count() }}
                             </div>
                             <a href="{{ route('statamic.cp.structures.edit', $structure->handle()) }}">{{ $structure->title() }}</a>
+
+                            @can('delete', $structure)
+                                <form method="POST" action="{{ cp_route('structures.destroy', $structure->handle()) }}">
+                                    @csrf @method('delete') <button>Delete</button>
+                                </form>
+                            @endcan
                         </td>
                     </tr>
                     @endforeach

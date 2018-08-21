@@ -6,6 +6,13 @@ use Statamic\API\Structure;
 
 class StructurePolicy
 {
+    public function before($user, $ability)
+    {
+        if ($user->hasPermission('configure structures')) {
+            return true;
+        }
+    }
+
     public function index($user)
     {
         if ($this->create($user)) {
@@ -19,17 +26,16 @@ class StructurePolicy
 
     public function create($user)
     {
-        return $this->canConfigure($user);
+        //
     }
 
     public function view($user, $structure)
     {
-        return $this->canConfigure($user)
-            || $user->hasPermission("view {$structure->handle()} structure");
+        return $user->hasPermission("view {$structure->handle()} structure");
     }
 
-    protected function canConfigure($user)
+    public function delete($user, $structure)
     {
-        return $user->hasPermission('configure structures');
+        //
     }
 }
