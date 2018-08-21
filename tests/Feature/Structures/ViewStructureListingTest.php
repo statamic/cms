@@ -65,6 +65,27 @@ class ViewStructureListingTest extends TestCase
     }
 
     /** @test */
+    function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
+    {
+        API\Structure::shouldReceive('all')->andReturn(collect([
+            'foo' => $structureA = $this->createStructure('foo'),
+            'bar' => $structureB = $this->createStructure('bar')
+        ]));
+        $this->setTestRoles(['test' => ['access cp', 'configure structures', 'view bar structure']]);
+        $user = API\User::create()->get()->assignRole('test');
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('statamic.cp.structures.index'))
+            ->assertSuccessful()
+            ->assertViewHas('structures', collect([
+                'foo' => $structureA,
+                'bar' => $structureB
+            ]))
+            ->assertDontSee('no-results');
+    }
+
+    /** @test */
     function it_denies_access_when_there_are_no_permitted_structures()
     {
         API\Structure::shouldReceive('all')->andReturn(collect([
@@ -83,9 +104,9 @@ class ViewStructureListingTest extends TestCase
     }
 
     /** @test */
-    function create_structure_button_is_visible_with_permission_to_create()
+    function create_structure_button_is_visible_with_permission_to_configure()
     {
-        $this->setTestRoles(['test' => ['access cp', 'create structures']]);
+        $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
         $user = API\User::create()->get()->assignRole('test');
 
         $response = $this
@@ -95,7 +116,7 @@ class ViewStructureListingTest extends TestCase
     }
 
     /** @test */
-    function create_structure_button_is_not_visible_without_permission_to_create()
+    function create_structure_button_is_not_visible_without_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = API\User::create()->get()->assignRole('test');

@@ -19,11 +19,17 @@ class StructurePolicy
 
     public function create($user)
     {
-        return $user->hasPermission('create structures');
+        return $this->canConfigure($user);
     }
 
     public function view($user, $structure)
     {
-        return $user->hasPermission("view {$structure->handle()} structure");
+        return $this->canConfigure($user)
+            || $user->hasPermission("view {$structure->handle()} structure");
+    }
+
+    protected function canConfigure($user)
+    {
+        return $user->hasPermission('configure structures');
     }
 }
