@@ -20,11 +20,13 @@
                         <i class="">@svg('new/content-pencil-write')</i><span>Entries</span>
                     </a>
                 </li>
+                @can('view structures')
                 <li>
-                    <a href="" class="active">
+                    <a href="{{ route('statamic.cp.structures.index') }}" class="active">
                         <i>@svg('new/hierarchy-files-1')</i><span>Structure</span>
                     </a>
                 </li>
+                @endcan
                 <li>
                     <a href="">
                         <i>@svg('new/tags-1')</i><span>Tags</span>
