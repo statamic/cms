@@ -50,12 +50,6 @@ class AuthServiceProvider extends ServiceProvider
             });
         });
 
-        collect([
-            'view structures' => 'Statamic\Policies\StructurePolicy@index',
-        ])->each(function ($item, $key) {
-            Gate::define($key, $item);
-        });
-
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);
         }

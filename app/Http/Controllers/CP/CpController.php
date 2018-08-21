@@ -8,6 +8,8 @@ use Statamic\API\YAML;
 use Statamic\API\Folder;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Exceptions\AuthorizationException;
+use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
 
 /**
  * The base control panel controller
@@ -72,5 +74,14 @@ class CpController extends Controller
     public function pageNotFound()
     {
         return response()->view('statamic::errors.404', [], 404);
+    }
+
+    public function authorize($ability, $args = [], $message = 'This action is unauthorized.')
+    {
+        try {
+            return parent::authorize($ability, $args);
+        } catch (LaravelAuthException $e) {
+            throw new AuthorizationException($message);
+        }
     }
 }

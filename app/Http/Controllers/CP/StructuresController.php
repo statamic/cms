@@ -5,20 +5,17 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\Structure;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
 class StructuresController extends CpController
 {
     public function index()
     {
-        $all = Structure::all();
+        $this->authorize('index', StructureContract::class, 'You are not authorized to view any structures.');
 
-        $structures = $all->filter(function ($structure) {
+        $structures = Structure::all()->filter(function ($structure) {
             return request()->user()->can('view', $structure);
         });
-
-        if ($structures->isEmpty() && $all->count() != $structures->count()) {
-            throw new AuthorizationException('You are not authorized to view any structures.');
-        }
 
         return view('statamic::structures.index', compact('structures'));
     }
@@ -30,7 +27,7 @@ class StructuresController extends CpController
         ]);
     }
 
-    public function get($structure)
+    public function show($structure)
     {
         $tree = (new \Statamic\Addons\Nav\ContentTreeBuilder)->build([
             'structure' => $structure,
@@ -72,7 +69,7 @@ class StructuresController extends CpController
                 'uri'         => $uri,
                 'extension'   => $page->dataType(),
                 'edit_url'    => $editUrl,
-                'create_child_url' => route('page.create', ['url' => ltrim($uri, '/')]),
+                'create_child_url' => null, // TODO route('page.create', ['url' => ltrim($uri, '/')]),
                 'slug'        => $page->slug(),
                 'published'   => $page->published(),
                 'has_entries' => false, // TODO $page->hasEntries(),
@@ -134,5 +131,10 @@ class StructuresController extends CpController
                 'children' => $this->toTree($item['items'])
             ];
         })->all();
+    }
+
+    public function create()
+    {
+        return view('statamic::structures.create');
     }
 }

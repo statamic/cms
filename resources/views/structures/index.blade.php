@@ -5,20 +5,17 @@
     <div class="flex mb-3">
         <h1 class="flex-1">{{ __('Structures') }}</h1>
 
-        @can('super')
-            <a href="{{ route('statamic.cp.structures.configure.index') }}" class="btn">{{ __('Configure Sections') }}</a>
+        @can('create', 'Statamic\Contracts\Data\Structures\Structure')
+            <a href="{{ route('statamic.cp.structures.create') }}" class="btn">{{ __('Create Structure') }}</a>
         @endcan
     </div>
 
     @if (! count($structures))
     <div class="card">
         <div class="no-results">
-            <span class="icon icon-documents"></span>
+            <div class="mx-auto w-32 h-32 p-4 border rounded-full text-grey-light">@svg('new/hierarchy-files-1')</div>
             <h2>{{ __('Structures') }}</h2>
             <h3>{{ _('There are no structures.') }}</h3>
-            @can('super')
-                <a href="{{ route('statamic.cp.structures.configure.index') }}" class="btn btn-default btn-lg">{{ __('Configure') }}</a>
-            @endcan
         </div>
     </div>
     @else

@@ -82,6 +82,30 @@ class ViewStructureListingTest extends TestCase
             ->assertRedirect('/cp/original');
     }
 
+    /** @test */
+    function create_structure_button_is_visible_with_permission_to_create()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create structures']]);
+        $user = API\User::create()->get()->assignRole('test');
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('statamic.cp.structures.index'))
+            ->assertSee('Create Structure');
+    }
+
+    /** @test */
+    function create_structure_button_is_not_visible_without_permission_to_create()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = API\User::create()->get()->assignRole('test');
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('statamic.cp.structures.index'))
+            ->assertDontSee('Create Structure');
+    }
+
     private function createStructure($handle)
     {
         return tap(Mockery::mock(Structure::class), function ($s) use ($handle) {

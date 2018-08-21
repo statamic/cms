@@ -154,7 +154,7 @@ function cp_route($route, $params = [])
         return null;
     }
 
-    return route($route, $params);
+    return route('statamic.cp.' . $route, $params);
 }
 
 /**

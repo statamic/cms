@@ -4,8 +4,8 @@
 
 <page-tree
     structure="{{ $structure->handle() }}"
-    url="{{ route('structures.get', $structure->handle()) }}"
-    save-url="{{ route('structures.update', $structure->handle()) }}"
+    url="{{ cp_route('structures.show', $structure->handle()) }}"
+    save-url="{{ cp_route('structures.update', $structure->handle()) }}"
     inline-template v-cloak>
 
     <div id="pages">

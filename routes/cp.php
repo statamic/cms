@@ -20,11 +20,7 @@ Route::group([
     Route::get('licensing/refresh', 'LicensingController@refresh')->name('licensing.refresh');
     Route::post('licensing', 'LicensingController@update')->name('licensing.update');
 
-    Route::get('structures', 'StructuresController@index')->name('structures.index');
-    Route::get('structures/{structure}', 'StructuresController@edit')->name('structures.edit');
-    Route::get('structures/{structure}/get', 'StructuresController@get')->name('structures.get');
-    Route::patch('structures/{structure}', 'StructuresController@update')->name('structures.update');
-    Route::get('configure/structures', 'ConfigureStructuresController@index')->name('structures.configure.index');
+    Route::resource('structures', 'StructuresController');
 
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', 'PagesController@pages')->name('pages');
