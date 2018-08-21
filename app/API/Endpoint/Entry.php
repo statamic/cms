@@ -57,9 +57,9 @@ class Entry
      * @param string $collection
      * @return \Statamic\Contracts\Data\Entries\Entry
      */
-    public function whereSlug($slug, $collection)
+    public function findBySlug($slug, $collection)
     {
-        return self::service()->slug($slug, $collection);
+        return $this->service()->findBySlug($slug, $collection);
     }
 
     /**

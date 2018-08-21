@@ -45,6 +45,15 @@ class EntryRepository implements RepositoryContract
         return $store->getItem($id);
     }
 
+    public function findBySlug(string $slug, string $collection): ?Entry
+    {
+        $store = $this->store->store($collection);
+
+        return $store->getItems()->first(function ($entry) use ($slug) {
+            return $entry->slug() === $slug;
+        });
+    }
+
     public function findByUri(string $uri): ?Entry
     {
         return app(StructureRepository::class)->findEntryByUri($uri)

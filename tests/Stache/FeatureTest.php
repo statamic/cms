@@ -63,6 +63,12 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
+    function it_gets_entry_by_slug()
+    {
+        $this->assertEquals('Christmas', Entry::findBySlug('christmas', 'blog', 'christmas')->get('title'));
+    }
+
+    /** @test */
     function it_gets_all_taxonomies()
     {
         $this->assertEquals(2, Taxonomy::all()->count());
