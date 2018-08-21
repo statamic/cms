@@ -601,6 +601,12 @@ if (! function_exists('back_or_route')) {
      */
     function back_or_route($route)
     {
-        return request()->header('referer') ? back() : redirect()->route($route);
+        $referrer = request()->header('referer');
+
+        if (! $referrer || $referrer === request()->getUri()) {
+            return redirect()->route($route);
+        }
+
+        return back();
     }
 }
