@@ -15,7 +15,7 @@
         <div class="no-results">
             <div class="mx-auto w-32 h-32 p-4 border rounded-full text-grey-light">@svg('new/hierarchy-files-1')</div>
             <h2>{{ __('Structures') }}</h2>
-            <h3>{{ _('There are no structures.') }}</h3>
+            <h3>{{ __('There are no structures.') }}</h3>
         </div>
     </div>
     @else
