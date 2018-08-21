@@ -21,6 +21,7 @@ Route::group([
     Route::post('licensing', 'LicensingController@update')->name('licensing.update');
 
     Route::resource('structures', 'StructuresController');
+    Route::resource('collections', 'CollectionsController');
 
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', 'PagesController@pages')->name('pages');
@@ -32,11 +33,6 @@ Route::group([
         Route::get('edit/{url?}', ['uses' => 'PublishPageController@edit', 'as' => 'page.edit'])->where('url', '.*');
         Route::post('mount', ['uses' => 'PagesController@mountCollection', 'as' => 'page.mount']);
         Route::post('duplicate', 'DuplicatePageController@store');
-    });
-
-    Route::group(['prefix' => 'collections'], function () {
-        Route::get('/', 'CollectionsController@index')->name('collections');
-        Route::get('get', 'CollectionsController@get')->name('collections.get');
     });
 
     Route::group(['prefix' => 'collections/entries'], function () {
@@ -205,7 +201,6 @@ Route::get('/account', function () { return ''; })->name('account');
 Route::get('/content', function () { return ''; })->name('content');
 Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
 Route::get('/assets.container.edit', function () { return ''; })->name('assets.container.edit');
-Route::get('/collections.manage', function () { return ''; })->name('collections.manage');
 Route::get('/collection.edit', function () { return ''; })->name('collection.edit');
 Route::get('/taxonomies.manage', function () { return ''; })->name('taxonomies.manage');
 Route::get('/taxonomy.edit', function () { return ''; })->name('taxonomy.edit');

@@ -15,14 +15,16 @@
             </ul>
             <h6>Content</h6>
             <ul>
+                @can('index', 'Statamic\Contracts\Data\Entries\Collection')
                 <li>
-                    <a href="">
-                        <i class="">@svg('new/content-pencil-write')</i><span>Entries</span>
+                    <a href="{{ cp_route('collections.index') }}">
+                        <i class="">@svg('new/content-pencil-write')</i><span>Collections</span>
                     </a>
                 </li>
+                @endcan
                 @can('index', 'Statamic\Contracts\Data\Structures\Structure')
                 <li>
-                    <a href="{{ route('statamic.cp.structures.index') }}" class="active">
+                    <a href="{{ cp_route('structures.index') }}" class="active">
                         <i>@svg('new/hierarchy-files-1')</i><span>Structure</span>
                     </a>
                 </li>

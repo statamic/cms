@@ -3,61 +3,47 @@
 @section('content')
 
     <div class="flex mb-3">
-        <h1 class="flex-1">{{ t('nav_collections') }}</h1>
+        <h1 class="flex-1">{{ __('Collections') }}</h1>
 
-        @can('super')
-            <a href="{{ route('collections.manage') }}" class="btn">{{ t('manage_collections') }}</a>
+        @can('create', 'Statamic\Contracts\Data\Entries\Collection')
+            <a href="{{ cp_route('collections.create') }}" class="btn">{{ __('Create Collection') }}</a>
         @endcan
     </div>
 
-    @if(! count($collections))
-    <div class="card">
-        <div class="no-results">
-            <span class="icon icon-documents"></span>
-            <h2>{{ t('nav_collections') }}</h2>
-            <h3>{{ t('collections_empty') }}</h3>
-            @can('super')
-                <a href="{{ route('collections.manage') }}" class="btn btn-default btn-lg">{{ t('manage_collections') }}</a>
-            @endcan
+    @if (! count($collections))
+        <div class="card">
+            <div class="no-results">
+                <div class="mx-auto w-32 h-32 p-4 border rounded-full text-grey-light">@svg('new/content-pencil-write')</div>
+                <h2>{{ __('Collections') }}</h2>
+                <h3>{{ __('Collections are containers that hold groups of similar entries all following the same URL pattern.') }}</h3>
+            </div>
         </div>
-    </div>
     @else
-    <div class="card flush">
-        <div class="dossier-table-wrapper">
-            <table class="dossier">
-                <tbody>
-                    @foreach($collections as $collection)
-                    <tr>
-                        <td class="cell-title first-cell flex items-center">
-                            <span class="column-label">{{ t('title' )}}</span>
-                            <div class="stat">
-                                <i class="icon icon-documents"></i>
-                                {{ $collection->count() }}
-                            </div>
-                            <div class="flex-1">
-                                <a href="{{ route('entry.edit', $collection->path()) }}">{{ $collection->title() }}</a>
-                            </div>
-                            <a class="btn btn-icon btn-primary" href="{{ route('entry.create', $collection->path()) }}">
-                                <span class="icon icon-plus"></span>
-                            </a>
-                        </td>
-                        <td class="column-actions">
-                            <div class="btn-group action-more">
-                                <button type="button" class="btn-more dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="icon icon-dots-three-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="{{ $collection->editUrl() }}">{{ t('manage') }}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="card flush">
+            <div class="dossier-table-wrapper">
+                <table class="dossier">
+                    <tbody>
+                        @foreach($collections as $collection)
+                        <tr>
+                            <td class="cell-title first-cell flex items-center">
+                                <span class="column-label">{{ _('Title' )}}</span>
+                                <div class="stat">
+                                    <i class="icon icon-documents"></i>
+                                    {{ $collection->entries()->count() }}
+                                </div>
+                                <a href="{{ cp_route('collections.edit', $collection->path()) }}">{{ $collection->title() }}</a>
+
+                                @can('delete', $collection)
+                                    <form method="POST" action="{{ cp_route('collections.destroy', $collection->path()) }}">
+                                        @csrf @method('delete') <button>Delete</button>
+                                    </form>
+                                @endcan
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
     @endif
 @endsection

@@ -6,30 +6,19 @@ use Statamic\API\Collection;
 use Statamic\API\Helper;
 use Statamic\API\Str;
 use Statamic\API\User;
+use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
 class CollectionsController extends CpController
 {
-    /**
-     * The main collections route, which either browses the first
-     * collection or redirects to the collection listing.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function index()
     {
-        $this->access('collections:*:view');
+        $this->authorize('index', CollectionContract::class, 'You are not authorized to view any collections.');
 
-        $collections = collect(Collection::all())->filter(function ($collection) {
-            return User::getCurrent()->can("collections:{$collection->path()}:view");
-        })->all();
+        $collections = Collection::all()->filter(function ($collection) {
+            return request()->user()->can('view', $collection);
+        });
 
-        if (count($collections) === 1) {
-            return redirect()->route('entries.show', reset($collections)->path());
-        }
-
-        return view('statamic::collections.index', [
-            'title'   => 'Collections'
-        ]);
+        return view('statamic::collections.index', compact('collections'));
     }
 
     public function manage()
@@ -37,28 +26,6 @@ class CollectionsController extends CpController
         return view('statamic::collections.manage', [
             'title'   => 'Collections'
         ]);
-    }
-
-    public function get()
-    {
-        $collections = [];
-
-        foreach (Collection::all() as $collection) {
-            if (! User::getCurrent()->can("collections:{$collection->path()}:view")) {
-                continue;
-            }
-
-            $collections[] = [
-                'id'          => $collection->path(),
-                'title'       => $collection->title(),
-                'entries'     => $collection->count(),
-                'edit_url'    => $collection->editUrl(),
-                'create_url'  => route('entry.create', $collection->path()),
-                'entries_url' => route('entries.show', $collection->path())
-            ];
-        }
-
-        return ['columns' => ['title'], 'items' => $collections];
     }
 
     public function create()
