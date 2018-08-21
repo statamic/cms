@@ -22,9 +22,11 @@ class StructuresController extends CpController
 
     public function edit($structure)
     {
-        return view('statamic::structures.edit', [
-            'structure' => Structure::find($structure)
-        ]);
+        $structure = Structure::find($structure);
+
+        $this->authorize('edit', $structure, 'You are not authorized to edit this structure.');
+
+        return view('statamic::structures.edit', compact('structure'));
     }
 
     public function show($structure)

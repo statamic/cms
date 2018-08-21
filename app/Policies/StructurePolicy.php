@@ -34,6 +34,11 @@ class StructurePolicy
         return $user->hasPermission("view {$structure->handle()} structure");
     }
 
+    public function edit($user, $structure)
+    {
+        return $user->hasPermission("edit {$structure->handle()} structure");
+    }
+
     public function delete($user, $structure)
     {
         //
