@@ -6,7 +6,7 @@
         <h1 class="flex-1">{{ __('Structures') }}</h1>
 
         @can('create', 'Statamic\Contracts\Data\Structures\Structure')
-            <a href="{{ route('statamic.cp.structures.create') }}" class="btn">{{ __('Create Structure') }}</a>
+            <a href="{{ cp_route('structures.create') }}" class="btn">{{ __('Create Structure') }}</a>
         @endcan
     </div>
 
@@ -31,7 +31,7 @@
                                 <i class="icon icon-documents"></i>
                                 {{ $structure->flattenedPages()->count() }}
                             </div>
-                            <a href="{{ route('statamic.cp.structures.edit', $structure->handle()) }}">{{ $structure->title() }}</a>
+                            <a href="{{ cp_route('structures.edit', $structure->handle()) }}">{{ $structure->title() }}</a>
 
                             @can('delete', $structure)
                                 <form method="POST" action="{{ cp_route('structures.destroy', $structure->handle()) }}">
