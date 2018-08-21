@@ -161,10 +161,7 @@ class ViewCollectionListingTest extends TestCase
 
     private function createCollection($handle)
     {
-        return tap(Mockery::mock(Collection::class), function ($s) use ($handle) {
-            $s->shouldReceive('title')->andReturn($handle);
-            $s->shouldReceive('path')->andReturn($handle);
-        });
+        return tap(new Collection)->path($handle);
     }
 
     private function setTestRoles($roles)
