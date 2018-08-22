@@ -4,6 +4,17 @@ namespace Tests;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $uses = array_flip(class_uses_recursive(static::class));
+
+        if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
+            $this->preventSavingStacheItemsToDisk();
+        }
+    }
+
     protected function getPackageProviders($app)
     {
         return ['Statamic\Providers\StatamicServiceProvider'];
