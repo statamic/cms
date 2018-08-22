@@ -5,11 +5,14 @@ namespace Tests\Feature\Structures;
 use Mockery;
 use Statamic\API;
 use Tests\TestCase;
+use Tests\FakesRoles;
 use Statamic\Data\Users\User;
 use Statamic\Data\Structures\Structure;
 
 class EditStructureTest extends TestCase
 {
+    use FakesRoles;
+
     /** @test */
     function it_shows_the_edit_form_if_user_has_edit_permission()
     {
@@ -53,26 +56,5 @@ class EditStructureTest extends TestCase
             $s->shouldReceive('uris')->andReturn(collect());
             $s->shouldReceive('flattenedPages')->andReturn(collect());
         });
-    }
-
-    private function setTestRoles($roles)
-    {
-        $roles = collect($roles)->map(function ($permissions, $handle) {
-            return app(\Statamic\Contracts\Permissions\Role::class)
-                ->handle($handle)
-                ->addPermission($permissions);
-        });
-
-        $fake = new class($roles) extends \Statamic\Permissions\RoleRepository {
-            protected $roles;
-            public function __construct($roles) {
-                $this->roles = $roles;
-            }
-            public function all(): \Illuminate\Support\Collection {
-                return $this->roles;
-            }
-        };
-
-        app()->instance(\Statamic\Contracts\Permissions\RoleRepository::class, $fake);
     }
 }

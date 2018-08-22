@@ -5,11 +5,14 @@ namespace Tests\Feature\Collections;
 use Mockery;
 use Statamic\API;
 use Tests\TestCase;
+use Tests\FakesRoles;
 use Statamic\Data\Users\User;
 use Statamic\Data\Entries\Collection;
 
 class ViewCollectionListingTest extends TestCase
 {
+    use FakesRoles;
+
     /** @test */
     function it_shows_a_list_of_collections()
     {
@@ -162,26 +165,5 @@ class ViewCollectionListingTest extends TestCase
     private function createCollection($handle)
     {
         return tap(new Collection)->path($handle);
-    }
-
-    private function setTestRoles($roles)
-    {
-        $roles = collect($roles)->map(function ($permissions, $handle) {
-            return app(\Statamic\Contracts\Permissions\Role::class)
-                ->handle($handle)
-                ->addPermission($permissions);
-        });
-
-        $fake = new class($roles) extends \Statamic\Permissions\RoleRepository {
-            protected $roles;
-            public function __construct($roles) {
-                $this->roles = $roles;
-            }
-            public function all(): \Illuminate\Support\Collection {
-                return $this->roles;
-            }
-        };
-
-        app()->instance(\Statamic\Contracts\Permissions\RoleRepository::class, $fake);
     }
 }
