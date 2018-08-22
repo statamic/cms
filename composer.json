@@ -36,7 +36,6 @@
             "Foo\\Bar\\": "tests/fixtures/Addon"
         }
     },
-    "minimum-stability": "dev",
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
