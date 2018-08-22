@@ -2,6 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\Events\Data\CollectionSaved;
 use Statamic\Contracts\Data\Repositories\CollectionRepository;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
@@ -70,6 +71,8 @@ class Collection
     public function save(CollectionContract $collection)
     {
         $this->repo()->save($collection);
+
+        CollectionSaved::dispatch($collection);
     }
 
     protected function repo(): CollectionRepository

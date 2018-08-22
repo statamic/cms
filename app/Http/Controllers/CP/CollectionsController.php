@@ -2,10 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Collection;
-use Statamic\API\Helper;
 use Statamic\API\Str;
 use Statamic\API\User;
+use Statamic\API\Helper;
+use Illuminate\Http\Request;
+use Statamic\API\Collection;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
 class CollectionsController extends CpController
@@ -28,92 +29,78 @@ class CollectionsController extends CpController
         return view('statamic::collections.show', compact('collection'));
     }
 
-    public function manage()
-    {
-        return view('statamic::collections.manage', [
-            'title'   => 'Collections'
-        ]);
-    }
-
     public function create()
     {
-        return view('statamic::collections.create', [
-            'title' => 'Creating collection'
-        ]);
+        $this->authorize('create', CollectionContract::class, 'You are not authorized to create collections.');
+
+        return view('statamic::collections.create');
     }
 
     public function edit($collection)
     {
         $collection = Collection::whereHandle($collection);
 
-        return view('statamic::collections.edit', [
-            'title' => 'Editing collection',
-            'collection' => $collection
-        ]);
+        $this->authorize('edit', $collection, 'You are not authorized to edit collections.');
+
+        return view('statamic::collections.edit', compact('collection'));
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $title = $this->request->input('title');
+        $this->authorize('store', CollectionContract::class, 'You are not authorized to create collections.');
 
-        $slug = ($this->request->has('slug')) ? $this->request->input('slug') : Str::slug($title);
-
-        $this->validate($this->request, [
+        $data = $request->validate([
             'title' => 'required',
-            'slug' => 'alpha_dash'
+            'handle' => 'nullable|alpha_dash',
+            'template' => 'nullable',
+            'fieldset' => 'nullable',
+            'route' => 'nullable',
+            'order' => 'nullable',
         ]);
 
-        $data = compact('title');
+        $handle = $request->handle ?? snake_case($request->title);
 
-        if ($this->request->has('order')) {
-            $data['order'] = $this->request->input('order');
-        }
+        $collection = tap(Collection::create($handle))
+            ->data(array_except($data, 'handle'))
+            ->save();
 
-        if ($this->request->has('fieldset')) {
-            $data['fieldset'] = $this->request->input('fieldset');
-        }
-
-        $folder = Collection::create($slug);
-        $folder->data($data);
-
-        if ($this->request->has('route')) {
-            $folder->route($this->request->input('route'));
-        }
-
-        $folder->save();
-
-        return redirect()->route('collections')
-            ->with('success', translate('cp.thing_created', ['thing' => $title]));
+        return redirect()
+            ->route('statamic.cp.collections.edit', $collection->path())
+            ->with('success', 'Collection created.');
     }
 
-    public function update($collection)
+    public function update(Request $request, $collection)
     {
         $collection = Collection::whereHandle($collection);
 
-        $fields = $this->request->input('fields');
+        $this->authorize('update', $collection, 'You are not authorized to edit collections.');
 
-        $route = $fields['route'];
-        unset($fields['route']);
+        $data = $request->validate([
+            'title' => 'required',
+            'template' => 'nullable',
+            'fieldset' => 'nullable',
+            'route' => 'nullable',
+        ]);
 
-        $data = array_merge($collection->data(), $fields);
+        tap($collection)
+            ->data(array_merge($collection->data(), $data))
+            ->save();
 
-        $collection->data($data);
-        $collection->route($route);
-
-        $collection->save();
-
-        return redirect()->route('entries.show', $collection->path())
-            ->with('success', translate('cp.thing_updated', ['thing' => $collection->title()]));
+        return redirect()
+            ->route('statamic.cp.collections.edit', $collection->path())
+            ->with('success', 'Collection updated');
     }
 
-    public function delete()
+    public function destroy($collection)
     {
-        $ids = Helper::ensureArray($this->request->input('ids'));
+        $collection = Collection::whereHandle($collection);
 
-        foreach ($ids as $slug) {
-            Collection::whereHandle($slug)->delete();
-        }
+        $this->authorize('delete', $collection, 'You are not authorized to delete collections.');
 
-        return ['success' => true];
+        $collection->delete();
+
+        return redirect()
+            ->route('statamic.cp.collections.index')
+            ->with('success', 'Collection deleted.');
     }
 }

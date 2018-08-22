@@ -2,59 +2,60 @@
 
 @section('content')
 
-    <form method="post" action="{{ route('collection.store') }}">
-        {!! csrf_field() !!}
+    <form method="POST" action="{{ cp_route('collections.store') }}">
+        @csrf
 
         <div class="flexy mb-3">
-            <h1 class="fill">{{ translate('cp.create_collection') }}</h1>
-            <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
+            <h1 class="fill">{{ __('Create Collection') }}</h1>
+            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 
         <div class="publish-form card">
 
-            <div class="publish-fields">
-
-                <div class="form-group">
-                    <label class="block">{{ t('title') }}</label>
-                    <small class="help-block">{{ t('collection_title_instructions') }}</small>
-                    <input type="text" name="title" class="form-control" value="{{ old('title') }}" autofocus="autofocus">
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('handle') }}</label>
-                    <small class="help-block">{{ t('collection_handle_instructions') }}</small>
-                    <input type="text" name="slug" class="form-control" value="{{ old('slug') }}">
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('order') }}</label>
-                    <small class="help-block">{{ t('collection_order_instructions' )}}</small>
-                    <select-fieldtype name="order" data="{{ old('order') }}" :options='[
-                        {"value": "", "text": "Alphabetical"},
-                        {"value": "date", "text": "Date"},
-                        {"value": "number", "text": "Number"}
-                    ]'></select-fieldtype>
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('fieldset') }}</label>
-                    <small class="help-block">{{ t('collection_fieldset_instructions') }}</small>
-                    <fieldset-fieldtype name="fieldset" data="{{ old('fieldset') }}"></fieldset-fieldtype>
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ trans_choice('cp.templates', 1) }}</label>
-                    <small class="help-block">{{ t('collection_template_instructions') }}</small>
-                    <template-fieldtype name="template" data="{{ old('template') }}"></template-fieldtype>
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('route') }}</label>
-                    <small class="help-block">{{ t('collection_route_instructions') }}</small>
-                    <routes-fieldtype :data="{{ old('routes', '[]') }}" name="routes"></routes-fieldtype>
-                </div>
-
+            <div class="form-group">
+                <label class="block">{{ __('Title') }}</label>
+                <small class="help-block">{{ __('The proper name of your collection.') }}</small>
+                <input type="text" name="title" class="form-control" value="{{ old('title') }}" autofocus="autofocus">
             </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Handle') }}</label>
+                <small class="help-block">{{ __("The collection's variable name used in settings and templates.") }}</small>
+                <input type="text" name="handle" class="form-control" value="{{ old('handle') }}">
+            </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Order') }}</label>
+                <small class="help-block">{{ __('Set the default sorting method for entries in this collection.' )}}</small>
+                {{-- TODO: Bring back select fieldtype. --}}
+                <select name="order" class="form-control">
+                    <option value="alphabetical" {{ old('order') == 'alphabetical' ? 'selected' : '' }}>Alphabetical</option>
+                    <option value="date" {{ old('order') == 'date' ? 'selected' : '' }}>Date</option>
+                    <option value="number" {{ old('order') == 'number' ? 'selected' : '' }}>Number</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Fieldset') }}</label>
+                <small class="help-block">{{ __('The default fieldset, unless otherwise specified.') }}</small>
+                {{-- TODO: Bring back fieldset fieldtype. --}}
+                <input type="text" name="fieldset" class="form-control" value="{{ old('fieldset') }}">
+            </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Template') }}</label>
+                <small class="help-block">{{ __('The default template, unless otherwise specified.') }}</small>
+                {{-- TODO: Bring back template fieldtype. --}}
+                <input type="text" name="template" class="form-control" value="{{ old('template') }}">
+            </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Route') }}</label>
+                <small class="help-block">{{ __('The route controls the URL pattern all entries in the collection will follow.') }}</small>
+                {{-- TODO: Bring back routes fieldtype. --}}
+                <input type="text" name="route" class="form-control" value="{{ old('route') }}">
+            </div>
+
         </div>
     </form>
 

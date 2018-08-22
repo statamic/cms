@@ -105,6 +105,8 @@ class Collection extends DataFolder implements CollectionContract
     public function save()
     {
         CollectionAPI::save($this);
+
+        return $this; // TODO: Test
     }
 
     /**
@@ -134,11 +136,14 @@ class Collection extends DataFolder implements CollectionContract
      */
     public function delete()
     {
-        $path = 'collections/' . $this->path();
+        // TODO: Re-implement correctly.
 
-        Folder::disk('content')->delete($path);
+        app('stache')->store('collections')->removeItem($this->path());
+        app('files')->delete(
+            app('stache')->store('collections')->directory() . $this->path() . '.yaml'
+        );
 
-        event(new CollectionDeleted($this->path()));
+        // event(new CollectionDeleted($this->path()));
     }
 
     /**

@@ -2,41 +2,43 @@
 
 @section('content')
 
-    <form method="post" action="{{ route('collection.update', $collection->path()) }}">
-        {!! csrf_field() !!}
+    <form method="POST" action="{{ cp_route('collections.update', $collection->path()) }}">
+        @method('patch') @csrf
 
-            <div class="flexy mb-3">
-                <h1 class="fill">{{ t('thing_configure', ['thing' => $collection->title()]) }}</h1>
-                <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
+        <div class="flexy mb-3">
+            <h1 class="fill">{{ $collection->title() }}</h1>
+            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+        </div>
+
+        <div class="publish-form card">
+
+            <div class="form-group">
+                <label class="block">{{ __('Title') }}</label>
+                <small class="help-block">{{ __('The proper name of your collection.') }}</small>
+                <input type="text" name="title" class="form-control" value="{{ old('title', $collection->get('title')) }}" autofocus="autofocus">
             </div>
 
-            <div class="card">
-
-                <div class="form-group">
-                    <label class="block">{{ t('title') }}</label>
-                    <small class="help-block">{{ t('collection_title_instructions') }}</small>
-                    <input type="text" name="fields[title]" class="form-control" value="{{ $collection->title() }}" />
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('fieldset') }}</label>
-                    <small class="help-block">{{ t('collection_fieldset_instructions') }}</small>
-                    <fieldset-fieldtype name="fields[fieldset]" data="{{ $collection->get('fieldset') }}"></fieldset-fieldtype>
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ trans_choice('cp.templates', 1) }}</label>
-                    <small class="help-block">{{ t('collection_template_instructions') }}</small>
-                    <template-fieldtype name="fields[template]" data="{{ $collection->get('template') }}"></template-fieldtype>
-                </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('route') }}</label>
-                    <small class="help-block">{{ t('collection_route_instructions') }}</small>
-                    <routes-fieldtype :data="{{ json_encode($routes) }}" name="routes"></routes-fieldtype>
-                </div>
-
+            <div class="form-group">
+                <label class="block">{{ __('Fieldset') }}</label>
+                <small class="help-block">{{ __('The default fieldset, unless otherwise specified.') }}</small>
+                {{-- TODO: Bring back fieldset fieldtype. --}}
+                <input type="text" name="fieldset" class="form-control" value="{{ old('fieldset', $collection->get('fieldset')) }}">
             </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Template') }}</label>
+                <small class="help-block">{{ __('The default template, unless otherwise specified.') }}</small>
+                {{-- TODO: Bring back template fieldtype. --}}
+                <input type="text" name="template" class="form-control" value="{{ old('template', $collection->get('template')) }}">
+            </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Route') }}</label>
+                <small class="help-block">{{ __('The route controls the URL pattern all entries in the collection will follow.') }}</small>
+                {{-- TODO: Bring back routes fieldtype. --}}
+                <input type="text" name="route" class="form-control" value="{{ old('route', $collection->get('route')) }}">
+            </div>
+
         </div>
     </form>
 

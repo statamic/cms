@@ -29,6 +29,11 @@ class CollectionPolicy
         //
     }
 
+    public function store($user)
+    {
+        //
+    }
+
     public function view($user, $collection)
     {
         return $user->hasPermission("view {$collection->path()} collection");
@@ -37,6 +42,11 @@ class CollectionPolicy
     public function edit($user, $collection)
     {
         return $user->hasPermission("edit {$collection->path()} collection");
+    }
+
+    public function update($user, $collection)
+    {
+        return $this->edit($user, $collection);
     }
 
     public function delete($user, $collection)
