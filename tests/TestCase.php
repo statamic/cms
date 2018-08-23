@@ -86,4 +86,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of ' . $class);
     }
+
+    protected function assertFileEqualsString($filename, $expected)
+    {
+        $this->assertFileExists($filename);
+
+        $this->assertEquals($expected, file_get_contents($filename));
+    }
 }
