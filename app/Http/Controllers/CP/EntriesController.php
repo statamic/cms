@@ -16,6 +16,8 @@ class EntriesController extends CpController
     {
         $entry = Entry::findBySlug($slug, $collection);
 
+        $this->authorize('edit', $entry);
+
         return view('statamic::entries.edit', compact('entry'));
     }
 

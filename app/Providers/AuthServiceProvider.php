@@ -16,6 +16,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         \Statamic\Contracts\Data\Structures\Structure::class => Policies\StructurePolicy::class,
         \Statamic\Contracts\Data\Entries\Collection::class => Policies\CollectionPolicy::class,
+        \Statamic\Contracts\Data\Entries\Entry::class => Policies\EntryPolicy::class,
     ];
 
     public function register()
