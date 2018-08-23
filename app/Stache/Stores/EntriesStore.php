@@ -5,6 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\API\Path;
 use Statamic\API\YAML;
 use Statamic\API\Entry;
+use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesStore extends AggregateStore
 {
@@ -86,5 +87,27 @@ class EntriesStore extends AggregateStore
         }
 
         return $file->getExtension() !== 'yaml' && substr_count($relative, '/') > 0;
+    }
+
+    public function save(EntryContract $entry)
+    {
+        // TODO: The logic for building a path is probably better somewhere else.
+        $prefix = '';
+        if ($order = $entry->order()) {
+            $prefix = $order . '.';
+        }
+        $path = vsprintf('%s/%s/%s%s.md', [
+            $this->directory,
+            $entry->collectionName(),
+            $prefix,
+            $entry->slug()
+        ]);
+
+        // TODO: The logic for building the markdown file contents is better elsewhere
+        $data = $entry->data();
+        $content = array_pull($data, 'content');
+        $contents = YAML::dump($data, $content);
+
+        $this->files->put($path, $contents);
     }
 }

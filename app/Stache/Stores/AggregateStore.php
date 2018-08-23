@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Closure;
 use Statamic\Stache\Stache;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\ChildStore;
 
@@ -11,11 +12,13 @@ abstract class AggregateStore extends Store
 {
     protected $stache;
     protected $stores;
+    protected $files;
     protected $childStoreCreator;
 
-    public function __construct(Stache $stache)
+    public function __construct(Stache $stache, Filesystem $files)
     {
         $this->stache = $stache;
+        $this->files = $files;
         $this->stores = collect();
     }
 
@@ -180,5 +183,19 @@ abstract class AggregateStore extends Store
     protected function getMetaKeysCacheKey()
     {
         return 'stache::meta/' . $this->key() . '-keys';
+    }
+
+    public function insert($item, $key, $path = null)
+    {
+        if (str_contains($key, '::')) {
+            list($store, $id) = $this->extractKeys($key);
+        } else {
+            $store = $key;
+            $id = $item->id();
+        }
+
+        $this->store($store)->insert($item, $id, $path);
+
+        return $this;
     }
 }

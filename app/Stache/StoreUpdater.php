@@ -68,16 +68,7 @@ class StoreUpdater
         foreach ($this->modifiedFiles() as $path) {
             $item = $this->store->createItemFromFile($path, $this->filesystem->get($path));
             $key = $this->store->getItemKey($item, $path);
-
-            $this->store
-                ->setItem($key, $item)
-                ->setPath($key, $path);
-
-            if (method_exists($item, 'uri')) {
-                $this->store->forEachSite(function ($site, $store) use ($item, $key) {
-                    $store->setSiteUri($site, $key, $item->uri());
-                });
-            }
+            $this->store->insert($item, $key, $path);
         }
 
         foreach ($this->deletedFiles() as $path) {

@@ -135,7 +135,7 @@ class StacheTest extends TestCase
     function an_aggregate_stores_child_store_can_be_retrieved_directly()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $store = (new EntriesStore($this->stache))->setChildStoreCreator(function () {
+        $store = (new EntriesStore($this->stache, \Mockery::mock(Filesystem::class)))->setChildStoreCreator(function () {
             return new ChildStore($this->stache, \Mockery::mock(Filesystem::class));
         });
         $one = $store->store('one');
@@ -186,7 +186,7 @@ class StacheTest extends TestCase
     function stache_is_booted_on_demand_when_attempting_to_access_an_aggregate_stores_child_store()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $store = (new EntriesStore($this->stache))->setChildStoreCreator(function () {
+        $store = (new EntriesStore($this->stache, \Mockery::mock(Filesystem::class)))->setChildStoreCreator(function () {
             return new ChildStore($this->stache, \Mockery::mock(Filesystem::class));
         });
         $one = $store->store('one');
@@ -265,7 +265,7 @@ class StacheTest extends TestCase
     function it_gets_a_store_by_id()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
-        $entriesStore = (new EntriesStore($this->stache))->setChildStoreCreator(function () {
+        $entriesStore = (new EntriesStore($this->stache, \Mockery::mock(Filesystem::class)))->setChildStoreCreator(function () {
             return new ChildStore($this->stache, \Mockery::mock(Filesystem::class));
         });
         $entriesOne = $entriesStore->store('one');

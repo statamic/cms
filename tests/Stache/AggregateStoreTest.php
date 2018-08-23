@@ -178,6 +178,74 @@ class AggregateStoreTest extends TestCase
     }
 
     /** @test */
+    function inserting_an_item_will_set_the_item_and_path_and_uris_in_each_child_store()
+    {
+        $objectForStoreOne = new class {
+            public function id() { return '123'; }
+            public function path() { return '/path/to/object'; }
+            public function uri() { return '/the/uri'; }
+        };
+        $objectForStoreTwo = new class {
+            public function id() { return '321'; }
+            public function path() { return '/path/to/object/in/store/two'; }
+            public function uri() { return '/the/uri/in/store/two'; }
+        };
+        // Inserting an object with an id method should use that as the key if no double colon is provided in the argument.
+        $return = $this->store->insert($objectForStoreOne, 'one');
+        $this->store->insert($objectForStoreOne, 'one::456');
+        $this->store->insert($objectForStoreTwo, 'two');
+        $this->store->insert($objectForStoreTwo, 'two::654');
+
+        // Inserting an item with the key and path parameters will use those
+        $this->store->insert(['title' => 'Item title'], 'one::789', '/the/path');
+        $this->store->insert(['title' => 'Item title in store two'], 'two::987', '/the/path/in/store/two');
+
+        $this->assertEquals($this->store, $return);
+        $this->assertEquals([
+            'one' => [
+                '123' => $objectForStoreOne,
+                '456' => $objectForStoreOne,
+                '789' => ['title' => 'Item title'],
+            ],
+            'two' => [
+                '321' => $objectForStoreTwo,
+                '654' => $objectForStoreTwo,
+                '987' => ['title' => 'Item title in store two'],
+            ],
+        ], $this->store->getItemsWithoutLoading()->toArray());
+        $this->assertEquals([
+            '123' => '/path/to/object',
+            '456' => '/path/to/object',
+            '789' => '/the/path',
+        ], $this->store->store('one')->getPaths()->all());
+        $this->assertEquals([
+            '321' => '/path/to/object/in/store/two',
+            '654' => '/path/to/object/in/store/two',
+            '987' => '/the/path/in/store/two',
+        ], $this->store->store('two')->getPaths()->all());
+        $this->assertEquals([
+            'en' => [
+                '123' => '/the/uri',
+                '456' => '/the/uri',
+            ],
+            'fr' => [
+                '123' => '/the/uri',
+                '456' => '/the/uri',
+            ]
+        ], $this->store->store('one')->getUris()->toArray());
+        $this->assertEquals([
+            'en' => [
+                '321' => '/the/uri/in/store/two',
+                '654' => '/the/uri/in/store/two',
+            ],
+            'fr' => [
+                '321' => '/the/uri/in/store/two',
+                '654' => '/the/uri/in/store/two',
+            ]
+        ], $this->store->store('two')->getUris()->toArray());
+    }
+
+    /** @test */
     function it_can_perform_an_action_for_each_child_stores_site()
     {
         $arguments = [];

@@ -2,23 +2,27 @@
 
 namespace Tests;
 
-use Statamic\Stache\Stores\CollectionsStore;
-
 trait PreventSavingStacheItemsToDisk
 {
     protected function preventSavingStacheItemsToDisk()
     {
         $stores = collect([
             NonSavingCollectionsStore::class,
+            NonSavingEntriesStore::class,
         ])->map(function ($class) {
-            return app($class)->directory(__DIR__); // Directory is irrelevant but it needs one.
+            return app($class)->directory(__DIR__.'/__fixtures__/dev-null');
         });
 
         $this->app['stache']->registerStores($stores->all());
     }
 }
 
-class NonSavingCollectionsStore extends CollectionsStore
+class NonSavingCollectionsStore extends \Statamic\Stache\Stores\CollectionsStore
 {
     public function save(\Statamic\Contracts\Data\Entries\Collection $collection) { }
+}
+
+class NonSavingEntriesStore extends \Statamic\Stache\Stores\EntriesStore
+{
+    public function save(\Statamic\Contracts\Data\Entries\Entry $entry) { }
 }

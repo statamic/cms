@@ -59,4 +59,11 @@ class EntryRepository implements RepositoryContract
         return app(StructureRepository::class)->findEntryByUri($uri)
             ?? $this->find($this->store->getIdFromUri($uri));
     }
+
+    public function save(Entry $entry)
+    {
+        $this->store->store($entry->collectionName())->insert($entry);
+
+        $this->store->save($entry);
+    }
 }

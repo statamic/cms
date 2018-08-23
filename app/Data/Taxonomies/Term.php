@@ -554,4 +554,9 @@ class Term extends Content implements TermContract
 
         $data->save();
     }
+
+    public function save()
+    {
+
+    }
 }

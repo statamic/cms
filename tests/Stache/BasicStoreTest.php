@@ -2,6 +2,7 @@
 
 namespace Tests\Stache;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
@@ -83,6 +84,38 @@ class BasicStoreTest extends TestCase
         $this->assertEquals($enUris, $this->store->getSiteUris('en')->all());
         $this->assertEquals($frUris, $this->store->getSiteUris('fr')->all());
         $this->assertEquals(['en' => collect($enUris), 'fr' => collect($frUris)], $this->store->getUris()->all());
+    }
+
+    /** @test */
+    function inserting_an_item_will_set_the_item_and_path_and_uris()
+    {
+        // Inserting an object with an id method should use that as the key
+        $return = $this->store->insert($object = new class {
+            public function id() { return '123'; }
+            public function path() { return '/path/to/object'; }
+            public function uri() { return '/the/uri'; }
+        });
+
+        // Inserting an item with the key and path parameters will use those
+        $this->store->insert(['title' => 'Item title'], '456', '/the/path');
+
+        $this->assertEquals($this->store, $return);
+        $this->assertEquals([
+            '123' => $object,
+            '456' => ['title' => 'Item title'],
+        ], $this->store->getItems()->all());
+        $this->assertEquals([
+            '123' => '/path/to/object',
+            '456' => '/the/path',
+        ], $this->store->getPaths()->all());
+        $this->assertEquals([
+            'en' => [
+                '123' => '/the/uri',
+            ],
+            'fr' => [
+                '123' => '/the/uri',
+            ]
+        ], $this->store->getUris()->toArray());
     }
 
     /** @test */

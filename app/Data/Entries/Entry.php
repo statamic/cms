@@ -8,6 +8,7 @@ use Statamic\API\Path;
 use Statamic\API\Config;
 use Statamic\API\Fieldset;
 use Statamic\Data\Content\Content;
+use Statamic\API\Entry as EntryAPI;
 use League\Flysystem\FileNotFoundException;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Data\Content\HasLocalizedSlugsInData;
@@ -341,5 +342,12 @@ class Entry extends Content implements EntryContract
         $this->supplements['collection'] = $this->collectionName();
         $this->supplements['is_entry'] = true;
         $this->supplements['last_modified'] = $this->lastModified()->timestamp;
+    }
+
+    public function save()
+    {
+        EntryAPI::save($this);
+
+        return $this;
     }
 }

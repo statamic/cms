@@ -228,4 +228,20 @@ class FeatureTest extends TestCase
         );
         @unlink($path);
     }
+
+    /** @test */
+    function saving_an_entry_writes_it_to_file()
+    {
+        Entry::create('test-entry')
+            ->collection('blog')
+            ->date('2017-07-04')
+            ->with(['title' => 'Test Entry', 'foo' => 'bar'])
+            ->save();
+
+        $this->assertFileEqualsString(
+            $path = __DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md',
+            "title: 'Test Entry'\nfoo: bar\n"
+        );
+        @unlink($path);
+    }
 }

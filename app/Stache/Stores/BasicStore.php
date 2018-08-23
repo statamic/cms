@@ -219,4 +219,21 @@ abstract class BasicStore extends Store
             ->setPaths($data['paths'])
             ->setUris($data['uris']);
     }
+
+    public function insert($item, $key = null, $path = null)
+    {
+        $key = $key ?? $item->id();
+
+        $this
+            ->setItem($key, $item)
+            ->setPath($key, $path ?? $item->path());
+
+        if (method_exists($item, 'uri')) {
+            $this->forEachSite(function ($site, $store) use ($item, $key) {
+                $store->setSiteUri($site, $key, $item->uri());
+            });
+        }
+
+        return $this;
+    }
 }

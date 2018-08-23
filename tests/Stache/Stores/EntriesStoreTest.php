@@ -5,6 +5,7 @@ namespace Tests\Stache\Stores;
 use Mockery;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
+use Statamic\API\Entry as EntryAPI;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Data\Entries\Entry;
@@ -16,7 +17,7 @@ class EntriesStoreTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new EntriesStore($stache))
+        $this->store = (new EntriesStore($stache, app('files')))
             ->directory($this->directory = __DIR__.'/../__fixtures__/content/collections');
     }
 
@@ -114,5 +115,29 @@ class EntriesStoreTest extends TestCase
             'example::test',
             $this->store->getItemKey($entry, '/path/to/doesnt/matter.yaml')
         );
+    }
+
+    /** @test */
+    function it_saves_to_disk()
+    {
+        $entry = EntryAPI::create('test')
+            ->id('test-blog-entry')
+            ->collection('blog')
+            ->date('2017-07-04')
+            ->with(['foo' => 'bar', 'content' => 'test content'])
+            ->get();
+
+        $this->store->save($entry);
+
+        $contents = <<<EOT
+---
+foo: bar
+id: test-blog-entry
+---
+test content
+EOT;
+        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.test.md', $contents);
+        @unlink($path);
+        $this->assertFileNotExists($path);
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Tests\TestCase;
 use Statamic\Stache\Stache;
+use Statamic\API\Entry as EntryAPI;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
@@ -19,9 +20,10 @@ class EntryRepositoryTest extends TestCase
 
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
+        $this->directory = __DIR__.'/../__fixtures__/content/collections';
         $stache->registerStores([
-            (new CollectionsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
-            (new EntriesStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
+            (new CollectionsStore($stache, app('files')))->directory($this->directory),
+            (new EntriesStore($stache, app('files')))->directory($this->directory),
             (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
         ]);
 
@@ -154,5 +156,28 @@ class EntryRepositoryTest extends TestCase
         $this->assertInstanceOf(Entry::class, $entry);
         $this->assertEquals('pages-directors', $entry->id());
         $this->assertEquals('Directors', $entry->get('title'));
+    }
+
+    /** @test */
+    function it_saves_an_entry_to_the_stache_and_to_a_file()
+    {
+        $entry = EntryAPI::create('test')
+            ->id('test-blog-entry')
+            ->collection('blog')
+            ->published(false)
+            ->date('2017-07-04')
+            ->with(['foo' => 'bar'])
+            ->get();
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($this->repo->find('test-blog-entry'));
+
+        $this->repo->save($entry);
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertArraySubset(['foo' => 'bar'], $item->data());
+        $this->assertFileExists($path = $this->directory.'/blog/2017-07-04.test.md');
+        @unlink($path);
     }
 }

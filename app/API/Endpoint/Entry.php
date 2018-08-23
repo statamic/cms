@@ -2,6 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 use Statamic\Contracts\Data\Repositories\StructureRepository;
 
 class Entry
@@ -146,5 +147,10 @@ class Entry
         \Log::notice('Entry::getByUuid() is deprecated. Use Entry::find()');
 
         return self::find($uuid);
+    }
+
+    public function save(EntryContract $entry)
+    {
+        $this->service()->save($entry);
     }
 }
