@@ -11,7 +11,8 @@ class EntryPolicy
 
     public function view($user, $entry)
     {
-        //
+        return $this->edit($user, $entry)
+            || $user->hasPermission("view {$entry->collectionName()} entries");
     }
 
     public function edit($user, $entry)

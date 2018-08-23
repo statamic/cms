@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Entry;
+use Illuminate\Http\Request;
 
 class EntriesController extends CpController
 {
@@ -12,13 +13,16 @@ class EntriesController extends CpController
         return Entry::whereCollection($collection)->toArray();
     }
 
-    public function edit($collection, $slug)
+    public function edit(Request $request, $collection, $slug)
     {
         $entry = Entry::findBySlug($slug, $collection);
 
-        $this->authorize('edit', $entry);
+        $this->authorize('view', $entry);
 
-        return view('statamic::entries.edit', compact('entry'));
+        return view('statamic::entries.edit', [
+            'entry' => $entry,
+            'readOnly' => $request->user()->cant('edit', $entry)
+        ]);
     }
 
     public function update($slug)
