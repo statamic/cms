@@ -9,6 +9,8 @@ export default {
     inject: ['sharedState'],
     computed: {
         allItemsChecked() {
+            if (this.sharedState.rows.length === 0) return false;
+
             return this.sharedState.checkedIds.length === this.sharedState.rows.length;
         },
     },
