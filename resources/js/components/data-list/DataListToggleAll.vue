@@ -1,5 +1,5 @@
 <template>
-    <div class="p-1">
+    <div class="px-2 w-4">
         <input type="checkbox" @change="toggle" :checked="allItemsChecked">
     </div>
 </template>

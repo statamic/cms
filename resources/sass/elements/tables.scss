@@ -3,7 +3,7 @@
 }
 
 .data-list-search-input {
-    @apply text-sm p-1 outline-none flex-1;
+    @apply text-sm px-2 py-1 outline-none flex-1;
 }
 
 table.data-table {
@@ -28,6 +28,10 @@ table.data-table {
                 @apply py-1 px-2;
             }
         }
+    }
+
+    .checkbox-column {
+        @apply .w-4 .pr-0;
     }
 }
 
