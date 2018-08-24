@@ -38,7 +38,7 @@ export default {
     },
     computed: {
         filteredRows() {
-            return _.pick(this.rows, row => {
+            return this.rows.filter(row => {
                 return row.title.toLowerCase().includes(this.searchQuery.toLowerCase());
             });
         }

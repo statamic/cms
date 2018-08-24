@@ -9,7 +9,7 @@ export default {
     inject: ['sharedState'],
     computed: {
         allItemsChecked() {
-            return this.sharedState.checkedIds.length === Object.values(this.sharedState.rows).length;
+            return this.sharedState.checkedIds.length === this.sharedState.rows.length;
         },
     },
     methods: {
@@ -18,7 +18,7 @@ export default {
         },
 
         checkAllItems() {
-            this.sharedState.checkedIds = _.values(_.mapObject(this.sharedState.rows, item => item.id))
+            this.sharedState.checkedIds = _.values(_.map(this.sharedState.rows, item => item.id))
         },
 
         uncheckAllItems() {

@@ -8,6 +8,7 @@ export default {
             required: true,
         },
         rows: {
+            type: Array,
             required: true,
         },
     },
