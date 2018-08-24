@@ -29,6 +29,11 @@ export default {
     },
     render() {
         return this.$scopedSlots.default( {} );
+    },
+    watch: {
+        rows(rows) {
+            this.sharedState.rows = rows;
+        }
     }
 }
 </script>

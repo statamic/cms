@@ -1,9 +1,9 @@
 <template>
-    <data-list :visible-columns="visibleColumns" :columns="columns" :rows="rows">
+    <data-list :visible-columns="visibleColumns" :columns="columns" :rows="filteredRows">
         <div class="card p-0" slot-scope="{}">
             <div class="data-list-header">
                 <data-list-toggle-all></data-list-toggle-all>
-                <data-list-search @input="search"></data-list-search>
+                <data-list-search v-model="searchQuery"></data-list-search>
                 <data-list-bulk-actions>
                     <div slot-scope="{ ids, hasCheckedIds }" class="flex items-center" v-if="hasCheckedIds">
                         <button class="btn ml-1" @click="bulkDelete(ids)">Delete</button>
@@ -32,7 +32,15 @@ export default {
     ],
     data() {
         return {
-            rows: this.initialRows
+            rows: this.initialRows,
+            searchQuery: ''
+        }
+    },
+    computed: {
+        filteredRows() {
+            return _.pick(this.rows, row => {
+                return row.title.toLowerCase().includes(this.searchQuery.toLowerCase());
+            });
         }
     },
     methods: {
@@ -40,6 +48,7 @@ export default {
             //TODO: Add axios call and store the updated visible columns
         },
         search(query) {
+            this.searchQuery = query;
             //TODO: Axios call & update rows
         },
         bulkDelete(ids) {
