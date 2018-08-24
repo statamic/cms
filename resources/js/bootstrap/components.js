@@ -25,6 +25,7 @@ Vue.component('data-table', require('../components/data-list/DataTable.vue'));
 
 // Resource Type Lists
 Vue.component('entry-list', require('../components/data-list/EntryList.vue'));
+Vue.component('collection-list', require('../components/data-list/CollectionList.vue'));
 
 Vue.component('formset-builder', require('../components/formset-builder/formset-builder'));
 Vue.component('fieldset-builder', require('../components/fieldset-builder/Builder.vue'));

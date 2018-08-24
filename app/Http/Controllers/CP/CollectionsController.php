@@ -17,9 +17,21 @@ class CollectionsController extends CpController
 
         $collections = Collection::all()->filter(function ($collection) {
             return request()->user()->can('view', $collection);
-        });
+        })->map(function ($collection) {
+            return [
+                'id' => $collection->path(),
+                'title' => $collection->title(),
+                'entries' => $collection->entries()->count(),
+                'edit_url' => $collection->editUrl(),
+                'entries_url' => cp_route('collections.show', $collection->path())
+            ];
+        })->values();
 
-        return view('statamic::collections.index', compact('collections'));
+        return view('statamic::collections.index', [
+            'collections' => $collections,
+            'columns' => ['title', 'entries'],
+            'visibleColumns' => ['title', 'entries'],
+        ]);
     }
 
     public function show($collection)

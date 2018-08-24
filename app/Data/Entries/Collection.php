@@ -153,7 +153,7 @@ class Collection extends DataFolder implements CollectionContract
      */
     public function editUrl()
     {
-        return cp_route('collection.edit', $this->path());
+        return cp_route('collections.edit', $this->path());
     }
 
     /**
