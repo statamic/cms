@@ -7,7 +7,26 @@
 .btn,
 .btn-default {
     @include button(#fff, $color_gray_dark);
+    box-shadow:
+        rgba(50,50,93,.1) 0 0 0 1px,
+        rgba(50,50,93,.08) 0 2px 5px,
+        rgba(0,0,0,.07) 0 1px 1.5px,
+        rgba(0,0,0,.08) 0 1px 2px 0,
+        transparent 0 0 0 0;
     .icon { color: #777; }
+
+    &:hover,
+    &.depressed {
+        box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.1), 0 3px 9px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.08), 0 1px 2px 0 rgba(0,0,0,.08);
+    }
+
+    &:active {
+        box-shadow:
+            rgba(50,50,93,.1) 0 0 0 1px,
+            rgba(0,0,0,.07) 0 1px 1.5px,
+            rgba(0,0,0,.08) 0 1px 2px 0,
+            transparent 0 0 0 0;
+    }
 }
 
 
@@ -23,25 +42,26 @@
 
 .btn-primary {
     @include button($brand-primary, rgba(255,255,255,.9));
+    // @apply bg-blue text-white
     box-shadow:
-        0 2px 5px 0 rgba($brand-primary,.05),
-        0 1px 2px 0 rgba(0,0,0,.07),
-        0 1px 3px 0 rgba(0,0,0,.08);
+        rgba($brand-primary, .05) 0 2px 5px 0,
+        rgba(0,0,0,.07) 0 1px 2px 0,
+        rgba(0,0,0,.08) 0 1px 3px 0;
     border-bottom: 1px solid #2090d5;
 
     &:hover,
     &.depressed {
-		box-shadow:
+        box-shadow:
             0 2px 5px 0 rgba(50,50,93,.1),
             0 2px 4px 0 rgba(50,50,93,.08),
             0 1px 2px 0 rgba(0,0,0,.08),
             0 1px 3px 0 rgba(0,0,0,.08);
         border-bottom: 1px solid rgba(#2090d5, .9);
-	}
+    }
 }
 
 .btn-secondary {
-    @include button($brand-secondary);
+    @include button(config('colors.grey-darker'));
 }
 
 .btn-delete {
@@ -99,7 +119,6 @@ td .btn-icon {
     top: 1px;
 }
 
-
 .btn-with-icon {
     @apply .flex .items-center;
     svg {
@@ -107,6 +126,16 @@ td .btn-icon {
         height: 16px;
         width: 16px;
 
+    }
+}
+
+.btn-icon-only {
+    @apply .flex .items-center;
+    padding: 0 12px;
+    svg {
+        margin: 0;
+        height: 16px;
+        width: 16px;
     }
 }
 
