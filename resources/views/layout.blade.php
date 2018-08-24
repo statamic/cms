@@ -28,7 +28,7 @@
       @include('statamic::partials.alerts')
       @include('statamic::partials.global-header')
 
-      <div class="application-grid @yield('content-class')">
+      <div id="main" class="@yield('content-class')">
             @include('statamic::partials.nav-main-new')
 
             <div class="content">

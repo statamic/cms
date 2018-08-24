@@ -23,9 +23,9 @@ a {
 // svg sprite
 body > svg { display: none; }
 
-.application-grid {
+#main {
     display: grid;
-    grid-template-columns: config('width.48') auto;
+    grid-template-columns: config('width.54') auto;
 
     &.hide-nav {
         display: block;
@@ -41,7 +41,7 @@ body > svg { display: none; }
     font-size: 14px;
 
     .logo {
-        @apply w-48 block flex items-center;
+        @apply w-54 block flex items-center;
         height: 40px;
         svg {
             height: 20px;
@@ -84,25 +84,25 @@ body > svg { display: none; }
     .btn { text-decoration: none; }
 }
 
-@media (max-width: 980px) {
-    .application-grid {
-        grid-template-columns: 140px 1fr auto;
-    }
-
-    .cp-head .logo {
-        width: 140px;
-    }
-}
-
-@media (max-width: 768px) {
-    .application-grid {
-        display: block;
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .cp-head .logo { display: none; }
-}
+// @media (max-width: 980px) {
+//     .application-grid {
+//         grid-template-columns: 140px 1fr auto;
+//     }
+//
+//     .cp-head .logo {
+//         width: 140px;
+//     }
+// }
+//
+// @media (max-width: 768px) {
+//     .application-grid {
+//         display: block;
+//         padding-left: 0;
+//         padding-right: 0;
+//     }
+//
+//     .cp-head .logo { display: none; }
+// }
 
 
 
