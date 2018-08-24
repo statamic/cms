@@ -13,7 +13,7 @@
                 <td v-for="column in sharedState.visibleColumns">
                     {{ row[column] }}
                 </td>
-                <td>
+                <td class="text-right">
                     <slot name="actions" :row="row"></slot>
                 </td>
             </tr>

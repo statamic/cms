@@ -15,8 +15,8 @@
             </div>
             <data-table :allow-bulk-actions="true">
                 <template slot="actions" slot-scope="{ row: entry }">
-                    <a :href="entry.edit_url">Edit</a>
-                    <a :href="entry.permalink">View</a>
+                    <a class="text-xs text-blue" :href="entry.permalink">View</a>
+                    <a class="text-xs text-blue ml-1" :href="entry.edit_url">Edit</a>
                 </template>
             </data-table>
         </div>
