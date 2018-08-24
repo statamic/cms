@@ -62,3 +62,15 @@
         margin: 6px -8px;
     }
 }
+
+.dropdown-menu-checkboxes {
+    @apply text-xs font-normal;
+
+    input[type=checkbox] {
+        @apply mr-1;
+    }
+
+    li {
+        @apply .mt-sm;
+    }
+}

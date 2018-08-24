@@ -7,7 +7,7 @@
     </div>
 
     <entry-list
-        :columns="['title', 'slug', 'last_modified']"
+        :columns="['title', 'last_modified', 'order', 'published', 'slug']"
         :visible-columns="['title', 'slug']"
         :initial-rows="{{ $entries }}"
         :endpoints="{ bulkDelete: '/bulk/delete/route' }">
