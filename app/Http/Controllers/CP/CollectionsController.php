@@ -25,8 +25,9 @@ class CollectionsController extends CpController
     public function show($collection)
     {
         $collection = Collection::whereHandle($collection);
+        $entries = $collection->entries()->toJson();
 
-        return view('statamic::collections.show', compact('collection'));
+        return view('statamic::collections.show', compact('collection', 'entries'));
     }
 
     public function create()

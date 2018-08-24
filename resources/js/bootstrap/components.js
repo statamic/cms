@@ -1,9 +1,6 @@
 import Vue from 'vue'
 import EntryListing from '../components/listings/entries';
 
-// TODO: Temporary
-Vue.component('listing-placeholder', require('../components/ListingPlaceholder.vue'));
-
 // Core
 Vue.component('addon-listing', require('../components/listings/addons'));
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
@@ -17,6 +14,18 @@ Vue.component('configure-collection-listing', require('../components/listings/co
 Vue.component('configure-globals-listing', require('../components/listings/globals-configure'));
 Vue.component('configure-taxonomies-listing', require('../components/listings/taxonomies-configure'));
 Vue.component('entry-listing', EntryListing);
+
+// Data List
+Vue.component('data-list', require('../components/data-list/DataList.vue'));
+Vue.component('data-list-search', require('../components/data-list/DataListSearch.vue'));
+Vue.component('data-list-bulk-actions', require('../components/data-list/DataListBulkActions.vue'));
+Vue.component('data-list-column-picker', require('../components/data-list/DataListColumnPicker.vue'));
+Vue.component('data-list-toggle-all', require('../components/data-list/DataListToggleAll.vue'));
+Vue.component('data-table', require('../components/data-list/DataTable.vue'));
+
+// Resource Type Lists
+Vue.component('entry-list', require('../components/data-list/EntryList.vue'));
+
 Vue.component('formset-builder', require('../components/formset-builder/formset-builder'));
 Vue.component('fieldset-builder', require('../components/fieldset-builder/Builder.vue'));
 Vue.component('global-search', require('../components/GlobalSearch.vue'));
