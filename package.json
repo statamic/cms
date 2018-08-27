@@ -22,6 +22,7 @@
     "dmuploader": "file:resources/js/vendor/dmuploader",
     "dropzone": "^4.0.1",
     "element-resize-detector": "^1.1.14",
+    "fuse.js": "^3.2.1",
     "jquery": "~1.11.3",
     "jquery-ui": "file:resources/js/vendor/jquery-ui",
     "luminous-lightbox": "^0.2.0",

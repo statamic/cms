@@ -1,11 +1,11 @@
 <template>
-    <data-list :visible-columns="visibleColumns" :columns="columns" :rows="filteredRows">
-        <div class="card p-0" slot-scope="{}">
+    <data-list :columns="columns" :rows="initialRows" :visible-columns="visibleColumns" :search-query="searchQuery">
+        <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <div class="data-list-header">
                 <data-list-toggle-all></data-list-toggle-all>
                 <data-list-search v-model="searchQuery"></data-list-search>
                 <data-list-bulk-actions>
-                    <div slot-scope="{ ids, hasCheckedIds }" class="flex items-center" v-if="hasCheckedIds">
+                    <div slot-scope="{ ids }" class="flex items-center" v-if="ids">
                         <button class="btn ml-1" @click="bulkDelete(ids)">Delete</button>
                         <button class="btn ml-1" @click="bulkUnpublish(ids)">Unpublish</button>
                         <button class="btn ml-1" @click="bulkPublish(ids)">Publish</button>
@@ -13,7 +13,7 @@
                 </data-list-bulk-actions>
                 <data-list-column-picker @change="updateColumns"></data-list-column-picker>
             </div>
-            <data-table :allow-bulk-actions="true">
+            <data-table :allow-bulk-actions="true" :rows="rows">
                 <template slot="actions" slot-scope="{ row: entry }">
                     <a class="text-xs text-blue" :href="entry.permalink">View</a>
                     <a class="text-xs text-blue ml-1" :href="entry.edit_url">Edit</a>
@@ -26,8 +26,8 @@
 <script>
 export default {
     props: [
-        'initial-rows',
         'columns',
+        'initial-rows',
         'visible-columns'
     ],
     data() {
@@ -36,19 +36,11 @@ export default {
             searchQuery: ''
         }
     },
-    computed: {
-        filteredRows() {
-            return this.rows.filter(row => {
-                return row.title.toLowerCase().includes(this.searchQuery.toLowerCase());
-            });
-        }
-    },
     methods: {
         updateColumns(columns) {
             //TODO: Add axios call and store the updated visible columns
         },
-        search(query) {
-            this.searchQuery = query;
+        search() {
             //TODO: Axios call & update rows
         },
         bulkDelete(ids) {

@@ -1,4 +1,6 @@
 <script>
+import Fuse from 'fuse.js';
+
 export default {
     props: {
         columns: {
@@ -11,6 +13,10 @@ export default {
             type: Array,
             required: true,
         },
+        searchQuery: {
+            type: String,
+            default: ''
+        }
     },
     provide() {
         return {
@@ -29,12 +35,16 @@ export default {
         }
     },
     render() {
-        return this.$scopedSlots.default( {} );
+        var fuse = new Fuse(this.rows, {
+            findAllMatches: true,
+            threshold: 0.1,
+            minMatchCharLength: 2,
+            keys: this.visibleColumns
+        });
+
+        return this.$scopedSlots.default({
+            filteredRows: this.searchQuery ? fuse.search(this.searchQuery) : this.rows
+        });
     },
-    watch: {
-        rows(rows) {
-            this.sharedState.rows = rows;
-        }
-    }
 }
 </script>

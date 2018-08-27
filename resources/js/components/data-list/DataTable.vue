@@ -6,7 +6,7 @@
             <th class="actions-column"></th>
         </thead>
         <tbody>
-            <tr v-for="row in sharedState.rows">
+            <tr v-for="row in rows">
                 <td class="checkbox-column" v-if="allowBulkActions">
                     <input type="checkbox" :value="row.id" v-model="sharedState.checkedIds">
                 </td>
@@ -27,6 +27,10 @@ export default {
         allowBulkActions: {
             default: false,
             type: Boolean
+        },
+        rows: {
+            required: true,
+            type: Array
         }
     },
     inject: ['sharedState']
