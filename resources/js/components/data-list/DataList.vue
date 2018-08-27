@@ -35,6 +35,8 @@ export default {
         }
     },
     render() {
+
+        // TODO: Ensure instance respects updates to visibleColumns
         var fuse = new Fuse(this.rows, {
             findAllMatches: true,
             threshold: 0.1,

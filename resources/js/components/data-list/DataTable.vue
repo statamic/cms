@@ -1,7 +1,7 @@
 <template>
     <table class="data-table">
         <thead>
-            <th class="checkbox-column"></th>
+            <th class="checkbox-column" v-if="allowBulkActions"></th>
             <th v-for="column in sharedState.visibleColumns">{{ column }}</th>
             <th class="actions-column"></th>
         </thead>
