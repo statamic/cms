@@ -1,6 +1,6 @@
 <template>
-    <data-list :columns="columns" :rows="initialRows" :visible-columns="visibleColumns" :search-query="searchQuery">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
+    <data-list :columns="columns" :rows="rows" :visible-columns="visibleColumns" :search-query="searchQuery">
+        <div class="card p-0" slot-scope="{ }">
             <div class="data-list-header">
                 <data-list-toggle-all></data-list-toggle-all>
                 <data-list-search v-model="searchQuery"></data-list-search>
@@ -13,7 +13,7 @@
                 </data-list-bulk-actions>
                 <data-list-column-picker @change="updateColumns"></data-list-column-picker>
             </div>
-            <data-table :allow-bulk-actions="true" :rows="rows">
+            <data-table :allow-bulk-actions="true" @sorted="sorted">
                 <template slot="actions" slot-scope="{ row: entry }">
                     <a class="text-xs text-blue" :href="entry.permalink">View</a>
                     <a class="text-xs text-blue ml-1" :href="entry.edit_url">Edit</a>
@@ -50,6 +50,9 @@ export default {
             //TODO: Axios call & update rows
         },
         bulkPublish(ids) {
+            //TODO: Axios call & update rows
+        },
+        sorted(column, direction) {
             //TODO: Axios call & update rows
         }
     }

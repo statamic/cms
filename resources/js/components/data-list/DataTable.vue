@@ -1,9 +1,22 @@
 <template>
     <table class="data-table">
         <thead>
+            <tr>
             <th class="checkbox-column" v-if="allowBulkActions"></th>
-            <th v-for="column in sharedState.visibleColumns">{{ column }}</th>
+            <th
+                v-for="column in sharedState.visibleColumns"
+                :key="column"
+                class="cursor-pointer hover:bg-grey-lighter"
+                @click.prevent="changeSortColumn(column)"
+            >
+                <span :class="{ 'font-bold': sharedState.sortColumn === column }">{{ column }}</span>
+                <template v-if="sharedState.sortColumn === column">
+                    <span v-show="sharedState.sortDirection === 'asc'">asc</span>
+                    <span v-show="sharedState.sortDirection === 'desc'">desc</span>
+                </template>
+            </th>
             <th class="actions-column"></th>
+            </tr>
         </thead>
         <tbody>
             <tr v-for="row in rows">
@@ -23,16 +36,36 @@
 
 <script>
 export default {
+
     props: {
         allowBulkActions: {
             default: false,
             type: Boolean
-        },
-        rows: {
-            required: true,
-            type: Array
         }
     },
-    inject: ['sharedState']
+
+    inject: ['sharedState'],
+
+    computed: {
+
+        rows() {
+            return this.sharedState.rows;
+        }
+
+    },
+
+    methods: {
+
+        changeSortColumn(column) {
+            if (this.sharedState.sortColumn === column) this.swapSortDirection();
+            this.sharedState.sortColumn = column;
+            this.$emit('sorted', this.sharedState.sortColumn, this.sharedState.sortDirection);
+        },
+
+        swapSortDirection() {
+            this.sharedState.sortDirection = this.sharedState.sortDirection === 'asc' ? 'desc' : 'asc';
+        }
+
+    }
 }
 </script>
