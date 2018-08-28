@@ -14,6 +14,7 @@ Vue.component('configure-collection-listing', require('../components/listings/co
 Vue.component('configure-globals-listing', require('../components/listings/globals-configure'));
 Vue.component('configure-taxonomies-listing', require('../components/listings/taxonomies-configure'));
 Vue.component('entry-listing', EntryListing);
+Vue.component('dropdown-list', require('../components/DropdownList'));
 
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
