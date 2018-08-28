@@ -6,14 +6,14 @@
                 <th
                     v-for="column in sharedState.visibleColumns"
                     :key="column"
-                    class="cursor-pointer hover:bg-grey-lighter"
+                    class="sortable-column"
+                    :class="{'current-column': sharedState.sortColumn === column}"
                     @click.prevent="changeSortColumn(column)"
                 >
-                    <span :class="{ 'font-bold': sharedState.sortColumn === column }">{{ column }}</span>
-                    <template v-if="sharedState.sortColumn === column">
-                        <span v-show="sharedState.sortDirection === 'asc'">asc</span>
-                        <span v-show="sharedState.sortDirection === 'desc'">desc</span>
-                    </template>
+                    <span>{{ column }}</span>
+                    <svg :class="sharedState.sortDirection" v-if="sharedState.sortColumn === column" height="8" width="8" viewBox="0 0 10 6.5" style="enable-background:new 0 0 10 6.5;">
+                        <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z"/>
+                    </svg>
                 </th>
                 <th class="actions-column"></th>
             </tr>

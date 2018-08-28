@@ -33,6 +33,27 @@ table.data-table {
     .checkbox-column {
         @apply .w-4 .pr-0;
     }
+
+    .sortable-column {
+        @apply cursor-pointer select-none;
+
+        &:hover {
+            @apply bg-grey-lighter;
+        }
+
+        &.current-column {
+            @apply font-bold;
+        }
+
+        svg {
+            transition: all 150ms ease;
+        }
+
+        svg.asc {
+            transform: scaleY(-1);
+        }
+
+    }
 }
 
 table.table-legacy {
