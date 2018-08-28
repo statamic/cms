@@ -30,23 +30,65 @@ export default {
                 searchQuery: this.searchQuery,
                 columns: this.columns,
                 visibleColumns: this.visibleColumns,
-                rows: this.rows
+                sortColumn: this.visibleColumns[0],
+                sortDirection: 'asc',
+                rows: []
             }
         }
     },
-    render() {
 
-        // TODO: Ensure instance respects updates to visibleColumns
-        var fuse = new Fuse(this.rows, {
-            findAllMatches: true,
-            threshold: 0.1,
-            minMatchCharLength: 2,
-            keys: this.visibleColumns
-        });
+    computed: {
 
-        return this.$scopedSlots.default({
-            filteredRows: this.searchQuery ? fuse.search(this.searchQuery) : this.rows
-        });
+        filteredRows() {
+            let rows = this.rows;
+            rows = this.filterBySearch(rows);
+            return this.sort(rows)
+        }
+
     },
+
+    watch: {
+
+        filteredRows: {
+            immediate: true,
+            handler: function (rows) {
+                this.sharedState.rows = rows;
+            }
+        }
+
+    },
+
+    methods: {
+
+        filterBySearch(rows) {
+            if (! this.searchQuery) return rows;
+
+            // TODO: Ensure instance respects updates to visibleColumns
+            const fuse = new Fuse(rows, {
+                findAllMatches: true,
+                threshold: 0.1,
+                minMatchCharLength: 2,
+                keys: this.visibleColumns
+            });
+
+            return fuse.search(this.searchQuery);
+        },
+
+        sort(rows) {
+            rows = _.sortBy(rows, this.sharedState.sortColumn);
+
+            if (this.sharedState.sortDirection === 'desc') {
+                rows = rows.reverse();
+            }
+
+            return rows;
+        }
+
+    },
+
+    render() {
+        return this.$scopedSlots.default({ });
+    }
+
 }
 </script>
