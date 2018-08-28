@@ -5,26 +5,29 @@
     height: 34px;
     padding: 0 16px;
     line-height: 34px;
-    transition: box-shadow .08s ease-in, color .08s ease-in;
 
     &:hover, &:active, &:focus, &:active:focus {
         background: $background;
         color: $text;
-        outline: none !important;
-        transition: box-shadow .04s ease-in, color .04s ease-in;
+        outline: 0 !important;
     }
 
-    &:hover,
+    &:hover:not(:disabled),
     &.depressed {
         box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.1), 0 3px 9px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.08), 0 1px 2px 0 rgba(0,0,0,.08);
     }
 
-    &:active {
+    &:active, &:focus:active {
+        bottom: -1px;
         box-shadow:
             rgba(50,50,93,.1) 0 0 0 1px,
             rgba(0,0,0,.07) 0 1px 1.5px,
             rgba(0,0,0,.08) 0 1px 2px 0,
             transparent 0 0 0 0;
+    }
+
+    &:disabled {
+        @apply opacity-75;
     }
 }
 

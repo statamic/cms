@@ -14,42 +14,17 @@
         rgba(0,0,0,.08) 0 1px 2px 0,
         transparent 0 0 0 0;
     .icon { color: #777; }
-
-    &:hover,
-    &.depressed {
-        box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.1), 0 3px 9px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.08), 0 1px 2px 0 rgba(0,0,0,.08);
-    }
-
-    &:active {
-        box-shadow:
-            rgba(50,50,93,.1) 0 0 0 1px,
-            rgba(0,0,0,.07) 0 1px 1.5px,
-            rgba(0,0,0,.08) 0 1px 2px 0,
-            transparent 0 0 0 0;
-    }
-}
-
-
-.btn-danger {
-    @include button($color_red, white);
-
-    &:hover { color: white; }
-}
-
-.btn:focus {
-    box-shadow: 0 0 10px rgba($brand-primary, .9);
 }
 
 .btn-primary {
     @include button($brand-primary, rgba(255,255,255,.9));
-    // @apply bg-blue text-white
     box-shadow:
         rgba($brand-primary, .05) 0 2px 5px 0,
         rgba(0,0,0,.07) 0 1px 2px 0,
         rgba(0,0,0,.08) 0 1px 3px 0;
     border-bottom: 1px solid #2090d5;
 
-    &:hover,
+    &:hover:not(:disabled),
     &.depressed {
         box-shadow:
             0 2px 5px 0 rgba(50,50,93,.1),
@@ -64,8 +39,10 @@
     @include button(config('colors.grey-darker'));
 }
 
-.btn-delete {
-    @include button($color_red);
+.btn-danger {
+    @include button($color_red, white);
+
+    &:hover { color: white; }
 }
 
 .btn-icon {
