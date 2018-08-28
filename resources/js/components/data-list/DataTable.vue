@@ -2,20 +2,20 @@
     <table class="data-table">
         <thead>
             <tr>
-            <th class="checkbox-column" v-if="allowBulkActions"></th>
-            <th
-                v-for="column in sharedState.visibleColumns"
-                :key="column"
-                class="cursor-pointer hover:bg-grey-lighter"
-                @click.prevent="changeSortColumn(column)"
-            >
-                <span :class="{ 'font-bold': sharedState.sortColumn === column }">{{ column }}</span>
-                <template v-if="sharedState.sortColumn === column">
-                    <span v-show="sharedState.sortDirection === 'asc'">asc</span>
-                    <span v-show="sharedState.sortDirection === 'desc'">desc</span>
-                </template>
-            </th>
-            <th class="actions-column"></th>
+                <th class="checkbox-column" v-if="allowBulkActions"></th>
+                <th
+                    v-for="column in sharedState.visibleColumns"
+                    :key="column"
+                    class="cursor-pointer hover:bg-grey-lighter"
+                    @click.prevent="changeSortColumn(column)"
+                >
+                    <span :class="{ 'font-bold': sharedState.sortColumn === column }">{{ column }}</span>
+                    <template v-if="sharedState.sortColumn === column">
+                        <span v-show="sharedState.sortDirection === 'asc'">asc</span>
+                        <span v-show="sharedState.sortDirection === 'desc'">desc</span>
+                    </template>
+                </th>
+                <th class="actions-column"></th>
             </tr>
         </thead>
         <tbody>
