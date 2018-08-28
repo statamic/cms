@@ -160,8 +160,6 @@ var vm = new Vue({
     },
 
     mounted() {
-        console.log('Hello from Vue2!')
-
         this.$mousetrap.bind('?', function(e) {
             this.showShortcuts = true;
         }.bind(this), 'keyup');
