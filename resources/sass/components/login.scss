@@ -20,7 +20,7 @@
             rgba(0, 0, 0, .1) 0 3px 4px,
             inset rgba(108, 167, 234, .2) -5px 5px 30px,
             inset rgba(241, 84, 106, .2) 5px -5px 30px;
-        &:hover {
+        &:hover, &:focus-within {
             transform: translateY(-2px);
             box-shadow:
                 rgba(50, 50, 93, .5) 0 35px 78px 0,
