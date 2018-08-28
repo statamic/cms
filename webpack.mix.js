@@ -48,18 +48,6 @@ mix.copyDirectory(`${src}/svg`, `${dest}/svg`);
 mix.copyDirectory(`${src}/audio`, `${dest}/audio`);
 mix.copyDirectory(`${src}/fonts`, `${dest}/fonts`);
 
-// mix.browserSync({
-//     proxy: process.env.BROWSERSYNC_PROXY || 'talonsbeard.test',
-//     startPath: '/cp',
-//     open: false,
-//     files: [
-//         `${src}/views/**/*.blade.php`,
-//         `${dest}/js/*.js`,
-//         `${dest}/css/*.css`,
-//         `app/site/addons/**/*`
-//     ]
-// });
-
 mix.sourceMaps();
 
 mix.options({ extractVueStyles: true });
