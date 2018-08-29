@@ -2,10 +2,14 @@
     <data-list :visible-columns="visibleColumns" :columns="columns" :rows="initialRows">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-table :rows="rows">
+                <template slot="cell-title" slot-scope="{ row: collection }">
+                    <a :href="collection.entries_url">{{ collection.title }}</a>
+                </template>
                 <template slot="actions" slot-scope="{ row: collection }">
-                    <a class="text-xs text-blue" :href="collection.entries_url">View Entries</a>
-                    <a class="text-xs text-blue ml-1" :href="collection.edit_url">Edit</a>
-                    <a class="text-xs text-red ml-1" @click.prevent="deleteCollection(collection.id)">Delete</a>
+                    <dropdown-list>
+                        <li><a :href="collection.edit_url">Edit</a></li>
+                        <li class="warning"><a @click.prevent="deleteCollection(collection.id)">Delete</a></li>
+                    </dropdown-list>
                 </template>
             </data-table>
         </div>
