@@ -62,12 +62,11 @@ interface Fieldset extends Arrayable, Editable
     public function contents($contents = null);
 
     /**
-     * Get or set the fields
+     * Get the fields
      *
-     * @param array|null $fields
-     * @return mixed
+     * @return array
      */
-    public function fields($fields = null);
+    public function fields();
 
     /**
      * Get the fieldtypes
