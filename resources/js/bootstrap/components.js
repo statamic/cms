@@ -1,19 +1,10 @@
 import Vue from 'vue'
-import EntryListing from '../components/listings/entries';
 
 // Core
-Vue.component('addon-listing', require('../components/listings/addons'));
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue'));
 Vue.component('asset-container-form', require('../components/assets/Container/EditForm.vue'));
-Vue.component('asset-container-listing', require('../components/listings/asset-containers'));
 Vue.component('asset-container-wizard', require('../components/assets/Container/Wizard/Wizard.vue'));
-Vue.component('collection-listing', require('../components/listings/collections'));
-Vue.component('configure-asset-container-listing', require('../components/listings/asset-containers-configure'));
-Vue.component('configure-collection-listing', require('../components/listings/collections-configure'));
-Vue.component('configure-globals-listing', require('../components/listings/globals-configure'));
-Vue.component('configure-taxonomies-listing', require('../components/listings/taxonomies-configure'));
-Vue.component('entry-listing', EntryListing);
 
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
@@ -36,14 +27,7 @@ Vue.component('publish-fields', require('../components/publish/Fields.vue'));
 Vue.component('installer', require('../components/installer/installer'));
 Vue.component('updater', require('../components/updater'));
 Vue.component('importer', require('../components/importer/importer'));
-Vue.component('term-listing', require('../components/listings/terms'));
-Vue.component('globals-listing', require('../components/listings/globals'));
-Vue.component('user-listing', require('../components/listings/users'));
 Vue.component('user-options', require('../components/publish/user-options'));
-Vue.component('user-group-listing', require('../components/listings/user-groups'));
-Vue.component('user-role-listing', require('../components/listings/user-roles'));
-Vue.component('fieldset-listing', require('../components/listings/fieldsets'));
-Vue.component('form-submission-listing', require('../components/listings/form-submissions'));
 Vue.component('roles', require('../components/roles/roles'));
 Vue.component('login', require('../components/login/login'));
 Vue.component('login-modal', require('../components/login/LoginModal.vue'));
