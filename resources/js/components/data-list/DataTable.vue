@@ -24,7 +24,9 @@
                     <input type="checkbox" :value="row.id" v-model="sharedState.checkedIds">
                 </td>
                 <td v-for="column in sharedState.visibleColumns">
-                    {{ row[column] }}
+                    <slot :name="`cell-${column}`" :row="row">
+                        {{ row[column] }}
+                    </slot>
                 </td>
                 <td class="text-right">
                     <slot name="actions" :row="row"></slot>

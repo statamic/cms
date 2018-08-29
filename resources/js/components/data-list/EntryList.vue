@@ -14,6 +14,9 @@
                 <data-list-column-picker @change="updateColumns"></data-list-column-picker>
             </div>
             <data-table :allow-bulk-actions="true" @sorted="sorted">
+                <template slot="cell-title" slot-scope="{ row: entry }">
+                    <a :href="entry.edit_url">{{ entry.title }}</a>
+                </template>
                 <template slot="actions" slot-scope="{ row: entry }">
                     <dropdown-list>
                         <li><a :href="entry.permalink">View</a></li>
