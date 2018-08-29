@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <div class="publish-sidebar ml-4" v-show="shouldShowSidebar">
+            <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
                 <div class="card p-0">
                     <publish-fields :fields="sidebarSection.fields" />
                 </div>
@@ -72,6 +72,8 @@ export default {
         },
 
         shouldShowSidebar() {
+            if (! this.sidebarSection) return false;
+
             const width = this.$store.state.statamic.windowWidth;
 
             // TODO: or is live previewing
