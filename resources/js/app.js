@@ -73,4 +73,3 @@ var vm = new Vue({
 // TODO: Drag events
 // TODO: Live Preview
 // TODO: Mousetrap bind ? to shortcuts
-// TODO: Dialog when leaving dirty form

@@ -51,14 +51,23 @@ export default {
                 actions: {
                     updateField(context, payload) {
                         context.commit('updateField', payload);
-                        vm.$emit('updated', context.state.values);
+                        vm.emitUpdatedEvent(context.state.values);
                     },
                     updateFields(context, payload) {
                         context.commit('updateFields', payload);
-                        vm.$emit('updated', context.state.values);
+                        vm.emitUpdatedEvent(context.state.values);
                     }
                 }
             });
+        },
+
+        emitUpdatedEvent(values) {
+            this.$emit('updated', values);
+            this.enableNavigationWarning();
+        },
+
+        enableNavigationWarning() {
+            window.onbeforeunload = () => '';
         }
 
     },
