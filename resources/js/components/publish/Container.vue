@@ -15,6 +15,9 @@ export default {
         values: {
             type: Object,
             default: () => {}
+        },
+        errors: {
+            type: Object
         }
     },
 
@@ -37,7 +40,8 @@ export default {
                 namespaced: true,
                 state: {
                     fieldset: _.clone(this.fieldset),
-                    values: _.clone(this.values)
+                    values: _.clone(this.values),
+                    errors: {}
                 },
                 mutations: {
                     updateField(state, payload) {
@@ -46,6 +50,9 @@ export default {
                     },
                     updateFields(state, values) {
                         state.values = values;
+                    },
+                    setErrors(state, errors) {
+                        state.errors = errors;
                     }
                 },
                 actions: {
@@ -86,6 +93,10 @@ export default {
             handler() {
                 console.error(`The "fieldset" prop is reserved for initializing the Publish store. You should use this.$store.commit('${this.name}/setFieldset', fieldset) instead.`);
             }
+        },
+
+        errors(errors) {
+            this.$store.commit(`publish/${this.name}/setErrors`, errors);
         }
 
     },

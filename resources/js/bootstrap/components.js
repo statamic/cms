@@ -10,6 +10,7 @@ Vue.component('asset-container-wizard', require('../components/assets/Container/
 Vue.component('publish-container', require('../components/publish/Container.vue'));
 Vue.component('publish-fields', require('../components/publish/Fields.vue'));
 Vue.component('publish-sections', require('../components/publish/Sections.vue'));
+Vue.component('publish-validation-errors', require('../components/publish/ValidationErrors'));
 
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue'));

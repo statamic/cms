@@ -20,10 +20,11 @@
                 <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>
             </div>
 
-            <validation-errors :errors="errors"></validation-errors>
-
-            <publish-container name="base" :fieldset="fieldset" :values="initialValues" @updated="values = $event">
-                <div slot-scope="{ }"><publish-sections /></div>
+            <publish-container name="base" :fieldset="fieldset" :values="initialValues" :errors="errors" @updated="values = $event">
+                <div slot-scope="{ }">
+                    <publish-validation-errors></publish-validation-errors>
+                    <publish-sections></publish-sections>
+                </div>
             </publish-container>
         </div>
     </entry-publish-form>
