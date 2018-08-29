@@ -72,8 +72,10 @@ export default {
         },
 
         shouldShowSidebar() {
-            // TODO: or is live previewing, or window is too small
-            if (this.sidebarSection.fields.length == 0) return false;
+            const width = this.$store.state.statamic.windowWidth;
+
+            // TODO: or is live previewing
+            if (this.sidebarSection.fields.length == 0 || width < 1366) return false;
 
             return true;
         },
