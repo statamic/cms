@@ -2,9 +2,9 @@
 
     <div>
 
-        <div class="publish-tabs tabs mb-2">
+        <div class="publish-tabs tabs mb-2" v-show="mainSections.length > 1">
             <a href=""
-                v-for="section in sections"
+                v-for="section in mainSections"
                 :key="section.handle"
                 :class="{
                     'active': section.handle == active,
@@ -19,19 +19,19 @@
             <div class="w-full">
                 <div
                     class="card p-0"
-                    v-for="section in sections"
+                    v-for="section in mainSections"
                     :key="section.handle"
                     v-show="section.handle === active"
                 >
-                    <div class="card-body">
-                        <publish-fields :fields="section.fields" />
-                    </div>
+                    <publish-fields :fields="section.fields" />
                 </div>
             </div>
 
-            <!-- TODO: <div class="publish-sidebar ml-32" v-show="shouldShowSidebar">
-
-            </div> -->
+            <div class="publish-sidebar ml-4" v-show="shouldShowSidebar">
+                <div class="card p-0">
+                    <publish-fields :fields="sidebarSection.fields" />
+                </div>
+            </div>
         </div>
 
     </div>
@@ -59,6 +59,23 @@ export default {
 
         sections() {
             return this.state.fieldset.sections;
+        },
+
+        mainSections() {
+            if (! this.shouldShowSidebar) return this.sections;
+
+            return _.filter(this.sections, section => section.handle != 'sidebar');
+        },
+
+        sidebarSection() {
+            return _.find(this.sections, { handle: 'sidebar' });
+        },
+
+        shouldShowSidebar() {
+            // TODO: or is live previewing, or window is too small
+            if (this.sidebarSection.fields.length == 0) return false;
+
+            return true;
         },
 
         errors() {
