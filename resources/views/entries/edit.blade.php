@@ -20,12 +20,7 @@
                 <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>
             </div>
 
-            <div class="publish-errors alert alert-danger" v-if="hasErrors">
-                @{{ error }}
-                <ul>
-                    <li v-for="(error, i) in errors" :key="i">@{{ error }}</li>
-                </ul>
-            </div>
+            <validation-errors :errors="errors"></validation-errors>
 
             <publish-container name="base" :fieldset="fieldset" :values="initialValues" @updated="values = $event">
                 <div slot-scope="{ }"><publish-sections /></div>
