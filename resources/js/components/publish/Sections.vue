@@ -44,9 +44,10 @@ export default {
     inject: ['storeName'],
 
     data() {
+        const state = this.$store.state.publish[this.storeName];
 
         return {
-            active: this.$store.state.publish[this.storeName].fieldset.sections[0].handle
+            active: state.fieldset.sections[0].handle
         }
     },
 
