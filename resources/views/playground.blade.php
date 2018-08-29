@@ -109,4 +109,53 @@
             <div class="text-black bg-purple p-3 flex-1">Purple</div>
         </div>
     </div>
+
+    <h2 class="mb-1">Widgets</h2>
+    <div class="flex flex-wrap -mx-2 mb-4">
+        <div class="w-1/3 px-2">
+            <div class="card px-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-grey">New Users</h3>
+                    <select name="" id="">
+                        <option value="">30 Days</option>
+                    </select>
+                </div>
+                <div class="text-4xl mb-2">89</div>
+                <div class="flex items-center ">
+                    <span class="w-4 h-4 text-green mr-1">@svg('new/performance-increase-1')</span>
+                    <span class="leading-none text-sm">8.54% Increase</span>
+                </div>
+            </div>
+        </div>
+        <div class="w-1/3 px-2">
+            <div class="card px-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-grey">Form Submissions</h3>
+                    <select name="" id="">
+                        <option value="">7 Days</option>
+                    </select>
+                </div>
+                <div class="text-4xl mb-2">35</div>
+                <div class="flex items-center ">
+                    <span class="w-4 h-4 text-green mr-1">@svg('new/performance-increase-1')</span>
+                    <span class="leading-none text-sm">2.15% Increase</span>
+                </div>
+            </div>
+        </div>
+        <div class="w-1/3 px-2">
+            <div class="card bg-grey-darker px-3">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-grey-light">New Users</h3>
+                    <select name="" id="" class="bg-grey-dark border-grey-dark text-grey-light">
+                        <option value="">30 Days</option>
+                    </select>
+                </div>
+                <div class="text-4xl mb-2 text-grey-light">251</div>
+                <div class="flex items-center ">
+                    <span class="w-4 h-4 text-green mr-1">@svg('new/performance-increase-1')</span>
+                    <span class="leading-none text-grey-light text-sm">8.54% Increase</span>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
