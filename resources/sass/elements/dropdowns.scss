@@ -2,6 +2,18 @@
    DROPDOWNS
    ========================================================================== */
 
+.dropdown {
+   position: relative;
+}
+
+.dropdown .rotating-dots {
+    transition: .12s ease-out;
+}
+
+.dropdown.open .rotating-dots {
+    transform: rotate(90deg);
+}
+
 .open .dropdown-menu {
     transform: scale(1);
     opacity: 1;
@@ -10,7 +22,7 @@
 }
 
 .dropdown-menu {
-    @apply bg-white shadow-lg absolute block float-left list-reset p-1 rounded-md;
+    @apply bg-white shadow-lg absolute block float-left list-reset p-1 rounded-md text-left;
     top: 100%;
     left: auto;
     right: -5px;

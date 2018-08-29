@@ -15,8 +15,11 @@
             </div>
             <data-table :allow-bulk-actions="true" @sorted="sorted">
                 <template slot="actions" slot-scope="{ row: entry }">
-                    <a class="text-xs text-blue" :href="entry.permalink">View</a>
-                    <a class="text-xs text-blue ml-1" :href="entry.edit_url">Edit</a>
+                    <dropdown-list>
+                        <li><a :href="entry.permalink">View</a></li>
+                        <li><a :href="entry.edit_url">Edit</a></li>
+                        <li class="warning"><a :href="entry.edit_url">Delete</a></li>
+                    </dropdown-list>
                 </template>
             </data-table>
         </div>

@@ -26,6 +26,7 @@ Vue.component('collection-list', require('../components/data-list/CollectionList
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
 Vue.component('file-icon', require('../components/FileIcon.vue'));
+Vue.component('dropdown-list', require('../components/DropdownList'));
 
 // Recursive from page tree
 Vue.component('branch', require('../components/page-tree/Branch.vue'));

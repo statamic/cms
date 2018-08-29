@@ -43,10 +43,12 @@ table.data-table {
 
         &.current-column {
             @apply font-bold;
+            svg { opacity: 1; }
         }
 
         svg {
             transition: all 150ms ease;
+            opacity: 0;
         }
 
         svg.asc {
