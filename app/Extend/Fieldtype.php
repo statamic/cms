@@ -41,9 +41,23 @@ class Fieldtype implements FieldtypeInterface
      */
     public $is_config = false;
 
+    /**
+     * Fieldtype categories
+     * @var array
+     */
+    public $category = ['text'];
+
+    /**
+     * Whether this fieldtype should appear in the selector
+     * @var bool
+     */
+    public $selectable = true;
+
     public function setFieldConfig($config)
     {
         $this->field_config = $config;
+
+        return $this;
     }
 
     /**
@@ -93,6 +107,11 @@ class Fieldtype implements FieldtypeInterface
         return ($classBasedName === $addon)
             ? $classBasedName
             : $classBasedName . ' - ' . $addon;
+    }
+
+    public function getIcon()
+    {
+        return $this->getHandle();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Fields;
 
+use Statamic\CP\Fieldset;
 use Statamic\CP\FieldtypeFactory;
 use Statamic\Extend\Fieldtype;
 
@@ -74,6 +75,6 @@ class FieldsFieldtype extends Fieldtype
             $config[$field->getName()] = $field->process($config[$field->getName()]);
         }
 
-        return $config;
+        return Fieldset::cleanFieldForSaving($config);
     }
 }
