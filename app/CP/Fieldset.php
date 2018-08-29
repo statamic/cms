@@ -583,9 +583,15 @@ class Fieldset implements FieldsetContract
     public function toPublishArray()
     {
         $sections = collect($this->sections())->map(function ($section) {
-            $section['fields'] = $this->preProcessFields($this->inlinePartials($section['fields']));
+            $section['fields'] = collect($this->preProcessFields($this->inlinePartials($section['fields'])))->map(function ($field, $handle) {
+                $field['handle'] = $handle;
+                return $field;
+            })->values()->all();
             return $section;
-        })->all();
+        })->map(function ($section, $handle) {
+            $section['handle'] = $handle;
+            return $section;
+        })->values()->all();
 
         $array = array_merge($this->contents(), [
             'name' => $this->name(),

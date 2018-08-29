@@ -19,19 +19,9 @@ class EntriesController extends CpController
 
         $this->authorize('view', $entry);
 
-        $tempFieldset = $entry->fieldset()->toPublishArray();
-        $tempFieldset['sections'] = collect($tempFieldset['sections'])->map(function ($section, $handle) {
-            $section['handle'] = $handle;
-            $section['fields'] = collect($section['fields'])->map(function ($config, $handle) {
-                $config['handle'] = $handle;
-                return $config;
-            })->values()->all();
-            return $section;
-        })->values()->all();
 
         return view('statamic::entries.edit', [
             'entry' => $entry,
-            'tempFieldset' => $tempFieldset,
             'readOnly' => $request->user()->cant('edit', $entry)
         ]);
     }
