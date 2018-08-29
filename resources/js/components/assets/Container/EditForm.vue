@@ -1,5 +1,7 @@
 <template>
 
+<div>
+
     <div class="alert alert-danger" v-if="hasErrors">
         <ul>
             <li v-for="error in errors">{{ error }}</li>
@@ -55,6 +57,8 @@
             :path.sync="config.s3.path">
         </driver-s3>
     </div>
+
+</div>
 
 </template>
 

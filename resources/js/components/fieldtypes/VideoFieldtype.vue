@@ -1,10 +1,12 @@
 <template>
-    <input type="text" v-model="data" class="form-control" />
+    <div>
+        <input type="text" v-model="data" class="form-control" />
 
-    <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
-        <div class="video-preview">
-            <iframe v-if="isEmbeddable" width="560" height="315" src="{{ embed }}" frameborder="0" allowfullscreen></iframe>
-            <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
+        <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
+            <div class="video-preview">
+                <iframe v-if="isEmbeddable" width="560" height="315" :src="embed" frameborder="0" allowfullscreen></iframe>
+                <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
+            </div>
         </div>
     </div>
 </template>

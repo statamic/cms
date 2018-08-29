@@ -18,7 +18,7 @@
                     >
                         {{ column.label }}
                         <i v-if="isColumnActive(column)"
-                           class="icon icon-chevron-{{ sortOrder === 'asc' ? 'up' : 'down' }}"></i>
+                           class="`icon icon-chevron-${sortOrder === 'asc' ? 'up' : 'down'}`"></i>
                     </th>
                     <th class="column-actions"></th>
                 </tr>

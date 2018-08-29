@@ -1,5 +1,16 @@
+import Vue from "vue";
+
+Vue.component('select-input', require('../components/inputs/Select.vue'));
+Vue.component('text-input', require('../components/inputs/Text.vue'));
+Vue.component('textarea-input', require('../components/inputs/Textarea.vue'));
+Vue.component('toggle-input', require('../components/inputs/Toggle.vue'));
+
+Vue.component('select-fieldtype', require('../components/fieldtypes/Select.vue'));
+Vue.component('text-fieldtype', require('../components/fieldtypes/Text.vue'));
+Vue.component('textarea-fieldtype', require('../components/fieldtypes/Textarea.vue'));
+Vue.component('toggle-fieldtype', require('../components/fieldtypes/Toggle.vue'));
+
 // Fieldtypes
-import Vue from 'vue'
 import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue'
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue'
 import AssetsFolderFieldtype from '../components/fieldtypes/AssetsFolderFieldtype.vue'
@@ -26,18 +37,18 @@ import ReplicatorFieldtype from '../components/fieldtypes/replicator/ReplicatorF
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue'
-import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue'
+// import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import SuggestFieldtype from '../components/fieldtypes/SuggestFieldtype.vue'
 import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue'
 import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue'
 import TaxonomyFieldtype from '../components/fieldtypes/TaxonomyFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
-import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue'
-import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue'
+// import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue'
+// import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue'
-import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue'
+// import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue'
 import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue'
 import UserGroupsFieldtype from '../components/fieldtypes/UserGroupsFieldtype.vue'
 import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
@@ -70,18 +81,18 @@ Vue.component('replicator-fieldtype', ReplicatorFieldtype);
 Vue.component('revealer-fieldtype', RevealerFieldtype);
 Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', SectionFieldtype);
-Vue.component('select-fieldtype', SelectFieldtype);
+// Vue.component('select-fieldtype', SelectFieldtype);
 Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('suggest-fieldtype', SuggestFieldtype);
 Vue.component('table-fieldtype', TableFieldtype);
 Vue.component('tags-fieldtype', TagsFieldtype);
 Vue.component('taxonomy-fieldtype', TaxonomyFieldtype);
 Vue.component('template-fieldtype', TemplateFieldtype);
-Vue.component('text-fieldtype', TextFieldtype);
-Vue.component('textarea-fieldtype', TextareaFieldtype);
+// Vue.component('text-fieldtype', TextFieldtype);
+// Vue.component('textarea-fieldtype', TextareaFieldtype);
 Vue.component('theme-fieldtype', ThemeFieldtype);
 Vue.component('time-fieldtype', TimeFieldtype);
-Vue.component('toggle-fieldtype', ToggleFieldtype);
+// Vue.component('toggle-fieldtype', ToggleFieldtype);
 Vue.component('users-fieldtype', UsersFieldtype);
 Vue.component('user_groups-fieldtype', UserGroupsFieldtype);
 Vue.component('user_roles-fieldtype', UserRolesFieldtype);

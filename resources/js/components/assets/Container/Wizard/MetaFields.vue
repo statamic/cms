@@ -10,7 +10,7 @@
 
         <div class="form-group">
             <label class="block">{{ translate('cp.handle') }}</label>
-            <div class="help-block">{{{ translate('cp.asset_handle_instructions') }}}</div>
+            <div class="help-block" v-html="translate('cp.asset_handle_instructions')"></div>
             <input type="text" class="form-control" v-model="handle" @keydown="isHandleModified = true" />
         </div>
 

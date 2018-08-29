@@ -21,7 +21,7 @@
                      :class="{ 'active': $index === active }"
                      @click.prevent="select(item)"
                 >
-                    {{{ item.text }}}
+                    <template v-html="item.text"></template>
                     <span class="icon icon-chevron-right"></span>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="relate-items" ref="sortable">
                 <div class="item" v-for="item in selected">
                     <span class="item-remove" @click.prevent="remove(item)">&times;</span>
-                    {{{ item.text }}}
+                    <template v-html="item.text"></template>
                 </div>
             </div>
         </div>

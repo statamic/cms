@@ -19,7 +19,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <slot name="expand-collapse"></slot>
-                        <li class="warning"><a @click="delete">{{ translate('cp.delete_set') }}</a></li>
+                        <li class="warning"><a @click="destroy">{{ translate('cp.delete_set') }}</a></li>
                         <li class="divider"></li>
                         <slot name="add-sets"></slot>
                     </ul>

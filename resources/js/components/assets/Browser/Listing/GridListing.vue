@@ -15,7 +15,8 @@
         </div>
 
         <folder-tile
-            v-for="folder in subfolders"
+            v-for="(folder, i) in subfolders"
+            :key="i"
             :folder="folder"
             @selected="selectFolder"
             @editing="editFolder"
@@ -24,6 +25,7 @@
 
         <asset-tile
             v-for="asset in assets"
+            :key="asset.id"
             :asset="asset"
             :selected-assets="selectedAssets"
             @selected="selectAsset"

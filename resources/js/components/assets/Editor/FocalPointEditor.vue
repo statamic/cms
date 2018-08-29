@@ -29,7 +29,7 @@
             </div>
         </div>
         <div v-for="n in 9"
-             class="frame frame-{{ n+1 }}"
+             class="`frame frame-${n+1}`"
              :style="{ backgroundImage: 'url('+bgImage+')', backgroundPosition: bgPosition }">
         </div>
     </div>

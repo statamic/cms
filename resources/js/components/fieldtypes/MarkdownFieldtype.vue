@@ -29,7 +29,7 @@
             </ul>
         </div>
 
-        <div class="mode-wrap mode-{{ mode }}">
+        <div :class="`mode-wrap mode-${mode}`">
             <div class="markdown-writer"
                  ref="writer"
                  v-show="mode == 'write'"
@@ -81,9 +81,7 @@
 
         <modal :show.sync="showCheatsheet" class="markdown-modal">
             <template slot="header">{{ translate('cp.markdown_cheatsheet') }}</template>
-            <template slot="body">
-                {{{ translate('markdown.cheatsheet') }}}
-            </template>
+            <template slot="body" v-html="translate('markdown.cheatsheet')"></template>
         </modal>
 
     </div>

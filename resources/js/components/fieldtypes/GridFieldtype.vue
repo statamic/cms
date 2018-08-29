@@ -1,5 +1,5 @@
 <template>
-<div class="grid-field grid-mode-{{ (stacked) ? 'stacked' : 'table' }}">
+<div class="`grid-field grid-mode-${stacked ? 'stacked' : 'table'}`">
 	<table v-if="hasData && !stacked" class="grid-table bordered-table">
 		<thead>
 			<tr>
@@ -19,7 +19,7 @@
 		<tbody>
 			<tr v-for="(rowIndex, row) in data" :class="{excess: isExcessive(rowIndex)}">
 				<td v-for="field in config.fields">
-					<div class="{{ field.type }}-fieldtype">
+					<div :class="`${field.type}-fieldtype`">
 						<component :is="componentName(field.type)"
 						           :name="name + '.' + rowIndex + '.' + field.name"
 						           :data.sync="row[field.name]"

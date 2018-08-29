@@ -1,8 +1,10 @@
 <template>
 
+<div>
     <select ref="tags" multiple tabindex="0" ></select>
 
     <input type="hidden" :name="name" :value="data|json" class="form-control" />
+</div>
 
 </template>
 

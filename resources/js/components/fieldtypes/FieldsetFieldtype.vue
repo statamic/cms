@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <div class="input-group" v-else>
+            <div class="input-group" v-show="!creating">
                 <select-fieldtype :name="name" :data.sync="data" :config="selectConfig"></select-fieldtype>
 
                 <span class="input-group-btn">

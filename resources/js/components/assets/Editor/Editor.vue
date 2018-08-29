@@ -141,7 +141,7 @@
                     </div>
 
                     <div class="editor-form-actions">
-                        <button type="button" class="btn btn-danger" @click="delete" v-if="allowDeleting">
+                        <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
                             {{ translate('cp.delete') }}
                         </button>
                         <button type="button" class="btn btn-primary" @click="save">
@@ -195,7 +195,7 @@
 
 
 <script>
-import Fieldset from '../../publish/Fieldset';
+// import Fieldset from '../../publish/Fieldset';
 
 export default {
 
@@ -352,7 +352,7 @@ export default {
         /**
          * Delete the asset
          */
-        delete() {
+        destroy() {
             if (! confirm(translate('cp.are_you_sure'))) {
                 return;
             }

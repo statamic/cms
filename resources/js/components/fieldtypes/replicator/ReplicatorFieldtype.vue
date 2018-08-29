@@ -4,6 +4,7 @@
         <div class="replicator-sets">
             <replicator-set
                 v-for="(index, set) in data"
+                :key="index"
                 v-ref=set
                 :parent-name="name"
                 :data="set"

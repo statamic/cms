@@ -3,7 +3,7 @@
     	<table class="bordered-table" v-if="rowCount || columnCount">
     		<thead>
     			<tr>
-    				<th v-for="column in columnCount">
+    				<th v-for="(column, $index) in columnCount" :key="$index">
     					<span class="column-count">{{ $index + 1 }}</span>
     					<span class="icon icon-cross delete-column" @click="deleteColumn($index)"></span>
     				</th>
@@ -11,9 +11,9 @@
     			</tr>
     		</thead>
     		<tbody>
-    			<tr v-for="row in data">
-    				<td v-for="cell in row.cells" track-by="$index">
-    					<input type="text" v-model="cell" class="form-control" />
+    			<tr v-for="(row, i) in data" :key="i">
+    				<td v-for="(cell, $index) in row.cells" :key="$index">
+    					<input type="text" v-model="row[$index]" class="form-control" />
     				</td>
     				<td class="row-controls">
     					<span class="icon icon-menu move drag-handle"></span>

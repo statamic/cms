@@ -27,6 +27,7 @@
                     v-for="(i, section) in sections"
                     v-show="activeSection === section.id"
                     v-ref=sections
+                    :key="i"
                     :section.sync="section"
                     :fieldtypes="fieldtypes"
                     :is-only-section="sections.length === 1"
@@ -48,7 +49,7 @@
 
 
 <script>
-import Fieldset from '../../publish/Fieldset';
+// import Fieldset from '../../publish/Fieldset';
 import { Sortable } from '@shopify/draggable';
 import SectionsSection from './Section.vue';
 

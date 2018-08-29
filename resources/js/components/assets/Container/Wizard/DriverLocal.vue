@@ -1,17 +1,19 @@
 <template>
 
+<div>
+
     <div class="form-group">
         <label class="block">{{ translate('cp.path') }}</label>
         <small class="help-block">{{ translate('cp.asset_path_instructions') }}</small>
         <div class="input-with-loader">
-            <input type="text" class="form-control" v-model="path" @keyup="resolvePath | debounce 500" />
+            <input type="text" class="form-control" v-model="path" @keyup="resolvePath" />
             <span v-show="resolvingPath" class="icon-resolving icon icon-circular-graph animation-spin"></span>
         </div>
         <small class="help-block" v-if="showResolvedPath">
             <span>
                 {{ translate('cp.path_resolves_to', { path: resolvedPath }) }}
                 <span v-show="resolvedPathExists" class="text-success">{{ translate('cp.path_exists') }}</span>
-                <span v-else class="text-danger">{{ translate('cp.path_does_not_exist') }}</span>
+                <span v-show="!resolvedPathExists" class="text-danger">{{ translate('cp.path_does_not_exist') }}</span>
             </span>
         </small>
     </div>
@@ -20,19 +22,21 @@
         <label class="block">{{ translate('cp.url') }}</label>
         <small class="help-block">{{ translate('cp.asset_url_instructions') }}</small>
         <div class="input-with-loader">
-            <input type="text" class="form-control" v-model="url" @keyup="resolveUrl | debounce 500" />
+            <input type="text" class="form-control" v-model="url" @keyup="resolveUrl" />
             <span v-show="resolvingUrl" class="icon-resolving icon icon-circular-graph animation-spin"></span>
         </div>
         <small class="help-block" v-if="showResolvedUrl">
             {{ translate('cp.url_resolves_to', { path: resolvedUrl }) }}
             <span class="text-success" v-show="validUrl">{{ translate('cp.valid_url') }}.</span>
-            <span class="text-danger" v-else>{{ translate('cp.invalid_url') }}</span>
+            <span class="text-danger" v-show="!validUrl">{{ translate('cp.invalid_url') }}</span>
         </small>
     </div>
 
     <div class="form-group" v-if="!editing">
         <button class="btn btn-default" @click="submit" :disabled="!canContinue">{{ translate('cp.next_step') }}</button>
     </div>
+
+</div>
 
 </template>
 
@@ -116,7 +120,7 @@
 
         methods: {
 
-            resolvePath() {
+            resolvePath: _.debounce(function () {
                 this.resolvingPath = true;
 
                 this.$http.post(cp_url('assets/containers/resolve-path'), {
@@ -126,9 +130,9 @@
                     this.resolvedPath = response.path;
                     this.resolvedPathExists = response.exists;
                 });
-            },
+            }, 500),
 
-            resolveUrl() {
+            resolveUrl: _.debounce(function () {
                 this.resolvingUrl = true;
 
                 this.$http.post(cp_url('assets/containers/resolve-url'), {
@@ -137,7 +141,7 @@
                     this.resolvingUrl = false;
                     this.resolvedUrl = response.url;
                 });
-            },
+            }, 500),
 
             submit() {
                 this.$emit('submit');

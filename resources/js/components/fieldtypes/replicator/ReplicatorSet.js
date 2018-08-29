@@ -45,7 +45,7 @@ export default {
 
     methods: {
 
-        delete() {
+        destroy() {
             swal({
                 type: 'warning',
                 title: translate('cp.are_you_sure'),

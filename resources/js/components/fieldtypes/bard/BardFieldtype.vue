@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import Replicator from '../replicator/Replicator';
+import Replicator from '../replicator/Replicator.js';
 import { Draggable } from '@shopify/draggable';
 
 export default {

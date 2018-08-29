@@ -1,8 +1,8 @@
 <template>
     <ul class="list-unstyled">
-        <li v-for="option in config.options">
+        <li v-for="(option, $index) in config.options" :key="$index">
             <input type="checkbox"
-                   name="{{ name }}[]"
+                   :name="name + '[]'"
                    :id="name + '-' + $index"
                    :value="option.value"
                    v-model="data"

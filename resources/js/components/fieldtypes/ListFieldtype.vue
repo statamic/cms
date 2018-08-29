@@ -1,10 +1,10 @@
 <template>
 <ul>
-	<li v-for="item in data" track-by="$index" :class="{ editing: (editing == $index) }">
+	<li v-for="(item, $index) in data" :key="i" :class="{ editing: (editing == $index) }">
 		<span v-if="editing == $index">
 			<input
 				type="text"
-				v-model="item"
+				v-model="data[$index]"
 				class="form-control"
 				@keydown.enter="updateItem(item, $index, $event)"
 				@keyup.up="goUp"
@@ -18,7 +18,7 @@
 	</li>
 	<li>
 		<input type="text" class="form-control new-item" v-model="newItem"
-            placeholder="{{ translate('cp.add_another_item')}}..."
+            :placeholder="`${translate('cp.add_another_item')}...`"
             @keydown.enter.prevent="addItem"
             @blur="addItem"
             @keyup.up="goUp"

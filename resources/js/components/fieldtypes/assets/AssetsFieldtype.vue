@@ -81,6 +81,7 @@
 
                     <asset-tile
                         v-for="asset in assets"
+                        :key="asset.id"
                         :asset="asset"
                         @removed="assetRemoved">
                     </asset-tile>
@@ -93,6 +94,7 @@
                         <tbody ref="assets">
                             <tr is="assetRow"
                                 v-for="asset in assets"
+                                :key="asset.id"
                                 :asset="asset"
                                 @removed="assetRemoved">
                             </tr>
@@ -106,6 +108,7 @@
             <div class="asset-solo-container" v-if="expanded && soloAsset" ref="assets">
                 <asset-tile
                     v-for="asset in assets"
+                    :key="asset.id"
                     :asset="asset"
                     @removed="assetRemoved">
                 </asset-tile>

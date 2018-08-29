@@ -6,7 +6,7 @@
         </template>
 
         <template slot="body">
-            <div class="alert alert-warning">{{{ warningText | markdown }}}</div>
+            <div class="alert alert-warning" v-html="warningText | markdown"></div>
 
             <div class="alert alert-danger" v-if="errors">
                 <p v-for="error in errors">{{ error }}</p>

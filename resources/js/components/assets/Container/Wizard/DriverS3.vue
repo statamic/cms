@@ -1,5 +1,7 @@
 <template>
 
+<div>
+
     <div class="form-group">
         <label class="block">{{ translate('cp.access_key_id') }}</label>
         <input type="text" class="form-control" v-model="key" />
@@ -63,6 +65,8 @@
 
         </dl>
     </div>
+
+</div>
 
 </template>
 
