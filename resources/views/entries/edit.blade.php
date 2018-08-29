@@ -2,18 +2,40 @@
 
 @section('content')
 
-    The publish component would go here for editing an entry.
+    <entry-publish-form
+        action="{{ cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()]) }}"
+        :fieldset="{{ json_encode($tempFieldset) }}"
+        :initial-values="{{ json_encode($entry->toArray()) }}"
+        inline-template
+    >
+        <div>
+            <div class="flex mb-3">
+                <h1 class="flex-1">
+                    <a href="{{ cp_route('collections.show', $entry->collectionName())}}">
+                        {{ $entry->collection()->title() }}
+                    </a>
+                    @svg('new/chevron-right')
+                    {{ $entry->get('title') }}
+                </h1>
+                <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>
+            </div>
 
-    <hr>
+            <div class="publish-errors alert alert-danger" v-if="hasErrors">
+                @{{ error }}
+                <ul>
+                    <li v-for="(error, i) in errors" :key="i">@{{ error }}</li>
+                </ul>
+            </div>
 
-    @if ($readOnly)
-        The user cannot edit this. The publish component should be read only.
-    @else
-        This user can edit this.
-    @endif
-
-    <hr>
-
-    <pre class="card mt-4 whitespace-pre-wrap text-sm">{{ json_encode($entry->toArray(), JSON_PRETTY_PRINT) }}</pre>
+            <publish-container name="base" :fieldset="fieldset" :values="initialValues" @updated="values = $event">
+                <div slot-scope="{ }"><publish-sections /></div>
+            </publish-container>
+        </div>
+    </entry-publish-form>
 
 @endsection
+
+
+
+
+
