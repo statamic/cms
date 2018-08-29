@@ -12,18 +12,10 @@
           <a href="{{ route('statamic.cp.index') }}" class="logo">
               {!! svg('statamic-wordmark') !!}
           </a>
-          <a @click.prevent="toggleNav" class="toggle">
+          <a class="toggle">
               <span class="icon icon-menu"></span>
           </a>
       </nav>
-
-      <div class="sneak-peek-wrapper">
-            <div class="sneak-peek-viewport">
-                  <i class="icon icon-circular-graph animation-spin"></i>
-                  <div class="sneak-peek-resizer" @mousedown="sneakPeekResizeStart"></div>
-                  <div class="sneak-peek-iframe-wrap" id="sneak-peek"></div>
-            </div>
-      </div>
 
       @include('statamic::partials.alerts')
       @include('statamic::partials.global-header')
@@ -33,10 +25,6 @@
 
             <div class="content">
                   <div class="page-wrapper">
-                        <div class="sneak-peek-header flexy">
-                              <h1 class="fill">{{ trans('cp.sneak_peeking') }}</h1>
-                              <button class="btn btn-primary" @click="stopPreviewing">{{ trans('cp.done') }}</button>
-                        </div>
                         @yield('content')
                   </div>
             </div>
