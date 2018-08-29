@@ -4,12 +4,10 @@
     transition: .12s ease-out;
 
     .search-input {
+        @apply .bg-white .text-sm .w-full;
         padding-left: 5px;
         height: 32px;
-        background: #fff;
-		font-size: 14px;
         max-width: 400px;
-        width: 100%;
 		&:focus {
 			outline: 0;
 		}
