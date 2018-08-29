@@ -1,9 +1,7 @@
 <template>
 
     <div v-if="hasErrors" class="bg-red text-white p-2 rounded-md shadow mb-2">
-        <ul>
-            <li v-for="(error, i) in flattenedErrors" :key="i">{{ error }}</li>
-        </ul>
+        <p v-for="(error, i) in flattenedErrors" :key="i">{{ error }}</p>
     </div>
 
 </template>
