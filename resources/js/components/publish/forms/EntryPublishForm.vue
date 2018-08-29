@@ -1,16 +1,18 @@
 <script>
 import axios from 'axios';
+import Fieldset from '../Fieldset';
 
 export default {
 
     props: {
-        fieldset: Object,
+        initialFieldset: Object,
         initialValues: Object,
         action: String
     },
 
     data() {
         return {
+            fieldset: null,
             values: _.clone(this.initialValues),
             error: null,
             errors: {}
@@ -23,6 +25,14 @@ export default {
             return this.error || Object.keys(this.errors).length;
         }
 
+    },
+
+    created() {
+        this.fieldset = new Fieldset(this.initialFieldset)
+            .showSlug(true)
+            .prependTitle()
+            .prependMeta()
+            .getFieldset();
     },
 
     methods: {

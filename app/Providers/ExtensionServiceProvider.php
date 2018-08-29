@@ -46,8 +46,8 @@ class ExtensionServiceProvider extends ServiceProvider
         'arr', 'asset_container', 'asset_folder', 'assets', 'bard', 'checkboxes', 'collection', 'collections',
         'date', 'fields', 'fieldset', 'grid', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
-        'revealer', 'section', 'select', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_password', 'user_roles', 'video', 'yaml',
+        'revealer', 'section', 'select', 'slug', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
     ];
 
     /**

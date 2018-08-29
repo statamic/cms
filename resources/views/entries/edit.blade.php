@@ -4,8 +4,8 @@
 
     <entry-publish-form
         action="{{ cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()]) }}"
-        :fieldset="{{ json_encode($entry->fieldset()->toPublishArray()) }}"
-        :initial-values="{{ json_encode($entry->toArray()) }}"
+        :initial-fieldset="{{ json_encode($entry->fieldset()->toPublishArray()) }}"
+        :initial-values="{{ json_encode($data) }}"
         inline-template
     >
         <div>
@@ -20,7 +20,14 @@
                 <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>
             </div>
 
-            <publish-container name="base" :fieldset="fieldset" :values="initialValues" :errors="errors" @updated="values = $event">
+            <publish-container
+                v-if="fieldset"
+                name="base"
+                :fieldset="fieldset"
+                :values="initialValues"
+                :errors="errors"
+                @updated="values = $event"
+            >
                 <div slot-scope="{ }">
                     <publish-validation-errors></publish-validation-errors>
                     <publish-sections></publish-sections>

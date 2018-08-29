@@ -4,9 +4,13 @@ namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
+use Statamic\API\Collection;
+use Statamic\CP\Publish\ProcessesFields;
 
 class EntriesController extends CpController
 {
+    use ProcessesFields;
+
     public function index($collection)
     {
         // TODO: Bring over the rest of the logic.
@@ -19,9 +23,16 @@ class EntriesController extends CpController
 
         $this->authorize('view', $entry);
 
+        $fieldset = $entry->fieldset();
+        // event(new PublishFieldsetFound($fieldset, 'entry', $entry)); // TODO
+
+        $data = array_merge($this->addBlankFields($fieldset, $entry->processedData()), [
+            'slug' => $entry->slug()
+        ]);
 
         return view('statamic::entries.edit', [
             'entry' => $entry,
+            'data' => $data,
             'readOnly' => $request->user()->cant('edit', $entry)
         ]);
     }
@@ -40,6 +51,7 @@ class EntriesController extends CpController
         });
 
         $rules = $fieldsetValidationRules->merge([
+            'title' => 'required',
             'slug' => 'required',
         ]);
 
@@ -48,6 +60,7 @@ class EntriesController extends CpController
         foreach (array_only($data, array_keys($fieldsetFields)) as $key => $value) {
             $entry->set($key, $value);
         }
+        $entry->set('title', $data['title']);
         $entry->slug($data['slug']);
         $entry->save();
 

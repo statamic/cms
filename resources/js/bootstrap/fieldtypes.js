@@ -9,6 +9,7 @@ Vue.component('select-fieldtype', require('../components/fieldtypes/Select.vue')
 Vue.component('text-fieldtype', require('../components/fieldtypes/Text.vue'));
 Vue.component('textarea-fieldtype', require('../components/fieldtypes/Textarea.vue'));
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/Toggle.vue'));
+Vue.component('slug-fieldtype', require('../components/fieldtypes/Slug.vue'));
 
 // Fieldtypes
 import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue'
