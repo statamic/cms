@@ -37,7 +37,6 @@ Vue.component('shortcuts-modal', require('../components/ShortcutsModal.vue'));
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
 Vue.component('file-icon', require('../components/FileIcon.vue'));
-Vue.component('list', require('../components/list'));
 Vue.component('alert', require('../components/alert'));
 Vue.component('branch', require('../components/page-tree/Branch.vue'));
 Vue.component('branches', require('../components/page-tree/Branches.vue'));
