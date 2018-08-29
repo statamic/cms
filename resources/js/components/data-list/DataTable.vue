@@ -19,11 +19,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="row in rows">
+            <tr v-for="row in rows" :key="row.id">
                 <td class="checkbox-column" v-if="allowBulkActions">
                     <input type="checkbox" :value="row.id" v-model="sharedState.checkedIds">
                 </td>
-                <td v-for="column in sharedState.visibleColumns">
+                <td v-for="column in sharedState.visibleColumns" :key="column">
                     <slot :name="`cell-${column}`" :row="row">
                         {{ row[column] }}
                     </slot>
