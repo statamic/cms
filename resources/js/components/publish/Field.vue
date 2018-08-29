@@ -3,7 +3,7 @@
     <div :class="classes">
         <label class="block" :class="{'bold': config.bold, 'text-red': hasError}">
             <template v-if="config.display">{{ config.display }}</template>
-            <template v-if="!config.display">{{ config.name | deslugify | titleize }}</template>
+            <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
         </label>
 
