@@ -75,20 +75,9 @@ label .required {
     }
 }
 
-// select {
-//     appearance: none;
-//     -khtml-appearance: none;
-//     -webkit-appearance: none;
-//
-//     cursor: pointer;
-//     left: 0;
-//     opacity: 0;
-//     position: absolute;
-//     top: 0;
-//     width: 100%;
-//     height: 100%;
-//     z-index: 2;
-// }
+select {
+    @apply .text-xs .bg-grey-lighter .border-2 .border-grey-lighter .cursor-pointer;
+}
 
 .select {
     cursor: pointer;
