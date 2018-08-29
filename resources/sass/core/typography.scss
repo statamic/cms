@@ -41,11 +41,10 @@ h6 {
 }
 
 a {
-    color: #4e5e73;
-    cursor: pointer;
+    @apply .text-grey-dark .cursor-pointer;
+
     &:hover {
-        color: $brand-primary;
-        text-decoration: none;
+        @apply .text-blue;
     }
 }
 
