@@ -7,6 +7,7 @@
             :key="field.handle"
             :config="field"
             :value="values[field.handle]"
+            :errors="errors[field.handle]"
             @updated="updated"
         />
 
@@ -32,8 +33,16 @@ export default {
 
     computed: {
 
+        state() {
+            return this.$store.state.publish[this.storeName];
+        },
+
         values() {
-            return this.$store.state.publish[this.storeName].values;
+            return this.state.values;
+        },
+
+        errors() {
+            return this.state.errors;
         }
 
     },

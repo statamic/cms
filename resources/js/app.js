@@ -3,6 +3,7 @@ import Notifications from './mixins/Notifications.js';
 import axios from 'axios';
 import PortalVue from "portal-vue"
 import Vuex from 'vuex';
+import StatamicStore from './store';
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('#csrf-token').getAttribute('value');
@@ -33,6 +34,7 @@ var vm = new Vue({
 
     store: new Vuex.Store({
         modules: {
+            statamic: StatamicStore,
             publish: {
                 namespaced: true
             }
@@ -66,6 +68,19 @@ var vm = new Vue({
         this.$mousetrap.bind('?', function(e) {
             this.showShortcuts = true;
         }.bind(this), 'keyup');
+
+        this.bindWindowResizeListener();
+    },
+
+    methods: {
+
+        bindWindowResizeListener() {
+            window.addEventListener('resize', () => {
+                this.$store.commit('statamic/windowWidth', document.documentElement.clientWidth);
+            });
+            window.dispatchEvent(new Event('resize'));
+        }
+
     }
 
 });
