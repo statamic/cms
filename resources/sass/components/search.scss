@@ -1,10 +1,10 @@
 .global-search {
-    @apply rounded-md bg-white px-1 w-96 shadow py-0 flex items-center relative;
+    @apply rounded-md px-1 w-96 py-0 flex items-center relative;
     max-width: 400px;
     transition: .12s ease-out;
 
     .search-input {
-        @apply .bg-white .text-sm .w-full;
+        @apply .text-sm .w-full;
         padding-left: 5px;
         height: 32px;
         max-width: 400px;
@@ -13,7 +13,7 @@
 		}
     }
 
-    &:hover, &:focus-within { @apply .shadow-lg; }
+    // &:hover, &:focus-within { @apply .shadow-lg; }
 
     ul {
         @apply shadow-lg absolute p-0 w-full bg-white list-reset;

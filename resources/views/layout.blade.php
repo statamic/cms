@@ -18,7 +18,7 @@
       </nav>
 
       @include('statamic::partials.alerts')
-      @include('statamic::partials.global-header')
+      @include('statamic::partials.new-global-header')
 
       <div id="main" class="@yield('content-class')">
             @include('statamic::partials.nav-main-new')

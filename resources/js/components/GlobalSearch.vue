@@ -2,7 +2,7 @@
     <div>
         <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
             <div class="state-container w-4 h-4 text-grey-light" @click="focus">
-                <slot name="icon"></slot>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="9.813" cy="9.812" r="9.063" transform="rotate(-23.025 9.813 9.812)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.221 16.22l7.029 7.03"/></svg>
             </div>
 
             <input type="text"
