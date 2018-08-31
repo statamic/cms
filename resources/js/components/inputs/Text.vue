@@ -1,6 +1,7 @@
 <template>
     <input
         class="form-control"
+        :name="name"
         :value="value"
         :type="type"
         :disabled="disabled"
@@ -12,6 +13,7 @@
 <script>
 export default {
     props: {
+        name: {},
         disabled: { default: false },
         placeholder: { required: false },
         type: { default: "text" },
