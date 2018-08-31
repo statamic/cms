@@ -5,11 +5,6 @@ namespace Statamic\Extend;
 abstract class Filter
 {
     /**
-     * Provides access to addon helper methods
-     */
-    use Extensible;
-
-    /**
      * Provides access to methods for retrieving parameters
      */
     use HasParameters;

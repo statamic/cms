@@ -123,4 +123,29 @@ trait HasParameters
 
         return ($keys) ? explode('|', $keys) : $default;
     }
+
+    protected function getConfig($keys = null, $default = null)
+    {
+        $addon = \Statamic\API\Addon::all()->first(function ($addon) {
+            return \Statamic\API\Str::startsWith(get_class($this), $addon->namespace());
+        });
+
+        $config = config(optional($addon)->handle());
+
+        if (is_null($keys)) {
+            return $config;
+        }
+
+        if (! is_array($keys)) {
+            $keys = [$keys];
+        }
+
+        foreach ($keys as $key) {
+            if (isset($config[$key])) {
+                return $config[$key];
+            }
+        }
+
+        return $default;
+    }
 }

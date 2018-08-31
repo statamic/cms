@@ -13,11 +13,6 @@ use Statamic\Data\DataCollection;
 abstract class Tags
 {
     /**
-     * Provides access to addon helper methods
-     */
-    use Extensible;
-
-    /**
      * Provides access to methods for retrieving parameters
      */
     use HasParameters;

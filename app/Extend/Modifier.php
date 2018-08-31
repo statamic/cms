@@ -7,8 +7,4 @@ namespace Statamic\Extend;
  */
 class Modifier
 {
-    /**
-     * Provides access to addon helper methods
-     */
-    use Extensible;
 }

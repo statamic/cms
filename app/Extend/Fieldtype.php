@@ -10,13 +10,8 @@ use Statamic\API\Str;
 /**
  * Control panel fieldtype
  */
-class Fieldtype implements FieldtypeInterface
+class Fieldtype
 {
-    /**
-     * Provides access to addon helper methods
-     */
-    use Extensible;
-
     /**
      * The configuration of the field from within a fieldset
      * @var array
