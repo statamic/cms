@@ -22,7 +22,11 @@ Route::group(['prefix' => config('statamic.routes.action')], function () {
         Route::post('reset', 'UserController@reset');
         Route::post('forgot', 'UserController@forgot');
     });
+
+    Statamic::additionalActionRoutes();
 });
+
+Statamic::additionalWebRoutes();
 
 /**
  * Front-end

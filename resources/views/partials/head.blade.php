@@ -5,9 +5,11 @@
 <meta name="robots" content="noindex,nofollow">
 <title>@yield('title', $title ?? __('Here')) &#10174; Statamic</title>
 <link href="{{ cp_resource_url('css/cp.css') }}?v={{ STATAMIC_VERSION }}" rel="stylesheet" />
-@if (\Statamic\API\File::exists('site/helpers/cp/override.css'))
-    <link href="{{ resource_url('helpers/cp/override.css') }}" rel="stylesheet" />
-@endif
+
+@foreach (Statamic::availableStyles(request()) as $name => $path)
+    <link href="{{ resource_url("vendor/$name/css/$path") }}" rel="stylesheet" />
+@endforeach
+
 <link rel="icon" type="image/png" href="{{ cp_resource_url('img/favicon@2x.png') }}" sizes="32x32" />
 <link rel="icon" type="image/png" href="{{ cp_resource_url('img/favicon.png') }}" sizes="16x16" />
 <script>

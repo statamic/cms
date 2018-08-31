@@ -3,64 +3,143 @@
 namespace Statamic\Extend;
 
 use Closure;
-use Statamic\API\Helper;
+use Statamic\API\Str;
+use Statamic\Statamic;
+use Statamic\API\Addon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 abstract class ServiceProvider extends LaravelServiceProvider
 {
-    /**
-     * Provides access to addon helper methods
-     */
-    use Extensible;
+    protected $listen = [];
+    protected $subscribe = [];
+    protected $tags = [];
+    protected $fieldtypes = [];
+    protected $modifiers = [];
+    protected $commands = [];
+    protected $stylesheets = [];
+    protected $scripts = [];
+    protected $routes = [];
 
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
-
-    public function registerEventListener($class)
-    {
-        $listener = $this->app->make($class);
-
-        foreach ($listener->events as $event => $methods) {
-            foreach (Helper::ensureArray($methods) as $method) {
-                Event::listen($event, [$listener, $method]);
-            }
-        }
-    }
-
-    /**
-     * Register all different types of routes at once.
-     *
-     * @param string  $path  The path to the routes file.
-     * @return void
-     */
-    public function registerRoutes($path)
+    public function boot()
     {
         if (! $this->addonDiscovered()) {
             return;
         }
 
-        $routes = require $path;
+        $this
+            ->bootEvents()
+            ->bootTags()
+            ->bootFieldtypes()
+            ->bootModifiers()
+            ->bootCommands()
+            ->bootSchedule()
+            ->bootStylesheets()
+            ->bootScripts()
+            ->bootRoutes();
+    }
 
-        if ($web = array_get($routes, 'web')) {
+    public function bootEvents()
+    {
+        foreach ($this->listen as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                Event::listen($event, $listener);
+            }
+        }
+
+        foreach ($this->subscribe as $subscriber) {
+            Event::subscribe($subscriber);
+        }
+
+        return $this;
+    }
+
+    protected function bootTags()
+    {
+        foreach ($this->tags as $handle => $class) {
+            $this->registerTags($handle, $class);
+        }
+
+        return $this;
+    }
+
+    protected function bootFieldtypes()
+    {
+        foreach ($this->fieldtypes as $handle => $class) {
+            $this->registerFieldtype($handle, $class);
+        }
+
+        return $this;
+    }
+
+    protected function bootModifiers()
+    {
+        foreach ($this->fieldtypes as $handle => $class) {
+            $this->registerFieldtype($handle, $class);
+        }
+
+        return $this;
+    }
+
+    protected function bootCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands($this->commands);
+        }
+
+        return $this;
+    }
+
+    protected function bootSchedule()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->app->booted(function () {
+                $this->schedule($this->app->make(Schedule::class));
+            });
+        }
+
+        return $this;
+    }
+
+    protected function bootStylesheets()
+    {
+        foreach ($this->stylesheets as $path) {
+            $this->registerStylesheet($path);
+        }
+
+        return $this;
+    }
+
+    protected function bootScripts()
+    {
+        foreach ($this->scripts as $path) {
+            $this->registerScript($path);
+        }
+
+        return $this;
+    }
+
+    protected function bootRoutes()
+    {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
+        if ($web = array_get($this->routes, 'web')) {
             $this->registerWebRoutes($web);
         }
 
-        if ($cp = array_get($routes, 'cp')) {
+        if ($cp = array_get($this->routes, 'cp')) {
             $this->registerCpRoutes($cp);
         }
 
-        if ($actions = array_get($routes, 'actions')) {
+        if ($actions = array_get($this->routes, 'actions')) {
             $this->registerActionRoutes($actions);
         }
+
+        return $this;
     }
 
     /**
@@ -75,7 +154,9 @@ abstract class ServiceProvider extends LaravelServiceProvider
             return;
         }
 
-        $this->registerRouteGroup($routes);
+        Statamic::pushWebRoutes(function () use ($routes) {
+            Route::namespace($this->namespace())->group($routes);
+        });
     }
 
     /**
@@ -90,9 +171,9 @@ abstract class ServiceProvider extends LaravelServiceProvider
             return;
         }
 
-        $this->registerRouteGroup($routes, [
-            'prefix' => config('statamic.cp.route') . '/' . $this->getAddon()->slug(),
-        ]);
+        Statamic::pushCpRoutes(function () use ($routes) {
+            Route::namespace($this->namespace())->group($routes);
+        });
     }
 
     /**
@@ -107,9 +188,11 @@ abstract class ServiceProvider extends LaravelServiceProvider
             return;
         }
 
-        $this->registerRouteGroup($routes, [
-            'prefix' => config('statamic.routes.action') . '/' . $this->getAddon()->slug()
-        ]);
+        Statamic::pushActionRoutes(function () use ($routes) {
+            Route::namespace($this->namespace())
+                ->prefix($this->getAddon()->slug())
+                ->group($routes);
+        });
     }
 
     /**
@@ -127,7 +210,9 @@ abstract class ServiceProvider extends LaravelServiceProvider
             };
         }
 
-        Route::group($this->routeGroupAttributes($attributes), $routes);
+        Statamic::routes(function () use ($attributes, $routes) {
+            Route::group($this->routeGroupAttributes($attributes), $routes);
+        });
     }
 
     /**
@@ -177,6 +262,57 @@ abstract class ServiceProvider extends LaravelServiceProvider
     public function registerFieldtype(string $fieldtype, string $class)
     {
         $this->app['statamic.fieldtypes'][$fieldtype] = $class;
+    }
+
+    public function registerScript(string $path)
+    {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
+        $name = $this->getAddon()->handle();
+        $filename = pathinfo($path, PATHINFO_FILENAME);
+
+        $this->publishes([
+            $path => public_path("resources/vendor/{$name}/{$filename}.js"),
+        ]);
+
+        Statamic::script($name, $filename);
+    }
+
+    public function registerStylesheet(string $path)
+    {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
+        $name = $this->getAddon()->handle();
+        $filename = pathinfo($path, PATHINFO_FILENAME);
+
+        $this->publishes([
+            $path => public_path("resources/vendor/{$name}/{$filename}.css"),
+        ]);
+
+        Statamic::style($name, $filename);
+    }
+
+    protected function schedule($schedule)
+    {
+        //
+    }
+
+    protected function namespace()
+    {
+        return $this->getAddon()->namespace();
+    }
+
+    private function getAddon()
+    {
+        $class = get_class($this);
+
+        return Addon::all()->first(function ($addon) use ($class) {
+            return Str::startsWith($class, $addon->namespace());
+        });
     }
 
     private function addonDiscovered()

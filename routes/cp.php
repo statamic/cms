@@ -180,6 +180,8 @@ Route::group([
 
     Route::get('resolve-duplicate-ids', 'DuplicateIdController@index')->name('resolve-duplicate-ids');
     Route::post('resolve-duplicate-ids', 'DuplicateIdController@update')->name('resolve-duplicate-ids.update');
+
+    Statamic::additionalCpRoutes();
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');
