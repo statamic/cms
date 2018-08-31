@@ -1,5 +1,5 @@
 <template>
-    <input type="hidden" :name="name" v-model="data" />
+    <input type="hidden" :name="config.handle" :value="initialValue" />
 </template>
 
 <script>
