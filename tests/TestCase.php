@@ -20,6 +20,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
         return ['Statamic\Providers\StatamicServiceProvider'];
     }
 
+    protected function getPackageAliases($app)
+    {
+        return ['Statamic' => 'Statamic\Statamic'];
+    }
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
