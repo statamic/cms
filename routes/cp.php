@@ -13,6 +13,8 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group([
     'middleware' => [Authenticate::class, 'can:access cp']
 ], function () {
+    Statamic::additionalCpRoutes();
+
     Route::redirect('/', 'cp/dashboard')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
@@ -180,8 +182,6 @@ Route::group([
 
     Route::get('resolve-duplicate-ids', 'DuplicateIdController@index')->name('resolve-duplicate-ids');
     Route::post('resolve-duplicate-ids', 'DuplicateIdController@update')->name('resolve-duplicate-ids.update');
-
-    Statamic::additionalCpRoutes();
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');
