@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons;
 
+use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\Extend\Fieldtype;
 
@@ -22,7 +23,8 @@ abstract class BundleFieldtype extends Fieldtype
         // under the 'fieldtype_fields' key. In v3, the meta file has been removed in
         // favor of just returning an array from this method. For now, we'll just
         // keep the meta.yaml files and convert it to an array.
-        $contents = $this->getAddon()->getFile('meta.yaml', 'fieldtype_fields: []');
+        $dir = pathinfo((new \ReflectionClass(static::class))->getFileName(), PATHINFO_DIRNAME);
+        $contents = File::get($dir.'/meta.yaml', 'fieldtype_fields: []');
         $yaml = YAML::parse($contents);
         return ['fields' => array_get($yaml, 'fieldtype_fields', [])];
     }
