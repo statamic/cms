@@ -4,7 +4,6 @@ Vue.component('select-input', require('../components/inputs/Select.vue'));
 Vue.component('text-input', require('../components/inputs/Text.vue'));
 Vue.component('textarea-input', require('../components/inputs/Textarea.vue'));
 
-Vue.component('select-fieldtype', require('../components/fieldtypes/Select.vue'));
 Vue.component('text-fieldtype', require('../components/fieldtypes/Text.vue'));
 Vue.component('textarea-fieldtype', require('../components/fieldtypes/Textarea.vue'));
 Vue.component('slug-fieldtype', require('../components/fieldtypes/Slug.vue'));
@@ -36,7 +35,6 @@ import ReplicatorFieldtype from '../components/fieldtypes/replicator/ReplicatorF
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue'
-// import SelectFieldtype from '../components/fieldtypes/SelectFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import SuggestFieldtype from '../components/fieldtypes/SuggestFieldtype.vue'
 import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue'
@@ -79,7 +77,7 @@ Vue.component('replicator-fieldtype', ReplicatorFieldtype);
 Vue.component('revealer-fieldtype', RevealerFieldtype);
 Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', SectionFieldtype);
-// Vue.component('select-fieldtype', SelectFieldtype);
+Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue'));
 Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('suggest-fieldtype', SuggestFieldtype);
 Vue.component('table-fieldtype', TableFieldtype);

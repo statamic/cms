@@ -3,7 +3,7 @@
         <option v-text="placeholder" value="" v-if="placeholder" :selected="! value"></option>
         <option
             v-for="option in options"
-            v-text="option.label"
+            v-text="option.text"
             :value="option.value"
             :selected="option.value == value"
         ></option>

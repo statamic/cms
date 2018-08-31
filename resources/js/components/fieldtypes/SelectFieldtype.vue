@@ -1,9 +1,5 @@
 <template>
-    <div class="select select-full" :class="{ 'select--active': isActive }" :data-content="label">
-        <select ref="input" @change="change" tabindex="0" @focus="isActive = true" @blur="isActive = false">
-            <option v-for="option in selectOptions" :value="option.value" v-text="option.text"></option>
-        </select>
-    </div>
+    <select-input :value="initialValue" @input="update" :options="config.options" />
 </template>
 
 <script>
@@ -11,29 +7,6 @@
 export default {
 
     mixins: [Fieldtype],
-
-    props: {
-        disabled: { default: false },
-        options: { default: []},
-        // placeholder: { required: false },
-        value: { required: false },
-    },
-
-    data: function() {
-        return {
-            keyed: false,
-            selectOptions: [],
-            isActive: false,
-        }
-    },
-
-    mounted() {
-        if (this.options) {
-            this.selectOptions = this.options;
-        } else {
-            this.selectOptions = this.config.options;
-        }
-    },
 
     computed: {
         label: function() {
@@ -48,10 +21,6 @@ export default {
     },
 
     methods: {
-        change(event) {
-            this.$emit('input', event.target.value)
-        },
-
         focus() {
             this.$refs.input.focus();
         },
