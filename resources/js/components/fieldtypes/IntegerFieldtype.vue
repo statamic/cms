@@ -1,5 +1,11 @@
 <template>
-    <input type="number" :class="classes" v-model="data" tabindex="0" :autofocus="autofocus" />
+    <text-input
+        type="number"
+        tabindex="0"
+        :autofocus="autofocus"
+        :value="initialValue"
+        @input="update"
+    />
 </template>
 
 <script>
@@ -8,13 +14,7 @@ export default {
 
     mixins: [Fieldtype],
 
-    props: ['autofocus'],
-
-    computed: {
-        classes: function() {
-            return 'form-control';
-        }
-    },
+    props: ['autofocus']
 
 };
 </script>
