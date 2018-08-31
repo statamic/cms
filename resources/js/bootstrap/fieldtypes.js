@@ -3,12 +3,10 @@ import Vue from "vue";
 Vue.component('select-input', require('../components/inputs/Select.vue'));
 Vue.component('text-input', require('../components/inputs/Text.vue'));
 Vue.component('textarea-input', require('../components/inputs/Textarea.vue'));
-Vue.component('toggle-input', require('../components/inputs/Toggle.vue'));
 
 Vue.component('select-fieldtype', require('../components/fieldtypes/Select.vue'));
 Vue.component('text-fieldtype', require('../components/fieldtypes/Text.vue'));
 Vue.component('textarea-fieldtype', require('../components/fieldtypes/Textarea.vue'));
-Vue.component('toggle-fieldtype', require('../components/fieldtypes/Toggle.vue'));
 Vue.component('slug-fieldtype', require('../components/fieldtypes/Slug.vue'));
 
 // Fieldtypes
@@ -49,7 +47,6 @@ import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 // import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue'
-// import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue'
 import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue'
 import UserGroupsFieldtype from '../components/fieldtypes/UserGroupsFieldtype.vue'
 import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
@@ -93,7 +90,7 @@ Vue.component('template-fieldtype', TemplateFieldtype);
 // Vue.component('textarea-fieldtype', TextareaFieldtype);
 Vue.component('theme-fieldtype', ThemeFieldtype);
 Vue.component('time-fieldtype', TimeFieldtype);
-// Vue.component('toggle-fieldtype', ToggleFieldtype);
+Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue'));
 Vue.component('users-fieldtype', UsersFieldtype);
 Vue.component('user_groups-fieldtype', UserGroupsFieldtype);
 Vue.component('user_roles-fieldtype', UserRolesFieldtype);

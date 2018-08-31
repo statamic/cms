@@ -15,8 +15,8 @@ export default {
 
     data() {
         return {
-            autoBindChangeWatcher: false
-        };
+            value: this.initialValue || false
+        }
     },
 
     computed: {
@@ -29,23 +29,17 @@ export default {
                 match = false;
             }
 
-            return this.data === match;
+            return this.value === match;
         }
     },
     methods: {
-        toggle: function () {
-            this.data = !this.data;
+        toggle() {
+            this.value = !this.value;
+            this.update(this.value);
         },
         focus() {
             this.$refs.knob.focus();
         }
-    },
-    mounted() {
-        if (this.data === null) {
-            this.data = this.config.default || false;
-        }
-
-        this.bindChangeWatcher();
     }
 };
 </script>
