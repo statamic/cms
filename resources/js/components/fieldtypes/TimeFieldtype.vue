@@ -37,6 +37,24 @@ export default {
         required: Boolean
     },
 
+    data() {
+        return {
+            data: this.value
+        }
+    },
+
+    watch: {
+
+        value(value) {
+            this.data = value;
+        },
+
+        data(value) {
+            this.update(value);
+        }
+
+    },
+
     computed: {
         hour: {
             set: function(val) {

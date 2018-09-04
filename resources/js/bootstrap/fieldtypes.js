@@ -15,7 +15,6 @@ import AssetContainerFieldtype from '../components/fieldtypes/AssetContainerFiel
 import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue'
 import CollectionFieldtype from '../components/fieldtypes/CollectionFieldtype.vue'
 import CollectionsFieldtype from '../components/fieldtypes/CollectionsFieldtype.vue'
-import DateFieldtype from '../components/fieldtypes/DateFieldtype.vue'
 import GridFieldtype from '../components/fieldtypes/GridFieldtype.vue'
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import FormFieldtype from '../components/fieldtypes/FormFieldtype.vue'
@@ -37,7 +36,6 @@ import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 // import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue'
 // import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
-import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue'
 import UserGroupsFieldtype from '../components/fieldtypes/UserGroupsFieldtype.vue'
 import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue'
@@ -51,7 +49,7 @@ Vue.component('bard-fieldtype', BardFieldtype);
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue'));
 Vue.component('collection-fieldtype', CollectionFieldtype);
 Vue.component('collections-fieldtype', CollectionsFieldtype);
-Vue.component('date-fieldtype', DateFieldtype);
+Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue'));
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
 Vue.component('form-fieldtype', FormFieldtype);
 Vue.component('grid-fieldtype', GridFieldtype);
@@ -79,7 +77,7 @@ Vue.component('template-fieldtype', TemplateFieldtype);
 // Vue.component('text-fieldtype', TextFieldtype);
 // Vue.component('textarea-fieldtype', TextareaFieldtype);
 Vue.component('theme-fieldtype', ThemeFieldtype);
-Vue.component('time-fieldtype', TimeFieldtype);
+Vue.component('time-fieldtype', require('../components/fieldtypes/TimeFieldtype.vue'));
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue'));
 Vue.component('users-fieldtype', UsersFieldtype);
 Vue.component('user_groups-fieldtype', UserGroupsFieldtype);

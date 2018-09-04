@@ -8,7 +8,7 @@
     	<div v-if="hasDate" class="date-time-container">
 
     		<div class="col-date">
-    			<div class="daterange daterange--single flex" :data-datetime="date" ref="date">
+    			<div class="daterange daterange--single flex" ref="date">
                     <div class="flex items-center h-8" v-if="blankAllowed">
         				<span class="icon icon-remove" @click="removeDate" >&times;</span>
                     </div>
@@ -17,7 +17,7 @@
 
     		<div class="col-time" v-if="timeAllowed">
     			<div class="time-fieldtype">
-    				<time-fieldtype v-ref=time v-show="hasTime" :data.sync="time" :required="timeRequired"></time-fieldtype>
+    				<time-fieldtype ref="time" v-show="hasTime" :value="time" @updated="updateTime" :required="timeRequired" :config="{}" name=""></time-fieldtype>
     				<button type="button" class="btn btn-default btn-icon add-time" v-show="!hasTime" @click="addTime" tabindex="0">
     					<span class="icon icon-clock"></span>
     				</button>
@@ -38,17 +38,11 @@ export default {
 
     mixins: [Fieldtype],
 
-    props: {
-        name: String,
-        data: {},
-        config: { default: function() { return {}; } },
-    },
-
     data: function() {
         return {
+            data: null,
             calendar: null,
-            time: null,
-            autoBindChangeWatcher: false
+            time: null
         }
     },
 
@@ -84,6 +78,14 @@ export default {
         blankAllowed: function() {
             return this.config.allow_blank === true;
         }
+    },
+
+    watch: {
+
+        data(value) {
+            this.update(value);
+        }
+
     },
 
     methods: {
@@ -130,7 +132,7 @@ export default {
             this.time = moment().format('HH:mm');
 
             this.$nextTick(function() {
-                $(this.$refs.time.$els.hour).focus().select();
+                $(this.$refs.time.$refs.hour).focus().select();
             });
         },
 
@@ -175,6 +177,10 @@ export default {
 
         focus() {
             setTimeout(() => $(this.$refs.date).find('.dr-input .dr-date').click(), 200);
+        },
+
+        updateTime(time) {
+            this.time = time;
         }
 
     },
@@ -201,7 +207,6 @@ export default {
 
         this.watchTime();
         this.bindCalendar();
-        this.bindChangeWatcher();
     }
 };
 </script>
