@@ -1,3 +1,5 @@
+import marked from 'marked';
+
 global.cp_url = function(url) {
     url = Statamic.cpRoot + '/' + url;
     return url.replace(/\/+/g, '/');
@@ -55,3 +57,12 @@ global.tailwind_width_class = function (width) {
 
     return `w-${widths[width] || 'full'}`;
 }
+
+global.markdown = function (value) {
+    marked.setOptions({
+        gfm: true,
+        breaks: Statamic.markdownHardWrap,
+        tables: true
+    });
+    return marked(value);
+};

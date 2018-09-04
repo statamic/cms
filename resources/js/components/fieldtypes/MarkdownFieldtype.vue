@@ -41,6 +41,7 @@
                 <div class="editor" ref="codemirror"></div>
 
                 <div class="helpers" v-if="cheatsheet || assetsEnabled">
+                    <!-- TODO: Fix modal -->
                     <div class="markdown-cheatsheet-helper" v-if="cheatsheet">
                         <a href="" @click.prevent="showCheatsheet = true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" mask="url(#a)"/></svg>
@@ -58,7 +59,7 @@
                 </div>
             </div>
 
-            <div v-show="mode == 'preview'" v-html="data || '' | markdown" class="markdown-preview"></div>
+            <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview"></div>
         </div>
 
         <selector v-if="showAssetSelector"
@@ -70,6 +71,7 @@
                   @closed="closeAssetSelector"
         ></selector>
 
+        <!-- TODO: Bring this back.
         <uploader
             v-ref=uploader
             v-if="! showAssetSelector"
@@ -77,7 +79,7 @@
             :container="container"
             :path="folder"
             @upload-complete="uploadComplete">
-        </uploader>
+        </uploader> -->
 
         <modal :show.sync="showCheatsheet" class="markdown-modal">
             <template slot="header">{{ translate('cp.markdown_cheatsheet') }}</template>
@@ -116,6 +118,7 @@ export default {
 
     data: function() {
         return {
+            data: this.value,
             mode: 'write',
             selections: null,      // CodeMirror text selections
             showAssetSelector: false,  // Is the asset selector opened?
@@ -126,6 +129,14 @@ export default {
             fullScreenMode: false,
             codemirror: null       // The CodeMirror instance
         };
+    },
+
+    watch: {
+
+        data(data) {
+            this.update(data);
+        }
+
     },
 
     methods: {
@@ -465,6 +476,10 @@ export default {
 
         restrictAssetNavigation() {
             return this.config.restrict_assets || false;
+        },
+
+        markdownPreviewText() {
+            return markdown(this.data);
         }
     },
 
@@ -491,7 +506,7 @@ export default {
         });
 
         // Update CodeMirror if we change the value independent of CodeMirror
-        this.$watch('data', function(val) {
+        this.$watch('value', function(val) {
             if (val !== self.codemirror.doc.getValue()) {
                 self.codemirror.doc.setValue(val);
             }
