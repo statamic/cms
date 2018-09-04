@@ -1,5 +1,5 @@
 <template>
-    <select class="select-input" @change="change" :value="value">
+    <select class="select-input" :name="name" @change="change" :value="value">
         <option v-text="placeholder" value="" v-if="placeholder" :selected="! value"></option>
         <option
             v-for="option in options"
@@ -13,6 +13,7 @@
 <script>
 export default {
     props: {
+        name: {},
         disabled: { default: false },
         options: { default: []},
         placeholder: { required: false },

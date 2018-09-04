@@ -20,8 +20,9 @@
             :is="fieldtypeComponent"
             :config="config"
             :value="value"
+            :name="config.handle"
             @updated="updated"
-        />
+        /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
     </div>
 
 </template>

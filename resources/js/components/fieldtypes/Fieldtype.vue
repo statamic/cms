@@ -8,6 +8,10 @@ export default {
         config: {
             type: Object,
             required: true
+        },
+        name: {
+            type: String,
+            required: true
         }
     },
 

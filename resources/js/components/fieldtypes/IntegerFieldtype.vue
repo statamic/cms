@@ -2,6 +2,7 @@
     <text-input
         type="number"
         tabindex="0"
+        :name="name"
         :autofocus="autofocus"
         :value="value"
         @input="update"

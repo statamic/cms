@@ -1,5 +1,5 @@
 <template>
-    <input type="hidden" :name="config.handle" :value="value" />
+    <input type="hidden" :name="name" :value="value" />
 </template>
 
 <script>
