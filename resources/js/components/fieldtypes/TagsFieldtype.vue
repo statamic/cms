@@ -9,6 +9,20 @@ export default {
 
     mixins: [Fieldtype],
 
+    data() {
+        return {
+            data: this.value || []
+        }
+    },
+
+    watch: {
+
+        data(value) {
+            this.update(value);
+        }
+
+    },
+
     mounted() {
         var self = this;
 

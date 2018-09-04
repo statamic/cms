@@ -32,7 +32,6 @@ import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import SuggestFieldtype from '../components/fieldtypes/SuggestFieldtype.vue'
 import TableFieldtype from '../components/fieldtypes/TableFieldtype.vue'
-import TagsFieldtype from '../components/fieldtypes/TagsFieldtype.vue'
 import TaxonomyFieldtype from '../components/fieldtypes/TaxonomyFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 // import TextFieldtype from '../components/fieldtypes/TextFieldtype.vue'
@@ -74,7 +73,7 @@ Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldt
 Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('suggest-fieldtype', SuggestFieldtype);
 Vue.component('table-fieldtype', TableFieldtype);
-Vue.component('tags-fieldtype', TagsFieldtype);
+Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue'));
 Vue.component('taxonomy-fieldtype', TaxonomyFieldtype);
 Vue.component('template-fieldtype', TemplateFieldtype);
 // Vue.component('text-fieldtype', TextFieldtype);
