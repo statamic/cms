@@ -9,7 +9,6 @@ Vue.component('textarea-fieldtype', require('../components/fieldtypes/Textarea.v
 Vue.component('slug-fieldtype', require('../components/fieldtypes/Slug.vue'));
 
 // Fieldtypes
-import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue'
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue'
 import AssetsFolderFieldtype from '../components/fieldtypes/AssetsFolderFieldtype.vue'
 import AssetContainerFieldtype from '../components/fieldtypes/AssetContainerFieldtype.vue'
@@ -46,7 +45,7 @@ import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue'
 import UsersFieldtype from '../components/fieldtypes/UsersFieldtype.vue'
 
-Vue.component('array-fieldtype', ArrayFieldtype);
+Vue.component('array-fieldtype', require('../components/fieldtypes/ArrayFieldtype.vue'));
 Vue.component('assets-fieldtype', AssetsFieldtype);
 Vue.component('asset_container-fieldtype', AssetContainerFieldtype);
 Vue.component('asset_folder-fieldtype', AssetsFolderFieldtype);

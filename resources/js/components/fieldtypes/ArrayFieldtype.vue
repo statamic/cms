@@ -4,7 +4,7 @@
         <div class='grid-field array-keyed' v-if="componentType === 'keyed'">
             <table class="grid-table grid-mode-table headless">
                 <tbody>
-                    <tr v-if="data" v-for="key in config.keys">
+                    <tr v-if="data" v-for="(key, i) in config.keys" :key="i">
                         <th>{{ key.text }}</th>
                         <td>
                             <input type="text" class="form-control" v-model="data[key.value]" />
@@ -25,7 +25,7 @@
                         </tr>
                     </thead>
                     <tbody ref="tbody">
-                        <tr v-for="(rowIndex, row) in data">
+                        <tr v-for="(row, rowIndex) in data" :key="rowIndex">
                             <td>
                                 <input type="text" class="form-control" v-model="row.value" />
                             </td>
@@ -55,13 +55,21 @@ export default {
 
     mixins: [Fieldtype],
 
-    mounted() {
+    data() {
+        return {
+            data: null
+        }
+    },
+
+    created() {
         this.data = this.data || [];
 
         if (this.componentType === 'keyed') {
             this.data = (this.data.length === 0) ? {} : this.data;
         }
+    },
 
+    mounted() {
         if (this.componentType === 'dynamic') {
             this.initSortable();
         }
@@ -89,9 +97,21 @@ export default {
         }
     },
 
+    watch: {
+
+        data: {
+            deep: true,
+            handler(value) {
+                this.update(value);
+            }
+        }
+
+    },
+
     methods: {
         addRow: function() {
             this.data.push({ value: '', text: '' });
+            this.initSortable();
         },
 
         deleteRow: function(index) {
