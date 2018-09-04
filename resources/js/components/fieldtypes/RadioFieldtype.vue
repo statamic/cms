@@ -4,8 +4,12 @@
             'list-unstyled',
             config.inline ? 'list-inline mb-0' : ''
         ]">
-            <li v-for="option in config.options" :class="{ 'mb-0 mr-2': config.inline }">
-                <input type="radio" v-model="data" :value="option.value" :id="name + '-' + $index" />
+            <li
+                v-for="(option, $index) in config.options"
+                :key="$index"
+                :class="{ 'mb-0 mr-2': config.inline }"
+            >
+                <input type="radio" :name="name" @input="update($event.target.value)" :value="option.value" :id="name + '-' + $index" />
                 <label :for="name + '-' + $index">{{ option.text }}</label>
             </li>
         </ul>
@@ -23,8 +27,8 @@ export default {
         },
 
         getReplicatorPreviewText() {
-            var option = _.findWhere(this.config.options, {value: this.data});
-            return (option) ? option.text : this.data;
+            var option = _.findWhere(this.config.options, {value: this.value});
+            return (option) ? option.text : this.value;
         },
 
     }
