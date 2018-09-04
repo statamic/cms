@@ -15,7 +15,6 @@ import AssetContainerFieldtype from '../components/fieldtypes/AssetContainerFiel
 import BardFieldtype from '../components/fieldtypes/bard/BardFieldtype.vue'
 import CollectionFieldtype from '../components/fieldtypes/CollectionFieldtype.vue'
 import CollectionsFieldtype from '../components/fieldtypes/CollectionsFieldtype.vue'
-import GridFieldtype from '../components/fieldtypes/GridFieldtype.vue'
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import FormFieldtype from '../components/fieldtypes/FormFieldtype.vue'
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue'
@@ -50,7 +49,7 @@ Vue.component('collections-fieldtype', CollectionsFieldtype);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue'));
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
 Vue.component('form-fieldtype', FormFieldtype);
-Vue.component('grid-fieldtype', GridFieldtype);
+Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue'));
 Vue.component('hidden-fieldtype', HiddenFieldtype);
 Vue.component('integer-fieldtype', IntegerFieldtype);
 Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.vue'));
