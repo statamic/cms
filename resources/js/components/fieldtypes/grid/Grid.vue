@@ -2,30 +2,13 @@
 
     <div>
 
-        <table class="data-table w-full mb-2 border">
-            <thead>
-                <tr>
-                    <grid-header-cell
-                        v-for="field in config.fields"
-                        :key="field.handle"
-                        :field="field"
-                    />
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <grid-row
-                    v-for="(row, index) in rows"
-                    :key="`row-${index}`"
-                    :index="index"
-                    :fields="fields"
-                    :values="row"
-                    :name="name"
-                    @updated="updated"
-                    @removed="removed"
-                />
-            </tbody>
-        </table>
+        <grid-table
+            :fields="fields"
+            :rows="rows"
+            :name="name"
+            @updated="updated"
+            @removed="removed"
+        />
 
         <button @click.prevent="addRow" class="btn">Add Row</button>
 
@@ -34,17 +17,13 @@
 </template>
 
 <script>
-import GridRow from './Row.vue';
-import GridHeaderCell from './HeaderCell.vue';
+import GridTable from './Table.vue';
 
 export default {
 
     mixins: [Fieldtype],
 
-    components: {
-        GridRow,
-        GridHeaderCell,
-    },
+    components: { GridTable },
 
     data() {
         return {
