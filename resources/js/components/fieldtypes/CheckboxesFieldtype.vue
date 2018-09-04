@@ -5,8 +5,8 @@
                    :name="name + '[]'"
                    :id="name + '-' + $index"
                    :value="option.value"
-                   v-model="data"
-    		/>
+                   v-model="values"
+            />
             <label :for="name + '-' + $index">{{ option.text }}</label>
         </li>
     </ul>
@@ -19,20 +19,16 @@ export default {
 
     data() {
         return {
-            autoBindChangeWatcher: false
-        };
+            values: []
+        }
     },
 
-    mounted() {
-        if (typeof this.config === 'string') {
-            this.config = JSON.parse(this.config);
+    watch: {
+
+        values(values) {
+            this.update(values);
         }
 
-        if ( ! this.data) {
-            this.data = [];
-        }
-
-        this.bindChangeWatcher();
     },
 
     methods: {
@@ -42,7 +38,7 @@ export default {
         },
 
         getReplicatorPreviewText() {
-            return this.data.map(item => {
+            return this.values.map(item => {
                 var option = _.findWhere(this.config.options, {value: item});
                 return (option) ? option.text : item;
             }).join(', ');
