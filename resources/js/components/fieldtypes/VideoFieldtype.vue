@@ -13,7 +13,21 @@
 
 <script>
 export default {
-    props: ['data', 'config', 'name'],
+    mixins: [Fieldtype],
+
+    data() {
+        return {
+            data: this.value || ''
+        }
+    },
+
+    watch: {
+
+        data(value) {
+            this.update(value);
+        }
+
+    },
 
     computed: {
         embed() {

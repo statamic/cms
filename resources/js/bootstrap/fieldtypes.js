@@ -37,7 +37,6 @@ import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
 import UserGroupsFieldtype from '../components/fieldtypes/UserGroupsFieldtype.vue'
 import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
-import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue'
 import UsersFieldtype from '../components/fieldtypes/UsersFieldtype.vue'
 
 Vue.component('array-fieldtype', require('../components/fieldtypes/ArrayFieldtype.vue'));
@@ -81,5 +80,5 @@ Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldt
 Vue.component('users-fieldtype', UsersFieldtype);
 Vue.component('user_groups-fieldtype', UserGroupsFieldtype);
 Vue.component('user_roles-fieldtype', UserRolesFieldtype);
-Vue.component('video-fieldtype', VideoFieldtype);
+Vue.component('video-fieldtype', require('../components/fieldtypes/VideoFieldtype.vue'));
 Vue.component('yaml-fieldtype', require('../components/fieldtypes/YamlFieldtype.vue'));
