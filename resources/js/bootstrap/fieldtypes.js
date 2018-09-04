@@ -41,7 +41,6 @@ import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 // import TextareaFieldtype from '../components/fieldtypes/TextareaFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue'
-import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue'
 import UserGroupsFieldtype from '../components/fieldtypes/UserGroupsFieldtype.vue'
 import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue'
@@ -89,4 +88,4 @@ Vue.component('users-fieldtype', UsersFieldtype);
 Vue.component('user_groups-fieldtype', UserGroupsFieldtype);
 Vue.component('user_roles-fieldtype', UserRolesFieldtype);
 Vue.component('video-fieldtype', VideoFieldtype);
-Vue.component('yaml-fieldtype', YamlFieldtype);
+Vue.component('yaml-fieldtype', require('../components/fieldtypes/YamlFieldtype.vue'));

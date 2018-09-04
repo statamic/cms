@@ -15,8 +15,17 @@ export default {
 
     data() {
         return {
+            data: this.value,
             codemirror: null       // The CodeMirror instance
         }
+    },
+
+    watch: {
+
+        data(value) {
+            this.update(value);
+        }
+
     },
 
     mounted() {
