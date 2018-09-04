@@ -25,6 +25,7 @@ export default {
 
     data: function() {
         return {
+            data: this.value,
             mode: 'write'
         }
     },
@@ -32,6 +33,7 @@ export default {
     methods: {
         update: function(html) {
             this.data = html;
+            this.$emit('updated', html);
         },
 
         insertLink: function(url, text) {
@@ -153,11 +155,15 @@ export default {
 
         // Get the appropriate configuration. If the one they've requested
         // doesnt exist, we'll use the first one defined.
-        if (_.has(Statamic.redactorSettings, this.config.settings)) {
-            var config = Statamic.redactorSettings[this.config.settings];
-        } else {
-            var config = Statamic.redactorSettings[_.first(_.keys(Statamic.redactorSettings))];
-        }
+        // TODO: Get it from whatever we decide the new pattern is.
+        // if (_.has(Statamic.redactorSettings, this.config.settings)) {
+        //     var config = Statamic.redactorSettings[this.config.settings];
+        // } else {
+        //     var config = Statamic.redactorSettings[_.first(_.keys(Statamic.redactorSettings))];
+        // }
+        const config = {
+            buttons: ['formatting', 'bold', 'italic', 'link', 'unorderedlist', 'orderedlist', 'html']
+        };
 
         var settings = _.extend(defaults, config);
 

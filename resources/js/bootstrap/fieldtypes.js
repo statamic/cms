@@ -25,7 +25,6 @@ import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue'
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue'
 import LocaleSettingsFieldtype from '../components/fieldtypes/LocaleSettingsFieldtype.vue'
 import PagesFieldtype from '../components/fieldtypes/PagesFieldtype.vue'
-import RedactorFieldtype from '../components/fieldtypes/redactor/RedactorFieldtype.vue'
 import RedactorSettingsFieldtype from '../components/fieldtypes/redactor/RedactorSettingsFieldtype.vue'
 import RelateFieldtype from '../components/fieldtypes/relate/RelateFieldtype.vue'
 import ReplicatorFieldtype from '../components/fieldtypes/replicator/ReplicatorFieldtype.vue'
@@ -67,7 +66,7 @@ Vue.component('locale_settings-fieldtype', LocaleSettingsFieldtype);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue'));
 Vue.component('pages-fieldtype', PagesFieldtype);
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue'));
-Vue.component('redactor-fieldtype', RedactorFieldtype);
+Vue.component('redactor-fieldtype', require('../components/fieldtypes/redactor/RedactorFieldtype.vue'));
 Vue.component('redactor_settings-fieldtype', RedactorSettingsFieldtype);
 Vue.component('relate-fieldtype', RelateFieldtype);
 Vue.component('replicator-fieldtype', ReplicatorFieldtype);
