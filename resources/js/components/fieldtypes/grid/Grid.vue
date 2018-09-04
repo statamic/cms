@@ -10,6 +10,7 @@
                         :key="field.handle"
                         :field="field"
                     />
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -21,6 +22,7 @@
                     :values="row"
                     :name="name"
                     @updated="updated"
+                    @removed="removed"
                 />
             </tbody>
         </table>
@@ -71,6 +73,12 @@ export default {
 
         updated(index, row) {
             this.rows.splice(index, 1, row);
+        },
+
+        removed(index) {
+            if (confirm(translate('Are you sure?'))) {
+                this.rows.splice(index, 1);
+            }
         }
 
     },

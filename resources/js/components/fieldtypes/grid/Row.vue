@@ -11,6 +11,10 @@
             :grid-name="name"
             @updated="updated"
         />
+
+        <td class="row-controls">
+            <span class="icon icon-cross delete" @click="$emit('removed', index)"></span>
+        </td>
     </tr>
 
 </template>
