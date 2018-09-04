@@ -1,5 +1,5 @@
 <template>
-    <select-input :value="initialValue" @input="update" :options="config.options" />
+    <select-input :value="value" @input="update" :options="config.options" />
 </template>
 
 <script>

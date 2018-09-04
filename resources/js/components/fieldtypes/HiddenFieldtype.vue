@@ -1,5 +1,5 @@
 <template>
-    <input type="hidden" :name="config.handle" :value="initialValue" />
+    <input type="hidden" :name="config.handle" :value="value" />
 </template>
 
 <script>

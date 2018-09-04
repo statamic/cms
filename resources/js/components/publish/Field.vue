@@ -19,7 +19,7 @@
         <component
             :is="fieldtypeComponent"
             :config="config"
-            :initial-value="value"
+            :value="value"
             @updated="updated"
         />
     </div>

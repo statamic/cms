@@ -3,7 +3,7 @@
         type="number"
         tabindex="0"
         :autofocus="autofocus"
-        :value="initialValue"
+        :value="value"
         @input="update"
     />
 </template>

@@ -15,7 +15,7 @@ export default {
 
     data() {
         return {
-            value: this.initialValue || false
+            state: this.value || false
         }
     },
 
@@ -29,13 +29,13 @@ export default {
                 match = false;
             }
 
-            return this.value === match;
+            return this.state === match;
         }
     },
     methods: {
         toggle() {
-            this.value = !this.value;
-            this.update(this.value);
+            this.state = !this.state;
+            this.update(this.state);
         },
         focus() {
             this.$refs.knob.focus();

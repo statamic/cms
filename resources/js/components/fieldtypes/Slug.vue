@@ -3,7 +3,7 @@
     <text-fieldtype
         class="font-mono text-xs"
         :config="config"
-        :initial-value="initialValue"
+        :value="value"
         @updated="update" />
 
 </template>

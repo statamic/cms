@@ -2,7 +2,7 @@
 export default {
 
     props: {
-        initialValue: {
+        value: {
             required: true
         },
         config: {

@@ -1,5 +1,5 @@
 <template>
-    <textarea-input :value="initialValue" @input="update" />
+    <textarea-input :value="value" @input="update" />
 </template>
 
 <script>
