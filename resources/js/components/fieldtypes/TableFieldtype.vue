@@ -11,13 +11,13 @@
     			</tr>
     		</thead>
     		<tbody>
-    			<tr v-for="(row, i) in data" :key="i">
-    				<td v-for="(cell, $index) in row.cells" :key="$index">
-    					<input type="text" v-model="row[$index]" class="form-control" />
+    			<tr v-for="(row, rowIndex) in data" :key="rowIndex">
+    				<td v-for="(cell, cellIndex) in row.cells" :key="cellIndex">
+    					<input type="text" v-model="row['cells'][cellIndex]" class="form-control" />
     				</td>
     				<td class="row-controls">
     					<span class="icon icon-menu move drag-handle"></span>
-    					<span class="icon icon-cross delete" v-on:click="deleteRow($index)"></span>
+    					<span class="icon icon-cross delete" v-on:click="deleteRow(cellIndex)"></span>
     				</td>
     			</tr>
     		</tbody>
@@ -42,9 +42,9 @@ export default {
 
     data: function () {
         return {
+            data: JSON.parse(JSON.stringify(this.value || [])),
             max_rows: this.config.max_rows || null,
             max_columns: this.config.max_columns || null,
-            autoBindChangeWatcher: false,
             sortableInitialized: false
         }
     },
@@ -191,24 +191,24 @@ export default {
     },
 
     mounted() {
-        if ( ! this.data) {
-            this.data = [];
-        }
-
-        this.bindChangeWatcher();
         this.sortable();
     },
 
     watch: {
 
-        data(data) {
-            this.$nextTick(() => {
-                if (this.data.length) {
-                    this.sortable();
-                } else {
-                    this.destroySortable();
-                }
-            });
+        data: {
+            deep: true,
+            handler (data) {
+                this.update(data);
+
+                this.$nextTick(() => {
+                    if (this.data.length) {
+                        this.sortable();
+                    } else {
+                        this.destroySortable();
+                    }
+                });
+            }
         }
 
     }
