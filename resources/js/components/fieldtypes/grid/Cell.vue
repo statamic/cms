@@ -1,6 +1,6 @@
 <template>
 
-    <td>
+    <td class="border">
         <component
             :is="fieldtypeComponent"
             :config="field"
@@ -21,6 +21,10 @@ export default {
             required: true
         },
         value: {
+            required: true
+        },
+        index: {
+            type: Number,
             required: true
         },
         rowIndex: {

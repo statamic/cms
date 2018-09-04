@@ -13,7 +13,7 @@ class FieldsFieldtype extends Fieldtype
         $processed = [];
 
         foreach ($data as $field_name => $field_config) {
-            $field_config['name'] = $field_name;
+            $field_config['handle'] = $field_name;
             $processed[] = $this->recursivelyPreProcess($field_config);
         }
 

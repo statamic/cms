@@ -2,10 +2,11 @@
 
     <tr>
         <grid-cell
-            v-for="field in fields"
+            v-for="(field, i) in fields"
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"
+            :index="i"
             :row-index="index"
             :grid-name="name"
             @updated="updated"
