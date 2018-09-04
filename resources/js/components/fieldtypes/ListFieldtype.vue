@@ -1,6 +1,6 @@
 <template>
 <ul>
-	<li v-for="(item, $index) in data" :key="i" :class="{ editing: (editing == $index) }">
+	<li v-for="(item, $index) in data" :key="$index" :class="{ editing: (editing == $index) }">
 		<span v-if="editing == $index">
 			<input
 				type="text"
@@ -13,7 +13,7 @@
 		</span>
 		<span v-if="editing != $index" @dblclick="editItem($index, $event)">
 		    {{ item }}
-			<i class="delete" @click="deleteItem(item)"></i>
+			<i class="delete" @click="deleteItem($index)"></i>
 		</span>
 	</li>
 	<li>
@@ -34,10 +34,18 @@ export default {
 
     data: function () {
         return {
+            data: this.value || [],
             newItem: '',
             editing: null,
-            autoBindChangeWatcher: false
         }
+    },
+
+    watch: {
+
+        data(value) {
+            this.update(value);
+        }
+
     },
 
     methods: {
@@ -102,8 +110,8 @@ export default {
 
         },
 
-        deleteItem: function(item) {
-            this.data.$remove(item);
+        deleteItem: function(i) {
+            this.data.splice(i, 1);
         },
 
         getReplicatorPreviewText() {
@@ -114,13 +122,6 @@ export default {
     mounted() {
         var self = this,
             start = '';
-
-        if ( ! this.data) {
-            this.data = [];
-        }
-
-        this.bindChangeWatcher();
-
         $(this.$el).sortable({
             axis: "y",
             revert: 175,

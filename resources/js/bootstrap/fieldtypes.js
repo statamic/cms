@@ -21,7 +21,6 @@ import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import FormFieldtype from '../components/fieldtypes/FormFieldtype.vue'
 import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue'
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue'
-import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue'
 import LocaleSettingsFieldtype from '../components/fieldtypes/LocaleSettingsFieldtype.vue'
 import PagesFieldtype from '../components/fieldtypes/PagesFieldtype.vue'
 import RedactorSettingsFieldtype from '../components/fieldtypes/redactor/RedactorSettingsFieldtype.vue'
@@ -59,7 +58,7 @@ Vue.component('form-fieldtype', FormFieldtype);
 Vue.component('grid-fieldtype', GridFieldtype);
 Vue.component('hidden-fieldtype', HiddenFieldtype);
 Vue.component('integer-fieldtype', IntegerFieldtype);
-Vue.component('list-fieldtype', ListFieldtype);
+Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.vue'));
 Vue.component('locale_settings-fieldtype', LocaleSettingsFieldtype);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue'));
 Vue.component('pages-fieldtype', PagesFieldtype);
