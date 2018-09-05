@@ -85,62 +85,43 @@ label .required {
     }
 }
 
-.select {
-    cursor: pointer;
-    display: inline-block;
-    max-width: 300px;
-    max-height: 32px;
-    padding-right: 32px;
+.select-input-container {
     position: relative;
-    width: 100%;
-    white-space: nowrap;
 
-    &:after {
-        content: "";
-        display: block;
-        height: 9px;
-        right: 0;
-        position: absolute;
-        top: 12px;
-        width: 20px;
-        z-index: 0;
-
-        @include background('../img/select.png', 20px 9px, transparent, right center);
+    select {
+        @apply block appearance-none bg-white cursor-pointer w-full h-full pr-4 relative w-full shadow-button;
+        @include button(#fff, $color_gray_dark);
     }
 
-    &:before {
-        content: attr(data-content);
-        display: inline-block;
-        text-overflow: ellipsis;
-        width: 80%;
-    }
-
-    &.select-full {
-        max-width: 100%;
-        width: 100%;
-    }
-
-    span.status {
-        border-radius: 7px;
-        display: inline-block;
-        float: left;
-        height: 7px;
-        margin-right: 10px;
-        position: relative;
-        top: 6px;
-        width: 7px;
-    }
-
-    span.status-draft {
-        background: $color_gray_light;
-    }
-    span.status-hidden {
-        border: solid 1px $color_gray_light;
-    }
-    span.status-live {
-        background: $color_green;
+    .select-input-toggle {
+        @apply pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker;
+        svg {
+            @apply fill-current h-4 w-4;
+        }
     }
 }
+
+    // span.status {
+    //     border-radius: 7px;
+    //     display: inline-block;
+    //     float: left;
+    //     height: 7px;
+    //     margin-right: 10px;
+    //     position: relative;
+    //     top: 6px;
+    //     width: 7px;
+    // }
+    //
+    // span.status-draft {
+    //     background: $color_gray_light;
+    // }
+    // span.status-hidden {
+    //     border: solid 1px $color_gray_light;
+    // }
+    // span.status-live {
+    //     background: $color_green;
+    // }
+// }
 
 input[type="file"] {
     padding: 16px;

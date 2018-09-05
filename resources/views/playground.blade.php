@@ -18,7 +18,7 @@
         </div>
         <div class="mb-2 flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <select class="ml-1 input-select" name="" id="">
+            <select class="ml-1" name="" id="">
                 <option value="">Oh hai Mark</option>
             </select>
         </div>
@@ -26,10 +26,15 @@
             <textarea name="" class="input-text" placeholder="v3 style"></textarea>
         </div>
         <div class="mb-2">
-            <select class="select" name="" id="">
-                <option value="">Oh hai Mark</option>
-                <option value="">I did not do it i did not</option>
-            </select>
+            <div class="select-input-container w-64">
+                <select class="select-input">
+                    <option value="">Oh hai Mark</option>
+                    <option value="">I did not do it i did not</option>
+                </select>
+                <div class="select-input-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                 </div>
+            </div>
         </div>
     </div>
 
