@@ -13,7 +13,7 @@ class ReplicatorSetsFieldtype extends Fieldtype
         $processed = [];
 
         foreach ($data as $set_name => $set_config) {
-            $set_config['name'] = $set_name;
+            $set_config['handle'] = $set_name;
             $set_config['id'] = $set_name; // Used by Vue so the name can be modified freely and not lose track.
             $set_config['fields'] = $this->moveInNameKey(array_get($set_config, 'fields', []));
             $processed[] = $set_config;
@@ -27,7 +27,7 @@ class ReplicatorSetsFieldtype extends Fieldtype
         $processed = [];
 
         foreach ($fields as $name => $config) {
-            $config['name'] = $name;
+            $config['handle'] = $name;
             $processed[] = $this->recursivelyPreProcess($config);
         }
 
@@ -66,8 +66,8 @@ class ReplicatorSetsFieldtype extends Fieldtype
         $processed = [];
 
         foreach ($data as $set) {
-            $set_name = $set['name'];
-            unset($set['name']);
+            $set_name = $set['handle'];
+            unset($set['handle']);
             $set['fields'] = $this->moveOutNameKey($set['fields']);
             // Method is called cleanField but the logic applies to the sets too.
             // We want to get rid of the Vue stuff like ids, isNew, isMeta, etc.
@@ -82,9 +82,9 @@ class ReplicatorSetsFieldtype extends Fieldtype
         $processed = [];
 
         foreach ($fields as $field) {
-            $name = $field['name'];
-            unset($field['name']);
-            $processed[$name] = $this->recursivelyProcess($field);
+            $handle = $field['handle'];
+            unset($field['handle']);
+            $processed[$handle] = $this->recursivelyProcess($field);
         }
 
         return $processed;

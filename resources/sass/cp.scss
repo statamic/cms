@@ -84,4 +84,9 @@
 @import "components/fieldtypes/revealer";
 @import "components/fieldtypes/bard";
 
+// Shame
+.help-block {
+    p { @apply mb-1 }
+}
+
 @tailwind utilities;
