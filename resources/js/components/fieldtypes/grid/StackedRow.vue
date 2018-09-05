@@ -11,14 +11,16 @@
             {{ index }}
             <span class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
         </div>
-        <publish-field
-            v-for="field in fields"
-            :key="field.handle"
-            :config="field"
-            :value="values[field.handle]"
-            class="p-2"
-            @updated="updated"
-        />
+        <div class="publish-fields">
+            <publish-field
+                v-for="field in fields"
+                :key="field.handle"
+                :config="field"
+                :value="values[field.handle]"
+                class="p-2"
+                @updated="updated"
+            />
+        </div>
     </div>
 
 </template>
