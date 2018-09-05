@@ -2,7 +2,7 @@
 
     <div
         class="bg-grey-lightest shadow mb-2 rounded border"
-        :class="{ 'opacity-50': isExcessive }"
+        :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div
             class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between"

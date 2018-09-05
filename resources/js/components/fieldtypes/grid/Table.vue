@@ -14,21 +14,20 @@
         <sortable-list
             v-model="sortableRows"
             :vertical="true"
+            :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
         >
-            <tbody slot-scope="{ items: rows }">
-                <sortable-item
+            <tbody slot-scope="{}">
+                <grid-row
                     v-for="(row, index) in rows"
-                    :key="`row-${row._id}`">
-                    <grid-row
-                        :index="index"
-                        :fields="fields"
-                        :values="row"
-                        :name="name"
-                        @updated="(row, value) => $emit('updated', row, value)"
-                        @removed="(row) => $emit('removed', row)"
-                    />
-                </sortable-item>
+                    :key="`row-${row._id}`"
+                    :index="index"
+                    :fields="fields"
+                    :values="row"
+                    :name="name"
+                    @updated="(row, value) => $emit('updated', row, value)"
+                    @removed="(row) => $emit('removed', row)"
+                />
             </tbody>
         </sortable-list>
     </table>

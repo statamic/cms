@@ -1,6 +1,6 @@
 <template>
 
-    <tr :class="{ 'opacity-50': isExcessive }">
+    <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
         <grid-cell
             v-for="(field, i) in fields"
             :key="field.handle"
@@ -28,14 +28,10 @@
 
 <script>
 import GridCell from './Cell.vue';
-import { SortableHandle } from '../../sortable/Sortable';
 
 export default {
 
-    components: {
-        GridCell,
-        SortableHandle
-    },
+    components: { GridCell },
 
     props: {
         index: {
@@ -56,7 +52,7 @@ export default {
         }
     },
 
-    inject: ['gridConfig'],
+    inject: ['gridConfig', 'sortableItemClass', 'sortableHandleClass'],
 
     computed: {
 
@@ -64,10 +60,6 @@ export default {
             const max = this.gridConfig.max_rows;
             if (! max) return false;
             return this.index >= max;
-        },
-
-        sortableHandleClass() {
-            return `${this.name}-drag-handle`;
         }
 
     },
