@@ -13,6 +13,7 @@
         />
 
         <td class="row-controls">
+            <span class="icon icon-menu move cursor-move" :class="sortableHandleClass"></span>
             <span class="icon icon-cross delete" @click="$emit('removed', index)"></span>
         </td>
     </tr>
@@ -21,10 +22,14 @@
 
 <script>
 import GridCell from './Cell.vue';
+import { SortableHandle } from '../../sortable/Sortable';
 
 export default {
 
-    components: { GridCell },
+    components: {
+        GridCell,
+        SortableHandle
+    },
 
     props: {
         index: {
@@ -43,6 +48,14 @@ export default {
             type: String,
             required: true
         }
+    },
+
+    computed: {
+
+        sortableHandleClass() {
+            return `${this.name}-drag-handle`;
+        }
+
     },
 
     methods: {

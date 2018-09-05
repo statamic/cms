@@ -41,7 +41,8 @@ class EntriesController extends CpController
     {
         $entry = Entry::findBySlug($slug, $collection);
 
-        $fieldsetFields = $entry->fieldset()->inlinedFields();
+        $fieldset = $entry->fieldset();
+        $fieldsetFields = $fieldset->inlinedFields();
         $fields = array_keys($fieldsetFields);
         $extra = ['slug'];
         $validatable = array_merge($fields, $extra);
@@ -57,7 +58,10 @@ class EntriesController extends CpController
 
         $data = $request->validate($rules->all());
 
-        foreach (array_only($data, array_keys($fieldsetFields)) as $key => $value) {
+        $fieldsetData = array_only($data, array_keys($fieldsetFields));
+        $fieldsetData = $this->processFields($fieldset, $fieldsetData);
+
+        foreach ($fieldsetData as $key => $value) {
             $entry->set($key, $value);
         }
         $entry->set('title', $data['title']);

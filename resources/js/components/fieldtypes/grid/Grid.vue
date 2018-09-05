@@ -2,12 +2,14 @@
 
     <div>
 
-        <grid-table
+        <component
+            :is="component"
             :fields="fields"
             :rows="rows"
             :name="name"
             @updated="updated"
             @removed="removed"
+            @sorted="sorted"
         />
 
         <button @click.prevent="addRow" class="btn">Add Row</button>
@@ -17,26 +19,43 @@
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import GridTable from './Table.vue';
+import GridStacked from './Stacked.vue';
 
 export default {
 
     mixins: [Fieldtype],
 
-    components: { GridTable },
+    components: {
+        GridTable,
+        GridStacked
+    },
 
     data() {
         return {
-            rows: _.clone(this.value || [])
+            rows: null
         }
     },
 
     computed: {
 
+        component() {
+            return this.config.mode === 'stacked' ? 'GridStacked' : 'GridTable';
+        },
+
         fields() {
             return this.config.fields;
         }
 
+    },
+
+    created() {
+        // Rows should be cloned so we don't unintentionally modify the prop.
+        let rows = _.clone(this.value || []);
+
+        // Assign each row a unique id that Vue can use as a v-for key.
+        this.rows = rows.map(row => Object.assign(row, { _id: uniqid() }));
     },
 
     methods: {
@@ -46,6 +65,8 @@ export default {
                 .indexBy('handle')
                 .mapObject(field => null)
                 .value();
+
+            row._id = uniqid(); // Assign a unique id that Vue can use as a v-for key.
 
             this.rows.push(row);
         },
@@ -58,6 +79,10 @@ export default {
             if (confirm(translate('Are you sure?'))) {
                 this.rows.splice(index, 1);
             }
+        },
+
+        sorted(rows) {
+            this.rows = rows;
         }
 
     },

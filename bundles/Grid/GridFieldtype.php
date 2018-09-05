@@ -56,6 +56,8 @@ class GridFieldtype extends Fieldtype
     {
         $processed = [];
 
+        unset($row_data['_id']);
+
         foreach ($row_data as $field => $value) {
             $field_config = Helper::ensureArray($this->getFieldConfig('fields.'.$field));
 

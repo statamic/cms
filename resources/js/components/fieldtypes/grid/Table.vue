@@ -11,39 +11,45 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
-            <grid-row
-                v-for="(row, index) in rows"
-                :key="`row-${index}`"
-                :index="index"
-                :fields="fields"
-                :values="row"
-                :name="name"
-                @updated="(row, value) => $emit('updated', row, value)"
-                @removed="(row) => $emit('removed', row)"
-            />
-        </tbody>
+        <sortable-list
+            v-model="sortableRows"
+            :vertical="true"
+            :handle-class="sortableHandleClass"
+        >
+            <tbody slot-scope="{ items: rows }">
+                <sortable-item
+                    v-for="(row, index) in rows"
+                    :key="`row-${row._id}`">
+                    <grid-row
+                        :index="index"
+                        :fields="fields"
+                        :values="row"
+                        :name="name"
+                        @updated="(row, value) => $emit('updated', row, value)"
+                        @removed="(row) => $emit('removed', row)"
+                    />
+                </sortable-item>
+            </tbody>
+        </sortable-list>
     </table>
 
 </template>
 
 <script>
+import View from './View.vue';
 import GridRow from './Row.vue';
 import GridHeaderCell from './HeaderCell.vue';
+import { SortableList, SortableItem } from '../../sortable/Sortable';
 
 export default {
+
+    mixins: [View],
 
     components: {
         GridRow,
         GridHeaderCell,
-    },
-
-    props: ['fields', 'rows', 'name'],
-
-    methods: {
-        updated(v, a) {
-            console.log(v, a);
-        }
+        SortableList,
+        SortableItem
     }
 
 }
