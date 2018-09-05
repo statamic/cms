@@ -20,7 +20,7 @@
 
 </template>
 
-<style>
+<style scoped>
     .draggable-mirror {
         position: relative;
         z-index: 1000;

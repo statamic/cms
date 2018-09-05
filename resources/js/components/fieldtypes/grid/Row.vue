@@ -20,6 +20,12 @@
 
 </template>
 
+<style scoped>
+    .draggable-mirror {
+        display: none;
+    }
+</style>
+
 <script>
 import GridCell from './Cell.vue';
 import { SortableHandle } from '../../sortable/Sortable';
