@@ -45,10 +45,7 @@
         "laravel": {
             "providers": [
                 "Statamic\\Providers\\StatamicServiceProvider"
-            ],
-            "aliases": {
-                "Statamic": "Statamic\\Statamic"
-            }
+            ]
         }
     }
 }
