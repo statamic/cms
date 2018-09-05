@@ -2,10 +2,11 @@
 
     <div class="bg-grey-lightest shadow mb-2 rounded border">
         <div
-            class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm"
+            class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between"
             :class="sortableHandleClass"
         >
             {{ index }}
+            <span class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
         </div>
         <publish-field
             v-for="field in fields"
