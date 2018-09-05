@@ -5,49 +5,34 @@
         <h1>{{ __('The Statamic Playground') }}</h1>
     </div>
 
-    <div class="card p-0 mb-5">
-        <div class="py-1.5 pr-2 flex items-center">
-            <div class="flex flex-1 items-center">
-                <div class="w-10 pl-2">
-                    <input type="checkbox">
-                </div>
-                <input type="text" class="text-sm py-1 outline-none flex-1" placeholder="Search...">
-            </div>
-            <button class="btn btn-with-icon antialiased">
-                @svg('new/filter-1') Filter
-            </button>
+    <h2 class="mb-1">
+        Form Inputs
+    </h2>
+
+    <div class="shadow bg-white p-4 rounded-lg mb-6">
+        <div class="mb-2">
+            <input type="text" placeholder="unstyled">
         </div>
-        <table class="w-full text-left text-grey">
-            <thead class="bg-grey-lightest border-t text-grey-darker uppercase text-xxs tracking-wide">
-                <th class="w-10"></th>
-                <th class="font-medium pr-1 py-1.5">Title</th>
-                <th class="font-medium px-1 py-1.5">Author</th>
-                <th class="font-medium px-1 py-1.5">Slug</th>
-                <th class="font-medium px-1 py-1.5">Date</th>
-                <th></th>
-            </thead>
-            <tbody>
-                <tr class="border-t text-sm group hover:bg-grey-lightest ease-quick" v-for="n in 10">
-                    <td class="p-1.5 opacity-0 group-hover:opacity-100 ease-quick"><input type="checkbox"></td>
-                    <td class="pr-2 py-1">
-                        <div class="flex items-center">
-                            <span class="bullet bg-green mr-1"></span>
-                            <a href="" class="text-grey-darker text-md hover:text-blue">Another Day in Paradise</a>
-                        </div>
-                    </td>
-                    <td class="p-1">
-                        <a class="flex items-center text-grey-darker hover:text-blue">
-                            <img src="https://www.biography.com/.image/ar_1:1%2Cc_fill%2Ccs_srgb%2Cg_face%2Cq_auto:good%2Cw_300/MTIwNjA4NjM0MDQyNzQ2Mzgw/hulk-hogan-9542305-1-402.jpg" class="h-6 w-6 rounded-full mr-1">
-                            <span>Hulk Hogan</span>
-                        </a>
-                    </td>
-                    <td class="p-1">another-day-in-paradise</td>
-                    <td class="p-1">2018/04/14 14:25</td>
-                    <td class="p-1 w-8"><a class="text-grey p-1 flex items-center fill-current hover:text-black">@svg('new/navigation-menu-horizontal')</a></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="mb-2">
+            <input type="text" class="form-control" placeholder="v2 style">
+        </div>
+        <div class="mb-2 flex">
+            <input type="text" class="input-text" placeholder="v3 style">
+            <select class="ml-1 input-select" name="" id="">
+                <option value="">Oh hai Mark</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <textarea name="" class="input-text" placeholder="v3 style"></textarea>
+        </div>
+        <div class="mb-2">
+            <select class="select" name="" id="">
+                <option value="">Oh hai Mark</option>
+                <option value="">I did not do it i did not</option>
+            </select>
+        </div>
     </div>
+
 
     <h2 class="mb-1">Typography</h2>
     <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-6">
@@ -116,7 +101,7 @@
             <div class="card px-3">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-bold text-grey">New Users</h3>
-                    <select name="" id="">
+                    <select class="text-xs" name="" id="">
                         <option value="">30 Days</option>
                     </select>
                 </div>
@@ -131,7 +116,7 @@
             <div class="card px-3">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-bold text-grey">Form Submissions</h3>
-                    <select name="" id="">
+                    <select class="text-xs" name="" id="">
                         <option value="">7 Days</option>
                     </select>
                 </div>
@@ -146,7 +131,7 @@
             <div class="card bg-grey-darker px-3">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-bold text-grey-light">New Users</h3>
-                    <select name="" id="" class="bg-grey-dark border-grey-dark text-grey-light">
+                    <select class="text-xs" name="" id="" class="bg-grey-dark border-grey-dark text-grey-light">
                         <option value="">30 Days</option>
                     </select>
                 </div>

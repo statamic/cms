@@ -1,23 +1,27 @@
 var defaultConfig = require('tailwindcss/defaultConfig')
 
 var colors = {
-    'transparent':   'transparent',
-    'black':         '#000000',
-    'grey-darkest':  'hsla(210, 20%, 10%, 1)',
-    'grey-darker':   'hsla(210, 15%, 20%, 1)',
-    'grey-dark':     'hsla(210, 10%, 30%, 1)',
-    'grey':          'hsla(210, 10%, 50%, 1)',
-    'grey-light':    'hsla(210, 20%, 70%, 1)',
-    'grey-lighter':  'hsla(210, 40%, 95%, 1)',
-    'grey-lightest': 'hsla(210, 40%, 98%, 1)',
-    'green':         '#479967',
-    'blue':          'hsla(200, 80%, 50%, 1)',
-    'red':           '#E75650',
-    'yellow':        '#fbfab0',
-    'yellow-dark':   '#d8cd1b',
-    'white':         '#ffffff',
-    'pink':          '#ff269e',
-    'purple':        '#c471ed',
+    'transparent':      'transparent',
+    'black':            '#000000',
+    'grey-darkest':     'hsla(210, 20%, 10%, 1)', // grey-darken-3
+    'grey-darker':      'hsla(210, 15%, 20%, 1)', // grey-darken-2
+    'grey-dark':        'hsla(210, 10%, 30%, 1)', // grey-darken-1
+    'grey':             'hsla(210, 10%, 50%, 1)', // grey
+    'grey-light':       'hsla(210, 15%, 70%, 1)', // lighten-1
+    'grey-lighten-2':   'hsla(210, 15%, 80%, 1)', // lighten-2
+    'grey-lighten-3':   'hsla(210, 15%, 86%, 1)', // lighten-3
+    'grey-lighter':     'hsla(210, 30%, 95%, 1)', // lighten-4
+    'grey-lightest':    'hsla(210, 40%, 98%, 1)', // lighten-5
+    'grey-lighten-6':   'hsla(210, 40%, 99%, 1)', // lighten-6
+    'green':            '#479967',
+    'blue-light':       'hsla(210, 100%, 75%, 1)',
+    'blue':             'hsla(200, 80%, 50%, 1)',
+    'red':              '#E75650',
+    'yellow':           '#fbfab0',
+    'yellow-dark':      '#d8cd1b',
+    'white':            '#ffffff',
+    'pink':             '#ff269e',
+    'purple':           '#c471ed',
 }
 
 var units = {
@@ -230,7 +234,7 @@ module.exports = {
     |
     */
 
-    borderColors: Object.assign({ default: colors['grey-light'] }, colors),
+    borderColors: Object.assign({ default: colors['grey-lighten-3'] }, colors),
 
 
 
@@ -446,7 +450,7 @@ module.exports = {
         'sm': '1px 2px 4px 0 rgba(0,0,0,.03)',
         default: '0 0 0 0.5px rgba(49,49,93,.03), 0 2px 5px 0 rgba(49,49,93,.1), 0 1px 2px 0 rgba(0,0,0,.08)',
         'lg': '0 7px 14px 0 rgba(50,50,93,.1), 0 2px 8px 0 rgba(0,0,0,.075)',
-        'inner': 'inset 0px 1px 1px 0px rgba(0,0,0,.1)',
+        'inner': 'inset 0px 1px 1px 0px rgba(0,0,0,.05)',
         'none':  'none',
     },
 

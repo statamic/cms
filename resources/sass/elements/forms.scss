@@ -2,27 +2,44 @@
    BASIC FORM FIELDS
    ========================================================================== */
 
+// TODO: Figure out where this is used. What even is it?
 form {
-    ul,li {
+    ul, li {
         list-style: none;
         padding: 3px 0;
     }
 }
 
 fieldset {
-    margin-bottom: 16px;
+
 }
 
 label {
-    font-weight: normal;
-    color: #333;
-    font-size: 14px;
-    display: block;
-    line-height: 1;
+    @apply .text-grey-dark .font-normal .text-sm .block .leading-normal;
 }
 
 input[type="checkbox"] {
     font-size: 18px;
+}
+
+select {
+    @apply .text-base .bg-grey-lighter .border-2 .border-grey-lighter .cursor-pointer;
+}
+
+
+.input-text {
+    @apply appearance-none bg-grey-lighten-6 w-full border p-1 rounded shadow-inner;
+    transition: border-color .15s ease-in-out,
+                box-shadow .15s ease-in-out;
+    &:focus {
+        @apply border-blue-light;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
+    }
+}
+
+.input-select {
+
 }
 
 .form-group.tight {
@@ -43,13 +60,6 @@ input[type="checkbox"] {
         font-size: 12px;
         color: $color_red;
     }
-
-    // &[type="text"],
-    // &[type="search"],
-    // &[type="email"],
-    // &[type="number"] {
-    //     height: 32px;
-    // }
 
     &.alt {
         background: $color_search_alt;
@@ -73,10 +83,6 @@ label .required {
     + .localizable-icon {
         margin-left: 5px;
     }
-}
-
-select {
-    @apply .text-xs .bg-grey-lighter .border-2 .border-grey-lighter .cursor-pointer;
 }
 
 .select {

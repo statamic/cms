@@ -10,14 +10,9 @@ body {
     @apply .w-full .bg-grey-lighter;
 }
 
-*, *::before, *::after {
-    border-width: 0;
-    border-style: solid;
-    border-color: $color_border;
-}
-
 a {
     text-decoration: none;
+    cursor: pointer;
 }
 
 // svg sprite
