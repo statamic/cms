@@ -118,7 +118,7 @@ export default {
 
     data: function() {
         return {
-            data: this.value,
+            data: this.value || '',
             mode: 'write',
             selections: null,      // CodeMirror text selections
             showAssetSelector: false,  // Is the asset selector opened?
@@ -487,7 +487,7 @@ export default {
         var self = this;
 
         self.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: self.data || '',
+            value: self.data,
             mode: 'gfm',
             dragDrop: false,
             lineWrapping: true,
