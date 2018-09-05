@@ -7,8 +7,8 @@
             <i class="required" v-if="config.required">*</i>
         </label>
 
-        <small
-            class="help-block"
+        <div
+            class="help-block -mt-1"
             v-if="config.instructions"
             v-html="$options.filters.markdown(config.instructions)" />
 
