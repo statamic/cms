@@ -1,6 +1,5 @@
 <?php
 
-use Statamic\Statamic;
 use Statamic\Http\Middleware\CP\Authenticate;
 use Statamic\Http\Middleware\CP\Configurable;
 

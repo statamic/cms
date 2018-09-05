@@ -1,7 +1,5 @@
 <?php
 
-use Statamic\Statamic;
-
 /**
  * Glide
  * On-the-fly URL-based image transforms.
