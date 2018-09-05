@@ -2,6 +2,10 @@
 
     <div>
 
+        <small v-if="hasExcessRows" class="help-block text-red">
+            Only {{ maxRows }} rows are allowed.
+        </small>
+
         <component
             :is="component"
             :fields="fields"
@@ -12,7 +16,11 @@
             @sorted="sorted"
         />
 
-        <button @click.prevent="addRow" class="btn">Add Row</button>
+        <button
+            class="btn"
+            v-if="canAddRows"
+            v-text="translate('Add Row')"
+            @click.prevent="addRow" />
 
     </div>
 
@@ -46,8 +54,31 @@ export default {
 
         fields() {
             return this.config.fields;
+        },
+
+        maxRows() {
+            return this.config.max_rows || Infinity;
+        },
+
+        canAddRows() {
+            return this.rows.length < this.maxRows;
+        },
+
+        hasMaxRows() {
+            return this.maxRows != null;
+        },
+
+        hasExcessRows() {
+            if (! this.hasMaxRows) return false;
+            return (this.rows.length - this.maxRows) > 0;
         }
 
+    },
+
+    provide() {
+        return {
+            gridConfig: this.config
+        }
     },
 
     created() {

@@ -1,6 +1,6 @@
 <template>
 
-    <tr>
+    <tr :class="{ 'opacity-50': isExcessive }">
         <grid-cell
             v-for="(field, i) in fields"
             :key="field.handle"
@@ -56,7 +56,15 @@ export default {
         }
     },
 
+    inject: ['gridConfig'],
+
     computed: {
+
+        isExcessive() {
+            const max = this.gridConfig.max_rows;
+            if (! max) return false;
+            return this.index >= max;
+        },
 
         sortableHandleClass() {
             return `${this.name}-drag-handle`;
