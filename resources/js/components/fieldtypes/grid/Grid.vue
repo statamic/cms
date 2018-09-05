@@ -56,6 +56,11 @@ export default {
 
         // Assign each row a unique id that Vue can use as a v-for key.
         this.rows = rows.map(row => Object.assign(row, { _id: uniqid() }));
+
+        if (this.config.min_rows) {
+            const rowsToAdd = this.config.min_rows - this.rows.length;
+            for (var i = 1; i <= rowsToAdd; i++) this.addRow();
+        }
     },
 
     methods: {
