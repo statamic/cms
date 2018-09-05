@@ -47,7 +47,7 @@ class ReplicatorFieldtype extends Fieldtype
         $processed = [];
 
         if ($this->process === 'process') {
-            unset($set_data['#hidden']);
+            unset($set_data['#hidden'], $set_data['_id']);
         }
 
         foreach ($set_data as $field => $value) {

@@ -2,14 +2,26 @@
 
     <div class="replicator">
 
-        <replicator-set
-            v-for="(set, index) in values"
-            :key="`set-${index}`"
-            :index="index"
-            :values="set"
-            :config="setConfig(set.type)"
-            @updated="updated"
-        />
+        <sortable-list
+            v-model="values"
+            :vertical="true"
+            :item-class="sortableItemClass"
+            :handle-class="sortableHandleClass"
+        >
+            <div slot-scope="{}">
+                <replicator-set
+                    v-for="(set, index) in values"
+                    :key="`set-${set._id}`"
+                    :index="index"
+                    :values="set"
+                    :config="setConfig(set.type)"
+                    :sortable-item-class="sortableItemClass"
+                    :sortable-handle-class="sortableHandleClass"
+                    @updated="updated"
+                    @removed="removed"
+                />
+            </div>
+        </sortable-list>
 
         <div class="set-buttons">
             <button
@@ -27,17 +39,22 @@
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import ReplicatorSet from './Set.vue';
+import { SortableList } from '../../sortable/Sortable';
 
 export default {
 
     mixins: [Fieldtype],
 
-    components: { ReplicatorSet },
+    components: {
+        ReplicatorSet,
+        SortableList
+    },
 
     data() {
         return {
-            values: _.clone(this.value || []),
+            values: null
         }
     },
 
@@ -45,8 +62,24 @@ export default {
 
         setConfigs() {
             return this.config.sets;
+        },
+
+        sortableItemClass() {
+            return `${this.name}-sortable-item`;
+        },
+
+        sortableHandleClass() {
+            return `${this.name}-sortable-handle`;
         }
 
+    },
+
+    created() {
+        // Values should be cloned so we don't unintentionally modify the prop.
+        let values = _.clone(this.value || []);
+
+        // Assign each set a unique id that Vue can use as a v-for key.
+        this.values = values.map(set => Object.assign(set, { _id: uniqid() }));
     },
 
     methods: {
@@ -57,6 +90,12 @@ export default {
 
         updated(index, set) {
             this.values.splice(index, 1, set);
+        },
+
+        removed(index) {
+            if (confirm(translate('Are you sure?'))) {
+                this.values.splice(index, 1);
+            }
         },
 
         addSet(handle, index) {

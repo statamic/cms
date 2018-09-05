@@ -1,8 +1,8 @@
 <template>
 
-    <div class="bg-grey-lightest shadow mb-2 rounded border">
+    <div :class="sortableItemClass" class="bg-grey-lightest shadow mb-2 rounded border">
 
-        <div class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between">
+        <div :class="sortableHandleClass" class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between">
             <div class="pt-1">
                 <label class="mb-1" v-text="config.display" />
                 <div
@@ -12,10 +12,6 @@
             </div>
             <div>
                 <dropdown-list>
-                    <li><a @click.prevent="">Collapse All</a></li>
-                    <li><a @click.prevent="">Expand All</a></li>
-                    <li class="divider"></li>
-                    <li><a @click.prevent="">Inline insert for each set here</a></li>
                     <li class="warning"><a @click.prevent="$emit('removed', index)">Delete Set</a></li>
                 </dropdown-list>
             </div>
@@ -34,6 +30,16 @@
     </div>
 
 </template>
+
+<style scoped>
+    .draggable-mirror {
+        position: relative;
+        z-index: 1000;
+    }
+    .draggable-source--is-dragging {
+        opacity: 0.5;
+    }
+</style>
 
 <script>
 import SetField from './Field.vue';
@@ -54,6 +60,12 @@ export default {
         values: {
             type: Object,
             required: true
+        },
+        sortableItemClass: {
+            type: String
+        },
+        sortableHandleClass: {
+            type: String
         }
     },
 
