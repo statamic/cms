@@ -40,6 +40,7 @@ export default {
             let options = Object.assign({}, {
                 draggable: `.${this.itemClass}`,
                 handle: `.${this.handleClass}`,
+                delay: 200,
                 mirror: {
                     constrainDimensions: true,
                 },
