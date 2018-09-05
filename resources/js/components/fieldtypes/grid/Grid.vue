@@ -49,6 +49,7 @@ export default {
     computed: {
 
         component() {
+            // TODO: Should become stacked at <600px
             return this.config.mode === 'stacked' ? 'GridStacked' : 'GridTable';
         },
 
@@ -119,6 +120,14 @@ export default {
 
         sorted(rows) {
             this.rows = rows;
+        },
+
+        getReplicatorPreviewText() {
+            // TODO
+        },
+
+        focus() {
+            // TODO
         }
 
     },
