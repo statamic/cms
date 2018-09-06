@@ -15,6 +15,7 @@
                     :index="index"
                     :values="set"
                     :config="setConfig(set.type)"
+                    :parent-name="name"
                     :sortable-item-class="sortableItemClass"
                     :sortable-handle-class="sortableHandleClass"
                     @updated="updated"
@@ -76,7 +77,7 @@ export default {
 
     created() {
         // Values should be cloned so we don't unintentionally modify the prop.
-        let values = _.clone(this.value || []);
+        let values = JSON.parse(JSON.stringify(this.value || []));
 
         // Assign each set a unique id that Vue can use as a v-for key.
         this.values = values.map(set => Object.assign(set, { _id: uniqid() }));
@@ -85,7 +86,7 @@ export default {
     methods: {
 
         setConfig(handle) {
-            return _.find(this.setConfigs, { handle });
+            return _.find(this.setConfigs, { handle }) || {};
         },
 
         updated(index, set) {
@@ -115,12 +116,18 @@ export default {
             this.values.splice(index, 0, newSet);
         },
 
+        collapseAll() { },
+        expandAll() { },
+
     },
 
     watch: {
 
-        values(values) {
-            this.$emit('updated', values);
+        values: {
+            deep: true,
+            handler(values) {
+                this.$emit('updated', values);
+            }
         }
 
     }

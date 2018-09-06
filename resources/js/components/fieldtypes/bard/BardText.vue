@@ -9,9 +9,9 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li v-for="set in $parent.config.sets">
-                        <a @click.prevent="insertSet(set.name)">
+                        <a @click.prevent="insertSet(set.handle)">
                             <i class="icon icon-add-to-list"></i>
-                            {{ set.display || set.name }}
+                            {{ set.display || set.handle }}
                         </a>
                     </li>
                     <li v-if="isBlank">
@@ -69,7 +69,7 @@
 
         mixins: [InsertsAssets],
 
-        props: ['data', 'index', 'showSource'],
+        props: ['values', 'index', 'showSource'],
 
         data() {
             return {
@@ -78,7 +78,7 @@
                 optionsTopPosition: 0,
                 focusedElement: null,
                 dropped: { sibling: null, position: null },
-                text: this.data.text || ''
+                text: this.values.text || ''
             };
         },
 
@@ -119,11 +119,12 @@
             },
 
             text(text) {
-                this.$emit('text-updated', this.index, text);
-                this.$dispatch('changesMade', true);
+                let set = JSON.parse(JSON.stringify(this.values));
+                set.text = text;
+                this.$emit('updated', this.index, set);
             },
 
-            'data.text': function (text, oldText) {
+            'values.text': function (text, oldText) {
                 // Prevent an update when typing directly in the field.
                 if (text === this.text) return;
 

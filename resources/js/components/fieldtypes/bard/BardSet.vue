@@ -4,52 +4,49 @@
 
         <slot name="divider-start"></slot>
 
-        <div class="list-group">
-            <div class="list-group-item group-header pl-3 bard-drag-handle" :class="{'collapsed': isHidden}" @dblclick="toggle" v-if="! goingSolo">
-                <div class="flexy">
-                    <div class="fill">
-                        <div class="flexy baseline">
-                            <label @click="toggle" class="cursor-pointer m-0">{{ display }}</label>
-                            <div v-if="isHidden">
-                                <small class="replicator-set-summary fill" v-html="collapsedPreview"></small>
-                            </div>
-                        </div>
-                        <small class="help-block" v-if="instructions && !isHidden" v-html="instructions | markdown"></small>
-                    </div>
-                    <div class="btn-group icon-group action-more">
-                        <button type="button" class="btn-more dropdown-toggle"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="icon icon-dots-three-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <slot name="expand-collapse"></slot>
-                            <li class="warning"><a @click="destroy">{{ translate('cp.delete_set') }}</a></li>
-                        </ul>
-                    </div>
+        <div
+            :class="{
+                'collapsed': isHidden,
+                'bg-white shadow mb-2 rounded border': !goingSolo
+            }"
+            @dblclick="toggle"
+        >
+            <div
+                v-if="!goingSolo"
+                class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between"
+            >
+                <div class="pt-1">
+                    <label class="mb-1 leading-none" v-text="display" />
+                    <div
+                        v-if="config.instructions"
+                        v-html="instructions"
+                        class="help-block -mt-1" />
+                </div>
+                <div>
+                    <dropdown-list>
+                        <li class="warning"><a @click.prevent="destroy">Delete Set</a></li>
+                    </dropdown-list>
                 </div>
             </div>
 
-            <div v-show="!isHidden || goingSolo" :class="{'list-group-item p-0': ! goingSolo}" v-if="config.fields.length">
+            <div
+                v-show="!isHidden || goingSolo"
+                v-if="fields.length"
+            >
                 <div class="publish-fields">
-                    <div v-for="field in config.fields" :class="fieldClasses(field)">
-                        <div :class="{'bard-drag-handle': goingSolo}">
-                            <label v-if="hasMultipleFields" class="block" :class="{'bold': field.bold}">
-                                <template v-if="field.display">{{ field.display }}</template>
-                                <template v-if="!field.display">{{ field.name | capitalize }}</template>
-                                <i class="required" v-if="field.required">*</i>
-                            </label>
-
-                            <small class="help-block" v-if="field.instructions" v-html="field.instructions | markdown"></small>
-                        </div>
-
-                        <component :is="componentName(field.type)"
-                                :name="parentName + '.' + index + '.' + field.name"
-                                :data.sync="data[field.name]"
-                                :config="field">
-                        </component>
-                    </div>
+                    <set-field
+                        v-for="field in fields"
+                        :key="field.handle"
+                        :field="field"
+                        :value="values[field.handle]"
+                        :parent-name="parentName"
+                        :set-index="index"
+                        :class="{ 'bard-drag-handle': goingSolo }"
+                        @updated="updated"
+                    />
                 </div>
             </div>
+
         </div>
 
         <slot name="divider-end"></slot>
@@ -59,7 +56,7 @@
 </template>
 
 <script>
-import ReplicatorSet from '../replicator/ReplicatorSet';
+import ReplicatorSet from '../replicator/Set.vue';
 
 export default {
 
@@ -68,7 +65,7 @@ export default {
     methods: {
         focusAt(position) {
             this.focus();
-        }
+        },
     },
 
     computed: {

@@ -31,6 +31,14 @@ export default {
         },
         value: {
             required: true
+        },
+        parentName: {
+            type: String,
+            required: true
+        },
+        setIndex: {
+            type: Number,
+            required: true
         }
     },
 
@@ -42,7 +50,7 @@ export default {
         },
 
         name() {
-            return 'todo';
+            return `${this.parentName}[${this.setIndex}][${this.field.handle}]`;
         },
 
         display() {

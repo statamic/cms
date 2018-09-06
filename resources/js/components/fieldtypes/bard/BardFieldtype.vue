@@ -4,21 +4,21 @@
         <div class="bard-blocks" v-if="isReady" ref="blocks">
             <component
                 :is="block.type === 'text' ? 'BardText' : 'BardSet'"
-                v-for="(index, block) in data"
-                v-ref=set
+                v-for="(block, index) in values"
+                ref="set"
                 :class="{ 'divider-at-start': canShowDividerAtStart(index), 'divider-at-end': canShowDividerAtEnd(index) }"
-                :key="index"
-                :data="block"
+                :key="block._id"
+                :values="block"
                 :index="index"
                 :parent-name="name"
                 :config="setConfig(block.type)"
                 :show-source="showSource"
                 @set-inserted="setInserted"
-                @deleted="deleteSet"
+                @removed="removed"
                 @source-toggled="toggleSource"
                 @arrow-up-at-start="goToPreviousTextField"
                 @arrow-down-at-end="goToNextTextField"
-                @text-updated="updateText"
+                @updated="updated"
             >
                 <template slot="divider-start">
                     <div v-show="canShowDividerAtStart(index)" class="bard-divider bard-divider-start" @click="addTextBlock(index-1)"></div>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import Replicator from '../replicator/Replicator.js';
+import Replicator from '../replicator/Replicator.vue';
 import { Draggable } from '@shopify/draggable';
 
 export default {
@@ -58,7 +58,8 @@ export default {
     computed: {
 
         textBlocks() {
-            return this.$refs.set.filter(set => set.data.type === 'text');
+            if (!this.isReady) return;
+            return this.$refs.set.filter(set => set.values.type === 'text');
         },
 
         allowSource() {
@@ -69,7 +70,7 @@ export default {
 
     },
 
-    data: function() {
+    data() {
         return {
             isReady: false,
             setBeingDragged: null,
@@ -77,34 +78,33 @@ export default {
             hasSets: this.config.sets !== undefined,
             showSource: false,
             fullScreenMode: false,
-            autoBindChangeWatcher: false,
-            changeWatcherWatchDeep: false,
             previousScrollPosition: null
         };
     },
 
-    mounted() {
-        if (! this.data) {
-            this.data = [{type: 'text', text: '<p><br></p>'}];
-        }
-
+    created() {
         this.combineConsecutiveTextBlocks();
+    },
 
+    mounted() {
         this.isReady = true;
-
         this.$nextTick(() => {
             this.draggable();
             if (this.accordionMode) this.collapseAll();
-            this.bindChangeWatcher();
         });
     },
 
     watch: {
 
-        data(data) {
-            if (data.length === 0) {
-                this.data = [{type: 'text', text: '<p><br></p>'}];
-                this.$nextTick(() => this.getBlock(0).focus());
+        values: {
+            deep: true,
+            handler(values) {
+                if (values.length === 0) {
+                    values = [{type: 'text', text: '<p><br></p>'}];
+                    this.$nextTick(() => this.getBlock(0).focus());
+                }
+
+                this.values = values;
             }
         }
 
@@ -115,7 +115,7 @@ export default {
         addTextBlock(index, text) {
             text = text || '<p><br></p>';
             index = index + 1;
-            this.data.splice(index, 0, { type: 'text', text });
+            this.values.splice(index, 0, { type: 'text', text });
             this.$nextTick(() => {
                 const block = this.getBlock(index);
                 if (text) {
@@ -132,14 +132,16 @@ export default {
             // Get nulls for all the set's fields so Vue can track them more reliably.
             var set = this.setConfig(type);
             _.each(set.fields, function(field) {
-                newSet[field.name] = field.default || Statamic.fieldtypeDefaults[field.type] || null;
+                newSet[field.handle] = field.default
+                // || Statamic.fieldtypeDefaults[field.type] // TODO
+                || null;
             });
 
             if (index === undefined) {
-                index = this.data.length;
+                index = this.values.length;
             }
 
-            this.data.splice(index, 0, newSet);
+            this.values.splice(index, 0, newSet);
 
             this.$nextTick(() => this.getBlock(index).focus());
         },
@@ -150,10 +152,12 @@ export default {
             // Get nulls for all the set's fields so Vue can track them more reliably.
             var set = this.setConfig(type);
             _.each(set.fields, function(field) {
-                newSet[field.name] = field.default || Statamic.fieldtypeDefaults[field.type] || null;
+                newSet[field.handle] = field.default
+                // || Statamic.fieldtypeDefaults[field.type] // TODO
+                || null;
             });
 
-            this.data.splice(index, 1, newSet);
+            this.values.splice(index, 1, newSet);
 
             this.$nextTick(() => this.getBlock(index).focus());
         },
@@ -168,7 +172,7 @@ export default {
                 return set.text !== '';
             });
 
-            this.data.splice(index, 1, ...newItems);
+            this.values.splice(index, 1, ...newItems);
         },
 
         getBlankSet(type) {
@@ -177,14 +181,18 @@ export default {
             // Get nulls for all the set's fields so Vue can track them more reliably.
             var set = this.setConfig(type);
             _.each(set.fields, function(field) {
-                newSet[field.name] = field.default || Statamic.fieldtypeDefaults[field.type] || null;
+                newSet[field.handle] = field.default
+                // || Statamic.fieldtypeDefaults[field.type] // TODO
+                || null;
             });
 
             return newSet;
         },
 
         getBlock(index) {
-            return this.$refs.set[index];
+            const blocks = this.$refs.set;
+            if (!blocks) return;
+            return blocks[index];
         },
 
         /**
@@ -200,11 +208,17 @@ export default {
          * We don't want the UI to get clogged with multiple empty blocks.
          */
         canShowDividerAtEnd(index) {
-            if (index === this.data.length - 1) {
+            if (!this.isReady) return false;
+
+            if (index === this.values.length - 1) {
                 return true;
             }
 
-            return this.getBlock(index + 1).data.type !== 'text';
+            // If the blocks haven't been rendered yet,
+            const block = this.getBlock(index + 1);
+            if (! block) return false;
+
+            return block.values.type !== 'text';
         },
 
         draggable() {
@@ -277,7 +291,7 @@ export default {
         },
 
         moveSet(block) {
-            if (block.data.type === 'text') {
+            if (block.values.type === 'text') {
                 return this.moveSetIntoText(block);
             }
 
@@ -290,7 +304,7 @@ export default {
                 end = 0;
             }
 
-            this.data.splice(end, 0, this.data.splice(start, 1)[0]);
+            this.values.splice(end, 0, this.values.splice(start, 1)[0]);
 
             this.combineConsecutiveTextBlocks();
         },
@@ -301,9 +315,9 @@ export default {
             const [before, after] = block.getBeforeAndAfterHtml();
             const beforeSet = { type: 'text', text: before };
             const afterSet = { type: 'text', text: after };
-            const set = this.data[this.setBeingDragged];
+            const set = this.values[this.setBeingDragged];
 
-            this.data.splice(this.setBeingDragged, 1);
+            this.values.splice(this.setBeingDragged, 1);
 
             let newItems = [beforeSet, set, afterSet].filter(set => {
                 if (set.type !== 'text') return true;
@@ -311,7 +325,7 @@ export default {
             });
 
             const index = this.getInsertIndex(this.setBeingDragged, block.index);
-            this.data.splice(index, 1, ...newItems);
+            this.values.splice(index, 1, ...newItems);
 
             this.setBeingDragged = null;
 
@@ -334,7 +348,7 @@ export default {
             let data = [];
             let previousBlockWasText = false
 
-            this.data.forEach((block, i) => {
+            this.values.forEach((block, i) => {
                 if (block.type !== 'text') {
                     data.push(block)
                     previousBlockWasText = false;
@@ -350,7 +364,7 @@ export default {
                 data[data.length-1].text += block.text;
             });
 
-            this.data = data;
+            this.values = data;
         },
 
         toggleSource() {
@@ -362,11 +376,11 @@ export default {
             this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
-        deleteSet(index) {
+        removed(index) {
             const block = this.getBlock(index - 1);
-            const focus = (block && block.data.type === 'text') ? block.plainText().length : null;
+            const focus = (block && block.values.type === 'text') ? block.plainText().length : null;
 
-            this.data.splice(index, 1);
+            this.values.splice(index, 1);
             this.combineConsecutiveTextBlocks();
 
             if (block) {
@@ -380,7 +394,7 @@ export default {
             while (index > 0) {
                 index--;
                 const block = this.getBlock(index);
-                if (block.data.type === 'text') {
+                if (block.values.type === 'text') {
                     setTimeout(() => { block.focusAt('end') }, 10);
                     return;
                 }
@@ -395,20 +409,20 @@ export default {
             while (index < totalBlocks) {
                 index++;
                 const block = this.getBlock(index);
-                if (block.data.type === 'text') {
+                if (block.values.type === 'text') {
                     setTimeout(() => { block.focusAt('start') }, 10);
                     return;
                 }
             }
         },
 
-        updateText(i, text) {
-            this.data[i].text = text;
+        updated(index, set) {
+            this.values.splice(index, 1, set);
         },
 
         getReplicatorPreviewText() {
             return _.map(this.$refs.set, (set) => {
-                return (set.data.type === 'text') ? set.plainText() : set.getCollapsedPreview();
+                return (set.values.type === 'text') ? set.plainText() : set.getCollapsedPreview();
             }).join(', ');
         },
     }
