@@ -187,7 +187,12 @@ class AssetContainer implements AssetContainerContract
      */
     public function editUrl()
     {
-        return cp_route('assets.container.edit', $this->id());
+        return cp_route('asset-containers.edit', $this->id());
+    }
+
+    public function deleteUrl()
+    {
+        return cp_route('asset-containers.destroy', $this->id());
     }
 
     /**

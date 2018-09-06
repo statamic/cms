@@ -23,6 +23,7 @@ Vue.component('data-table', require('../components/data-list/DataTable.vue'));
 // Resource Type Lists
 Vue.component('entry-list', require('../components/data-list/EntryList.vue'));
 Vue.component('collection-list', require('../components/data-list/CollectionList.vue'));
+Vue.component('asset-container-list', require('../components/data-list/AssetContainerList.vue'));
 
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));

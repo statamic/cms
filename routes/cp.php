@@ -26,6 +26,8 @@ Route::group([
     Route::resource('collections', 'CollectionsController');
     Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
 
+    Route::resource('asset-containers', 'AssetContainersController');
+
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', 'PagesController@pages')->name('pages');
         Route::post('/', 'PagesController@save')->name('pages.post');
@@ -60,15 +62,6 @@ Route::group([
 
     Route::group(['prefix' => 'assets'], function () {
         Route::get('/', 'AssetsController@index')->name('assets');
-
-        Route::group(['prefix' => 'containers'], function () {
-            Route::delete('delete', 'AssetContainersController@delete')->name('assets.containers.delete');
-            Route::get('get', 'AssetContainersController@get')->name('assets.containers.get');
-            Route::post('resolve-path', 'AssetContainersController@getResolvedPath');
-            Route::post('resolve-url', 'AssetContainersController@getResolvedUrl');
-            Route::post('validate-s3', 'AssetContainersController@validateS3Credentials');
-            Route::get('{container}/folders', 'AssetContainersController@folders')->name('assets.containers.folders');
-        });
 
         Route::group(['prefix' => 'folders'], function () {
             Route::post('/', 'AssetFoldersController@store')->name('assets.folder.store');
