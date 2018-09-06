@@ -22,7 +22,6 @@ import RedactorSettingsFieldtype from '../components/fieldtypes/redactor/Redacto
 import RelateFieldtype from '../components/fieldtypes/relate/RelateFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
-import SectionFieldtype from '../components/fieldtypes/SectionFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import SuggestFieldtype from '../components/fieldtypes/SuggestFieldtype.vue'
 import TaxonomyFieldtype from '../components/fieldtypes/TaxonomyFieldtype.vue'
@@ -57,7 +56,7 @@ Vue.component('relate-fieldtype', RelateFieldtype);
 Vue.component('replicator-fieldtype', require('../components/fieldtypes/replicator/Replicator.vue'));
 Vue.component('revealer-fieldtype', RevealerFieldtype);
 Vue.component('routes-fieldtype', RoutesFieldtype);
-Vue.component('section-fieldtype', SectionFieldtype);
+Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue'));
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue'));
 Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('suggest-fieldtype', SuggestFieldtype);

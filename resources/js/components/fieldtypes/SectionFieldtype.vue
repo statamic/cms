@@ -1,5 +1,8 @@
 <script>
 export default {
-    props: ['name', 'data', 'config']
+    mixins: [Fieldtype],
+    render() {
+        return '';
+    }
 };
 </script>
