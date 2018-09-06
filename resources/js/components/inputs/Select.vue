@@ -1,9 +1,10 @@
 <template>
     <div class="select-input-container">
         <select class="select-input" :name="name" @change="change" :value="value">
-            <option v-text="placeholder" value="" v-if="placeholder" :selected="! value"></option>
+            <option v-text="placeholder" value="" :selected="! value"></option>
             <option
                 v-for="option in options"
+                :key="option.value"
                 v-text="option.text"
                 :value="option.value"
                 :selected="option.value == value"
@@ -23,7 +24,10 @@ export default {
         name: {},
         disabled: { default: false },
         options: { default: []},
-        placeholder: { required: false },
+        placeholder: {
+            required: false,
+            default: 'Please select...'
+        },
         value: { required: true },
     },
     methods: {
