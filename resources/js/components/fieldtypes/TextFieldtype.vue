@@ -1,5 +1,5 @@
 <template>
-    <input :type="mode" :class="classes" v-model="data" tabindex="0" :autofocus="autofocus" :placeholder="config.placeholder" />
+    <input :type="mode" :name="name" :class="classes" v-model="data" tabindex="0" :autofocus="autofocus" :placeholder="config.placeholder" />
 </template>
 
 <script>
