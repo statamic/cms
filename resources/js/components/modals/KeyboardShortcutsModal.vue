@@ -1,7 +1,9 @@
 <template>
-    <modal-dialog :show="show" @close="dismiss">
-        <h1 slot="header">{{ translate('cp.keyboard_shortcuts') }}</h1>
-        <slot>
+    <modal name="keyboard-shortcuts" width="380">
+        <h1 class="p-2 bg-grey-lightest border-b text-center">
+            {{ translate('cp.keyboard_shortcuts') }}
+        </h1>
+        <div class="p-4 relative">
             <div class="shortcut-pair">
                 <span class="shortcut-key">
                     <span class="shortcut">shift</span><span class="shortcut-joiner">+</span><span class="shortcut">?</span>
@@ -24,31 +26,22 @@
                 <span class="shortcut-value">{{ translate('cp.publish_content') }}</span>
             </div>
 
-            <div class="shortcut-pair">
+            <div class="shortcut-pair mb-0">
                 <span class="shortcut-key">
                     <span class="shortcut">Esc</span>
                 </span>
                 <span class="shortcut-value">{{ translate('cp.close_this_window') }}</span>
             </div>
-
-        </slot>
-
-        <template slot="footer"></template>
-    </modal-dialog>
+        </div>
+    </modal>
 </template>
 
 <script>
-import ModalDialog from "./ModalDialog.vue"
-
 export default {
-    components: {
-        ModalDialog
-    },
-    props: ["show"],
-    methods: {
-        dismiss() {
-            this.$emit("close")
-        }
+    mounted() {
+        this.$mousetrap.bind('?', function(e) {
+            this.$modal.show('keyboard-shortcuts')
+        }.bind(this), 'keyup');
     }
 }
 </script>

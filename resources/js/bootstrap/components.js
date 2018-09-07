@@ -40,6 +40,9 @@ Vue.component('branches', require('../components/page-tree/Branches.vue'));
 // Vue.component('fieldset-field', require('../components/fieldset-builder/Sections/Field.vue'));
 Vue.component('fieldtype-selector', require('../components/fieldset-builder/FieldtypeSelector.vue'));
 
-Vue.component('modal', require('../components/Modal.vue'));
-Vue.component('modal-dialog', require('../components/ModalDialog.vue'));
+// Modals
+// Vue.component('modal', require('../components/Modal.vue'));
+Vue.component('keyboard-shortcuts-modal', require('../components/modals/KeyboardShortcutsModal.vue'));
+// Vue.component('modal-dialog', require('../components/ModalDialog.vue'));
+
 Vue.component('pagination', require('../components/pagination/Pagination.vue'));

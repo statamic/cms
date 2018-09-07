@@ -36,12 +36,7 @@
                 ></login-modal>
             </portal>
 
-            <portal to="modals" v-if="showShortcuts">
-                <shortcuts-modal
-                    :show="showShortcuts"
-                    @close="showShortcuts = false">
-                </shortcuts-modal>
-            </portal>
+            <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
             <vue-toast ref="toast"></vue-toast>
 

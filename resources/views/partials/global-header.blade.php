@@ -38,7 +38,7 @@
                     </a>
                 </li>
                 <li>
-                    <a @click="showShortcuts = true" class="flex items-center">
+                    <a @click="$modal.show('keyboard-shortcuts')" class="flex items-center">
                         <span>Keyboard Shortcuts</span>
                     </a>
                 </li>
