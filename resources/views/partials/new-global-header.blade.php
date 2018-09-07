@@ -2,8 +2,9 @@
     <div class="flex items-center flex-1">
         <div class="w-54 pl-3">
             <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
-                  @svg('statamic-wordmark')
-                  <span class="version text-3xs leading-none pl-1 align-bottom text-grey-light" v-cloak>@{{ version }}</span>
+                <div v-popover:tooltip.bottom="version">
+                    @svg('statamic-wordmark')
+                </div>
             </a>
         </div>
 
@@ -30,7 +31,7 @@
 
     <div class="head-link border-l h-full px-3 flex items-center">
         <div class="dropdown">
-            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-popover:tooltip.bottom="'{{ __('Helpful Links') }}'">
                 @svg('new/book-open-text')
             </a>
             <ul class="dropdown-menu">
@@ -53,11 +54,11 @@
                 </li>
             </ul>
         </div>
-        <a class="h-6 w-6 block p-sm text-grey-light ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank">
+        <a class="h-6 w-6 block p-sm text-grey-light ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
             @svg('new/browser-com')
         </a>
         <div class="dropdown">
-            <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-popover:tooltip.bottom="'{{ __('Account') }}'">
                 <div class="icon-user-initials rounded-full text-xxs bg-pink shadow">ME</div>
             </a>
             <ul class="dropdown-menu hide md:block">

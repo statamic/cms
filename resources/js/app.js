@@ -5,6 +5,8 @@ import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
+import Popover  from 'vue-js-popover'
+
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('#csrf-token').getAttribute('value');
@@ -15,6 +17,7 @@ Vue.prototype.$eventHub = new Vue(); // Global event bus
 
 Vue.config.productionTip = false
 
+Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
 Vue.use(VModal)
 Vue.use(Vuex);

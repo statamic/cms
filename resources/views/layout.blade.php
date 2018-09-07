@@ -38,6 +38,8 @@
 
             <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
+            <tooltip :pointer="true" />
+
             <vue-toast ref="toast"></vue-toast>
 
             <portal-target name="modals"></portal-target>
