@@ -16,6 +16,9 @@ export default {
         searchQuery: {
             type: String,
             default: ''
+        },
+        maxSelections: {
+            type: Number
         }
     },
     provide() {
@@ -26,13 +29,14 @@ export default {
     data() {
         return {
             sharedState: {
-                checkedIds: [],
                 searchQuery: this.searchQuery,
                 columns: this.columns,
                 visibleColumns: this.visibleColumns,
                 sortColumn: this.visibleColumns[0],
                 sortDirection: 'asc',
-                rows: []
+                rows: [],
+                selections: [],
+                maxSelections: this.maxSelections,
             }
         }
     },
@@ -54,6 +58,10 @@ export default {
             handler: function (rows) {
                 this.sharedState.rows = rows;
             }
+        },
+
+        'sharedState.selections': function (selections) {
+            this.$emit('selections-updated', selections);
         }
 
     },

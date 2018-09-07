@@ -11,7 +11,7 @@ export default {
         allItemsChecked() {
             if (this.sharedState.rows.length === 0) return false;
 
-            return this.sharedState.checkedIds.length === this.sharedState.rows.length;
+            return this.sharedState.selections.length === this.sharedState.rows.length;
         },
     },
     methods: {
@@ -20,11 +20,11 @@ export default {
         },
 
         checkAllItems() {
-            this.sharedState.checkedIds = _.values(_.map(this.sharedState.rows, item => item.id))
+            this.sharedState.selections = _.values(_.map(this.sharedState.rows, item => item.id))
         },
 
         uncheckAllItems() {
-            this.sharedState.checkedIds = []
+            this.sharedState.selections = []
         },
     },
 }

@@ -21,7 +21,12 @@
         <tbody>
             <tr v-for="(row, index) in rows" :key="row.id">
                 <td class="checkbox-column" v-if="allowBulkActions">
-                    <input type="checkbox" :value="row.id" v-model="sharedState.checkedIds">
+                    <input
+                        type="checkbox"
+                        :value="row.id"
+                        v-model="sharedState.selections"
+                        :disabled="reachedSelectionLimit && !sharedState.selections.includes(row.id)"
+                    />
                 </td>
                 <td v-for="column in sharedState.visibleColumns" :key="column">
                     <slot :name="`cell-${column}`" :row="row" :index="index">
@@ -52,6 +57,10 @@ export default {
 
         rows() {
             return this.sharedState.rows;
+        },
+
+        reachedSelectionLimit() {
+            return this.sharedState.selections.length === this.sharedState.maxSelections;
         }
 
     },

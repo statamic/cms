@@ -5,10 +5,10 @@
                 <data-list-toggle-all></data-list-toggle-all>
                 <data-list-search v-model="searchQuery"></data-list-search>
                 <data-list-bulk-actions>
-                    <div slot-scope="{ ids }" class="flex items-center" v-if="ids">
-                        <button class="btn ml-1" @click="bulkDelete(ids)">Delete</button>
-                        <button class="btn ml-1" @click="bulkUnpublish(ids)">Unpublish</button>
-                        <button class="btn ml-1" @click="bulkPublish(ids)">Publish</button>
+                    <div slot-scope="{ selections, hasSelections }" class="flex items-center" v-if="hasSelections">
+                        <button class="btn ml-1" @click="bulkDelete(selections)">Delete</button>
+                        <button class="btn ml-1" @click="bulkUnpublish(selections)">Unpublish</button>
+                        <button class="btn ml-1" @click="bulkPublish(selections)">Publish</button>
                     </div>
                 </data-list-bulk-actions>
                 <data-list-column-picker @change="updateColumns"></data-list-column-picker>
