@@ -1,32 +1,13 @@
 <template>
-    <input :type="mode" :name="name" :class="classes" v-model="data" tabindex="0" :autofocus="autofocus" :placeholder="config.placeholder" />
+    <text-input :name="name" :value="value" @input="update" />
 </template>
 
 <script>
+import Fieldtype from './Fieldtype.vue';
 
 export default {
 
-    mixins: [Fieldtype, AutoSlug],
+    mixins: [Fieldtype]
 
-    props: ['autofocus'],
-
-    data: function() {
-    	return {
-    		mode: this.config.mode || 'text'
-    	}
-    },
-
-    computed: {
-        classes: function() {
-            return 'form-control type-' + this.mode;
-        }
-    },
-
-    mounted() {
-        if (this.config.autoslug) {
-            this.autoSlug(this.config.autoslug);
-        }
-    }
-
-};
+}
 </script>

@@ -4,9 +4,9 @@ Vue.component('select-input', require('../components/inputs/Select.vue'));
 Vue.component('text-input', require('../components/inputs/Text.vue'));
 Vue.component('textarea-input', require('../components/inputs/Textarea.vue'));
 
-Vue.component('text-fieldtype', require('../components/fieldtypes/Text.vue'));
-Vue.component('textarea-fieldtype', require('../components/fieldtypes/Textarea.vue'));
-Vue.component('slug-fieldtype', require('../components/fieldtypes/Slug.vue'));
+Vue.component('text-fieldtype', require('../components/fieldtypes/TextFieldtype.vue'));
+Vue.component('textarea-fieldtype', require('../components/fieldtypes/TextareaFieldtype.vue'));
+Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.vue'));
 
 // Fieldtypes
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue'
