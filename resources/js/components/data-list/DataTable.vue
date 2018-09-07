@@ -19,6 +19,7 @@
             </tr>
         </thead>
         <tbody>
+            <slot name="tbody-start" />
             <tr v-for="(row, index) in rows" :key="row.id">
                 <td class="checkbox-column" v-if="allowBulkActions">
                     <input
