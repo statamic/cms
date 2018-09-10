@@ -42,6 +42,11 @@ select {
 
 }
 
+textarea.input-text {
+    @apply p-2;
+    min-height: 80px;
+}
+
 .form-group.tight {
     margin-bottom: 8px;
 }
