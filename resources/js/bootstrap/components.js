@@ -3,8 +3,6 @@ import Vue from 'vue'
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue'));
-Vue.component('asset-container-form', require('../components/assets/Container/EditForm.vue'));
-Vue.component('asset-container-wizard', require('../components/assets/Container/Wizard/Wizard.vue'));
 
 // Publish
 Vue.component('publish-container', require('../components/publish/Container.vue'));
