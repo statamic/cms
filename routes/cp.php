@@ -27,6 +27,13 @@ Route::group([
     Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
 
     Route::resource('asset-containers', 'AssetContainersController');
+    Route::get('assets/browse', 'AssetBrowserController@index')->name('assets.browse.index');
+    Route::get('assets/browse/folders/{container}/{path?}', 'AssetBrowserController@folder')->where('path', '.*');
+    Route::get('assets/browse/{container}/{path?}', 'AssetBrowserController@show')->where('path', '.*')->name('assets.browse.show');
+    Route::get('assets-fieldtype', 'AssetsFieldtypeController@index');
+    Route::resource('assets', 'AssetsController');
+    Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
+    Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
 
     Route::group(['prefix' => 'pages'], function () {
         Route::get('/', 'PagesController@pages')->name('pages');
@@ -58,33 +65,6 @@ Route::group([
         Route::get('get', 'GlobalsController@get')->name('globals.get');
         Route::get('{slug}', ['uses' => 'PublishGlobalController@edit', 'as' => 'globals.edit']);
         Route::post('publish', 'PublishGlobalController@save')->name('global.save');
-    });
-
-    Route::group(['prefix' => 'assets'], function () {
-        Route::get('/', 'AssetsController@index')->name('assets');
-
-        Route::group(['prefix' => 'folders'], function () {
-            Route::post('/', 'AssetFoldersController@store')->name('assets.folder.store');
-            Route::delete('delete', 'AssetFoldersController@delete')->name('assets.folders.delete');
-            Route::get('{container}/{path?}', 'AssetFoldersController@edit')->where('path',
-                '.*')->name('assets.folder.edit');
-            Route::post('{container}/{path?}', 'AssetFoldersController@update')->where('path',
-                '.*')->name('assets.folder.update');
-        });
-
-        Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('asset.thumbnail');
-
-        Route::post('get', 'AssetsController@get')->name('assets.get');
-        Route::delete('delete', 'AssetsController@delete')->name('asset.delete');
-        Route::get('browse/{container}/{folder?}', 'AssetsController@browse')->where('folder', '.*')->name('assets.browse');
-        Route::post('browse', 'AssetsController@json');
-        Route::post('search', 'AssetsController@search');
-        Route::post('/', 'AssetsController@store')->name('asset.store');
-        Route::get('download/{container}/{path}', 'AssetsController@download')->name('asset.download')->where('path', '.*');
-        Route::post('rename/{container}/{path}', 'AssetsController@rename')->name('asset.rename')->where('path', '.*');
-        Route::post('move', 'AssetsController@move')->name('asset.move');
-        Route::get('{container}/{path}', 'AssetsController@edit')->name('asset.edit')->where('path', '.*');
-        Route::post('{container}/{path}', 'AssetsController@update')->name('asset.update')->where('path', '.*');
     });
 
     Route::group(['prefix' => 'users'], function () {

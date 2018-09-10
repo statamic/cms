@@ -2,22 +2,31 @@
 
     <div class="asset-manager">
 
-        <asset-browser
-            :selected-container="container"
-            :selected-path="path"
-            :selected-assets="selectedAssets"
-            @navigated="navigate"
-            @selections-updated="updateSelections">
+        <div class="flex mb-3">
+            <h1 class="flex-1">{{ container.title }}</h1>
 
-            <template slot="contextual-actions" v-if="selectedAssets.length">
-                    <button class="btn btn-danger ml-2 mr-2 mb-3" @click="deleteSelected">{{ translate('cp.delete') }}</button>
-                    <div class="btn-group mb-3">
-                        <button class="btn" @click="selectedAssets = []">{{ translate('cp.uncheck_all') }}</button>
-                        <button class="btn" @click="openAssetMover">{{ translate('cp.move') }}</button>
-                    </div>
-            </template>
+            <a :href="container.edit_url" class="btn">Edit Container</a>
+        </div>
 
-        </asset-browser>
+        <div class="card p-0">
+            <asset-browser
+                ref="browser"
+                :initial-container="container"
+                :selected-path="path"
+                :selected-assets="selectedAssets"
+                :max-files="2"
+                @navigated="navigate"
+                @selections-updated="updateSelections"
+                @asset-doubleclicked="editAsset"
+            >
+
+                <template slot="actions" slot-scope="{ ids }">
+                    <button class="btn ml-1" @click="openAssetMover">{{ translate('cp.move') }}</button>
+                    <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">Delete</button>
+                </template>
+
+            </asset-browser>
+        </div>
 
         <mover
             v-if="showAssetMover"
@@ -40,11 +49,16 @@ export default {
     },
 
 
-    props: ['container', 'path'],
+    props: [
+        'initialContainer',
+        'initialPath'
+    ],
 
 
     data() {
         return {
+            container: this.initialContainer,
+            path: this.initialPath,
             selectedAssets: [],
             showAssetMover: false
         }
@@ -77,7 +91,7 @@ export default {
          * Push a new state onto the browser's history
          */
         pushState() {
-            let url = cp_url('assets/browse/' + this.container);
+            let url = cp_url('assets/browse/' + this.container.id);
 
             if (this.path !== '/') {
                 url += '/' + this.path;
@@ -109,12 +123,8 @@ export default {
             this.selectedAssets = selections;
         },
 
-        /**
-         * Delete all the selected assets.
-         */
-        deleteSelected() {
-            //@TODO: Wire up
-            this.$eventHub.$emit('delete-assets', this.selectedAssets);
+        destroyMultiple(ids) {
+            this.$refs.browser.destroyMultiple(ids);
         },
 
         openAssetMover() {
@@ -128,6 +138,10 @@ export default {
         assetsMoved(folder) {
             this.closeAssetMover();
             this.navigate(this.container, folder);
+        },
+
+        editAsset(asset) {
+            this.$refs.browser.edit(asset.id);
         }
     }
 

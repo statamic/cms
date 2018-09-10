@@ -60,7 +60,7 @@
                 </template>
             </div>
 
-            <uploader
+            <!-- <uploader
                 v-ref=uploader
                 v-if="containerSpecified && !showSelector"
                 :dom-element="uploadElement"
@@ -73,7 +73,7 @@
             <uploads
                 v-if="uploads.length"
                 :uploads="uploads">
-            </uploads>
+            </uploads> -->
 
             <template v-if="expanded && ! soloAsset">
 
@@ -155,6 +155,7 @@
 
 
 <script>
+import axios from 'axios';
 import DetectsFileDragging from '../../DetectsFileDragging';
 
 export default {
@@ -180,7 +181,6 @@ export default {
             draggingFile: false,
             uploads: [],
             innerDragging: false,
-            autoBindChangeWatcher: false,
             displayMode: 'grid'
         };
     },
@@ -257,7 +257,7 @@ export default {
         selectedAssets() {
             // If the value has an :: it's already an ID and we can return as-is.
             // Otherwise, we need to find the ID from the corresponding asset.
-            return _(this.data).map((value) => {
+            return _(this.value).map((value) => {
                 return (value.includes('::')) ? value : _(this.assets).findWhere({ url: value }).id;
             });
         },
@@ -307,28 +307,29 @@ export default {
          *
          * Accepts an array of asset URLs and/or IDs.
          */
-        loadAssets(data) {
+        loadAssets(assets) {
             this.loading = true;
 
-            if (! data || ! data.length) {
+            if (! assets || ! assets.length) {
                 this.loading = false;
                 this.assets = [];
                 return;
             }
 
-            this.$http.post(cp_url('assets/get'), { assets: data }, (response) => {
-                this.assets = response;
+            axios.get(cp_url('assets/data'), {
+                params: { assets }
+            }).then(response => {
+                this.assets = response.data;
                 this.loading = false;
 
                 this.$nextTick(() => {
-                    // Juggle the data to make parent components notice something changed.
-                    // This makes nested replicators generate new preview text.
-                    const data = this.data;
-                    this.data = [];
-                    this.data = data;
+                    // // Juggle the data to make parent components notice something changed.
+                    // // This makes nested replicators generate new preview text.
+                    // const data = this.data;
+                    // this.data = [];
+                    // this.data = data;
 
                     this.sortable();
-                    this.bindChangeWatcher();
                 });
             });
         },
@@ -431,7 +432,7 @@ export default {
          * a non-public container, the url property will just be the ID, so we're ok.
          */
         assets(val) {
-            this.data = _.pluck(this.assets, 'url');
+            this.update(_.pluck(this.assets, 'url'));
         }
 
     },
@@ -445,7 +446,7 @@ export default {
         this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
 
         // We only have URLs in the field data, so we'll need to request the asset data from the server.
-        this.loadAssets(this.data);
+        this.loadAssets(this.value);
     }
 
 }

@@ -3,8 +3,8 @@
 @section('content')
 
     <asset-manager
-        container="{{ $container }}"
-        path="{{ $folder }}">
-    </asset-manager>
+        :initial-container="{{ json_encode($container) }}"
+        initial-path="{{ $folder }}"
+    ></asset-manager>
 
 @endsection

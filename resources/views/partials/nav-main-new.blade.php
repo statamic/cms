@@ -35,7 +35,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="">
+                    <a href="{{ cp_route('assets.index') }}">
                         <i>@svg('new/picture-polaroid-landscape')</i><span>Assets</span>
                     </a>
                 </li>

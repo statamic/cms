@@ -1,675 +1,251 @@
 <template>
 
-    <div class="asset-browser card"
-         @dragover="dragOver"
-         @dragleave="dragStop"
-         @drop="dragStop">
+    <div>
 
-        <div v-if="! initialized" class="asset-browser-loading loading">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+        <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictNavigation && Object.keys(containers).length > 1">
+            <a v-for="item in containers" :key="item.id"
+                v-text="item.title"
+                :class="{ active: item.id === container.id }"
+                @click="selectContainer(item.id)"
+            />
         </div>
 
-        <div class="drag-notification" v-show="canEdit && draggingFile">
-            <i class="icon icon-download"></i>
-            <h3>{{ translate('cp.drop_to_upload') }}</h3>
+        <div v-if="loading" class="asset-browser-loading loading">
+            <span class="icon icon-circular-graph animation-spin" />
+            {{ translate('Loading') }}
         </div>
 
-        <div v-if="showSidebar" class="asset-browser-sidebar">
-            <h4>{{ translate('cp.containers') }}</h4>
-            <div v-for="c in containers" class="sidebar-item" :class="{ 'active': container.id == c.id }">
-                <a @click="selectContainer(c.id)">
-                    {{ c.title }}
-                </a>
-            </div>
-        </div>
+        <data-list
+            v-if="!loading"
+            :rows="assets"
+            :columns="columns"
+            :visible-columns="visibleColumns"
+            :search-query="searchQuery"
+            :selections="selectedAssets"
+            :max-selections="maxFiles"
+            @selections-updated="(ids) => $emit('selections-updated', ids)"
+        >
+            <div slot-scope="{ filteredRows: rows }">
 
-        <div class="asset-browser-main" v-if="initialized">
-
-            <div class="asset-browser-header">
-                <h1 class="mb-3">
-                    <template v-if="isSearching">
-                        {{ translate('cp.search_results') }}
-                    </template>
-                    <template v-else>
-                        <template v-if="restrictNavigation">
-                            {{ folder.title || folder.path }}
-                        </template>
-                        <template v-else>
-                            {{ container.title }}
-                        </template>
-                    </template>
-
-                    <div class="loading-indicator" v-show="loadingAssets">
-                        <span class="icon icon-circular-graph animation-spin"></span>
-                    </div>
-                </h1>
-
-                <input type="text"
-                    class="search filter-control mb-3"
-                    :placeholder="translate('cp.search')"
-                    v-model="searchTerm" />
-
-                <div class="asset-browser-actions flexy wrap">
-
-                    <slot name="contextual-actions"></slot>
-
-                    <div class="btn-group action mb-3">
-                        <button type="button"
-                                class="btn btn-icon"
-                                :class="{'depressed': displayMode == 'grid'}"
-                                @click="setDisplayMode('grid')">
-                            <span class="icon icon-grid"></span>
-                        </button>
-                        <button type="button"
-                                class="btn btn-icon"
-                                :class="{'depressed': displayMode == 'table'}"
-                                @click="setDisplayMode('table')">
-                            <span class="icon icon-list"></span>
-                        </button>
-                    </div>
-
-                    <div class="btn-group action mb-3" v-if="canEdit">
-                        <button type="button"
-                                class="btn"
-                                v-if="!restrictNavigation && !isSearching"
-                                @click.prevent="createFolder">
-                            {{ translate('cp.new_folder') }}
-                        </button>
-                        <button type="button" class="btn" @click.prevent="uploadFile" v-if="!isSearching">
-                            {{ translate('cp.upload') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="asset-browser-content">
-
-                <uploader
-                    ref="uploader"
-                    :dom-element="uploadElement"
-                    :container="container.id"
-                    :path="path"
-                    @updated="uploadsUpdated"
-                    @upload-complete="loadAssets">
-                </uploader>
-
-                <uploads
-                    v-if="uploads.length"
-                    :uploads="uploads">
-                </uploads>
-
-                <component
-                    :is="listingComponent"
-                    :container="container.id"
-                    :assets="assets"
-                    :folder="folder"
-                    :subfolders="subfolders"
-                    :loading="loading"
-                    :selected-assets="selectedAssets"
-                    :restrict-navigation="restrictNavigation"
-                    :is-searching="isSearching"
-                    @folder-selected="folderSelected"
-                    @folder-editing="editFolder"
-                    @folder-deleted="folderDeleted"
-                    @asset-selected="assetSelected"
-                    @asset-deselected="assetDeselected"
-                    @asset-editing="editAsset"
-                    @asset-deleting="deleteAsset"
-                    @assets-dragged-to-folder="assetsDraggedToFolder"
-                    @asset-doubleclicked="assetDoubleclicked"
-                    @sorted="sortBy">
-                </component>
-
-                <div class="no-results" v-if="isSearching && isEmpty">
-                    <svg-icon name="folder-search-empty" class="h-16 w-16 mx-auto"></svg-icon>
-                    <h2>{{ translate('cp.no_search_results') }}</h2>
+                <div class="data-list-header">
+                    <data-list-toggle-all />
+                    <data-list-search v-model="searchQuery" />
+                    <data-list-bulk-actions>
+                        <div slot-scope="{ selections, hasSelections }">
+                            <div class="flex items-center" v-if="hasSelections">
+                                <div class="text-xs text-grey-light mr-2">{{ selections.length }} selected</div>
+                                <slot name="actions" :selections="selections" />
+                            </div>
+                            <div v-show="!hasSelections">
+                                <button class="btn">New Folder</button>
+                                <button class="btn ml-1">Upload</button>
+                            </div>
+                        </div>
+                    </data-list-bulk-actions>
                 </div>
 
-                <pagination
-                    v-if="pagination.totalPages > 1"
-                    :total="pagination.totalPages"
-                    :current="pagination.currentPage"
-                    :segments="pagination.segments"
-                    @selected="paginationPageSelected">
-                </pagination>
+                <data-table :rows="rows" :allow-bulk-actions="true">
+
+                    <template slot="tbody-start">
+                        <tr v-if="folder.parent_path && !restrictNavigation">
+                            <td />
+                            <td @click="selectFolder(folder.parent_path)">
+                                <a class="flex items-center cursor-pointer">
+                                    <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                    ..
+                                </a>
+                            </td>
+                            <td :colspan="columns.length" />
+                        </tr>
+                        <tr v-for="folder in folders" :key="folder.path" v-if="!restrictNavigation">
+                            <td />
+                            <td @click="selectFolder(folder.path)">
+                                <a class="flex items-center cursor-pointer">
+                                    <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                    {{ folder.path }}
+                                </a>
+                            </td>
+                            <td :colspan="columns.length" />
+                        </tr>
+                    </template>
+
+                    <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
+                        <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
+                            <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
+                            <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.basename }}</label>
+                        </div>
+                    </template>
+
+                    <template slot="actions" slot-scope="{ row: asset }">
+                        <dropdown-list>
+                            <li><a @click="edit(asset.id)">Edit</a></li>
+                            <li class="warning"><a @click="destroy(asset.id)">Delete</a></li>
+                        </dropdown-list>
+                    </template>
+
+                </data-table>
 
             </div>
+        </data-list>
 
-            <breadcrumbs
-                v-if="!restrictNavigation && !isSearching"
-                :path="path"
-                @navigated="folderSelected">
-            </breadcrumbs>
+        <asset-editor
+            v-if="showAssetEditor"
+            :id="editedAssetId"
+            :has-child="editorHasChild"
+            @closed="closeAssetEditor"
+            @saved="assetSaved"
+            @deleted="assetDeleted"
+            @moved="assetMoved">
+        </asset-editor>
 
-            <asset-editor
-                v-if="showAssetEditor"
-                :id="editedAssetId"
-                :has-child="editorHasChild"
-                @closed="closeAssetEditor"
-                @saved="assetSaved"
-                @deleted="assetDeleted"
-                @moved="assetMoved">
-            </asset-editor>
-
-            <folder-editor
-                v-if="showFolderCreator"
-                :create="true"
-                :container="container.id"
-                :path="path"
-                @closed="folderCreatorClosed"
-                @created="folderCreated">
-            </folder-editor>
-
-            <folder-editor
-                v-if="showFolderEditor"
-                :create="false"
-                :container="container.id"
-                :path="editedFolderPath"
-                @closed="folderEditorClosed"
-                @updated="loadAssets">
-            </folder-editor>
-        </div>
     </div>
 
 </template>
 
 <script>
-import DetectsFileDragging from '../../DetectsFileDragging';
+import axios from 'axios';
+import AssetThumbnail from './Thumbnail.vue';
+import AssetEditor from '../Editor/Editor.vue';
 
 export default {
 
     components: {
-        GridListing: require('./Listing/GridListing.vue'),
-        TableListing: require('./Listing/TableListing.vue'),
-        Uploader: require('../Uploader.vue'),
-        Uploads: require('../Uploads.vue'),
-        AssetEditor: require('../Editor/Editor.vue'),
-        FolderEditor: require('./FolderEditor.vue'),
-        Breadcrumbs: require('./Breadcrumbs.vue')
+        AssetThumbnail,
+        AssetEditor,
     },
 
-
-    mixins: [DetectsFileDragging],
-
-
     props: [
-        'selectedContainer',   // The ID of the container to display, determined by a parent component.
+        // The container to display, determined by a parent component.
+        // Either the ID, or the whole container object.
+        'initialContainer',
+
         'selectedPath',        // The path to display, determined by a parent component.
+
         'restrictNavigation',  // Whether to restrict to a single folder and prevent navigation.
         'selectedAssets',
         'maxFiles'
     ],
 
-
     data() {
         return {
-            loadingAssets: true,
-            initializedAssets: false,
+            columns: ['basename', 'size_b', 'last_modified_timestamp'],
+            visibleColumns: ['basename', 'size_b', 'last_modified_timestamp'],
             loadingContainers: true,
-            containers: null,
-            container: null,
-            path: null,
+            containers: [],
+            container: {},
+            loadingAssets: true,
             assets: [],
+            path: this.selectedPath,
             folders: [],
             folder: {},
-            displayMode: 'table',
-            uploads: [],
-            draggingFile: false,
-            pagination: {},
-            selectedPage: 1,
+            searchQuery: '',
             editedAssetId: null,
-            showFolderCreator: false,
-            editedFolderPath: null,
-            editorHasChild: false,
-            isSearching: false,
-            sort: 'title',
-            sortOrder: 'asc'
         }
     },
 
-
     computed: {
 
-        initialized() {
-            return this.initializedAssets && !this.loadingContainers;
+        selectedContainer() {
+            return (typeof this.initialContainer === 'object')
+                ? this.initialContainer.id
+                : this.initialContainer;
         },
 
         loading() {
             return this.loadingAssets || this.loadingContainers;
         },
 
-        /**
-         * Whether the current folder has assets.
-         */
-        hasAssets() {
-            return this.assets.length > 0;
-        },
-
-        hasSubfolders() {
-            return this.subfolders.length > 0;
-        },
-
-        isEmpty() {
-            return !this.hasAssets && !this.hasSubfolders;
-        },
-
-        canEdit: function() {
-            return this.can('assets:'+ this.container.id +':edit')
-        },
-
-        showSidebar() {
-            if (! this.initialized) return false;
-
-            if (this.isSearching) return false;
-
-            if (this.restrictNavigation) return false;
-
-            return Object.keys(this.containers).length > 1;
-        },
-
-        listingComponent() {
-            return (this.displayMode === 'grid') ? 'GridListing' : 'TableListing';
-        },
-
-        fullPath() {
-            if (! this.container) return;
-
-            let fullPath = this.container.id;
-
-            if (this.path !== '/') {
-                fullPath += '/' + this.path;
-            }
-
-            return fullPath;
-        },
-
-        subfolders() {
-            if (this.restrictNavigation) return [];
-
-            return this.folders;
-        },
-
-        uploadElement() {
-            return this.$el;
-        },
-
         showAssetEditor() {
             return Boolean(this.editedAssetId);
         },
 
-        showFolderEditor() {
-            return this.editedFolderPath !== null;
-        },
-
-        maxFilesReached() {
-            return this.maxFiles
-                && this.selectedAssets.length >= this.maxFiles
+        canEdit() {
+            return true;
+            // TODO
+            // return this.can('assets:'+ this.container.id +':edit')
         }
 
     },
 
-
     mounted() {
-        this.path = this.selectedPath;
-
-        // We need all the containers since they'll be displayed in the sidebar. This will also load
-        // up the current container object using the initial container id. Setting the container
-        // property will trigger loading of assets since there's a watcher reacting to it.
         this.loadContainers();
-
-        this.displayMode = Cookies.get('statamic.assets.listing_view_mode') || 'table';
     },
-
-
-    events: {
-
-        'close-editor': function() {
-            if (this.editorHasChild) {
-                return this.$eventHub.$emit('close-child-editor');
-            }
-
-            this.showFolderCreator = false;
-            this.editedAssetId = null;
-            this.editedFolderPath = null;
-        },
-
-        'refresh-assets': function() {
-            this.loadAssets();
-        },
-
-        'delete-assets': function(ids) {
-            this.deleteAsset(ids);
-        },
-
-    },
-
 
     watch: {
 
-        /**
-         * Whenever the fullPath computed property is changed, it means
-         * that either the path or the container has been modified,
-         * so then a new set of assets should be displayed.
-         */
-        fullPath() {
+        initialContainer() {
+            this.container = this.initialContainer;
+        },
+
+        container() {
             this.loadAssets();
         },
 
-        /**
-         * When the selected container prop has changed, the parent component
-         * has indicated that a different set of assets should be shown.
-         */
-        selectedContainer(container) {
-            this.container = this.containers[container];
-        },
-
-        /**
-         * When the selected path prop has changed, the parent component
-         * has indicated that a different set of assets should be shown.
-         */
-        selectedPath(path) {
-            this.path = path;
-        },
-
-        /**
-         * When selected assets are updated/modified, the parent component should be notified.
-         */
-        selectedAssets(selections) {
-            this.$emit('selections-updated', selections);
-        },
-
-        searchTerm(term) {
-
-            if (term) {
-                _.debounce(this.search(), 500);
-            } else {
-                this.loadAssets();
-            }
+        path() {
+            this.loadAssets();
         }
 
     },
 
-
     methods: {
 
-        /**
-         * Load asset container data
-         */
         loadContainers() {
-            this.axios.get(cp_url('assets/containers/get')).then((response) => {
-                // Set the containers property to a collection of the items in the response.
-                // We are only interested in certain keys, and we want them indexed by
-                // ID to make retrieving container values simpler down the road.
-                this.containers = _.chain(response.items).map((container) => {
-                    return _.pick(container, 'id', 'title');
-                }).indexBy('id').value();
+            this.loadingContainers = true;
 
-                // We need the container property to be the retrieved data object.
+            axios.get(cp_url('asset-containers')).then(response => {
+                this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
-
                 this.loadingContainers = false;
             });
         },
 
-        /**
-         * Load assets from the container and folder specified
-         */
-        loadAssets(page) {
+        loadAssets() {
             this.loadingAssets = true;
+            const url = cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
 
-            this.axios.post(cp_url('assets/browse'), {
-                container: this.container.id,
-                path: this.path,
-                page: this.selectedPage,
-                sort: this.sort,
-                dir: this.sortOrder
-            }).then((response) => {
-                this.assets = response.assets;
-                this.folders = response.folders;
-                this.folder = response.folder;
-                this.pagination = response.pagination;
-                this.selectedPage = response.pagination.currentPage;
+            axios.get(url).then(response => {
+                const { assets, folders, folder } = response.data;
+                this.assets = assets;
+                this.folders = folders;
+                this.folder = folder;
                 this.loadingAssets = false;
-                this.initializedAssets = true;
-                this.isSearching = false;
             });
         },
 
-        search() {
-            this.loadingAssets = true;
-
-            this.axios.post(cp_url('assets/search'), {
-                term: this.searchTerm,
-                container: this.container.id,
-                folder: this.folder.path,
-                restrictNavigation: this.restrictNavigation
-            }).then((response) => {
-                this.isSearching = true;
-                this.assets = response.assets;
-                this.folders = [];
-                this.loadingAssets = false;
-                this.initializedAssets = true;
-            });
-        },
-
-        /**
-         * When a folder was selected from within listing component.
-         */
-        folderSelected(path) {
+        selectFolder(path) {
             // Trigger re-loading of assets in the selected folder.
             this.path = path;
             this.selectedPage = 1;
 
-            // Trigger an event so the parent can do something.
-            // eg. The asset manager would want to change the browser URL.
-            this.$emit('navigated', this.container.id, this.path);
+            this.$emit('navigated', this.container, this.path);
         },
 
-        /**
-         * When a container is selected/clicked in the sidebar
-         */
-        selectContainer(container) {
-            // Trigger re-loading of assets in the selected container.
-            this.container = this.containers[container];
+        selectContainer(id) {
+            this.container = this.containers[id];
             this.path = '/';
-
-            // Trigger an event so the parent can do something.
-            // eg. The asset manager would want to change the browser URL.
-            this.$emit('navigated', this.container.id, this.path);
+            this.$emit('navigated', this.container, this.path);
         },
 
-        /**
-         * When an asset has been selected.
-         */
-        assetSelected(id) {
-            // For single asset selections, clicking a different asset will replace the selection.
-            if (this.maxFiles === 1 && this.maxFilesReached) {
-                this.selectedAssets = [id];
-            }
-
-            // Completely prevent additional selections when the limit has been hit.
-            if (this.maxFilesReached) {
-                return;
-            }
-
-            // Don't add the same asset twice.
-            if (_(this.selectedAssets).contains(id)) {
-                return;
-            }
-
-            this.selectedAssets.push(id);
-
-            // For some reason, Vue wasn't reacting to new item.
-            // It would show up in the data, but wouldn't adjust the view.
-            // Mapping over itself fixes this. ¯\_(ツ)_/¯
-            this.selectedAssets = _(this.selectedAssets).map(val => val);
-        },
-
-        /**
-         * When an asset has been deselected.
-         */
-        assetDeselected(id) {
-            this.selectedAssets = _(this.selectedAssets).without(id);
-        },
-
-        /**
-         * When an asset has been chosen for editing.
-         */
-        editAsset(id) {
+        edit(id) {
             if (this.canEdit) {
                 this.editedAssetId = id;
             }
         },
 
-        /**
-         * Delete the given asset and refresh the browser.
-         */
-        deleteAsset(ids) {
-            ids = Array.isArray(ids) ? ids : [ids];
-
-            swal({
-                type: 'warning',
-                title: translate('cp.are_you_sure'),
-                text: translate_choice('cp.confirm_delete_items', ids),
-                confirmButtonText: translate('cp.yes_im_sure'),
-                cancelButtonText: translate('cp.cancel'),
-                showCancelButton: true
-            }, () => {
-                const endpoint = cp_url('assets/delete');
-
-                this.axios.delete(endpoint, { ids: ids }).then((response) => {
-                    this.loadAssets();
-                    this.selectedAssets = _(this.selectedAssets).difference(ids);
-                });
-            });
-        },
-
-        /**
-         * Close the asset editor.
-         */
         closeAssetEditor() {
-            this.$eventHub.$emit('modal.close');
             this.editedAssetId = null;
         },
 
-        /**
-         * When an asset has been saved from the editor.
-         */
-        assetSaved() {
-            this.closeAssetEditor();
-            this.loadAssets();
+        destroy(id) {
+            // TODO
+            console.log('deleting asset');
         },
 
-        /**
-         * When an asset was deleted from the editor.
-         */
-        assetDeleted() {
-            this.closeAssetEditor();
-            this.loadAssets();
-        },
-
-        /**
-         * When an asset was moved to another folder from the editor.
-         */
-        assetMoved(folder) {
-            this.closeAssetEditor();
-            this.folderSelected(folder);
-        },
-
-        /**
-         * When an asset was double clicked.
-         *
-         * This event would only ever be called when the browser is used in the context of a
-         * fieldtype. When used in the "Assets" section, the double click would be handled
-         * from within the asset component and caused the edit dialog to be opened.
-         */
-        assetDoubleclicked(id) {
-            this.assetSelected(id);
-            this.$emit('asset-doubleclicked');
-        },
-
-        /**
-         * Show the file upload finder window.
-         */
-        uploadFile() {
-            this.$refs.uploader.browse();
-        },
-
-        /**
-         * When a page was selected in the pagination.
-         */
-        paginationPageSelected(page) {
-            this.selectedPage = page;
-            this.loadAssets();
-        },
-
-        createFolder() {
-            this.showFolderCreator = true;
-        },
-
-        folderCreatorClosed() {
-            this.showFolderCreator = false;
-        },
-
-        folderCreated(path) {
-            this.folderSelected(path)
-        },
-
-        editFolder(folder) {
-            this.editedFolderPath = folder;
-        },
-
-        folderEditorClosed() {
-            this.editedFolderPath = null;
-        },
-
-        folderDeleted(folder) {
-            this.loadAssets();
-        },
-
-        uploadsUpdated(uploads) {
-            this.$set('uploads', uploads);
-        },
-
-        /**
-         * Set the display mode and remember it in a cookie
-         */
-        setDisplayMode(mode) {
-            this.displayMode = mode;
-            Cookies.set('statamic.assets.listing_view_mode', mode);
-        },
-
-        assetsDraggedToFolder(folder) {
-            const url = cp_url('/assets/move');
-
-            const payload = {
-                assets: this.selectedAssets,
-                folder: folder,
-                container: this.container.id
-             };
-
-            this.axios.post(url, payload).then((response) => {
-                this.loadAssets();
-                this.selectedAssets = [];
-            });
-        },
-
-        sortBy(sort) {
-            if (this.isSearching) return;
-
-            let sortOrder = 'asc';
-
-            // If the current sort order was clicked again, change the direction.
-            if (this.sort === sort) {
-                sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-            }
-
-            this.sort = sort;
-            this.sortOrder = sortOrder;
-            this.loadAssets();
-        },
-
+        destroyMultiple(ids) {
+            // TODO
+            console.log('deleting multiple assets', ids);
+        }
     }
 
-};
+}
 </script>

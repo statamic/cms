@@ -1,45 +1,59 @@
 <template>
-    <div class="asset-selector-modal">
 
-        <div class="asset-selector">
+<div>
 
-            <asset-browser
-                :selected-container="container"
-                :selected-path="folder"
-                :selected-assets="browserSelections"
-                :restrict-navigation="restrictNavigation"
-                :max-files="maxFiles"
-                @selections-updated="selectionsUpdated"
-                @asset-doubleclicked="select">
+        <modal
+            name="asset-selector"
+            width="90%"
+            height="90%"
+            :resizable="true"
+        >
+            <div class="flex flex-col justify-end h-full">
 
-                <template slot="contextual-actions" v-if="browserSelections.length">
-                    <button class="btn action mb-3" @click="browserSelections = []">{{ translate('cp.uncheck_all') }}</button>
-                </template>
+                <div class="flex-1 overflow-scroll">
+                    <asset-browser
+                        :initial-container="container"
+                        :selected-path="folder"
+                        :selected-assets="browserSelections"
+                        :restrict-navigation="restrictNavigation"
+                        :max-files="maxFiles"
+                        @selections-updated="selectionsUpdated"
+                        @asset-doubleclicked="select">
 
-            </asset-browser>
+                        <template slot="contextual-actions" v-if="browserSelections.length">
+                            <button class="btn action mb-3" @click="browserSelections = []">{{ translate('cp.uncheck_all') }}</button>
+                        </template>
 
-            <div class="modal-footer">
-                <div class="left" v-if="browserSelections.length">
-                    {{ browserSelections.length }}<span v-if="maxFiles">/{{ maxFiles }}</span> {{ translate('cp.selected') }}
+                    </asset-browser>
                 </div>
-                <button
-                    type="button"
-                    class="btn"
-                    @click="close">
-                    {{ translate('cp.cancel') }}
-                </button>
 
-                <button
-                    type="button"
-                    class="btn btn-primary"
-                    @click="select">
-                    {{ translate('cp.select') }}
-                </button>
+                <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
+                    <div class="text-sm text-grey-light">
+                        {{ browserSelections.length }}<span v-if="maxFiles">/{{ maxFiles }}</span> {{ translate('cp.selected') }}
+                    </div>
+                    <div>
+                        <button
+                            type="button"
+                            class="btn"
+                            @click="close">
+                            {{ translate('cp.cancel') }}
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary ml-1"
+                            @click="select">
+                            {{ translate('cp.select') }}
+                        </button>
+                    </div>
+                </div>
+
             </div>
+        </modal>
 
-        </div>
 
-    </div>
+</div>
+
 </template>
 
 <script>
@@ -73,7 +87,7 @@ export default {
         /**
          * Confirm the updated selections
          */
-        select: function() {
+        select() {
             this.$emit('selected', this.browserSelections);
             this.close();
         },
@@ -82,8 +96,8 @@ export default {
          * Close this selector
          */
         close() {
+            this.$modal.hide('asset-selector');
             this.$emit('closed');
-            this.$dispatch('modal.close');
         },
 
         /**
@@ -96,7 +110,7 @@ export default {
     },
 
     mounted() {
-        this.$dispatch('modal.open');
+        this.$modal.show('asset-selector');
     }
 
 };

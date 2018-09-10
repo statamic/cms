@@ -3,10 +3,11 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\AssetContainer;
+use Illuminate\Http\Request;
 
 class AssetContainersController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $containers = AssetContainer::all()->filter(function ($container) {
             return true; // TODO: auth.
@@ -19,6 +20,10 @@ class AssetContainersController extends CpController
                 'delete_url' => $container->deleteUrl()
             ];
         })->values();
+
+        if ($request->wantsJson()) {
+            return $containers;
+        }
 
         return view('statamic::assets.containers.index', [
             'containers' => $containers,

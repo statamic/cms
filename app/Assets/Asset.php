@@ -616,7 +616,7 @@ class Asset extends Data implements AssetContract
      */
     public function editUrl()
     {
-        return cp_route('asset.edit', [$this->container()->id(), $this->path()]);
+        return cp_route('assets.edit', base64_encode($this->id()));
     }
 
     /**
