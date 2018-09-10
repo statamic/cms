@@ -18,11 +18,8 @@ Route::group([
     Route::redirect('/', 'cp/dashboard')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
-    Route::get('licensing', 'LicensingController@index')->name('licensing');
-    Route::get('licensing/refresh', 'LicensingController@refresh')->name('licensing.refresh');
-    Route::post('licensing', 'LicensingController@update')->name('licensing.update');
-
     Route::resource('structures', 'StructuresController');
+
     Route::resource('collections', 'CollectionsController');
     Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
 
@@ -34,142 +31,12 @@ Route::group([
     Route::resource('assets', 'AssetsController');
     Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
     Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
-
-    Route::group(['prefix' => 'pages'], function () {
-        Route::get('/', 'PagesController@pages')->name('pages');
-        Route::post('/', 'PagesController@save')->name('pages.post');
-        Route::get('/get', 'PagesController@get')->name('pages.get');
-        Route::post('/delete', 'PagesController@delete')->name('page.delete');
-        Route::post('publish', 'PublishPageController@save')->name('page.save');
-        Route::get('create/{parent?}', 'PublishPageController@create')->name('page.create')->where('parent', '.*');
-        Route::get('edit/{url?}', ['uses' => 'PublishPageController@edit', 'as' => 'page.edit'])->where('url', '.*');
-        Route::post('mount', ['uses' => 'PagesController@mountCollection', 'as' => 'page.mount']);
-        Route::post('duplicate', 'DuplicatePageController@store');
-    });
-
-    Route::get('taxonomies', 'TaxonomiesController@index')->name('taxonomies');
-    Route::get('configure/taxonomies', 'ConfigureTaxonomiesController@index')->name('taxonomies.configure.index');
-
-    Route::group(['prefix' => 'taxonomies/terms'], function () {
-        Route::get('/', 'TaxonomyTermsController@index')->name('terms');
-        Route::delete('delete', 'TaxonomyTermsController@delete')->name('terms.delete');
-        Route::get('/{taxonomy}/get', 'TaxonomyTermsController@get')->name('terms.get');
-        Route::get('/{taxonomy}/create', 'PublishTaxonomyController@create')->name('term.create');
-        Route::get('/{taxonomy}/{slug}', 'PublishTaxonomyController@edit')->name('term.edit');
-        Route::post('publish', 'PublishTaxonomyController@save')->name('taxonomy.save');
-        Route::get('/{taxonomy}', 'TaxonomyTermsController@show')->name('terms.show');
-    });
-
-    Route::group(['prefix' => 'globals'], function () {
-        Route::get('/', 'GlobalsController@index')->name('globals');
-        Route::get('get', 'GlobalsController@get')->name('globals.get');
-        Route::get('{slug}', ['uses' => 'PublishGlobalController@edit', 'as' => 'globals.edit']);
-        Route::post('publish', 'PublishGlobalController@save')->name('global.save');
-    });
-
-    Route::group(['prefix' => 'users'], function () {
-        Route::get('account', 'UsersController@account')->name('account');
-        Route::get('/', 'UsersController@index')->name('users');
-        Route::get('get', 'UsersController@get')->name('users.get');
-        Route::get('create', 'UsersController@create')->name('user.create');
-        Route::delete('delete', 'UsersController@delete')->name('users.delete');
-        Route::post('publish', 'PublishUserController@save')->name('user.save');
-
-        Route::group(['prefix' => 'roles'], function () {
-            Route::get('/', 'RolesController@index')->name('user.roles');
-            Route::get('get', 'RolesController@get')->name('user.roles.get');
-            Route::get('create', 'RolesController@create')->name('user.role.create');
-            Route::post('/', 'RolesController@store')->name('user.role.store');
-            Route::delete('delete', 'RolesController@delete')->name('user.roles.delete');
-            Route::get('roles', 'RolesController@getRoles');
-            Route::get('{role}', 'RolesController@edit')->name('user.role');
-            Route::post('{role}', 'RolesController@update')->name('user.role');
-        });
-
-        Route::group(['prefix' => 'groups'], function () {
-            Route::get('/', 'UserGroupsController@index')->name('user.groups');
-            Route::get('get', 'UserGroupsController@get')->name('user.groups.get');
-            Route::get('create', 'UserGroupsController@create')->name('user.group.create');
-            Route::post('/', 'UserGroupsController@store')->name('user.group.store');
-            Route::delete('delete', 'UserGroupsController@delete')->name('user.groups.delete');
-            Route::get('groups', 'UserGroupsController@getGroups');
-            Route::get('{group}', 'UserGroupsController@edit')->name('user.group');
-            Route::post('{group}', 'UserGroupsController@update')->name('user.group');
-        });
-
-        Route::get('{username}', 'UsersController@edit')->name('user.edit');
-        Route::get('{username}/reset-url', 'UsersController@getResetUrl')->name('user.reset.url');
-        Route::get('{username}/send-reset-email', 'UsersController@sendResetEmail')->name('user.reset.email');
-    });
-
-
-    Route::group(['prefix' => 'forms'], function () {
-        Route::get('/', 'FormsController@index')->name('forms');
-        Route::get('get', 'FormsController@get')->name('forms.get');
-        Route::get('create', 'FormsController@create')->name('form.create');
-        Route::post('/', 'FormsController@store')->name('form.store');
-        Route::get('{form}', 'FormsController@show')->name('form.show');
-        Route::get('{form}/submissions', 'FormsController@getFormSubmissions')->name('form.submissions');
-        Route::get('{form}/edit', 'FormsController@edit')->name('form.edit');
-        Route::get('{form}/get', 'FormsController@getForm')->name('form.get');
-        Route::post('{form}', 'FormsController@update')->name('form.update');
-        Route::get('{form}/submission/{submission}', 'FormsController@submission')->name('form.submission.show');
-        Route::get('{form}/submission/{submission}/delete', 'FormsController@deleteSubmission')->name('form.submission.delete');
-        Route::get('{form}/export/{type}', 'FormsController@export')->name('form.export');
-    });
-
-    Route::get('system/templates/get', 'CpController@templates');
-
-    Route::group(['prefix' => 'fieldsets'], function () {
-        Route::get('get', 'FieldsetController@get')->name('fieldsets.get');
-        Route::get('{fieldset}/get', 'FieldsetController@getFieldset')->name('fieldset.get');
-
-        Route::group(['middleware' => Configurable::class], function () {
-            Route::get('/', 'FieldsetController@index')->name('fieldsets');
-            Route::get('/create', 'FieldsetController@create')->name('fieldset.create');
-            Route::post('/update-layout/{fieldset}', 'FieldsetController@updateLayout')->name('fieldset.update-layout');
-            Route::delete('delete', 'FieldsetController@delete')->name('fieldsets.delete');
-            Route::post('quick', 'FieldsetController@quickStore');
-            Route::get('/{fieldset}', 'FieldsetController@edit')->name('fieldset.edit');
-            Route::post('/{fieldset}', 'FieldsetController@update')->name('fieldset.update');
-            Route::post('/', 'FieldsetController@store')->name('fieldset.store');
-        });
-    });
-
-    Route::get('fieldtypes', 'FieldtypesController@index')->name('fieldtypes');
-
-    Route::group(['prefix' => 'addons', 'middleware' => Configurable::class], function () {
-        Route::get('/', 'AddonsController@index')->name('addons');
-        Route::get('get', 'AddonsController@get')->name('addons.get');
-    });
-
-    Route::group(['prefix' => 'addons', 'middleware' => Configurable::class], function () {
-        Route::get('{addon}/settings', 'AddonsController@settings')->name('addon.settings');
-        Route::post('{addon}/settings', 'AddonsController@saveSettings');
-    });
-
-    Route::post('addons/suggest/suggestions', '\Statamic\Addons\Suggest\SuggestController@suggestions');
-
-    Route::get('updater', 'UpdaterController@index')->name('updater');
-    Route::get('updater/{version}', 'UpdaterController@update')->name('updater.update');
-
-    Route::get('resolve-duplicate-ids', 'DuplicateIdController@index')->name('resolve-duplicate-ids');
-    Route::post('resolve-duplicate-ids', 'DuplicateIdController@update')->name('resolve-duplicate-ids.update');
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');
 
 // Just to make stuff work.
 Route::get('/account', function () { return ''; })->name('account');
-Route::get('/content', function () { return ''; })->name('content');
-Route::get('/assets.containers.manage', function () { return ''; })->name('assets.containers.manage');
-Route::get('/assets.container.edit', function () { return ''; })->name('assets.container.edit');
-Route::get('/collection.edit', function () { return ''; })->name('collection.edit');
-Route::get('/taxonomies.manage', function () { return ''; })->name('taxonomies.manage');
-Route::get('/taxonomy.edit', function () { return ''; })->name('taxonomy.edit');
-Route::get('/taxonomy.create', function () { return ''; })->name('taxonomy.create');
-Route::get('/globals.manage', function () { return ''; })->name('globals.manage');
-Route::get('/fieldsets', function () { return ''; })->name('fieldsets');
 Route::get('/search', function () { return ''; })->name('search.global');
 Route::get('/account/password', function () { return ''; })->name('account.password');
 
