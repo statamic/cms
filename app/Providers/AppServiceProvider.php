@@ -57,6 +57,10 @@ class AppServiceProvider extends ServiceProvider
                 File::get(statamic_path("resources/dist/svg/{$file}.svg"))
             );
         });
+
+        $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
+            return $this->to(cp_route($route, $parameters));
+        });
     }
 
     public function register()
