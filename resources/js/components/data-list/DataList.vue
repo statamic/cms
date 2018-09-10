@@ -17,6 +17,10 @@ export default {
             type: String,
             default: ''
         },
+        selections: {
+            type: Array,
+            default: () => []
+        },
         maxSelections: {
             type: Number
         }
@@ -35,7 +39,7 @@ export default {
                 sortColumn: this.visibleColumns[0],
                 sortDirection: 'asc',
                 rows: [],
-                selections: [],
+                selections: this.selections,
                 maxSelections: this.maxSelections,
             }
         }
