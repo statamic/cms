@@ -40,7 +40,9 @@ mix.extract([
     'underscore',
     'vue',
     'vue-clickaway',
-    'vue-typeahead'
+    'vue-js-modal',
+    'vue-js-popover',
+    'vue-typeahead',
 ]);
 
 mix.copyDirectory(`${src}/img`, `${dest}/img`);
