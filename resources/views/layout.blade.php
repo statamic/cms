@@ -2,7 +2,7 @@
 {{-- TODO: Set lang with current translation --}}
 <html lang="en">
 <head>
-      @include('statamic::partials.head')
+    @include('statamic::partials.head')
 </head>
 
 <body>
