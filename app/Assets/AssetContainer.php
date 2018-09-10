@@ -151,18 +151,13 @@ class AssetContainer implements AssetContainerContract
     }
 
     /**
-     * Get or set the URL to this location
+     * Get the URL to this location
      *
-     * @param string|null $url
      * @return null|string
      */
-    public function url($url = null)
+    public function url()
     {
-        if (! is_null($url)) {
-            $this->url = $url;
-        }
-
-        return $this->url;
+        return array_get($this->diskConfig(), 'url');
     }
 
     /**
@@ -279,6 +274,13 @@ class AssetContainer implements AssetContainerContract
         $disk = array_get($this->data(), 'disk');
 
         return File::disk($disk);
+    }
+
+    public function diskConfig()
+    {
+        $disk = array_get($this->data(), 'disk');
+
+        return config("filesystems.disks.$disk");
     }
 
     /**
@@ -433,14 +435,6 @@ class AssetContainer implements AssetContainerContract
      */
     public function accessible()
     {
-        $driver = $this->driver();
-
-        if ($driver === 's3') {
-            return true;
-        } elseif ($driver === 'local') {
-            return ! is_null($this->url());
-        }
-
-        return false;
+        return $this->url() !== null;
     }
 }

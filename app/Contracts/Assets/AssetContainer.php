@@ -62,12 +62,11 @@ interface AssetContainer extends Editable
     public function resolvedPath();
 
     /**
-     * Get or set the URL to this location
+     * Get the URL to this location
      *
-     * @param string|null $url
      * @return null|string
      */
-    public function url($url = null);
+    public function url();
 
     /**
      * Create an asset
