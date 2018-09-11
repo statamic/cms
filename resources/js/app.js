@@ -73,6 +73,7 @@ var vm = new Vue({
         this.bindWindowResizeListener();
 
         this.$mousetrap.bind(['command+\\'], e => {
+            e.preventDefault();
             this.toggleNav();
         });
     },
@@ -89,7 +90,6 @@ var vm = new Vue({
         toggleNav() {
             this.navOpen = ! this.navOpen;
         }
-
     }
 
 });
