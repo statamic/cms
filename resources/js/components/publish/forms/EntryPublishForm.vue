@@ -46,16 +46,15 @@ export default {
             this.clearErrors();
 
             axios.patch(this.action, this.values).then(response => {
-                // this.$notify.success('Saved!');
-                alert('Saved!');
+                this.$notify.success('Saved');
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
+                    this.$notify.error(message, { timeout: 2000 });
                 } else {
-                    // this.$notify.error('Something went wrong');
-                    alert('Something went wrong');
+                    this.$notify.error('Something went wrong');
                 }
             });
         }

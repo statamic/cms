@@ -341,16 +341,18 @@ export default {
 
             axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);
+                this.$notify.success('Saved');
                 this.saving = false;
                 this.clearErrors();
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
+                    const { message, errors, error } = e.response.data;
                     this.error = message;
                     this.errors = errors;
                     this.saving = false;
+                    this.$notify.error(error);
                 } else {
-                    alert('Something went wrong'); // TODO: Notification
+                    this.$notify.error('Something went wrong');
                 }
             });
         },

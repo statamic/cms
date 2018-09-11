@@ -211,7 +211,7 @@ export default {
                 this.folder = folder;
                 this.loadingAssets = false;
             }).catch(e => {
-                alert(e.response.data.message);
+                this.$notify.error(e.response.data.message, { dismissible: false });
                 this.loadingAssets = false;
             });
         },
