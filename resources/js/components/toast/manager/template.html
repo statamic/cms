@@ -4,7 +4,7 @@
       :key="index"
       :message="toast.message"
       :options="toast.options"
-      :destroyed.sync="toast.isDestroyed"
-      :position="$index"
+      :position="index"
+      @removed="_removeToast(index)"
     ></vue-toast>
 </div>

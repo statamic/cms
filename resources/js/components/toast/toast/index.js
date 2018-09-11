@@ -16,11 +16,6 @@ export default {
             type: Number,
             required: true
         },
-        destroyed: {
-            twoWay: true,
-            type: Boolean,
-            required: true
-        },
         options: {
             type: Object,
             coerce(options) {
@@ -60,16 +55,16 @@ export default {
         // Public
         remove() {
             this._clearTimer()
-            this.destroyed = true
-            this.$remove().$destroy()
-
-            return this
+            this._remove();
         },
         // Private
+        _remove() {
+            this.$emit('removed');
+        },
         _startLazyAutoDestroy() {
             this._clearTimer()
             this.timerDestroy = setTimeout(() => {
-                this.$remove().$destroy()
+                this._remove();
             }, this.options.timeLife)
         },
         _clearTimer() {

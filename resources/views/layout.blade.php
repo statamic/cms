@@ -38,7 +38,7 @@
 
             <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
-            <tooltip :pointer="true" />
+            <tooltip :pointer="true"></tooltip>
 
             <vue-toast ref="toast"></vue-toast>
 

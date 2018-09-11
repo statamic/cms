@@ -1,6 +1,7 @@
 import VueToast from '../components/toast/main.js';
 
 export default {
+
     components: { VueToast },
 
     data: {
@@ -8,7 +9,18 @@ export default {
         flash: Statamic.flash,
     },
 
+    created() {
+        this.$events.$on('notify.success', this.setFlashSuccess);
+        this.$events.$on('notify.error', this.setFlashError);
+    },
+
+    mounted() {
+        this.bindToastNotifications();
+        this.flashExistingMessages();
+    },
+
     methods: {
+
         flashExistingMessages() {
             this.flash.forEach(
                 ({ type, message }) => this.setFlashMessage(message, { theme: type })
@@ -31,9 +43,7 @@ export default {
                 closeBtn: opts.hasOwnProperty('dismissible') ? opts.dismissible : true,
             });
         },
-    },
 
-    events: {
         setFlashSuccess(message, opts) {
             opts = opts || {};
             opts.theme = 'success';
@@ -44,11 +54,6 @@ export default {
             opts = opts || {};
             opts.theme = 'danger';
             this.setFlashMessage(message, opts);
-        },
-    },
-
-    mounted() {
-        this.bindToastNotifications();
-        this.flashExistingMessages();
-    },
+        }
+    }
 }

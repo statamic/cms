@@ -6,11 +6,11 @@ class NotificationBus {
     }
 
     success(message, opts) {
-        this.instance.$dispatch('setFlashSuccess', message, opts);
+        this.instance.$events.$emit('notify.success', message, opts);
     }
 
     error(message, opts) {
-        this.instance.$dispatch('setFlashError', message, opts);
+        this.instance.$events.$emit('notify.error', message, opts);
     }
 }
 

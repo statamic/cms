@@ -36,6 +36,8 @@ require('./components/NotificationBus');
 var vm = new Vue({
     el: '#statamic',
 
+    mixins: [Notifications],
+
     store: new Vuex.Store({
         modules: {
             statamic: StatamicStore,

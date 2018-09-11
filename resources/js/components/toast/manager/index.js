@@ -47,9 +47,11 @@ export default {
 
       this.toasts.unshift({
         message,
-        options,
-        isDestroyed: false
+        options
       })
+    },
+    _removeToast(index) {
+      this.toasts.splice(index, 1);
     },
     _moveToast(toast) {
       const maxToasts = this.options.maxToasts > 0
