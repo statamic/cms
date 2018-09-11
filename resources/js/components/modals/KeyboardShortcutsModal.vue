@@ -1,5 +1,5 @@
 <template>
-    <modal name="keyboard-shortcuts" width="380" height="auto">
+    <modal name="keyboard-shortcuts" width="380" height="auto" :pivotY=".1">
         <h1 class="p-2 bg-grey-lightest border-b text-center">
             {{ translate('cp.keyboard_shortcuts') }}
         </h1>
