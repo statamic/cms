@@ -35,7 +35,7 @@
 
             <div class="shortcut-pair mb-0">
                 <span class="shortcut-key">
-                    <span class="shortcut">Esc</span>
+                    <span class="shortcut">esc</span>
                 </span>
                 <span class="shortcut-value">{{ translate('cp.close_modal') }}</span>
             </div>
