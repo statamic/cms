@@ -91,11 +91,9 @@
         <asset-editor
             v-if="showAssetEditor"
             :id="editedAssetId"
-            :has-child="editorHasChild"
             @closed="closeAssetEditor"
             @saved="assetSaved"
-            @deleted="assetDeleted"
-            @moved="assetMoved">
+            @deleted="assetDeleted">
         </asset-editor>
 
     </div>
@@ -234,6 +232,16 @@ export default {
 
         closeAssetEditor() {
             this.editedAssetId = null;
+        },
+
+        assetSaved() {
+            this.closeAssetEditor();
+            this.loadAssets();
+        },
+
+        assetDeleted() {
+            this.closeAssetEditor();
+            this.loadAssets();
         },
 
         destroy(id) {

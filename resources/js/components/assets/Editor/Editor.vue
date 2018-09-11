@@ -1,18 +1,18 @@
 <template>
 
-    <div class="asset-editor-modal">
+    <modal
+        name="asset-editor"
+        width="90%"
+        height="90%"
+    >
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
 
         <div v-if="loading" class="loading">
-            <div><span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}</div>
+            <loading-graphic />
         </div>
 
-        <div v-if="saving" class="loading">
-            <div><span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.saving') }}</div>
-        </div>
-
-        <template v-if="!loading && !saving">
+        <template v-if="!loading">
 
             <div class="editor-meta">
                 <div class="asset-editor-meta-items">
@@ -86,13 +86,13 @@
                         <video :src="asset.url" controls></video>
                     </div>
 
-                    <div class="full-height" v-if="asset.extension == 'pdf'">
+                    <div class="h-full" v-if="asset.extension == 'pdf'">
                         <object :data="asset.url" type="application/pdf" width="100%" height="100%">
                         </object>
                     </div>
 
-                    <div class="full-height" v-if="asset.is_previewable">
-                        <iframe class="full-height full-width" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
+                    <div class="h-full" v-if="asset.is_previewable">
+                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
                     <div class="editor-file-actions">
@@ -122,34 +122,37 @@
 
                 </div>
 
-                <div class="editor-form">
+                <publish-container
+                    v-if="fields"
+                    name="asset"
+                    :fieldset="fieldset"
+                    :values="initialValues"
+                    :errors="errors"
+                    @updated="values = $event"
+                >
+                    <div class="editor-form" slot-scope="{}">
 
-                    <div class="editor-form-fields">
-                        <div class="alert alert-danger" v-if="hasErrors">
-                            <ul>
-                                <li v-for="error in errors">{{ error }}</li>
-                            </ul>
+                        <div v-if="saving" class="loading">
+                            <loading-graphic text="Saving" />
                         </div>
 
-                        <publish-fields
-                            :fields="publishFields"
-                            :data.sync="fields"
-                            :errors="errors"
-                            :autofocus="true"
-                            :regular-title-field="true">
-                        </publish-fields>
-                    </div>
+                        <div class="editor-form-fields">
+                            <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
+                            <publish-fields :fields="fields" />
+                        </div>
 
-                    <div class="editor-form-actions">
-                        <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
-                            {{ translate('cp.delete') }}
-                        </button>
-                        <button type="button" class="btn btn-primary" @click="save">
-                            {{ translate('cp.save') }}
-                        </button>
-                    </div>
+                        <div class="editor-form-actions">
+                            <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
+                                {{ translate('cp.delete') }}
+                            </button>
+                            <button type="button" class="btn btn-primary" @click="save">
+                                {{ translate('cp.save') }}
+                            </button>
+                        </div>
 
-                </div>
+                    </div>
+                </publish-container>
+
 
             </div>
 
@@ -157,20 +160,11 @@
 
         <focal-point-editor
             v-if="showFocalPointEditor"
-            :data="fields.focus"
+            :data="values.focus"
             :image="asset.preview"
             @selected="selectFocalPoint"
             @closed="closeFocalPointEditor">
         </focal-point-editor>
-
-        <image-editor
-            v-if="showImageEditor"
-            :id="asset.id"
-            :container="asset.container"
-            :path="asset.path"
-            :url="asset.permalink"
-            @saved="updateThumbnail">
-        </image-editor>
 
         <renamer
             v-if="showRenamer"
@@ -189,13 +183,14 @@
         </mover>
     </div>
 
-    </div>
+    </modal>
 
 </template>
 
 
 <script>
-// import Fieldset from '../../publish/Fieldset';
+import axios from 'axios';
+import Fieldset from '../../publish/Fieldset';
 
 export default {
 
@@ -224,12 +219,15 @@ export default {
             loading: true,
             saving: false,
             asset: null,
+            values: null,
+            initialValues: null,
             fields: null,
-            publishFields: null,
+            fieldset: null,
             showFocalPointEditor: false,
             showRenamer: false,
             showMover: false,
-            errors: []
+            error: null,
+            errors: {}
         }
     },
 
@@ -249,13 +247,14 @@ export default {
          * Whether there are errors present.
          */
         hasErrors: function() {
-            return _.size(this.errors) !== 0;
+            return this.error || Object.keys(this.errors).length;
         },
 
     },
 
 
     mounted() {
+        this.$modal.show('asset-editor');
         this.load();
     },
 
@@ -278,11 +277,12 @@ export default {
         load() {
             this.loading = true;
 
-            const url = cp_url('assets/' + this.id.replace('::', '/'));
+            const url = cp_url(`assets/${btoa(this.id)}`);
 
-            this.$http.get(url).success((response) => {
-                this.asset = response.asset;
-                this.fields = response.fields;
+            axios.get(url).then(response => {
+                this.asset = response.data.asset;
+                this.initialValues = response.data.fields;
+                this.values = this.initialValues;
                 this.getFieldset();
             });
         },
@@ -291,12 +291,15 @@ export default {
          * Load the fieldset
          */
         getFieldset() {
-            const url = cp_url(`fieldsets-json/${this.asset.fieldset}`);
+            const url = cp_url(`publish-fieldsets/${this.asset.fieldset}`);
 
-            this.$http.get(url).success((response) => {
+            axios.get(url).then(response => {
+                const fieldset = new Fieldset(response.data);
+
+                this.fieldset = fieldset.fieldset;
+
                 // Flatten fields from all sections into one array.
-                const fieldset = new Fieldset(response);
-                this.publishFields = _.chain(fieldset.sections)
+                this.fields = _.chain(fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)
                     .value();
@@ -326,7 +329,7 @@ export default {
          */
         selectFocalPoint(point) {
             point = (point === '50-50') ? null : point;
-            this.$set(this.fields, 'focus', point)
+            this.$set(this.values, 'focus', point)
         },
 
         /**
@@ -334,19 +337,27 @@ export default {
          */
         save() {
             this.saving = true;
+            const url = cp_url(`assets/${btoa(this.id)}`);
 
-            const url = cp_url('assets/' + this.id.replace('::', '/'));
-
-            this.$http.post(url, this.fields).success((response) => {
-                this.$emit('saved', response.asset);
+            axios.patch(url, this.values).then(response => {
+                this.$emit('saved', response.data.asset);
                 this.saving = false;
-            }).error((error) => {
-                this.$notify.error(translate('cp.error'), { timeout: 2000 });
-                this.saving = false;
-                this.errors = error;
+                this.clearErrors();
+            }).catch(e => {
+                if (e.response && e.response.status === 422) {
+                    const { message, errors } = e.response.data;
+                    this.error = message;
+                    this.errors = errors;
+                    this.saving = false;
+                } else {
+                    alert('Something went wrong'); // TODO: Notification
+                }
             });
+        },
 
-            this.$dispatch('changesMade', false);
+        clearErrors() {
+            this.error = null;
+            this.errors = {};
         },
 
         /**
@@ -359,9 +370,9 @@ export default {
 
             this.saving = true;
 
-            const url = cp_url('assets/delete');
+            const url = cp_url(`assets/${btoa(this.id)}`);
 
-            this.$http.delete(url, { ids: this.asset.id }).success((response) => {
+            axios.delete(url).then(response => {
                 this.$emit('deleted', this.asset.id);
                 this.saving = false;
             });
@@ -371,6 +382,7 @@ export default {
          * Close the editor
          */
         close() {
+            this.$modal.hide('asset-editor');
             this.$emit('closed');
         },
 

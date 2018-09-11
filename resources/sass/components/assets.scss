@@ -708,31 +708,6 @@
  * Asset Editor
  */
 
-.asset-editor-modal {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    padding: 30px;
-    background: rgba($color_dark_blue, .33);
-    z-index: 1000;
-    will-change: transform;
-    cursor: auto;
-
-    .asset-editor {
-        height: 100%;
-        box-shadow: 0 0 15px rgba(black, .5);
-        border-radius: 4px;
-    }
-}
-
-@media all and (max-width: 960px) {
-    .asset-editor-modal {
-        padding: 0;
-    }
-}
-
 @media all and (max-width: 800px) {
     .asset-editor-meta-items .meta-item {
         display: none;
@@ -744,12 +719,19 @@
     flex-direction: column;
     position: relative;
     background: white;
+    height: 100%;
+    box-shadow: 0 0 15px rgba(black, .5);
+    border-radius: 4px;
 
-    > .loading {
-        flex-basis: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+    .loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        background: rgba(white, 0.7);
+        @apply flex items-center justify-center;
     }
 
     .editor-main {

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Asset;
+use Illuminate\Http\Request;
 use Statamic\CP\Publish\ProcessesFields;
 
 class AssetsController extends CpController
@@ -44,6 +45,31 @@ class AssetsController extends CpController
         return $asset;
     }
 
+    public function update(Request $request, $asset)
+    {
+        $asset = Asset::find(base64_decode($asset));
+
+        // TODO: Auth
+        // TODO: Validation
+
+        $request->validate([
+            'title' => 'required',
+            'alt' => 'required',
+        ]);
+
+        $fieldset = $asset->fieldset();
+        $fields = $this->processFields($fieldset, $this->request->all());
+        $asset->data($fields);
+        $asset->save();
+
+        if ($asset->isImage()) {
+            $asset->set('thumbnail', $this->thumbnail($asset, 'small'));
+            $asset->set('toenail', $this->thumbnail($asset, 'large'));
+        }
+
+        return ['success' => true, 'message' => 'Asset updated', 'asset' => $asset->toArray()];
+    }
+
     public function download($asset)
     {
         $asset = Asset::find(base64_decode($asset));
@@ -61,6 +87,25 @@ class AssetsController extends CpController
             "Content-Type" => $filesystem->getMimetype($file),
             "Content-Length" => $filesystem->getSize($file),
             "Content-disposition" => "attachment; filename=\"" . basename($file) . "\"",
+        ]);
+    }
+
+    public function destroy($asset)
+    {
+        $asset = Asset::find(base64_decode($asset));
+
+        // TODO: Auth
+
+        $asset->delete();
+
+        return response('', 204);
+    }
+
+    private function thumbnail($asset, $preset = null)
+    {
+        return cp_route('assets.thumbnails.show', [
+            'asset' => base64_encode($asset->id()),
+            'size' => $preset
         ]);
     }
 }
