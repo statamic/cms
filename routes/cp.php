@@ -31,6 +31,8 @@ Route::group([
     Route::resource('assets', 'AssetsController');
     Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
     Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
+
+    Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');

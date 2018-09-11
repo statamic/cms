@@ -562,7 +562,7 @@ class Fieldset implements FieldsetContract
      */
     public function editUrl()
     {
-        return cp_route('fieldset.edit', $this->name());
+        return cp_route('fieldsets.edit', $this->name());
     }
 
     /**
