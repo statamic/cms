@@ -26,6 +26,7 @@ Vue.component('asset-container-list', require('../components/data-list/AssetCont
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
 Vue.component('file-icon', require('../components/FileIcon.vue'));
+Vue.component('loading-graphic', require('../components/LoadingGraphic.vue'));
 Vue.component('dropdown-list', require('../components/DropdownList'));
 Vue.component('validation-errors', require('../components/ValidationErrors'));
 
