@@ -19,17 +19,32 @@ a {
 body > svg { display: none; }
 
 #main {
-    display: grid;
-    grid-template-columns: config('width.54') auto;
+    @apply flex;
+}
 
-    &.hide-nav {
-        display: block;
+#main .new-nav-main {
+    @apply w-54 absolute pin-l;
+    transition: all .3s;
+}
 
-        > .nav-main {
-            display: none;
-        }
+#main .content {
+    flex: 1;
+    transition: padding .3s;
+    padding-left: 14rem;
+}
+
+#main.nav-closed {
+    .new-nav-main {
+        left: -14rem;
+    }
+
+    .content {
+        padding-left: 0;
     }
 }
+
+
+
 
 .cp-head {
     @apply .flex .items-center .relative .p-3;

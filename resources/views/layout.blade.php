@@ -20,7 +20,7 @@
       @include('statamic::partials.alerts')
       @include('statamic::partials.new-global-header')
 
-      <div id="main" class="@yield('content-class')">
+      <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen}">
             @include('statamic::partials.nav-main-new')
 
             <div class="content">

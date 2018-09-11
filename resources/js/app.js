@@ -64,10 +64,15 @@ var vm = new Vue({
     data: {
         version: Statamic.version,
         showLoginModal: false,
+        navOpen: true
     },
 
     mounted() {
         this.bindWindowResizeListener();
+
+        this.$mousetrap.bind(['command+\\'], e => {
+            this.toggleNav();
+        });
     },
 
     methods: {
@@ -77,6 +82,10 @@ var vm = new Vue({
                 this.$store.commit('statamic/windowWidth', document.documentElement.clientWidth);
             });
             window.dispatchEvent(new Event('resize'));
+        },
+
+        toggleNav() {
+            this.navOpen = ! this.navOpen;
         }
 
     }
