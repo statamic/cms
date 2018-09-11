@@ -216,7 +216,7 @@ export default {
                 this.getPages();
                 this.changed = false;
                 this.saving = false;
-                this.$eventHub.$emit('setFlashSuccess', translate('cp.pages_reordered'))
+                this.$events.$emit('setFlashSuccess', translate('cp.pages_reordered'))
             });
         },
 
@@ -235,7 +235,7 @@ export default {
         },
 
         createPage: function(parent) {
-            this.$eventHub.$emit('pages.create', parent);
+            this.$events.$emit('pages.create', parent);
         },
 
         onShowDraftsChanged() {
@@ -250,14 +250,14 @@ export default {
 
     events: {
         'pages.create': function(parent) {
-            this.$eventHub.$emit('pages.create', parent);
+            this.$events.$emit('pages.create', parent);
         },
         'pages.mount': function(id) {
-            this.$eventHub.$emit('pages.mount', id);
+            this.$events.$emit('pages.mount', id);
         },
         'pages.unmount': function(id) {
             this.saving = true;
-            this.$eventHub.$emit('pages.unmount', id);
+            this.$events.$emit('pages.unmount', id);
         },
         'page.deleted': function () {
             if (this.pages.length > 1) {
@@ -270,7 +270,7 @@ export default {
 
     watch: {
         changed(changed) {
-            this.$eventHub.$emit('changesMade', changed);
+            this.$events.$emit('changesMade', changed);
         }
     }
 

@@ -111,7 +111,7 @@ export default {
         },
 
         createPage: function() {
-            this.$eventHub.$emit('pages.create', this.url);
+            this.$events.$emit('pages.create', this.url);
         },
 
         deletePage: function() {
@@ -128,7 +128,7 @@ export default {
                 self.$http.post(cp_url('pages/delete'), { uuid: self.uuid }).success(function() {
                     self.$parent.pages.splice(self.branchIndex, 1);
 
-                    this.$eventHub.$emit('page.deleted');
+                    this.$events.$emit('page.deleted');
                 });
             });
         },
@@ -140,11 +140,11 @@ export default {
         },
 
         mountCollection: function () {
-            this.$eventHub.$emit('pages.mount', this.uuid);
+            this.$events.$emit('pages.mount', this.uuid);
         },
 
         unmountCollection: function () {
-            this.$eventHub.$emit('pages.unmount', this.uuid);
+            this.$events.$emit('pages.unmount', this.uuid);
         }
 
     }

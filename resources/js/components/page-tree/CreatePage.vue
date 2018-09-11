@@ -35,7 +35,7 @@ export default {
     },
 
     created() {
-        this.$eventHub.$on('pages.create', this.getFieldsets);
+        this.$events.$on('pages.create', this.getFieldsets);
     },
 
     methods: {
