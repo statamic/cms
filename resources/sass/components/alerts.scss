@@ -93,6 +93,18 @@
     box-shadow: 0 7px 14px 0 rgba(50,50,93,.1), 0 3px 6px 0 rgba(0,0,0,.07);
 }
 
+.alert {
+  @apply p-2 rounded;
+
+  .close {
+    @apply ml-2 float-right leading-none text-xl;
+  }
+}
+
+.alert-danger {
+  @apply bg-red text-white;
+}
+
 .alert-success {
     background: $color_dark_blue;
     color: #fff;
