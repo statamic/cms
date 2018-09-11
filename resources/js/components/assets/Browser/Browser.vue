@@ -11,8 +11,7 @@
         </div>
 
         <div v-if="loading" class="asset-browser-loading loading">
-            <span class="icon icon-circular-graph animation-spin" />
-            {{ translate('Loading') }}
+            <loading-graphic />
         </div>
 
         <data-list
