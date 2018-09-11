@@ -271,7 +271,9 @@ class AssetContainer implements AssetContainerContract
 
     public function disk()
     {
-        $disk = array_get($this->data(), 'disk');
+        if (! $disk = array_get($this->data(), 'disk')) {
+            throw new \Exception("Asset container [{$this->id()}] does not have a disk specified.");
+        }
 
         return File::disk($disk);
     }

@@ -84,6 +84,10 @@
 
                 </data-table>
 
+                <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
+                    There are no assets.
+                </div>
+
             </div>
         </data-list>
 
@@ -205,6 +209,9 @@ export default {
                 this.assets = assets;
                 this.folders = folders;
                 this.folder = folder;
+                this.loadingAssets = false;
+            }).catch(e => {
+                alert(e.response.data.message);
                 this.loadingAssets = false;
             });
         },
