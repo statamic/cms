@@ -418,7 +418,7 @@ class Asset extends Data implements AssetContract
 
         $extra = [
             'id'             => $this->id(),
-            'title'          => $this->get('title', $this->filename()),
+            'title'          => $this->get('title'),
             'url'            => $this->url(),
             'permalink'      => $this->absoluteUrl(),
             'path'           => $this->path(),
