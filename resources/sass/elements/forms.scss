@@ -94,12 +94,12 @@ label .required {
     position: relative;
 
     select {
-        @apply block appearance-none bg-white cursor-pointer w-full h-full pr-4 relative w-full shadow-button;
         @include button(#fff, $color_gray_dark);
+        @apply block appearance-none pl-1.5 pr-3 bg-white cursor-pointer w-full h-full relative shadow-button;
     }
 
     .select-input-toggle {
-        @apply pointer-events-none absolute pin-y pin-r flex items-center px-2 text-grey-darker;
+        @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-darker;
         svg {
             @apply fill-current h-4 w-4;
         }
