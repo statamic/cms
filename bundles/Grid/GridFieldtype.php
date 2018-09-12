@@ -4,8 +4,9 @@ namespace Statamic\Addons\Grid;
 
 use Statamic\API\Helper;
 use Statamic\CP\Fieldset;
-use Statamic\Addons\BundleFieldtype as Fieldtype;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Validation\Compiler;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class GridFieldtype extends Fieldtype
 {
@@ -75,5 +76,41 @@ class GridFieldtype extends Fieldtype
 
         // Either call $fieldtype->process($data) or $fieldtype->preProcess($data)
         return call_user_func([$fieldtype, $this->process], $field_data);
+    }
+
+    public function rules()
+    {
+        $rules = ['array'];
+
+        if ($min = $this->getFieldConfig('min_rows')) {
+            $rules[] = 'min:' . $min;
+        }
+
+        if ($max = $this->getFieldConfig('max_rows')) {
+            $rules[] = 'max:' . $min;
+        }
+
+        return $rules;
+    }
+
+    public function extraRules()
+    {
+        $fieldset = (new Fieldset)->contents(['fields' => $this->getFieldConfig('fields')]);
+        $rules = (new Compiler)->fieldset($fieldset)->rules();
+
+        return collect($rules)->mapWithKeys(function ($rules, $handle) {
+            return ["grid.*.{$handle}" => $rules];
+        })->all();
+    }
+
+    public function extraAttributes()
+    {
+        $fieldset = (new Fieldset)->contents(['fields' => $this->getFieldConfig('fields')]);
+
+        return collect($fieldset->fields())->map(function ($field, $handle) {
+            return (new \Statamic\Fields\Field($handle, $field));
+        })->mapWithKeys(function ($field, $handle) {
+            return ["grid.*.{$handle}" => $field->display()];
+        })->all();
     }
 }

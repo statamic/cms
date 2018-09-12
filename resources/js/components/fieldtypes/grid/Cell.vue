@@ -8,6 +8,10 @@
             :name="name"
             @updated="updated"
         />
+
+        <div v-if="hasError">
+            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
     </td>
 
 </template>
@@ -37,6 +41,8 @@ export default {
         }
     },
 
+    inject: ['storeName'],
+
     computed: {
 
         fieldtypeComponent() {
@@ -45,6 +51,20 @@ export default {
 
         name() {
             return `${this.gridName}[${this.rowIndex}][${this.field.handle}]`;
+        },
+
+        hasError() {
+            return this.errors.length > 0;
+        },
+
+        errorKey() {
+            return `${this.gridName}.${this.rowIndex}.${this.field.handle}`;
+        },
+
+        errors() {
+            const state = this.$store.state.publish[this.storeName];
+            if (! state) return [];
+            return state.errors[this.errorKey] || [];
         }
 
     },
