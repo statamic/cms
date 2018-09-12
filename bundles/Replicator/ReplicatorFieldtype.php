@@ -2,8 +2,10 @@
 
 namespace Statamic\Addons\Replicator;
 
-use Statamic\Addons\BundleFieldtype as Fieldtype;
+use Statamic\CP\Fieldset;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Validation\Compiler;
+use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class ReplicatorFieldtype extends Fieldtype
 {
@@ -78,5 +80,30 @@ class ReplicatorFieldtype extends Fieldtype
 
         // Either call $fieldtype->process($data) or $fieldtype->preProcess($data)
         return call_user_func([$fieldtype, $this->process], $field_data);
+    }
+
+    public function extraRules($data)
+    {
+        return collect($data)->map(function ($set, $index) {
+            return $this->setRules($set['type'], $set, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
+    }
+
+    private function setRules($handle, $data, $index)
+    {
+        $fieldset = (new Fieldset)->contents(['fields' => $this->setConfig($handle)['fields']]);
+
+        $rules = (new Compiler)->fieldset($fieldset)->rules();
+
+        return collect($rules)->mapWithKeys(function ($rules, $field) use ($index) {
+            return ["{$this->getName()}.{$index}.{$field}" => $rules];
+        })->all();
+    }
+
+    private function setConfig($handle)
+    {
+        return array_get($this->getFieldConfig('sets'), $handle);
     }
 }

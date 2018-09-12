@@ -9,6 +9,10 @@
             v-if="field.instructions"
             v-html="$options.filters.markdown(field.instructions)" />
 
+        <div v-if="hasError">
+            <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
+
         <component
             :is="fieldtypeComponent"
             :config="field"
@@ -42,6 +46,7 @@ export default {
         }
     },
 
+    inject: ['storeName'],
 
     computed: {
 
@@ -55,6 +60,20 @@ export default {
 
         display() {
             return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
+        },
+
+        hasError() {
+            return this.errors.length > 0;
+        },
+
+        errorKey() {
+            return `${this.parentName}.${this.setIndex}.${this.field.handle}`;
+        },
+
+        errors() {
+            const state = this.$store.state.publish[this.storeName];
+            if (! state) return [];
+            return state.errors[this.errorKey] || [];
         }
 
     },
