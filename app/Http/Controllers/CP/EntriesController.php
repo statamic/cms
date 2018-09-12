@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
+use Statamic\Validation\Compiler;
 use Statamic\CP\Publish\ProcessesFields;
 
 class EntriesController extends CpController
@@ -42,21 +43,13 @@ class EntriesController extends CpController
         $entry = Entry::findBySlug($slug, $collection);
 
         $fieldset = $entry->fieldset();
-        $fieldsetFields = $fieldset->inlinedFields();
-        $fields = array_keys($fieldsetFields);
-        $extra = ['slug'];
-        $validatable = array_merge($fields, $extra);
 
-        $fieldsetValidationRules = collect($fieldsetFields)->map(function ($field) {
-            return array_get($field, 'validate', '');
-        });
-
-        $rules = $fieldsetValidationRules->merge([
+        $compiler = (new Compiler)->fieldset($fieldset)->with([
             'title' => 'required',
             'slug' => 'required',
         ]);
 
-        $data = $request->validate($rules->all());
+        $data = $request->validate($compiler->rules(), [], $compiler->attributes());
 
         $fieldsetData = array_only($data, array_keys($fieldsetFields));
         $fieldsetData = $this->processFields($fieldset, $fieldsetData);
