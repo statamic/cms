@@ -5,7 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
-use Statamic\Validation\Compiler;
+use Statamic\Fields\Validation;
 use Statamic\CP\Publish\ProcessesFields;
 
 class EntriesController extends CpController
@@ -44,7 +44,7 @@ class EntriesController extends CpController
 
         $fieldset = $entry->fieldset();
 
-        $compiler = (new Compiler)
+        $compiler = (new Validation)
             ->fieldset($fieldset)
             ->data($request->all())
             ->with([

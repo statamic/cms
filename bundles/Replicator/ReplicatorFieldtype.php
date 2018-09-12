@@ -3,8 +3,8 @@
 namespace Statamic\Addons\Replicator;
 
 use Statamic\CP\Fieldset;
+use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
-use Statamic\Validation\Compiler;
 use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class ReplicatorFieldtype extends Fieldtype
@@ -95,7 +95,7 @@ class ReplicatorFieldtype extends Fieldtype
     {
         $fieldset = (new Fieldset)->contents(['fields' => $this->setConfig($handle)['fields']]);
 
-        $rules = (new Compiler)->fieldset($fieldset)->rules();
+        $rules = (new Validation)->fieldset($fieldset)->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $field) use ($index) {
             return ["{$this->getName()}.{$index}.{$field}" => $rules];

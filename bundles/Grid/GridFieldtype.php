@@ -4,8 +4,8 @@ namespace Statamic\Addons\Grid;
 
 use Statamic\API\Helper;
 use Statamic\CP\Fieldset;
+use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
-use Statamic\Validation\Compiler;
 use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class GridFieldtype extends Fieldtype
@@ -96,7 +96,7 @@ class GridFieldtype extends Fieldtype
     public function extraRules($data)
     {
         $fieldset = (new Fieldset)->contents(['fields' => $this->getFieldConfig('fields')]);
-        $rules = (new Compiler)->fieldset($fieldset)->rules();
+        $rules = (new Validation)->fieldset($fieldset)->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) {
             return ["{$this->getName()}.*.{$handle}" => $rules];

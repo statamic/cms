@@ -4,7 +4,6 @@ namespace Statamic\Fields;
 
 use Statamic\API\Str;
 use Statamic\CP\FieldtypeFactory;
-use Statamic\Validation\Compiler;
 
 class Field
 {
@@ -57,6 +56,6 @@ class Field
 
     protected function explodeRules($rules)
     {
-        return Compiler::explodeRules($rules);
+        return Validation::explodeRules($rules);
     }
 }

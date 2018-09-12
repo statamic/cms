@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Validation;
+namespace Statamic\Fields;
 
 use Statamic\Fields\Field;
 use Statamic\Contracts\CP\Fieldset;
 
-class Compiler
+class Validation
 {
     protected $fieldset;
     protected $data = [];

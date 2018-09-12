@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Validation;
+namespace Tests\Fields;
 
 use Tests\TestCase;
-use Statamic\CP\Fieldset;
-use Statamic\Validation\Compiler;
+use Statamic\Fields\Fieldset;
+use Statamic\Fields\Validation;
 use Facades\Tests\FakeFieldsetLoader;
 use Facades\Tests\Factories\FieldsetFactory;
 
 /** @group fields */
-class CompilerTest extends TestCase
+class ValidationTest extends TestCase
 {
     protected function setUp()
     {
@@ -24,19 +24,19 @@ class CompilerTest extends TestCase
     /** @test */
     function it_explodes_pipe_style_rules_into_arrays()
     {
-        $this->assertEquals(['foo'], Compiler::explodeRules('foo'));
+        $this->assertEquals(['foo'], Validation::explodeRules('foo'));
 
-        $this->assertEquals(['foo', 'bar'], Compiler::explodeRules('foo|bar'));
+        $this->assertEquals(['foo', 'bar'], Validation::explodeRules('foo|bar'));
 
-        $this->assertEquals([], Compiler::explodeRules(null));
+        $this->assertEquals([], Validation::explodeRules(null));
 
-        $this->assertEquals(['foo', 'bar'], Compiler::explodeRules(['foo', 'bar']));
+        $this->assertEquals(['foo', 'bar'], Validation::explodeRules(['foo', 'bar']));
     }
 
     /** @test */
     function it_compiles_rules()
     {
-        $compiler = $this->compile([
+        $validation = $this->compile([
             'fieldtype_and_field_rules' => [
                 'type' => 'fieldtype_with_rules',
                 'validate' => 'required|array'
@@ -64,29 +64,29 @@ class CompilerTest extends TestCase
             'test.*.one' => ['required', 'min:2'],
             'test.*.two' => ['max:2'],
             'no_rules' => [],
-        ], $compiler->rules());
+        ], $validation->rules());
     }
 
     /** @test */
     function it_adds_additional_rules()
     {
-        $compiler = $this->compile([
+        $validation = $this->compile([
             'test' => [
                 'type' => 'fieldtype_with_no_rules',
                 'validate' => 'min:10'
             ]
         ]);
 
-        $return = $compiler->with([
+        $return = $validation->with([
             'foo' => 'required',
             'test' => 'required|array'
         ]);
 
-        $this->assertEquals($compiler, $return);
+        $this->assertEquals($validation, $return);
         $this->assertEquals([
             'foo' => ['required'],
             'test' => ['min:10', 'required', 'array', ]
-        ], $compiler->rules());
+        ], $validation->rules());
     }
 
     /** @test */
@@ -107,13 +107,13 @@ class CompilerTest extends TestCase
 
         $this->assertEquals([
             'fieldtype_and_field_rules' => ['required', 'array', 'min:2', 'max:5']
-        ], (new Compiler)->fieldset($fieldset)->rules());
+        ], (new Validation)->fieldset($fieldset)->rules());
     }
 
     /** @test */
     function it_compiles_attributes()
     {
-        $compiler = $this->compile([
+        $validation = $this->compile([
             'field_with_display' => [
                 'display' => 'Field One'
             ],
@@ -130,7 +130,7 @@ class CompilerTest extends TestCase
             'field_with_extra_attributes' => 'Extras',
             'extra.*.one' => 'Extra One',
             'extra.*.two' => 'Extra Two',
-        ], $compiler->attributes());
+        ], $validation->attributes());
     }
 
     /** @test */
@@ -150,14 +150,14 @@ class CompilerTest extends TestCase
         $this->assertEquals([
             'nested_field' => 'Nested Field',
             'nested_field_with_no_explicit_display' => 'Nested field with no explicit display'
-        ], (new Compiler)->fieldset($fieldset)->attributes());
+        ], (new Validation)->fieldset($fieldset)->attributes());
     }
 
     private function compile($fields)
     {
         $fieldset = $this->createFieldsetWith($fields);
 
-        return (new Compiler)->fieldset($fieldset);
+        return (new Validation)->fieldset($fieldset);
     }
 
     private function createFieldsetWith($fields)
