@@ -99,7 +99,7 @@ class GridFieldtype extends Fieldtype
         $rules = (new Compiler)->fieldset($fieldset)->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) {
-            return ["grid.*.{$handle}" => $rules];
+            return ["{$this->getName()}.*.{$handle}" => $rules];
         })->all();
     }
 
