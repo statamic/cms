@@ -78,4 +78,13 @@ class Statamic
             $routes();
         }
    }
+
+   public static function isCpRoute()
+   {
+       if (! config('statamic.cp.enabled')) {
+           return false;
+       }
+
+        return starts_with(request()->path(), config('statamic.cp.route'));
+   }
 }
