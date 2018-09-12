@@ -100,7 +100,10 @@ export default {
         },
 
         addSet(handle, index) {
-            let newSet = { type: handle };
+            let newSet = {
+                _id: uniqid(), // Assign a unique id that Vue can use as a v-for key.
+                type: handle,
+            };
 
             // Get nulls for all the set's fields so Vue can track them more reliably.
             _.each(this.setConfig(handle).fields, field => {
