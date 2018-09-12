@@ -177,6 +177,8 @@ class Fieldset implements FieldsetContract
         }
 
         $this->contents = $contents;
+
+        return $this;
     }
 
     public function sections()
