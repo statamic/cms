@@ -80,8 +80,8 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \Statamic\Contracts\CP\Fieldset::class,
-            \Statamic\CP\Fieldset::class
+            \Statamic\Contracts\Fields\Fieldset::class,
+            \Statamic\Fields\Fieldset::class
         );
 
         $this->app->bind(\Statamic\Contracts\Data\Users\User::class, function () {

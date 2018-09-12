@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Fields;
 
-use Statamic\CP\Fieldset;
+use Statamic\Fields\Fieldset;
 use Statamic\CP\FieldtypeFactory;
 use Statamic\Extend\Fieldtype;
 

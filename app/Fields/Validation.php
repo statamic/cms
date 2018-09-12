@@ -3,7 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\Fields\Field;
-use Statamic\Contracts\CP\Fieldset;
+use Statamic\Contracts\Fields\Fieldset;
 
 class Validation
 {

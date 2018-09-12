@@ -3,7 +3,7 @@
 namespace Tests\Factories;
 
 use Closure;
-use Statamic\CP\Fieldset;
+use Statamic\Fields\Fieldset;
 
 class FieldsetFactory
 {

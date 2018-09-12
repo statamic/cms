@@ -23,12 +23,12 @@ class Fieldset
      *
      * @param string $name
      * @param array  $contents
-     * @return \Statamic\Contracts\CP\Fieldset
+     * @return \Statamic\Contracts\Fields\Fieldset
      */
     public function create($name, $contents = [])
     {
-        /** @var \Statamic\Contracts\CP\Fieldset $fieldset */
-        $fieldset = app('Statamic\Contracts\CP\Fieldset');
+        /** @var \Statamic\Contracts\Fields\Fieldset $fieldset */
+        $fieldset = app('Statamic\Contracts\Fields\Fieldset');
 
         $fieldset->name($name);
         $fieldset->contents($contents);
@@ -41,7 +41,7 @@ class Fieldset
      *
      * @param string $name
      * @param string $type
-     * @return \Statamic\CP\Fieldset
+     * @return \Statamic\Fields\Fieldset
      * @throws FileNotFoundException
      */
     public function get($name, $type = 'default')
@@ -64,7 +64,7 @@ class Fieldset
      *
      * @param string $name
      * @param string $type
-     * @return \Statamic\CP\Fieldset
+     * @return \Statamic\Fields\Fieldset
      * @throws FileNotFoundException
      */
     private function fetch($name, $type = 'default')
@@ -85,7 +85,7 @@ class Fieldset
      * Get all the fieldsets
      *
      * @param string $type
-     * @return \Statamic\Contracts\CP\Fieldset[]
+     * @return \Statamic\Contracts\Fields\Fieldset[]
      */
     public function all($type = 'default')
     {

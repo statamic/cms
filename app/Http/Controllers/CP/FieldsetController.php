@@ -155,7 +155,7 @@ class FieldsetController extends CpController
 
     /**
      * @param string $fieldset  Name of the fieldset, as specified in the URL.
-     * @return \Statamic\Contracts\CP\Fieldset
+     * @return \Statamic\Contracts\Fields\Fieldset
      */
     private function getInitialFieldset($fieldset)
     {

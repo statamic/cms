@@ -186,7 +186,7 @@ class Collection extends DataFolder implements CollectionContract
      * Get or set the fieldset
      *
      * @param string|null|bool
-     * @return Statamic\Contracts\CP\Fieldset
+     * @return Statamic\Contracts\Fields\Fieldset
      */
     public function fieldset($fieldset = null)
     {

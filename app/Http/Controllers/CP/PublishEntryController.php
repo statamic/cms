@@ -159,10 +159,10 @@ class PublishEntryController extends PublishController
     /**
      * Create the title for the page.
      *
-     * @param  \Statamic\CP\Fieldset  $fieldset
+     * @param  \Statamic\Fields\Fieldset  $fieldset
      * @return string
      */
-    private function title(\Statamic\CP\Fieldset $fieldset)
+    private function title(\Statamic\Fields\Fieldset $fieldset)
     {
         if (! $title = array_get($fieldset->contents(), 'create_title')) {
             return translate('cp.create_entry', [

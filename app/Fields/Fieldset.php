@@ -1,14 +1,15 @@
 <?php
 
-namespace Statamic\CP;
+namespace Statamic\Fields;
 
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Taxonomy;
 use Statamic\API\YAML;
+use Statamic\CP\FieldtypeFactory;
 use Statamic\API\Fieldset as FieldsetAPI;
-use Statamic\Contracts\CP\Fieldset as FieldsetContract;
+use Statamic\Contracts\Fields\Fieldset as FieldsetContract;
 use Statamic\Events\Data\FieldsetDeleted;
 use Statamic\Events\Data\FieldsetSaved;
 

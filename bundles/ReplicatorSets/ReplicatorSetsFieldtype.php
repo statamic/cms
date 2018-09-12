@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\ReplicatorSets;
 
-use Statamic\CP\Fieldset;
+use Statamic\Fields\Fieldset;
 use Statamic\Extend\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 

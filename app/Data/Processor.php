@@ -10,7 +10,7 @@ class Processor
     protected $fieldtypes;
 
     /**
-     * @param \Statamic\CP\Fieldset $fieldset
+     * @param \Statamic\Fields\Fieldset $fieldset
      */
     public function __construct($fieldset)
     {

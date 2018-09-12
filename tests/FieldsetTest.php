@@ -1,11 +1,11 @@
 <?php namespace Tests;
 
-use Statamic\CP\Fieldset;
+use Statamic\Fields\Fieldset;
 use Statamic\Extend\Fieldtype;
 
 class FieldsetTest extends TestCase
 {
-    /** @var \Statamic\CP\Fieldset */
+    /** @var \Statamic\Fields\Fieldset */
     private $fieldset;
 
     private $contents;

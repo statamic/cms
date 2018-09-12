@@ -3,7 +3,7 @@
 namespace Statamic\Addons\Grid;
 
 use Statamic\API\Helper;
-use Statamic\CP\Fieldset;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
 use Statamic\Addons\BundleFieldtype as Fieldtype;

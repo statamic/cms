@@ -567,7 +567,7 @@ class Asset extends Data implements AssetContract
      * Get or set the fieldset
      *
      * @param string|null $fieldset
-     * @return \Statamic\CP\Fieldset
+     * @return \Statamic\Fields\Fieldset
      * @throws \Exception
      * @throws \Statamic\Exceptions\FileNotFoundException
      */

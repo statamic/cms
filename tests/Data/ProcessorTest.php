@@ -4,7 +4,7 @@ namespace Tests\Data;
 
 use Mockery;
 use Tests\TestCase;
-use Statamic\CP\Fieldset;
+use Statamic\Fields\Fieldset;
 use Statamic\Data\Processor;
 
 class ProcessorTest extends TestCase

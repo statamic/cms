@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Contracts\CP;
+namespace Statamic\Contracts\Fields;
 
+use Statamic\Contracts\CP\Editable;
 use Illuminate\Contracts\Support\Arrayable;
 
 interface Fieldset extends Arrayable, Editable
