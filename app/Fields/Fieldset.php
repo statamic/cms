@@ -108,6 +108,8 @@ class Fieldset implements FieldsetContract
         }
 
         $this->name = $name;
+
+        return $this;
     }
 
     /**
