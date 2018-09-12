@@ -26,12 +26,9 @@ class Compiler
 
     public function rules()
     {
-        $rules = collect($this->fieldset->fields())
-            ->map(function ($field, $handle) {
-                return (new Field($handle, $field));
-            })->reduce(function ($carry, $field) {
-                return $carry->merge($field->rules());
-            }, collect());
+        $rules = $this->fields()->reduce(function ($carry, $field) {
+            return $carry->merge($field->rules());
+        }, collect());
 
         foreach ($this->extraRules as $field => $fieldRules) {
             $fieldRules = self::explodeRules($fieldRules);
@@ -48,12 +45,9 @@ class Compiler
 
     public function attributes()
     {
-        return collect($this->fieldset->fields())
-            ->map(function ($field, $handle) {
-                return (new Field($handle, $field));
-            })->reduce(function ($carry, $field) {
-                return $carry->merge($field->attributes());
-            }, collect())->all();
+        return $this->fields()->reduce(function ($carry, $field) {
+            return $carry->merge($field->attributes());
+        }, collect())->all();
     }
 
     public static function explodeRules($rules)
@@ -67,5 +61,12 @@ class Compiler
         }
 
         return $rules;
+    }
+
+    private function fields()
+    {
+        return collect($this->fieldset->fields())->map(function ($field, $handle) {
+            return (new Field($handle, $field));
+        });
     }
 }
