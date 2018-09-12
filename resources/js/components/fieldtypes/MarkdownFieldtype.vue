@@ -1,7 +1,7 @@
 <template>
     <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode}">
 
-        <div class="markdown-toolbar clearfix">
+        <div class="markdown-toolbar">
             <ul class="markdown-modes">
                 <li :class="{ 'active': mode == 'write' }">
                     <a href="" @click.prevent="mode = 'write'" tabindex="-1">{{ translate('cp.write') }}</a>

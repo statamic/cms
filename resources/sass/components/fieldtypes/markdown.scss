@@ -5,23 +5,16 @@
 .markdown-fieldtype {
 
     .markdown-fieldtype-wrapper {
-        border: 1px solid $border;
-        border-radius: 3px;
-        overflow: hidden;
+        @apply .border .rounded .overflow-hidden
     }
 
     .markdown-toolbar {
-        background: #fff;
-        box-shadow: none;
-        padding: 9px 10px 7px;
-        border-bottom: 1px solid #cecece;
-        font-size: 14px;
+        @apply .bg-white .shadow-none .border-b .text-sm .p-1 flex items-center justify-between;
+        padding: 8px 12px;
     }
 
     .markdown-modes, .markdown-buttons {
-        list-style: none;
-        margin: 0;
-        padding: 0;
+        @apply list-reset;
 
         li {
             display: inline-block;
@@ -29,68 +22,35 @@
     }
 
     .markdown-modes {
-        float: left;
-        margin-left: 10px;
+        @apply ml-1;
 
         li {
-            margin-right: 15px;
+            @apply .mr-2
         }
 
         a {
-            color: #aaa;
-            outline: none;
+            @apply text-grey-light outline-none;
+
             &:hover {
-                color: #333;
+                @apply text-blue;
             }
         }
 
-        .active {
-            position: relative;
-
-            &:before, &:after {
-                content: '';
-                border: 5px solid transparent;
-                border-bottom-color: $border;
-                position: absolute;
-                top: 18px;
-                left: 50%;
-                z-index: 2;
-                margin-top: 2px;
-                margin-left: -3px;
-            }
-
-            &:after {
-                border-bottom-color: darken(#cecece, 5);
-                margin-top: 1px;
-                z-index: 1;
-            }
-
-            a {
-                color: #333;
-            }
+        .active a {
+            @apply .text-grey-dark;
         }
     }
 
-    .markdown-buttons {
-        float: right;
-
-        li a {
-            display: block;
-            padding: 0 5px;
-        }
+    .markdown-buttons li a {
+        @apply block px-sm;
     }
 
     .CodeMirror {
-        @apply .shadow-inner .h-auto .font-mono;
-        background: $bg;
-        line-height: 1.5;
-        padding: 10px;
-        font-size: 13px;
+        @apply .bg-grey-lighten-6 .shadow-inner .h-auto .font-mono .leading-normal .p-1.5 .text-xs;
         border-radius: 0 0 3px 3px;
 
         .cm-comment {
-            font-family: $font_monospace;
-            font-size: 14px;
+            @apply .font-mono .text-sm
         }
     }
 
@@ -98,17 +58,14 @@
 
     .CodeMirror-lines {
         max-width: 860px;
-        border-right: 1px solid #f8f8f8;
     }
 
     .helpers {
-        border-top: 1px solid #ddd;
-        font-size: 13px;
+        @apply border-t text-xs text-grey;
     }
 
     .markdown-cheatsheet-helper {
-        padding: 10px;
-        display: inline-block;
+        @apply py-1 px-2 inline-block;
         svg {
             height: 14px;
             width: 24px;
@@ -120,59 +77,13 @@
     }
 
     .markdown-asset-helper {
-        padding: 10px;
-        display: inline-block;
-        color: #ccc;
+        @apply py-1 px-2 inline-block;
 
         .icon {
-            margin-right: 3px;
+            @apply mr-sm;
         }
-    }
-
-    .mode-preview {
-        background: #fff;
-    }
-
-    .markdown-preview {
-        background: #fff;
-        padding: 64px 32px;
-        max-width: 860px;
-        margin: 0 auto;
-        h1, h2, h3, h4, h5, h6, p, blockquote {
-            color: #333;
-            font-size: 16px;
-            line-height: 25px;
-            margin-bottom: .5em;
-        }
-
-        li {
-            color: #333;
-            line-height: 1;
-            margin-bottom: .25em;
-        }
-
-        blockquote {
-            font-style: italic;
-        }
-
-        blockquote p:last-child {
-            margin-bottom: 0;
-        }
-
-        hr {
-            margin: 1em 0 .5em 0 !important;
-        }
-
-        img {
-            max-width: 100%;
-        }
-    }
-
-    .markdown-writer {
-        position: relative;
     }
 }
-
 
 
 
@@ -185,19 +96,17 @@
         border-radius: 0;
     }
 
-    .markdown-toolbar { }
-
     .CodeMirror {
         background: #fff;
     }
 
     .markdown-preview {
-        border: none;
-        padding: 10px;
-        text-align: left;
+        @apply border-none p-1 text-left;
         p { line-height: 1.2; }
     }
 }
+
+
 
 /* Inside a Replicator Fieldtype
   ========================================================================== */
@@ -216,8 +125,9 @@
   ========================================================================== */
 
 .markdown-fieldtype .markdown-preview {
-    font: 1em/1.5em sans-serif;
-    color: $color_gray_dark;
+
+    @apply .text-grey-dark .text-base .bg-white .p-2;
+    max-width: 860px;
 
     blockquote {
         margin: 0 1.5em 1.5em 0;
@@ -288,7 +198,7 @@
     }
 
     li {
-        color: #333;
+        @apply text-grey-dark;
         line-height: 1;
         margin-bottom: .25em;
     }
@@ -306,6 +216,7 @@
     }
 }
 
+// TODO: Needs serious love.
 .markdown-fullscreen {
     background: #fff;
     position: fixed;
@@ -333,8 +244,7 @@
 
 
 
-
-/* Sneak Peek mode
+/* @TODO make sure Sneak Peek mode looks good
   ========================================================================== */
 
 .sneak-peeking .markdown-fieldtype {
@@ -342,7 +252,6 @@
     .CodeMirror { font-size: 13px; }
     .markdown-preview { padding: 10px; }
 }
-
 
 
 
