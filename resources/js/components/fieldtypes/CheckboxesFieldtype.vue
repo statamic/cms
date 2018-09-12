@@ -1,15 +1,15 @@
 <template>
-    <ul class="list-unstyled">
-        <li v-for="(option, $index) in config.options" :key="$index">
+    <div class="checkbox-fieldtype-wrapper">
+        <div class="option" v-for="(option, $index) in config.options" :key="$index">
             <input type="checkbox"
                    :name="name + '[]'"
-                   :id="name + '-' + $index"
+                   :id="name + $index"
                    :value="option.value"
                    v-model="values"
             />
-            <label :for="name + '-' + $index">{{ option.text }}</label>
-        </li>
-    </ul>
+            <label :for="name + $index">{{ option.text }}</label>
+        </div>
+    </div>
 </template>
 
 <script>

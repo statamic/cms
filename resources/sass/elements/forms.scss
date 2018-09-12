@@ -27,6 +27,10 @@ select {
 }
 
 
+
+/* Text Fields
+  ========================================================================== */
+
 .input-text {
     @apply appearance-none bg-grey-lighten-6 w-full border p-1 rounded shadow-inner;
     transition: border-color .15s ease-in-out,
@@ -38,10 +42,6 @@ select {
     }
 }
 
-.input-select {
-
-}
-
 textarea.input-text {
     @apply p-2;
     min-height: 80px;
@@ -50,6 +50,57 @@ textarea.input-text {
 .form-group.tight {
     margin-bottom: 8px;
 }
+
+
+
+/* Radio and Checkbox Fields
+  ========================================================================== */
+
+.radio-fieldtype .option,
+.checkboxes-fieldtype .option {
+    @apply mb-1 flex items-center;
+
+    input {
+        @apply leading-normal;
+    }
+
+    label {
+        @apply .font-normal .ml-1 .mt-sm leading-normal;
+    }
+}
+
+.radio-fieldtype .inline-mode {
+    @apply flex items-center;
+
+    .option {
+        @apply mr-2;
+    }
+}
+
+
+/* Select Fields
+  ========================================================================== */
+
+  .select-input-container {
+      position: relative;
+
+      select {
+          @include button(#fff, $color_gray_dark);
+          @apply block appearance-none pl-1.5 pr-3 bg-white cursor-pointer w-full h-full relative shadow-button;
+      }
+
+      .select-input-toggle {
+          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-darker;
+
+          svg {
+              @apply fill-current h-4 w-4;
+          }
+      }
+  }
+
+
+  /* @TODO Legacy stuff to remove, reduce, or refactor
+    ========================================================================== */
 
 .form-control {
     @apply .text-sm .w-full .rounded .border-0 .bg-grey-lightest .shadow-inner;
@@ -87,22 +138,6 @@ label .required {
 
     + .localizable-icon {
         margin-left: 5px;
-    }
-}
-
-.select-input-container {
-    position: relative;
-
-    select {
-        @include button(#fff, $color_gray_dark);
-        @apply block appearance-none pl-1.5 pr-3 bg-white cursor-pointer w-full h-full relative shadow-button;
-    }
-
-    .select-input-toggle {
-        @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-darker;
-        svg {
-            @apply fill-current h-4 w-4;
-        }
     }
 }
 

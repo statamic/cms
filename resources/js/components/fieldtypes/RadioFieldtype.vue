@@ -1,18 +1,13 @@
 <template>
-    <div class="radio-fieldtype-wrapper">
-        <ul :class="[
-            'list-unstyled',
-            config.inline ? 'list-inline mb-0' : ''
-        ]">
-            <li
+    <div class="radio-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
+            <div
                 v-for="(option, $index) in config.options"
                 :key="$index"
-                :class="{ 'mb-0 mr-2': config.inline }"
+                class="option"
             >
-                <input type="radio" :name="name" @input="update($event.target.value)" :value="option.value" :id="name + '-' + $index" />
-                <label :for="name + '-' + $index">{{ option.text }}</label>
-            </li>
-        </ul>
+                <input type="radio" :name="name" @input="update($event.target.value)" :value="option.value" :id="name + $index" />
+                <label :for="name + $index">{{ option.text }}</label>
+            </div>
     </div>
 </template>
 
