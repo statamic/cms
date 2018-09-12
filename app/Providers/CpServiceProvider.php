@@ -2,13 +2,15 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Extensions\Translation\Translator;
 
 class CpServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if (! config('statamic.cp.enabled')) {
+        if (! Statamic::isCpRoute()) {
             return;
         }
 
@@ -21,11 +23,15 @@ class CpServiceProvider extends ServiceProvider
 
     public function register()
     {
-        if (! config('statamic.cp.enabled')) {
+        if (! Statamic::isCpRoute()) {
             return;
         }
 
         $this->registerPublishers();
+
+        $this->app->extend('translator', function ($translator) {
+            return new Translator($translator->getLoader(), $translator->getLocale());
+        });
     }
 
     /**

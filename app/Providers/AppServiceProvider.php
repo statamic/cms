@@ -51,6 +51,12 @@ class AppServiceProvider extends ServiceProvider
             "{$this->root}/resources/dist" => public_path('resources/cp')
         ], 'statamic-cp');
 
+        $this->loadTranslationsFrom("{$this->root}/resources/lang", 'statamic');
+
+        $this->publishes([
+            "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic')
+        ], 'statamic');
+
         Blade::directive('svg', function ($expression) {
             $file = trim($expression, "'");
             return StaticStringy::collapseWhitespace(
