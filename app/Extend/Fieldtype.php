@@ -209,7 +209,17 @@ class Fieldtype
      */
     public function rules()
     {
-        return null;
+        return [];
+    }
+
+    public function extraRules()
+    {
+        return [];
+    }
+
+    public function extraAttributes()
+    {
+        return [];
     }
 
     public function getConfigFieldset()
