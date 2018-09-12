@@ -29,7 +29,7 @@
                 @updated="values = $event"
             >
                 <div slot-scope="{ }">
-                    <publish-validation-errors></publish-validation-errors>
+                    <div class="alert alert-danger mb-2" v-if="error" v-text="error" v-cloak></div>
                     <publish-sections></publish-sections>
                 </div>
             </publish-container>
