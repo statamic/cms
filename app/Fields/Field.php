@@ -10,10 +10,12 @@ class Field
 {
     protected $handle;
     protected $config;
+    protected $data;
 
-    public function __construct($handle, array $config)
+    public function __construct($handle, array $config, $data = null)
     {
         $this->handle = $handle;
+        $this->data = $data;
 
         $this->config = array_merge($config, [
             'name' => $this->handle
@@ -39,7 +41,7 @@ class Field
             $this->explodeRules($this->fieldtype()->rules())
         )];
 
-        $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
+        $extra = collect($this->fieldtype()->extraRules($this->data))->map(function ($rules) {
             return $this->explodeRules($rules);
         })->all();
 

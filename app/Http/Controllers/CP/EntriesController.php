@@ -44,10 +44,13 @@ class EntriesController extends CpController
 
         $fieldset = $entry->fieldset();
 
-        $compiler = (new Compiler)->fieldset($fieldset)->with([
-            'title' => 'required',
-            'slug' => 'required',
-        ]);
+        $compiler = (new Compiler)
+            ->fieldset($fieldset)
+            ->data($request->all())
+            ->with([
+                'title' => 'required',
+                'slug' => 'required',
+            ]);
 
         $data = $request->validate($compiler->rules(), [], $compiler->attributes());
 

@@ -8,11 +8,19 @@ use Statamic\Contracts\CP\Fieldset;
 class Compiler
 {
     protected $fieldset;
+    protected $data = [];
     protected $extraRules = [];
 
     public function fieldset(Fieldset $fieldset)
     {
         $this->fieldset = $fieldset;
+
+        return $this;
+    }
+
+    public function data($data)
+    {
+        $this->data = $data;
 
         return $this;
     }
@@ -66,7 +74,8 @@ class Compiler
     private function fields()
     {
         return collect($this->fieldset->inlinedFields())->map(function ($field, $handle) {
-            return (new Field($handle, $field));
+            $data = array_get($this->data, $handle);
+            return (new Field($handle, $field, $data));
         });
     }
 }

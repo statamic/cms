@@ -93,7 +93,7 @@ class GridFieldtype extends Fieldtype
         return $rules;
     }
 
-    public function extraRules()
+    public function extraRules($data)
     {
         $fieldset = (new Fieldset)->contents(['fields' => $this->getFieldConfig('fields')]);
         $rules = (new Compiler)->fieldset($fieldset)->rules();

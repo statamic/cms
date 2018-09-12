@@ -212,7 +212,7 @@ class Fieldtype
         return [];
     }
 
-    public function extraRules()
+    public function extraRules($data)
     {
         return [];
     }
