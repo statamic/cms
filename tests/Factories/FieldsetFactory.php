@@ -1,0 +1,55 @@
+<?php
+
+namespace Tests\Factories;
+
+use Closure;
+use Statamic\CP\Fieldset;
+
+class FieldsetFactory
+{
+    protected $contents;
+
+    public function withContents($contents)
+    {
+        $this->contents = $contents;
+
+        return $this;
+    }
+
+    public function withSections($sections)
+    {
+        if (!$this->contents) {
+            $this->contents = [];
+        }
+
+        $this->contents['sections'] = $sections;
+
+        return $this;
+    }
+
+    public function withFieldtypes($fieldtypes)
+    {
+        foreach ($fieldtypes as $name => $fieldtype) {
+            $this->fieldtypes[$name] = $fieldtype;
+        }
+
+        return $this;
+    }
+
+    public function withFields($fields)
+    {
+        if (!$this->contents) {
+            $this->contents = [];
+        }
+
+        $this->contents['fields'] = $fields;
+
+        return $this;
+    }
+
+    public function create()
+    {
+        return tap(new Fieldset)
+            ->contents($this->contents);
+    }
+}

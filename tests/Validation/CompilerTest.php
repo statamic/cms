@@ -5,6 +5,8 @@ namespace Tests\Validation;
 use Tests\TestCase;
 use Statamic\CP\Fieldset;
 use Statamic\Validation\Compiler;
+use Facades\Tests\FakeFieldsetLoader;
+use Facades\Tests\Factories\FieldsetFactory;
 
 /** @group fields */
 class CompilerTest extends TestCase
@@ -90,7 +92,22 @@ class CompilerTest extends TestCase
     /** @test */
     function it_inlines_rules_from_partials()
     {
-        $this->markTestIncomplete();
+        FakeFieldsetLoader::bind()->with('the_partial', function ($fieldset) {
+            return $fieldset->withFields([
+                'fieldtype_and_field_rules' => [
+                    'type' => 'fieldtype_with_rules',
+                    'validate' => 'required|array'
+                ],
+            ]);
+        });
+
+        $fieldset = FieldsetFactory::withFields([
+            'partial' => ['type' => 'partial', 'fieldset' => 'the_partial']
+        ])->create();
+
+        $this->assertEquals([
+            'fieldtype_and_field_rules' => ['required', 'array', 'min:2', 'max:5']
+        ], (new Compiler)->fieldset($fieldset)->rules());
     }
 
     /** @test */
@@ -119,7 +136,21 @@ class CompilerTest extends TestCase
     /** @test */
     function it_inlines_attributes_from_partials()
     {
-        $this->markTestIncomplete();
+        FakeFieldsetLoader::bind()->with('the_partial', function ($fieldset) {
+            return $fieldset->withFields([
+                'nested_field' => ['display' => 'Nested Field'],
+                'nested_field_with_no_explicit_display' => []
+            ]);
+        });
+
+        $fieldset = FieldsetFactory::withFields([
+            'partial' => ['type' => 'partial', 'fieldset' => 'the_partial']
+        ])->create();
+
+        $this->assertEquals([
+            'nested_field' => 'Nested Field',
+            'nested_field_with_no_explicit_display' => 'Nested field with no explicit display'
+        ], (new Compiler)->fieldset($fieldset)->attributes());
     }
 
     private function compile($fields)

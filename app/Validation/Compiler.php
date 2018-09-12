@@ -65,7 +65,7 @@ class Compiler
 
     private function fields()
     {
-        return collect($this->fieldset->fields())->map(function ($field, $handle) {
+        return collect($this->fieldset->inlinedFields())->map(function ($field, $handle) {
             return (new Field($handle, $field));
         });
     }
