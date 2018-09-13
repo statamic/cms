@@ -10,7 +10,7 @@ class CpServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if (! Statamic::isCpRoute()) {
+        if ($this->preventRegistration()) {
             return;
         }
 
@@ -23,7 +23,7 @@ class CpServiceProvider extends ServiceProvider
 
     public function register()
     {
-        if (! Statamic::isCpRoute()) {
+        if ($this->preventRegistration()) {
             return;
         }
 
@@ -60,5 +60,14 @@ class CpServiceProvider extends ServiceProvider
         $this->app->when(\Statamic\Http\Controllers\CP\PublishUserController::class)
                   ->needs(\Statamic\CP\Publish\Publisher::class)
                   ->give(\Statamic\CP\Publish\UserPublisher::class);
+    }
+
+    private function preventRegistration()
+    {
+        if (app()->environment('testing')) {
+            return false;
+        }
+
+        return ! Statamic::isCpRoute();
     }
 }
