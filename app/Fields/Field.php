@@ -36,19 +36,14 @@ class Field
     public function rules()
     {
         $rules = [$this->handle => array_merge(
-            $this->explodeRules(array_get($this->config, 'validate')),
-            $this->explodeRules($this->fieldtype()->rules())
+            Validation::explodeRules(array_get($this->config, 'validate')),
+            Validation::explodeRules($this->fieldtype()->rules())
         )];
 
         $extra = collect($this->fieldtype()->extraRules($this->data))->map(function ($rules) {
-            return $this->explodeRules($rules);
+            return Validation::explodeRules($rules);
         })->all();
 
         return array_merge($rules, $extra);
-    }
-
-    protected function explodeRules($rules)
-    {
-        return Validation::explodeRules($rules);
     }
 }
