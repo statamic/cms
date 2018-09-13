@@ -7,6 +7,9 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\Validation;
 use Facades\Tests\FakeFieldsetLoader;
 use Facades\Tests\Factories\FieldsetFactory;
+use Tests\Fakes\Fieldtypes\FieldtypeWithValidationRules;
+use Tests\Fakes\Fieldtypes\FieldtypeWithNoValidationRules;
+use Tests\Fakes\Fieldtypes\FieldtypeWithExtraValidationRules;
 
 /** @group fields */
 class ValidationTest extends TestCase
@@ -121,29 +124,5 @@ class ValidationTest extends TestCase
         $fieldset = new Fieldset;
         $fieldset->contents(['fields' => $fields]);
         return $fieldset;
-    }
-}
-
-class FieldtypeWithNoValidationRules extends \Statamic\Extend\Fieldtype
-{
-    //
-}
-
-class FieldtypeWithValidationRules extends \Statamic\Extend\Fieldtype
-{
-    public function rules()
-    {
-        return 'min:2|max:5';
-    }
-}
-
-class FieldtypeWithExtraValidationRules extends \Statamic\Extend\Fieldtype
-{
-    public function extraRules()
-    {
-        return [
-            'test.*.one' => 'required|min:2',
-            'test.*.two' => 'max:2'
-        ];
     }
 }

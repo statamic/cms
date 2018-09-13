@@ -12,9 +12,9 @@ use Statamic\Addons\ReplicatorSets\ReplicatorSetsFieldtype as ReplicatorSets;
 use Facades\Tests\FakeFieldsetLoader;
 use Facades\Tests\FakeFieldtypeLoader;
 use Facades\Tests\Factories\FieldsetFactory;
-use Tests\Fixtures\Fieldtypes\PlainFieldtype;
-use Tests\Fixtures\Fieldtypes\FieldtypeThatPreprocesses;
-use Tests\Fixtures\Fieldtypes\FieldtypeWithPreprocessableConfigField;
+use Tests\Fakes\Fieldtypes\PlainFieldtype;
+use Tests\Fakes\Fieldtypes\FieldtypeThatPreprocesses;
+use Tests\Fakes\Fieldtypes\FieldtypeWithPreprocessableConfigField;
 
 class FieldsetTest extends TestCase
 {

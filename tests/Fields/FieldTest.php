@@ -4,6 +4,9 @@ namespace Tests\Fields;
 
 use Tests\TestCase;
 use Statamic\Fields\Field;
+use Tests\Fakes\Fieldtypes\FieldtypeWithValidationRules;
+use Tests\Fakes\Fieldtypes\FieldtypeWithNoValidationRules;
+use Tests\Fakes\Fieldtypes\FieldtypeWithExtraValidationRules;
 
 /** @group fields */
 class FieldTest extends TestCase
@@ -93,29 +96,5 @@ class FieldTest extends TestCase
             'Test multi word handle and no explicit display',
             (new Field('test_multi_word_handle_and_no_explicit_display', []))->display()
         );
-    }
-}
-
-class FieldtypeWithNoValidationRules extends \Statamic\Extend\Fieldtype
-{
-    //
-}
-
-class FieldtypeWithValidationRules extends \Statamic\Extend\Fieldtype
-{
-    public function rules()
-    {
-        return 'min:2|max:5';
-    }
-}
-
-class FieldtypeWithExtraValidationRules extends \Statamic\Extend\Fieldtype
-{
-    public function extraRules($data)
-    {
-        return [
-            'test.*.one' => 'required|min:2',
-            'test.*.two' => 'max:2'
-        ];
     }
 }
