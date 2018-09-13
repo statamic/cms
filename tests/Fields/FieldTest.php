@@ -111,7 +111,7 @@ class FieldtypeWithValidationRules extends \Statamic\Extend\Fieldtype
 
 class FieldtypeWithExtraValidationRules extends \Statamic\Extend\Fieldtype
 {
-    public function extraRules()
+    public function extraRules($data)
     {
         return [
             'test.*.one' => 'required|min:2',
