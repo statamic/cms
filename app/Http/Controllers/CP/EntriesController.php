@@ -52,7 +52,7 @@ class EntriesController extends CpController
                 'slug' => 'required',
             ]);
 
-        $data = $request->validate($compiler->rules(), [], $compiler->attributes());
+        $data = $request->validate($compiler->rules());
 
         $fieldsetData = array_only($data, array_keys($fieldsetFields));
         $fieldsetData = $this->processFields($fieldset, $fieldsetData);

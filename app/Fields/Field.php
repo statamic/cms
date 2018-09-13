@@ -47,13 +47,6 @@ class Field
         return array_merge($rules, $extra);
     }
 
-    public function attributes()
-    {
-        $attrs = [$this->handle => $this->display()];
-
-        return array_merge($attrs, $this->fieldtype()->extraAttributes());
-    }
-
     protected function explodeRules($rules)
     {
         return Validation::explodeRules($rules);

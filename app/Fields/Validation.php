@@ -51,13 +51,6 @@ class Validation
         return $rules->all();
     }
 
-    public function attributes()
-    {
-        return $this->fields()->reduce(function ($carry, $field) {
-            return $carry->merge($field->attributes());
-        }, collect())->all();
-    }
-
     public static function explodeRules($rules)
     {
         if (! $rules) {

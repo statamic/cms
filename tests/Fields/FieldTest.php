@@ -15,7 +15,6 @@ class FieldTest extends TestCase
         $this->app['statamic.fieldtypes']['fieldtype_with_rules'] = FieldtypeWithValidationRules::class;
         $this->app['statamic.fieldtypes']['fieldtype_with_no_rules'] = FieldtypeWithNoValidationRules::class;
         $this->app['statamic.fieldtypes']['fieldtype_with_extra_rules'] = FieldtypeWithExtraValidationRules::class;
-        $this->app['statamic.fieldtypes']['fieldtype_with_extra_attributes'] = FieldtypeWithExtraAttributes::class;
     }
 
     /** @test */
@@ -72,29 +71,6 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_gets_validation_attributes_from_field()
-    {
-        $field = new Field('test', ['display' => 'Test']);
-
-        $this->assertEquals(['test' => 'Test'], $field->attributes());
-    }
-
-    /** @test */
-    function it_merges_extra_fieldtype_attributes()
-    {
-        $field = new Field('test', [
-            'type' => 'fieldtype_with_extra_attributes',
-            'display' => 'Test'
-        ]);
-
-        $this->assertEquals([
-            'test' => 'Test',
-            'test.*.one' => 'Extra One',
-            'test.*.two' => 'Extra Two',
-        ], $field->attributes());
-    }
-
-    /** @test */
     function it_gets_the_fieldtype()
     {
         $this->markTestIncomplete();
@@ -140,17 +116,6 @@ class FieldtypeWithExtraValidationRules extends \Statamic\Extend\Fieldtype
         return [
             'test.*.one' => 'required|min:2',
             'test.*.two' => 'max:2'
-        ];
-    }
-}
-
-class FieldtypeWithExtraAttributes extends \Statamic\Extend\Fieldtype
-{
-    public function extraAttributes()
-    {
-        return [
-            'test.*.one' => 'Extra One',
-            'test.*.two' => 'Extra Two'
         ];
     }
 }

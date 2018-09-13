@@ -18,7 +18,6 @@ class ValidationTest extends TestCase
         $this->app['statamic.fieldtypes']['fieldtype_with_rules'] = FieldtypeWithValidationRules::class;
         $this->app['statamic.fieldtypes']['fieldtype_with_no_rules'] = FieldtypeWithNoValidationRules::class;
         $this->app['statamic.fieldtypes']['fieldtype_with_extra_rules'] = FieldtypeWithExtraValidationRules::class;
-        $this->app['statamic.fieldtypes']['fieldtype_with_extra_attributes'] = FieldtypeWithExtraAttributes::class;
     }
 
     /** @test */
@@ -110,49 +109,6 @@ class ValidationTest extends TestCase
         ], (new Validation)->fieldset($fieldset)->rules());
     }
 
-    /** @test */
-    function it_compiles_attributes()
-    {
-        $validation = $this->compile([
-            'field_with_display' => [
-                'display' => 'Field One'
-            ],
-            'field_with_no_display' => [],
-            'field_with_extra_attributes' => [
-                'display' => 'Extras',
-                'type' => 'fieldtype_with_extra_attributes'
-            ]
-        ]);
-
-        $this->assertEquals([
-            'field_with_display' => 'Field One',
-            'field_with_no_display' => 'Field with no display',
-            'field_with_extra_attributes' => 'Extras',
-            'extra.*.one' => 'Extra One',
-            'extra.*.two' => 'Extra Two',
-        ], $validation->attributes());
-    }
-
-    /** @test */
-    function it_inlines_attributes_from_partials()
-    {
-        FakeFieldsetLoader::bind()->with('the_partial', function ($fieldset) {
-            return $fieldset->withFields([
-                'nested_field' => ['display' => 'Nested Field'],
-                'nested_field_with_no_explicit_display' => []
-            ]);
-        });
-
-        $fieldset = FieldsetFactory::withFields([
-            'partial' => ['type' => 'partial', 'fieldset' => 'the_partial']
-        ])->create();
-
-        $this->assertEquals([
-            'nested_field' => 'Nested Field',
-            'nested_field_with_no_explicit_display' => 'Nested field with no explicit display'
-        ], (new Validation)->fieldset($fieldset)->attributes());
-    }
-
     private function compile($fields)
     {
         $fieldset = $this->createFieldsetWith($fields);
@@ -188,17 +144,6 @@ class FieldtypeWithExtraValidationRules extends \Statamic\Extend\Fieldtype
         return [
             'test.*.one' => 'required|min:2',
             'test.*.two' => 'max:2'
-        ];
-    }
-}
-
-class FieldtypeWithExtraAttributes extends \Statamic\Extend\Fieldtype
-{
-    public function extraAttributes()
-    {
-        return [
-            'extra.*.one' => 'Extra One',
-            'extra.*.two' => 'Extra Two'
         ];
     }
 }
