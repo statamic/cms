@@ -7,13 +7,13 @@ use Statamic\Contracts\Fields\Fieldset;
 
 class Validation
 {
-    protected $fieldset;
+    protected $fields = [];
     protected $data = [];
     protected $extraRules = [];
 
-    public function fieldset(Fieldset $fieldset)
+    public function fields($fields)
     {
-        $this->fieldset = $fieldset;
+        $this->fields = $fields;
 
         return $this;
     }
@@ -25,7 +25,7 @@ class Validation
         return $this;
     }
 
-    public function with($rules)
+    public function withRules($rules)
     {
         $this->extraRules = $rules;
 
@@ -34,7 +34,7 @@ class Validation
 
     public function rules()
     {
-        $rules = $this->fields()->reduce(function ($carry, $field) {
+        $rules = $this->fields->reduce(function ($carry, $field) {
             return $carry->merge($field->rules());
         }, collect());
 
@@ -62,13 +62,5 @@ class Validation
         }
 
         return $rules;
-    }
-
-    private function fields()
-    {
-        return collect($this->fieldset->inlinedFields())->map(function ($field, $handle) {
-            $data = array_get($this->data, $handle);
-            return (new Field($handle, $field, $data));
-        });
     }
 }

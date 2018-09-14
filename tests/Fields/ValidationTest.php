@@ -3,24 +3,29 @@
 namespace Tests\Fields;
 
 use Tests\TestCase;
-use Statamic\Fields\Fieldset;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Extend\Fieldtype;
 use Statamic\Fields\Validation;
-use Facades\Tests\FakeFieldsetLoader;
-use Facades\Tests\Factories\FieldsetFactory;
-use Tests\Fakes\Fieldtypes\FieldtypeWithValidationRules;
-use Tests\Fakes\Fieldtypes\FieldtypeWithNoValidationRules;
-use Tests\Fakes\Fieldtypes\FieldtypeWithExtraValidationRules;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
-/** @group fields */
 class ValidationTest extends TestCase
 {
     protected function setUp()
     {
         parent::setUp();
 
-        $this->app['statamic.fieldtypes']['fieldtype_with_rules'] = FieldtypeWithValidationRules::class;
-        $this->app['statamic.fieldtypes']['fieldtype_with_no_rules'] = FieldtypeWithNoValidationRules::class;
-        $this->app['statamic.fieldtypes']['fieldtype_with_extra_rules'] = FieldtypeWithExtraValidationRules::class;
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype_with_rules')
+            ->andReturn($this->fieldtypeWithRules());
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype_with_no_rules')
+            ->andReturn($this->fieldtypeWithNoRules());
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype_with_extra_rules')
+            ->andReturn($this->fieldtypeWithExtraRules());
     }
 
     /** @test */
@@ -79,7 +84,7 @@ class ValidationTest extends TestCase
             ]
         ]);
 
-        $return = $validation->with([
+        $return = $validation->withRules([
             'foo' => 'required',
             'test' => 'required|array'
         ]);
@@ -91,38 +96,48 @@ class ValidationTest extends TestCase
         ], $validation->rules());
     }
 
-    /** @test */
-    function it_inlines_rules_from_partials()
-    {
-        FakeFieldsetLoader::bind()->with('the_partial', function ($fieldset) {
-            return $fieldset->withFields([
-                'fieldtype_and_field_rules' => [
-                    'type' => 'fieldtype_with_rules',
-                    'validate' => 'required|array'
-                ],
-            ]);
-        });
-
-        $fieldset = FieldsetFactory::withFields([
-            'partial' => ['type' => 'partial', 'fieldset' => 'the_partial']
-        ])->create();
-
-        $this->assertEquals([
-            'fieldtype_and_field_rules' => ['required', 'array', 'min:2', 'max:5']
-        ], (new Validation)->fieldset($fieldset)->rules());
-    }
-
     private function compile($fields)
     {
-        $fieldset = $this->createFieldsetWith($fields);
+        $fields = collect($fields)->map(function ($config, $handle) {
+            return new Field($handle, $config);
+        });
 
-        return (new Validation)->fieldset($fieldset);
+        return (new Validation)->fields($fields);
     }
 
-    private function createFieldsetWith($fields)
+    private function fieldtypeWithNoRules()
     {
-        $fieldset = new Fieldset;
-        $fieldset->contents(['fields' => $fields]);
-        return $fieldset;
+        return new class extends Fieldtype
+        {
+            public function rules()
+            {
+                return null;
+            }
+        };
+    }
+
+    private function fieldtypeWithRules()
+    {
+        return new class extends Fieldtype
+        {
+            public function rules()
+            {
+                return 'min:2|max:5';
+            }
+        };
+    }
+
+    private function fieldtypeWithExtraRules()
+    {
+        return new class extends Fieldtype
+        {
+            public function extraRules($data)
+            {
+                return [
+                    'test.*.one' => 'required|min:2',
+                    'test.*.two' => 'max:2'
+                ];
+            }
+        };
     }
 }
