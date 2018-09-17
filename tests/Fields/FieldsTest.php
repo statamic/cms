@@ -42,14 +42,20 @@ class FieldsTest extends TestCase
             [
                 'handle' => 'two',
                 'field' => 'fieldset_one.field_two'
+            ],
+            [
+                'handle' => 'three',
+                'field' => [
+                    'type' => 'textarea',
+                ]
             ]
         ]);
 
         tap($fields->all(), function ($items) {
-            $this->assertCount(2, $items);
+            $this->assertCount(3, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals(['one', 'two'], $items->map->handle()->values()->all());
-            $this->assertEquals(['text', 'textarea'], $items->map->type()->values()->all());
+            $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
+            $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
         });
     }
 

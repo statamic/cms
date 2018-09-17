@@ -24,7 +24,7 @@ class Fields
         $this->items = collect($items);
 
         $this->fields = $this->items->map(function ($config) {
-            return FieldRepository::find($config['field'])->setHandle($config['handle']);
+            return $this->field($config)->setHandle($config['handle']);
         });
 
         return $this;
@@ -80,5 +80,16 @@ class Fields
         $this->fields->each->preProcess();
 
         return $this;
+    }
+
+    protected function field(array $config): Field
+    {
+        // If "field" is a string, it's a reference to a field in a fieldset.
+        if (is_string($config['field'])) {
+            return FieldRepository::find($config['field']);
+        }
+
+        // Otherwise, the field has been configured inline.
+        return new Field($config['handle'], $config['field']);
     }
 }
