@@ -8,6 +8,7 @@ use Facades\Statamic\Fields\FieldRepository;
 class Fields
 {
     protected $items;
+    protected $fields;
 
     public function __construct($items = [])
     {
@@ -22,6 +23,10 @@ class Fields
 
         $this->items = collect($items);
 
+        $this->fields = $this->items->map(function ($config) {
+            return FieldRepository::find($config['field'])->setHandle($config['handle']);
+        });
+
         return $this;
     }
 
@@ -32,10 +37,7 @@ class Fields
 
     public function all(): Collection
     {
-        return $this->items->map(function ($config) {
-            return FieldRepository::find($config['field'])
-                ->setHandle($config['handle']);
-        });
+        return $this->fields;
     }
 
     public function merge($fields)
@@ -47,6 +49,36 @@ class Fields
 
     public function toPublishArray()
     {
-        return $this->all()->map->toPublishArray()->all();
+        return $this->fields->map->toPublishArray()->all();
+    }
+
+    public function addValues(array $values)
+    {
+        $this->fields->each(function ($field) use ($values) {
+            return $field->setValue(array_get($values, $field->handle()));
+        });
+
+        return $this;
+    }
+
+    public function values()
+    {
+        return $this->fields->mapWithKeys(function ($field) {
+            return [$field->handle() => $field->value()];
+        })->all();
+    }
+
+    public function process()
+    {
+        $this->fields->each->process();
+
+        return $this;
+    }
+
+    public function preProcess()
+    {
+        $this->fields->each->preProcess();
+
+        return $this;
     }
 }

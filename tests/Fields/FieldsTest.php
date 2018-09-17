@@ -5,8 +5,10 @@ namespace Tests\Fields;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Extend\Fieldtype;
 use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldsTest extends TestCase
 {
@@ -22,10 +24,15 @@ class FieldsTest extends TestCase
 
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
-            ->andReturn(new Field('field_one', ['type' => 'text']));
+            ->andReturnUsing(function () {
+                return new Field('field_one', ['type' => 'text']);
+            });
+
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_two')
-            ->andReturn(new Field('field_one', ['type' => 'textarea']));
+            ->andReturnUsing(function () {
+                return new Field('field_one', ['type' => 'textarea']);
+            });
 
         $fields->setItems([
             [
@@ -51,10 +58,15 @@ class FieldsTest extends TestCase
     {
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
-            ->andReturn(new Field('field_one', ['type' => 'text']));
+            ->andReturnUsing(function () {
+                return new Field('field_one', ['type' => 'text']);
+            });
+
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_two')
-            ->andReturn(new Field('field_one', ['type' => 'textarea']));
+            ->andReturnUsing(function () {
+                return new Field('field_one', ['type' => 'textarea']);
+            });
 
         $fields = new Fields([
             [
@@ -83,19 +95,24 @@ class FieldsTest extends TestCase
     {
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
-            ->andReturn(new Field('field_one', [
-                'type' => 'text',
-                'display' => 'One',
-                'instructions' => 'One instructions',
-                'validate' => 'required',
-            ]));
+            ->andReturnUsing(function () {
+                return new Field('field_one', [
+                    'type' => 'text',
+                    'display' => 'One',
+                    'instructions' => 'One instructions',
+                    'validate' => 'required',
+                ]);
+            });
+
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_two')
-            ->andReturn(new Field('field_two', [
-                'type' => 'textarea',
-                'display' => 'Two',
-                'instructions' => 'Two instructions'
-            ]));
+            ->andReturnUsing(function () {
+                return new Field('field_two', [
+                    'type' => 'textarea',
+                    'display' => 'Two',
+                    'instructions' => 'Two instructions'
+                ]);
+            });
 
         $fields = new Fields([
             [
@@ -124,5 +141,91 @@ class FieldsTest extends TestCase
                 'required' => false
             ]
         ], $fields->toPublishArray());
+    }
+
+    /** @test */
+    function it_adds_values_to_fields()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', []);
+        });
+
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', []);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two']
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+
+        $return = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals($fields, $return);
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $fields->values());
+    }
+
+    /** @test */
+    function it_processes_each_fields_values_by_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+            public function process($data) {
+                return $data . ' processed';
+            }
+        });
+
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'fieldtype']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'fieldtype']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two']
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+
+        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals([
+            'one' => 'foo processed',
+            'two' => 'bar processed'
+        ], $fields->process()->values());
+    }
+
+    /** @test */
+    function it_preprocesses_each_fields_values_by_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+            public function preProcess($data) {
+                return $data . ' preprocessed';
+            }
+        });
+
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'fieldtype']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'fieldtype']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two']
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+
+        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals([
+            'one' => 'foo preprocessed',
+            'two' => 'bar preprocessed'
+        ], $fields->preProcess()->values());
     }
 }
