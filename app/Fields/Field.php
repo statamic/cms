@@ -10,6 +10,7 @@ class Field
 {
     protected $handle;
     protected $config;
+    protected $value;
 
     public function __construct($handle, array $config)
     {
@@ -80,5 +81,38 @@ class Field
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
         ];
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function value()
+    {
+        return $this->value;
+    }
+
+    public function defaultValue()
+    {
+        return $this->config['default'] ?? $this->fieldtype()->defaultValue();
+    }
+
+    public function process()
+    {
+        $this->value = $this->fieldtype()->process($this->value);
+
+        return $this;
+    }
+
+    public function preProcess()
+    {
+        $value = $this->value ?? $this->defaultValue();
+
+        $this->value = $this->fieldtype()->preProcess($value);
+
+        return $this;
     }
 }

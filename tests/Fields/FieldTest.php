@@ -208,4 +208,86 @@ class FieldTest extends TestCase
             'required' => true
         ], $field->toPublishArray());
     }
+
+    /** @test */
+    function it_gets_the_value()
+    {
+        $field = (new Field('test', ['type' => 'fieldtype']));
+        $this->assertNull($field->value());
+
+        $return = $field->setValue('foo');
+
+        $this->assertEquals($field, $return);
+        $this->assertEquals('foo', $field->value());
+    }
+
+    /** @test */
+    function it_processes_the_value_through_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function process($data) {
+                    return $data . ' processed';
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
+
+        $this->assertEquals('foo processed', $field->process()->value());
+    }
+
+    /** @test */
+    function it_preprocesses_the_value_through_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcess($data) {
+                    return $data . ' preprocessed';
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
+
+        $this->assertEquals('foo preprocessed', $field->preProcess()->value());
+    }
+
+    /** @test */
+    function preprocessing_a_field_with_no_value_will_take_the_default_from_the_field()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcess($data) {
+                    return $data . ' preprocessed';
+                }
+            });
+
+        $field = (new Field('test', [
+            'type' => 'fieldtype',
+            'default' => 'field defined default',
+        ]));
+
+        $this->assertEquals('field defined default preprocessed', $field->preProcess()->value());
+    }
+
+    /** @test */
+    function preprocessing_a_field_with_no_value_and_no_field_defined_default_value_will_take_the_default_from_the_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcess($data) {
+                    return $data . ' preprocessed';
+                }
+                public function defaultValue() {
+                    return 'fieldtype defined default';
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']));
+
+        $this->assertEquals('fieldtype defined default preprocessed', $field->preProcess()->value());
+    }
 }
