@@ -204,4 +204,16 @@ class Collection extends DataFolder implements CollectionContract
             config('statamic.theming.fieldsets.default')
         ]);
     }
+
+    public function blueprints()
+    {
+        return collect($this->get('blueprints', []))->map(function ($blueprint) {
+            return \Facades\Statamic\Fields\BlueprintRepository::find($blueprint);
+        });
+    }
+
+    public function blueprint()
+    {
+        return $this->blueprints()->first();
+    }
 }

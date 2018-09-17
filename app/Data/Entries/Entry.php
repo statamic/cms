@@ -350,4 +350,13 @@ class Entry extends Content implements EntryContract
 
         return $this;
     }
+
+    public function blueprint()
+    {
+        if ($blueprint = $this->get('blueprint')) {
+            return \Facades\Statamic\Fields\BlueprintRepository::find($blueprint);
+        }
+
+        return $this->collection()->blueprint();
+    }
 }
