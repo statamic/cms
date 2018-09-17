@@ -197,9 +197,14 @@ class Fieldtype
      *
      * @return null
      */
-    public function blank()
+    public function defaultValue()
     {
         return null;
+    }
+
+    public function blank()
+    {
+        return $this->defaultValue(); // TODO: deprecate/remove.
     }
 
     /**
