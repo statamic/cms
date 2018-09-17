@@ -2,32 +2,17 @@
 
 namespace Tests\Fields;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Extend\Fieldtype;
 use Statamic\Fields\Validation;
+use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
 class ValidationTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        FieldtypeRepository::shouldReceive('find')
-            ->with('fieldtype_with_rules')
-            ->andReturn($this->fieldtypeWithRules());
-
-        FieldtypeRepository::shouldReceive('find')
-            ->with('fieldtype_with_no_rules')
-            ->andReturn($this->fieldtypeWithNoRules());
-
-        FieldtypeRepository::shouldReceive('find')
-            ->with('fieldtype_with_extra_rules')
-            ->andReturn($this->fieldtypeWithExtraRules());
-    }
-
     /** @test */
     function it_explodes_pipe_style_rules_into_arrays()
     {
@@ -41,103 +26,90 @@ class ValidationTest extends TestCase
     }
 
     /** @test */
-    function it_compiles_rules()
+    function it_merges_rules()
     {
-        $validation = $this->compile([
-            'fieldtype_and_field_rules' => [
-                'type' => 'fieldtype_with_rules',
-                'validate' => 'required|array'
-            ],
-            'fieldtype_rules_only' => [
-                'type' => 'fieldtype_with_rules',
-            ],
-            'field_rules_only' => [
-                'type' => 'fieldtype_with_no_rules',
-                'validate' => 'required|min:10'
-            ],
-            'extra_fieldtype_rules' => [
-                'type' => 'fieldtype_with_extra_rules',
-            ],
-            'no_rules' => [
-                'type' => 'fieldtype_with_no_rules'
-            ]
+        $original = [
+            'one' => ['required'],
+            'two' => ['array'],
+        ];
+
+        $overrides = [
+            'one' => ['min:20'],
+            'three' => ['required'],
+        ];
+
+        $merged = (new Validation)->merge($original, $overrides);
+
+        $this->assertInstanceOf(Collection::class, $merged);
+        $this->assertEquals([
+            'one' => ['required', 'min:20'],
+            'two' => ['array'],
+            'three' => ['required'],
+        ], $merged->all());
+    }
+
+    /** @test */
+    function it_compiles_field_rules()
+    {
+        $fieldWithItsOwnRules = Mockery::mock(Field::class);
+        $fieldWithItsOwnRules->shouldReceive('rules')->andReturn(['one' => ['required']]);
+
+        $fieldWithExtraRules = Mockery::mock(Field::class);
+        $fieldWithExtraRules->shouldReceive('rules')->andReturn([
+            'two' => ['required', 'array'],
+            'another' => ['min:2'],
         ]);
 
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([
+            $fieldWithItsOwnRules,
+            $fieldWithExtraRules,
+        ]));
+
+        $validation = (new Validation)->fields($fields);
+
         $this->assertEquals([
-            'fieldtype_and_field_rules' => ['required', 'array', 'min:2', 'max:5'],
-            'fieldtype_rules_only' => ['min:2', 'max:5'],
-            'field_rules_only' => ['required', 'min:10'],
-            'extra_fieldtype_rules' => [],
-            'test.*.one' => ['required', 'min:2'],
-            'test.*.two' => ['max:2'],
-            'no_rules' => [],
+            'one' => ['required'],
+            'two' => ['required', 'array'],
+            'another' => ['min:2'],
         ], $validation->rules());
     }
 
     /** @test */
     function it_adds_additional_rules()
     {
-        $validation = $this->compile([
-            'test' => [
-                'type' => 'fieldtype_with_no_rules',
-                'validate' => 'min:10'
-            ]
-        ]);
-
-        $return = $validation->withRules([
+        $validation = (new Validation)->withRules([
             'foo' => 'required',
             'test' => 'required|array'
         ]);
 
-        $this->assertEquals($validation, $return);
         $this->assertEquals([
             'foo' => ['required'],
-            'test' => ['min:10', 'required', 'array', ]
+            'test' => ['required', 'array'],
         ], $validation->rules());
     }
 
-    private function compile($fields)
+    /** @test */
+    function it_merges_additional_rules_into_field_rules()
     {
-        $fields = collect($fields)->map(function ($config, $handle) {
-            return new Field($handle, $config);
-        });
+        $field = Mockery::mock(Field::class);
+        $field->shouldReceive('rules')->andReturn([
+            'one' => ['required', 'array'],
+            'extra' => ['min:2'],
+        ]);
 
-        return (new Validation)->fields($fields);
-    }
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([$field]));
 
-    private function fieldtypeWithNoRules()
-    {
-        return new class extends Fieldtype
-        {
-            public function rules()
-            {
-                return null;
-            }
-        };
-    }
+        $validation = (new Validation)->fields($fields)->withRules([
+            'one' => 'required|min:2',
+            'additional' => 'required'
+        ]);
 
-    private function fieldtypeWithRules()
-    {
-        return new class extends Fieldtype
-        {
-            public function rules()
-            {
-                return 'min:2|max:5';
-            }
-        };
-    }
-
-    private function fieldtypeWithExtraRules()
-    {
-        return new class extends Fieldtype
-        {
-            public function extraRules($data)
-            {
-                return [
-                    'test.*.one' => 'required|min:2',
-                    'test.*.two' => 'max:2'
-                ];
-            }
-        };
+        $this->assertEquals([
+            'one' => ['required', 'array', 'min:2'], // notice required is deduplicated.
+            'extra' => ['min:2'],
+            'additional' => ['required']
+        ], $validation->rules());
     }
 }

@@ -7,20 +7,13 @@ use Statamic\Contracts\Fields\Fieldset;
 
 class Validation
 {
-    protected $fields = [];
+    protected $fields;
     protected $data = [];
     protected $extraRules = [];
 
     public function fields($fields)
     {
         $this->fields = $fields;
-
-        return $this;
-    }
-
-    public function data($data)
-    {
-        $this->data = $data;
 
         return $this;
     }
@@ -34,21 +27,37 @@ class Validation
 
     public function rules()
     {
-        $rules = $this->fields->reduce(function ($carry, $field) {
-            return $carry->merge($field->rules());
-        }, collect());
+        return $this
+            ->merge($this->fieldRules(), $this->extraRules)
+            ->all();
+    }
 
-        foreach ($this->extraRules as $field => $fieldRules) {
-            $fieldRules = self::explodeRules($fieldRules);
-
-            if ($rules->has($field)) {
-                $rules[$field] = array_merge($rules[$field], $fieldRules);
-            } else {
-                $rules[$field] = $fieldRules;
-            }
+    private function fieldRules()
+    {
+        if (! $this->fields) {
+            return collect();
         }
 
-        return $rules->all();
+        return $this->fields->all()->reduce(function ($carry, $field) {
+            return $carry->merge($field->rules());
+        }, collect());
+    }
+
+    public function merge($original, $overrides)
+    {
+        foreach ($overrides as $field => $fieldRules) {
+            $fieldRules = self::explodeRules($fieldRules);
+
+            if (array_has($original, $field)) {
+                $original[$field] = array_merge($original[$field], $fieldRules);
+            } else {
+                $original[$field] = $fieldRules;
+            }
+
+            $original[$field] = collect($original[$field])->unique()->values()->all();
+        }
+
+        return collect($original);
     }
 
     public static function explodeRules($rules)
