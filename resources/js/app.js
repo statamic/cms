@@ -59,6 +59,7 @@ var vm = new Vue({
         Updater: require('./components/updater'),
         Importer: require('./components/importer/importer'),
         Roles: require('./components/roles/roles'),
+        FieldsetListing: require('./components/fieldsets/Listing.vue')
     },
 
     mixins: [ Notifications ],

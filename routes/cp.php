@@ -32,6 +32,8 @@ Route::group([
     Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
     Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
 
+    Route::resource('fieldsets', 'FieldsetController');
+
     Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
 });
 
