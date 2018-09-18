@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldset;
+use Illuminate\Support\Collection;
 use Statamic\Fields\FieldRepository;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Fields\FieldsetRepository;
@@ -51,8 +52,71 @@ EOT;
     }
 
     /** @test */
+    function it_gets_a_fieldset_in_a_subdirectory()
+    {
+        $contents = <<<'EOT'
+title: Test Fieldset
+fields: []
+EOT;
+        mkdir($this->tempDir.'/sub');
+        file_put_contents($this->tempDir.'/sub/test.yaml', $contents);
+
+        $fieldset = $this->repo->find('sub.test');
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertEquals('Test Fieldset', $fieldset->title());
+        $this->assertEquals('sub.test', $fieldset->handle());
+
+        // Test that using slash delimiter instead of dots returns the same thing.
+        $this->assertEquals($fieldset, $this->repo->find('sub/test'));
+    }
+
+    /** @test */
     function it_returns_null_if_fieldset_doesnt_exist()
     {
         $this->assertNull($this->repo->find('unknown'));
+    }
+
+    /** @test */
+    function it_gets_all_fieldsets()
+    {
+        $firstContents = <<<'EOT'
+title: First Fieldset
+fields:
+  one:
+    type: text
+    display: First Field
+EOT;
+        file_put_contents($this->tempDir.'/first.yaml', $firstContents);
+
+        $secondContents = <<<'EOT'
+title: Second Fieldset
+fields:
+  two:
+    type: text
+    display: Second Field
+EOT;
+        file_put_contents($this->tempDir.'/second.yaml', $secondContents);
+
+        file_put_contents($this->tempDir.'/not-a-yaml-file.txt', '');
+
+        mkdir($this->tempDir.'/sub');
+        $thirdContents = <<<'EOT'
+title: Third Fieldset
+fields:
+  three:
+    type: text
+    display: Third Field
+EOT;
+        file_put_contents($this->tempDir.'/sub/third.yaml', $thirdContents);
+
+        $all = $this->repo->all();
+
+        $this->assertInstanceOf(Collection::class, $all);
+        $this->assertCount(3, $all);
+        $this->assertEveryItemIsInstanceOf(Fieldset::class, $all);
+        $this->assertEquals(['first', 'second', 'sub.third'], $all->keys()->all());
+        $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
+        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset'], $all->map->title()->values()->all());
     }
 }
