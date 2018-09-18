@@ -31,7 +31,7 @@
                     />
                 </td>
                 <td v-for="column in sharedState.visibleColumns" :key="column">
-                    <slot :name="`cell-${column}`" :row="row" :index="index" :checkbox-id="`checkbox-${row.id}`">
+                    <slot :name="`cell-${column}`" :value="row[column]" :row="row" :index="index" :checkbox-id="`checkbox-${row.id}`">
                         {{ row[column] }}
                     </slot>
                 </td>
