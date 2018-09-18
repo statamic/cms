@@ -3,23 +3,14 @@
 namespace Statamic\Fields;
 
 use Statamic\API\YAML;
-use Illuminate\Filesystem\Filesystem;
 
 class FieldRepository
 {
-    protected $files;
-    protected $directory;
+    protected $fieldsets;
 
-    public function __construct(Filesystem $files)
+    public function __construct(FieldsetRepository $fieldsets)
     {
-        $this->files = $files;
-    }
-
-    public function setDirectory($directory)
-    {
-        $this->directory = $directory;
-
-        return $this;
+        $this->fieldsets = $fieldsets;
     }
 
     public function find(string $field): ?Field
@@ -30,23 +21,10 @@ class FieldRepository
 
         list($fieldset, $handle) = explode('.', $field);
 
-        if (! $fieldset = $this->fieldset($fieldset)) {
+        if (! $fieldset = $this->fieldsets->find($fieldset)) {
             return null;
         }
 
-        if (! $config = array_get($fieldset['fields'], $handle)) {
-            return null;
-        }
-
-        return new Field($handle, $config);
-    }
-
-    protected function fieldset(string $handle): ?array
-    {
-        if (! $this->files->exists($path = "{$this->directory}/{$handle}.yaml")) {
-            return null;
-        }
-
-        return YAML::parse($this->files->get($path));
+        return $fieldset->field($handle);
     }
 }

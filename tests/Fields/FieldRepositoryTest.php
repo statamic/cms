@@ -2,10 +2,12 @@
 
 namespace Tests\Fields;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldRepository;
-use Illuminate\Filesystem\Filesystem;
+use Statamic\Fields\FieldsetRepository;
 
 class FieldRepositoryTest extends TestCase
 {
@@ -13,36 +15,36 @@ class FieldRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = __DIR__.'/tmp';
-        mkdir($this->tempDir);
+        $fieldsets = Mockery::mock(FieldsetRepository::class);
 
-        $this->repo = app(FieldRepository::class)->setDirectory($this->tempDir);
-    }
+        $fieldsets->shouldReceive('find')->with('test')->andReturnUsing(function () {
+            return (new Fieldset)->setHandle('test')->setContents([
+                'title' => 'Test',
+                'fields' => [
+                    'one' => ['type' => 'textarea', 'display' => 'First Field'],
+                ]
+            ]);
+        });
 
-    public function tearDown()
-    {
-        (new Filesystem)->deleteDirectory($this->tempDir);
+        $fieldsets->shouldReceive('find')->with('unknown')->andReturnNull();
+
+        $this->repo = new FieldRepository($fieldsets);
     }
 
     /** @test */
     function it_gets_a_field_within_a_fieldset()
     {
-        $contents = <<<'EOT'
-title: Test
-fields:
-  one:
-    type: text
-    display: First Field
-EOT;
-        file_put_contents($this->tempDir.'/test.yaml', $contents);
-
         $field = $this->repo->find('test.one');
 
         $this->assertInstanceOf(Field::class, $field);
         $this->assertEquals('one', $field->handle());
         $this->assertEquals('First Field', $field->display());
+        $this->assertEquals('textarea', $field->type());
+    }
 
-        // Valid fieldset but invalid field returns null
+    /** @test */
+    function unknown_field_in_valid_fieldset_returns_null()
+    {
         $this->assertNull($this->repo->find('test.unknown'));
     }
 
