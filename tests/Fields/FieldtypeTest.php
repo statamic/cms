@@ -138,6 +138,7 @@ class FieldtypeTest extends TestCase
 
         $this->assertEquals([
             'handle' => 'test',
+            'title' => 'Test',
             'localizable' => true,
             'validatable' => true,
             'defaultable' => true,

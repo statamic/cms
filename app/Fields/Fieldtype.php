@@ -72,6 +72,7 @@ abstract class Fieldtype
     {
         return [
             'handle' => $this->handle(),
+            'title' => $this->title(),
             'localizable' => $this->localizable(),
             'validatable' => $this->validatable(),
             'defaultable' => $this->defaultable(),
