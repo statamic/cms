@@ -51,4 +51,9 @@ class Fieldset
     {
         return $this->fields()->get($handle);
     }
+
+    public function editUrl()
+    {
+        return cp_route('fieldsets.edit', $this->handle());
+    }
 }
