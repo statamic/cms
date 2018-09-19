@@ -14,6 +14,9 @@ abstract class Fieldtype
     protected $defaultable = true;
     protected $selectable = true;
     protected $categories = ['text'];
+    protected $rules = [];
+    protected $extraRules = [];
+    protected $defaultValue;
 
     public function setField(Field $field)
     {
@@ -66,6 +69,21 @@ abstract class Fieldtype
     public function categories(): array
     {
         return $this->categories;
+    }
+
+    public function rules(): array
+    {
+        return Validation::explodeRules($this->rules);
+    }
+
+    public function extraRules(): array
+    {
+        return array_map([Validation::class, 'explodeRules'], $this->extraRules);
+    }
+
+    public function defaultValue()
+    {
+        return $this->defaultValue;
     }
 
     public function toArray(): array

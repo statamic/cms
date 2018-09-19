@@ -146,6 +146,62 @@ class FieldtypeTest extends TestCase
             'categories' => ['text']
         ], $fieldtype->toArray());
     }
+
+    /** @test */
+    function it_gets_custom_validation_rules_as_an_array()
+    {
+        $this->assertEquals([], (new TestFieldtype)->rules());
+
+        $arrayDefined = new class extends Fieldtype {
+            protected $rules = ['required', 'min:2'];
+        };
+        $this->assertEquals(['required', 'min:2'], $arrayDefined->rules());
+
+        $stringDefined = new class extends Fieldtype {
+            protected $rules = 'required|min:2';
+        };
+        $this->assertEquals(['required', 'min:2'], $stringDefined->rules());
+    }
+
+    /** @test */
+    function it_gets_extra_custom_validation_rules_as_an_array()
+    {
+        $this->assertEquals([], (new TestFieldtype)->rules());
+
+        $arrayDefined = new class extends Fieldtype {
+            protected $extraRules = [
+                'extra.one' => ['required', 'min:2'],
+                'extra.two' => ['array']
+            ];
+        };
+        $this->assertEquals([
+            'extra.one' => ['required', 'min:2'],
+            'extra.two' => ['array']
+        ], $arrayDefined->extraRules());
+
+        $stringDefined = new class extends Fieldtype {
+            protected $extraRules = [
+                'extra.one' => 'required|min:2',
+                'extra.two' => 'array'
+            ];
+        };
+        $this->assertEquals([
+            'extra.one' => ['required', 'min:2'],
+            'extra.two' => ['array']
+        ], $stringDefined->extraRules());
+    }
+
+    /** @test */
+    function it_can_have_a_default_value()
+    {
+        $this->assertNull((new TestFieldtype)->defaultValue());
+
+        $fieldtype = new class extends Fieldtype {
+            protected $defaultValue = 'test';
+        };
+
+        $this->assertEquals('test', $fieldtype->defaultValue());
+    }
 }
 
 class TestFieldtype extends Fieldtype
