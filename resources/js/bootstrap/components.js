@@ -19,9 +19,11 @@ Vue.component('data-list-toggle-all', require('../components/data-list/DataListT
 Vue.component('data-table', require('../components/data-list/DataTable.vue'));
 
 // Resource Type Lists
-Vue.component('entry-list', require('../components/data-list/EntryList.vue'));
-Vue.component('collection-list', require('../components/data-list/CollectionList.vue'));
-Vue.component('asset-container-list', require('../components/data-list/AssetContainerList.vue'));
+Vue.component('entry-list', require('../components/EntryList.vue'));
+Vue.component('collection-list', require('../components/CollectionList.vue'));
+Vue.component('asset-container-list', require('../components/AssetContainerList.vue'));
+Vue.component('addon-list', require('../components/AddonList.vue'));
+
 
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));

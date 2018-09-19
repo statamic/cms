@@ -18,11 +18,14 @@ Route::group([
     Route::redirect('/', 'cp/dashboard')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
+    // Structures
     Route::resource('structures', 'StructuresController');
 
+    // Collections
     Route::resource('collections', 'CollectionsController');
     Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
 
+    // Assets
     Route::resource('asset-containers', 'AssetContainersController');
     Route::get('assets/browse', 'AssetBrowserController@index')->name('assets.browse.index');
     Route::get('assets/browse/folders/{container}/{path?}', 'AssetBrowserController@folder')->where('path', '.*');
@@ -32,7 +35,11 @@ Route::group([
     Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
     Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
 
+    // Fieldsets
     Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
+
+    // Addons
+    Route::resource('addons', 'AddonsController');
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');

@@ -83,8 +83,8 @@
             </ul>
             <h6>Site</h6>
             <ul>
-                <li>
-                    <a href="">
+                <li class="{{ current_class('addons') }}">
+                    <a href="{{ route('statamic.cp.addons.index') }}">
                         <i>@svg('new/module-three-2')</i><span>Addons</span>
                     </a>
                 </li>
