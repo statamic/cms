@@ -86,7 +86,11 @@ class Fields
     {
         // If "field" is a string, it's a reference to a field in a fieldset.
         if (is_string($config['field'])) {
-            return FieldRepository::find($config['field']);
+            if ($field = FieldRepository::find($config['field'])) {
+                return $field;
+            }
+
+            throw new \Exception("Field {$config['field']} not found.");
         }
 
         // Otherwise, the field has been configured inline.

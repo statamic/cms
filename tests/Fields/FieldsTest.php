@@ -60,6 +60,21 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    function it_throws_an_exception_when_an_invalid_field_reference_is_encountered()
+    {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Field foo.bar not found.');
+        FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturnNull();
+
+        (new Fields)->setItems([
+            [
+                'handle' => 'test',
+                'field' => 'foo.bar'
+            ]
+        ]);
+    }
+
+    /** @test */
     function it_merges_with_other_fields()
     {
         FieldRepository::shouldReceive('find')
