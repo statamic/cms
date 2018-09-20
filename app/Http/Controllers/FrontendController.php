@@ -36,7 +36,13 @@ class FrontendController extends Controller
      */
     public function index(Request $request)
     {
-        $url = $this->removeIgnoredSegments($request->getPathInfo());
+        $url = Site::current()->relativePath($request->getUri());
+
+        $url = $this->removeIgnoredSegments($url);
+
+        if (str_contains($url, '?')) {
+            $url = substr($url, 0, strpos($url, '?'));
+        }
 
         if ($data = $this->getDataForUri($url)) {
             return $data;
