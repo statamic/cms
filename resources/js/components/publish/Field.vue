@@ -16,13 +16,15 @@
             <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
-        <component
-            :is="fieldtypeComponent"
-            :config="config"
-            :value="value"
-            :name="config.handle"
-            @updated="updated"
-        /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
+        <slot name="fieldtype">
+            <component
+                :is="fieldtypeComponent"
+                :config="config"
+                :value="value"
+                :name="config.handle"
+                @updated="updated"
+            /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
+        </slot>
     </div>
 
 </template>
