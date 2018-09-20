@@ -54,4 +54,12 @@ class FieldsetRepository
             })
             ->keyBy->handle();
     }
+
+    public function save(Fieldset $fieldset)
+    {
+        $this->files->put(
+            "{$this->directory}/{$fieldset->handle()}.yaml",
+            YAML::dump($fieldset->contents())
+        );
+    }
 }

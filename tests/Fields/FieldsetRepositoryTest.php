@@ -119,4 +119,29 @@ EOT;
         $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
         $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset'], $all->map->title()->values()->all());
     }
+
+    /** @test */
+    function it_saves_to_disk()
+    {
+        $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
+            'title' => 'Test Fieldset',
+            'fields' => [
+                'foo' => ['type' => 'textarea', 'bar' => 'baz']
+            ]
+        ]);
+
+        $this->repo->save($fieldset);
+
+$expectedYaml = <<<'EOT'
+title: 'Test Fieldset'
+fields:
+  foo:
+    type: textarea
+    bar: baz
+
+EOT;
+        $this->assertFileExists($path = $this->tempDir.'/the_test_fieldset.yaml');
+        $this->assertFileEqualsString($path, $expectedYaml);
+        @unlink($path);
+    }
 }

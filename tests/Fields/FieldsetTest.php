@@ -7,6 +7,7 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
 use Illuminate\Support\Collection;
+use Facades\Statamic\Fields\FieldsetRepository;
 
 class FieldsetTest extends TestCase
 {
@@ -105,5 +106,15 @@ class FieldsetTest extends TestCase
         $this->assertEquals('textarea', $field->type());
 
         $this->assertNull($fieldset->field('unknown'));
+    }
+
+    /** @test */
+    function it_saves_through_the_repository()
+    {
+        FieldsetRepository::shouldReceive('save')->with($fieldset = new Fieldset)->once();
+
+        $return = $fieldset->save();
+
+        $this->assertEquals($fieldset, $return);
     }
 }

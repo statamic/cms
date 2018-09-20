@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\API\Str;
+use Facades\Statamic\Fields\FieldsetRepository;
 
 class Fieldset
 {
@@ -55,5 +56,12 @@ class Fieldset
     public function editUrl()
     {
         return cp_route('fieldsets.edit', $this->handle());
+    }
+
+    public function save()
+    {
+        FieldsetRepository::save($this);
+
+        return $this;
     }
 }
