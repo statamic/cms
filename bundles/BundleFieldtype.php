@@ -17,7 +17,7 @@ abstract class BundleFieldtype extends Fieldtype
      *
      * @return array
      */
-    public function fieldsetContents()
+    public function configFieldItems(): array
     {
         // In v2, fieldtypes would define their fieldtype 'fields' in their meta.yaml file
         // under the 'fieldtype_fields' key. In v3, the meta file has been removed in
@@ -26,6 +26,6 @@ abstract class BundleFieldtype extends Fieldtype
         $dir = pathinfo((new \ReflectionClass(static::class))->getFileName(), PATHINFO_DIRNAME);
         $contents = File::get($dir.'/meta.yaml', 'fieldtype_fields: []');
         $yaml = YAML::parse($contents);
-        return ['fields' => array_get($yaml, 'fieldtype_fields', [])];
+        return array_get($yaml, 'fieldtype_fields', []);
     }
 }
