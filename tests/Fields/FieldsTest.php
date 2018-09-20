@@ -121,11 +121,11 @@ class FieldsTest extends TestCase
             });
 
         $fields = new Fields([
-            [
+            'one' => [ // use keys to ensure they get stripped out
                 'handle' => 'one',
                 'field' => 'fieldset_one.field_one'
             ],
-            [
+            'two' => [
                 'handle' => 'two',
                 'field' => 'fieldset_one.field_two'
             ]

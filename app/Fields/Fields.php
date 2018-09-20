@@ -49,7 +49,7 @@ class Fields
 
     public function toPublishArray()
     {
-        return $this->fields->map->toPublishArray()->all();
+        return $this->fields->values()->map->toPublishArray()->all();
     }
 
     public function addValues(array $values)
