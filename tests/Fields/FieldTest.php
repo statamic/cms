@@ -288,4 +288,15 @@ class FieldTest extends TestCase
 
         $this->assertEquals('fieldtype defined default preprocessed', $field->preProcess()->value());
     }
+
+    /** @test */
+    function converting_to_an_array_will_inline_the_handle()
+    {
+        $field = new Field('the_handle', ['foo' => 'bar']);
+
+        $this->assertEquals([
+            'handle' => 'the_handle',
+            'foo' => 'bar',
+        ], $field->toArray());
+    }
 }

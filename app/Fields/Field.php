@@ -4,9 +4,10 @@ namespace Statamic\Fields;
 
 use Statamic\API\Str;
 use Statamic\CP\FieldtypeFactory;
+use Illuminate\Contracts\Support\Arrayable;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
-class Field
+class Field implements Arrayable
 {
     protected $handle;
     protected $config;
@@ -15,10 +16,7 @@ class Field
     public function __construct($handle, array $config)
     {
         $this->handle = $handle;
-
-        $this->config = array_merge($config, [
-            'handle' => $this->handle
-        ]);
+        $this->config = $config;
     }
 
     public function setHandle(string $handle)
@@ -114,5 +112,12 @@ class Field
         $this->value = $this->fieldtype()->preProcess($value);
 
         return $this;
+    }
+
+    public function toArray()
+    {
+        return array_merge($this->config, [
+            'handle' => $this->handle
+        ]);
     }
 }
