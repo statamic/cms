@@ -7,7 +7,9 @@ export default {
             required: true,
         },
         visibleColumns: {
-            required: true,
+            default() {
+                return this.columns;
+            }
         },
         rows: {
             type: Array,
