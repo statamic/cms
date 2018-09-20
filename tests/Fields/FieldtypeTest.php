@@ -273,6 +273,18 @@ class FieldtypeTest extends TestCase
 
         $this->assertEquals('foo', $customIcon->icon());
     }
+
+    /** @test */
+    function no_processing_happens_by_default()
+    {
+        $this->assertEquals('test', (new TestFieldtype)->process('test'));
+    }
+
+    /** @test */
+    function no_pre_processing_happens_by_default()
+    {
+        $this->assertEquals('test', (new TestFieldtype)->preProcess('test'));
+    }
 }
 
 class TestFieldtype extends Fieldtype

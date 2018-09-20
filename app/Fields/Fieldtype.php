@@ -122,4 +122,14 @@ abstract class Fieldtype implements Arrayable
     {
         return $this->icon ?? $this->handle();
     }
+
+    public function process($data)
+    {
+        return $data;
+    }
+
+    public function preProcess($data)
+    {
+        return $data;
+    }
 }
