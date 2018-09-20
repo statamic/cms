@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API;
+use Illuminate\Http\Request;
 use Statamic\Fields\Fieldset;
 
 class FieldsetController extends CpController
@@ -29,5 +30,23 @@ class FieldsetController extends CpController
         return view('statamic::fieldsets.edit', [
             'fieldset' => API\Fieldset::find($fieldset)
         ]);
+    }
+
+    public function update(Request $request, $fieldset)
+    {
+        $fieldset = API\Fieldset::find($fieldset);
+
+        $this->authorize('edit', $fieldset);
+
+        $fields = collect($request->fields)->mapWithKeys(function ($field) {
+            return [array_pull($field, 'handle') => array_except($field, '_id')];
+        })->all();
+
+        $fieldset->setContents([
+            'title' => $request->title,
+            'fields' => $fields
+        ])->save();
+
+        return response('', 204);
     }
 }
