@@ -5,3 +5,12 @@ import AutoSlug from '../components/fieldtypes/AutoSlug.js'
 
 window.Fieldtype = Fieldtype;
 window.AutoSlug = AutoSlug;
+
+
+Vue.mixin({
+    methods: {
+        __(key) {
+            return __(key);
+        }
+    }
+})

@@ -66,3 +66,7 @@ global.markdown = function (value) {
     });
     return marked(value);
 };
+
+global.__ = function (string) {
+    return string;
+}
