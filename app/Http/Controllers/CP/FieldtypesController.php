@@ -12,7 +12,7 @@ class FieldtypesController extends CpController
             ->unique() // Remove any dupes in the case of aliases. Aliases are defined later so they will win.
             ->map(function ($class) {
                 return app($class)->toArray();
-            })->sortBy('handle')->values();
+            })->sortBy('handle');
 
         if ($request->selectable) {
             $fieldtypes = $fieldtypes->filter->selectable;
@@ -20,6 +20,6 @@ class FieldtypesController extends CpController
 
         // TODO: Make sure the configs get preprocessed.
 
-        return $fieldtypes;
+        return $fieldtypes->values();
     }
 }
