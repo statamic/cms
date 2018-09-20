@@ -3,8 +3,9 @@
 namespace Statamic\Fields;
 
 use Statamic\API\Str;
+use Illuminate\Contracts\Support\Arrayable;
 
-abstract class Fieldtype
+abstract class Fieldtype implements Arrayable
 {
     protected $field;
     protected $handle;
