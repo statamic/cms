@@ -21,7 +21,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $bundledTags = [
         'asset', 'assets', 'cache', 'can', 'collection', 'dump', 'entries', 'env',
         'get_content', 'get_files', 'get_value', 'glide', 'in', 'is', 'link', 'locales',
-        'markdown', 'member', 'nav', 'not_found', 'oauth', 'obfuscate', 'pages', 'parent',
+        'markdown', 'member', 'mix', 'nav', 'not_found', 'oauth', 'obfuscate', 'pages', 'parent',
         'partial', 'path', 'redirect', 'relate', 'rotate', 'routes', 'search',
         'section', 'taxonomy', 'theme', 'trans', 'trans_choice', 'users', 'widont', 'yields',
     ];
