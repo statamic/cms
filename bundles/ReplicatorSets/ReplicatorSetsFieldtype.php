@@ -8,6 +8,8 @@ use Statamic\CP\FieldtypeFactory;
 
 class ReplicatorSetsFieldtype extends Fieldtype
 {
+    protected $selectable = false;
+
     public function preProcess($data)
     {
         $processed = [];

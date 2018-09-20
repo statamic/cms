@@ -6,4 +6,5 @@ use Statamic\Extend\Fieldtype;
 
 class RedactorSettingsFieldtype extends Fieldtype
 {
+    protected $selectable = false;
 }

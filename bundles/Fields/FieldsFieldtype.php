@@ -8,6 +8,8 @@ use Statamic\Extend\Fieldtype;
 
 class FieldsFieldtype extends Fieldtype
 {
+    protected $selectable = false;
+
     public function preProcess($data)
     {
         $processed = [];

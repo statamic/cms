@@ -6,4 +6,5 @@ use Statamic\Extend\Fieldtype;
 
 class AssetFolderFieldtype extends Fieldtype
 {
+    protected $selectable = false;
 }
