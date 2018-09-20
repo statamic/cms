@@ -62,7 +62,7 @@ class FieldTest extends TestCase
     function it_gets_validation_rules_from_field()
     {
         $fieldtype = new class extends Fieldtype {
-            public function rules() { return null; }
+            protected $rules = null;
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -83,7 +83,7 @@ class FieldTest extends TestCase
     function it_gets_validation_rules_from_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
-            public function rules() { return 'min:2|max:5'; }
+            protected $rules = 'min:2|max:5';
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -101,7 +101,7 @@ class FieldTest extends TestCase
     function it_merges_validation_rules_from_field_with_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
-            public function rules() { return 'min:2|max:5'; }
+            protected $rules = 'min:2|max:5';
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -122,12 +122,10 @@ class FieldTest extends TestCase
     function it_merges_extra_fieldtype_rules()
     {
         $fieldtype = new class extends Fieldtype {
-            public function extraRules($data) {
-                return [
-                    'test.*.one' => 'required|min:2',
-                    'test.*.two' => 'max:2'
-                ];
-            }
+            protected $extraRules = [
+                'test.*.one' => 'required|min:2',
+                'test.*.two' => 'max:2'
+            ];
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -150,7 +148,7 @@ class FieldTest extends TestCase
     function it_checks_if_a_field_is_required_when_defined_in_field()
     {
         $fieldtype = new class extends Fieldtype {
-            public function rules() { return null; }
+            protected $rules = null;
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -175,7 +173,7 @@ class FieldTest extends TestCase
     function it_checks_if_a_field_is_required_when_defined_in_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
-            public function rules() { return 'required|min:2'; }
+            protected $rules = 'required|min:2';
         };
 
         FieldtypeRepository::shouldReceive('find')
