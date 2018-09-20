@@ -2,8 +2,10 @@
 
 namespace Tests\Fields;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Addons\Text\TextFieldtype;
 
@@ -143,7 +145,31 @@ class FieldtypeTest extends TestCase
             'validatable' => true,
             'defaultable' => true,
             'selectable' => true,
-            'categories' => ['text']
+            'categories' => ['text'],
+            'icon' => 'test',
+            'config' => []
+        ], $fieldtype->toArray());
+    }
+
+    /** @test */
+    function config_uses_publish_array_when_converting_to_array()
+    {
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('toPublishArray')->once()->andReturn(['example', 'publish', 'array']);
+
+        $fieldtype = new class($fields) extends Fieldtype {
+            protected $mock;
+            public function __construct($mock)
+            {
+                $this->mock = $mock;
+            }
+            public function configFields(): Fields {
+                return $this->mock;
+            }
+        };
+
+        $this->assertArraySubset([
+            'config' => ['example', 'publish', 'array']
         ], $fieldtype->toArray());
     }
 
@@ -201,6 +227,51 @@ class FieldtypeTest extends TestCase
         };
 
         $this->assertEquals('test', $fieldtype->defaultValue());
+    }
+
+    /** @test */
+    function it_gets_the_config_fields()
+    {
+        tap(new TestFieldtype, function ($fieldtype) {
+            $fields = $fieldtype->configFields();
+            $this->assertInstanceOf(Fields::class, $fields);
+            $this->assertCount(0, $fields->all());
+        });
+
+        $fieldtype = new class extends Fieldtype {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fields = $fieldtype->configFields();
+        $this->assertInstanceOf(Fields::class, $fields);
+        $this->assertCount(2, $all = $fields->all());
+        tap($all['foo'], function ($field) {
+            $this->assertEquals('textarea', $field->type());
+        });
+        tap($all['max_items'], function ($field) {
+            $this->assertEquals('integer', $field->type());
+        });
+    }
+
+    /** @test */
+    function it_can_have_an_icon()
+    {
+        $this->assertEquals('test', (new TestFieldtype)->icon());
+
+        $customHandle = new class extends Fieldtype {
+            protected $handle = 'custom_handle';
+        };
+
+        $this->assertEquals('custom_handle', $customHandle->icon());
+
+        $customIcon = new class extends Fieldtype {
+            protected $icon = 'foo';
+        };
+
+        $this->assertEquals('foo', $customIcon->icon());
     }
 }
 
