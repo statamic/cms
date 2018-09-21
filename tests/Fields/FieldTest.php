@@ -329,4 +329,16 @@ class FieldTest extends TestCase
             'foo' => 'bar',
         ], $field->toArray());
     }
+
+    /** @test */
+    function it_gets_and_sets_the_config()
+    {
+        $field = new Field('the_handle', ['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $field->config());
+
+        $return = $field->setConfig(['bar' => 'baz']);
+
+        $this->assertEquals($field, $return);
+        $this->assertEquals(['bar' => 'baz'], $field->config());
+    }
 }

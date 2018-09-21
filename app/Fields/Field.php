@@ -121,6 +121,13 @@ class Field implements Arrayable
         ]);
     }
 
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
     public function config(): array
     {
         return $this->config;
