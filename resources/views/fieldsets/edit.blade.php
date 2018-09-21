@@ -1,12 +1,13 @@
 @extends('statamic::layout')
-@section('content-class', 'publishing')
 
 @section('content')
 
-
-        <fieldset-builder fieldset-title="{{ $fieldset->title() }}"
-                          save-url="{{ route('fieldset.update', $fieldset->name()) }}">
-        </fieldset-builder>
-
+    <fieldset-editor
+        action="{{ cp_route('fieldsets.update', $fieldset->handle()) }}"
+        :initial-fieldset="{{ json_encode([
+            'title' => $fieldset->title(),
+            'fields' => $fieldset->fields()->values()
+        ]) }}"
+    ></fieldset-editor>
 
 @endsection
