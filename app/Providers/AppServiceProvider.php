@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->publishes([
             "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic')
-        ], 'statamic');
+        ], 'statamic-translations');
 
         Blade::directive('svg', function ($expression) {
             $file = trim($expression, "'");
