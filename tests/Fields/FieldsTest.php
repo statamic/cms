@@ -60,17 +60,66 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    function it_gets_a_field_in_a_fieldset_when_given_a_reference()
+    {
+        $existing = new Field('bar', [
+            'type' => 'textarea',
+            'var_one' => 'one',
+            'var_two' => 'two',
+        ]);
+
+        FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturn($existing);
+
+        $created = (new Fields)->createField([
+            'handle' => 'test',
+            'field' => 'foo.bar',
+        ]);
+
+        $this->assertEquals('test', $created->handle());
+        $this->assertEquals([
+            'type' => 'textarea',
+            'var_one' => 'one',
+            'var_two' => 'two',
+        ], $created->config());
+    }
+
+    /** @test */
+    function it_can_override_the_config_in_a_referenced_field()
+    {
+        $existing = new Field('bar', [
+            'type' => 'textarea',
+            'var_one' => 'one',
+            'var_two' => 'two',
+        ]);
+
+        FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturn($existing);
+
+        $created = (new Fields)->createField([
+            'handle' => 'test',
+            'field' => 'foo.bar',
+            'config' => [
+                'var_one' => 'overridden'
+            ]
+        ]);
+
+        $this->assertEquals('test', $created->handle());
+        $this->assertEquals([
+            'type' => 'textarea',
+            'var_one' => 'overridden',
+            'var_two' => 'two',
+        ], $created->config());
+    }
+
+    /** @test */
     function it_throws_an_exception_when_an_invalid_field_reference_is_encountered()
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Field foo.bar not found.');
         FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturnNull();
 
-        (new Fields)->setItems([
-            [
-                'handle' => 'test',
-                'field' => 'foo.bar'
-            ]
+        (new Fields)->createField([
+            'handle' => 'test',
+            'field' => 'foo.bar'
         ]);
     }
 

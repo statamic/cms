@@ -24,7 +24,7 @@ class Fields
         $this->items = collect($items);
 
         $this->fields = $this->items->map(function ($config) {
-            return $this->field($config)->setHandle($config['handle']);
+            return $this->createField($config);
         });
 
         return $this;
@@ -82,18 +82,27 @@ class Fields
         return $this;
     }
 
-    protected function field(array $config): Field
+    public function createField(array $config): Field
     {
         // If "field" is a string, it's a reference to a field in a fieldset.
         if (is_string($config['field'])) {
-            if ($field = FieldRepository::find($config['field'])) {
-                return $field;
-            }
-
-            throw new \Exception("Field {$config['field']} not found.");
+            return $this->getReferencedField($config);
         }
 
         // Otherwise, the field has been configured inline.
         return new Field($config['handle'], $config['field']);
+    }
+
+    private function getReferencedField(array $config): Field
+    {
+        if (! $field = FieldRepository::find($config['field'])) {
+            throw new \Exception("Field {$config['field']} not found.");
+        }
+
+        if ($overrides = array_get($config, 'config')) {
+            $field->setConfig(array_merge($field->config(), $overrides));
+        }
+
+        return $field->setHandle($config['handle']);
     }
 }
