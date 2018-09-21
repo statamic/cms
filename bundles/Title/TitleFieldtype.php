@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Title;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class TitleFieldtype extends Fieldtype
 {

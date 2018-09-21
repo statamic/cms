@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\UserRoles;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class UserRolesFieldtype extends Fieldtype
 {

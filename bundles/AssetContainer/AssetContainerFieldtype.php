@@ -2,8 +2,9 @@
 
 namespace Statamic\Addons\AssetContainer;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class AssetContainerFieldtype extends Fieldtype
 {
+    protected $selectable = false;
 }

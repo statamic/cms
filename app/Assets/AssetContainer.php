@@ -194,7 +194,7 @@ class AssetContainer implements AssetContainerContract
      * Get or set the fieldset to be used by assets in this container
      *
      * @param string $fieldset
-     * @return \Statamic\Contracts\Fields\Fieldset
+     * @return \Statamic\Fields\Fieldset
      */
     public function fieldset($fieldset = null)
     {

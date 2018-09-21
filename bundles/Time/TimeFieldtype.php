@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Time;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class TimeFieldtype extends Fieldtype
 {

@@ -186,7 +186,7 @@ class Collection extends DataFolder implements CollectionContract
      * Get or set the fieldset
      *
      * @param string|null|bool
-     * @return Statamic\Contracts\Fields\Fieldset
+     * @return Statamic\Fields\Fieldset
      */
     public function fieldset($fieldset = null)
     {
@@ -203,5 +203,17 @@ class Collection extends DataFolder implements CollectionContract
             config('statamic.theming.fieldsets.entry'),
             config('statamic.theming.fieldsets.default')
         ]);
+    }
+
+    public function blueprints()
+    {
+        return collect($this->get('blueprints', []))->map(function ($blueprint) {
+            return \Facades\Statamic\Fields\BlueprintRepository::find($blueprint);
+        });
+    }
+
+    public function blueprint()
+    {
+        return $this->blueprints()->first();
     }
 }

@@ -35,7 +35,9 @@ Route::group([
     Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
     Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
 
-    // Fieldsets
+    // Fields
+    Route::resource('fieldsets', 'FieldsetController');
+    Route::get('fieldtypes', 'FieldtypesController@index');
     Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
 
     // Addons

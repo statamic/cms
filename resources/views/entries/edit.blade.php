@@ -4,8 +4,8 @@
 
     <entry-publish-form
         action="{{ cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()]) }}"
-        :initial-fieldset="{{ json_encode($entry->fieldset()->toPublishArray()) }}"
-        :initial-values="{{ json_encode($data) }}"
+        :initial-fieldset="{{ json_encode($entry->blueprint()->toPublishArray()) }}"
+        :initial-values="{{ json_encode($values) }}"
         inline-template
     >
         <div>

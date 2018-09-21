@@ -237,7 +237,7 @@ abstract class Content extends Data implements ContentContract
      * Get or set the fieldset
      *
      * @param string|null|bool
-     * @return \Statamic\Contracts\Fields\Fieldset
+     * @return \Statamic\Fields\Fieldset
      */
     public function fieldset($fieldset = null)
     {

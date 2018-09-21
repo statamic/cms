@@ -44,9 +44,9 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected $bundledFieldtypes = [
         'arr', 'asset_container', 'asset_folder', 'assets', 'bard', 'checkboxes', 'code', 'collection', 'collections',
-        'date', 'fields', 'fieldset', 'grid', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
+        'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
-        'theme', 'time', 'title', 'toggle', 'user_groups', 'user_password', 'user_roles', 'video', 'yaml',
+        'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
         'revealer', 'section', 'select', 'slug', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
     ];
 
@@ -258,6 +258,8 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         $this->app['statamic.fieldtypes']['form'] = \Statamic\Forms\Fieldtype::class;
+        $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
+        $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
     }
 
     /**

@@ -6,6 +6,8 @@ use Statamic\Addons\Suggest\SuggestFieldtype;
 
 class RelateFieldtype extends SuggestFieldtype
 {
+    protected $selectable = false;
+
     public function preProcess($data)
     {
         $max_items = (int) $this->getFieldConfig('max_items');

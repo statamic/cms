@@ -2,27 +2,17 @@
 
 namespace Tests\Fields;
 
+use Mockery;
 use Tests\TestCase;
-use Statamic\Fields\Fieldset;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Extend\Fieldtype;
 use Statamic\Fields\Validation;
-use Facades\Tests\FakeFieldsetLoader;
-use Facades\Tests\Factories\FieldsetFactory;
-use Tests\Fakes\Fieldtypes\FieldtypeWithValidationRules;
-use Tests\Fakes\Fieldtypes\FieldtypeWithNoValidationRules;
-use Tests\Fakes\Fieldtypes\FieldtypeWithExtraValidationRules;
+use Illuminate\Support\Collection;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
-/** @group fields */
 class ValidationTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->app['statamic.fieldtypes']['fieldtype_with_rules'] = FieldtypeWithValidationRules::class;
-        $this->app['statamic.fieldtypes']['fieldtype_with_no_rules'] = FieldtypeWithNoValidationRules::class;
-        $this->app['statamic.fieldtypes']['fieldtype_with_extra_rules'] = FieldtypeWithExtraValidationRules::class;
-    }
-
     /** @test */
     function it_explodes_pipe_style_rules_into_arrays()
     {
@@ -36,93 +26,90 @@ class ValidationTest extends TestCase
     }
 
     /** @test */
-    function it_compiles_rules()
+    function it_merges_rules()
     {
-        $validation = $this->compile([
-            'fieldtype_and_field_rules' => [
-                'type' => 'fieldtype_with_rules',
-                'validate' => 'required|array'
-            ],
-            'fieldtype_rules_only' => [
-                'type' => 'fieldtype_with_rules',
-            ],
-            'field_rules_only' => [
-                'type' => 'fieldtype_with_no_rules',
-                'validate' => 'required|min:10'
-            ],
-            'extra_fieldtype_rules' => [
-                'type' => 'fieldtype_with_extra_rules',
-            ],
-            'no_rules' => [
-                'type' => 'fieldtype_with_no_rules'
-            ]
+        $original = [
+            'one' => ['required'],
+            'two' => ['array'],
+        ];
+
+        $overrides = [
+            'one' => ['min:20'],
+            'three' => ['required'],
+        ];
+
+        $merged = (new Validation)->merge($original, $overrides);
+
+        $this->assertInstanceOf(Collection::class, $merged);
+        $this->assertEquals([
+            'one' => ['required', 'min:20'],
+            'two' => ['array'],
+            'three' => ['required'],
+        ], $merged->all());
+    }
+
+    /** @test */
+    function it_compiles_field_rules()
+    {
+        $fieldWithItsOwnRules = Mockery::mock(Field::class);
+        $fieldWithItsOwnRules->shouldReceive('rules')->andReturn(['one' => ['required']]);
+
+        $fieldWithExtraRules = Mockery::mock(Field::class);
+        $fieldWithExtraRules->shouldReceive('rules')->andReturn([
+            'two' => ['required', 'array'],
+            'another' => ['min:2'],
         ]);
 
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([
+            $fieldWithItsOwnRules,
+            $fieldWithExtraRules,
+        ]));
+
+        $validation = (new Validation)->fields($fields);
+
         $this->assertEquals([
-            'fieldtype_and_field_rules' => ['required', 'array', 'min:2', 'max:5'],
-            'fieldtype_rules_only' => ['min:2', 'max:5'],
-            'field_rules_only' => ['required', 'min:10'],
-            'extra_fieldtype_rules' => [],
-            'test.*.one' => ['required', 'min:2'],
-            'test.*.two' => ['max:2'],
-            'no_rules' => [],
+            'one' => ['required'],
+            'two' => ['required', 'array'],
+            'another' => ['min:2'],
         ], $validation->rules());
     }
 
     /** @test */
     function it_adds_additional_rules()
     {
-        $validation = $this->compile([
-            'test' => [
-                'type' => 'fieldtype_with_no_rules',
-                'validate' => 'min:10'
-            ]
-        ]);
-
-        $return = $validation->with([
+        $validation = (new Validation)->withRules([
             'foo' => 'required',
             'test' => 'required|array'
         ]);
 
-        $this->assertEquals($validation, $return);
         $this->assertEquals([
             'foo' => ['required'],
-            'test' => ['min:10', 'required', 'array', ]
+            'test' => ['required', 'array'],
         ], $validation->rules());
     }
 
     /** @test */
-    function it_inlines_rules_from_partials()
+    function it_merges_additional_rules_into_field_rules()
     {
-        FakeFieldsetLoader::bind()->with('the_partial', function ($fieldset) {
-            return $fieldset->withFields([
-                'fieldtype_and_field_rules' => [
-                    'type' => 'fieldtype_with_rules',
-                    'validate' => 'required|array'
-                ],
-            ]);
-        });
+        $field = Mockery::mock(Field::class);
+        $field->shouldReceive('rules')->andReturn([
+            'one' => ['required', 'array'],
+            'extra' => ['min:2'],
+        ]);
 
-        $fieldset = FieldsetFactory::withFields([
-            'partial' => ['type' => 'partial', 'fieldset' => 'the_partial']
-        ])->create();
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([$field]));
+
+        $validation = (new Validation)->fields($fields)->withRules([
+            'one' => 'required|min:2',
+            'additional' => 'required'
+        ]);
 
         $this->assertEquals([
-            'fieldtype_and_field_rules' => ['required', 'array', 'min:2', 'max:5']
-        ], (new Validation)->fieldset($fieldset)->rules());
-    }
-
-    private function compile($fields)
-    {
-        $fieldset = $this->createFieldsetWith($fields);
-
-        return (new Validation)->fieldset($fieldset);
-    }
-
-    private function createFieldsetWith($fields)
-    {
-        $fieldset = new Fieldset;
-        $fieldset->contents(['fields' => $fields]);
-        return $fieldset;
+            'one' => ['required', 'array', 'min:2'], // notice required is deduplicated.
+            'extra' => ['min:2'],
+            'additional' => ['required']
+        ], $validation->rules());
     }
 }

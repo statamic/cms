@@ -10,7 +10,6 @@ use Statamic\API\Helper;
 use Statamic\API\Content;
 use Statamic\API\Taxonomy;
 use Statamic\CP\Publish\Publisher;
-use Statamic\Contracts\Fields\Fieldset as FieldsetContract;
 use Statamic\Addons\Suggest\TypeMode;
 use Statamic\CP\Publish\ProcessesFields;
 use Statamic\Exceptions\PublishException;

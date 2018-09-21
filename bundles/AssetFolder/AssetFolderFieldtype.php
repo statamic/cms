@@ -2,8 +2,9 @@
 
 namespace Statamic\Addons\AssetFolder;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class AssetFolderFieldtype extends Fieldtype
 {
+    protected $selectable = false;
 }

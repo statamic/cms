@@ -2,10 +2,12 @@
 
 namespace Statamic\Addons\LocaleSettings;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class LocaleSettingsFieldtype extends Fieldtype
 {
+    protected $selectable = false;
+
     public function preProcess($data)
     {
         $processed = [];

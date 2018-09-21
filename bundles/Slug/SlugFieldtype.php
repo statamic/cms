@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Slug;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 use Statamic\Addons\Text\TextFieldtype;
 
 class SlugFieldtype extends TextFieldtype

@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Toggle;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class ToggleFieldtype extends Fieldtype
 {

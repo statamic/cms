@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Section;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class SectionFieldtype extends Fieldtype
 {

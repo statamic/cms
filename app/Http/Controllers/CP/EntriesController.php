@@ -24,16 +24,25 @@ class EntriesController extends CpController
 
         $this->authorize('view', $entry);
 
-        $fieldset = $entry->fieldset();
-        // event(new PublishFieldsetFound($fieldset, 'entry', $entry)); // TODO
+        if (! $blueprint = $entry->blueprint()) {
+            throw new \Exception('There is no blueprint defined for this collection.');
+        }
 
-        $data = array_merge($this->addBlankFields($fieldset, $entry->processedData()), [
+        // event(new PublishBlueprintFound($blueprint, 'entry', $entry)); // TODO
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($entry->data())
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'title' => $entry->get('title'),
             'slug' => $entry->slug()
         ]);
 
         return view('statamic::entries.edit', [
             'entry' => $entry,
-            'data' => $data,
+            'values' => $values,
             'readOnly' => $request->user()->cant('edit', $entry)
         ]);
     }
@@ -42,29 +51,27 @@ class EntriesController extends CpController
     {
         $entry = Entry::findBySlug($slug, $collection);
 
-        $fieldset = $entry->fieldset();
+        $this->authorize('edit', $entry);
 
-        $compiler = (new Validation)
-            ->fieldset($fieldset)
-            ->data($request->all())
-            ->with([
-                'title' => 'required',
-                'slug' => 'required',
-            ]);
+        $fields = $entry->blueprint()->fields()->addValues($request->all())->process();
 
-        $data = $request->validate($compiler->rules());
+        $validation = (new Validation)->fields($fields)->withRules([
+            'title' => 'required',
+            'slug' => 'required',
+        ]);
 
-        $fieldsetData = array_only($data, array_keys($fieldsetFields));
-        $fieldsetData = $this->processFields($fieldset, $fieldsetData);
+        $request->validate($validation->rules());
 
-        foreach ($fieldsetData as $key => $value) {
+        foreach ($fields->values() as $key => $value) {
             $entry->set($key, $value);
         }
-        $entry->set('title', $data['title']);
-        $entry->slug($data['slug']);
-        $entry->save();
 
-        return ['success' => true];
+        $entry
+            ->set('title', $request->title)
+            ->slug($request->slug)
+            ->save();
+
+        return response('', 204);
     }
 
     public function create()

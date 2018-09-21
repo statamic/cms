@@ -3,29 +3,22 @@
 namespace Statamic\Fields;
 
 use Statamic\Fields\Field;
-use Statamic\Contracts\Fields\Fieldset;
+use Statamic\Fields\Fieldset;
 
 class Validation
 {
-    protected $fieldset;
+    protected $fields;
     protected $data = [];
     protected $extraRules = [];
 
-    public function fieldset(Fieldset $fieldset)
+    public function fields($fields)
     {
-        $this->fieldset = $fieldset;
+        $this->fields = $fields;
 
         return $this;
     }
 
-    public function data($data)
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    public function with($rules)
+    public function withRules($rules)
     {
         $this->extraRules = $rules;
 
@@ -34,21 +27,37 @@ class Validation
 
     public function rules()
     {
-        $rules = $this->fields()->reduce(function ($carry, $field) {
-            return $carry->merge($field->rules());
-        }, collect());
+        return $this
+            ->merge($this->fieldRules(), $this->extraRules)
+            ->all();
+    }
 
-        foreach ($this->extraRules as $field => $fieldRules) {
-            $fieldRules = self::explodeRules($fieldRules);
-
-            if ($rules->has($field)) {
-                $rules[$field] = array_merge($rules[$field], $fieldRules);
-            } else {
-                $rules[$field] = $fieldRules;
-            }
+    private function fieldRules()
+    {
+        if (! $this->fields) {
+            return collect();
         }
 
-        return $rules->all();
+        return $this->fields->all()->reduce(function ($carry, $field) {
+            return $carry->merge($field->rules());
+        }, collect());
+    }
+
+    public function merge($original, $overrides)
+    {
+        foreach ($overrides as $field => $fieldRules) {
+            $fieldRules = self::explodeRules($fieldRules);
+
+            if (array_has($original, $field)) {
+                $original[$field] = array_merge($original[$field], $fieldRules);
+            } else {
+                $original[$field] = $fieldRules;
+            }
+
+            $original[$field] = collect($original[$field])->unique()->values()->all();
+        }
+
+        return collect($original);
     }
 
     public static function explodeRules($rules)
@@ -62,13 +71,5 @@ class Validation
         }
 
         return $rules;
-    }
-
-    private function fields()
-    {
-        return collect($this->fieldset->inlinedFields())->map(function ($field, $handle) {
-            $data = array_get($this->data, $handle);
-            return (new Field($handle, $field, $data));
-        });
     }
 }

@@ -3,7 +3,7 @@
 namespace Statamic\Addons\Lists;
 
 use Statamic\API\Helper;
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class ListsFieldtype extends Fieldtype
 {

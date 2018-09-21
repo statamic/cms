@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Text;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class TextFieldtype extends Fieldtype
 {

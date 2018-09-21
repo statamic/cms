@@ -7,7 +7,9 @@ export default {
             required: true,
         },
         visibleColumns: {
-            required: true,
+            default() {
+                return this.columns;
+            }
         },
         rows: {
             type: Array,
@@ -23,6 +25,10 @@ export default {
         },
         maxSelections: {
             type: Number
+        },
+        sort: {
+            type: Boolean,
+            default: true
         }
     },
     provide() {
@@ -36,7 +42,7 @@ export default {
                 searchQuery: this.searchQuery,
                 columns: this.columns,
                 visibleColumns: this.visibleColumns,
-                sortColumn: this.visibleColumns[0],
+                sortColumn: this.sort ? this.visibleColumns[0] : null,
                 sortDirection: 'asc',
                 rows: [],
                 selections: this.selections,
@@ -50,7 +56,7 @@ export default {
         filteredRows() {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
-            return this.sort(rows)
+            return this.sortRows(rows);
         }
 
     },
@@ -86,7 +92,10 @@ export default {
             return fuse.search(this.searchQuery);
         },
 
-        sort(rows) {
+        sortRows(rows) {
+            // If no column is selected, don't sort.
+            if (! this.sharedState.sortColumn) return rows;
+
             rows = _.sortBy(rows, this.sharedState.sortColumn);
 
             if (this.sharedState.sortDirection === 'desc') {

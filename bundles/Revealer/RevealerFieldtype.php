@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Revealer;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class RevealerFieldtype extends Fieldtype
 {

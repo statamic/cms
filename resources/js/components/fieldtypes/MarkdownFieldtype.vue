@@ -81,10 +81,12 @@
             @upload-complete="uploadComplete">
         </uploader> -->
 
+        <!-- TODO: Bring this back.
         <modal :show.sync="showCheatsheet" class="markdown-modal">
             <template slot="header">{{ translate('cp.markdown_cheatsheet') }}</template>
             <template slot="body" v-html="translate('markdown.cheatsheet')"></template>
         </modal>
+        -->
 
     </div>
 </template>

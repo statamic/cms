@@ -16,7 +16,7 @@ trait HasLocalizedSlugsInData
             return $this->getSlug();
         }
 
-        $this->setSlug($slug);
+        return $this->setSlug($slug);
     }
 
     /**
@@ -54,5 +54,7 @@ trait HasLocalizedSlugsInData
                 $this->set('slug', $slug);
             }
         }
+
+        return $this;
     }
 }
