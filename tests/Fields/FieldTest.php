@@ -191,22 +191,49 @@ class FieldTest extends TestCase
     /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype {
+                protected $configFields = [
+                    'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
+                    'a_config_field_without_pre_processing' => ['type' => 'without_processing']
+                ];
+            });
+
+            FieldtypeRepository::shouldReceive('find')
+                ->with('with_processing')
+                ->andReturn(new class extends Fieldtype {
+                    public function preProcess($data) {
+                        return $data . ' preprocessed';
+                    }
+                });
+
+            FieldtypeRepository::shouldReceive('find')
+                ->with('without_processing')
+                ->andReturn(new class extends Fieldtype {
+                    public function preProcess($data) {
+                        return $data;
+                    }
+                });
+
         $field = new Field('test', [
-            'type' => 'text',
+            'type' => 'example',
             'display' => 'Test Field',
             'instructions' => 'Test instructions',
             'validate' => 'required',
-            'some_extra_config' => 'foo'
+            'a_config_field_with_pre_processing' => 'foo',
+            'a_config_field_without_pre_processing' => 'foo',
         ]);
 
         $this->assertEquals([
             'handle' => 'test',
-            'type' => 'text',
+            'type' => 'example',
             'display' => 'Test Field',
             'instructions' => 'Test instructions',
             'required' => true,
             'validate' => 'required',
-            'some_extra_config' => 'foo'
+            'a_config_field_with_pre_processing' => 'foo preprocessed',
+            'a_config_field_without_pre_processing' => 'foo',
         ], $field->toPublishArray());
     }
 

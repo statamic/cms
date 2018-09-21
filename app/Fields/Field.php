@@ -72,7 +72,7 @@ class Field implements Arrayable
 
     public function toPublishArray()
     {
-        return array_merge($this->config(), [
+        return array_merge($this->preProcessedConfig(), [
             'handle' => $this->handle,
             'type' => $this->type(),
             'display' => $this->display(),
@@ -129,5 +129,12 @@ class Field implements Arrayable
     public function get(string $key, $fallback = null)
     {
         return $this->config[$key] ?? $fallback;
+    }
+
+    private function preProcessedConfig()
+    {
+        $fields = $this->fieldtype()->configFields()->addValues($this->config);
+
+        return array_merge($this->config, $fields->preProcess()->values());
     }
 }
