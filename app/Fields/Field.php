@@ -58,7 +58,7 @@ class Field implements Arrayable
             Validation::explodeRules($this->fieldtype()->rules())
         )];
 
-        $extra = collect($this->fieldtype()->extraRules(null))->map(function ($rules) {
+        $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
             return Validation::explodeRules($rules);
         })->all();
 
