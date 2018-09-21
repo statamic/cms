@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Fieldset;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class FieldsetFieldtype extends Fieldtype
 {

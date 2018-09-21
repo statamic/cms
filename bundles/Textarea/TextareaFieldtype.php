@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Textarea;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class TextareaFieldtype extends Fieldtype
 {

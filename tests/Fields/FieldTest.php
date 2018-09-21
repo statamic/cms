@@ -5,7 +5,7 @@ namespace Tests\Fields;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 use Illuminate\Support\Collection;
 use Tests\Fakes\Fieldtypes\PlainFieldtype;
 use Facades\Statamic\Fields\FieldRepository;

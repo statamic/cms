@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Integer;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class IntegerFieldtype extends Fieldtype
 {

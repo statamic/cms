@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Theme;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class ThemeFieldtype extends Fieldtype
 {

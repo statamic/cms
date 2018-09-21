@@ -4,7 +4,7 @@ namespace Statamic\Addons;
 
 use Statamic\API\File;
 use Statamic\API\YAML;
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 abstract class BundleFieldtype extends Fieldtype
 {

@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\LocaleSettings;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class LocaleSettingsFieldtype extends Fieldtype
 {

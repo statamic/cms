@@ -3,7 +3,7 @@
 namespace Statamic\Addons\Yaml;
 
 use Statamic\API\YAML;
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class YamlFieldtype extends Fieldtype
 {

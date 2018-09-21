@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Code;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class CodeFieldtype extends Fieldtype
 {

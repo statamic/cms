@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Tags;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class TagsFieldtype extends Fieldtype
 {

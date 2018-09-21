@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\UserGroups;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class UserGroupsFieldtype extends Fieldtype
 {

@@ -3,7 +3,7 @@
 namespace Statamic\Addons\ReplicatorSets;
 
 use Statamic\Fields\Fieldset;
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 
 class ReplicatorSetsFieldtype extends Fieldtype
