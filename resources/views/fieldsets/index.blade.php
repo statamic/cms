@@ -5,7 +5,7 @@
     <div class="flex mb-3">
         <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
 
-        @can('create', 'Statamic\Contracts\Fields\Fieldset')
+        @can('create', 'Statamic\Fields\Fieldset')
             <a href="{{ cp_route('fieldsets.create') }}" class="btn">{{ __('Create Fieldset') }}</a>
         @endcan
     </div>
