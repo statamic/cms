@@ -285,6 +285,25 @@ class FieldtypeTest extends TestCase
     {
         $this->assertEquals('test', (new TestFieldtype)->preProcess('test'));
     }
+
+    /** @test */
+    function it_gets_a_config_value()
+    {
+        $field = new Field('test', [
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+
+        $fieldtype = (new TestFieldtype)->setField($field);
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ], $fieldtype->config());
+        $this->assertEquals('bar', $fieldtype->config('foo'));
+        $this->assertNull($fieldtype->config('unknown'));
+        $this->assertEquals('fallback', $fieldtype->config('unknown', 'fallback'));
+    }
 }
 
 class TestFieldtype extends Fieldtype
