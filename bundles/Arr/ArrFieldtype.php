@@ -15,9 +15,11 @@ class ArrFieldtype extends Fieldtype
 
     public function preProcess($data)
     {
+        if (! $data) return $data;
+
         if ($this->keyed()) {
             $processed = [];
-            foreach (format_input_options($this->getFieldConfig('keys')) as $formatted) {
+            foreach (format_input_options($this->config('keys')) as $formatted) {
                 $value = $formatted['value'];
                 $processed[$value] = array_get($data, $value);
             }
@@ -54,6 +56,6 @@ class ArrFieldtype extends Fieldtype
 
     private function keyed()
     {
-        return (bool) $this->getFieldConfig('keys');
+        return (bool) $this->config('keys');
     }
 }
