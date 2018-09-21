@@ -82,8 +82,9 @@ class ReplicatorFieldtype extends Fieldtype
         return call_user_func([$fieldtype, $this->process], $field_data);
     }
 
-    public function extraRules($data)
+    public function extraRules(): array
     {
+        // TODO
         return collect($data)->map(function ($set, $index) {
             return $this->setRules($set['type'], $set, $index);
         })->reduce(function ($carry, $rules) {
