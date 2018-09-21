@@ -33,6 +33,7 @@ Route::group([
     Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
 
     Route::resource('fieldsets', 'FieldsetController');
+    Route::get('fieldtypes', 'FieldtypesController@index');
 
     Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
 });
