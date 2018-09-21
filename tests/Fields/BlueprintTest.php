@@ -170,14 +170,15 @@ class BlueprintTest extends TestCase
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
-                'validate' => 'required',
+                'validate' => 'required|min:2',
             ]));
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_two')
             ->andReturn(new Field('field_two', [
                 'type' => 'textarea',
                 'display' => 'Two',
-                'instructions' => 'Two instructions'
+                'instructions' => 'Two instructions',
+                'validate' => 'min:2'
             ]));
 
         $blueprint->setContents($contents = [
@@ -214,7 +215,8 @@ class BlueprintTest extends TestCase
                             'type' => 'text',
                             'display' => 'One',
                             'instructions' => 'One instructions',
-                            'required' => true
+                            'required' => true,
+                            'validate' => 'required|min:2'
                         ]
                     ]
                 ],
@@ -227,7 +229,8 @@ class BlueprintTest extends TestCase
                             'type' => 'textarea',
                             'display' => 'Two',
                             'instructions' => 'Two instructions',
-                            'required' => false
+                            'required' => false,
+                            'validate' => 'min:2'
                         ]
                     ]
                 ]

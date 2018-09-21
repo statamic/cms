@@ -38,7 +38,7 @@ class Field implements Arrayable
 
     public function fieldtype()
     {
-        return FieldtypeRepository::find($this->type());
+        return FieldtypeRepository::find($this->type())->setField($this);
     }
 
     public function display()
@@ -72,13 +72,13 @@ class Field implements Arrayable
 
     public function toPublishArray()
     {
-        return [
+        return array_merge($this->config(), [
             'handle' => $this->handle,
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
-        ];
+        ]);
     }
 
     public function setValue($value)
@@ -119,5 +119,19 @@ class Field implements Arrayable
         return array_merge($this->config, [
             'handle' => $this->handle
         ]);
+    }
+
+    public function config(): array
+    {
+        $fields = $this->fieldtype()->configFields()->addValues($this->config);
+
+        $processed = $fields->preProcess()->values();
+
+        return array_merge($this->config, $processed);
+    }
+
+    public function get(string $key, $fallback = null)
+    {
+        return $this->config()[$key] ?? $fallback;
     }
 }

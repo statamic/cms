@@ -121,7 +121,7 @@ class FieldsTest extends TestCase
                     'type' => 'text',
                     'display' => 'One',
                     'instructions' => 'One instructions',
-                    'validate' => 'required',
+                    'validate' => 'required|min:2',
                 ]);
             });
 
@@ -131,7 +131,8 @@ class FieldsTest extends TestCase
                 return new Field('field_two', [
                     'type' => 'textarea',
                     'display' => 'Two',
-                    'instructions' => 'Two instructions'
+                    'instructions' => 'Two instructions',
+                    'validate' => 'min:2'
                 ]);
             });
 
@@ -152,14 +153,16 @@ class FieldsTest extends TestCase
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
-                'required' => true
+                'required' => true,
+                'validate' => 'required|min:2'
             ],
             [
                 'handle' => 'two',
                 'type' => 'textarea',
                 'display' => 'Two',
                 'instructions' => 'Two instructions',
-                'required' => false
+                'required' => false,
+                'validate' => 'min:2'
             ]
         ], $fields->toPublishArray());
     }

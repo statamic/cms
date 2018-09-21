@@ -196,6 +196,7 @@ class FieldTest extends TestCase
             'display' => 'Test Field',
             'instructions' => 'Test instructions',
             'validate' => 'required',
+            'some_extra_config' => 'foo'
         ]);
 
         $this->assertEquals([
@@ -203,7 +204,9 @@ class FieldTest extends TestCase
             'type' => 'text',
             'display' => 'Test Field',
             'instructions' => 'Test instructions',
-            'required' => true
+            'required' => true,
+            'validate' => 'required',
+            'some_extra_config' => 'foo'
         ], $field->toPublishArray());
     }
 
@@ -298,5 +301,51 @@ class FieldTest extends TestCase
             'handle' => 'the_handle',
             'foo' => 'bar',
         ], $field->toArray());
+    }
+
+    /** @test */
+    function config_values_are_preprocessed()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('example')
+            ->andReturn(new class extends Fieldtype {
+                protected $configFields = [
+                    'one' => ['type' => 'no_processing'],
+                    'two' => ['type' => 'has_processing']
+                ];
+            });
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('no_processing')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcess($data) {
+                    return $data;
+                }
+            });
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('has_processing')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcess($data) {
+                    return $data . ' preprocessed';
+                }
+            });
+
+        $field = new Field('test', [
+            'type' => 'example',
+            'one' => 'foo', // corresponding fieldtype has no preprocessing
+            'two' => 'bar', // corresponding fieldtype does have preprocessing
+            'three' => 'baz' // no corresponding fieldtype, so theres no preprocessing
+        ]);
+
+        $this->assertEquals([
+            'type' => 'example',
+            'one' => 'foo',
+            'two' => 'bar preprocessed',
+            'three' => 'baz'
+        ], $field->config());
+        $this->assertEquals('foo', $field->get('one'));
+        $this->assertEquals('bar preprocessed', $field->get('two'));
+        $this->assertEquals('baz', $field->get('three'));
     }
 }
