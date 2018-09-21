@@ -79,11 +79,6 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Assets\AssetContainerFactory::class
         );
 
-        $this->app->bind(
-            \Statamic\Contracts\Fields\Fieldset::class,
-            \Statamic\Fields\Fieldset::class
-        );
-
         $this->app->bind(\Statamic\Contracts\Data\Users\User::class, function () {
             $driver = Config::get('statamic.users.driver');
 
