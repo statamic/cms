@@ -123,15 +123,11 @@ class Field implements Arrayable
 
     public function config(): array
     {
-        $fields = $this->fieldtype()->configFields()->addValues($this->config);
-
-        $processed = $fields->preProcess()->values();
-
-        return array_merge($this->config, $processed);
+        return $this->config;
     }
 
     public function get(string $key, $fallback = null)
     {
-        return $this->config()[$key] ?? $fallback;
+        return $this->config[$key] ?? $fallback;
     }
 }

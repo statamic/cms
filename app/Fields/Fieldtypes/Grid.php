@@ -57,8 +57,7 @@ class Grid extends Fieldtype
 
     private function fields()
     {
-        return new Fields(collect($this->config('fields'))->map(function ($field) {
-            $handle = array_pull($field, 'handle');
+        return new Fields(collect($this->config('fields'))->map(function ($field, $handle) {
             return compact('handle', 'field');
         }));
     }
