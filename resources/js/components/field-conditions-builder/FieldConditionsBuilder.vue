@@ -26,7 +26,7 @@
                         :handle.sync="condition.handle"
                         :operator.sync="condition.operator"
                         :values.sync="condition.values"
-                        @deleted="delete(i)"
+                        @deleted="destroy(i)"
                     ></tr>
                 </table>
 
@@ -111,7 +111,7 @@ export default {
             });
         },
 
-        delete(i) {
+        destroy(i) {
             this.conditions.splice(i, 1);
         }
 
