@@ -36,6 +36,7 @@ class EntriesController extends CpController
             ->preProcess();
 
         $values = array_merge($fields->values(), [
+            'title' => $entry->get('title'),
             'slug' => $entry->slug()
         ]);
 
