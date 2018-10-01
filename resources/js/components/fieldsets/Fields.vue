@@ -12,13 +12,15 @@
                             type="text"
                             class="bg-transparent outline-none w-full"
                             v-model="field.display"
-                            :placeholder="field.handle" />
+                            :placeholder="field.handle"
+                            @focus="$event.target.select()" />
                     </template>
                     <template slot="cell-handle" slot-scope="{ row: field }">
                         <input
                             type="text"
                             class="bg-transparent text-xs font-mono outline-none w-full"
-                            v-model="field.handle" />
+                            v-model="field.handle"
+                            @focus="$event.target.select()" />
                     </template>
                     <template slot="cell-type" slot-scope="{ value: type }">
                         <div class="flex">
