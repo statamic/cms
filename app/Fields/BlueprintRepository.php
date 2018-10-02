@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\API\YAML;
+use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 
 class BlueprintRepository
@@ -31,5 +32,23 @@ class BlueprintRepository
         return (new Blueprint)
             ->setHandle($handle)
             ->setContents(YAML::parse($this->files->get($path)));
+    }
+
+    public function all(): Collection
+    {
+        return collect($this->files->allFiles($this->directory))
+            ->filter(function ($file) {
+                return $file->getExtension() === 'yaml';
+            })
+            ->map(function ($file) {
+                $basename = str_after($file->getPathname(), str_finish($this->directory, '/'));
+                $handle = str_before($basename, '.yaml');
+                $handle = str_replace('/', '.', $handle);
+
+                return (new Blueprint)
+                    ->setHandle($handle)
+                    ->setContents(YAML::parse($this->files->get($file->getPathname())));
+            })
+            ->keyBy->handle();
     }
 }

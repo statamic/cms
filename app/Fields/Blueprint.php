@@ -68,4 +68,9 @@ class Blueprint
             'sections' => $this->sections()->map->toPublishArray()->values()->all()
         ];
     }
+
+    public function editUrl()
+    {
+        return cp_route('blueprints.edit', $this->handle());
+    }
 }

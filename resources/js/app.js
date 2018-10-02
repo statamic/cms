@@ -61,7 +61,8 @@ var vm = new Vue({
         Roles: require('./components/roles/roles'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
-        FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue')
+        FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue'),
+        BlueprintListing: require('./components/blueprints/Listing.vue'),
     },
 
     mixins: [ Notifications ],
