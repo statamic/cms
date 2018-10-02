@@ -3,7 +3,7 @@
     <div>
 
         <div class="flexy mb-3">
-            <h1 class="fill">{{ fieldset.title }}</h1>
+            <h1 class="fill">{{ initialTitle }}</h1>
             <button type="submit" class="btn btn-primary" @click.prevent="save">Save</button>
         </div>
 
@@ -12,6 +12,9 @@
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('The proper name of your fieldset.') }}</small>
+                <div v-if="errors.title">
+                    <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                </div>
                 <input type="text" name="title" class="form-control" v-model="fieldset.title" autofocus="autofocus">
             </div>
 
@@ -27,35 +30,24 @@
 </template>
 
 <script>
-import axios from 'axios';
-import FieldsetFields from './Fields.vue';
+import Form from './Form.vue';
 
 export default {
 
-    components: {
-        FieldsetFields
-    },
-
-    props: ['action', 'initialFieldset'],
+    mixins: [Form],
 
     data() {
         return {
-            fieldset: JSON.parse(JSON.stringify(this.initialFieldset))
+            method: 'patch',
+            initialTitle: this.initialFieldset.title
         }
     },
 
     methods: {
 
-        save() {
-            axios.patch(this.action, this.fieldset).then(response => {
-                this.$notify.success('Saved');
-            }).catch(e => {
-                this.$notify.error(e.response.data.message);
-            })
-        },
-
-        fieldsUpdated(fields) {
-            this.fieldset.fields = fields;
+        saved(response) {
+            this.$notify.success('Saved');
+            this.errors = {};
         }
 
     }

@@ -2,8 +2,12 @@
 
 @section('content')
 
-    <fieldset-builder :create="true"
-                      save-url="{{ route('fieldset.store') }}">
-    </fieldset-builder>
+    <fieldset-create-form
+        action="{{ cp_route('fieldsets.store') }}"
+        :initial-fieldset="{{ json_encode([
+            'title' => '',
+            'fields' => []
+        ]) }}"
+    ></fieldset-create-form>
 
 @endsection

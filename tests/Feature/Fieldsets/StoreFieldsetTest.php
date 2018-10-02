@@ -11,7 +11,7 @@ use Statamic\Data\Entries\Collection;
 use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 
-class UpdateFieldsetTest extends TestCase
+class StoreFieldsetTest extends TestCase
 {
     use FakesRoles;
 
@@ -27,30 +27,32 @@ class UpdateFieldsetTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = API\User::create('test')->get()->assignRole('test');
-        $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($fieldset)
+            ->post(cp_route('fieldsets.store'), [
+                'handle' => 'Test',
+                'title' => 'Updated',
+                'fields' => []
+            ])
             ->assertRedirect('/original')
             ->assertSessionHasErrors();
 
-        $fieldset = API\Fieldset::find('test');
-        $this->assertEquals('Test', $fieldset->title());
+        $this->assertNull(API\Fieldset::find('test'));
     }
 
     /** @test */
-    function fieldset_gets_saved()
+    function fieldset_gets_created()
     {
-        $this->withoutExceptionHandling();
         $user = API\User::create('test')->get()->makeSuper();
-        $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $this->assertCount(0, API\Fieldset::all());
 
         $this
             ->actingAs($user)
-            ->submit($fieldset, [
-                'title' => 'Updated title',
+            ->post(cp_route('fieldsets.store'), [
+                'handle' => 'test',
+                'title' => 'Test',
                 'fields' => [
                     [
                         '_id' => 'id-one',
@@ -70,10 +72,15 @@ class UpdateFieldsetTest extends TestCase
                     ],
                 ]
             ])
-            ->assertStatus(204);
+            ->assertStatus(200)
+            ->assertJson([
+                'redirect' => cp_route('fieldsets.edit', 'test')
+            ])
+            ->assertSessionHas('message', __('Saved'));
 
+        $this->assertCount(1, API\Fieldset::all());
         $this->assertEquals([
-            'title' => 'Updated title',
+            'title' => 'Test',
             'fields' => [
                 'one' => [
                     'type' => 'textarea',
@@ -88,7 +95,21 @@ class UpdateFieldsetTest extends TestCase
                     'baz' => 'qux'
                 ]
             ]
-        ], $fieldset->contents());
+        ], API\Fieldset::find('test')->contents());
+    }
+
+    /** @test */
+    function handle_is_required()
+    {
+        $user = API\User::create('test')->get()->makeSuper();
+        $this->assertCount(0, API\Fieldset::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->post(cp_route('fieldsets.store'), $this->validParams(['handle' => '']))
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('handle');
     }
 
     /** @test */
@@ -96,16 +117,13 @@ class UpdateFieldsetTest extends TestCase
     {
         $user = API\User::create('test')->get()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
-        $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($fieldset, ['title' => ''])
+            ->post(cp_route('fieldsets.store'), $this->validParams(['title' => '']))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
-
-        $this->assertEquals('Test', API\Fieldset::find('test')->title());
     }
 
     /** @test */
@@ -113,19 +131,13 @@ class UpdateFieldsetTest extends TestCase
     {
         $user = API\User::create('test')->get()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
-        $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
-            'title' => 'Test',
-            'fields' => ['foo' => 'bar']
-        ])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($fieldset, ['fields' => ''])
+            ->post(cp_route('fieldsets.store'), $this->validParams(['fields' => '']))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('fields');
-
-        $this->assertEquals($originalContents, API\Fieldset::find('test')->contents());
     }
 
     /** @test */
@@ -133,33 +145,20 @@ class UpdateFieldsetTest extends TestCase
     {
         $user = API\User::create('test')->get()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
-        $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
-            'title' => 'Test',
-            'fields' => ['foo' => 'bar']
-        ])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($fieldset, ['fields' => 'string'])
+            ->post(cp_route('fieldsets.store'), $this->validParams(['fields' => 'string']))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('fields');
-
-        $this->assertEquals($originalContents, API\Fieldset::find('test')->contents());
-    }
-
-    private function submit($fieldset, $params = [])
-    {
-        return $this->patch(
-            cp_route('fieldsets.update', $fieldset->handle()),
-            $this->validParams($params)
-        );
     }
 
     private function validParams($overrides = [])
     {
         return array_merge([
-            'title' => 'Updated',
+            'handle' => 'test',
+            'title' => 'Test',
             'fields' => [],
         ], $overrides);
     }
