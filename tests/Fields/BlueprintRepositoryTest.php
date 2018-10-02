@@ -106,4 +106,61 @@ EOT;
         $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
         $this->assertEquals(['First Blueprint', 'Second Blueprint', 'Third Blueprint'], $all->map->title()->values()->all());
     }
+
+    /** @test */
+    function it_saves_to_disk()
+    {
+        $fieldset = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
+            'title' => 'Test Blueprint',
+            'sections' => [
+                'one' => [
+                    'display' => 'One',
+                    'fields' => [
+                        [
+                            'handle' => 'foo',
+                            'field' => 'foo.bar',
+                            'config' => [
+                                'display' => 'Foo',
+                                'foo' => 'bar',
+                            ]
+                        ],
+                        [
+                            'handle' => 'bar',
+                            'field' => [
+                                'type' => 'bar',
+                                'display' => 'Bar',
+                                'bar' => 'foo',
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->repo->save($fieldset);
+
+$expectedYaml = <<<'EOT'
+title: 'Test Blueprint'
+sections:
+  one:
+    display: One
+    fields:
+      -
+        handle: foo
+        field: foo.bar
+        config:
+          display: Foo
+          foo: bar
+      -
+        handle: bar
+        field:
+          type: bar
+          display: Bar
+          bar: foo
+
+EOT;
+        $this->assertFileExists($path = $this->tempDir.'/the_test_blueprint.yaml');
+        $this->assertFileEqualsString($path, $expectedYaml);
+        @unlink($path);
+    }
 }

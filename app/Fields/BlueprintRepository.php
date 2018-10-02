@@ -51,4 +51,12 @@ class BlueprintRepository
             })
             ->keyBy->handle();
     }
+
+    public function save(Blueprint $blueprint)
+    {
+        $this->files->put(
+            "{$this->directory}/{$blueprint->handle()}.yaml",
+            YAML::dump($blueprint->contents())
+        );
+    }
 }
