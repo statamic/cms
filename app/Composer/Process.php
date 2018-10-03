@@ -21,8 +21,7 @@ class Process
      */
     public function run($command, $cacheKey = null)
     {
-        // Had this in composter, but tests don't run with base_path()?
-        // $process = new SymfonyProcess($command, base_path());
+        $process = new SymfonyProcess($command, base_path());
 
         $process = new SymfonyProcess($command);
         $process->setTimeout(null);

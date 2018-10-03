@@ -83,6 +83,21 @@ return [
 
     'stache' => [
         'always_update' => true,
-    ]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Intensive Operations
+    |--------------------------------------------------------------------------
+    |
+    | Sometimes Statamic requires extra resources to complete intensive
+    | operations. Here you may configure system resource limits for
+    | those rare times when we need to turn things up to eleven!
+    |
+    */
+
+    'php_memory_limit' => '-1',
+    'php_max_execution_time' => '-1',
+    'ajax_timeout' => '600000',
 
 ];
