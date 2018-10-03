@@ -10,9 +10,13 @@ class Composer extends Process
 
     /**
      * Instantiate composer process.
+     *
+     * @param mixed $basePath
      */
-    public function __construct()
+    public function __construct($basePath = null)
     {
+        parent::__construct($basePath);
+
         // Set this process to eleven.
         $this->toEleven();
 

@@ -12,6 +12,21 @@ class Process
     const CACHE_EXPIRY_MINUTES = 10;
 
     /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
+     * Instantiate process.
+     *
+     * @param mixed $basePath
+     */
+    public function __construct($basePath = null)
+    {
+        $this->basePath = is_null($basePath) ? base_path() : $basePath;
+    }
+
+    /**
      * Run the command.
      *
      * @param string|array $command
@@ -21,9 +36,7 @@ class Process
      */
     public function run($command, $cacheKey = null)
     {
-        $process = new SymfonyProcess($command, base_path());
-
-        $process = new SymfonyProcess($command);
+        $process = new SymfonyProcess($command, $this->basePath);
         $process->setTimeout(null);
 
         if ($cacheKey) {

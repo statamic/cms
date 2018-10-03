@@ -10,6 +10,13 @@ use Tests\TestCase;
 
 class ComposerTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        Composer::swap(new \Statamic\Composer\Composer($this->basePath()));
+    }
+
     /**
      * @group integration
      * @test
@@ -34,7 +41,7 @@ class ComposerTest extends TestCase
         // Test that the package isn't installed yet...
 
         $this->assertNotContains('test/package', Composer::installed()->keys());
-        $this->assertFalse(File::exists(base_path('vendor/test/package')));
+        $this->assertFalse(File::exists($this->basePath('vendor/test/package')));
 
         // Test that we can require the package...
 
@@ -43,7 +50,7 @@ class ComposerTest extends TestCase
 
         $installed = Composer::installed();
         $this->assertContains('test/package', $installed->keys());
-        $this->assertTrue(File::exists(base_path('vendor/test/package')));
+        $this->assertTrue(File::exists($this->basePath('vendor/test/package')));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
 
         // Test that we can update the package...
@@ -53,7 +60,7 @@ class ComposerTest extends TestCase
 
         $installed = Composer::installed();
         $this->assertContains('test/package', $installed->keys());
-        $this->assertTrue(File::exists(base_path('vendor/test/package')));
+        $this->assertTrue(File::exists($this->basePath('vendor/test/package')));
         $this->assertEquals('1.0.1', $installed->get('test/package')->version);
 
         // Test that we can downgrade to a specific version...
@@ -63,7 +70,7 @@ class ComposerTest extends TestCase
 
         $installed = Composer::installed();
         $this->assertContains('test/package', $installed->keys());
-        $this->assertTrue(File::exists(base_path('vendor/test/package')));
+        $this->assertTrue(File::exists($this->basePath('vendor/test/package')));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
 
         // Test that we can remove the package...
@@ -71,6 +78,11 @@ class ComposerTest extends TestCase
         Composer::remove('test/package');
 
         $this->assertNotContains('test/package', Composer::installed()->keys());
-        $this->assertFalse(File::exists(base_path('vendor/test/package')));
+        $this->assertFalse(File::exists($this->basePath('vendor/test/package')));
+    }
+
+    private function basePath($path = null)
+    {
+        return __DIR__ . '/../../' . $path;
     }
 }

@@ -13,7 +13,7 @@ class PackToTheFuture
      */
     public static function setVersion(string $version)
     {
-        File::put(base_path('tests/Fakes/Package/test-package/composer.json'), json_encode([
+        File::put(__DIR__.'/test-package/composer.json', json_encode([
             'name' => 'test/package',
             'version' => $version,
         ], JSON_UNESCAPED_SLASHES));
