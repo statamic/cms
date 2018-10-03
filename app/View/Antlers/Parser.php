@@ -66,15 +66,7 @@ class Parser
     {
         $this->allowPhp = $allowPhp;
 
-        // <statamic>
-        // before we get started, make sure the text needs parsing
-        if ( ! $this->allowPhp && strpos($text, '{{') === false) {
-            return $text;
-        }
-
-        // use : as scope-glue
         $this->scopeGlue = ':';
-        // </statamic>
 
         $this->setupRegex();
 
