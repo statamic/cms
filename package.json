@@ -11,7 +11,7 @@
     "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "dependencies": {
-    "@shopify/draggable": "^1.0.0-beta.7",
+    "@shopify/draggable": "^1.0.0-beta.8",
     "autosize": "~3.0.12",
     "axios": "^0.18.0",
     "baremetrics-calendar": "file:resources/js/vendor/baremetrics-calendar",

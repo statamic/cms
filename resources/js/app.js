@@ -63,6 +63,7 @@ var vm = new Vue({
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
         FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue'),
         BlueprintListing: require('./components/blueprints/Listing.vue'),
+        BlueprintBuilder: require('./components/blueprints/Builder.vue'),
     },
 
     mixins: [ Notifications ],
