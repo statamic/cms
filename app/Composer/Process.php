@@ -23,7 +23,7 @@ class Process
      */
     public function __construct($basePath = null)
     {
-        $this->basePath = is_null($basePath) ? base_path() : $basePath;
+        $this->basePath = $basePath ?? base_path();
     }
 
     /**
