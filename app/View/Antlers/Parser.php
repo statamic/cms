@@ -66,15 +66,7 @@ class Parser
     {
         $this->allowPhp = $allowPhp;
 
-        // <statamic>
-        // before we get started, make sure the text needs parsing
-        if ( ! $this->allowPhp && strpos($text, '{{') === false) {
-            return $text;
-        }
-
-        // use : as scope-glue
         $this->scopeGlue = ':';
-        // </statamic>
 
         $this->setupRegex();
 
@@ -88,9 +80,9 @@ class Parser
         $this->original_text = $text;
         // </statamic>
 
-        // The parseConditionals method executes any PHP in the text, so clean it up.
+        // Prevent the parsing of PHP by b0rking the PHP open tag
         if (! $allowPhp) {
-            $text = str_replace(['<?', '?>'], ['&lt;?', '?&gt;'], $text);
+            $text = str_replace(['<?php'], ['&lt;?php'], $text);
         }
 
         // <statamic>

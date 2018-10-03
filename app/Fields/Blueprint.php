@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Statamic\API\Str;
 use Illuminate\Support\Collection;
+use Facades\Statamic\Fields\BlueprintRepository;
 
 class Blueprint
 {
@@ -67,5 +68,17 @@ class Blueprint
             'title' => $this->title(),
             'sections' => $this->sections()->map->toPublishArray()->values()->all()
         ];
+    }
+
+    public function editUrl()
+    {
+        return cp_route('blueprints.edit', $this->handle());
+    }
+
+    public function save()
+    {
+        BlueprintRepository::save($this);
+
+        return $this;
     }
 }

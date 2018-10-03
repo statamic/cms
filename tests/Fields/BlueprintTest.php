@@ -10,6 +10,7 @@ use Statamic\Fields\Blueprint;
 use Illuminate\Support\Collection;
 use Statamic\API\Field as FieldAPI;
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\BlueprintRepository;
 
 class BlueprintTest extends TestCase
 {
@@ -236,5 +237,15 @@ class BlueprintTest extends TestCase
                 ]
             ]
         ], $blueprint->toPublishArray());
+    }
+
+    /** @test */
+    function it_saves_through_the_repository()
+    {
+        BlueprintRepository::shouldReceive('save')->with($blueprint = new Blueprint)->once();
+
+        $return = $blueprint->save();
+
+        $this->assertEquals($blueprint, $return);
     }
 }

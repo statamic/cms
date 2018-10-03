@@ -98,6 +98,11 @@
                         <i>@svg('new/hammer-wench')</i><span>Fieldsets</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ cp_route('blueprints.index') }}">
+                        <i>@svg('new/hammer-wench')</i><span>Blueprints</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>

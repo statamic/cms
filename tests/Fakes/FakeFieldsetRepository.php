@@ -10,7 +10,12 @@ class FakeFieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
-        return $this->fieldsets[$handle] ?? null;
+        if ($fieldset = array_get($this->fieldsets, $handle)) {
+            // Return a clone so that modifications to the object will only be updated when saving.
+            return clone $fieldset;
+        }
+
+        return null;
     }
 
     public function save(Fieldset $fieldset)
