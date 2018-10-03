@@ -34,6 +34,7 @@ class ComposerTest extends TestCase
      * This method is intentionally doing way too much, for the sake of test suite performance.
      *
      * @group integration
+     * @group slow
      * @test
      */
     function it_can_require_update_downgrade_and_remove_a_package()
