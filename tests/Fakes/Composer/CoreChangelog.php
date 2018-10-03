@@ -2,7 +2,7 @@
 
 namespace Tests\Fakes\Composer;
 
-use App\Services\CoreChangelog as RealChangelog;
+use Statamic\Composer\CoreChangelog as RealChangelog;
 
 class CoreChangelog extends RealChangelog
 {

@@ -2,8 +2,8 @@
 
 namespace Statamic\Composer;
 
-use Facades\App\Services\Composer;
-use Facades\App\Services\CoreChangelog;
+use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Composer\CoreChangelog;
 
 class CoreUpdater
 {

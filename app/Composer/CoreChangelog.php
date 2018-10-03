@@ -2,7 +2,7 @@
 
 namespace Statamic\Composer;
 
-use Facades\App\Services\Composer;
+use Facades\Statamic\Composer\Composer;
 
 class CoreChangelog
 {
