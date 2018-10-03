@@ -31,7 +31,7 @@
 
     <div class="head-link border-l h-full px-3 flex items-center">
         <div class="dropdown">
-            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-popover:tooltip.bottom="'{{ __('Helpful Links') }}'">
+            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @svg('new/book-open-text')
             </a>
             <ul class="dropdown-menu">
@@ -58,7 +58,7 @@
             @svg('new/browser-com')
         </a>
         <div class="dropdown">
-            <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-popover:tooltip.bottom="'{{ __('Account') }}'">
+            <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="icon-user-initials rounded-full text-xxs bg-pink shadow">ME</div>
             </a>
             <ul class="dropdown-menu hide md:block">
