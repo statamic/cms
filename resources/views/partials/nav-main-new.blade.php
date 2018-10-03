@@ -52,8 +52,8 @@
                         <i>@svg('new/drawer-file')</i><span>Forms</span>
                     </a>
                 </li>
-                <li>
-                    <a href="">
+                <li class="{{ current_class('updater') }}">
+                    <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('new/loading-bar-1')</i><span>Updates</span>
                     </a>
                 </li>

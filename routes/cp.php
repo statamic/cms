@@ -41,8 +41,22 @@ Route::group([
     Route::get('fieldtypes', 'FieldtypesController@index');
     Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
 
+    // Composer
+    Route::get('composer/check', 'ComposerOutputController@check');
+
+    // Updater
+    Route::get('updater', 'UpdaterController@index')->name('updater.index');
+    Route::get('updater/version', 'UpdaterController@version');
+    Route::get('updater/changelog', 'UpdaterController@changelog');
+    Route::post('updater/update', 'UpdaterController@update');
+    Route::post('updater/update-to-latest', 'UpdaterController@updateToLatest');
+    Route::post('updater/install-explicit-version', 'UpdaterController@installExplicitVersion');
+
     // Addons
-    Route::resource('addons', 'AddonsController');
+    Route::get('addons', 'AddonsController@index')->name('addons.index');
+    Route::get('addons/installed', 'AddonsController@installed');
+    Route::post('addons/install', 'AddonsController@install');
+    Route::post('addons/uninstall', 'AddonsController@uninstall');
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');
