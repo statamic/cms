@@ -1,0 +1,116 @@
+<?php
+
+namespace Statamic\Composer;
+
+use Illuminate\Support\Facades\Cache;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process as SymfonyProcess;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
+class Process
+{
+    const CACHE_EXPIRY_MINUTES = 10;
+
+    /**
+     * Run the command.
+     *
+     * @param string|array $command
+     * @param string $cacheKey
+     * @return mixed
+     * @throws ProcessFailedException
+     */
+    public function run($command, $cacheKey = null)
+    {
+        // Had this in composter, but tests don't run with base_path()?
+        // $process = new SymfonyProcess($command, base_path());
+
+        $process = new SymfonyProcess($command);
+        $process->setTimeout(null);
+
+        if ($cacheKey) {
+            $this->runAndCacheOutput($process, $cacheKey);
+            return;
+        }
+
+        return $this->runAndReturnOutput($process);
+    }
+
+    /**
+     * Run and return output when finished.
+     *
+     * @param SymfonyProcess $process
+     * @return string
+     */
+    private function runAndReturnOutput($process)
+    {
+        $output = '';
+
+        $process->run(function ($type, $buffer) use (&$output) {
+            $output .= $buffer;
+        });
+
+        return $output;
+    }
+
+    /**
+     * Run and append output to cache as it's generated.
+     *
+     * @param SymfonyProcess $process
+     * @param string $cacheKey
+     */
+    private function runAndCacheOutput($process, $cacheKey)
+    {
+        $process->run(function ($type, $buffer) use ($cacheKey) {
+            $this->appendOutputToCache($cacheKey, $buffer);
+        });
+
+        $this->setCompletedOnCache($cacheKey);
+    }
+
+    /**
+     * Append output to cache.
+     *
+     * @param string $cacheKey
+     * @param string $output
+     */
+    private function appendOutputToCache($cacheKey, $output)
+    {
+        Cache::put($cacheKey, [
+            'completed' => false,
+            'output' => Cache::get($cacheKey)['output'] . $output,
+        ], self::CACHE_EXPIRY_MINUTES);
+    }
+
+    /**
+     * Set completed on cache.
+     *
+     * @param string $cacheKey
+     */
+    private function setCompletedOnCache($cacheKey)
+    {
+        Cache::put($cacheKey, [
+            'completed' => true,
+            'output' => Cache::get($cacheKey)['output'],
+        ], self::CACHE_EXPIRY_MINUTES);
+    }
+
+    /**
+     * Absolute path to PHP Binary.
+     *
+     * @return string
+     */
+    public function phpBinary()
+    {
+        return (new PhpExecutableFinder)->find();
+    }
+
+    /**
+     * Crank parent process up to eleven (doesn't apply to child process called by run method).
+     */
+    public function toEleven()
+    {
+        @ini_set('memory_limit', config('statamic.system.php_memory_limit'));
+
+        @set_time_limit(config('statamic.system.php_max_execution_time'));
+    }
+}
