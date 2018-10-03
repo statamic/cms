@@ -95,12 +95,12 @@
                 </li>
                 <li>
                     <a href="{{ cp_route('fieldsets.index') }}">
-                        <i>@svg('new/hammer-wench')</i><span>Fieldsets</span>
+                        <i>@svg('new/design-tool-wireframe')</i><span>Fieldsets</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ cp_route('blueprints.index') }}">
-                        <i>@svg('new/hammer-wench')</i><span>Blueprints</span>
+                        <i>@svg('new/project-blueprint-buildings')</i><span>Blueprints</span>
                     </a>
                 </li>
             </ul>
