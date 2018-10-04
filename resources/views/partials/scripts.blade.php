@@ -1,3 +1,14 @@
+<script>
+    window.Statamic = @json(Statamic::jsonVariables(request()))
+
+    @if(session()->has('success'))
+        Statamic.flash = [{
+            type:    'success',
+            message: '{{ session()->get('success') }}',
+        }];
+    @endif
+</script>
+
 <script src="{{ cp_resource_url('js/manifest.js') }}?v={{ STATAMIC_VERSION }}"></script>
 <script src="{{ cp_resource_url('js/vendor.js') }}?v={{ STATAMIC_VERSION }}"></script>
 <script src="{{ cp_resource_url('js/bootstrap.js') }}?v={{ STATAMIC_VERSION }}"></script>

@@ -12,6 +12,8 @@ class PermissionComposer
     {
         $permissions = User::getCurrent()->permissions();
 
-        $view->with('permissions', base64_encode(json_encode($permissions)));
+        \Statamic::provideToScript([
+            'permissions' => base64_encode(json_encode($permissions))
+        ]);
     }
 }
