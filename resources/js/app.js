@@ -56,7 +56,6 @@ var vm = new Vue({
         FormsetBuilder: require('./components/formset-builder/formset-builder'),
         FieldsetBuilder: require('./components/fieldset-builder/Builder.vue'), // TODO: Remove
         Installer: require('./components/installer/installer'),
-        Updater: require('./components/updater'),
         Importer: require('./components/importer/importer'),
         Roles: require('./components/roles/roles'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),

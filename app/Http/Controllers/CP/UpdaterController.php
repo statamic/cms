@@ -2,27 +2,27 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use GuzzleHttp\Client;
 use Facades\Statamic\Composer\CoreChangelog;
 use Facades\Statamic\Composer\CoreUpdater;
 use Illuminate\Http\Request;
-use Tests\Fakes\Composer\Package\PackToTheFuture;
 
 class UpdaterController extends CpController
 {
     public function __construct()
     {
+        // All temporary stuff to get this all hooked up with test/package instead of statamic/cms.
         $fakeCoreUpdater = new \Statamic\Composer\CoreUpdater;
         $fakeCoreUpdater->core = 'test/package';
         CoreUpdater::swap($fakeCoreUpdater);
+        require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
     }
 
-    // public function index()
-    // {
-    //     return view('statamic::updater.index', [
-    //         'title' => 'Addons'
-    //     ]);
-    // }
+    public function index()
+    {
+        return view('statamic::updater.index', [
+            'title' => 'Addons'
+        ]);
+    }
 
     public function version()
     {
@@ -46,14 +46,14 @@ class UpdaterController extends CpController
 
     public function updateToLatest()
     {
-        PackToTheFuture::setVersion(CoreUpdater::latestVersion()); // Temp!
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion(CoreUpdater::latestVersion()); // Temp!
 
         return CoreUpdater::updateToLatest();
     }
 
     public function installExplicitVersion(Request $request)
     {
-        PackToTheFuture::setVersion($request->version); // Temp!
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion($request->version); // Temp!
 
         return CoreUpdater::installExplicitVersion($request->version);
     }
@@ -63,20 +63,20 @@ class UpdaterController extends CpController
     //  *
     //  * @return \Illuminate\View\View
     //  */
-    public function index()
-    {
-        $this->access('updater');
+    // public function index()
+    // {
+    //     $this->access('updater');
 
-        $client = new Client();
-        $response = $client->get('https://outpost.statamic.com/v2/changelog');
-        $releases = json_decode($response->getBody());
+    //     $client = new \GuzzleHttp\Client\Client();
+    //     $response = $client->get('https://outpost.statamic.com/v2/changelog');
+    //     $releases = json_decode($response->getBody());
 
-        return view('statamic::updater.index', [
-            'title' => 'Updater',
-            'releases' => $releases,
-            'latest' => $releases[0]
-        ]);
-    }
+    //     return view('statamic::updater.index', [
+    //         'title' => 'Updater',
+    //         'releases' => $releases,
+    //         'latest' => $releases[0]
+    //     ]);
+    // }
 
     // /**
     //  * Show update instructions

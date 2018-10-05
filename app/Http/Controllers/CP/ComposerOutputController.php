@@ -3,8 +3,9 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Http\Controllers\Controller;
 
-class ComposerOutputController
+class ComposerOutputController extends Controller
 {
     /**
      * Get composer output from cache for realtime output in browser.
@@ -19,6 +20,6 @@ class ComposerOutputController
             Cache::forget('composer');
         }
 
-        return $cache;
+        return $cache ?? ['output' => false];
     }
 }
