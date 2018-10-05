@@ -17,6 +17,11 @@ class Process
     protected $basePath;
 
     /**
+     * @var string
+     */
+    protected $output;
+
+    /**
      * Instantiate process.
      *
      * @param mixed $basePath
@@ -55,13 +60,11 @@ class Process
      */
     private function runAndReturnOutput($process)
     {
-        $output = '';
-
         $process->run(function ($type, $buffer) use (&$output) {
-            $output .= $buffer;
+            $this->output .= $buffer;
         });
 
-        return $output;
+        return $this->output;
     }
 
     /**
@@ -91,7 +94,7 @@ class Process
     {
         Cache::put($cacheKey, [
             'completed' => false,
-            'output' => Cache::get($cacheKey)['output'] . $output,
+            'output' => $this->output .= $output,
         ], self::CACHE_EXPIRY_MINUTES);
     }
 
@@ -104,7 +107,7 @@ class Process
     {
         Cache::put($cacheKey, [
             'completed' => true,
-            'output' => Cache::get($cacheKey)['output'],
+            'output' => $this->output,
         ], self::CACHE_EXPIRY_MINUTES);
     }
 
