@@ -73,6 +73,20 @@ class Composer extends Process
     }
 
     /**
+     * Get last cached output.
+     *
+     * @param string $package
+     * @return mixed
+     */
+    public function lastCachedOutput(string $package)
+    {
+        // TODO: Key composer cache by package!
+        // return parent::lastCachedOutput("composer.{$package}");
+
+        return parent::lastCachedOutput('composer');
+    }
+
+    /**
      * Run composer command.
      *
      * @param mixed $parts

@@ -1,8 +1,10 @@
 <template>
     <div>
-        <span v-if="polling" class="icon icon-circular-graph animation-spin float-right"></span>
-        <slot></slot>
-        <pre v-if="output" class="p-1 rounded bg-grey-lighter text-grey text-sm">{{ output }}</pre>
+        <p class="mb-2">
+            {{ title }}
+            <span v-if="polling" class="icon icon-circular-graph animation-spin ml-1"></span>
+        </p>
+        <pre v-if="output" class="p-1 rounded bg-grey-lighter text-grey text-sm clearfix">{{ output }}</pre>
     </div>
 </template>
 
@@ -16,6 +18,10 @@
                 polling: false,
             };
         },
+
+        props: [
+            'title',
+        ],
 
         created() {
             this.$events.$on('start-composer', this.startComposer);

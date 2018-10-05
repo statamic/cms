@@ -112,6 +112,17 @@ class Process
     }
 
     /**
+     * Get last cached output.
+     *
+     * @param string $cacheKey
+     * @return mixed
+     */
+    public function lastCachedOutput(string $cacheKey)
+    {
+        return Cache::get($cacheKey)['completed'] ? Cache::get($cacheKey)['output'] : false;
+    }
+
+    /**
      * Absolute path to PHP Binary.
      *
      * @return string
