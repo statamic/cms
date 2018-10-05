@@ -1,9 +1,8 @@
 <template>
     <div>
+        <span v-if="polling" class="icon icon-circular-graph animation-spin float-right"></span>
         <slot></slot>
-        <pre v-if="output">{{ output }}</pre>
-        <p v-else-if="polling"><span class="icon icon-circular-graph animation-spin"></span></p>
-        <p v-else>No output</p>
+        <pre v-if="output" class="p-1 rounded bg-grey-lighter text-grey text-sm">{{ output }}</pre>
     </div>
 </template>
 
