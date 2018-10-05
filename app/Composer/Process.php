@@ -72,6 +72,8 @@ class Process
      */
     private function runAndCacheOutput($process, $cacheKey)
     {
+        $this->appendOutputToCache($cacheKey, null);
+
         $process->run(function ($type, $buffer) use ($cacheKey) {
             $this->appendOutputToCache($cacheKey, $buffer);
         });
