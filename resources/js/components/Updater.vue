@@ -18,7 +18,7 @@
         </div>
 
         <div v-for="release in changelog" class="card tight update-release shadow mb-5">
-            <div class="card-heading clearfix">
+            <div class="card-heading clearfix mb-4">
                 <template v-if="showActions">
                     <button v-if="release.type === 'current'" class="btn float-right opacity-50" disabled>Current Version</button>
                     <button v-else-if="release.latest" @click="updateToLatest()" class="btn float-right">Update to Latest</button>

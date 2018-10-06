@@ -68,9 +68,11 @@ class CoreChangelog
     protected function formatRelease(string $string)
     {
         $string = markdown($string);
-        $string = Str::replace($string, '[new]', '<span class="label label-info">New</span>');
-        $string = Str::replace($string, '[fix]', '<span class="label label-success">Fix</span>');
-        $string = Str::replace($string, '[break]', '<span class="label label-danger">Break</span>');
+
+        // Barf!  Figure out if new changelog API will be outputting straight JSON before refactoring this...
+        $string = Str::replace($string, '[new]', '<span class="label block text-center text-white rounded" style="background: #5bc0de; padding: 2px; padding-bottom: 1px;">NEW</span>');
+        $string = Str::replace($string, '[fix]', '<span class="label block text-center text-white rounded" style="background: #5cb85c; padding: 2px; padding-bottom: 1px;">NEW</span>');
+        $string = Str::replace($string, '[break]', '<span class="label block text-center text-white rounded" style="background: #d9534f; padding: 2px; padding-bottom: 1px;">NEW</span>');
 
         return $string;
     }
