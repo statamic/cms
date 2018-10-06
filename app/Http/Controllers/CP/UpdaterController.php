@@ -23,22 +23,24 @@ class UpdaterController extends CpController
 
     public function index()
     {
+        $this->access('updater');
+
         return view('statamic::updater.index', [
             'title' => 'Updates'
         ]);
     }
 
-    public function version()
-    {
-        return [
-            'currentVersion' => Composer::installed()->get(self::CORE)->version,
-            'lastInstallLog' => Composer::lastCachedOutput(self::CORE),
-        ];
-    }
-
     public function changelog()
     {
-        return CoreChangelog::get();
+        $this->access('updater');
+
+        $currentVersion = Composer::installed()->get(self::CORE)->version;
+
+        return [
+            'changelog' => CoreChangelog::get($currentVersion),
+            'currentVersion' => $currentVersion,
+            'lastInstallLog' => Composer::lastCachedOutput(self::CORE),
+        ];
     }
 
     public function update()

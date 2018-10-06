@@ -2,68 +2,76 @@
 
 namespace Statamic\Composer;
 
+use Carbon\Carbon;
 use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Composer\CoreUpdater;
+use GuzzleHttp\Client;
+use Statamic\API\Str;
 
 class CoreChangelog
 {
     /**
      * Get changelog, sorted from newest to oldest.
+     *
+     * @return \Illuminate\Support\Collection
      */
-    public function get()
+    public function get($currentVersion = null)
     {
-        // Will actually get changelog from database later.
-        return collect([
-            '3.1.2' => (object) [
-                $this->new('Even more crazy new things!'),
-                $this->fix('Fixed this.'),
-                $this->fix('Fixed that.'),
-            ],
-            '3.1.1' => (object) [
-                $this->new('More crazy new things!'),
-                $this->fix('Fixed this.'),
-                $this->fix('Fixed that.'),
-            ],
-            '3.1.0' => (object) [
-                $this->new('Crazy new things!'),
-                $this->fix('Fixed this.'),
-                $this->fix('Fixed that.'),
-            ],
-            '3.0.1' => (object) [
-                $this->new('Such new!'),
-                $this->fix('Fixed this.'),
-                $this->fix('Fixed that.'),
-            ],
-            '3.0.0' => (object) [
-                $this->new('Much wow!'),
-                $this->fix('Fixed this.'),
-                $this->fix('Fixed that.'),
-            ],
-        ]);
+        return $this->getReleases()->map(function ($release, $index) use ($currentVersion) {
+            return (object) [
+                'version' => $release->tag_name,
+                'type' => $this->parseReleaseType($release->tag_name, $currentVersion, $index),
+                'latest' => $index === 0,
+                'date' => Carbon::parse($release->created_at)->format('F jS, Y'),
+                'body' => $this->formatRelease($release->body),
+            ];
+        });
     }
 
     /**
-     * New change type.
+     * Get releases.
      *
-     * @param \stdClass $change
+     * @return \Illuminate\Support\Collection
      */
-    protected function new($change)
+    protected function getReleases()
     {
-        return (object) [
-            'type' => 'new',
-            'change' => $change,
-        ];
+        $client = new Client;
+        $response = $client->get('https://outpost.statamic.com/v2/changelog');
+
+        return collect(json_decode($response->getBody()));
     }
 
     /**
-     * Fix change type.
+     * Parse release type.
      *
-     * @param \stdClass $change
+     * @param string $releaseVersion
+     * @param string $currentVersion
+     * @return string
      */
-    protected function fix($change)
+    protected function parseReleaseType($releaseVersion, $currentVersion)
     {
-        return (object) [
-            'type' => 'fix',
-            'change' => $change,
-        ];
+        if (version_compare($releaseVersion, $currentVersion, '>')) {
+            return 'upgrade';
+        } elseif (version_compare($releaseVersion, $currentVersion, '=')) {
+            return 'current';
+        }
+
+        return 'downgrade';
+    }
+
+    /**
+     * Format release.
+     *
+     * @param string $string
+     * @return string
+     */
+    protected function formatRelease(string $string)
+    {
+        $string = markdown($string);
+        $string = Str::replace($string, '[new]', '<span class="label label-info">New</span>');
+        $string = Str::replace($string, '[fix]', '<span class="label label-success">Fix</span>');
+        $string = Str::replace($string, '[break]', '<span class="label label-danger">Break</span>');
+
+        return $string;
     }
 }

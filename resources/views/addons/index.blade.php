@@ -9,7 +9,7 @@
     </div>
 
     <addon-list
-        domain="{{ env('MARKETPLACE_API_DOMAIN') ?? 'https://statamic.com' }}"
+        domain="{{ env('STATAMIC_DOMAIN') ?? 'https://statamic.com' }}"
         :endpoints="{'addons': '/addons'}">
     </addon-list>
 

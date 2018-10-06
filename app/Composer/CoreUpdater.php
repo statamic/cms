@@ -22,7 +22,7 @@ class CoreUpdater
      */
     public function latestVersion()
     {
-        return CoreChangelog::get()->keys()->first();
+        return CoreChangelog::get()->first()->version;
     }
 
     /**

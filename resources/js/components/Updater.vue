@@ -17,12 +17,25 @@
             <button class="btn" @click="updateToLatest()">{{ translate('Update to Latest') }}</button>
         </div>
 
-        <ul v-for="(changes, version) in changelog" class="mt-3">
-            <p><strong>{{ version }}</strong></p>
-            <button v-if="version == latest" @click="updateToLatest()" class="btn">Update to latest version!</button>
-            <button v-else @click="installExplicitVersion(version)" class="btn">Install {{ version }}</button>
-            <li v-for="item in changes">[{{ item.type }}] {{ item.change }}</li>
-        </ul>
+        <div v-for="release in changelog" class="card tight update-release shadow mb-5">
+            <div class="card-heading clearfix">
+                <template v-if="! gettingChangelog && ! output.processing">
+                    <button v-if="release.type === 'current'" class="btn float-right opacity-50" disabled>Current Version</button>
+                    <button v-else-if="release.latest" @click="updateToLatest()" class="btn float-right">Update to Latest</button>
+                    <button v-else @click="installExplicitVersion(release.version)" class="btn float-right">
+                        <template v-if="release.type === 'upgrade'">Upgrade to</template>
+                        <template v-if="release.type === 'downgrade'">Downgrade to</template>
+                        {{ release.version }}
+                    </button>
+                </template>
+
+                <h1>{{ release.version }}</h1>
+                <h5 class="date">Released on {{ release.date }}</h5>
+            </div>
+            <div class="card-body">
+                <div v-html="release.body"></div>
+            </div>
+        </div>
 
         <portal to="modals">
             <modal
@@ -47,6 +60,7 @@
     export default {
         data() {
             return {
+                gettingChangelog: false,
                 changelog: [],
                 currentVersion: null,
                 lastInstallLog: null,
@@ -73,7 +87,6 @@
         },
 
         mounted() {
-            this.getCurrentVersion();
             this.getChangelog();
         },
 
@@ -83,13 +96,11 @@
 
         methods: {
             getChangelog() {
-                axios.get('/cp/updater/changelog').then(response => {
-                    this.changelog = response.data;
-                });
-            },
+                this.gettingChangelog = true;
 
-            getCurrentVersion() {
-                axios.get('/cp/updater/version').then(response => {
+                axios.get('/cp/updater/changelog').then(response => {
+                    this.gettingChangelog = false;
+                    this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
                     this.lastInstallLog = response.data.lastInstallLog;
                 });
@@ -129,7 +140,7 @@
             },
 
             composerFinished() {
-                this.getCurrentVersion();
+                this.getChangelog();
 
                 this.output = {
                     processing: false,

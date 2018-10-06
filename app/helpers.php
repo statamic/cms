@@ -542,16 +542,6 @@ function collect_assets($value = [])
     return new \Statamic\Assets\AssetCollection($value);
 }
 
-function format_update($string)
-{
-    $string = markdown($string);
-    $string = Str::replace($string, '[new]', '<span class="label label-info">New</span>');
-    $string = Str::replace($string, '[fix]', '<span class="label label-success">Fix</span>');
-    $string = Str::replace($string, '[break]', '<span class="label label-danger">Break</span>');
-
-    return $string;
-}
-
 if (! function_exists('start_measure')) {
     function start_measure()
     {
