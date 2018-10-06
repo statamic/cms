@@ -7,19 +7,19 @@
                     Current Version: {{ currentVersion }}
                 </span>
             </h1>
-            <button v-if="(output || lastInstallLog) && ! modalOpen" class="btn mr-2" @click="$modal.show('output-modal')">
+            <button v-if="(output || lastInstallLog) && ! modalOpen" class="btn" @click="$modal.show('output-modal')">
                 <template v-if="output.processing">
                     {{ output.status }}
                     <span class="icon icon-circular-graph animation-spin ml-1"></span>
                 </template>
                 <template v-else>Last Install Log</template>
             </button>
-            <button class="btn" @click="updateToLatest()">{{ translate('Update to Latest') }}</button>
+            <button v-if="showActions" class="btn ml-2" @click="updateToLatest()">{{ translate('Update to Latest') }}</button>
         </div>
 
         <div v-for="release in changelog" class="card tight update-release shadow mb-5">
             <div class="card-heading clearfix">
-                <template v-if="! gettingChangelog && ! output.processing">
+                <template v-if="showActions">
                     <button v-if="release.type === 'current'" class="btn float-right opacity-50" disabled>Current Version</button>
                     <button v-else-if="release.latest" @click="updateToLatest()" class="btn float-right">Update to Latest</button>
                     <button v-else @click="installExplicitVersion(release.version)" class="btn float-right">
@@ -81,9 +81,9 @@
                 return {timeout: this.ajaxTimeout};
             },
 
-            latest() {
-                return _.chain(this.changelog).keys().first();
-            },
+            showActions() {
+                return ! this.gettingChangelog && ! this.output.processing;
+            }
         },
 
         mounted() {
