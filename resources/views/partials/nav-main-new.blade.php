@@ -55,6 +55,7 @@
                 <li class="{{ current_class('updater') }}">
                     <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('new/loading-bar-1')</i><span>Updates</span>
+                        <portal-target name="updates-badge"></portal-target>
                     </a>
                 </li>
                 <li>
