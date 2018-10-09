@@ -68,8 +68,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
         });
-
-        define('STATAMIC_VERSION', Statamic::version());
     }
 
     public function register()

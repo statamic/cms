@@ -5,7 +5,7 @@
 <title>@yield('title', $title ?? __('Here')) &#10174; Statamic</title>
 <link rel="icon" type="image/png" href="{{ cp_resource_url('img/favicon@2x.png') }}" sizes="32x32" />
 <link rel="icon" type="image/png" href="{{ cp_resource_url('img/favicon.png') }}" sizes="16x16" />
-<link href="{{ cp_resource_url('css/cp.css') }}?v={{ STATAMIC_VERSION }}" rel="stylesheet" />
+<link href="{{ cp_resource_url('css/cp.css') }}?v={{ Statamic::version() }}" rel="stylesheet" />
 
 @foreach (Statamic::availableStyles(request()) as $name => $path)
 <link href="{{ resource_url("vendor/$name/css/$path") }}" rel="stylesheet" />

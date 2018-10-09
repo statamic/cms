@@ -49,7 +49,7 @@
 <script>
     // Statamic.translations = {{-- $translations --}};
     Statamic.permissions = '{!! $permissions !!}';
-    Statamic.version = '{!! STATAMIC_VERSION !!}';
+    Statamic.version = '{!! Statamic::version() !!}';
 
     @if(session()->has('success'))
         Statamic.flash = [{
