@@ -6,17 +6,13 @@ use Facades\Statamic\Composer\Composer;
 use Facades\Statamic\Composer\CoreChangelog;
 use Facades\Statamic\Composer\CoreUpdater;
 use Illuminate\Http\Request;
+use Statamic\Statamic;
 
 class UpdaterController extends CpController
 {
-    const CORE = 'test/package';
-
     public function __construct()
     {
-        // All temporary stuff to get this all hooked up with test/package instead of statamic/cms.
-        $fakeCoreUpdater = new \Statamic\Composer\CoreUpdater;
-        $fakeCoreUpdater->core = self::CORE;
-        CoreUpdater::swap($fakeCoreUpdater);
+        // Temporarily using PackToTheFuture to fake version tags until we get this hooked up to statamic/cms.
         require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
     }
 
@@ -33,12 +29,12 @@ class UpdaterController extends CpController
     {
         $this->access('updater');
 
-        $currentVersion = Composer::installed()->get(self::CORE)->version;
+        $currentVersion = Composer::installed()->get(Statamic::CORE_REPO)->version;
 
         return [
             'changelog' => CoreChangelog::get($currentVersion),
             'currentVersion' => $currentVersion,
-            'lastInstallLog' => Composer::lastCachedOutput(self::CORE),
+            'lastInstallLog' => Composer::lastCachedOutput(Statamic::CORE_REPO),
         ];
     }
 

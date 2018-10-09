@@ -4,17 +4,18 @@ namespace Statamic\Composer;
 
 use Facades\Statamic\Composer\Composer;
 use Facades\Statamic\Composer\CoreChangelog;
+use Statamic\Statamic;
 
 class CoreUpdater
 {
-    public $core = 'statamic/cms';
-
     /**
      * Get current version.
+     *
+     * @return string
      */
     public function currentVersion()
     {
-        return Composer::installed()->get($this->core)->version;
+        return Statamic::version();
     }
 
     /**
@@ -30,7 +31,7 @@ class CoreUpdater
      */
     public function update()
     {
-        return Composer::update($this->core);
+        return Composer::update(Statamic::CORE_REPO);
     }
 
     /**
@@ -38,7 +39,7 @@ class CoreUpdater
      */
     public function updateToLatest()
     {
-        return Composer::require($this->core, $this->latestVersionConstraint());
+        return Composer::require(Statamic::CORE_REPO, $this->latestVersionConstraint());
     }
 
     /**
@@ -48,7 +49,7 @@ class CoreUpdater
      */
     public function installExplicitVersion(string $version)
     {
-        return Composer::require($this->core, $version);
+        return Composer::require(Statamic::CORE_REPO, $version);
     }
 
     /**
