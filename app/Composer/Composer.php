@@ -40,6 +40,22 @@ class Composer extends Process
     }
 
     /**
+     * Get installed version of a specific package, in a more performant way than calling composer show.
+     *
+     * @param string $package
+     * @return string
+     */
+    public function installedVersion(string $package)
+    {
+        $version = collect(json_decode(file_get_contents($this->basePath . 'composer.lock'))->packages)
+            ->keyBy('name')
+            ->get($package)
+            ->version;
+
+        return $this->normalizeVersion($version);
+    }
+
+    /**
      * Require a package.
      *
      * @param string $package

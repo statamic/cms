@@ -28,7 +28,7 @@ class Process
      */
     public function __construct($basePath = null)
     {
-        $this->basePath = $basePath ?? base_path();
+        $this->basePath = str_finish($basePath ?? base_path(), '/');
     }
 
     /**

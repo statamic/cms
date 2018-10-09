@@ -31,6 +31,15 @@ class ComposerTest extends TestCase
     }
 
     /**
+     * @group integration
+     * @test
+     */
+    function it_can_get_installed_version_of_a_specific_package()
+    {
+        $this->assertEquals(app()->version(), Composer::installedVersion('laravel/framework'));
+    }
+
+    /**
      * This method is intentionally doing way too much, for the sake of test suite performance.
      *
      * @group integration
