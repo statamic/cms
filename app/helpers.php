@@ -11,8 +11,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
-define('STATAMIC_VERSION', '3.0.0');
-
 $GLOBALS['statamictodos'] = [];
 function log_todo()
 {

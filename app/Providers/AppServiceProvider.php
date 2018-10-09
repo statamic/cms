@@ -5,6 +5,7 @@ namespace Statamic\Providers;
 use Statamic\API\File;
 use Statamic\DataStore;
 use Statamic\Sites\Sites;
+use Statamic\Statamic;
 use Stringy\StaticStringy;
 use Statamic\Routing\Router;
 use Statamic\Extensions\FileStore;
@@ -67,6 +68,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
         });
+
+        define('STATAMIC_VERSION', Statamic::version());
     }
 
     public function register()
