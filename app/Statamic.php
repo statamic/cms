@@ -3,15 +3,23 @@
 namespace Statamic;
 
 use Closure;
+use Facades\Statamic\Composer\Composer;
 use Illuminate\Http\Request;
 
 class Statamic
 {
+    const CORE_REPO = 'test/package'; // Will be `statamic/cms` on release.
+
     protected static $scripts = [];
     protected static $styles = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
+
+    public static function version()
+    {
+        return Composer::installedVersion(static::CORE_REPO);
+    }
 
     public static function availableScripts(Request $request)
     {
