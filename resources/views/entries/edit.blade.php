@@ -14,7 +14,7 @@
                     <a href="{{ cp_route('collections.show', $entry->collectionName())}}">
                         {{ $entry->collection()->title() }}
                     </a>
-                    @svg('new/chevron-right')
+                    @svg('chevron-right')
                     {{ $entry->get('title') }}
                 </h1>
                 <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>

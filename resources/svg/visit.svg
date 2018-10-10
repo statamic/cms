@@ -1,7 +1,0 @@
-<svg class="stroke-current" width="16px" height="12px" viewBox="0 0 16 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15.4997,4.5 L7.9997,4.5 C6.6187,4.5 5.4997,5.619 5.4997,7" stroke="currentColor"></path>
-        <polyline stroke="currentColor" points="13.4997 2.5 15.4997 4.5 13.4997 6.5"></polyline>
-        <path d="M11.4997,1.5 C11.4997,0.947 11.0527,0.5 10.4997,0.5 L1.4997,0.5 C0.9477,0.5 0.4997,0.947 0.4997,1.5 L0.4997,10.5 C0.4997,11.053 0.9477,11.5 1.4997,11.5 L10.4997,11.5 C11.0527,11.5 11.4997,11.053 11.4997,10.5 L11.4997,7.5" stroke="currentColor"></path>
-    </g>
-</svg>

@@ -15,7 +15,7 @@
     <div class="flex items-center px-3 border-l h-full text-sm">
         <div class="dropdown">
             <button class="flex outline-none items-center dropdown-toggle anti text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="block h-6 w-6 mr-1">@svg('new/content-pencil-write')</i><span>Shortcuts</span>
+                <i class="block h-6 w-6 mr-1">@svg('content-writing')</i><span>Shortcuts</span>
             </button>
             <ul class="dropdown-menu">
                 <li><a href="">New Blog Post</a></li>
@@ -32,19 +32,19 @@
     <div class="head-link border-l h-full px-3 flex items-center">
         <div class="dropdown">
             <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @svg('new/book-open-text')
+                @svg('book-open')
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <a href="https://docs.statamic.com" class="flex items-center">
                         <span>Documentation</span>
-                        <i class="w-3 block ml-1">@svg('new/expand-6')</i>
+                        <i class="w-3 block ml-1">@svg('expand')</i>
                     </a>
                 </li>
                 <li>
                     <a href="https://statamic.com/forum" class="flex items-center">
                         <span>Support</span>
-                        <i class="w-3 block ml-1">@svg('new/expand-6')</i>
+                        <i class="w-3 block ml-1">@svg('expand')</i>
                     </a>
                 </li>
                 <li>
@@ -55,7 +55,7 @@
             </ul>
         </div>
         <a class="h-6 w-6 block p-sm text-grey-light ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
-            @svg('new/browser-com')
+            @svg('browser-com')
         </a>
         <div class="dropdown">
             <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
