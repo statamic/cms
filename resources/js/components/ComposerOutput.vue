@@ -36,6 +36,8 @@
                 this.output = false;
                 this.polling = true;
 
+                this.checkComposer();
+
                 this.composerProcess = window.setInterval(() => {
                     this.checkComposer();
                 }, 1000);
