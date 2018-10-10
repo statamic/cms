@@ -16,9 +16,10 @@ class CoreUpdaterTest extends TestCase
     {
         parent::setUp();
 
-        CoreChangelog::swap(new FakeCoreChangelog);
         Composer::swap(new FakeComposer);
+        Composer::require('test/package');
         Composer::require('statamic/cms');
+        CoreChangelog::swap(new FakeCoreChangelog);
     }
 
     /** @test */

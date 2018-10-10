@@ -20,6 +20,11 @@ class Composer
         return collect($this->installed);
     }
 
+    public function installedVersion(string $package)
+    {
+        return $this->installed()->get($package)->version;
+    }
+
     public function require(string $package, string $version = null)
     {
         $this->putPackageIntoInstalled($package, $version);
