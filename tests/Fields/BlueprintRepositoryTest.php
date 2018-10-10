@@ -62,6 +62,13 @@ EOT;
     }
 
     /** @test */
+    function it_returns_null_if_blueprint_directory_doesnt_exist()
+    {
+        $this->repo->setDirectory(__DIR__.'/nope');
+        $this->assertNull($this->repo->find('unknown'));
+    }
+
+    /** @test */
     function it_gets_all_blueprints()
     {
         $firstContents = <<<'EOT'
@@ -105,6 +112,17 @@ EOT;
         $this->assertEquals(['first', 'second', 'sub.third'], $all->keys()->all());
         $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
         $this->assertEquals(['First Blueprint', 'Second Blueprint', 'Third Blueprint'], $all->map->title()->values()->all());
+    }
+
+    /** @test */
+    function it_returns_empty_collection_if_blueprint_directory_doesnt_exist()
+    {
+        $this->repo->setDirectory(__DIR__.'/nope');
+
+        $all = $this->repo->all();
+
+        $this->assertInstanceOf(Collection::class, $all);
+        $this->assertCount(0, $all);
     }
 
     /** @test */

@@ -36,6 +36,10 @@ class BlueprintRepository
 
     public function all(): Collection
     {
+        if (! $this->files->exists($this->directory)) {
+            return collect();
+        }
+
         return collect($this->files->allFiles($this->directory))
             ->filter(function ($file) {
                 return $file->getExtension() === 'yaml';
