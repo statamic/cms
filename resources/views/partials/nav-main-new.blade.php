@@ -72,7 +72,7 @@
                 </li>
                 <li>
                     <a href="">
-                        <i>@svg('multiple-users')</i><span>Groups</span>
+                        <i>@svg('users-multiple')</i><span>Groups</span>
                     </a>
                 </li>
                 <li>
