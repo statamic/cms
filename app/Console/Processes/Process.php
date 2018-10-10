@@ -60,6 +60,8 @@ class Process
      */
     private function runAndReturnOutput($process)
     {
+        $this->output = null;
+
         $process->run(function ($type, $buffer) use (&$output) {
             $this->output .= $buffer;
         });
