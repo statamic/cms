@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="flexy mb-3">
+    <div class="flex items-center mb-3">
         <a href="{{ route('form.show', $submission->form->name) }}" class="btn icon round mr-2">&larr;</a>
         <h1>{{ translate_choice('cp.submissions', 1) }}</h1>
     </div>

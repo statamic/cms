@@ -7,8 +7,8 @@
 
         <div class="form-submission-listing">
 
-            <div class="flexy mb-3">
-                <h1 class="fill">{{ $form->title() }}</h1>
+            <div class="flex items-center mb-3">
+                <h1 class="flex-1">{{ $form->title() }}</h1>
 
                 @can('super')
                 <a href="{{ route('form.edit', ['form' => $form->name()]) }}" class="btn mr-1">{{ t('configure') }}</a>

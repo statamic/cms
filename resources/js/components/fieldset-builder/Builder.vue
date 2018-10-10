@@ -2,12 +2,12 @@
 
 <div>
 
-    <div class="flexy mb-3 sticky">
-        <h1 class="fill" v-if="create">
+    <div class="flex items-center mb-3 sticky">
+        <h1 class="flex-1" v-if="create">
             {{ translate('cp.create_fieldset') }}
         </h1>
 
-        <h1 class="fill" v-else>
+        <h1 class="flex-1" v-else>
             {{ translate('cp.editing_fieldset') }}:
             <strong>{{ fieldsetTitle }}</strong>
         </h1>

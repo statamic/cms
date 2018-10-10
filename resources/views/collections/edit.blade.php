@@ -5,8 +5,8 @@
     <form method="POST" action="{{ cp_route('collections.update', $collection->path()) }}">
         @method('patch') @csrf
 
-        <div class="flexy mb-3">
-            <h1 class="fill">{{ $collection->title() }}</h1>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">{{ $collection->title() }}</h1>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 

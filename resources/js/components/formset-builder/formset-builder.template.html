@@ -1,10 +1,10 @@
 <div>
-    <div class="sticky flexy mb-3 full-width">
-        <h1 class="fill" v-if="create">
+    <div class="sticky flex items-center mb-3 w-full">
+        <h1 class="flex-1" v-if="create">
             {{ translate('cp.create_formset') }}
         </h1>
 
-        <h1 class="fill" v-if="!create">
+        <h1 class="flex-1" v-if="!create">
             {{ translate('cp.editing_formset') }}:
             <strong>{{ formsetTitle }}</strong>
         </h1>

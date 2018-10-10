@@ -5,8 +5,8 @@
     <form method="POST" action="{{ cp_route('asset-containers.update', $container->handle()) }}">
         @method('patch') @csrf
 
-        <div class="flexy mb-3">
-            <h1 class="fill">{{ $container->title() }}</h1>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">{{ $container->title() }}</h1>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 

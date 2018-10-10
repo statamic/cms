@@ -11,7 +11,7 @@ module.exports = {
 
     mounted() {
         if (this.hasError) {
-            this.$el.parentElement.parentElement.classList.add('shake');
+            this.$el.parentElement.parentElement.classList.add('animation-shake');
         }
     }
 

@@ -5,12 +5,12 @@
 .section-fieldtype {
     @apply .border-t .border-b .bg-grey-lighter;
 
-  &.form-group {
-    position: relative;
-    &:first-child {
-        @apply .rounded-t .border-t-0;
+    &.form-group {
+        position: relative;
+        &:first-child {
+            @apply .rounded-t .border-t-0;
+        }
     }
-  }
 
     label {
         @apply .uppercase .text-sm .font-bold;

@@ -10,7 +10,7 @@
                     <div class="focal-point-reticle" :style="{ top: y+'%', left: x+'%' }"></div>
                 </div>
             </div>
-            <div class="flexy apart">
+            <div class="flex items-center justify-between">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" @click.prevent="close">{{ translate('cp.cancel') }}</button>
                     <button type="button" class="btn btn-default" @click.prevent="reset">{{ translate('cp.reset') }}</button>

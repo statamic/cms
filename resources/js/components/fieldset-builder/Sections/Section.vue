@@ -8,7 +8,7 @@
             <div>
                 <label class="flex justify-between">
                     <span class="mr-sm">{{ translate('cp.section_handle') }}</span>
-                    <i class="icon icon-info text-xxs opacity-25 hover:opacity-75" v-tip :tip-text="translate('cp.section_handle_tip')"></i>
+                    <i class="icon icon-info text-2xs opacity-25 hover:opacity-75" v-tip :tip-text="translate('cp.section_handle_tip')"></i>
                 </label>
                 <input type="text" class="section-handle form-control mono" v-model="section.handle" @keydown="handleModified = true" />
             </div>

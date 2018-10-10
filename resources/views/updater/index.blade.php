@@ -2,8 +2,8 @@
 
 @section('content')
 
-    <div class="flexy mb-3">
-        <h1 class="fill">{{ __('Updater') }}</h1>
+    <div class="flex items-center mb-3">
+        <h1 class="flex-1">{{ __('Updater') }}</h1>
         @if (version_compare($latest->tag_name, STATAMIC_VERSION, '>'))
             <a href="{{ route('updater.update', $latest->tag_name) }}" class="btn btn-primary">{{ __('Update') }}</a>
         @else

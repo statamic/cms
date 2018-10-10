@@ -4,13 +4,13 @@
 		<thead>
 			<tr>
 				<th v-for="field in config.fields" :style="{ width: gridColWidth(field.width) }">
-					<div class="flexy">
-						<label class="block fill">
+					<div class="flex items-center">
+						<label class="block flex-1">
 							<template v-if="field.display">{{ field.display }}</template>
 							<template v-if="!field.display">{{ field.name | capitalize }}</template>
 							<i class="required" v-if="field.required">*</i>
 						</label>
-						<i class="icon icon-help-with-circle o5 fs-12" v-if="field.instructions" v-tip :tip-text="field.instructions | markdown"></i>
+						<i class="icon icon-help-with-circle opacity-50 text-xs" v-if="field.instructions" v-tip :tip-text="field.instructions | markdown"></i>
 					</div>
 				</th>
                 <th class="row-controls"></th>
@@ -38,8 +38,8 @@
 	<div v-if="hasData && stacked" class="grid-stacked">
 		<div class="list-group" v-for="(rowIndex, row) in data">
 			<div class="list-group-item group-header pl-3 drag-handle">
-				<div class="flexy">
-					<label class="fill">{{ rowIndex + 1 }}</label>
+				<div class="flex items-center">
+					<label class="flex">{{ rowIndex + 1 }}</label>
 					<i class="icon icon-cross" v-on:click="deleteRow(rowIndex)"></i>
 				</div>
 			</div>

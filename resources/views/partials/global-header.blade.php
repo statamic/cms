@@ -49,12 +49,12 @@
         </a>
         <div class="dropdown">
             <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <div class="icon-user-initials rounded-full text-xxs bg-pink shadow">ME</div>
+                <div class="icon-user-initials rounded-full text-2xs bg-pink shadow">ME</div>
             </a>
             <ul class="dropdown-menu hide md:block">
                 <li class="px-1">
                     <div class="text-base mb-px">dev@statamic.com</div>
-                    <div class="text-xxs mt-px text-grey-light">Super Admin</div>
+                    <div class="text-2xs mt-px text-grey-light">Super Admin</div>
                 </li>
                 <li class="divider"></li>
                 <li><a href="{{ route('statamic.cp.account') }}">{{ __('Profile') }}</a></li>

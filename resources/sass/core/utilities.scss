@@ -2,22 +2,11 @@
    UTILITES
    ========================================================================== */
 
-/* Visibility
-   ========================================================================== */
-
-[v-cloak] { display: none; }
-
-/* Color
-   ========================================================================== */
-
 .text-shadow {
     text-shadow: 0 1px 2px rgba(0,0,0,.25);
 }
 
-
-
-/* Misc
-  ========================================================================== */
+[v-cloak] { display: none; }
 
 .ease-quick {
     transition: all 60ms ease;
@@ -43,51 +32,18 @@
     }
 }
 
-.flexy {
-    display: flex;
-    align-items: center;
-
-    &.baseline { align-items: baseline;}
-    &.apart { justify-content: space-between; }
-    &.column { flex-direction: column;}
-    &.wrap { flex-wrap: wrap; }
-
-    .fill { flex: 1; }
-}
-
-@media (min-width: 768px) {
-    .lg_flex-no-wrap { flex-wrap: nowrap; }
-    .lg_w-auto { width: auto; }
-    .lg_mb-0 { margin-bottom: 0 !important; }
-}
-
 .loading-blocker {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 10; // arbitrary to make it appear over the fields
+    @apply absolute pin z-10;
     background: rgba(white, .7);
 }
 
-// Saving overlay
+// Saving Overlay
 .saving {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 200;
+    @apply absolute pin z-200 flex items-center rounded;
     background: rgba(white, .9);
-    display: flex;
-    align-items: center;
-    border-radius: 3px;
 
     .inner {
-        text-align: center;
-        padding: 40px;
-        margin: 0 auto;
+        @apply .p-5 .text-center .mx-auto;
     }
 
     i {
@@ -96,6 +52,3 @@
         margin-right: 10px;
     }
 }
-
-
-.help-block { width: 100%; }

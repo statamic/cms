@@ -19,7 +19,7 @@
         ></fieldset-fields>
         <div class="flex items-center mt-2">
             <a class="btn btn-default btn-small" @click="isAddingField = true">{{ translate('cp.add_field') }}</a>
-            <a class="opacity-50 text-xxs hover:opacity-100 ml-1" @click="$emit('deleted', setIndex)">{{ translate('cp.delete_set') }}</a>
+            <a class="opacity-50 text-2xs hover:opacity-100 ml-1" @click="$emit('deleted', setIndex)">{{ translate('cp.delete_set') }}</a>
         </div>
     </div>
 

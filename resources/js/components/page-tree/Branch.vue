@@ -24,7 +24,7 @@
                 <div class="has-collection flex items-center pl-2" v-if="hasEntries">
                     <svg-icon name="entries" class="pr-1 text-grey h-6 w-6"></svg-icon>
                     <a :href="createEntryUrl">{{ translate('cp.add') }}</a>
-                    <span class="mx-sm text-grey text-xxs">{{ translate('cp.or') }}</span>
+                    <span class="mx-sm text-grey text-2xs">{{ translate('cp.or') }}</span>
                     <a :href="entriesUrl">{{ translate('cp.edit') }}</a>
                 </div>
             </div>

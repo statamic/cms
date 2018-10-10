@@ -5,8 +5,8 @@
     <form method="POST" action="{{ cp_route('asset-containers.store') }}">
         @csrf
 
-        <div class="flexy mb-3">
-            <h1 class="fill">{{ __('Create Asset Container') }}</h1>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">{{ __('Create Asset Container') }}</h1>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 
