@@ -3,7 +3,7 @@
 namespace Statamic;
 
 use Closure;
-use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\Request;
 
 class Statamic

@@ -2,7 +2,7 @@
 
 namespace Statamic\Jobs;
 
-use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;

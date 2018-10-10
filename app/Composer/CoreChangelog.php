@@ -3,7 +3,7 @@
 namespace Statamic\Composer;
 
 use Carbon\Carbon;
-use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Composer\CoreUpdater;
 use GuzzleHttp\Client;
 use Statamic\API\Str;

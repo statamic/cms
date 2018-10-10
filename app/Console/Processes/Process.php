@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Composer;
+namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Process\PhpExecutableFinder;

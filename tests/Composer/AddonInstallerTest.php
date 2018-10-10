@@ -3,7 +3,7 @@
 namespace Tests\Composer;
 
 use Facades\Statamic\Composer\AddonInstaller;
-use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Composer\Marketplace;
 use Tests\Fakes\Composer\Composer as FakeComposer;
 use Tests\Fakes\Composer\Marketplace as FakeMarketplace;

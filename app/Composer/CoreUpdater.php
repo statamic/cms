@@ -2,7 +2,7 @@
 
 namespace Statamic\Composer;
 
-use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Composer\CoreChangelog;
 use Statamic\Statamic;
 

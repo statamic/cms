@@ -2,7 +2,7 @@
 
 namespace Tests\Composer;
 
-use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
@@ -14,7 +14,7 @@ class ComposerTest extends TestCase
     {
         parent::setUp();
 
-        Composer::swap(new \Statamic\Composer\Composer($this->basePath()));
+        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
     }
 
     /**
@@ -34,7 +34,7 @@ class ComposerTest extends TestCase
      * @group integration
      * @test
      */
-    function it_can_get_installed_version_of_a_specific_package()
+    function it_can_get_installed_version_of_a_package_directly_from_composer_lock()
     {
         $this->assertEquals(app()->version(), Composer::installedVersion('laravel/framework'));
     }
