@@ -12,7 +12,7 @@ class BlueprintController extends CpController
 
     public function index()
     {
-        $this->authorize('index', Blueprint::class, 'You are not authorized to access fieldsets.');
+        $this->authorize('index', Blueprint::class, 'You are not authorized to access blueprints.');
 
         $blueprints = API\Blueprint::all()->map(function ($blueprint) {
             return [
@@ -26,6 +26,31 @@ class BlueprintController extends CpController
         })->values();
 
         return view('statamic::blueprints.index', compact('blueprints'));
+    }
+
+    public function create()
+    {
+        $this->authorize('create', Blueprint::class, 'You are not authorized to create blueprints.');
+
+        return view('statamic::blueprints.create');
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorize('create', Blueprint::class, 'You are not authorized to create blueprints.');
+
+        $request->validate([
+            'title' => 'required'
+        ]);
+
+        $blueprint = (new Blueprint)
+            ->setHandle(snake_case($request->title))
+            ->setContents([
+                'title' => $request->title,
+                'sections' => []
+            ])->save();
+
+        return redirect($blueprint->editUrl())->with('message', __('Saved'));
     }
 
     public function edit($blueprint)
