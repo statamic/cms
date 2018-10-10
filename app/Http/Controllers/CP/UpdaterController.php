@@ -44,11 +44,9 @@ class UpdaterController extends CpController
     {
         $this->access('updater');
 
-        $currentVersion = Composer::installed()->get(Statamic::CORE_REPO)->version;
-
         return [
-            'changelog' => CoreChangelog::get($currentVersion),
-            'currentVersion' => $currentVersion,
+            'changelog' => CoreChangelog::get(),
+            'currentVersion' => Statamic::version(),
             'lastInstallLog' => Composer::lastCachedOutput(Statamic::CORE_REPO),
         ];
     }

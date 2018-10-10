@@ -7,20 +7,34 @@ use Facades\Statamic\Composer\Composer;
 use Facades\Statamic\Composer\CoreUpdater;
 use GuzzleHttp\Client;
 use Statamic\API\Str;
+use Statamic\Statamic;
 
 class CoreChangelog
 {
+    /**
+     * @var string
+     */
+    public $currentVersion;
+
+    /**
+     * Instantiate core changelog.
+     */
+    public function __construct()
+    {
+        $this->currentVersion = Statamic::version();
+    }
+
     /**
      * Get changelog, sorted from newest to oldest.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function get($currentVersion = null)
+    public function get()
     {
-        return $this->getReleases()->map(function ($release, $index) use ($currentVersion) {
+        return $this->getReleases()->map(function ($release, $index) {
             return (object) [
                 'version' => $release->tag_name,
-                'type' => $this->parseReleaseType($release->tag_name, $currentVersion, $index),
+                'type' => $this->parseReleaseType($release->tag_name, $index),
                 'latest' => $index === 0,
                 'date' => Carbon::parse($release->created_at)->format('F jS, Y'),
                 'body' => $this->formatRelease($release->body),
@@ -55,15 +69,14 @@ class CoreChangelog
      * Parse release type.
      *
      * @param string $releaseVersion
-     * @param string $currentVersion
      * @return string
      */
-    protected function parseReleaseType($releaseVersion, $currentVersion)
+    protected function parseReleaseType($releaseVersion)
     {
-        if (version_compare($releaseVersion, $currentVersion, '>')) {
-            return 'upgrade';
-        } elseif (version_compare($releaseVersion, $currentVersion, '=')) {
+        if (version_compare($releaseVersion, $this->currentVersion, '=')) {
             return 'current';
+        } elseif (version_compare($releaseVersion, $this->currentVersion, '>')) {
+            return 'upgrade';
         }
 
         return 'downgrade';
