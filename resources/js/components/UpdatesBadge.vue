@@ -15,7 +15,7 @@
         },
 
         mounted() {
-            this.getCount();
+            this.getCount(false);
         },
 
         created() {
@@ -23,8 +23,10 @@
         },
 
         methods: {
-            getCount() {
-                axios.get('/cp/updater/count').then(response => {
+            getCount(clearCache = true) {
+                let params = clearCache ? {'clearCache': clearCache} : {};
+
+                axios.get('/cp/updater/count', params).then(response => {
                     this.count = response.data;
                 });
             }

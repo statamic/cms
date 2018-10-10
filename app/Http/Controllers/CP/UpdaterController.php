@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Facades\Statamic\Composer\Composer;
 use Facades\Statamic\Composer\CoreChangelog;
 use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\UpdatesCount;
 use Illuminate\Http\Request;
 use Statamic\Statamic;
 
@@ -25,19 +26,11 @@ class UpdaterController extends CpController
         ]);
     }
 
-    public function count()
+    public function count(Request $request)
     {
         $this->access('updater');
 
-        $count = 0;
-
-        if (Statamic::version() != CoreUpdater::latestVersion()) {
-            $count++;
-        }
-
-        // Todo: Increment for each addon that has updates as well.
-
-        return $count;
+        return UpdatesCount::get($request->input('clearCache', false));
     }
 
     public function changelog()
