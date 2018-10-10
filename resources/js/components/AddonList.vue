@@ -14,7 +14,7 @@
                     <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                     <div class="px-3 mb-2 relative text-center">
                         <a :href="addon.seller.website" class="relative">
-                            <img :src="'https://mouthnasium.test/images/storage/'+addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 z-30 bg-white relative -mt-4 border-2 border-white">
+                            <img :src="this.domain+'/images/storage/'+addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 z-30 bg-white relative -mt-4 border-2 border-white">
                         </a>
                         <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
                         <p v-text="addon.variants[0].summary" class="text-sm"></p>
@@ -25,7 +25,7 @@
                             <img :src="getCover(addon)" class="rounded-t">
                             <div class="flex items-center justify-between px-4 py-2 mb-2 border-b">
                                 <a :href="addon.seller.website" class="relative flex items-center">
-                                    <img :src="'https://mouthnasium.test/images/storage/'+addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
+                                    <img :src="this.domain+'/images/storage/'+addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
                                     <span class="font-bold">{{ addon.seller.name }}</span>
                                 </a>
                                 <button class="btn">
@@ -59,6 +59,7 @@ import axios from 'axios';
 export default {
 
     props: [
+        'domain',
         'endpoints'
     ],
 
@@ -71,20 +72,26 @@ export default {
         }
     },
 
+    computed: {
+        api() {
+            return this.domain + '/api/v1/marketplace';
+        }
+    },
+
     created() {
         this.rows = this.getAddons()
     },
 
     methods: {
         getAddons() {
-            this.axios.get(this.endpoints.addons).then(response => {
+            this.axios.get(this.api + this.endpoints.addons).then(response => {
                 this.rows = response.data;
                 this.loaded = true;
             });
         },
 
         getCover(addon) {
-            return (addon.variants[0].assets.length) ? 'https://mouthnasium.test/images/storage/' + addon.variants[0].assets[0].path : '';
+            return (addon.variants[0].assets.length) ? this.domain + '/images/storage/' + addon.variants[0].assets[0].path : '';
         },
 
         showAddon(addon) {

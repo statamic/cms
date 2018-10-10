@@ -55,6 +55,7 @@
                 <li>
                     <a href="">
                         <i>@svg('loading-bar')</i><span>Updates</span>
+                        <updates-badge class="ml-1"></updates-badge>
                     </a>
                 </li>
                 <li>

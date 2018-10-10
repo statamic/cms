@@ -45,6 +45,7 @@
             <portal-target name="modals"></portal-target>
       </div>
   </div>
+
 @include('statamic::partials.scripts')
 @yield('scripts')
 

@@ -3,6 +3,7 @@
     "description": "Statamic CMS",
     "keywords": ["statamic", "cms", "flat file", "laravel"],
     "require": {
+        "composer/composer": "^1.7",
         "danielstjules/stringy": "dev-master",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*",
@@ -50,5 +51,14 @@
                 "Statamic": "Statamic\\Statamic"
             }
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "tests/Fakes/Composer/Package/test-package",
+            "options": {
+                "symlink": false
+            }
+        }
+    ]
 }

@@ -2,43 +2,69 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use GuzzleHttp\Client;
+use Facades\Statamic\Composer\Composer;
+use Facades\Statamic\Composer\CoreChangelog;
+use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\UpdatesCount;
+use Illuminate\Http\Request;
+use Statamic\Statamic;
 
 class UpdaterController extends CpController
 {
-    /**
-     * Show the available updates and changelogs
-     *
-     * @return \Illuminate\View\View
-     */
+    public function __construct()
+    {
+        // Temporarily using PackToTheFuture to fake version tags until we get this hooked up to statamic/cms.
+        require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
+    }
+
     public function index()
     {
         $this->access('updater');
 
-        $client = new Client();
-        $response = $client->get('https://outpost.statamic.com/v2/changelog');
-        $releases = json_decode($response->getBody());
-
         return view('statamic::updater.index', [
-            'title' => 'Updater',
-            'releases' => $releases,
-            'latest' => $releases[0]
+            'title' => 'Updates'
         ]);
     }
 
-    /**
-     * Show update instructions
-     *
-     * @param string $version  The version number
-     * @return \Illuminate\View\View
-     */
-    public function update($version)
+    public function count(Request $request)
     {
-        $this->access('updater:update');
+        $this->access('updater');
 
-        return view('statamic::updater.update', [
-            'title' => 'Update',
-            'version' => $version,
-        ]);
+        return UpdatesCount::get($request->input('clearCache', false));
+    }
+
+    public function changelog()
+    {
+        $this->access('updater');
+
+        return [
+            'changelog' => CoreChangelog::get(),
+            'currentVersion' => Statamic::version(),
+            'lastInstallLog' => Composer::lastCachedOutput(Statamic::CORE_REPO),
+        ];
+    }
+
+    public function update()
+    {
+        return CoreUpdater::update();
+    }
+
+    public function updateToLatest()
+    {
+        // Todo, fix composer output issue?
+        // \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion(CoreUpdater::latestVersion()); // Temp!
+        // return CoreUpdater::updateToLatest();
+
+        \Illuminate\Support\Facades\Cache::forget('composer');
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.5'); // Temp!
+
+        return CoreUpdater::installExplicitVersion('2.10.5');
+    }
+
+    public function installExplicitVersion(Request $request)
+    {
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion($request->version); // Temp!
+
+        return CoreUpdater::installExplicitVersion($request->version);
     }
 }

@@ -55,7 +55,6 @@ var vm = new Vue({
         EntryPublishForm: require('./components/publish/forms/EntryPublishForm.vue'),
         FormsetBuilder: require('./components/formset-builder/formset-builder'),
         Installer: require('./components/installer/installer'),
-        Updater: require('./components/updater'),
         Importer: require('./components/importer/importer'),
         Roles: require('./components/roles/roles'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),

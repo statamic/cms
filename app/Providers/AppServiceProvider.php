@@ -5,6 +5,7 @@ namespace Statamic\Providers;
 use Statamic\API\File;
 use Statamic\DataStore;
 use Statamic\Sites\Sites;
+use Statamic\Statamic;
 use Stringy\StaticStringy;
 use Statamic\Routing\Router;
 use Statamic\Extensions\FileStore;

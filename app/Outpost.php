@@ -159,7 +159,7 @@ class Outpost
      */
     public function isUpdateAvailable()
     {
-        return version_compare(STATAMIC_VERSION, $this->getLatestVersion(), '<');
+        return version_compare(Statamic::version(), $this->getLatestVersion(), '<');
     }
 
     /**
@@ -260,7 +260,7 @@ class Outpost
         return [
             'default_response' => true,
             'license_key'      => $this->getLicenseKey(),
-            'latest_version'   => STATAMIC_VERSION,
+            'latest_version'   => Statamic::version(),
             'update_available' => false,
             'update_count'     => 0,
             'license_valid'    => false
@@ -276,7 +276,7 @@ class Outpost
     {
         return [
             'license_key' => $this->getLicenseKey(),
-            'version'     => STATAMIC_VERSION,
+            'version'     => Statamic::version(),
             'php_version' => PHP_VERSION,
             'request'     => [
                 'domain'  => request()->server('HTTP_HOST'),

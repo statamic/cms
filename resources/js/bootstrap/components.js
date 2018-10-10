@@ -3,6 +3,9 @@ import Vue from 'vue'
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue'));
+Vue.component('updater', require('../components/Updater.vue'));
+Vue.component('updates-badge', require('../components/UpdatesBadge.vue'));
+Vue.component('composer-output', require('../components/ComposerOutput.vue'));
 
 // Publish
 Vue.component('publish-container', require('../components/publish/Container.vue'));
@@ -23,7 +26,6 @@ Vue.component('entry-list', require('../components/EntryList.vue'));
 Vue.component('collection-list', require('../components/CollectionList.vue'));
 Vue.component('asset-container-list', require('../components/AssetContainerList.vue'));
 Vue.component('addon-list', require('../components/AddonList.vue'));
-
 
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));

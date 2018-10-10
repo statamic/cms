@@ -3,16 +3,24 @@
 namespace Statamic;
 
 use Closure;
+use Facades\Statamic\Composer\Composer;
 use Illuminate\Http\Request;
 
 class Statamic
 {
+    const CORE_REPO = 'test/package'; // Will be `statamic/cms` on release.
+
     protected static $scripts = [];
     protected static $styles = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+
+    public static function version()
+    {
+        return Composer::installedVersion(static::CORE_REPO);
+    }
 
     public static function availableScripts(Request $request)
     {
@@ -100,7 +108,7 @@ class Statamic
     {
         if (empty(static::$jsonVariables)) {
             static::$jsonVariables = [
-                'version' => STATAMIC_VERSION,
+                'version' => static::version(),
                 'csrfToken' => csrf_token(),
                 'siteRoot' => site_root(),
                 'cpRoot' => cp_root(),
