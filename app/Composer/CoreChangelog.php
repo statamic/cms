@@ -29,6 +29,16 @@ class CoreChangelog
     }
 
     /**
+     * Get latest release.
+     *
+     * @return \stdClass
+     */
+    public function latest()
+    {
+        return $this->get()->first();
+    }
+
+    /**
      * Get releases.
      *
      * @return \Illuminate\Support\Collection

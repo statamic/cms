@@ -29,7 +29,15 @@ class UpdaterController extends CpController
     {
         $this->access('updater');
 
-        return 5;
+        $count = 0;
+
+        if (Statamic::version() != CoreUpdater::latestVersion()) {
+            $count++;
+        }
+
+        // Todo: Increment for each addon that has updates as well.
+
+        return $count;
     }
 
     public function changelog()
