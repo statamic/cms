@@ -47,6 +47,7 @@ Route::group([
     // Updater
     Route::get('updater', 'UpdaterController@index')->name('updater.index');
     Route::get('updater/changelog', 'UpdaterController@changelog');
+    Route::get('updater/count', 'UpdaterController@count');
     Route::post('updater/update', 'UpdaterController@update');
     Route::post('updater/update-to-latest', 'UpdaterController@updateToLatest');
     Route::post('updater/install-explicit-version', 'UpdaterController@installExplicitVersion');

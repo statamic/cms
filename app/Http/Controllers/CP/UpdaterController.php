@@ -25,6 +25,13 @@ class UpdaterController extends CpController
         ]);
     }
 
+    public function count()
+    {
+        $this->access('updater');
+
+        return 5;
+    }
+
     public function changelog()
     {
         $this->access('updater');

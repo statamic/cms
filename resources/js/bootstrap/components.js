@@ -4,6 +4,7 @@ import Vue from 'vue'
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue'));
 Vue.component('updater', require('../components/Updater.vue'));
+Vue.component('updates-badge', require('../components/UpdatesBadge.vue'));
 Vue.component('composer-output', require('../components/ComposerOutput.vue'));
 
 // Publish

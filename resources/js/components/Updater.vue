@@ -50,11 +50,6 @@
                 <composer-output :title="output.status" class="m-3"></composer-output>
             </modal>
         </portal>
-
-        <portal to="updates-badge" v-if="currentVersion && changelog[0].version != currentVersion">
-            <span class="badge bg-red text-white ml-1 rounded-full px-1">1</span>
-        </portal>
-
     </div>
 </template>
 
@@ -150,6 +145,8 @@
                     processing: false,
                     status: 'Installation complete!'
                 };
+
+                this.$events.$emit('recount-updates');
             },
         }
     }
