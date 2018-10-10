@@ -128,6 +128,10 @@ EOT;
     /** @test */
     function it_saves_to_disk()
     {
+        // Set the directory to one that doesn't exist so we can test that the directory would also get created.
+        $directory = $this->tempDir . '/doesnt-exist';
+        $this->repo->setDirectory($directory);
+
         $fieldset = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
             'title' => 'Test Blueprint',
             'sections' => [
@@ -177,7 +181,7 @@ sections:
           bar: foo
 
 EOT;
-        $this->assertFileExists($path = $this->tempDir.'/the_test_blueprint.yaml');
+        $this->assertFileExists($path = $directory.'/the_test_blueprint.yaml');
         $this->assertFileEqualsString($path, $expectedYaml);
         @unlink($path);
     }

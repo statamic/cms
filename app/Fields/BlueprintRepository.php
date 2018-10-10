@@ -58,6 +58,10 @@ class BlueprintRepository
 
     public function save(Blueprint $blueprint)
     {
+        if (! $this->files->exists($this->directory)) {
+            $this->files->makeDirectory($this->directory);
+        }
+
         $this->files->put(
             "{$this->directory}/{$blueprint->handle()}.yaml",
             YAML::dump($blueprint->contents())
