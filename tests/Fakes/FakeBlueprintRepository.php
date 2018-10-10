@@ -6,7 +6,12 @@ use Statamic\Fields\Blueprint;
 
 class FakeBlueprintRepository
 {
-    protected $blueprints = [];
+    protected $blueprints;
+
+    public function __construct()
+    {
+        $this->blueprints = collect();
+    }
 
     public function find(string $handle): ?Blueprint
     {
