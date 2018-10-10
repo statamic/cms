@@ -65,7 +65,6 @@ class UpdatesCount
      */
     protected function cacheCount()
     {
-        \Log::info('cached updates count');
         Cache::put('updates-count', $this->count, 60);
 
         return $this;
