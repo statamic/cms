@@ -7,6 +7,7 @@
             :type="type"
             :disabled="disabled"
             :placeholder="placeholder"
+            :autofocus="autofocus"
             @input="$emit('input', $event.target.value)"
         >
         <div class="text-xs ml-1" :class="limitIndicatorColor" v-if="limit">
@@ -25,7 +26,8 @@ export default {
         disabled: { default: false },
         placeholder: { required: false },
         type: { default: "text" },
-        value: { required: true }
+        value: { required: true },
+        autofocus: { type: Boolean }
     },
 }
 </script>
