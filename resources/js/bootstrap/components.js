@@ -40,7 +40,6 @@ Vue.component('branches', require('../components/page-tree/Branches.vue'));
 // Vue.component('fields-builder', require('../components/fieldset-builder/fields-builder'));
 // Vue.component('fieldset-fields', require('../components/fieldset-builder/Sections/Fields.vue'));
 // Vue.component('fieldset-field', require('../components/fieldset-builder/Sections/Field.vue'));
-Vue.component('fieldtype-selector', require('../components/fieldset-builder/FieldtypeSelector.vue'));
 
 // Modals
 // Vue.component('modal', require('../components/Modal.vue'));

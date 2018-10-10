@@ -8,13 +8,11 @@
                 v-for="(section, i) in sections"
                 :key="section._id"
                 :section="section"
+                @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
 
-            <div :class="['blueprint-add-section-container', {
-                'w-1/3': sections.length > 0,
-                'w-full': sections.length === 0
-            }]">
+            <div class="blueprint-add-section-container w-1/3">
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
@@ -96,6 +94,7 @@ export default {
 
             sortableFields = new Sortable(document.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
+                handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
                 plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
@@ -149,6 +148,10 @@ export default {
 
         deleteSection(i) {
             this.sections.splice(i, 1);
+        },
+
+        updateSection(i, section) {
+            this.sections.splice(i, 1, section);
         }
 
     }

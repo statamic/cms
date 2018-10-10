@@ -5,6 +5,7 @@
         </div>
 
         <select v-if="!loading"
+                ref="select"
                 :name="name"
                 :placeholder="translate('cp.please_select')"
                 :multiple="true">
@@ -28,6 +29,14 @@ export default {
         }
     },
 
+    watch: {
+
+        value(value) {
+            this.$refs.select.selectize.setValue(value);
+        }
+
+    },
+
     methods: {
 
         getSuggestions: function() {
@@ -48,7 +57,7 @@ export default {
         populateSuggestions(suggestions) {
             this.suggestions = suggestions;
 
-            if (this.data) {
+            if (this.value) {
                 var formatted = [];
                 _.each(this.data, function(value, key, list) {
                     formatted.push({'value': value, 'text': value});
@@ -74,7 +83,7 @@ export default {
                 placeholder: this.config.placeholder,
                 plugins: ['drag_drop', 'remove_button'],
                 onChange: function(value) {
-                    self.data = value;
+                    self.update(value);
                 }
             };
 
@@ -86,13 +95,13 @@ export default {
                 opts.optgroups = optgroups;
             }
 
-            $(this.$el).find('select').selectize(opts);
+            $(this.$refs.select).selectize(opts);
         },
 
         getReplicatorPreviewText() {
-            if (! this.data) return;
+            if (! this.value) return;
 
-            let values = JSON.parse(JSON.stringify(this.data));
+            let values = JSON.parse(JSON.stringify(this.value));
 
             if (this.suggestions) {
                 values = values.map(value => {

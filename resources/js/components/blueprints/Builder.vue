@@ -20,8 +20,6 @@
 
         </div>
 
-        <div class="text-center little-heading mb-3 opacity-50">Sections &amp; Fields</div>
-
         <sections
             :initial-sections="blueprint.sections"
             @updated="sectionsUpdated"
@@ -32,6 +30,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import uniqid from 'uniqid';
 import Sections from './Sections.vue';
 
@@ -79,6 +78,21 @@ export default {
 
         sectionsUpdated(sections) {
             this.sections = sections;
+        },
+
+        save() {
+            // axios[this.method](this.action, this.fieldset)
+            axios['patch'](this.action, this.blueprint)
+                .then(response => this.saved(response))
+                .catch(e => {
+                    this.$notify.error(e.response.data.message);
+                    this.errors = e.response.data.errors;
+                })
+        },
+
+        saved(response) {
+            this.$notify.success('Saved');
+            this.errors = {};
         }
 
     }
