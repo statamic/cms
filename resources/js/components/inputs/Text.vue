@@ -1,13 +1,13 @@
 <template>
     <div class="flex items-center">
         <input
+            ref="input"
             class="input-text"
             :name="name"
             :value="value"
             :type="type"
             :disabled="disabled"
             :placeholder="placeholder"
-            :autofocus="autofocus"
             @input="$emit('input', $event.target.value)"
         >
         <div class="text-xs ml-1" :class="limitIndicatorColor" v-if="limit">
@@ -29,5 +29,8 @@ export default {
         value: { required: true },
         autofocus: { type: Boolean }
     },
+    mounted() {
+        if (this.autofocus) this.$refs.input.focus();
+    }
 }
 </script>
