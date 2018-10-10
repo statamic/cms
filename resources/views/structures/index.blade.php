@@ -13,7 +13,7 @@
     @if (! count($structures))
     <div class="card">
         <div class="no-results">
-            <div class="mx-auto w-32 h-32 p-4 border rounded-full text-grey-light">@svg('new/hierarchy-files-1')</div>
+            <div class="mx-auto w-32 h-32 p-4 border rounded-full text-grey-light">@svg('hierarchy-files')</div>
             <h2>{{ __('Structures') }}</h2>
             <h3>{{ __('There are no structures.') }}</h3>
         </div>

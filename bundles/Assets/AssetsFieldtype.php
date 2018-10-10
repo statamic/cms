@@ -7,6 +7,8 @@ use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class AssetsFieldtype extends Fieldtype
 {
+    protected $categories = ['media', 'relationship'];
+
     public function canHaveDefault()
     {
         return false;

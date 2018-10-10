@@ -15,6 +15,7 @@ class Statamic
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
+    protected static $jsonVariables = [];
 
     public static function version()
     {
@@ -95,4 +96,34 @@ class Statamic
 
         return starts_with(request()->path(), config('statamic.cp.route'));
    }
+
+    public static function jsonVariables(Request $request)
+    {
+        return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
+            return is_callable($variable) ? $variable($request) : $variable;
+        })->all();
+    }
+
+    public static function provideToScript(array $variables)
+    {
+        if (empty(static::$jsonVariables)) {
+            static::$jsonVariables = [
+                'version' => static::version(),
+                'csrfToken' => csrf_token(),
+                'siteRoot' => site_root(),
+                'cpRoot' => cp_root(),
+                'urlPath' => '/' . request()->path(),
+                'resourceUrl' => cp_resource_url('/'),
+                'locales' => \Statamic\API\Config::get('statamic.system.locales'),
+                'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
+                'conditions' => [],
+                'MediumEditorExtensions' => [],
+                'flash' => []
+            ];
+        }
+
+        static::$jsonVariables = array_merge(static::$jsonVariables, $variables);
+
+        return new static;
+    }
 }

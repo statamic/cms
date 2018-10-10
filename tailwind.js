@@ -120,7 +120,7 @@ module.exports = {
     textSizes: {
         '4xs':  '10px',
         '3xs':  '11px',
-        'xxs':  '12px',
+        '2xs':  '12px',
         'xs':   '13px',
         'sm':   '14px',
         'base': '16px',
@@ -362,6 +362,7 @@ module.exports = {
     minHeight: {
         '0':      '0',
         '24':     '80px',
+        '48':     '160px',
         'full':   '100%',
         'screen': '100vh'
     },
@@ -477,6 +478,7 @@ module.exports = {
         '30':   30,
         '40':   40,
         '50':   50,
+        '200':  200,
         'auto': 'auto',
     },
 

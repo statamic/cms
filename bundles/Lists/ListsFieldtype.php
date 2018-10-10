@@ -7,7 +7,7 @@ use Statamic\Fields\Fieldtype;
 
 class ListsFieldtype extends Fieldtype
 {
-    protected $snake_name = 'list';
+    protected $handle = 'list';
 
     public function preProcess($data)
     {

@@ -8,8 +8,8 @@
         :can-delete="{{ bool_str(\Statamic\API\User::getCurrent()->can('taxonomies:'.$group.':delete')) }}">
 
         <div class="listing term-listing">
-            <div class="flexy mb-3">
-                <h1 class="fill">{{ $group_title }}</h1>
+            <div class="flex items-center mb-3">
+                <h1 class="flex-1">{{ $group_title }}</h1>
                 <div class="controls flex items-center">
                     <dossier-sort-selector v-if="columns.length > 0" class="mr-1"></dossier-sort-selector>
 

@@ -5,8 +5,8 @@
     <configure-globals-listing inline-template v-cloak>
         <div>
 
-            <div class="flexy mb-3">
-                <h1 class="fill">{{ t('manage_global_sets') }}</h1>
+            <div class="flex items-center mb-3">
+                <h1 class="flex-1">{{ t('manage_global_sets') }}</h1>
                 <a href="{{ route('globals.create') }}" class="btn btn-primary float-right">{{ translate('cp.create_global_set_button') }}</a>
             </div>
 

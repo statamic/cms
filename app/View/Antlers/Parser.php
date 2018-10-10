@@ -122,6 +122,59 @@ class Parser
     }
 
     /**
+     * Sets up all the global regex to use the correct Scope Glue.
+     *
+     * @return void
+     */
+    protected function setupRegex()
+    {
+        if ($this->regexSetup) {
+            return;
+        }
+        $glue = preg_quote($this->scopeGlue, '/');
+
+        // <statamic>
+        // expand allowed characters in variable regex
+        $this->variableRegex = "\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.'".$glue.']*';
+        // Allow spaces after the variable name so you can do modifiers like | this | and_that
+        $this->looseVariableRegex = "\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?'".$glue.']*';
+        // </statamic>
+        $this->callbackNameRegex = '\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?)'.$glue.']*'.$glue.$this->variableRegex;
+        $this->variableLoopRegex = '/\{\{\s*('.$this->looseVariableRegex.')\s*\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
+
+        // <statamic>
+        // expanded to allow `or` options in variable tags
+        $this->variableTagRegex = '/\{\{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*\}\}/m';
+        // </statamic>
+
+        // <statamic>
+        // make the space-anything after the variable regex optional, this allows
+        // users to use {{tags}} in addition to {{ tags }} -- weird, I know
+        $this->callbackBlockRegex = '/\{\{\s*('.$this->variableRegex.')(\s.*?)?\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
+        // </statamic>
+
+        $this->recursiveRegex = '/\{\{\s*\*recursive\s*('.$this->variableRegex.')\*\s*\}\}/ms';
+
+        $this->noparseRegex = '/\{\{\s*noparse\s*\}\}(.*?)\{\{\s*\/noparse\s*\}\}/ms';
+
+        $this->ignoreRegex = '/@{{(?:(?!}}).)*}}/';
+
+        $this->conditionalRegex = '/\{\{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*\}\}/ms';
+        $this->conditionalElseRegex = '/\{\{\s*else\s*\}\}/ms';
+        $this->conditionalEndRegex = '/\{\{\s*(?:endif|\/if|\/unless)\s*\}\}/ms';
+        $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
+        $this->conditionalNotRegex = '/(\s+|^)not(\s+|$)/ms';
+
+        $this->regexSetup = true;
+
+        // This is important, it's pretty unclear by the documentation
+        // what the default value is on <= 5.3.6
+            ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
+        if (Config::get('statamic.system.parser_backtrack_limit')) {
+        }
+    }
+
+    /**
      * Removes all of the comments from the text.
      *
      * @param  string $text Text to remove comments from
@@ -977,59 +1030,6 @@ class Parser
             return !empty($value) ? "true" : "false";
         } else {
             return var_export($value, true);
-        }
-    }
-
-    /**
-     * Sets up all the global regex to use the correct Scope Glue.
-     *
-     * @return void
-     */
-    protected function setupRegex()
-    {
-        if ($this->regexSetup) {
-            return;
-        }
-        $glue = preg_quote($this->scopeGlue, '/');
-
-        // <statamic>
-        // expand allowed characters in variable regex
-        $this->variableRegex = "\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.'".$glue.']*';
-        // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?'".$glue.']*';
-        // </statamic>
-        $this->callbackNameRegex = '\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?)'.$glue.']*'.$glue.$this->variableRegex;
-        $this->variableLoopRegex = '/\{\{\s*('.$this->looseVariableRegex.')\s*\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
-
-        // <statamic>
-        // expanded to allow `or` options in variable tags
-        $this->variableTagRegex = '/\{\{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*\}\}/m';
-        // </statamic>
-
-        // <statamic>
-        // make the space-anything after the variable regex optional, this allows
-        // users to use {{tags}} in addition to {{ tags }} -- weird, I know
-        $this->callbackBlockRegex = '/\{\{\s*('.$this->variableRegex.')(\s.*?)?\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
-        // </statamic>
-
-        $this->recursiveRegex = '/\{\{\s*\*recursive\s*('.$this->variableRegex.')\*\s*\}\}/ms';
-
-        $this->noparseRegex = '/\{\{\s*noparse\s*\}\}(.*?)\{\{\s*\/noparse\s*\}\}/ms';
-
-        $this->ignoreRegex = '/@{{(?:(?!}}).)*}}/';
-
-        $this->conditionalRegex = '/\{\{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*\}\}/ms';
-        $this->conditionalElseRegex = '/\{\{\s*else\s*\}\}/ms';
-        $this->conditionalEndRegex = '/\{\{\s*(?:endif|\/if|\/unless)\s*\}\}/ms';
-        $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
-        $this->conditionalNotRegex = '/(\s+|^)not(\s+|$)/ms';
-
-        $this->regexSetup = true;
-
-        // This is important, it's pretty unclear by the documentation
-        // what the default value is on <= 5.3.6
-            ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
-        if (Config::get('statamic.system.parser_backtrack_limit')) {
         }
     }
 

@@ -18,7 +18,7 @@
                     <a :href="entry.edit_url">{{ entry.title }}</a>
                 </template>
                 <template slot="cell-slug" slot-scope="{ row: entry }">
-                    <span class="font-mono text-xxs">{{ entry.slug }}</span>
+                    <span class="font-mono text-2xs">{{ entry.slug }}</span>
                 </template>
                 <template slot="actions" slot-scope="{ row: entry }">
                     <dropdown-list>

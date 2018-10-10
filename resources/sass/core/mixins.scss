@@ -33,16 +33,12 @@
 
 
 // Background with retina support
+// @TODO Replace the need for this
 @mixin background($imgpath, $size: 100% 100%, $color: transparent, $position:0 0, $repeat: no-repeat) {
     background: #{$color} url(#{$imgpath}) $repeat $position;
-
-    @media #{$hidpi} {
-        background: #{$color} url(#{hidpiImage($imgpath)}) $repeat $position;
-        background-size: $size;
-    }
 }
 
-// Responsive support
+// @TODO replace these with Tailwind @screen helpers
 @mixin minWidth($width) {
     @media (min-width: #{$width}) {
         @content;
@@ -61,20 +57,7 @@
     }
 }
 
-// TODO: We should NOT need clearfixes anymore. Death to floats!
-@mixin clearfix() {
-    &:before,
-    &:after {
-        content: " "; // 1
-        display: table; // 2
-    }
-    &:after {
-        clear: both;
-    }
-}
-
 @mixin toolbar() {
-    @include clearfix;
     background: $color_gray_lighter;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 5px 5px -5px rgba(0,0,0,0.05);
     border-top-left-radius: 2px;

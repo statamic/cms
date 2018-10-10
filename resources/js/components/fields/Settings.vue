@@ -2,17 +2,17 @@
 
     <div class="flex flex-col h-full">
 
-        <div class="flex items-center p-3 bg-grey-lightest border-b text-center">
+        <div class="flex items-center p-3 bg-grey-lightest border-b text-center" v-if="fieldtypesLoaded">
             <svg-icon class="h-6 w-6 mr-2 inline-block opacity-50" :name="fieldtype.icon"></svg-icon>
-            <span>{{ field.display || field.handle }}</span>
+            <span>{{ config.display || config.handle }}</span>
             <span class="text-xs ml-2 font-bold uppercase opacity-25 pt-sm">{{ fieldtype.title }}</span>
         </div>
 
-        <div class="flex-1 overflow-scroll">
+        <div class="flex-1 overflow-scroll" v-if="fieldtypesLoaded">
 
             <div class="publish-fields">
 
-                <publish-field :value="field.display" @updated="updateField" :config="{
+                <publish-field :value="config.display" @updated="updateField" :config="{
                     type: 'text',
                     handle: 'display',
                     display: translate('Display'),
@@ -21,7 +21,7 @@
                 }" />
 
                 <publish-field
-                    :value="field.handle"
+                    :value="config.handle"
                     @updated="(handle, field) => {
                         this.isHandleModified = true;
                         this.updateField(handle, field);
@@ -35,37 +35,39 @@
                     }"
                 />
 
-                <publish-field :value="field.instructions" @updated="updateField" :config="{
+                <publish-field :value="config.instructions" @updated="updateField" :config="{
                     type: 'markdown',
                     handle: 'instructions',
                     display: translate('Instructions'),
                     instructions: translate(`Basic Markdown is allowed. Encouraged, even.`),
                 }" />
 
-                <publish-field v-if="canBeValidated" :value="field.validate" @updated="updateField" :config="{
+                <publish-field v-if="canBeValidated" :value="config.validate" @updated="updateField" :config="{
                     type: 'text',
                     handle: 'validate',
                     display: translate('Validation Rules'),
                     instructions: translate(`Has access to all of Laravel's validation rules`)
                 }" />
 
-                <publish-field v-if="canHaveDefault" :value="field.default" @updated="updateField" :config="{
+                <publish-field v-if="canHaveDefault" :value="config.default" @updated="updateField" :config="{
                     type: 'text',
                     handle: 'default',
                     display: translate('Default Value'),
                     instructions: translate(`Enter the default value for string-type fields.`)
                 }" />
 
-                <publish-field :value="field.conditions" @updated="updateField" :config="{
+
+                <!--
+                <publish-field :value="config.conditions" @updated="updateField" :config="{
                     handle: 'default',
                     display: translate('Display Conditions'),
                     instructions: translate(`Configure when this field will be shown.`)
                 }">
                     <template slot="fieldtype">
                         TODO: The field conditions builder will go here.
-                        <!-- <field-conditions-builder v-model="field.conditions" /> -->
                     </template>
                 </publish-field>
+                -->
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
@@ -95,16 +97,16 @@ export default {
 
     mixins: [ProvidesFieldtypes],
 
-    props: ['field', 'root'],
+    props: ['config', 'type', 'root'],
 
     model: {
-        prop: 'field',
+        prop: 'config',
         event: 'input'
     },
 
     data: function() {
         return {
-            values: this.field,
+            values: this.config,
             isHandleModified: true,
             activeTab: 'basics'
         };
@@ -112,13 +114,13 @@ export default {
 
     computed: {
         selectedWidth: function() {
-            var width = this.field.width || 100;
+            var width = this.config.width || 100;
             var found = _.findWhere(this.widths, {value: width});
             return found.text;
         },
 
         fieldtype: function() {
-            return _.findWhere(this.fieldtypes, { handle: this.field.type });
+            return _.findWhere(this.fieldtypes, { handle: this.type });
         },
 
         fieldtypeConfig() {
@@ -142,11 +144,11 @@ export default {
         },
 
         filteredFieldtypeConfig() {
-            if (this.field.type === 'grid') {
+            if (this.type === 'grid') {
                 return _.filter(this.fieldtypeConfig, config => config.handle !== 'fields');
             }
 
-            if (['replicator', 'bard'].includes(this.field.type)) {
+            if (['replicator', 'bard'].includes(this.type)) {
                 return _.filter(this.fieldtypeConfig, config => config.handle !== 'sets');
             }
 
@@ -161,13 +163,13 @@ export default {
 
         // For new fields, we'll slugify the display name into the field name.
         // If they edit the name, we'll stop.
-        if (this.field.isNew && !this.field.isMeta) {
+        if (this.config.isNew && !this.config.isMeta) {
             this.isNameModified = false;
-            delete this.field.isNew;
+            delete this.config.isNew;
 
             this.$watch('field.display', function(display) {
                 if (! this.isNameModified) {
-                    this.field.name = this.$slugify(display, '_');
+                    this.config.name = this.$slugify(display, '_');
                 }
             });
         }
@@ -195,9 +197,10 @@ export default {
         },
 
         updateField(handle, value) {
-            const field = this.values;
-            field[handle] = value;
-            this.$emit('input', field);
+            const values = this.values;
+            values[handle] = value;
+            this.$emit('input', values);
+            this.$emit('updated', handle, value);
         }
 
     }

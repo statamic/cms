@@ -11,19 +11,4 @@
 <link href="{{ resource_url("vendor/$name/css/$path") }}" rel="stylesheet" />
 @endforeach
 
-<script>
-    window.Statamic =  {!! json_encode([
-        'csrfToken' => csrf_token(),
-        'siteRoot' => site_root(),
-        'cpRoot' => cp_root(),
-        'urlPath' => '/' . request()->path(),
-        'resourceUrl' => cp_resource_url('/'),
-        'locales' => Statamic\API\Config::get('statamic.system.locales'),
-        'markdownHardWrap' => Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
-        'conditions' => [],
-        'MediumEditorExtensions' => [],
-        'flash' => []
-    ]) !!};
-</script>
-
 @stack('head')

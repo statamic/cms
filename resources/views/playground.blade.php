@@ -112,7 +112,7 @@
                 </div>
                 <div class="text-4xl mb-2">89</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green mr-1">@svg('new/performance-increase-1')</span>
+                    <span class="w-4 h-4 text-green mr-1">@svg('performance-increase')</span>
                     <span class="leading-none text-sm">8.54% Increase</span>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                 </div>
                 <div class="text-4xl mb-2">35</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green mr-1">@svg('new/performance-increase-1')</span>
+                    <span class="w-4 h-4 text-green mr-1">@svg('performance-increase')</span>
                     <span class="leading-none text-sm">2.15% Increase</span>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                 </div>
                 <div class="text-4xl mb-2 text-grey-light">251</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green mr-1">@svg('new/performance-increase-1')</span>
+                    <span class="w-4 h-4 text-green mr-1">@svg('performance-increase')</span>
                     <span class="leading-none text-grey-light text-sm">8.54% Increase</span>
                 </div>
             </div>

@@ -38,12 +38,6 @@ Vue.component('validation-errors', require('../components/ValidationErrors'));
 Vue.component('branch', require('../components/page-tree/Branch.vue'));
 Vue.component('branches', require('../components/page-tree/Branches.vue'));
 
-// Recursive from fieldset builder
-// Vue.component('fields-builder', require('../components/fieldset-builder/fields-builder'));
-// Vue.component('fieldset-fields', require('../components/fieldset-builder/Sections/Fields.vue'));
-// Vue.component('fieldset-field', require('../components/fieldset-builder/Sections/Field.vue'));
-Vue.component('fieldtype-selector', require('../components/fieldset-builder/FieldtypeSelector.vue'));
-
 // Modals
 // Vue.component('modal', require('../components/Modal.vue'));
 Vue.component('keyboard-shortcuts-modal', require('../components/modals/KeyboardShortcutsModal.vue'));

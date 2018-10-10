@@ -2,8 +2,8 @@
 
 @section('content')
 
-        <div class="flexy mb-3">
-            <h1 class="fill">{{ translate('cp.nav_forms') }}</h1>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">{{ translate('cp.nav_forms') }}</h1>
             @can('super')
                 <a href="{{ route('form.create') }}" class="btn btn-primary">{{ t('create_form') }}</a>
             @endcan

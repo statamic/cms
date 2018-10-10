@@ -6,7 +6,7 @@ use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class ArrFieldtype extends Fieldtype
 {
-    protected $snake_name = 'array';
+    protected $handle = 'array';
 
     public function blank()
     {

@@ -10,7 +10,7 @@ table.data-table {
     @apply w-full text-left text-grey;
 
     thead {
-        @apply bg-grey-lightest border-t text-grey-darker uppercase text-xxs tracking-wide;
+        @apply bg-grey-lightest border-t text-grey-darker uppercase text-2xs tracking-wide;
 
         th {
             @apply font-medium px-2 py-1.5;

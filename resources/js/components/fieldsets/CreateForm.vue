@@ -2,8 +2,8 @@
 
     <div>
 
-        <div class="flexy mb-3">
-            <h1 class="fill">{{ __('Create Fieldset') }}</h1>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">{{ __('Create Fieldset') }}</h1>
             <button type="submit" class="btn btn-primary" @click.prevent="save">Save</button>
         </div>
 

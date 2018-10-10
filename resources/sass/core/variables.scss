@@ -22,19 +22,6 @@ $asset_bg:              #394045;
 $font_monospace: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
 $font_serif: 'Georgia', 'serif';
 
-// Z indexes
-$z_index_modal: 100;
-
-$hidpi: 'only screen and (-webkit-min-device-pixel-ratio:1.5),only screen and (min-device-pixel-ratio:1.5)';
-
-// Bootstrap
 $brand-primary: 	#3aa3e3;
 $brand-secondary:   #48606f;
 $brand-darker:      #3C4858;
-
-$font-family-monospace: $font_monospace;
-$border-radius-base: 3px;
-$nav-link-hover-bg: $bg;
-$nav-tabs-border-color: $color_border;
-$nav-tabs-link-hover-border-color: $color_border;
-$nav-tabs-active-link-hover-border-color: $color_border;

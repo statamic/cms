@@ -46,18 +46,6 @@
       </div>
   </div>
 
-<script>
-    // Statamic.translations = {{-- $translations --}};
-    Statamic.permissions = '{!! $permissions !!}';
-    Statamic.version = '{!! Statamic::version() !!}';
-
-    @if(session()->has('success'))
-        Statamic.flash = [{
-            type:    'success',
-            message: '{{ session()->get('success') }}',
-        }];
-    @endif
-</script>
 @include('statamic::partials.scripts')
 @yield('scripts')
 

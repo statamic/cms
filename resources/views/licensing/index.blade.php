@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="md:flex justify-between items-center mb-3">
-        <h1 class="fill">{{ t('license_keys') }}</h1>
+        <h1 class="flex-1">{{ t('license_keys') }}</h1>
 
         <a href="https://statamic.com/account/licenses" target="_blank" class="text-xs md:ml-2">
             {{ t('license_statamic_link') }} &rarr;

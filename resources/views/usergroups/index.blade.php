@@ -5,8 +5,8 @@
     <user-group-listing inline-template v-cloak>
 
         <div class="listing user-roles-listing">
-            <div class="flexy mb-3">
-                <h1 class="fill">{{ translate('cp.nav_user-groups') }}</h1>
+            <div class="flex items-center mb-3">
+                <h1 class="flex-1">{{ translate('cp.nav_user-groups') }}</h1>
                 <div class="controls">
                     @can('users:create')
                         <search v-model="keyword"></search>

@@ -5,8 +5,8 @@
     <h1 class="mb-24">{{ t('duplicate_id_title')}}</h1>
 
     @if ($duplicates->isEmpty())
-        <div class="card flexy">
-            <span class="fill">{{ t('no_duplicate_ids')}}</span>
+        <div class="card flex items-center">
+            <span class="flex-1">{{ t('no_duplicate_ids')}}</span>
             <span>👍</span>
         </div>
     @else
@@ -16,7 +16,7 @@
                 <div class="head">
                     <h2 class="m-0">{{ $id }}</h2>
                 </div>
-                <div class="card-body pad-16">
+                <div class="card-body p-2">
                     <table class="dossier">
                         @foreach ($paths as $path)
                             <tr>

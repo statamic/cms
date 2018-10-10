@@ -32,7 +32,11 @@
                         <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
                         <portal to="modals" v-if="editingField === field._id">
                             <modal :name="`${field._id}-field-settings`" width="90%" height="90%">
-                                <field-settings ref="settings" :root="isRootLevel" v-model="field" />
+                                <field-settings
+                                    ref="settings"
+                                    :root="isRootLevel"
+                                    :type="field.type"
+                                    v-model="field" />
                             </modal>
                         </portal>
                     </template>

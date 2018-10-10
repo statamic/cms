@@ -4,8 +4,8 @@
 
     <user-listing inline-template v-cloak>
         <div>
-            <div class="flexy mb-24">
-                <h1 class="fill">{{ t('manage_users') }}</h1>
+            <div class="flex items-center mb-2">
+                <h1 class="flex-1">{{ t('manage_users') }}</h1>
                 @can('users:create')
                     <a href="{{ route('user.create') }}" class="btn btn-primary">{{ translate('cp.create_user_button') }}</a>
                 @endcan

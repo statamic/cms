@@ -8,6 +8,8 @@ use Statamic\Fields\Blueprint;
 
 class BlueprintController extends CpController
 {
+    protected $fieldsetFields;
+
     public function index()
     {
         $this->authorize('index', Blueprint::class, 'You are not authorized to access fieldsets.');
@@ -31,6 +33,8 @@ class BlueprintController extends CpController
         $blueprint = API\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
+
+        \Statamic::provideToScript(['fieldsetFields' => $this->fieldsetFields()]);
 
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
@@ -73,18 +77,26 @@ class BlueprintController extends CpController
 
     private function sectionField(array $submitted)
     {
-        if ($submitted['type'] === 'inline') {
-            return [
-                'handle' => $submitted['handle'],
-                'field' => $submitted['config']
-            ];
-        }
+        return ($submitted['type'] === 'inline')
+            ? $this->inlineSectionField($submitted)
+            : $this->referenceSectionField($submitted);
+    }
 
+    private function inlineSectionField(array $submitted)
+    {
         return [
             'handle' => $submitted['handle'],
-            'field' => $submitted['field_reference'],
-            'config' => $submitted['config']
+            'field' => array_except($submitted['config'], ['isNew'])
         ];
+    }
+
+    private function referenceSectionField(array $submitted)
+    {
+        return array_filter([
+            'handle' => $submitted['handle'],
+            'field' => $submitted['field_reference'],
+            'config' => array_only($submitted['config'], $submitted['config_overrides'])
+        ]);
     }
 
     private function toVueObject(Blueprint $blueprint): array
@@ -111,19 +123,49 @@ class BlueprintController extends CpController
 
     private function fieldToVue($field): array
     {
-        if (is_string($field['field'])) {
-            return [
-                'handle' => $field['handle'],
-                'type' => 'reference',
-                'field_reference' => $field['field'],
-                'config' => array_get($field, 'config', [])
-            ];
-        }
+        return (is_string($field['field']))
+            ? $this->referenceFieldToVue($field)
+            : $this->inlineFieldToVue($field);
+    }
 
+    private function referenceFieldToVue($field): array
+    {
+        $fieldsetField = array_get($this->fieldsetFields(), $field['field'], []);
+
+        $mergedConfig = array_merge(
+            $fieldsetFieldConfig = array_get($fieldsetField, 'config', []),
+            $config = array_get($field, 'config', [])
+        );
+
+        return [
+            'handle' => $field['handle'],
+            'type' => 'reference',
+            'field_reference' => $field['field'],
+            'config' => $mergedConfig,
+            'config_overrides' => array_keys($config),
+        ];
+    }
+
+    private function inlineFieldToVue($field): array
+    {
         return [
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $field['field']
         ];
+    }
+
+    private function fieldsetFields()
+    {
+        return $this->fieldsetFields = $this->fieldsetFields ?? collect(\Statamic\API\Fieldset::all())->flatMap(function ($fieldset) {
+            return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
+                return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
+                    'fieldset' => [
+                        'handle' => $fieldset->handle(),
+                        'title' => $fieldset->title(),
+                    ]
+                ])];
+            });
+        })->sortBy('display')->all();
     }
 }
