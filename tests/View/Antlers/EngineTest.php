@@ -70,7 +70,7 @@ class EngineTest extends TestCase
             ->andReturn('Hello <?php echo "World"; ?>');
 
         $this->assertEquals(
-            'Hello <?php echo "World"; ?>',
+            'Hello &lt;?php echo "World"; ?>',
             $this->engine->get('/path/to/foo.antlers.html', ['foo' => 'World'])
         );
     }
