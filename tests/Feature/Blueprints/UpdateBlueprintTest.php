@@ -63,7 +63,8 @@ class UpdateBlueprintTest extends TestCase
                                 'field_reference' => 'somefieldset.somefield',
                                 'config' => [
                                     'foo' => 'bar',
-                                ]
+                                ],
+                                'config_overrides' => ['foo']
                             ],
                             [
                                 '_id' => 'id-s1-f1',
@@ -161,6 +162,12 @@ class UpdateBlueprintTest extends TestCase
             ->assertSessionHasErrors('sections');
 
         $this->assertEquals($originalContents, API\Blueprint::find('test')->contents());
+    }
+
+    /** @test */
+    function config_override_only_gets_saved_if_its_specified()
+    {
+        $this->markTestIncomplete();
     }
 
     private function submit($blueprint, $params = [])
