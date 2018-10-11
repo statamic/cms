@@ -53,7 +53,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="">
+                    <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('loading-bar')</i><span>Updates</span>
                         <updates-badge class="ml-1"></updates-badge>
                     </a>
