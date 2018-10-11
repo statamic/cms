@@ -3,7 +3,7 @@
     <publish-field
         :config="config"
         :value="value"
-        @updated="$emit('input', $event)"
+        @updated="updated"
     />
 
 </template>
@@ -38,6 +38,10 @@ export default {
             type: String
         },
 
+        width: {
+            default: 100
+        },
+
         autofocus: {
             type: Boolean
         }
@@ -55,6 +59,14 @@ export default {
                 width: this.width,
                 autofocus: this.autofocus
             };
+        }
+
+    },
+
+    methods: {
+
+        updated(handle, value) {
+            this.$emit('input', value);
         }
 
     }
