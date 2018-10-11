@@ -12,61 +12,42 @@
 
             <div class="publish-fields">
 
-                <publish-field :value="config.display" @updated="updateField" :config="{
-                    type: 'text',
-                    handle: 'display',
-                    display: translate('Display'),
-                    instructions: translate(`The field's label shown in the Control Panel.`),
-                    width: 50
-                }" />
+                <form-group
+                    handle="display"
+                    :display="__('Display')"
+                    :instructions="__(`The field's label shown in the Control Panel.`)"
+                    width="50"
+                    autofocus
+                    :value="config.display"
+                    @input="updateField('display', $event)"
+                />
 
-                <publish-field
+                <form-group
+                    handle="handle"
+                    :display="__('Handle')"
+                    :instructions="__(`The field's template variable.`)"
+                    width="50"
                     :value="config.handle"
-                    @updated="(handle, field) => {
+                    @input="(field) => {
                         this.isHandleModified = true;
-                        this.updateField(handle, field);
-                    }"
-                    :config="{
-                        type: 'text',
-                        handle: 'handle',
-                        display: translate('Handle'),
-                        instructions: translate(`The field's template variable.`),
-                        width: 50
+                        this.updateField('handle', field);
                     }"
                 />
 
-                <publish-field :value="config.instructions" @updated="updateField" :config="{
-                    type: 'markdown',
-                    handle: 'instructions',
-                    display: translate('Instructions'),
-                    instructions: translate(`Basic Markdown is allowed. Encouraged, even.`),
-                }" />
-
-                <publish-field v-if="canBeValidated" :value="config.validate" @updated="updateField" :config="{
-                    type: 'text',
-                    handle: 'validate',
-                    display: translate('Validation Rules'),
-                    instructions: translate(`Has access to all of Laravel's validation rules`)
-                }" />
-
-                <publish-field v-if="canHaveDefault" :value="config.default" @updated="updateField" :config="{
-                    type: 'text',
-                    handle: 'default',
-                    display: translate('Default Value'),
-                    instructions: translate(`Enter the default value for string-type fields.`)
-                }" />
-
+                <form-group
+                    fieldtype="markdown"
+                    handle="instructions"
+                    :display="__('Instructions')"
+                    :instructions="__(`Basic Markdown is allowed. Encouraged, even.`)"
+                    :value="config.instructions"
+                    @input="updateField('instructions', $event)"
+                />
 
                 <!--
-                <publish-field :value="config.conditions" @updated="updateField" :config="{
-                    handle: 'default',
-                    display: translate('Display Conditions'),
-                    instructions: translate(`Configure when this field will be shown.`)
-                }">
-                    <template slot="fieldtype">
-                        TODO: The field conditions builder will go here.
-                    </template>
-                </publish-field>
+                    TODO:
+                    - Validation
+                    - Default value
+                    - Display conditions
                 -->
 
                 <publish-field
