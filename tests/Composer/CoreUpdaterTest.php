@@ -12,6 +12,8 @@ use Tests\TestCase;
 
 class CoreUpdaterTest extends TestCase
 {
+    protected $shouldFakeVersion = false;
+
     public function setUp()
     {
         parent::setUp();

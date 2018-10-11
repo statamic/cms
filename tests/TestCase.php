@@ -4,6 +4,8 @@ namespace Tests;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
+    protected $shouldFakeVersion = true;
+
     protected function setUp()
     {
         parent::setUp();
@@ -12,6 +14,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
             $this->preventSavingStacheItemsToDisk();
+        }
+
+        if ($this->shouldFakeVersion) {
+            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
         }
     }
 

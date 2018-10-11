@@ -3,7 +3,6 @@
 namespace Statamic;
 
 use Closure;
-use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\Request;
 
 class Statamic
@@ -19,7 +18,7 @@ class Statamic
 
     public static function version()
     {
-        return Composer::installedVersion(static::CORE_REPO);
+        return \Facades\Statamic\Version::get();
     }
 
     public static function availableScripts(Request $request)
