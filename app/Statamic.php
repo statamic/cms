@@ -19,10 +19,6 @@ class Statamic
 
     public static function version()
     {
-        if (app()->environment() === 'testing') {
-            return '3.0.0-testing';
-        }
-
         return Composer::installedVersion(static::CORE_REPO);
     }
 
