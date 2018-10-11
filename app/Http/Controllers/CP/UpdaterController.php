@@ -21,9 +21,7 @@ class UpdaterController extends CpController
     {
         $this->access('updater');
 
-        return view('statamic::updater.index', [
-            'title' => 'Updates'
-        ]);
+        return redirect()->route('statamic.cp.updater.product.index', ['statamic']);
     }
 
     public function count(Request $request)
@@ -31,6 +29,15 @@ class UpdaterController extends CpController
         $this->access('updater');
 
         return UpdatesCount::get($request->input('clearCache', false));
+    }
+
+    public function product()
+    {
+        $this->access('updater');
+
+        return view('statamic::updater.index', [
+            'title' => 'Updates'
+        ]);
     }
 
     public function changelog()

@@ -97,7 +97,7 @@
             getChangelog() {
                 this.gettingChangelog = true;
 
-                axios.get('/cp/updater/changelog').then(response => {
+                axios.get('/cp/updater/statamic/changelog').then(response => {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
@@ -106,7 +106,7 @@
             },
 
             update() {
-                axios.post('/cp/updater/update', {}, this.toEleven);
+                axios.post('/cp/updater/statamic/update', {}, this.toEleven);
 
                 this.output = {
                     processing: true,
@@ -117,7 +117,7 @@
             },
 
             updateToLatest() {
-                axios.post('/cp/updater/update-to-latest', {}, this.toEleven);
+                axios.post('/cp/updater/statamic/update-to-latest', {}, this.toEleven);
 
                 this.output = {
                     processing: true,
@@ -128,7 +128,7 @@
             },
 
             installExplicitVersion(version) {
-                axios.post('/cp/updater/install-explicit-version', {'version': version}, this.toEleven);
+                axios.post('/cp/updater/statamic/install-explicit-version', {'version': version}, this.toEleven);
 
                 this.output = {
                     processing: true,
