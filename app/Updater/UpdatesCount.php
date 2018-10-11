@@ -2,7 +2,7 @@
 
 namespace Statamic\Updater;
 
-use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\CoreUpdater;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Statamic;
 

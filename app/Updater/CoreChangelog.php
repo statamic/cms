@@ -4,7 +4,7 @@ namespace Statamic\Updater;
 
 use Carbon\Carbon;
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\CoreUpdater;
 use GuzzleHttp\Client;
 use Statamic\API\Str;
 use Statamic\Statamic;

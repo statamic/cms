@@ -4,7 +4,7 @@ namespace Tests\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Updater\CoreChangelog;
-use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\CoreUpdater;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Fakes\Composer\Composer as FakeComposer;
 use Tests\Fakes\Composer\CoreChangelog as FakeCoreChangelog;

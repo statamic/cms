@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Updater\CoreChangelog;
-use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\CoreUpdater;
 use Facades\Statamic\Updater\UpdatesCount;
 use Illuminate\Http\Request;
 use Statamic\Statamic;

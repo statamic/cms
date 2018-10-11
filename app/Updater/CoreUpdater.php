@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Composer;
+namespace Statamic\Updater;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Updater\CoreChangelog;

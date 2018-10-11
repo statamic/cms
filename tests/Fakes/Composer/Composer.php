@@ -2,7 +2,7 @@
 
 namespace Tests\Fakes\Composer;
 
-use Facades\Statamic\Composer\CoreUpdater;
+use Facades\Statamic\Updater\CoreUpdater;
 
 class Composer
 {
