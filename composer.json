@@ -16,7 +16,7 @@
         "webpatser/laravel-uuid": "1.*"
     },
     "require-dev": {
-        "codedungeon/phpunit-result-printer": "dev-master",
+        "codedungeon/phpunit-result-printer": "0.22",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
         "orchestra/testbench": "3.6",
