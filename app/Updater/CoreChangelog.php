@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Composer;
+namespace Statamic\Updater;
 
 use Carbon\Carbon;
 use Facades\Statamic\Console\Processes\Composer;

@@ -3,7 +3,7 @@
 namespace Statamic\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Composer\CoreChangelog;
+use Facades\Statamic\Updater\CoreChangelog;
 use Statamic\Statamic;
 
 class CoreUpdater

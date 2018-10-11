@@ -3,7 +3,7 @@
 namespace Tests\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Composer\CoreChangelog;
+use Facades\Statamic\Updater\CoreChangelog;
 use Facades\Statamic\Composer\CoreUpdater;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Fakes\Composer\Composer as FakeComposer;
