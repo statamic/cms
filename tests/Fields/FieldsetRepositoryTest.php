@@ -78,6 +78,13 @@ EOT;
     }
 
     /** @test */
+    function it_returns_null_if_fieldset_directory_doesnt_exist()
+    {
+        $this->repo->setDirectory(__DIR__.'/nope');
+        $this->assertNull($this->repo->find('unknown'));
+    }
+
+    /** @test */
     function it_gets_all_fieldsets()
     {
         $firstContents = <<<'EOT'
@@ -121,8 +128,23 @@ EOT;
     }
 
     /** @test */
+    function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
+    {
+        $this->repo->setDirectory(__DIR__.'/nope');
+
+        $all = $this->repo->all();
+
+        $this->assertInstanceOf(Collection::class, $all);
+        $this->assertCount(0, $all);
+    }
+
+    /** @test */
     function it_saves_to_disk()
     {
+        // Set the directory to one that doesn't exist so we can test that the directory would also get created.
+        $directory = $this->tempDir . '/doesnt-exist';
+        $this->repo->setDirectory($directory);
+
         $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
             'title' => 'Test Fieldset',
             'fields' => [
@@ -140,7 +162,7 @@ fields:
     bar: baz
 
 EOT;
-        $this->assertFileExists($path = $this->tempDir.'/the_test_fieldset.yaml');
+        $this->assertFileExists($path = $directory.'/the_test_fieldset.yaml');
         $this->assertFileEqualsString($path, $expectedYaml);
         @unlink($path);
     }

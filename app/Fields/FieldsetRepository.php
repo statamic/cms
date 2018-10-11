@@ -39,6 +39,10 @@ class FieldsetRepository
 
     public function all(): Collection
     {
+        if (! $this->files->exists($this->directory)) {
+            return collect();
+        }
+
         return collect($this->files->allFiles($this->directory))
             ->filter(function ($file) {
                 return $file->getExtension() === 'yaml';
@@ -57,6 +61,10 @@ class FieldsetRepository
 
     public function save(Fieldset $fieldset)
     {
+        if (! $this->files->exists($this->directory)) {
+            $this->files->makeDirectory($this->directory);
+        }
+
         $this->files->put(
             "{$this->directory}/{$fieldset->handle()}.yaml",
             YAML::dump($fieldset->contents())
