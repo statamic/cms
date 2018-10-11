@@ -88,7 +88,7 @@ class UpdateFieldsetTest extends TestCase
                     'baz' => 'qux'
                 ]
             ]
-        ], $fieldset->contents());
+        ], API\Fieldset::find('test')->contents());
     }
 
     /** @test */
