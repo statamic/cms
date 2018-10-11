@@ -5,8 +5,9 @@
             <div class="popover w-96">
 
                 <div>
+                    <p class="text-sm font-medium mb-1">Select a field from an existing fieldset:</p>
                     <suggest-fieldtype
-                        :config="{max_items: 1, placeholder: 'Select a field'}"
+                        :config="{max_items: 1, placeholder: ''}"
                         name="field"
                         :suggestions-prop="suggestions"
                         :value="[fieldReference]"
@@ -14,10 +15,13 @@
                     />
                 </div>
 
-                <div class="border-grey-lighter border-t mt-2 pt-2 text-grey-light text-right text-xs">
-                    <button class="text-blue" @click="addInlineField">Add a single-use field</button>
-                    or
-                    <button class="text-blue" @click.prevent="">import a fieldset</button>
+                <div class="border-grey-lighter border-t mt-2 pt-2 text-grey-light text-xs">
+                    <div class="mb-1">More options:</div>
+                    <ul class="pl-2">
+                        <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>
+                        <li><button class="text-blue" @click.prevent="">Create a new reusable field</button></li>
+                        <li><button class="text-blue" @click.prevent="">Import a fieldset</button></li>
+                    </ul>
                 </div>
 
                 <portal to="modals" v-if="selectingFieldtype">
