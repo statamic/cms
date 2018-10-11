@@ -8,6 +8,6 @@ class Version
 {
     public function get()
     {
-        return Composer::installedVersion(Static::CORE_REPO);
+        return Composer::installedVersion(Statamic::CORE_REPO);
     }
 }
