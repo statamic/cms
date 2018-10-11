@@ -137,31 +137,19 @@ export default {
         }
     },
 
-    ready: function() {
-        var self = this;
-
-        this.root = Boolean(this.root || false);
-
+    created() {
         // For new fields, we'll slugify the display name into the field name.
-        // If they edit the name, we'll stop.
+        // If they edit the handle, we'll stop.
         if (this.config.isNew && !this.config.isMeta) {
-            this.isNameModified = false;
+            this.isHandleModified = false;
             delete this.config.isNew;
 
-            this.$watch('field.display', function(display) {
-                if (! this.isNameModified) {
-                    this.config.name = this.$slugify(display, '_');
+            this.$watch('config.display', function(display) {
+                if (! this.isHandleModified) {
+                    this.config.handle = this.$slugify(display, '_');
                 }
             });
         }
-    },
-
-    watch: {
-
-        field(field) {
-            this.$emit('input', field);
-        }
-
     },
 
     methods: {
