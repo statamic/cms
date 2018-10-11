@@ -4,7 +4,7 @@ namespace Tests\Composer;
 
 use Facades\Statamic\Extend\AddonInstaller;
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Composer\Marketplace;
+use Facades\Statamic\Extend\Marketplace;
 use Tests\Fakes\Composer\Composer as FakeComposer;
 use Tests\Fakes\Composer\Marketplace as FakeMarketplace;
 use Tests\TestCase;

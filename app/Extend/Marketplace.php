@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Composer;
+namespace Statamic\Extend;
 
 use Facades\App\Services\Composer;
 

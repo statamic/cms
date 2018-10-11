@@ -3,7 +3,7 @@
 namespace Statamic\Extend;
 
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Composer\Marketplace;
+use Facades\Statamic\Extend\Marketplace;
 
 class AddonInstaller
 {
