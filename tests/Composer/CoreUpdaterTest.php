@@ -2,6 +2,7 @@
 
 namespace Tests\Composer;
 
+use Statamic\Statamic;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Updater\CoreChangelog;
 use Facades\Statamic\Updater\CoreUpdater;
@@ -19,8 +20,7 @@ class CoreUpdaterTest extends TestCase
         parent::setUp();
 
         Composer::swap(new FakeComposer);
-        Composer::require('test/package');
-        Composer::require('statamic/cms');
+        Composer::require(Statamic::CORE_REPO);
         CoreChangelog::swap(new FakeCoreChangelog);
     }
 
