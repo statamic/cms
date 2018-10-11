@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Composer;
+namespace Statamic\Extend;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Composer\Marketplace;

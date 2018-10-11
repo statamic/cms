@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Addon;
-use Facades\Statamic\Composer\AddonInstaller;
+use Facades\Statamic\Extend\AddonInstaller;
 
 class AddonsController extends CpController
 {
