@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldsetRepository;
 
 class Fields
 {
@@ -23,9 +24,9 @@ class Fields
 
         $this->items = collect($items);
 
-        $this->fields = $this->items->map(function ($config) {
-            return $this->createField($config);
-        });
+        $this->fields = $this->items->flatMap(function ($config) {
+            return $this->createFields($config);
+        })->keyBy->handle();
 
         return $this;
     }
@@ -82,7 +83,16 @@ class Fields
         return $this;
     }
 
-    public function createField(array $config): Field
+    public function createFields(array $config): array
+    {
+        if (isset($config['import'])) {
+            return $this->getImportedFields($config);
+        }
+
+        return [$this->createField($config)];
+    }
+
+    private function createField(array $config)
     {
         // If "field" is a string, it's a reference to a field in a fieldset.
         if (is_string($config['field'])) {
@@ -104,5 +114,22 @@ class Fields
         }
 
         return $field->setHandle($config['handle']);
+    }
+
+    private function getImportedFields(array $config): array
+    {
+        if (! $fieldset = FieldsetRepository::find($config['import'])) {
+            throw new \Exception("Fieldset {$config['import']} not found.");
+        }
+
+        $fields = $fieldset->fields();
+
+        if ($prefix = array_get($config, 'prefix')) {
+            $fields = $fields->map(function ($field) use ($prefix) {
+                return $field->setHandle($prefix . $field->handle());
+            });
+        }
+
+        return $fields->values()->all();
     }
 }
