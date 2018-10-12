@@ -13,18 +13,7 @@ class NestedFields extends Fieldtype
 
     public function preProcess($config)
     {
-        return collect($config)->map(function ($field, $handle) {
-            return $this->preProcessField($field) + ['handle' => $handle];
-        })->values()->all();
-    }
-
-    private function preProcessField($field)
-    {
-        $fieldtype = FieldtypeRepository::find($field['type']);
-
-        $processed = $fieldtype->configFields()->addValues($field)->preProcess()->values();
-
-        return array_merge($field, $processed);
+        return (new Fields($config))->toPublishArray();
     }
 
     public function process($config)

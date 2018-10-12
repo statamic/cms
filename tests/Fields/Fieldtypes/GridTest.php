@@ -7,6 +7,7 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Fieldtypes\Grid;
 use Statamic\Fields\Fieldtypes\NestedFields;
+use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
 class GridTest extends TestCase
@@ -14,11 +15,17 @@ class GridTest extends TestCase
     /** @test */
     function it_preprocesses_the_values()
     {
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
         $field = (new Field('test', [
             'type' => 'grid',
             'fields' => [
-                'numbers' => ['type' => 'integer'],
-                'words' => ['type' => 'text']
+                ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
+                ['handle' => 'words', 'field' => ['type' => 'text']], // test inline field
             ]
         ]))->setValue([
             [
@@ -50,14 +57,22 @@ class GridTest extends TestCase
     /** @test */
     function it_preprocesses_the_values_recursively()
     {
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
         $field = (new Field('test', [
             'type' => 'grid',
             'fields' => [
-                'numbers' => ['type' => 'integer'],
-                'words' => ['type' => 'text'],
-                'nested_grid' => ['type' => 'grid', 'fields' => [
-                    'nested_numbers' => ['type' => 'integer'],
-                    'nested_words' => ['type' => 'text'],
+                ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
+                ['handle' => 'words', 'field' => ['type' => 'text']], // test inline field
+                ['handle' => 'nested_grid', 'field' => [
+                    'type' => 'grid', 'fields' => [
+                        ['handle' => 'nested_numbers', 'field' => 'testfieldset.numbers'],
+                        ['handle' => 'nested_words', 'field' => ['type' => 'text']],
+                    ]
                 ]]
             ]
         ]))->setValue([
@@ -138,11 +153,17 @@ class GridTest extends TestCase
     /** @test */
     function it_processes_the_values()
     {
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
         $field = (new Field('test', [
             'type' => 'grid',
             'fields' => [
-                'numbers' => ['type' => 'integer'],
-                'words' => ['type' => 'text']
+                ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
+                ['handle' => 'words', 'field' => ['type' => 'text']], // test inline field
             ]
         ]))->setValue([
             [
@@ -176,15 +197,21 @@ class GridTest extends TestCase
     /** @test */
     function it_processes_the_values_recursively()
     {
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
         $field = (new Field('test', [
             'type' => 'grid',
             'fields' => [
-                'numbers' => ['type' => 'integer'],
-                'words' => ['type' => 'text'],
-                'nested_grid' => ['type' => 'grid', 'fields' => [
-                    'nested_numbers' => ['type' => 'integer'],
-                    'nested_words' => ['type' => 'text'],
-                ]]
+                ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
+                ['handle' => 'words', 'field' => ['type' => 'text']], // test inline field
+                ['handle' => 'nested_grid', 'field' => ['type' => 'grid', 'fields' => [
+                    ['handle' => 'nested_numbers', 'field' => 'testfieldset.numbers'],
+                    ['handle' => 'nested_words', 'field' => ['type' => 'text']],
+                ]]]
             ]
         ]))->setValue([
             [
