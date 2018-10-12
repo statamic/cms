@@ -46,6 +46,7 @@ class AuthServiceProvider extends ServiceProvider
 
         collect([
             'access cp',
+            'view drafts on frontend',
         ])->each(function ($ability) {
             Gate::define($ability, function ($user) use ($ability) {
                 return $user->hasPermission($ability);

@@ -71,7 +71,7 @@ class DataResponse implements Responsable
 
         $user = optional($this->request->user());
 
-        if (! $user->hasPermission('content:view_drafts_on_frontend')) {
+        if (! $user->can('view drafts on frontend')) {
             throw new NotFoundHttpException;
         }
 
