@@ -2,8 +2,9 @@
 
 namespace Tests\Composer;
 
-use Facades\Statamic\Extend\AddonInstaller;
+use Exception;
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Extend\AddonInstaller;
 use Facades\Statamic\Extend\Marketplace;
 use Tests\Fakes\Composer\Composer as FakeComposer;
 use Tests\Fakes\Composer\Marketplace as FakeMarketplace;
@@ -55,11 +56,9 @@ class AddonInstallerTest extends TestCase
     /** @test */
     function it_will_not_install_unapproved_addon()
     {
-        try {
-            AddonInstaller::install('addon/not-approved');
-        } catch (\Exception $exception) {
-            //
-        }
+        $this->expectException(Exception::class);
+
+        AddonInstaller::install('addon/not-approved');
 
         $this->assertTrue($exception instanceof \Exception);
         $this->assertCount(0, AddonInstaller::installed());
@@ -72,13 +71,10 @@ class AddonInstallerTest extends TestCase
 
         $this->assertCount(1, AddonInstaller::installed());
 
-        try {
-            AddonInstaller::uninstall('addon/not-approved');
-        } catch (\Exception $exception) {
-            //
-        }
+        $this->expectException(Exception::class);
 
-        $this->assertTrue($exception instanceof \Exception);
+        AddonInstaller::uninstall('addon/not-approved');
+
         $this->assertCount(1, AddonInstaller::installed());
     }
 }

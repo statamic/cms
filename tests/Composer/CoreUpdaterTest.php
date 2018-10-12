@@ -2,11 +2,11 @@
 
 namespace Tests\Composer;
 
-use Statamic\Statamic;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Updater\CoreChangelog;
 use Facades\Statamic\Updater\CoreUpdater;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Statamic\Statamic;
 use Tests\Fakes\Composer\Composer as FakeComposer;
 use Tests\Fakes\Composer\CoreChangelog as FakeCoreChangelog;
 use Tests\TestCase;
