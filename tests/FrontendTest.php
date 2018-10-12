@@ -3,21 +3,20 @@
 namespace Tests;
 
 use Statamic\API\User;
-use Statamic\API\Page;
-use Statamic\API\Role;
 use Statamic\API\Site;
-use Statamic\Stache\Stache;
+use Statamic\API\Entry;
+use Statamic\API\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 
 class FrontendTest extends TestCase
 {
+    use FakesRoles;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     public function setUp()
     {
-        $this->markTestSkipped(); // until pages return
-
         parent::setUp();
 
         $this->withStandardFakeViews();
@@ -44,20 +43,19 @@ class FrontendTest extends TestCase
     {
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> {{ content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
 
         $page = $this->createPage('/about', [
-            'path' => 'pages/index.md',
             'with' => [
                 'title' => 'The About Page',
-                'content' => 'This is the *about* page.',
+                'content' => 'This is the about page.',
                 'template' => 'some_template',
             ]
         ]);
 
         $response = $this->get('/about')->assertStatus(200);
 
-        $this->assertEquals('<h1>The About Page</h1> <p>This is the <em>about</em> page.</p>', trim($response->content()));
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
 
     /** @test */
@@ -65,20 +63,19 @@ class FrontendTest extends TestCase
     {
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> {{ content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
 
         $page = $this->createPage('/about', [
-            'path' => 'pages/index.md',
             'with' => [
                 'title' => 'The About Page',
-                'content' => 'This is the *about* page.',
+                'content' => 'This is the about page.',
                 'template' => 'some_template',
             ]
         ]);
 
         $response = $this->get('/about?some=querystring')->assertStatus(200);
 
-        $this->assertEquals('<h1>The About Page</h1> <p>This is the <em>about</em> page.</p>', trim($response->content()));
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
 
     /** @test */
@@ -108,8 +105,8 @@ class FrontendTest extends TestCase
     /** @test */
     function drafts_are_visible_if_logged_in_with_correct_permission()
     {
-        $this->fakeRoles(['draft_viewer' => ['permissions' => ['content:view_drafts_on_frontend']]]);
-        $user = User::create()->with(['roles' => ['draft_viewer']])->get();
+        $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
+        $user = User::create()->get()->assignRole('draft_viewer');
 
         $page = $this->createPage('/about');
         $page->published(false);
@@ -152,9 +149,9 @@ class FrontendTest extends TestCase
     /** @test */
     function key_variables_key_added()
     {
-        $page = $this->createPage('/');
+        $page = $this->createPage('about');
 
-        $response = $this->get('/')->assertStatus(200);
+        $response = $this->get('about')->assertStatus(200);
 
         $keys = [
             'site_url', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today', 'locale',
@@ -175,15 +172,15 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('default', '{{ content }}{{ subtitle }}');
 
-        $this->createPage('/', [
-            'path' => 'pages/index.md',
+        $this->createPage('about', [
+            'path' => 'about.md',
             'with' => [
                 'content' => '# Foo *Bar*',
                 'subtitle' => '# Foo *Bar*',
             ]
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get('about');
 
         $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
     }
@@ -193,15 +190,14 @@ class FrontendTest extends TestCase
     {
         $this->viewShouldReturnRaw('default', '{{ content }}{{ subtitle }}');
 
-        $this->createPage('/', [
-            'path' => 'pages/index.textile',
+        $this->createPage('test', [
             'with' => [
                 'content' => 'h1. Foo *Bar*',
                 'subtitle' => 'h1. Foo *Bar*',
             ]
-        ]);
+        ])->dataType('textile');
 
-        $response = $this->get('/');
+        $response = $this->get('test');
 
         $this->assertEquals("<h1>Foo <strong>Bar</strong></h1>h1. Foo *Bar*", trim($response->content()));
     }
@@ -209,67 +205,67 @@ class FrontendTest extends TestCase
     /** @test */
     function changes_content_type_to_xml()
     {
-        $this->createPage('/', ['with' => ['content_type' => 'xml']]);
+        $this->createPage('about', ['with' => ['content_type' => 'xml']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('/')->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
+        $this->get('about')->assertHeader('Content-Type', 'text/xml; charset=UTF-8');
     }
 
     /** @test */
     function changes_content_type_to_atom()
     {
-        $this->createPage('/', ['with' => ['content_type' => 'atom']]);
+        $this->createPage('about', ['with' => ['content_type' => 'atom']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('/')->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
+        $this->get('about')->assertHeader('Content-Type', 'application/atom+xml; charset=UTF-8');
     }
 
     /** @test */
     function changes_content_type_to_json()
     {
-        $this->createPage('/', ['with' => ['content_type' => 'json']]);
+        $this->createPage('about', ['with' => ['content_type' => 'json']]);
 
-        $this->get('/')->assertHeader('Content-Type', 'application/json');
+        $this->get('about')->assertHeader('Content-Type', 'application/json');
     }
 
     /** @test */
     function changes_content_type_to_text()
     {
-        $this->createPage('/', ['with' => ['content_type' => 'text']]);
+        $this->createPage('about', ['with' => ['content_type' => 'text']]);
 
         // Laravel adds utf-8 if the content-type starts with text/
-        $this->get('/')->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->get('about')->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
     }
 
     /** @test */
     function sends_powered_by_header_if_enabled()
     {
         config(['statamic.system.send_powered_by_header' => true]);
-        $this->createPage('/');
+        $this->createPage('about');
 
-        $this->get('/')->assertHeader('X-Powered-By', 'Statamic');
+        $this->get('about')->assertHeader('X-Powered-By', 'Statamic');
     }
 
     /** @test */
     function doesnt_send_powered_by_header_if_disabled()
     {
         config(['statamic.system.send_powered_by_header' => false]);
-        $this->createPage('/');
+        $this->createPage('about');
 
-        $this->get('/')->assertHeaderMissing('X-Powered-By', 'Statamic');
+        $this->get('about')->assertHeaderMissing('X-Powered-By', 'Statamic');
     }
 
     /** @test */
     function headers_can_be_set_in_content()
     {
-        $page = $this->createPage('/', ['with' => [
+        $page = $this->createPage('about', ['with' => [
             'headers' => [
                 'X-Some-Header' => 'Foo',
                 'X-Another-Header' => 'Bar'
             ]
         ]]);
 
-        $this->get('/')
+        $this->get('about')
             ->assertHeader('X-Some-Header', 'Foo')
             ->assertHeader('X-Another-Header', 'Bar');
     }
@@ -277,12 +273,13 @@ class FrontendTest extends TestCase
     /** @test */
     function event_is_emitted_when_response_is_created()
     {
+        $this->withoutExceptionHandling();
         Event::fake();
 
-        $page = $this->createPage('/');
+        $page = $this->createPage('about');
         $page->set('headers', ['X-Foo' => 'Bar']);
 
-        $this->get('/')->assertStatus(200);
+        $this->get('about')->assertStatus(200);
 
         Event::assertDispatched('Statamic\Events\ResponseCreated', function ($event) {
             return $event->response instanceof Response
@@ -344,31 +341,17 @@ class FrontendTest extends TestCase
         // the 'response_code' key var is 404
     }
 
-    private function createPage($url, $factoryAttributes = [])
+    private function createPage($slug, $factoryAttributes = [])
     {
-        $id = 'test-page-id';
-        $path = $url . '/index.md';
+        $collection = Collection::create('pages');
+        $collection->data(['route' => '{slug}']);
+        $collection->save();
 
-        $page = Page::create($url)->id($id);
-
-        foreach ($factoryAttributes as $attrKey => $attrValue) {
-            $page->$attrKey($attrValue);
-        }
-
-        $page = $page->get();
-
-        $stache = $this->app->make(Stache::class);
-        $stache->repo('pages')->setPath($id, $path)->setUri($id, $url)->setItem($id, $page);
-        $stache->repo('pagestructure')->setUri($id, $url)->setPath($id, $path)->setItem($id, $page->structure());
-        return $page;
-    }
-
-    private function fakeRoles($roles)
-    {
-        $roles = collect($roles)->mapWithKeys(function ($role, $id) {
-            return [$id => app('Statamic\Contracts\Permissions\RoleFactory')->create($role, $id)];
-        });
-
-        Role::shouldReceive('all')->andReturn($roles);
+        return Entry::create($slug)
+            ->id($slug)
+            ->collection('pages')
+            ->path(array_get($factoryAttributes, 'path', $slug.'.html'))
+            ->with(array_get($factoryAttributes, 'with', []))
+            ->save();
     }
 }
