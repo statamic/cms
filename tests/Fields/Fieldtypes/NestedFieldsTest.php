@@ -3,7 +3,9 @@
 namespace Tests\Fields\Fieldtypes;
 
 use Tests\TestCase;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Fieldtypes\NestedFields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
@@ -37,12 +39,26 @@ class NestedFieldsTest extends TestCase
                 }
             });
 
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.image')
+            ->andReturnUsing(function () {
+                return new Field('image', [
+                    'type' => 'assets',
+                    'max_files' => '2', // corresponding fieldtype has preprocessing
+                    'container' => 'main', // corresponding fieldtype has no preprocessing
+                    'foo' => 'bar' // no corresponding fieldtype, so theres no preprocessing
+                ]);
+            });
+
         $actual = (new NestedFields)->preProcess([
-            'image' => [
-                'type' => 'assets',
-                'max_files' => '2', // corresponding fieldtype has preprocessing
-                'container' => 'main', // corresponding fieldtype has no preprocessing
-                'foo' => 'bar' // no corresponding fieldtype, so theres no preprocessing
+            [
+                'handle' => 'image',
+                'field' => 'testfieldset.image',
+                'config' => [
+                    'display' => 'Test Image Field',
+                    'instructions' => 'Some instructions',
+                    'validate' => 'required'
+                ]
             ]
         ]);
 
@@ -52,7 +68,11 @@ class NestedFieldsTest extends TestCase
                 'max_files' => 2,
                 'container' => 'main',
                 'foo' => 'bar',
+                'display' => 'Test Image Field',
+                'instructions' => 'Some instructions',
+                'validate' => 'required',
                 'handle' => 'image',
+                'required' => true,
             ]
         ], $actual);
     }

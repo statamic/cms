@@ -5,9 +5,11 @@ namespace Tests\Fields;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldsTest extends TestCase
@@ -34,6 +36,15 @@ class FieldsTest extends TestCase
                 return new Field('field_one', ['type' => 'textarea']);
             });
 
+        FieldsetRepository::shouldReceive('find')
+            ->with('fieldset_three')
+            ->andReturnUsing(function () {
+                return (new Fieldset)->setHandle('fieldset_three')->setContents(['fields' => [
+                    'foo' => ['type' => 'textarea'],
+                    'bar' => ['type' => 'text'],
+                ]]);
+            });
+
         $fields->setItems([
             [
                 'handle' => 'one',
@@ -48,14 +59,24 @@ class FieldsTest extends TestCase
                 'field' => [
                     'type' => 'textarea',
                 ]
+            ],
+            [
+                'import' => 'fieldset_three',
+                'prefix' => 'a_',
+            ],
+            [
+                'import' => 'fieldset_three',
+                'prefix' => 'b_',
             ]
         ]);
 
         tap($fields->all(), function ($items) {
-            $this->assertCount(3, $items);
+            $this->assertCount(7, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
-            $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            $handles = ['one', 'two', 'three', 'a_foo', 'a_bar', 'b_foo', 'b_bar'];
+            $this->assertEquals($handles, $items->map->handle()->values()->all());
+            $this->assertEquals($handles, $items->keys()->all());
+            $this->assertEquals(['text', 'textarea', 'textarea', 'textarea', 'text', 'textarea', 'text'], $items->map->type()->values()->all());
         });
     }
 
@@ -70,17 +91,20 @@ class FieldsTest extends TestCase
 
         FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturn($existing);
 
-        $created = (new Fields)->createField([
+        $fields = (new Fields)->createFields([
             'handle' => 'test',
             'field' => 'foo.bar',
         ]);
 
-        $this->assertEquals('test', $created->handle());
+        $this->assertTrue(is_array($fields));
+        $this->assertCount(1, $fields);
+        $field = $fields[0];
+        $this->assertEquals('test', $field->handle());
         $this->assertEquals([
             'type' => 'textarea',
             'var_one' => 'one',
             'var_two' => 'two',
-        ], $created->config());
+        ], $field->config());
     }
 
     /** @test */
@@ -94,7 +118,7 @@ class FieldsTest extends TestCase
 
         FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturn($existing);
 
-        $created = (new Fields)->createField([
+        $fields = (new Fields)->createFields([
             'handle' => 'test',
             'field' => 'foo.bar',
             'config' => [
@@ -102,12 +126,15 @@ class FieldsTest extends TestCase
             ]
         ]);
 
-        $this->assertEquals('test', $created->handle());
+        $this->assertTrue(is_array($fields));
+        $this->assertCount(1, $fields);
+        $field = $fields[0];
+        $this->assertEquals('test', $field->handle());
         $this->assertEquals([
             'type' => 'textarea',
             'var_one' => 'overridden',
             'var_two' => 'two',
-        ], $created->config());
+        ], $field->config());
     }
 
     /** @test */
@@ -117,9 +144,74 @@ class FieldsTest extends TestCase
         $this->expectExceptionMessage('Field foo.bar not found.');
         FieldRepository::shouldReceive('find')->with('foo.bar')->once()->andReturnNull();
 
-        (new Fields)->createField([
+        (new Fields)->createFields([
             'handle' => 'test',
             'field' => 'foo.bar'
+        ]);
+    }
+
+    /** @test */
+    function it_imports_the_fields_from_an_entire_fieldset_inline()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                'one' => [
+                    'type' => 'text'
+                ],
+                'two' => [
+                    'type' => 'textarea'
+                ]
+            ]
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $fields = (new Fields)->createFields([
+            'import' => 'partial',
+        ]);
+
+        $this->assertTrue(is_array($fields));
+        $this->assertCount(2, $fields);
+        $this->assertEquals('one', $fields[0]->handle());
+        $this->assertEquals('two', $fields[1]->handle());
+    }
+
+    /** @test */
+    function it_prefixes_the_handles_of_imported_fieldsets()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                'one' => [
+                    'type' => 'text'
+                ],
+                'two' => [
+                    'type' => 'textarea'
+                ]
+            ]
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $fields = (new Fields)->createFields([
+            'import' => 'partial',
+            'prefix' => 'test_',
+        ]);
+
+        $this->assertTrue(is_array($fields));
+        $this->assertCount(2, $fields);
+        $this->assertEquals('test_one', $fields[0]->handle());
+        $this->assertEquals('test_two', $fields[1]->handle());
+    }
+
+    /** @test */
+    function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
+    {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Fieldset test_partial not found.');
+        FieldsetRepository::shouldReceive('find')->with('test_partial')->once()->andReturnNull();
+
+        (new Fields)->createFields([
+            'import' => 'test_partial'
         ]);
     }
 
