@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Illuminate\Http\Request;
 use Statamic\API\Addon;
 use Facades\Statamic\Extend\AddonInstaller;
 

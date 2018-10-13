@@ -28,13 +28,12 @@
                                     <img :src="showingAddon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
                                     <span class="font-bold">{{ showingAddon.seller.name }}</span>
                                 </a>
-                                <button class="btn">
+                                <button class="btn" @click="installAddon(showingAddon)">
                                     Install Addon
                                 </button>
                             </div>
-                            <div class="p-4">
-                                {{ showingAddon.variants[0].description }}
-                            </div>
+                            <composer-output v-show="output" :title="output.status" class="m-3"></composer-output>
+                            <div v-if="! output" class="p-4">{{ showingAddon.variants[0].description }}</div>
                         </modal>
                     </portal>
 
@@ -54,50 +53,64 @@
 </style>
 
 <script>
-import axios from 'axios';
+    import axios from 'axios';
 
-export default {
+    export default {
 
-    props: [
-        'domain',
-        'endpoints'
-    ],
+        props: [
+            'domain',
+            'endpoints'
+        ],
 
-    data() {
-        return {
-            rows: [],
-            searchQuery: '',
-            loaded: false,
-            showingAddon: false
-        }
-    },
-
-    computed: {
-        api() {
-            return this.domain + '/api/v1/marketplace';
-        }
-    },
-
-    created() {
-        this.rows = this.getAddons()
-    },
-
-    methods: {
-        getAddons() {
-            this.axios.get(this.api + this.endpoints.addons).then(response => {
-                this.rows = response.data.data;
-                this.loaded = true;
-            });
+        data() {
+            return {
+                rows: [],
+                searchQuery: '',
+                loaded: false,
+                showingAddon: false,
+                output: false,
+            }
         },
 
-        getCover(addon) {
-            return (addon.variants[0].assets.length) ? addon.variants[0].assets[0].url : '';
+        computed: {
+            api() {
+                return this.domain + '/api/v1/marketplace';
+            }
         },
 
-        showAddon(addon) {
-            this.showingAddon = addon;
-            this.$modal.show('addon-modal');
+        created() {
+            this.rows = this.getAddons()
+        },
+
+        methods: {
+            getAddons() {
+                this.axios.get(this.api + this.endpoints.addons).then(response => {
+                    this.rows = response.data.data;
+                    this.loaded = true;
+                });
+            },
+
+            getCover(addon) {
+                return (addon.variants[0].assets.length) ? addon.variants[0].assets[0].url : '';
+            },
+
+            showAddon(addon) {
+                this.showingAddon = addon;
+                this.$modal.show('addon-modal');
+            },
+
+            installAddon(addon) {
+                var repo = addon.variants[0].githubRepo;
+
+                axios.post('/cp/addons/install', {'addon': repo}, this.toEleven);
+
+                this.output = {
+                    processing: true,
+                    status: 'Installing ' + repo,
+                };
+
+                this.$events.$emit('start-composer');
+            },
         }
     }
-}
 </script>
