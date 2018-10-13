@@ -22,18 +22,18 @@
 
                     <portal to="modals" v-if="showingAddon">
                         <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
-                            <img :src="getCover(addon)" class="rounded-t">
+                            <img :src="getCover(showingAddon)" class="rounded-t">
                             <div class="flex items-center justify-between px-4 py-2 mb-2 border-b">
-                                <a :href="addon.seller.website" class="relative flex items-center">
-                                    <img :src="this.domain+'/images/storage/'+addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
-                                    <span class="font-bold">{{ addon.seller.name }}</span>
+                                <a :href="showingAddon.seller.website" class="relative flex items-center">
+                                    <img :src="showingAddon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
+                                    <span class="font-bold">{{ showingAddon.seller.name }}</span>
                                 </a>
                                 <button class="btn">
                                     Install Addon
                                 </button>
                             </div>
                             <div class="p-4">
-                                {{ addon.variants[0].description }}
+                                {{ showingAddon.variants[0].description }}
                             </div>
                         </modal>
                     </portal>
@@ -95,7 +95,7 @@ export default {
         },
 
         showAddon(addon) {
-            this.showingAddon = true;
+            this.showingAddon = addon;
             this.$modal.show('addon-modal');
         }
     }
