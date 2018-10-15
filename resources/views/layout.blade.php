@@ -12,7 +12,7 @@
       @include('statamic::partials.global-header')
 
       <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen}">
-            @include('statamic::partials.nav-main-new')
+            @include('statamic::partials.nav-main')
 
             <div class="content">
                   <div class="page-wrapper">

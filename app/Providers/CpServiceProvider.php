@@ -15,7 +15,6 @@ class CpServiceProvider extends ServiceProvider
         }
 
         tap($this->app->make('view'), function ($view) {
-            $view->composer('statamic::partials.nav-main', 'Statamic\Http\ViewComposers\NavigationComposer');
             $view->composer('statamic::layout', 'Statamic\Http\ViewComposers\PermissionComposer');
         });
     }
