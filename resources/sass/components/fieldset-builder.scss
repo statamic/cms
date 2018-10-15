@@ -1,10 +1,14 @@
+/* ==========================================================================
+   FIELDSET BUILDER
+   ========================================================================== */
+
 .fields-table {
     th {
         background: $bg;
         display: table-cell;
         box-shadow: none;
         padding-left: 10px;
-        text-align: left !important; // where/why was this being centered?
+        text-align: left !important; // @TODO figure out where was this being centered
     }
 
     td {

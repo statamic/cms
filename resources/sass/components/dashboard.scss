@@ -1,3 +1,6 @@
+/* ==========================================================================
+   DASHBOARD
+   ========================================================================== */
 
 .dashboard .widgets {
     display: grid;
@@ -17,6 +20,10 @@
         margin-bottom: 0;
     }
 }
+
+
+/* Responsive Wangjangling
+  ========================================================================== */
 
 @media all and (max-width: 900px) {
     .dashboard #publish-controls .controls { display: none; }

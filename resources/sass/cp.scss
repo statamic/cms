@@ -2,25 +2,25 @@
 
 @tailwind components;
 
-// Base
+// Base things
 @import "core/normalize";
 @import "core/fonts";
 @import "core/mixins";
 @import "core/variables";
 @import "core/animation";
 
-// Vendors
-// @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+// Vendor things
 @import "vendors/codemirror";
 @import "vendors/date-picker";
 @import "vendors/luminous";
-@import "vendors/medium-editor";
 @import "vendors/medium-editor-theme";
+@import "vendors/medium-editor";
 @import "vendors/redactor";
 @import "vendors/selectize";
 @import "vendors/sweetalert";
 @import "vendors/tippy";
 
+// Core things that need to override vendor things
 @import "core/utilities";
 @import "core/layout";
 @import "core/typography";
@@ -38,30 +38,37 @@
 
 // Components
 @import "components/alerts";
+@import "components/assets";
+@import "components/blueprints";
 @import "components/breadcrumbs";
 @import "components/cards";
-@import "components/dossier";
-@import "components/nav-main";
-@import "components/assets";
+@import "components/dashboard";
 @import "components/date-picker";
+@import "components/fieldset-builder";
+@import "components/filters";
+@import "components/focal-point";
+@import "components/global-header";
 @import "components/grid";
+@import "components/installer";
+@import "components/lists";
+@import "components/login";
+@import "components/metrics";
 @import "components/modal";
-@import "components/pagination";
-@import "components/sortable";
+@import "components/nav-main";
+@import "components/nav-mobile";
 @import "components/page-tree";
-@import "components/toggle";
-@import "components/tooltips";
+@import "components/pagination";
+@import "components/preview";
+@import "components/publish";
+@import "components/roles";
 @import "components/search";
 @import "components/shortcuts";
-@import "components/fieldset-builder";
-@import "components/blueprints";
-@import "components/panels";
-@import "components/publish";
-@import "components/preview";
-@import "components/lists";
+@import "components/sortable";
 @import "components/tabs";
-@import "components/filters";
+@import "components/toggle";
+@import "components/tooltips";
 @import "components/updates";
+<<<<<<< Updated upstream
 @import "components/roles";
 @import "components/focal-point";
 @import "components/metrics";
@@ -69,27 +76,24 @@
 @import "components/login";
 @import "components/dashboard";
 @import "components/popover";
+=======
+>>>>>>> Stashed changes
 
 // Fieldtypes
 @import "components/fieldtypes/array";
+@import "components/fieldtypes/bard";
 @import "components/fieldtypes/checkboxes";
 @import "components/fieldtypes/datetime";
-@import "components/fieldtypes/section";
-@import "components/fieldtypes/markdown";
-@import "components/fieldtypes/grid-replicator";
-@import "components/fieldtypes/redactor";
-@import "components/fieldtypes/yaml";
-@import "components/fieldtypes/relate";
 @import "components/fieldtypes/environment";
-@import "components/fieldtypes/partial";
+@import "components/fieldtypes/grid-replicator";
 @import "components/fieldtypes/hidden";
-@import "components/fieldtypes/tags";
+@import "components/fieldtypes/markdown";
+@import "components/fieldtypes/partial";
+@import "components/fieldtypes/redactor";
+@import "components/fieldtypes/relate";
 @import "components/fieldtypes/revealer";
-@import "components/fieldtypes/bard";
-
-// Shame
-.help-block {
-    p { @apply mb-1 }
-}
+@import "components/fieldtypes/section";
+@import "components/fieldtypes/tags";
+@import "components/fieldtypes/yaml";
 
 @tailwind utilities;

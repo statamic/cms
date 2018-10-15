@@ -23,19 +23,25 @@ body > svg { display: none; }
     @apply flex;
 }
 
-#main .new-nav-main {
+#main .nav-main {
     @apply w-54 absolute pin-l;
     transition: all .3s;
 }
 
 #main .content {
-    flex: 1;
     transition: padding .3s;
-    padding-left: 14rem;
+    @apply w-full pt-2;
+}
+
+@screen md {
+    #main .content {
+        padding-left: 14rem;
+        @apply pt-0;
+    }
 }
 
 #main.nav-closed {
-    .new-nav-main {
+    .nav-main {
         left: -14rem;
     }
 

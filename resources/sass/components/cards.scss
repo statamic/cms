@@ -40,32 +40,7 @@
     }
 }
 
-// .card .head {
-//     display: flex;
-//     flex-wrap: wrap;
-//     align-items: center;
-//     h1 { flex: 1; }
-// }
-//
-// .card .head .actions {
-//     padding: 16px 24px;
-// }
-//
-// .card.tight .card-body {
-//     padding-left: 24px;
-//     padding-right: 24px;
-// }
-//
-// .card .card-heading {
-//     margin-bottom: 16px;
-//     padding: 8px 24px;
-//     border-bottom: 1px solid rgba(63, 63, 68, .1);
-//
-//     h1, h2, h3, h4, h5 {
-//         margin: 0 0 5px;
-//     }
-// }
-
+// @TODO: Remove stacks. This stuff can be done cleaner with Tailwind.
 .stacks {
     margin: 24px -17px;
     display: flex;

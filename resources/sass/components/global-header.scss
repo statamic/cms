@@ -1,0 +1,14 @@
+/* ==========================================================================
+   THE GLOBAL HEADER
+   ========================================================================== */
+
+ .global-header {
+     @apply bg-white shadow h-12 mb-4 items-center justify-between hidden;
+ }
+
+ /* Responsive Wangjangling
+   ========================================================================== */
+
+ @screen md {
+     .global-header { @apply flex; }
+ }

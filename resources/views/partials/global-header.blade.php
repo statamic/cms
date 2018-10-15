@@ -1,28 +1,38 @@
-<div class="cp-head">
+<div class="global-header">
+    <div class="flex items-center flex-1">
+        <div class="w-54 pl-3">
+            <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
+                <div v-popover:tooltip.bottom="version">
+                    @svg('statamic-wordmark')
+                </div>
+            </a>
+        </div>
 
-    <div class="logo">
-        <a href="{{ route('statamic.cp.index') }}" class="flex items-center">
-              @svg('statamic-wordmark')
-              <span class="version" v-cloak>@{{ version }}</span>
-        </a>
+        <global-search class="pl-2" endpoint="{{ route('statamic.cp.search.global') }}" :limit="10" placeholder="{{ __('Search...') }}">
+        </global-search>
     </div>
 
-    <global-search endpoint="{{ route('statamic.cp.search.global') }}" :limit="10" placeholder="{{ __('Search...') }}">
-        <template slot="icon">
-            @svg('search')
-        </template>
-    </global-search>
-
-    <a>
-        <span class="h-6 w-6 block p-sm mt-px ml-2">
-            @svg('add-circle')
-        </span>
-    </a>
-
-    <div class="head-links pl-1 flex items-center">
+    <div class="flex items-center px-3 border-l h-full text-sm">
         <div class="dropdown">
-            <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @svg('book-open')
+            <button class="flex outline-none items-center dropdown-toggle anti text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="block h-6 w-6 mr-1">@svg('new/content-pencil-write')</i><span>Shortcuts</span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="">New Blog Post</a></li>
+                <li><a href="">New Event</a></li>
+                <li><a href="">New FAQ Question</a></li>
+                <li><a href="">Edit Footer Links</a></li>
+                <li><a href="">Manage Photo Galleries</a></li>
+                <li class="divider"></li>
+                <li><a href="" class="text-grey hover:text-white">Customize Shortcuts</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="head-link border-l h-full px-3 flex items-center">
+        <div class="dropdown">
+            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @svg('new/book-open-text')
             </a>
             <ul class="dropdown-menu">
                 <li>
@@ -44,8 +54,8 @@
                 </li>
             </ul>
         </div>
-        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank">
-            @svg('browser-com')
+        <a class="h-6 w-6 block p-sm text-grey-light ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
+            @svg('new/browser-com')
         </a>
         <div class="dropdown">
             <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -63,5 +73,4 @@
             </ul>
         </div>
     </div>
-
 </div>

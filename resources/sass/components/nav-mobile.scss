@@ -1,0 +1,26 @@
+/* ==========================================================================
+   THE MOBILE NAV
+   ========================================================================== */
+
+.nav-mobile {
+    @apply .bg-white border-t w-full fixed h-14 pin-b pin-l pin-r flex items-center justify-center;
+
+    a {
+        @apply .flex flex-col .mx-1 .p-1 .text-grey text-center .text-3xs .flex-1;
+    }
+
+    svg {
+        @apply .w-6 .h-6;
+    }
+}
+
+
+
+/* Responsive Wangjangling
+  ========================================================================== */
+
+@screen md {
+    .nav-mobile {
+        display: none;
+    }
+}

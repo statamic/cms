@@ -8,17 +8,8 @@
 <body>
     <div id="statamic">
 
-      <nav class="nav-mobile">
-          <a href="{{ route('statamic.cp.index') }}" class="logo">
-              {!! svg('statamic-wordmark') !!}
-          </a>
-          <a class="toggle">
-              <span class="icon icon-menu"></span>
-          </a>
-      </nav>
-
       @include('statamic::partials.alerts')
-      @include('statamic::partials.new-global-header')
+      @include('statamic::partials.global-header')
 
       <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen}">
             @include('statamic::partials.nav-main-new')
@@ -44,6 +35,9 @@
 
             <portal-target name="modals"></portal-target>
       </div>
+
+      @include('statamic::partials.nav-mobile')
+
   </div>
 
 @include('statamic::partials.scripts')
