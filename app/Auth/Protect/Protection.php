@@ -31,7 +31,7 @@ class Protection
 
     public function scheme()
     {
-        return optional($this->data)->get('protect');
+        return config('statamic.protect.default') ?? optional($this->data)->get('protect');
     }
 
     public function driver()

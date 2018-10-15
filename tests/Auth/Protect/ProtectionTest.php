@@ -44,6 +44,18 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
+    function sitewide_scheme_comes_from_the_default_setting()
+    {
+        config(['statamic.protect.default' => 'logged_in']);
+        config(['statamic.protect.schemes.logged_in' => [
+            'driver' => 'auth',
+            'form_url' => '/login',
+        ]]);
+
+        $this->assertEquals('logged_in', $this->protection->scheme());
+    }
+
+    /** @test */
     function driver_comes_from_schemes_driver_key()
     {
         config(['statamic.protect.schemes.custom_auth_scheme' => [
