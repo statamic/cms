@@ -5,6 +5,7 @@ namespace Statamic\Http\Responses;
 use Facades\Statamic\Cascade;
 use Statamic\View\Antlers\View;
 use Statamic\Events\ResponseCreated;
+use Statamic\Auth\Protect\Protection;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Exceptions\NotFoundHttpException;
 
@@ -58,7 +59,9 @@ class DataResponse implements Responsable
 
     protected function protect()
     {
-        // todo
+        app(Protection::class)
+            ->setData($this->data)
+            ->protect();
 
         return $this;
     }

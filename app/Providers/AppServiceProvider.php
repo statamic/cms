@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
-        collect(['assets', 'cp', 'forms', 'routes', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'])->each(function ($config) {
+        collect(['assets', 'cp', 'forms', 'protect', 'routes', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'])->each(function ($config) {
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
             $this->publishes(["{$this->root}/config/$config.php" => config_path("statamic/$config.php")], 'statamic');
         });

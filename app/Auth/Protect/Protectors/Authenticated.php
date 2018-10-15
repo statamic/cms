@@ -2,25 +2,8 @@
 
 namespace Statamic\Auth\Protect\Protectors;
 
-use Statamic\Exceptions\RedirectException;
-
-class LoggedInProtector extends AbstractProtector
+class Authenticated extends Protector
 {
-    /**
-     * Whether or not this provides protection.
-     *
-     * @return bool
-     */
-    public function providesProtection()
-    {
-        return true;
-    }
-
-    /**
-     * Provide protection
-     *
-     * @return void
-     */
     public function protect()
     {
         if (auth()->check()) {
@@ -32,17 +15,15 @@ class LoggedInProtector extends AbstractProtector
         }
 
         if (! $this->getLoginUrl()) {
-            $this->deny();
+            abort(403);
         }
 
-        throw tap(new RedirectException, function ($e) {
-            $e->setUrl($this->getLoginUrl());
-        });
+        abort(redirect($this->getLoginUrl()));
     }
 
     protected function getLoginUrl()
     {
-        if (! $url = array_get($this->scheme, 'login_url')) {
+        if (! $url = array_get($this->config, 'login_url')) {
             return null;
         }
 
@@ -66,6 +47,6 @@ class LoggedInProtector extends AbstractProtector
 
     protected function shouldAppendRedirect()
     {
-        return array_get($this->scheme, 'append_redirect', false);
+        return array_get($this->config, 'append_redirect', false);
     }
 }

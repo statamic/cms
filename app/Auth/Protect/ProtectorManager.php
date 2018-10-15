@@ -2,87 +2,42 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\Auth\Protect\Protectors\Protector;
-use Statamic\Auth\Protect\Protectors\IpProtector;
+use Illuminate\Support\Manager;
+use Statamic\Auth\Protect\Protectors\Fallback;
+use Statamic\Auth\Protect\Protectors\IpAddress;
+use Statamic\Auth\Protect\Protectors\Authenticated;
 use Statamic\Auth\Protect\Protectors\NullProtector;
-use Statamic\Auth\Protect\Protectors\PasswordProtector;
-use Statamic\Auth\Protect\Protectors\LoggedInProtector;
+use Statamic\Auth\Protect\Protectors\Password\PasswordProtector;
 
-class ProtectorManager
+class ProtectorManager extends Manager
 {
-    /**
-     * @var string
-     */
-    private $url;
-
-    /**
-     * @var array
-     */
-    protected $scheme;
-
-    /**
-     * @var bool
-     */
-    private $siteWide;
-
-    /**
-     * Protection classes in order of priority
-     *
-     * @var array
-     */
-    protected $protectors = [
-        'password' => PasswordProtector::class,
-        'ip_address' => IpProtector::class,
-        'logged_in' => LoggedInProtector::class,
-    ];
-
-    /**
-     * @param string $url
-     * @param array  $scheme
-     */
-    public function __construct($url, array $scheme, $siteWide)
+    public function getDefaultDriver()
     {
-        $this->url = $url;
-        $this->scheme = $scheme;
-        $this->siteWide = $siteWide;
+        return 'fallback';
     }
 
-    /**
-     * Provide protection
-     *
-     * @return void
-     */
-    public function protect($type)
+    public function createNullDriver()
     {
-        $this->getProtectionProvider($type)->protect();
+        return new NullProtector;
     }
 
-    /**
-     * Get the class that will provide protection
-     *
-     * @return Protector
-     */
-    protected function getProtectionProvider($type)
+    public function createFallbackDriver()
     {
-        $protector = $this->resolveProtector(
-            array_get($this->protectors, $type, NullProtector::class)
-        );
-
-        if (! $protector->providesProtection()) {
-            return $this->resolveProtector(NullProtector::class);
-        }
-
-        return $protector;
+        return new Fallback;
     }
 
-    /**
-     * Create an instance of a protector
-     *
-     * @param string $class
-     * @return Protector
-     */
-    protected function resolveProtector($class)
+    public function createAuthDriver()
     {
-        return new $class($this->url, $this->scheme, $this->siteWide);
+        return new Authenticated;
+    }
+
+    public function createIpAddressDriver()
+    {
+        return new IpAddress;
+    }
+
+    public function createPasswordDriver()
+    {
+        return new PasswordProtector;
     }
 }

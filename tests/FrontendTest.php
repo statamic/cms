@@ -79,20 +79,6 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
-    function pages_get_protected()
-    {
-        $this->markTestIncomplete(); // need to implement whole site protection
-
-        $page = $this->createPage('/');
-
-        config(['statamic.system.protect' => [
-            'type' => 'something'
-        ]]);
-
-        $this->get('/')->assertStatus(403);
-    }
-
-    /** @test */
     function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();

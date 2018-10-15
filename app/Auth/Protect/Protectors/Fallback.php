@@ -2,10 +2,10 @@
 
 namespace Statamic\Auth\Protect\Protectors;
 
-class NullProtector extends Protector
+class Fallback extends Protector
 {
     public function protect()
     {
-        // Do nothing.
+        abort(403);
     }
 }

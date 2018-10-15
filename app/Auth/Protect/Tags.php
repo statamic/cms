@@ -2,43 +2,33 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\API\URL;
-use Statamic\API\Request;
+use Illuminate\Support\ViewErrorBag;
 use Statamic\Extend\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    /**
-     * Password form
-     *
-     * @return string
-     */
     public function passwordForm()
     {
-        if (! $token = Request::get('token')) {
-            return $this->parse(['no_token' => true]);
+        if (! $token = request('token')) {
+            return $this->parse([
+                'errors' => [],
+                'no_token' => true
+            ]);
         }
 
-        $html = $this->formOpen('password');
+        $html = $this->formOpen(route('protect.password'));
 
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
+        $errors = session('errors', new ViewErrorBag)->passwordProtect;
+
         $html .= $this->parse([
-            'error' => session()->get('error')
+            'errors' => $errors->toArray(),
+            'error' => $errors->first()
         ]);
 
         $html .= '</form>';
 
         return $html;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function eventUrl($url, $relative = false)
-    {
-        return URL::prependSiteUrl(
-            config('statamic.routes.action') . '/protect/' . $url
-        );
     }
 }

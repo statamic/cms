@@ -2,26 +2,38 @@
 
 namespace Statamic\Auth\Protect\Protectors;
 
-interface Protector
+abstract class Protector
 {
-    /**
-     * Whether or not this provides protection.
-     *
-     * @return bool
-     */
-    public function providesProtection();
+    protected $url;
+    protected $data;
+    protected $scheme;
+    protected $config;
 
-    /**
-     * Provide protection
-     *
-     * @return void
-     */
-    public function protect();
+    public function setUrl($url)
+    {
+        $this->url = $url;
 
-    /**
-     * Deny access
-     *
-     * @return void
-     */
-    public function deny();
+        return $this;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function setScheme($scheme)
+    {
+        $this->scheme = $scheme;
+
+        return $this;
+    }
+
+    public function setConfig($config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Permissions\Role;
 use Statamic\Extensions\FileUserProvider;
+use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Permissions\UserGroup;
 use Statamic\Contracts\Permissions\RoleRepository;
 
@@ -30,6 +31,10 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(UserGroup::class, config('statamic.users.groups.group'));
+
+        $this->app->singleton(ProtectorManager::class, function ($app) {
+            return new ProtectorManager($app);
+        });
     }
 
     public function boot()
