@@ -6,10 +6,21 @@ class Marketplace
 {
     public function approvedAddons()
     {
-        return collect([
-            'addon/one',
-            'addon/two',
-            'addon/three',
-        ]);
+        return [
+            'data' => [
+                $this->addonPayload('addon/one'),
+                $this->addonPayload('addon/two'),
+                $this->addonPayload('addon/three'),
+            ]
+        ];
+    }
+
+    private function addonPayload($repo)
+    {
+        return [
+            'variants' => [
+                ['githubRepo' => $repo]
+            ]
+        ];
     }
 }
