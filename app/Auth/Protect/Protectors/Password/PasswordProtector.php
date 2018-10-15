@@ -8,8 +8,6 @@ use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 
 class PasswordProtector extends Protector
 {
-    protected $siteWide = false;
-
     /**
      * Provide protection
      *
@@ -25,9 +23,9 @@ class PasswordProtector extends Protector
             abort(403);
         }
 
-        // if ($this->isPasswordFormUrl()) {
-        //     return;
-        // }
+        if ($this->isPasswordFormUrl()) {
+            return;
+        }
 
         if (! $this->hasEnteredValidPassword()) {
             $this->redirectToPasswordForm();
@@ -41,10 +39,10 @@ class PasswordProtector extends Protector
         );
     }
 
-    // protected function isPasswordFormUrl()
-    // {
-    //     return $this->url === $this->getPasswordFormUrl();
-    // }
+    protected function isPasswordFormUrl()
+    {
+        return $this->url === $this->getPasswordFormUrl();
+    }
 
     protected function redirectToPasswordForm()
     {
@@ -55,7 +53,7 @@ class PasswordProtector extends Protector
 
     protected function getPasswordFormUrl()
     {
-        return $this->config['form_url'];
+        return url($this->config['form_url']);
     }
 
     protected function generateToken()

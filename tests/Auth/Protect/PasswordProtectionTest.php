@@ -68,4 +68,25 @@ class PasswordProtectionTest extends PageProtectionTestCase
             ->requestPageProtectedBy('password-scheme')
             ->assertStatus(403);
     }
+
+    /** @test */
+    function password_form_url_is_unprotected()
+    {
+        config(['statamic.routes.routes' => [
+            '/password-entry' => 'password-entry'
+        ]]);
+
+        config(['statamic.protect.default' => 'password-scheme']);
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'form_url' => '/password-entry',
+            'allowed' => ['test']
+        ]]);
+
+        Token::shouldReceive('generate')->andReturn('test-token');
+
+        $this
+            ->get('/password-entry')
+            ->assertOk();
+    }
 }
