@@ -210,8 +210,6 @@ abstract class Tags
             $attr_str .= 'enctype="multipart/form-data"';
         }
 
-        $action = $this->eventUrl($action);
-
         $html = '<form method="POST" action="'.$action.'" '.$attr_str.'>'.csrf_field();
 
         return $html;
