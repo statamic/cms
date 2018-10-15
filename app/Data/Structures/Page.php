@@ -98,7 +98,11 @@ class Page implements Entry
 
     public function toArray()
     {
-        return $this->entry()->toArray();
+        return array_merge($this->entry()->toArray(), [
+            'url' => $this->url(),
+            'url' => $this->uri(),
+            'permalink' => $this->absoluteUrl(),
+        ]);
     }
 
     public function editUrl()
