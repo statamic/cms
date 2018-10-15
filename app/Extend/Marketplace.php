@@ -2,8 +2,8 @@
 
 namespace Statamic\Extend;
 
-use Facades\App\Services\Composer;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
 
 class Marketplace
 {
@@ -12,36 +12,67 @@ class Marketplace
     /**
      * @var string
      */
-    protected $domain;
+    protected $domain = 'https://statamic.com';
+
+    /**
+     * @var int
+     */
+    protected $cacheForMinutes = 60;
+
+    /**
+     * @var bool
+     */
+    protected $verifySsl = true;
 
     /**
      * Instantiate marketplace API wrapper.
      */
     public function __construct()
     {
-        $this->domain = env('STATAMIC_DOMAIN') ?? 'https://statamic.com';
+        if ($domain = env('STATAMIC_DOMAIN')) {
+            $this->domain = $domain;
+            $this->cacheForMinutes = 0;
+            $this->verifySsl = false;
+        }
     }
 
     /**
      * Get marketplace approved addons.
+     *
+     * @return mixed
      */
     public function approvedAddons()
     {
+        return Cache::remember('marketplace-approved-addons', $this->cacheForMinutes, function () {
+            return (array) $this->request('addons');
+        });
+    }
+
+    /**
+     * Send API request.
+     *
+     * @param string $endpoint
+     * @param string $method
+     * @return mixed
+     */
+    protected function request($endpoint, $method = 'GET')
+    {
         $client = new Client;
-        $response = $client->get($this->api('addons'));
-        $addons = json_decode($response->getBody());
 
-        // Cache and return
+        $response = $client->request($method, $this->buildEndpoint($endpoint), [
+            'verify' => $this->verifySsl,
+        ]);
 
-        return $addons;
+        return json_decode($response->getBody());
     }
 
     /**
      * Build api endpoint.
      *
-     * @param string $endpoint
+     * @param string $uri
+     * @return string
      */
-    protected function api($endpoint)
+    protected function buildEndpoint($endpoint)
     {
         return collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
     }

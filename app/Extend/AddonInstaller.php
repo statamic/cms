@@ -8,24 +8,11 @@ use Facades\Statamic\Extend\Marketplace;
 class AddonInstaller
 {
     /**
-     * @var \Illuminate\Support\Collection;
-     */
-    public $approvedAddons;
-
-    /**
-     * Instantiate addon installer.
-     */
-    public function __construct()
-    {
-        $this->approvedAddons = Marketplace::approvedAddons();
-    }
-
-    /**
      * Get installable addons.
      */
     public function installable()
     {
-        return $this->approvedAddons->diff($this->installed());
+        return $this->approvedAddons()->diff($this->installed());
     }
 
     /**
@@ -35,7 +22,7 @@ class AddonInstaller
     {
         return Composer::installed()
             ->keys()
-            ->intersect($this->approvedAddons)
+            ->intersect($this->approvedAddons())
             ->values();
     }
 
@@ -65,5 +52,18 @@ class AddonInstaller
         }
 
         return Composer::remove($addon);
+    }
+
+    /**
+     * Get approved addon repositories.
+     *
+     * @return Illuminate\Support\Collection
+     */
+    protected function approvedAddons()
+    {
+        return collect(Marketplace::approvedAddons()['data'])
+            ->pluck('variants.*.githubRepo')
+            ->flatten()
+            ->unique();
     }
 }

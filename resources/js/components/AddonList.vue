@@ -72,19 +72,13 @@
             }
         },
 
-        computed: {
-            api() {
-                return this.domain + '/api/v1/marketplace';
-            }
-        },
-
         created() {
             this.rows = this.getAddons()
         },
 
         methods: {
             getAddons() {
-                this.axios.get(this.api + this.endpoints.addons).then(response => {
+                this.axios.get('/cp/marketplace/approved-addons').then(response => {
                     this.rows = response.data.data;
                     this.loaded = true;
                 });

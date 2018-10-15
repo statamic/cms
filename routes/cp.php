@@ -58,6 +58,9 @@ Route::group([
     Route::get('addons/installed', 'AddonsController@installed');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
+
+    // Marketplace
+    Route::get('marketplace/approved-addons', 'MarketplaceController@approvedAddons');
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');

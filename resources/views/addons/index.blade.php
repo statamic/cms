@@ -8,9 +8,6 @@
         <a href="" class="btn">{{ __('Refresh List') }}</a>
     </div>
 
-    <addon-list
-        domain="{{ env('STATAMIC_DOMAIN') ?? 'https://statamic.com' }}"
-        :endpoints="{'addons': '/addons'}">
-    </addon-list>
+    <addon-list></addon-list>
 
 @endsection
