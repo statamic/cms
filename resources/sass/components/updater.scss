@@ -48,12 +48,14 @@
 }
 
 .update-release {
-	.date {
-		color: $color_gray_light;
-        font-weight: normal;
+
+    .date {
+		@apply .font-normal .text-grey;
 	}
 
-	p { margin: 32px 0; }
+	p {
+        @apply .my-4;
+    }
 
 	ul {
 		margin: 0;
