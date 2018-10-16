@@ -6,9 +6,8 @@
                 <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
                 <span class="font-bold">{{ addon.seller.name }}</span>
             </a>
-            <button class="btn" @click="install">
-                Install Addon
-            </button>
+            <button class="btn" @click="install">Install Addon</button>
+            <button class="btn" @click="uninstall">Uninstall Addon</button>
         </div>
         <composer-output v-show="composer.status" class="m-3"></composer-output>
         <div v-if="! composer.status" class="p-4">{{ addon.variants[0].description }}</div>
@@ -55,7 +54,19 @@
                 });
 
                 this.$events.$emit('start-composer');
-            }
+            },
+
+            uninstall() {
+                axios.post('/cp/addons/uninstall', {'addon': this.package}, this.toEleven);
+
+                this.$store.commit('statamic/composer', {
+                    processing: true,
+                    status: 'Uninstalling ' + this.package,
+                    package: this.package,
+                });
+
+                this.$events.$emit('start-composer');
+            },
         }
     }
 </script>
