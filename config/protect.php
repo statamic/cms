@@ -47,13 +47,6 @@ return [
             'form_url' => '/password',
         ],
 
-        // 'admin_passwords' => [
-        //     'driver' => 'password',
-        //     'allowed' => ['admin', 'foobar123'],
-        //     'form_url' => '/password',
-        // ],
-
     ],
-
 
 ];
