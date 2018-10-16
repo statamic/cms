@@ -30,6 +30,10 @@
         },
 
         computed: {
+            toEleven() {
+                return {timeout: window.Statamic.ajaxTimeout};
+            },
+
             package() {
                 return this.addon.variants[0].githubRepo;
             },

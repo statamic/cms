@@ -117,7 +117,8 @@ class Statamic
                 'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
                 'conditions' => [],
                 'MediumEditorExtensions' => [],
-                'flash' => []
+                'flash' => [],
+                'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             ];
         }
 

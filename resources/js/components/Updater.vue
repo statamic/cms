@@ -85,6 +85,10 @@
     import axios from 'axios';
 
     export default {
+        props: [
+            'package',
+        ],
+
         data() {
             return {
                 gettingChangelog: false,
@@ -96,21 +100,9 @@
             };
         },
 
-        props: {
-            package: {
-                type: String,
-                required: true,
-            },
-
-            ajaxTimeout: {
-                type: Number,
-                default: 600000,
-            }
-        },
-
         computed: {
             toEleven() {
-                return {timeout: this.ajaxTimeout};
+                return {timeout: window.Statamic.ajaxTimeout};
             },
 
             composer() {
