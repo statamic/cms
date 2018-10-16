@@ -5,6 +5,7 @@ export default {
     state: {
         windowWidth: null,
         fieldtypes: null,
+        composer: {},
     },
 
     mutations: {
@@ -15,7 +16,11 @@ export default {
 
         fieldtypes(state, fieldtypes) {
             state.fieldtypes = fieldtypes;
-        }
+        },
+
+        composer(state, composer) {
+            state.composer = composer;
+        },
 
     }
 
