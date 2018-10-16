@@ -19,10 +19,6 @@ class PasswordProtector extends Protector
             abort(403);
         }
 
-        if (! array_get($this->config, 'form_url')) {
-            abort(403);
-        }
-
         if ($this->isPasswordFormUrl()) {
             return;
         }
@@ -53,7 +49,7 @@ class PasswordProtector extends Protector
 
     protected function getPasswordFormUrl()
     {
-        return url($this->config['form_url']);
+        return url($this->config['form_url'] ?? route('protect.password.show'));
     }
 
     protected function generateToken()

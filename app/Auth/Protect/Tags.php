@@ -16,7 +16,7 @@ class Tags extends BaseTags
             ]);
         }
 
-        $html = $this->formOpen(route('protect.password'));
+        $html = $this->formOpen(route('protect.password.store'));
 
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 

@@ -11,7 +11,6 @@ class PasswordProtectionTest extends PageProtectionTestCase
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'form_url' => '/password-entry',
             'allowed' => ['test']
         ]]);
 
@@ -19,7 +18,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
 
         $this
             ->requestPageProtectedBy('password-scheme')
-            ->assertRedirect('http://localhost/password-entry?token=test-token')
+            ->assertRedirect('http://localhost/!/protect/password?token=test-token')
             ->assertSessionHas('statamic:protect:password.tokens.test-token', [
                 'scheme' => 'password-scheme',
                 'url' => 'http://localhost/test',
@@ -27,11 +26,26 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
+    function password_form_url_can_be_overridden()
+    {
+        config(['statamic.protect.schemes.password-scheme' => [
+            'driver' => 'password',
+            'allowed' => ['test'],
+            'form_url' => '/password-entry',
+        ]]);
+
+        Token::shouldReceive('generate')->andReturn('test-token');
+
+        $this
+            ->requestPageProtectedBy('password-scheme')
+            ->assertRedirect('http://localhost/password-entry?token=test-token');
+    }
+
+    /** @test */
     function allow_access_if_password_has_been_entered_for_that_scheme()
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'form_url' => '/password-entry',
             'allowed' => ['the-password'],
         ]]);
 
@@ -43,34 +57,25 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function denies_access_if_no_form_url_is_defined()
+    function default_password_form_url_is_unprotected()
     {
+        $this->viewShouldReturnRendered('statamic::auth.protect.password', '');
+
+        config(['statamic.protect.default' => 'password-scheme']);
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'allowed' => ['the-password']
+            'allowed' => ['test']
         ]]);
 
+        Token::shouldReceive('generate')->andReturn('test-token');
+
         $this
-            ->requestPageProtectedBy('password-scheme')
-            ->assertStatus(403);
+            ->get('/!/protect/password')
+            ->assertOk();
     }
 
     /** @test */
-    function denies_access_if_no_passwords_are_defined()
-    {
-        config(['statamic.protect.schemes.password-scheme' => [
-            'driver' => 'password',
-            'form_url' => '/password-entry',
-            'allowed' => []
-        ]]);
-
-        $this
-            ->requestPageProtectedBy('password-scheme')
-            ->assertStatus(403);
-    }
-
-    /** @test */
-    function password_form_url_is_unprotected()
+    function custom_password_form_url_is_unprotected()
     {
         config(['statamic.routes.routes' => [
             '/password-entry' => 'password-entry'

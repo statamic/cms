@@ -10,7 +10,12 @@ class Controller extends BaseController
 {
     protected $tokenData;
 
-    public function password()
+    public function show()
+    {
+        return view('statamic::auth.protect.password');
+    }
+
+    public function store()
     {
         $this->password = request('password');
         $this->tokenData = session('statamic:protect:password.tokens.' . request('token'));
