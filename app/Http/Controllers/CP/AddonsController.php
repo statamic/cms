@@ -8,17 +8,18 @@ use Facades\Statamic\Extend\AddonInstaller;
 
 class AddonsController extends CpController
 {
+    public function __construct()
+    {
+        // Temporarily using PackToTheFuture to fake version tags until we get this hooked up to statamic/cms.
+        require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
+    }
+
     public function index()
     {
         return view('statamic::addons.index', [
             'title' => 'Addons'
         ]);
     }
-
-    // public function index()
-    // {
-    //     return Marketplace::approvedAddons();
-    // }
 
     public function installed()
     {
@@ -27,33 +28,15 @@ class AddonsController extends CpController
 
     public function install(Request $request)
     {
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setPackage($request->addon, '1.0.0'); // Temp!
+
         return AddonInstaller::install($request->addon);
     }
 
     public function uninstall(Request $request)
     {
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setPackage($request->addon, '1.0.0'); // Temp!
+
         return AddonInstaller::uninstall($request->addon);
     }
-
-    // Not sure if needed in this form?
-    // public function get()
-    // {
-    //     $addons = Addon::all()->map(function ($addon) {
-    //         return [
-    //             'id'            => $addon->id(),
-    //             'name'          => $addon->name(),
-    //             'url'           => $addon->url(),
-    //             'version'       => $addon->version(),
-    //             'developer'     => $addon->developer(),
-    //             'developer_url' => $addon->developerUrl(),
-    //             'description'   => $addon->description(),
-    //         ];
-    //     })->values();
-
-    //     return [
-    //         'columns' => ['name', 'version', 'developer', 'description'],
-    //         'items' => $addons,
-    //         'pagination' => ['totalPages' => 1]
-    //     ];
-    // }
 }

@@ -34,7 +34,7 @@ class AddonInstaller
     public function install(string $addon)
     {
         if (! $this->installable()->contains($addon)) {
-            throw new \Exception("{$addon} is not an installable package");
+            // throw new \Exception("{$addon} is not an installable package");
         }
 
         return Composer::require($addon);
@@ -48,7 +48,7 @@ class AddonInstaller
     public function uninstall(string $addon)
     {
         if (! $this->installed()->contains($addon)) {
-            throw new \Exception("{$addon} is not an uninstallable package");
+            // throw new \Exception("{$addon} is not an uninstallable package");
         }
 
         return Composer::remove($addon);
