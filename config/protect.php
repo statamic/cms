@@ -44,7 +44,7 @@ return [
         'password' => [
             'driver' => 'password',
             'allowed' => ['secret'],
-            'form_url' => '/password',
+            'form_url' => null,
         ],
 
     ],
