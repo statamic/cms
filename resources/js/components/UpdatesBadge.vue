@@ -1,5 +1,5 @@
 <template>
-    <span v-if="count" class="badge bg-red text-white rounded-full px-1">
+    <span v-if="count" class="badge">
         {{ count }}
     </span>
 </template>

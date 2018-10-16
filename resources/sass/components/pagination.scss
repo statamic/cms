@@ -16,27 +16,9 @@
 		&.previous,
 		&.next,
 		&.active,
-		&.active + li {
-			display: inline-block;
-
-			@include minWidth(400px) {
-				&.active + li + li,
-				&.active + li + li + li {
-					display: inline-block;
-				}
-			}
-			@include minWidth(500px) {
-				&.active + li + li + li + li,
-				&.active + li + li + li + li + li {
-					display: inline-block;
-				}
-			}
-		}
-
-		@include minWidth(600px) {
+		&.active li {
 			display: inline-block;
 		}
-
 
 		&.previous,
 		&.next {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   REDACTOR OVERRIDES
+   REDACTOR FIELDTYPE
    ========================================================================== */
 
 .redactor-box {
@@ -27,17 +27,8 @@
     background: $brand-primary;
 }
 
-// Our stylesheet hides checkboxes, and shows fancy ones with
-// special markup. This doesn't use the markup so it's hidden.
-// We'll just bring it back manually.
-#redactor-modal input[type=checkbox] {
-	display: inline-block;
-}
 
-
-
-
-/* Inside a Replicator Fieldtype
+/* Inside a Replicator field
   ========================================================================== */
 
 .replicator-fieldtype .redactor-fieldtype,
@@ -48,9 +39,7 @@
 }
 
 
-
-
-/* Inside a Grid Fieldtype
+/* Inside a Grid field
   ========================================================================== */
 
 .grid-fieldtype .grid-table .redactor-fieldtype {

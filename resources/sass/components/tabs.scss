@@ -1,12 +1,13 @@
+/* ==========================================================================
+   TABS
+   ========================================================================== */
+
 .tabs {
     @apply .bg-white .shadow .rounded-md .text-center .flex .w-full .overflow-hidden;
     height: 48px;
 
     a {
-        @apply .bg-grey-lightest .w-full .h-full .min-h-full .relative .flex-1 .flex .items-center .justify-center;
-        line-height: 1.25;
-        font-size: 15px;
-        padding: 4px 8px;
+        @apply .bg-grey-lightest .py-sm .px-1 .leading-tight .text-xs .w-full .h-full .min-h-full .relative .flex-1 .flex .items-center .justify-center;
         box-shadow: inset -1px 0 #e6ebf1;
     }
 
@@ -25,6 +26,10 @@
     }
 }
 
-@media (max-width: 640px) {
-    .tabs a { font-size: 13px; }
+
+/* Responsive Wangjangling
+  ========================================================================== */
+
+@screen md {
+    .tabs a { @apply .text-base; }
 }

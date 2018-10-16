@@ -23,6 +23,19 @@
         }
     }
 
+    tr.excess {
+        background: #f2f2f2;
+        .form-control,
+        textarea,
+        input {
+            &,
+            &[type="checkbox"] + label:before,
+            &[type="radio"] + label:before {
+                background: #fff;
+            }
+        }
+    }
+
 }
 
 .group-header {
@@ -85,7 +98,7 @@
         text-overflow: ellipsis;
         display: block;
         overflow: hidden;
-        max-width: 360px;
+        max-width: 160px;
 
         .sneak-peeking & {
             max-width: 160px;
@@ -93,28 +106,17 @@
     }
 }
 
-@media (max-width: 768px) {
+
+/* Responsive Wangjangling
+  ========================================================================== */
+
+@screen md {
     .replicator, .grid-fieldtype .grid-stacked {
         .replicator-set-summary {
-            max-width: 160px;
+            max-width: 360px;
         }
     }
 }
-
-tr.excess {
-    background: #f2f2f2;
-    .form-control,
-    textarea,
-    input {
-        &,
-        &[type="checkbox"] + label:before,
-        &[type="radio"] + label:before {
-            background: #fff;
-        }
-    }
-}
-
-
 
 
 /* Drag Interaction

@@ -1,3 +1,7 @@
+/* ==========================================================================
+   TABLES
+   ========================================================================== */
+
 .data-list-header {
     @apply py-1.5 pr-2 flex items-center;
 }
@@ -237,25 +241,6 @@ table.control {
     @apply select-none;
 }
 
-table.dossier,
-table.control {
-	margin-bottom: 0;
-	td > a {
-		// font-size: 16px;
-	}
-	thead tr {
-		@apply select-none;
-		border-bottom: 1px solid $color_border;
-	}
-    .stat {
-        display: inline-block;
-        margin-right: 5px;
-        min-width: 45px;
-        opacity: .5;
-        .icon { margin-right: 3px; }
-    }
-}
-
 .table-fieldtype table {
     .form-control,
     textarea,
@@ -268,17 +253,7 @@ table.control {
     }
 }
 
-.flat-top table.dossier,
-.flat-top table.control {
-	margin-top: 15px;
-	tr:first-child,
-	tr:first-child {
-		border-top: none;
-	}
-}
-
-.flush table.control,
-.flush table.dossier {
+.flush table.control {
     tr th:first-child {
         padding-left: 30px;
     }

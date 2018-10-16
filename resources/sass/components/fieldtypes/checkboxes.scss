@@ -1,12 +1,18 @@
+/* ==========================================================================
+   CHECKBOXES FIELDTYPE
+   ========================================================================== */
+
 .checkboxes-fieldtype {
     ul {
         @apply list-reset m-0;
     }
     li { margin-bottom: 5px; }
-    // li:last-child { margin-bottom: 0; }
 
     li label { margin: 0; }
 }
 
-// The Grid
+
+/* Inside a Grid field
+  ========================================================================== */
+
 .grid-fieldtype .checkboxes-fieldtype { padding: 10px }

@@ -1,3 +1,7 @@
+/* ==========================================================================
+   ARRAY FIELDTYPE
+   ========================================================================== */
+
 .array-fieldtype .row {
     margin-bottom: 8px;
 }
@@ -6,10 +10,12 @@
     margin-bottom: 0;
 }
 
-// Inside a grid
+
+/* Inside a Grid field
+  ========================================================================== */
+
 .grid-table .array-fieldtype {
 
-    // Applies to both modes
     .grid-table {
         margin-bottom: 0;
         tr:first-child {
@@ -22,7 +28,7 @@
         tr > :last-child { border-right: 0; }
     }
 
-    // Dynamic mode only
+    // Dynamic Mode
     .array-dynamic .btn {
         background: #f4f4f4;
         color: $brand-primary;
@@ -39,5 +45,4 @@
             top: 0;
         }
     }
-
 }

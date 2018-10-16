@@ -1,3 +1,7 @@
+/* ==========================================================================
+   YAML FIELDTYPE
+   ========================================================================== */
+
 .yaml-fieldtype-wrapper {
     position: relative;
 
@@ -27,6 +31,9 @@
         .CodeMirror-code { min-height: 100px; }
     }
 }
+
+/* Inside a Grid field
+  ========================================================================== */
 
 .grid-fieldtype .yaml-fieldtype-wrapper {
     > span {

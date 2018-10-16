@@ -1,3 +1,9 @@
+/* ==========================================================================
+   ENVIRONMENT FIELDTYPE
+   ========================================================================== */
+
+// @TODO: Remove dependency on .form-control, use a standard grey.
+
 .environment-field {
     @extend .form-control;
     color: #bbb;

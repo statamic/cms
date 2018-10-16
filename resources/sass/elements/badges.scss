@@ -1,5 +1,8 @@
+/* ==========================================================================
+   BADGES
+   ========================================================================== */
+
 .badge {
-    font-size: 11px;
-    font-weight: normal;
-    padding: 2px 6px;
+    @apply text-3xs roman bg-red text-white rounded-full;
+    padding: 2px 6px 1px;
 }

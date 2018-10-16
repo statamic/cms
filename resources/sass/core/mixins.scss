@@ -1,3 +1,7 @@
+/* ==========================================================================
+   MIXINS
+   ========================================================================== */
+
 @mixin button($background, $text: #fff) {
     @apply select-none border-0 rounded inline-block text-xs relative align-middle text-center;
     background: $background;
@@ -38,24 +42,6 @@
     background: #{$color} url(#{$imgpath}) $repeat $position;
 }
 
-// @TODO replace these with Tailwind @screen helpers
-@mixin minWidth($width) {
-    @media (min-width: #{$width}) {
-        @content;
-    }
-}
-
-@mixin maxWidth($width) {
-    @media (max-width: #{$width}) {
-        @content;
-    }
-}
-
-@mixin minMaxWidth($min, $max) {
-    @media (max-width:$max) and (min-width:$min) {
-        @content;
-    }
-}
 
 @mixin toolbar() {
     background: $color_gray_lighter;
