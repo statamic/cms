@@ -40,6 +40,11 @@ class Composer
         $this->putPackageIntoInstalled($package, $this->incrementVersion($this->installed->get($package)->version));
     }
 
+    public function clearOutputCache()
+    {
+        //
+    }
+
     private function putPackageIntoInstalled($package, $version = null)
     {
         if (is_null($version) && $this->installed->has($package)) {
