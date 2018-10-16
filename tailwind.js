@@ -24,6 +24,9 @@ var colors = {
     'purple':           '#c471ed',
 }
 
+// Set brand colors
+colors.primary = colors.blue;
+
 var units = {
     'px':  '1px',
     '0':   '0',

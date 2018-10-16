@@ -3,9 +3,7 @@
    ========================================================================== */
 
 .sweet-alert button {
-	border-radius: 3px;
-	font-size: 16px;
-	background: $brand-primary;
+	@apply .text-base .rounded .bg-primary;
 }
 
 .flashdance {
