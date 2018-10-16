@@ -7,9 +7,9 @@
                     Current Version: {{ currentVersion }}
                 </span>
             </h1>
-            <button v-if="(output || lastInstallLog) && ! modalOpen" class="btn" @click="$modal.show('output-modal')">
-                <template v-if="output.processing">
-                    {{ output.status }}
+            <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="$modal.show('output-modal')">
+                <template v-if="composer.processing">
+                    {{ composer.status }}
                     <span class="icon icon-circular-graph animation-spin ml-1"></span>
                 </template>
                 <template v-else>Last Install Log</template>
@@ -75,7 +75,7 @@
                 @opened="modalOpen = true; $events.$emit('start-composer')"
                 @closed="modalOpen = false"
             >
-                <composer-output :title="output.status" class="m-3"></composer-output>
+                <composer-output class="m-3"></composer-output>
             </modal>
         </portal>
     </div>
@@ -91,13 +91,17 @@
                 changelog: [],
                 currentVersion: null,
                 lastInstallLog: null,
-                output: false,
                 modalOpen: false,
                 onLatestVersion: false
             };
         },
 
         props: {
+            package: {
+                type: String,
+                required: true,
+            },
+
             ajaxTimeout: {
                 type: Number,
                 default: 600000,
@@ -109,9 +113,13 @@
                 return {timeout: this.ajaxTimeout};
             },
 
+            composer() {
+                return this.$store.state.statamic.composer;
+            },
+
             showActions() {
-                return ! this.gettingChangelog && ! this.output.processing;
-            }
+                return ! this.gettingChangelog && ! this.composer.processing;
+            },
         },
 
         mounted() {
@@ -137,10 +145,11 @@
             update() {
                 axios.post('/cp/updater/statamic/update', {}, this.toEleven);
 
-                this.output = {
+                this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Updating statamic/cms'
-                };
+                    status: 'Updating ' + this.package,
+                    package: this.package,
+                });
 
                 this.$modal.show('output-modal');
             },
@@ -148,10 +157,11 @@
             updateToLatest() {
                 axios.post('/cp/updater/statamic/update-to-latest', {}, this.toEleven);
 
-                this.output = {
+                this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Installing latest statamic/cms version'
-                };
+                    status: 'Installing latest ' + this.package + ' version',
+                    package: this.package,
+                });
 
                 this.$modal.show('output-modal');
             },
@@ -159,10 +169,11 @@
             installExplicitVersion(version) {
                 axios.post('/cp/updater/statamic/install-explicit-version', {'version': version}, this.toEleven);
 
-                this.output = {
+                this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Installing statamic/cms version ' + version
-                };
+                    status: 'Installing ' + this.package + ' version ' + version,
+                    package: this.package,
+                });
 
                 this.$modal.show('output-modal');
             },
@@ -170,10 +181,11 @@
             composerFinished() {
                 this.getChangelog();
 
-                this.output = {
+                this.$store.commit('statamic/composer', {
                     processing: false,
-                    status: 'Installation complete!'
-                };
+                    status: 'Installation complete!',
+                    package: this.package,
+                });
 
                 this.$events.$emit('recount-updates');
             },

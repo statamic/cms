@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="mb-2">
-            {{ title }}
+            <template v-if="composer.status">{{ composer.status }}</template>
             <span v-if="polling" class="icon icon-circular-graph animation-spin ml-1"></span>
         </p>
         <pre v-if="output" class="p-1 rounded bg-grey-lighter text-grey text-sm clearfix">{{ output }}</pre>
@@ -19,9 +19,11 @@
             };
         },
 
-        props: [
-            'title',
-        ],
+        computed: {
+            composer() {
+                return this.$store.state.statamic.composer;
+            }
+        },
 
         created() {
             this.$events.$on('start-composer', this.startComposer);
