@@ -27,6 +27,7 @@ Vue.component('entry-list', require('../components/EntryList.vue'));
 Vue.component('collection-list', require('../components/CollectionList.vue'));
 Vue.component('asset-container-list', require('../components/AssetContainerList.vue'));
 Vue.component('addon-list', require('../components/AddonList.vue'));
+Vue.component('addon-details', require('../components/AddonDetails.vue'));
 
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
