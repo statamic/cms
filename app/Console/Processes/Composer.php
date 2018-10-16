@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Processes;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
@@ -100,6 +101,14 @@ class Composer extends Process
         // return parent::lastCachedOutput("composer.{$package}");
 
         return parent::lastCachedOutput('composer');
+    }
+
+    /**
+     * Clear output cache.
+     */
+    public function clearOutputCache()
+    {
+        Cache::forget('composer');
     }
 
     /**

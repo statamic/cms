@@ -39,6 +39,10 @@ class CoreUpdater
      */
     public function updateToLatest()
     {
+        // It can take time to figure out the latest version constraint below,
+        // so here we preemptively clear the output cache for the composer ajax polling.
+        Composer::clearOutputCache();
+
         return Composer::require(Statamic::CORE_REPO, $this->latestVersionConstraint());
     }
 
