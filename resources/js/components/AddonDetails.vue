@@ -10,8 +10,8 @@
                 Install Addon
             </button>
         </div>
-        <composer-output v-show="output" :title="output.status" class="m-3"></composer-output>
-        <div v-if="! output" class="p-4">{{ addon.variants[0].description }}</div>
+        <composer-output v-show="composer.status" class="m-3"></composer-output>
+        <div v-if="! composer.status" class="p-4">{{ addon.variants[0].description }}</div>
     </div>
 </template>
 
@@ -26,24 +26,33 @@
 
         data() {
             return {
-                output: false,
+                //
             }
         },
 
+        computed: {
+            package() {
+                return this.addon.variants[0].githubRepo;
+            },
+
+            composer() {
+                return this.$store.state.statamic.composer;
+            },
+        },
+
         created() {
-            this.rows = this.getAddons()
+            //
         },
 
         methods: {
             install() {
-                var repo = addon.variants[0].githubRepo;
+                axios.post('/cp/addons/install', {'addon': this.package}, this.toEleven);
 
-                axios.post('/cp/addons/install', {'addon': repo}, this.toEleven);
-
-                this.output = {
+                this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Installing ' + repo,
-                };
+                    status: 'Installing ' + this.package,
+                    package: this.package,
+                });
 
                 this.$events.$emit('start-composer');
             }

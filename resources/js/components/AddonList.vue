@@ -59,7 +59,6 @@
                 searchQuery: '',
                 loaded: false,
                 showingAddon: false,
-                output: false,
             }
         },
 
@@ -85,9 +84,6 @@
                 this.$nextTick(() => {
                     this.$modal.show('addon-modal');
                 });
-            },
-
-            installAddon(addon) {
             },
         }
     }
