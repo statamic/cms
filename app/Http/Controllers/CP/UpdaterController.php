@@ -61,9 +61,9 @@ class UpdaterController extends CpController
         // Normally we can run this, but we can't require using a 2.10.* version constraint on a fake path repo.
         // return CoreUpdater::updateToLatest();
 
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.5'); // Temp!
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.6'); // Temp!
 
-        return CoreUpdater::installExplicitVersion('2.10.5');
+        return CoreUpdater::installExplicitVersion('2.10.6');
     }
 
     public function installExplicitVersion(Request $request)

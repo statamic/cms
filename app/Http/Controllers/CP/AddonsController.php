@@ -28,14 +28,14 @@ class AddonsController extends CpController
 
     public function install(Request $request)
     {
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setPackage($request->addon, '1.0.0'); // Temp!
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setAddon($request->addon, '1.0.0'); // Temp!
 
         return AddonInstaller::install($request->addon);
     }
 
     public function uninstall(Request $request)
     {
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setPackage($request->addon, '1.0.0'); // Temp!
+        \Tests\Fakes\Composer\Package\PackToTheFuture::setAddon($request->addon, '1.0.0'); // Temp!
 
         return AddonInstaller::uninstall($request->addon);
     }

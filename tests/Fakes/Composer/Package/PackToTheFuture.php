@@ -15,20 +15,52 @@ class PackToTheFuture
      */
     public static function setVersion(string $version)
     {
-        static::setPackage(static::DEFAULT_TEST_PACKAGE, $version);
+        static::generateComposerJson(static::DEFAULT_TEST_PACKAGE, $version);
     }
 
     /**
-     * Set custom package name and version on our test package.
+     * Set addon package name and version on our test package.
      *
      * @param string $package
      * @param string $version
      */
-    public static function setPackage(string $package, string $version)
+    public static function setAddon(string $package, string $version)
     {
-        File::put(__DIR__.'/test-package/composer.json', json_encode([
+        static::generateComposerJson($package, $version, [
+            'type' => 'statamic-addon',
+            "autoload" => [
+                "psr-4" => [
+                    "Statamic\\Providers\\" => "src"
+                ]
+            ],
+            "extra" => [
+                "statamic" => [
+                    "name" => "Example",
+                    "description" => "Example addon"
+                ],
+                "laravel" => [
+                    "providers" => [
+                        "Statamic\\Providers\\StatamicServiceProvider"
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Generate composer.json file for our test package.
+     *
+     * @param string $package
+     * @param string $version
+     * @param array $extra
+     */
+    private static function generateComposerJson(string $package, string $version, array $extra = [])
+    {
+        $content = array_merge([
             'name' => $package,
             'version' => $version,
-        ], JSON_UNESCAPED_SLASHES));
+        ], $extra);
+
+        File::put(__DIR__.'/test-package/composer.json', json_encode($content, JSON_UNESCAPED_SLASHES));
     }
 }
