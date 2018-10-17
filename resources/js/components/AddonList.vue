@@ -78,7 +78,15 @@
                 this.axios.get('/cp/marketplace/approved-addons').then(response => {
                     this.rows = response.data.data;
                     this.loaded = true;
+
+                    if (this.showingAddon) {
+                        this.refreshShowingAddon();
+                    }
                 });
+            },
+
+            refreshShowingAddon() {
+                this.showingAddon.installed = _.find(this.rows, {id: this.showingAddon.id}).installed;
             },
 
             getCover(addon) {
