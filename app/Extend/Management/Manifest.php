@@ -2,12 +2,13 @@
 
 namespace Statamic\Extend\Management;
 
-use ReflectionClass;
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\File;
+use Facades\Statamic\Extend\Marketplace;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest;
+use ReflectionClass;
+use Statamic\API\Arr;
+use Statamic\API\File;
+use Statamic\API\Str;
 
 class Manifest extends PackageManifest
 {
@@ -45,19 +46,23 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
+        $marketplaceData = Marketplace::findByGithubRepo($package['name']);
+
         return [
-            'id' => $id = Arr::last($providerParts),
+            'marketplace_product_id' => $marketplaceData->id,
+            'marketplace_variant_id' => $marketplaceData->variants[0]->id, // How to detect which variant ID they installed?
             'package' => $package['name'],
-            'name' => $statamic['name'] ?? $id,
-            'description' => $statamic['description'] ?? $package['description'] ?? null,
+            'version' => $package['version'], // Is this syncronized with git tag?
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,
-            'url' => $statamic['url'] ?? null,
-            'developer' => $statamic['developer'] ?? $author['name'] ?? null,
-            'developerUrl' => $statamic['developer-url'] ?? $author['homepage'] ?? null,
-            'email' => $package['support']['email'] ?? null,
-            'version' => $package['version'],
+            // 'id' => $id = Arr::last($providerParts),
+            // 'name' => $statamic['name'] ?? Arr::last($providerParts),
+            // 'description' => $statamic['description'] ?? $package['description'] ?? null,
+            // 'url' => $statamic['url'] ?? null,
+            // 'developer' => $statamic['developer'] ?? $author['name'] ?? null,
+            // 'developerUrl' => $statamic['developer-url'] ?? $author['homepage'] ?? null,
+            // 'email' => $package['support']['email'] ?? null,
         ];
     }
 

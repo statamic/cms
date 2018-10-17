@@ -49,6 +49,19 @@ class Marketplace
     }
 
     /**
+     * Find addon by github repo.
+     *
+     * @param string $githubRepo
+     * @return mixed
+     */
+    public function findByGithubRepo($githubRepo)
+    {
+        return collect($this->approvedAddons()['data'])->first(function ($addon) use ($githubRepo) {
+            return data_get($addon, 'variants.0.githubRepo') === $githubRepo;
+        });
+    }
+
+    /**
      * Send API request.
      *
      * @param string $endpoint
