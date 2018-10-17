@@ -69,6 +69,8 @@
 
         created() {
             this.rows = this.getAddons()
+
+            this.$events.$on('composer-finished', this.getAddons);
         },
 
         methods: {
