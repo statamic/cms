@@ -4,13 +4,13 @@
             <div class="data-list-header flex items-center card p-0">
                 <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
                 <div class="filter bg-white ml-3 mb-0">
-                    <a href="" class="active">Not Installed</a>
-                    <a href="">Installed</a>
-                    <a href="">All</a>
+                    <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }">Not Installed</a>
+                    <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }">Installed</a>
+                    <a @click="filter = 'all'" :class="{ active: filter == 'all' }">All</a>
                 </div>
             </div>
             <div class="addon-grid my-4">
-                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in addons" @click="showAddon(addon)">
+                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in filterAddons(addons)" @click="showAddon(addon)">
                     <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                     <div class="px-3 mb-2 relative text-center">
                         <a :href="addon.seller.website" class="relative">
@@ -57,12 +57,13 @@
             return {
                 rows: [],
                 searchQuery: '',
+                filter: 'installable',
                 loaded: false,
                 showingAddon: false,
                 searchableColumns: [
                     'name',
                     'seller', // TODO?
-                ]
+                ],
             }
         },
 
@@ -89,6 +90,16 @@
                     this.$modal.show('addon-modal');
                 });
             },
+
+            filterAddons(addons) {
+                if (this.filter === 'installable') {
+                    return _.reject(addons, (addon) => addon.installed);
+                } else if (this.filter === 'installed') {
+                    return _.filter(addons, (addon) => addon.installed);
+                }
+
+                return addons;
+            }
         }
     }
 </script>
