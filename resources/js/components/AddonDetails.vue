@@ -6,8 +6,8 @@
                 <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
                 <span class="font-bold">{{ addon.seller.name }}</span>
             </a>
-            <button class="btn" @click="install">Install Addon</button>
-            <button class="btn" @click="uninstall">Uninstall Addon</button>
+            <button v-if="addon.installed" class="btn" @click="uninstall">Uninstall Addon</button>
+            <button v-else class="btn" @click="install">Install Addon</button>
         </div>
         <composer-output v-show="composer.status" class="m-3"></composer-output>
         <div v-if="! composer.status" class="p-4">{{ addon.variants[0].description }}</div>
