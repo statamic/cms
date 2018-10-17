@@ -1,5 +1,5 @@
 <template>
-    <data-list :columns="[]" :rows="rows" :visible-columns="[]" :search-query="searchQuery" v-if="loaded">
+    <data-list :columns="searchableColumns" :rows="rows" :visible-columns="searchableColumns" :search-query="searchQuery" v-if="loaded">
         <div class="" slot-scope="{ rows: addons }">
             <div class="data-list-header flex items-center card p-0">
                 <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
@@ -59,6 +59,10 @@
                 searchQuery: '',
                 loaded: false,
                 showingAddon: false,
+                searchableColumns: [
+                    'name',
+                    'seller', // TODO?
+                ]
             }
         },
 
