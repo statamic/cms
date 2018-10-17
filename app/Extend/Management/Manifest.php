@@ -49,14 +49,14 @@ class Manifest extends PackageManifest
         $marketplaceData = Marketplace::findByGithubRepo($package['name']);
 
         return [
-            'marketplace_product_id' => $marketplaceData->id,
-            'marketplace_variant_id' => $marketplaceData->variants[0]->id, // How to detect which variant ID they installed?
+            'id' => Arr::last($providerParts),
+            'marketplace_product_id' => $marketplaceData['id'],
+            'marketplace_variant_id' => $marketplaceData['variants'][0]['id'], // How to detect which variant ID they installed?
             'package' => $package['name'],
             'version' => $package['version'], // Is this syncronized with git tag?
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,
-            // 'id' => $id = Arr::last($providerParts),
             // 'name' => $statamic['name'] ?? Arr::last($providerParts),
             // 'description' => $statamic['description'] ?? $package['description'] ?? null,
             // 'url' => $statamic['url'] ?? null,

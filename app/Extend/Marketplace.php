@@ -4,6 +4,7 @@ namespace Statamic\Extend;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Statamic\API\Addon;
 
 class Marketplace
 {
@@ -44,7 +45,7 @@ class Marketplace
     public function approvedAddons()
     {
         return Cache::remember('marketplace-approved-addons', $this->cacheForMinutes, function () {
-            return (array) $this->request('addons');
+            return $this->addLocalMetaToPayload($this->request('addons'));
         });
     }
 
@@ -76,7 +77,7 @@ class Marketplace
             'verify' => $this->verifySsl,
         ]);
 
-        return json_decode($response->getBody());
+        return json_decode($response->getBody(), true);
     }
 
     /**
@@ -88,5 +89,33 @@ class Marketplace
     protected function buildEndpoint($endpoint)
     {
         return collect([$this->domain, self::API_PREFIX, $endpoint])->implode('/');
+    }
+
+    /**
+     * Add local meta to whole payload.
+     *
+     * @param mixed $payload
+     * @return array
+     */
+    protected function addLocalMetaToPayload($payload)
+    {
+        $payload['data'] = collect($payload['data'])->map(function ($addon) {
+            return $this->addLocalMetaToAddon($addon);
+        });
+
+        return $payload;
+    }
+
+    /**
+     * Add local meta to addon paylod.
+     *
+     * @param array $addon
+     * @return array
+     */
+    protected function addLocalMetaToAddon($addon)
+    {
+        return array_merge($addon, [
+            'installed' => Addon::all()->keys()->contains($addon['variants'][0]['githubRepo']),
+        ]);
     }
 }
