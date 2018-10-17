@@ -4,13 +4,18 @@
         class="data-list-search-input"
         placeholder="Search..."
         :value="value"
-        @input="$emit('input', $event.target.value)"
+        @input="emitEvent"
     >
 </template>
 
 <script>
 export default {
-    props: ['value']
-    //TODO: Debouce the input
+    props: ['value'],
+
+    methods: {
+        emitEvent: _.debounce(function (event) {
+            this.$emit('input', event.target.value);
+        }, 300)
+    }
 }
 </script>
