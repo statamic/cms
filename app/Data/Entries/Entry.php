@@ -9,6 +9,7 @@ use Statamic\API\Config;
 use Statamic\API\Fieldset;
 use Statamic\Data\Content\Content;
 use Statamic\API\Entry as EntryAPI;
+use Statamic\Events\Data\EntrySaved;
 use League\Flysystem\FileNotFoundException;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Data\Content\HasLocalizedSlugsInData;
@@ -347,6 +348,8 @@ class Entry extends Content implements EntryContract
     public function save()
     {
         EntryAPI::save($this);
+
+        EntrySaved::dispatch($this, []);  // TODO: Test, and deal with second argument.
 
         return $this;
     }
