@@ -6,8 +6,8 @@ use Facades\Statamic\Extend\Marketplace;
 
 class MarketplaceController extends CpController
 {
-    public function approvedAddons()
+    public function addons()
     {
-        return Marketplace::approvedAddons();
+        return Marketplace::get();
     }
 }

@@ -75,7 +75,7 @@
 
         methods: {
             getAddons() {
-                this.axios.get('/cp/marketplace/approved-addons').then(response => {
+                this.axios.get('/cp/marketplace/addons').then(response => {
                     this.rows = response.data.data;
                     this.loaded = true;
 

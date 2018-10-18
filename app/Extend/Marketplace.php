@@ -4,7 +4,7 @@ namespace Statamic\Extend;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
-use Statamic\API\Addon;
+use Statamic\API\Addon as AddonAPI;
 
 class Marketplace
 {
@@ -38,14 +38,18 @@ class Marketplace
     }
 
     /**
-     * Get marketplace approved addons.
+     * Get addons.
      *
      * @return mixed
      */
-    public function approvedAddons()
+    public function get()
     {
-        return Cache::remember('marketplace-approved-addons', $this->cacheForMinutes, function () {
-            return $this->addLocalMetaToPayload($this->request('addons'));
+        return Cache::remember('marketplace-addons', $this->cacheForMinutes, function () {
+            $payload = $this->apiRequest('addons');
+            $payload = $this->addLocalMetaToPayload($payload);
+            $payload = $this->addLocalDevelopmentAddonsToPayload($payload);
+
+            return $payload;
         });
     }
 
@@ -57,7 +61,7 @@ class Marketplace
      */
     public function findByGithubRepo($githubRepo)
     {
-        return collect($this->approvedAddons()['data'])->first(function ($addon) use ($githubRepo) {
+        return collect($this->get()['data'])->first(function ($addon) use ($githubRepo) {
             return data_get($addon, 'variants.0.githubRepo') === $githubRepo;
         });
     }
@@ -69,7 +73,7 @@ class Marketplace
      * @param string $method
      * @return mixed
      */
-    protected function request($endpoint, $method = 'GET')
+    protected function apiRequest($endpoint, $method = 'GET')
     {
         $client = new Client;
 
@@ -115,7 +119,51 @@ class Marketplace
     protected function addLocalMetaToAddon($addon)
     {
         return array_merge($addon, [
-            'installed' => Addon::all()->keys()->contains($addon['variants'][0]['githubRepo']),
+            'installed' => AddonAPI::all()->keys()->contains($addon['variants'][0]['githubRepo']),
         ]);
+    }
+
+    /**
+     * Add local development addons to payload.
+     *
+     * @param array $payload
+     * @return array
+     */
+    protected function addLocalDevelopmentAddonsToPayload($payload)
+    {
+        AddonAPI::all()->reject->marketplaceProductId()->each(function ($addon) use (&$payload) {
+            $payload['data'][] = $this->buildAddonPayloadFromLocalData($addon);
+        });
+
+        return $payload;
+    }
+
+    /**
+     * Build addon payload from local data.
+     *
+     * @param Addon $addon
+     * @return array
+     */
+    protected function buildAddonPayloadFromLocalData(Addon $addon)
+    {
+        return [
+            'id' => $addon->id(),
+            'name' => $addon->name(),
+            'variants' => [
+                [
+                    'id' => $addon->id() . '-variant',
+                    'number' => 1,
+                    'description' => 'N/A',
+                    'assets' => [],
+                ]
+            ],
+            'seller' => [
+                'id' => $addon->id() . '-seller',
+                'name' => 'NA',
+                'website' => null,
+                'avatar' => null,
+            ],
+            'installed' => true,
+        ];
     }
 }

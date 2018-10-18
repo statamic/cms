@@ -21,11 +21,6 @@ class AddonsController extends CpController
         ]);
     }
 
-    public function installed()
-    {
-        return AddonInstaller::installed();
-    }
-
     public function install(Request $request)
     {
         \Tests\Fakes\Composer\Package\PackToTheFuture::setAddon($request->addon, '1.0.0'); // Temp!
