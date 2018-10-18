@@ -87,6 +87,8 @@
 
             refreshShowingAddon() {
                 this.showingAddon.installed = _.find(this.rows, {id: this.showingAddon.id}).installed;
+
+                this.$events.$emit('addon-refreshed');
             },
 
             getCover(addon) {

@@ -6,8 +6,8 @@
                 <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
                 <span class="font-bold">{{ addon.seller.name }}</span>
             </a>
-            <button v-if="addon.installed" class="btn" @click="uninstall">Uninstall Addon</button>
-            <button v-else class="btn" @click="install">Install Addon</button>
+            <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall">Uninstall Addon</button>
+            <button v-else class="btn" :disabled="processing" @click="install">Install Addon</button>
         </div>
         <composer-output v-show="composer.status" class="m-3"></composer-output>
         <div v-if="! composer.status" class="p-4">{{ addon.variants[0].description }}</div>
@@ -25,7 +25,7 @@
 
         data() {
             return {
-                //
+                waitingForRefresh: false,
             }
         },
 
@@ -41,15 +41,22 @@
             composer() {
                 return this.$store.state.statamic.composer;
             },
+
+            processing() {
+                return this.composer.processing || this.waitingForRefresh;
+            },
         },
 
         created() {
-            //
+            this.$events.$on('composer-finished', this.composerFinished);
+            this.$events.$on('addon-refreshed', this.addonRefreshed);
         },
 
         methods: {
             install() {
                 axios.post('/cp/addons/install', {'addon': this.package}, this.toEleven);
+
+                this.waitingForRefresh = true;
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -63,6 +70,8 @@
             uninstall() {
                 axios.post('/cp/addons/uninstall', {'addon': this.package}, this.toEleven);
 
+                this.waitingForRefresh = true;
+
                 this.$store.commit('statamic/composer', {
                     processing: true,
                     status: 'Uninstalling ' + this.package,
@@ -70,6 +79,18 @@
                 });
 
                 this.$events.$emit('start-composer');
+            },
+
+            composerFinished() {
+                this.$store.commit('statamic/composer', {
+                    processing: false,
+                    status: 'Operation complete!',
+                    package: this.package,
+                });
+            },
+
+            addonRefreshed() {
+                this.waitingForRefresh = false;
             },
         }
     }
