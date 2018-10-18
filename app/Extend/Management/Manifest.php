@@ -14,6 +14,8 @@ class Manifest extends PackageManifest
 {
     public function build()
     {
+        $this->manifest = null;
+
         $packages = [];
 
         if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
