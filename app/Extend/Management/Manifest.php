@@ -50,19 +50,21 @@ class Manifest extends PackageManifest
 
         return [
             'id' => Arr::last($providerParts),
-            'marketplace_product_id' => $marketplaceData['id'],
-            'marketplace_variant_id' => $marketplaceData['variants'][0]['id'], // How to detect which variant ID they installed?
+            'marketplaceProductId' => $marketplaceData['id'],
+            'marketplaceVariantId' => $marketplaceData['variants'][0]['id'], // How to detect which variant ID they installed?
             'package' => $package['name'],
             'version' => $package['version'], // Is this syncronized with git tag?
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,
-            // 'name' => $statamic['name'] ?? Arr::last($providerParts),
-            // 'description' => $statamic['description'] ?? $package['description'] ?? null,
-            // 'url' => $statamic['url'] ?? null,
-            // 'developer' => $statamic['developer'] ?? $author['name'] ?? null,
-            // 'developerUrl' => $statamic['developer-url'] ?? $author['homepage'] ?? null,
-            // 'email' => $package['support']['email'] ?? null,
+
+            // Local data for marketplace GUI?
+            'name' => $statamic['name'] ?? Arr::last($providerParts),
+            'url' => $statamic['url'] ?? null,
+            'description' => $statamic['description'] ?? $package['description'] ?? null,
+            'developer' => $statamic['developer'] ?? $author['name'] ?? null,
+            'developerUrl' => $statamic['developer-url'] ?? $author['homepage'] ?? null,
+            'email' => $package['support']['email'] ?? null,
         ];
     }
 
