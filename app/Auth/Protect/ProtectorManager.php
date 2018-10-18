@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth\Protect;
 
-use Illuminate\Support\Manager;
+use Statamic\Manager;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Statamic\Auth\Protect\Protectors\IpAddress;
 use Statamic\Auth\Protect\Protectors\Authenticated;
@@ -11,6 +11,21 @@ use Statamic\Auth\Protect\Protectors\Password\PasswordProtector;
 
 class ProtectorManager extends Manager
 {
+    protected function invalidImplementationMessage($name)
+    {
+        return "Protection scheme [{$name}] is not defined.";
+    }
+
+    protected function invalidDriverMessage($driver, $name)
+    {
+        return "Driver [{$driver}] in protection scheme [{$name}] is invalid.";
+    }
+
+    protected function getConfig($name)
+    {
+        return $this->app['config']["statamic.protect.schemes.$name"];
+    }
+
     public function getDefaultDriver()
     {
         return 'fallback';
@@ -26,18 +41,23 @@ class ProtectorManager extends Manager
         return new Fallback;
     }
 
-    public function createAuthDriver()
+    public function createAuthDriver($config, $name)
     {
-        return new Authenticated;
+        return $this->protector(new Authenticated, $name, $config);
     }
 
-    public function createIpAddressDriver()
+    public function createIpAddressDriver($config, $name)
     {
-        return new IpAddress;
+        return $this->protector(new IpAddress, $name, $config);
     }
 
-    public function createPasswordDriver()
+    public function createPasswordDriver($config, $name)
     {
-        return new PasswordProtector;
+        return $this->protector(new PasswordProtector, $name, $config);
+    }
+
+    protected function protector($class, $name, $config)
+    {
+        return $class->setConfig($config)->setScheme($name);
     }
 }

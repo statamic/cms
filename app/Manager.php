@@ -2,9 +2,10 @@
 
 namespace Statamic;
 
+use Closure;
 use InvalidArgumentException;
 
-class Manager
+abstract class Manager
 {
     protected $app;
     protected $drivers = [];
@@ -24,7 +25,7 @@ class Manager
 
     protected function get($name)
     {
-        return $this->stores[$name] ?? $this->resolve($name);
+        return $this->drivers[$name] ?? $this->resolve($name);
     }
     
     protected function resolve($name)
@@ -42,14 +43,21 @@ class Manager
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
         } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+            $driverMethod = 'create'.camel_case($config['driver']).'Driver';
 
             if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
+                return $this->{$driverMethod}($config, $name);
             } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
+                throw new InvalidArgumentException($this->invalidDriverMessage($config['driver'], $name));
             }
         }
+    }
+
+    public function extend($driver, Closure $callback)
+    {
+        $this->customCreators[$driver] = $callback->bindTo($this, $this);
+
+        return $this;
     }
 
     protected function callCustomCreator(array $config)
@@ -57,13 +65,17 @@ class Manager
         return $this->customCreators[$config['driver']]($this->app, $config);
     }
 
-    protected function getConfig($name)
-    {
-        return $this->app['config']["statamic.static_caching.strategies.{$name}"];
-    }
-
     protected function invalidImplementationMessage($name)
     {
         return "Implementation [{$name}] is not defined.";
     }
+
+    protected function invalidDriverMessage($driver, $name)
+    {
+        return "Driver [{$driver}] in implementation [{$name}] is invalid.";
+    }
+
+    abstract public function getDefaultDriver();
+
+    abstract protected function getConfig($name);
 }

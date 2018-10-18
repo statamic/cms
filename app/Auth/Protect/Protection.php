@@ -41,21 +41,11 @@ class Protection
             return $this->manager->driver('null');
         }
 
-        if (! $config = config("statamic.protect.schemes.{$scheme}")) {
-            $this->log("Invalid protection scheme [$scheme].");
-            return $this->manager->driver('fallback');
-        }
-
-        if (! $driver = $config['driver'] ?? null) {
-            $this->log("No driver provided in protection scheme [$scheme].");
-            return $this->manager->driver('fallback');
-        }
-
         try {
-            return $this->manager->driver($driver);
+            return $this->manager->driver($scheme);
         } catch (InvalidArgumentException $e) {
-            $this->log("Invalid driver [$driver] in protection scheme [$scheme].");
-            return $this->manager->driver('fallback');
+            $this->log($e->getMessage());
+            return $this->manager->createFallbackDriver();
         }
     }
 
@@ -64,8 +54,6 @@ class Protection
         $this->driver()
             ->setUrl($this->url())
             ->setData($this->data())
-            ->setScheme($this->scheme())
-            ->setConfig(config("statamic.protect.schemes.{$this->scheme()}"))
             ->protect();
     }
 

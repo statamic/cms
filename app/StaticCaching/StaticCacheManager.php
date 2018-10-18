@@ -38,7 +38,7 @@ class StaticCacheManager extends Manager
 
     protected function getConfig($name)
     {
-        if (! $config = parent::getConfig($name)) {
+        if (! $config = $this->app['config']["statamic.static_caching.strategies.$name"]) {
             return null;
         }
 
