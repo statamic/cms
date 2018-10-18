@@ -40,28 +40,33 @@ class Marketplace
     /**
      * Get addons.
      *
+     * @param boolean $addLocalData
      * @return mixed
      */
-    public function get()
+    public function get($addLocalData = true)
     {
-        return Cache::remember('marketplace-addons', $this->cacheForMinutes, function () {
-            $payload = $this->apiRequest('addons');
+        $payload = Cache::remember('marketplace-addons', $this->cacheForMinutes, function () {
+            return $this->apiRequest('addons');
+        });
+
+        if ($addLocalData) {
             $payload = $this->addLocalMetaToPayload($payload);
             $payload = $this->addLocalDevelopmentAddonsToPayload($payload);
+        }
 
-            return $payload;
-        });
+        return $payload;
     }
 
     /**
      * Find addon by github repo.
      *
      * @param string $githubRepo
+     * @param boolean $addLocalData
      * @return mixed
      */
-    public function findByGithubRepo($githubRepo)
+    public function findByGithubRepo($githubRepo, $addLocalData = true)
     {
-        return collect($this->get()['data'])->first(function ($addon) use ($githubRepo) {
+        return collect($this->get($addLocalData)['data'])->first(function ($addon) use ($githubRepo) {
             return data_get($addon, 'variants.0.githubRepo') === $githubRepo;
         });
     }
