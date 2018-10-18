@@ -92,7 +92,9 @@
             },
 
             getCover(addon) {
-                return (addon.variants[0].assets.length) ? addon.variants[0].assets[0].url : '';
+                return addon.variants[0].assets.length
+                    ? addon.variants[0].assets[0].url
+                    : 'https://statamic.com/images/img/marketplace/placeholder-addon.png';
             },
 
             showAddon(addon) {
