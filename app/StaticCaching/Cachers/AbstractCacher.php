@@ -1,11 +1,12 @@
 <?php
 
-namespace Statamic\StaticCaching;
+namespace Statamic\StaticCaching\Cachers;
 
 use Statamic\API\Str;
 use Statamic\API\Config;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Statamic\StaticCaching\Cacher;
 use Illuminate\Contracts\Cache\Repository;
 
 abstract class AbstractCacher implements Cacher

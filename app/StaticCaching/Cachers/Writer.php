@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\StaticCaching;
+namespace Statamic\StaticCaching\Cachers;
 
 use Statamic\API\File;
 use Statamic\API\Folder;

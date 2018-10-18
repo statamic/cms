@@ -2,55 +2,46 @@
 
 namespace Statamic\StaticCaching;
 
-use Illuminate\Cache\Repository;
-use Statamic\API\Config;
+use Illuminate\Support\Facades\Event;
+use Statamic\StaticCaching\Invalidator;
+use Statamic\StaticCaching\Middleware\Retrieve;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 class ServiceProvider extends LaravelServiceProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
     protected $defer = true;
 
-    /**
-     * Register services
-     *
-     * @return void
-     */
     public function register()
     {
-        $this->app->bind(Cacher::class, function () {
-            $cache = app(Repository::class);
-            $config = $this->getStaticCachingConfig();
-
-            return ($config['type'] === 'file')
-                ? new FileCacher(new Writer, $cache, $config)
-                : new ApplicationCacher($cache, $config);
+        $this->app->singleton(StaticCacheManager::class, function ($app) {
+            return new StaticCacheManager($app);
         });
+
+        $this->app->bind(Cacher::class, function ($app) {
+            return $app[StaticCacheManager::class]->driver();
+        });
+
+        $this->app->bind(Invalidator::class, function ($app) {
+            $class = config('statamic.static_caching.invalidation.class');
+
+            return new $class(
+                $app[Cacher::class],
+                $app['config']['statamic.static_caching.invalidation']
+            );
+        });
+    }
+
+    public function boot()
+    {
+        $this->app['router']->prependMiddlewareToGroup('web', Retrieve::class);
+
+        Event::subscribe(Invalidate::class);
 
         $this->commands(ClearStaticCommand::class);
     }
 
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
     public function provides()
     {
-        return [Cacher::class];
-    }
-
-    private function getStaticCachingConfig()
-    {
-        $config = config('statamic.static_caching');
-
-        $config['base_url'] = $this->app['request']->root();
-        $config['locale'] = site_locale();
-
-        return $config;
+        return [StaticCacheManager::class, Cacher::class];
     }
 }

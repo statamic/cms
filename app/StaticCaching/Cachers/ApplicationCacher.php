@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\StaticCaching;
+namespace Statamic\StaticCaching\Cachers;
 
 use Statamic\API\Config;
 use Illuminate\Http\Request;

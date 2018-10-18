@@ -44,13 +44,4 @@ interface Cacher
      * @return void
      */
     public function invalidateUrls($urls);
-
-    /**
-     * Get a config value
-     *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    public function config($key, $default = null);
 }

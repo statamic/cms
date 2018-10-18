@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Collection;
-use Statamic\StaticCaching\AbstractCacher;
+use Statamic\StaticCaching\Cachers\AbstractCacher;
 
 class CacherTest extends TestCase
 {

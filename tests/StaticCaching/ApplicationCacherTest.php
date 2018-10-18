@@ -5,7 +5,7 @@ namespace Tests\StaticCaching;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 use Illuminate\Contracts\Cache\Repository;
-use Statamic\StaticCaching\ApplicationCacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 
 class ApplicationCacherTest extends TestCase
 {

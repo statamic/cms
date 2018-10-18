@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 
 class Retrieve
@@ -26,10 +27,23 @@ class Retrieve
      */
     public function handle($request, Closure $next)
     {
-        if ($cached = $this->cacher->getCachedPage($request)) {
+        if ($this->canBeCached($request) && ($cached = $this->cacher->getCachedPage($request))) {
             return response($cached);
         }
 
         return $next($request);
+    }
+
+    protected function canBeCached($request)
+    {
+        if ($request->method() !== 'GET') {
+            return false;
+        }
+
+        if (Statamic::isCpRoute()) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\StaticCaching;
+namespace Statamic\StaticCaching\Cachers;
 
+use Statamic\API\File;
 use Statamic\API\Path;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Cache\Repository;
@@ -46,7 +47,7 @@ class FileCacher extends AbstractCacher
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
         }
-
+        
         $this->cacheUrl($this->makeHash($url), $url);
     }
 
@@ -56,8 +57,11 @@ class FileCacher extends AbstractCacher
      */
     public function getCachedPage(Request $request)
     {
-        // This method doesn't get used when using file-based static caching.
-        // The html file will get served before PHP even gets a chance.
+        $url  = $this->getUrl($request);
+
+        \Log::debug('Static cache loaded [' . $url . '] If you are seeing this, your server rewrite rules have not been set up correctly.');
+
+        return File::get($this->getFilePath($url));
     }
 
     /**
@@ -94,7 +98,7 @@ class FileCacher extends AbstractCacher
 
     public function getCachePaths()
     {
-        $paths = $this->config('file_path');
+        $paths = $this->config('path');
 
         if (! is_array($paths)) {
             $paths = [$this->config('locale') => $paths];
@@ -130,12 +134,10 @@ class FileCacher extends AbstractCacher
     {
         $parts = parse_url($url);
 
-        $path = sprintf('%s/%s_%s.html',
+        return sprintf('%s%s_%s.html',
             $this->getCachePath(),
             $parts['path'],
             array_get($parts, 'query', '')
         );
-
-        return Path::makeFull($path);
     }
 }

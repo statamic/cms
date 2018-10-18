@@ -39,7 +39,10 @@ class Cache
      */
     public function terminate($request, $response)
     {
-        if (! Config::get('statamic.caching.static_caching_enabled')) {
+        // Only GET requests should be cached. For instance, Live Preview hits frontend URLs as
+        // POST requests to preview the changes. We don't want those to trigger any caching,
+        // or else pending changes will be shown immediately, even without hitting save.
+        if ($request->method() !== 'GET') {
             return;
         }
 

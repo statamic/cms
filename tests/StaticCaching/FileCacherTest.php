@@ -4,8 +4,8 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Statamic\API\Path;
-use Statamic\StaticCaching\FileCacher;
-use Statamic\StaticCaching\Writer;
+use Statamic\StaticCaching\Cachers\FileCacher;
+use Statamic\StaticCaching\Cachers\Writer;
 use Tests\TestCase;
 
 class FileCacherTest extends TestCase
@@ -14,7 +14,7 @@ class FileCacherTest extends TestCase
     public function gets_cache_paths_when_multiple_paths_are_provided()
     {
         $cacher = $this->fileCacher([
-            'file_path' => [
+            'path' => [
                 'en' => 'test/path',
                 'fr' => 'fr/test/path'
             ]
@@ -31,7 +31,7 @@ class FileCacherTest extends TestCase
     {
         $cacher = $this->fileCacher([
             'locale' => 'en',
-            'file_path' => 'test/path'
+            'path' => 'test/path'
         ]);
 
         $this->assertEquals([
@@ -43,7 +43,7 @@ class FileCacherTest extends TestCase
     public function gets_cache_path()
     {
         $cacher = $this->fileCacher([
-            'file_path' => 'test/path'
+            'path' => 'test/path'
         ]);
 
         $this->assertEquals('test/path', $cacher->getCachePath());
@@ -53,16 +53,16 @@ class FileCacherTest extends TestCase
     public function gets_file_path_from_url()
     {
         $cacher = $this->fileCacher([
-            'file_path' => 'test/path'
+            'path' => 'test/path'
         ]);
 
         $this->assertEquals(
-            Path::makeFull('test/path/foo/bar_baz=qux&one=two.html'),
+            'test/path/foo/bar_baz=qux&one=two.html',
             $cacher->getFilePath('http://domain.com/foo/bar?baz=qux&one=two')
         );
 
         $this->assertEquals(
-            Path::makeFull('test/path/foo/bar_.html'),
+            'test/path/foo/bar_.html',
             $cacher->getFilePath('http://domain.com/foo/bar')
         );
     }
@@ -72,14 +72,14 @@ class FileCacherTest extends TestCase
     {
         $cacher = $this->fileCacher([
             'locale' => 'en',
-            'file_path' => [
+            'path' => [
                 'en' => 'test/path',
                 'fr' => 'fr/test/path'
             ]
         ]);
 
         $this->assertEquals(
-            Path::makeFull('test/path/foo/bar_.html'),
+            'test/path/foo/bar_.html',
             $cacher->getFilePath('http://domain.com/foo/bar')
         );
     }
@@ -91,7 +91,7 @@ class FileCacherTest extends TestCase
 
         $cacher = $this->fileCacher([
             'locale' => 'en',
-            'file_path' => [
+            'path' => [
                 'en' => 'test/path',
                 'fr' => 'fr/test/path'
             ]
