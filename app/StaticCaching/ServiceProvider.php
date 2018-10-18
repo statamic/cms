@@ -9,8 +9,6 @@ use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 class ServiceProvider extends LaravelServiceProvider
 {
-    protected $defer = true;
-
     public function register()
     {
         $this->app->singleton(StaticCacheManager::class, function ($app) {
@@ -38,10 +36,5 @@ class ServiceProvider extends LaravelServiceProvider
         Event::subscribe(Invalidate::class);
 
         $this->commands(ClearStaticCommand::class);
-    }
-
-    public function provides()
-    {
-        return [StaticCacheManager::class, Cacher::class];
     }
 }
