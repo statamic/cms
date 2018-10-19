@@ -20,7 +20,11 @@
 }
 
 .blueprint-section-field {
-    @apply border rounded my-1 bg-grey-lightest shadow-sm flex outline-none z-10;
+    @apply relative my-1 z-10;
+
+    .blueprint-section-field-inner {
+        @apply relative border rounded bg-grey-lightest shadow-sm flex outline-none z-10;
+    }
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -28,6 +32,14 @@
 
     &.draggable-mirror {
         @apply shadow-lg;
+    }
+}
+
+.blueprint-section-import {
+    &:before {
+        content: '';
+        @apply border rounded absolute bg-grey-lightest shadow-sm;
+        top: -3px; left: 3px; right: -3px; bottom: 3px; z-index: 1;
     }
 }
 

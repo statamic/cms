@@ -20,7 +20,7 @@
                     <ul class="pl-2">
                         <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>
                         <li><button class="text-blue" @click.prevent="">Create a new reusable field</button></li>
-                        <li><button class="text-blue" @click.prevent="">Import a fieldset</button></li>
+                        <li><button class="text-blue" @click="addImportField">Import a fieldset</button></li>
                     </ul>
                 </div>
 
@@ -116,7 +116,12 @@ export default {
         },
 
         addImportField() {
-
+            this.$emit('added', {
+                _id: uniqid(),
+                type: 'import',
+                fieldset: null,
+                prefix: null,
+            });
         }
 
     }

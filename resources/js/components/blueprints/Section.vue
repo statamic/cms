@@ -19,8 +19,9 @@
             <div class="p-2 flex flex-col flex-1">
 
                 <div class="blueprint-section-draggable-zone flex-1 mb-2">
-                    <blueprint-field
+                    <component
                         v-for="(field, i) in section.fields"
+                        :is="fieldComponent(field)"
                         :key="field._id"
                         :field="field"
                         :is-editing="editingField === field._id"
@@ -44,12 +45,14 @@
 
 <script>
 import AddField from './AddField.vue';
-import BlueprintField from './Field.vue';
+import RegularField from './RegularField.vue';
+import ImportField from './ImportField.vue';
 
 export default {
 
     components: {
-        BlueprintField,
+        RegularField,
+        ImportField,
         AddField,
     },
 
@@ -95,6 +98,10 @@ export default {
 
         deleteField(i) {
             this.section.fields.splice(i, 1);
+        },
+
+        fieldComponent(field) {
+            return (field.type === 'import') ? 'ImportField' : 'RegularField';
         }
 
     }

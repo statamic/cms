@@ -102,9 +102,17 @@ class BlueprintController extends CpController
 
     private function sectionField(array $submitted)
     {
-        return ($submitted['type'] === 'inline')
-            ? $this->inlineSectionField($submitted)
-            : $this->referenceSectionField($submitted);
+        $method = $submitted['type'] . 'SectionField';
+
+        return $this->$method($submitted);
+    }
+
+    private function importSectionField(array $submitted)
+    {
+        return array_filter([
+            'import' => $submitted['fieldset'],
+            'prefix' => $submitted['prefix'] ?? null
+        ]);
     }
 
     private function inlineSectionField(array $submitted)
@@ -148,6 +156,10 @@ class BlueprintController extends CpController
 
     private function fieldToVue($field): array
     {
+        if (isset($field['import'])) {
+            return $this->importFieldToVue($field);
+        }
+
         return (is_string($field['field']))
             ? $this->referenceFieldToVue($field)
             : $this->inlineFieldToVue($field);
@@ -177,6 +189,14 @@ class BlueprintController extends CpController
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $field['field']
+        ];
+    }
+
+    private function importFieldToVue($field): array
+    {
+        return [
+            'type' => 'import',
+            'fieldset' => $field['import']
         ];
     }
 
