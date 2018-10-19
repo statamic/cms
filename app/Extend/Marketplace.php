@@ -8,17 +8,20 @@ use Statamic\API\Addon as AddonAPI;
 
 class Marketplace
 {
+    /**
+     * @var string
+     */
     const API_PREFIX = 'api/v1/marketplace';
+
+    /**
+     * @var int
+     */
+    const CACHE_FOR_MINUTES = 60;
 
     /**
      * @var string
      */
     protected $domain = 'https://statamic.com';
-
-    /**
-     * @var int
-     */
-    protected $cacheForMinutes = 60;
 
     /**
      * @var bool
@@ -32,7 +35,6 @@ class Marketplace
     {
         if ($domain = env('STATAMIC_DOMAIN')) {
             $this->domain = $domain;
-            $this->cacheForMinutes = 0;
             $this->verifySsl = false;
         }
     }
@@ -45,7 +47,7 @@ class Marketplace
      */
     public function get($addLocalData = true)
     {
-        $payload = Cache::remember('marketplace-addons', $this->cacheForMinutes, function () {
+        $payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
             return $this->apiRequest('addons');
         });
 

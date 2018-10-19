@@ -61,9 +61,12 @@ class AddonInstaller
      */
     protected function approvedAddons()
     {
-        return collect(Marketplace::approvedAddons()['data'])
+        return collect(Marketplace::get()['data'])
             ->pluck('variants.*.githubRepo')
             ->flatten()
-            ->unique();
+            ->unique()
+            ->filter();
+
+        // Todo: doesn't currently output local addons!
     }
 }
