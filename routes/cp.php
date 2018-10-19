@@ -18,6 +18,9 @@ Route::group([
     Route::redirect('/', 'cp/dashboard')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
+    // Bringing back debugbar with this temp dummy route.
+    Route::get('user/edit', function () {})->name('user.edit');
+
     // Structures
     Route::resource('structures', 'StructuresController');
 
