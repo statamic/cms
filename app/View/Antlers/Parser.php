@@ -186,7 +186,7 @@ class Parser
         /**
          * $data_matches[][0][0] is the raw data loop tag
          * $data_matches[][0][1] is the offset of raw data loop tag
-         * $data_matches[][1][0] is the data variable (dot notated)
+         * $data_matches[][1][0] is the data variable
          * $data_matches[][1][1] is the offset of data variable
          * $data_matches[][2][0] is the content to be looped over
          * $data_matches[][2][1] is the offset of content to be looped over
@@ -342,9 +342,9 @@ class Parser
                     // retrieve the value of $var, otherwise, a no-value string
                     $val = $this->getVariable($var, $data, '__lex_no_value__');
 
-                    // we only want to keep going if either:
+                    // we only want to continue if:
                     //   - $val has no value according to the parser
-                    //   - $val *does* have a value, it's false-y *and* there are multiple options here *and* we're not on the last one
+                    //   - $val *does* have a value, it's falsey, there are multiple options, *and* we're not on the last one
                     if ($val === '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1))) {
                         continue;
                     } else {
@@ -354,8 +354,7 @@ class Parser
                             \Log::error("Cannot render an array variable as a string: {{ $var }}");
                         }
 
-                        // if variable is in the no-parse list, extract it
-                        // handles the very-special `|noparse` modifier
+                        // if variable is in the noparse list, extract it.
                         if (($var_pipe !== false && in_array('noparse', array_slice(explode('|', $var), 1))) || in_array($var_name, $noparse)) {
                             $text = $this->createExtraction('noparse', $data_matches[0][$index], $val, $text);
                         } else {
@@ -477,57 +476,33 @@ class Parser
                 $cb_data = $data + $this->callbackData;
             }
 
-            $selfClosed = false;
+            $content    = '';
             $parameters = [];
             $tag        = $match[0][0];
             $start      = $match[0][1];
             $name       = $match[1][0];
+            $selfClosed = array_get($match, 3, false);
+            $text_subselection = substr($text, $start + strlen($tag));
 
             if (isset($match[2])) {
                 $raw_params = $this->injectExtractions($match[2][0], '__cond_str');
                 $parameters = $this->parseParameters($raw_params, $cb_data, $callback);
-
-                // replace variables within parameters
-                // - we need make sure the parameter's parameters (for lack of a better term)
-                //   is an array. this is because if there are duplicate parameters, they
-                //   will be an array ($param_params).
-                foreach ($parameters as $param_key => $param_params) {
-                    foreach (Helper::ensureArray($param_params) as $param_value) {
-                        if (preg_match_all(
-                            '/(\{\s*' . $this->variableRegex . '\s*\})/',
-                            $param_value,
-                            $param_matches
-                        )) {
-                            $param_value = str_replace('{', '{{', $param_value);
-                            $param_value = str_replace('}', '}}', $param_value);
-                            $param_value = $this->parseVariables($param_value, $data);
-                            $parameters[$param_key] = $this->parseCallbackTags($param_value, $data, $callback);
-                        }
-                    }
-                }
+                $parameters = $this->parseVariablesInsideParameters($parameters, $data, $callback);
             }
 
-            if (isset($match[3])) {
-                $selfClosed = true;
-            }
-
-            $content = '';
-
-            $temp_text = substr($text, $start + strlen($tag));
-            if (preg_match('/\{\{\s*\/' . preg_quote($name, '/') . '\s*\}\}/m', $temp_text, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
-                $content = substr($temp_text, 0, $match[0][1]);
+            if (preg_match('/\{\{\s*\/' . preg_quote($name, '/') . '\s*\}\}/m', $text_subselection, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
+                $content = substr($text_subselection, 0, $match[0][1]);
                 $tag .= $content . $match[0][0];
 
                 // Is there a nested block under this one existing with the same name?
                 $nested_regex = '/\{\{\s*(' . preg_quote($name, '/') . ')(\s.*?)\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
                 if (preg_match($nested_regex, $content . $match[0][0], $nested_matches)) {
                     $nested_content = preg_replace('/\{\{\s*\/' . preg_quote($name, '/') . '\s*\}\}/m', '', $nested_matches[0]);
-                    $content        = $this->createExtraction('nested_looped_tags', $nested_content, $nested_content, $content);
+                    $content = $this->createExtraction('nested_looped_tags', $nested_content, $nested_content, $content);
                 }
             }
 
-            // we'll need this shortly.
-            $replacement = null;
+            $replacement = null; // oh look, another temporary variable.
 
             // now, check to see if a callback should happen
             if ($callback) {
@@ -561,7 +536,6 @@ class Parser
                         $total_results = count($values);
 
                         foreach ($values as $value_key => $value_value) {
-                            // increment index iterator
                             $i++;
 
                             // if this isn't an array, we need to make it one
@@ -622,6 +596,22 @@ class Parser
         }
 
         return $text;
+    }
+
+    /**
+     * Parses {variables} with single braces inside parameters
+     * making sure the parameter's parameters are an array in order to resolve duplicates.
+     */
+    public function parseVariablesInsideParameters($parameters, $data, $callback)
+    {
+        return collect($parameters)->map(function ($value) use ($data, $callback) {
+            preg_match_all('/(\{\s*' . $this->variableRegex . '\s*\})/', $value, $matches);
+
+            $value = str_replace(['{', '}'], ['{{', '}}'], $value);
+            $value = $this->parseVariables($value, $data);
+
+            return $this->parseCallbackTags($value, $data, $callback);
+        })->toArray();
     }
 
     /**
