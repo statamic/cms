@@ -154,15 +154,31 @@ class Parser
     }
 
     /**
-     * Recursively parses all of the variables in the given text and
-     * returns the parsed text.
+     * Recursively parses all of the variables in the given HTML markup.
      *
-     * @param  string       $text      Text to parse
-     * @param  array|object $data      Array or object to use
-     * @param  callable     $callback  Callback function to call
+     * @param  string       $html      The HTML markup
+     * @param  array|object $data      the data
+     * @param  callable     $callback  optional callback
      * @return string
      */
-    public function parseVariables($text, $data, $callback = null)
+    public function parseVariables($html, $data, $callback = null)
+    {
+        $html = $this->parseLoopVariables($html, $data, $callback);
+        $html = $this->parseStringVariables($html, $data, $callback);
+        $html = $this->parseVariablesWithParameterStyleModifiers($html, $data, $callback);
+
+        return $html;
+    }
+
+    /**
+     * Look for and parse array variables
+     *
+     * @param  string       $html      The HTML markup
+     * @param  array|object $data      the data
+     * @param  callable     $callback  optional callback
+     * @return string
+     */
+    public function parseLoopVariables($text, $data, $callback)
     {
         // Check for any vars flagged as noparse
         $noparse = array_get($data, '_noparse', []);
@@ -273,6 +289,22 @@ class Parser
             }
         }
 
+        return $text;
+    }
+
+    /**
+     * Look for and parse string variables
+     *
+     * @param  string       $html      The HTML markup
+     * @param  array|object $data      the data
+     * @param  callable     $callback  optional callback
+     * @return string
+     */
+    public function parseStringVariables($text, $data, $callback)
+    {
+        // Check for any vars flagged as noparse
+        $noparse = array_get($data, '_noparse', []);
+
         /**
          * $data_matches[0] is the raw data tag
          * $data_matches[1] is the data variable (dot notated)
@@ -339,8 +371,20 @@ class Parser
             }
         }
 
-        // we need to look for parameters on plain-old non-callback variable tags
-        // right now, this only applies to `format` parameters for dates
+        return $text;
+    }
+
+    /**
+     * Look for and parse variables with parameter style modifiers.
+     * Example: {{ date format="Y-m-d" }}
+     *
+     * @param  string       $html      The HTML markup
+     * @param  array|object $data      the data
+     * @param  callable     $callback  optional callback
+     * @return string
+     */
+    public function parseVariablesWithParameterStyleModifiers($text, $data, $callback)
+    {
         $regex = '/\{\{\s*(' . $this->looseVariableRegex . ')(\s+.*?)?\s*\}\}/ms';
 
         if (preg_match_all($regex, $text, $data_matches, PREG_SET_ORDER + PREG_OFFSET_CAPTURE)) {
