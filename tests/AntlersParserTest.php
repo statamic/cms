@@ -4,7 +4,7 @@ use Statamic\API\Term;
 use Statamic\API\Taxonomy;
 use Statamic\View\Antlers\Template as Antlers;
 
-class ParserTest extends TestCase
+class AntlersParserTest extends TestCase
 {
     private $variables;
 
