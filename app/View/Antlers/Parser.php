@@ -611,7 +611,7 @@ class Parser
             $value = $this->parseVariables($value, $data);
 
             return $this->parseCallbackTags($value, $data, $callback);
-        })->toArray();
+        })->all();
     }
 
     /**
