@@ -3,6 +3,8 @@
 namespace Statamic\Extend;
 
 use GuzzleHttp\Client;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\Addon as AddonAPI;
 
@@ -29,6 +31,11 @@ class Marketplace
     protected $verifySsl = true;
 
     /**
+     * @var string
+     */
+    protected $filter;
+
+    /**
      * Instantiate marketplace API wrapper.
      */
     public function __construct()
@@ -40,6 +47,19 @@ class Marketplace
     }
 
     /**
+     * Set filter.
+     *
+     * @param mixed $filter
+     * @return $this
+     */
+    public function filter($filter)
+    {
+        $this->filter = $filter;
+
+        return $this;
+    }
+
+    /**
      * Get addons.
      *
      * @param boolean $addLocalData
@@ -47,16 +67,43 @@ class Marketplace
      */
     public function get($addLocalData = true)
     {
-        $payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
+        $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
             return $this->apiRequest('addons');
         });
 
         if ($addLocalData) {
-            $payload = $this->addLocalMetaToPayload($payload);
-            $payload = $this->addLocalDevelopmentAddonsToPayload($payload);
+            $this->addLocalMetaToPayload();
+            $this->addLocalDevelopmentAddonsToPayload();
         }
 
-        return $payload;
+        if ($this->filter) {
+            $this->filterPayload();
+        }
+
+        return $this->payload;
+    }
+
+    /**
+     * Get paginated addons.
+     *
+     * We need to paginate after processing local filters (ie. installed, not installed, etc.),
+     * so we take the whole cached payload and paginate here in the app.
+     *
+     * @param int $perPage
+     * @return mixed
+     */
+    public function paginate($perPage)
+    {
+        $data = collect($this->get()['data']);
+
+        $currentPage = request()->input('page', 1);
+        $items = $data->forPage($currentPage, $perPage)->values();
+        $total = $data->count();
+        $options = ['path' => collect(explode('?', request()->getUri()))->first()];
+
+        return Resource::collection(
+            new LengthAwarePaginator($items, $total, $perPage, $currentPage, $options)
+        );
     }
 
     /**
@@ -104,17 +151,12 @@ class Marketplace
 
     /**
      * Add local meta to whole payload.
-     *
-     * @param mixed $payload
-     * @return array
      */
-    protected function addLocalMetaToPayload($payload)
+    protected function addLocalMetaToPayload()
     {
-        $payload['data'] = collect($payload['data'])->map(function ($addon) {
+        $this->payload['data'] = collect($this->payload['data'])->map(function ($addon) {
             return $this->addLocalMetaToAddon($addon);
         });
-
-        return $payload;
     }
 
     /**
@@ -133,16 +175,12 @@ class Marketplace
     /**
      * Add local development addons to payload.
      *
-     * @param array $payload
-     * @return array
      */
-    protected function addLocalDevelopmentAddonsToPayload($payload)
+    protected function addLocalDevelopmentAddonsToPayload()
     {
-        AddonAPI::all()->reject->marketplaceProductId()->each(function ($addon) use (&$payload) {
-            $payload['data'][] = $this->buildAddonPayloadFromLocalData($addon);
+        AddonAPI::all()->reject->marketplaceProductId()->each(function ($addon) {
+            $this->payload['data'][] = $this->buildAddonPayloadFromLocalData($addon);
         });
-
-        return $payload;
     }
 
     /**
@@ -172,5 +210,17 @@ class Marketplace
             ],
             'installed' => true,
         ];
+    }
+
+    /**
+     * Filter payload.
+     */
+    protected function filterPayload()
+    {
+        if ($this->filter === 'installable') {
+            $this->payload['data'] = collect($this->payload['data'])->reject->installed->values()->all();
+        } elseif ($this->filter === 'installed') {
+            $this->payload['data'] = collect($this->payload['data'])->filter->installed->values()->all();
+        }
     }
 }

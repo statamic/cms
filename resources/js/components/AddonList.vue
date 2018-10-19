@@ -4,13 +4,13 @@
             <div class="data-list-header flex items-center card p-0">
                 <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
                 <div class="filter bg-white ml-3 mb-0">
-                    <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }">Not Installed</a>
-                    <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }">Installed</a>
-                    <a @click="filter = 'all'" :class="{ active: filter == 'all' }">All</a>
+                    <a @click="setFilter('installable')" :class="{ active: filter == 'installable' }">Not Installed</a>
+                    <a @click="setFilter('installed')" :class="{ active: filter == 'installed' }">Installed</a>
+                    <a @click="setFilter('all')" :class="{ active: filter == 'all' }">All</a>
                 </div>
             </div>
             <div class="addon-grid my-4">
-                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in filterAddons(addons)" :key="addon.id" @click="showAddon(addon)">
+                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                     <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                     <div class="px-3 mb-2 relative text-center">
                         <a :href="addon.seller.website" class="relative">
@@ -20,7 +20,14 @@
                         <p v-text="addon.variants[0].summary" class="text-sm"></p>
                     </div>
                 </div>
+
             </div>
+
+            <!-- I see there's a pagination component, maybe I could tie into that instead -->
+            <template v-if="pagination.links">
+                <button class="btn" @click="currentPage--; getAddons">Previous Page</button>
+                <button class="btn" @click="currentPage++; getAddons">Next Page</button>
+            </template>
 
             <portal to="modals" v-if="showingAddon">
                 <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
@@ -56,8 +63,10 @@
         data() {
             return {
                 rows: [],
+                pagination: {},
                 searchQuery: '',
                 filter: 'installable',
+                currentPage: 1,
                 loaded: false,
                 showingAddon: false,
                 searchableColumns: [
@@ -73,11 +82,30 @@
             this.$events.$on('composer-finished', this.getAddons);
         },
 
+        watch: {
+            currentPage() {
+                this.getAddons();
+            }
+        },
+
         methods: {
             getAddons() {
-                this.axios.get('/cp/marketplace/addons').then(response => {
-                    this.rows = response.data.data;
+                this.loaded = false;
+
+                var params = {'page': this.currentPage};
+
+                if (this.filter !== 'all') {
+                    params.filter = this.filter;
+                }
+
+                axios.get('/cp/marketplace/addons', {'params': params}).then(response => {
                     this.loaded = true;
+                    this.rows = response.data.data;
+
+                    if (response.data.links) {
+                        this.pagination.links = response.data.links;
+                        this.pagination.meta = response.data.meta;
+                    }
 
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
@@ -105,14 +133,16 @@
                 });
             },
 
-            filterAddons(addons) {
-                if (this.filter === 'installable') {
-                    return _.reject(addons, (addon) => addon.installed);
-                } else if (this.filter === 'installed') {
-                    return _.filter(addons, (addon) => addon.installed);
+            setFilter(filter) {
+                this.currentPage = 1;
+
+                if (this.filter === filter) {
+                    return;
                 }
 
-                return addons;
+                this.filter = filter;
+
+                this.getAddons();
             }
         }
     }

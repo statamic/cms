@@ -3,11 +3,12 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Facades\Statamic\Extend\Marketplace;
+use Illuminate\Http\Request;
 
 class MarketplaceController extends CpController
 {
-    public function addons()
+    public function addons(Request $request)
     {
-        return Marketplace::get();
+        return Marketplace::filter($request->filter)->paginate(30);
     }
 }
