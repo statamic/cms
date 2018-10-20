@@ -52,15 +52,21 @@ class Marketplace
     }
 
     /**
-     * Query for payload.
+     * Query and cache payload from statamic.com marketplace API, then add local data to payload.
      *
+     * @param bool $addLocalData
      * @return $this
      */
-    public function query()
+    public function query($addLocalData = true)
     {
         $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
             return $this->apiRequest('addons');
         });
+
+        if ($addLocalData) {
+            $this->addLocalMetaToPayload();
+            $this->addLocalDevelopmentAddonsToPayload();
+        }
 
         return $this;
     }
@@ -94,17 +100,11 @@ class Marketplace
     /**
      * Get addons.
      *
-     * @param boolean $addLocalData
      * @return mixed
      */
-    public function get($addLocalData = true)
+    public function get()
     {
         $this->query();
-
-        if ($addLocalData) {
-            $this->addLocalMetaToPayload();
-            $this->addLocalDevelopmentAddonsToPayload();
-        }
 
         if ($this->filter) {
             $this->filterPayload();
@@ -119,9 +119,6 @@ class Marketplace
 
     /**
      * Get paginated addons.
-     *
-     * We need to paginate after processing local filters (ie. installed, not installed, etc.),
-     * so we take the whole cached payload and paginate here in the app.
      *
      * @param int $perPage
      * @return mixed
@@ -141,15 +138,14 @@ class Marketplace
     }
 
     /**
-     * Find addon by github repo.
+     * Find addon by github repo (ie. 'vendor/package').
      *
      * @param string $githubRepo
-     * @param boolean $addLocalData
      * @return mixed
      */
-    public function findByGithubRepo($githubRepo, $addLocalData = true)
+    public function findByGithubRepo($githubRepo)
     {
-        return collect($this->get($addLocalData)['data'])->first(function ($addon) use ($githubRepo) {
+        return collect($this->get()['data'])->first(function ($addon) use ($githubRepo) {
             return data_get($addon, 'variants.0.githubRepo') === $githubRepo;
         });
     }

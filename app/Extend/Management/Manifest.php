@@ -48,7 +48,7 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $marketplaceData = Marketplace::findByGithubRepo($package['name'], false);
+        $marketplaceData = Marketplace::query(false)->findByGithubRepo($package['name']);
 
         return [
             'id' => Arr::last($providerParts),
