@@ -62,7 +62,9 @@ Route::group([
     Route::post('addons/uninstall', 'AddonsController@uninstall');
 
     // Local API
-    Route::resource('api/addons', 'Api\AddonsController');
+    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
+        Route::resource('addons', 'AddonsController');
+    });
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');
