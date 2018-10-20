@@ -48,12 +48,12 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $marketplaceData = Marketplace::query(false)->findByGithubRepo($package['name']);
+        $marketplaceData = Marketplace::withoutLocalData()->findByGithubRepo($package['name']);
 
         return [
             'id' => Arr::last($providerParts),
-            'marketplaceProductId' => $marketplaceData['id'],
-            'marketplaceVariantId' => $marketplaceData['variants'][0]['id'], // How to detect which variant ID they installed?
+            'marketplaceProductId' => data_get($marketplaceData, 'id', null),
+            'marketplaceVariantId' => data_get($marketplaceData, 'variants.0.id', null), // How to detect which variant ID they installed?
             'package' => $package['name'],
             'version' => $package['version'], // Is this syncronized with git tag?
             'namespace' => $namespace,

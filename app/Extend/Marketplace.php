@@ -31,6 +31,11 @@ class Marketplace
     protected $verifySsl = true;
 
     /**
+     * @var bool
+     */
+    protected $addLocalData = true;
+
+    /**
      * @var string
      */
     protected $filter;
@@ -54,19 +59,30 @@ class Marketplace
     /**
      * Query and cache payload from statamic.com marketplace API, then add local data to payload.
      *
-     * @param bool $addLocalData
      * @return $this
      */
-    public function query($addLocalData = true)
+    public function query()
     {
         $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
             return $this->apiRequest('addons');
         });
 
-        if ($addLocalData) {
+        if ($this->addLocalData) {
             $this->addLocalDataToPayload();
             $this->addLocalDevelopmentAddonsToPayload();
         }
+
+        return $this;
+    }
+
+    /**
+     * Query without local data.
+     *
+     * @return $this
+     */
+    public function withoutLocalData()
+    {
+        $this->addLocalData = false;
 
         return $this;
     }
