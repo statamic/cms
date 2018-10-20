@@ -52,6 +52,20 @@ class Marketplace
     }
 
     /**
+     * Query for payload.
+     *
+     * @return $this
+     */
+    public function query()
+    {
+        $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
+            return $this->apiRequest('addons');
+        });
+
+        return $this;
+    }
+
+    /**
      * Set filter.
      *
      * @param mixed $filter
@@ -85,9 +99,7 @@ class Marketplace
      */
     public function get($addLocalData = true)
     {
-        $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
-            return $this->apiRequest('addons');
-        });
+        $this->query();
 
         if ($addLocalData) {
             $this->addLocalMetaToPayload();

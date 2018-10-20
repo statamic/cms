@@ -104,7 +104,7 @@
 
         methods: {
             getAddons() {
-                axios.get('/cp/marketplace/addons', {'params': this.params}).then(response => {
+                axios.get('/cp/api/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
                     this.rows = response.data.data;
                     this.pagination.links = response.data.links;
