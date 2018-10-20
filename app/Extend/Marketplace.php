@@ -36,6 +36,11 @@ class Marketplace
     protected $filter;
 
     /**
+     * @var string
+     */
+    protected $searchQuery;
+
+    /**
      * Instantiate marketplace API wrapper.
      */
     public function __construct()
@@ -60,6 +65,19 @@ class Marketplace
     }
 
     /**
+     * Set search query.
+     *
+     * @param mixed $searchQuery
+     * @return $this
+     */
+    public function search($searchQuery)
+    {
+        $this->searchQuery = $searchQuery;
+
+        return $this;
+    }
+
+    /**
      * Get addons.
      *
      * @param boolean $addLocalData
@@ -78,6 +96,10 @@ class Marketplace
 
         if ($this->filter) {
             $this->filterPayload();
+        }
+
+        if ($this->searchQuery) {
+            $this->searchPayload();
         }
 
         return $this->payload;
@@ -222,5 +244,34 @@ class Marketplace
         } elseif ($this->filter === 'installed') {
             $this->payload['data'] = collect($this->payload['data'])->filter->installed->values()->all();
         }
+    }
+
+    /**
+     * Search payload.
+     */
+    protected function searchPayload()
+    {
+        $this->payload['data'] = collect($this->payload['data'])
+             ->filter(function ($addon) {
+                 return $this->searchProperty($addon['name'])
+                     || $this->searchProperty($addon['seller']['name'] ?? true);
+             })
+             ->values()
+             ->all();
+    }
+
+    /**
+     * Search property.
+     *
+     * @param mixed $property
+     * @return bool
+     */
+    protected function searchProperty($property)
+    {
+        if ($property === true) {
+            return true;
+        }
+
+        return str_contains(strtolower($property), $this->searchQuery);
     }
 }

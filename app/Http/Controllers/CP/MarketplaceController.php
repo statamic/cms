@@ -9,6 +9,6 @@ class MarketplaceController extends CpController
 {
     public function addons(Request $request)
     {
-        return Marketplace::filter($request->filter)->paginate(30);
+        return Marketplace::filter($request->filter)->search($request->q)->paginate(30);
     }
 }

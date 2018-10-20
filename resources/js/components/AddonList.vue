@@ -1,5 +1,5 @@
 <template>
-    <data-list :columns="searchableColumns" :rows="rows" :visible-columns="searchableColumns" :search-query="searchQuery" v-if="loaded">
+    <data-list :columns="[]" :rows="rows" :visible-columns="[]" v-if="loaded">
         <div class="" slot-scope="{ rows: addons }">
             <div class="data-list-header flex items-center card p-0">
                 <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
@@ -25,8 +25,8 @@
 
             <!-- I see there's a pagination component, maybe I could tie into that instead -->
             <template v-if="pagination.links">
-                <button class="btn" @click="currentPage--; getAddons">Previous Page</button>
-                <button class="btn" @click="currentPage++; getAddons">Next Page</button>
+                <button class="btn" @click="page--; getAddons">Previous Page</button>
+                <button class="btn" @click="page++; getAddons">Next Page</button>
             </template>
 
             <portal to="modals" v-if="showingAddon">
@@ -62,50 +62,53 @@
 
         data() {
             return {
+                loaded: false,
                 rows: [],
                 pagination: {},
                 searchQuery: '',
                 filter: 'installable',
-                currentPage: 1,
-                loaded: false,
+                page: 1,
                 showingAddon: false,
-                searchableColumns: [
-                    'name',
-                    'seller', // TODO?
-                ],
+            }
+        },
+
+        computed: {
+            params() {
+                return {
+                    page: this.page,
+                    filter: this.filter,
+                    q: this.searchQuery,
+                };
             }
         },
 
         created() {
-            this.rows = this.getAddons()
+            this.rows = this.getAddons();
 
             this.$events.$on('composer-finished', this.getAddons);
         },
 
         watch: {
-            currentPage() {
+            page() {
                 this.getAddons();
-            }
+            },
+
+            searchQuery() {
+                this.page = 1;
+
+                this.$nextTick(function () {
+                    this.getAddons();
+                });
+            },
         },
 
         methods: {
             getAddons() {
-                this.loaded = false;
-
-                var params = {'page': this.currentPage};
-
-                if (this.filter !== 'all') {
-                    params.filter = this.filter;
-                }
-
-                axios.get('/cp/marketplace/addons', {'params': params}).then(response => {
+                axios.get('/cp/marketplace/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
                     this.rows = response.data.data;
-
-                    if (response.data.links) {
-                        this.pagination.links = response.data.links;
-                        this.pagination.meta = response.data.meta;
-                    }
+                    this.pagination.links = response.data.links;
+                    this.pagination.meta = response.data.meta;
 
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
@@ -134,16 +137,15 @@
             },
 
             setFilter(filter) {
-                this.currentPage = 1;
-
                 if (this.filter === filter) {
                     return;
                 }
 
+                this.page = 1;
                 this.filter = filter;
 
                 this.getAddons();
-            }
+            },
         }
     }
 </script>
