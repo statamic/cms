@@ -24,7 +24,7 @@
             </div>
 
             <!-- I see there's a pagination component, maybe I could tie into that instead -->
-            <template v-if="pagination.links">
+            <template v-if="links">
                 <button class="btn" @click="page--; getAddons">Previous Page</button>
                 <button class="btn" @click="page++; getAddons">Next Page</button>
             </template>
@@ -64,7 +64,8 @@
             return {
                 loaded: false,
                 rows: [],
-                pagination: {},
+                links: {},
+                meta: {},
                 searchQuery: '',
                 filter: 'installable',
                 page: 1,
@@ -107,8 +108,8 @@
                 axios.get('/cp/api/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
                     this.rows = response.data.data;
-                    this.pagination.links = response.data.links;
-                    this.pagination.meta = response.data.meta;
+                    this.links = response.data.links;
+                    this.meta = response.data.meta;
 
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
@@ -117,7 +118,7 @@
             },
 
             refreshShowingAddon() {
-                this.showingAddon.installed = _.find(this.rows, {id: this.showingAddon.id}).installed;
+                this.showingAddon.installed = _.contains(this.meta.installed, this.showingAddon.variants[0].githubRepo);
 
                 this.$events.$emit('addon-refreshed');
             },

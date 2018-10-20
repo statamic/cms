@@ -64,7 +64,7 @@ class Marketplace
         });
 
         if ($addLocalData) {
-            $this->addLocalMetaToPayload();
+            $this->addLocalDataToPayload();
             $this->addLocalDevelopmentAddonsToPayload();
         }
 
@@ -132,9 +132,9 @@ class Marketplace
         $total = $data->count();
         $options = ['path' => collect(explode('?', request()->getUri()))->first()];
 
-        return Resource::collection(
-            new LengthAwarePaginator($items, $total, $perPage, $currentPage, $options)
-        );
+        $paginator = new LengthAwarePaginator($items, $total, $perPage, $currentPage, $options);
+
+        return Resource::collection($paginator)->additional($this->installedMeta());
     }
 
     /**
@@ -180,22 +180,22 @@ class Marketplace
     }
 
     /**
-     * Add local meta to whole payload.
+     * Add local data to whole payload.
      */
-    protected function addLocalMetaToPayload()
+    protected function addLocalDataToPayload()
     {
         $this->payload['data'] = collect($this->payload['data'])->map(function ($addon) {
-            return $this->addLocalMetaToAddon($addon);
+            return $this->addLocalDataToAddon($addon);
         });
     }
 
     /**
-     * Add local meta to addon paylod.
+     * Add local data to addon paylod.
      *
      * @param array $addon
      * @return array
      */
-    protected function addLocalMetaToAddon($addon)
+    protected function addLocalDataToAddon($addon)
     {
         return array_merge($addon, [
             'installed' => AddonAPI::all()->keys()->contains($addon['variants'][0]['githubRepo']),
@@ -281,5 +281,19 @@ class Marketplace
         }
 
         return str_contains(strtolower($property), $this->searchQuery);
+    }
+
+    /**
+     * Get installed addon meta.
+     *
+     * @return array
+     */
+    protected function installedMeta()
+    {
+        return [
+            'meta' => [
+                'installed' => AddonAPI::all()->keys()->all()
+            ]
+        ];
     }
 }
