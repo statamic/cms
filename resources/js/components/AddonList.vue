@@ -4,9 +4,9 @@
             <div class="data-list-header flex items-center card p-0">
                 <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
                 <div class="filter bg-white ml-3 mb-0">
-                    <a @click="setFilter('installable')" :class="{ active: filter == 'installable' }">Not Installed</a>
-                    <a @click="setFilter('installed')" :class="{ active: filter == 'installed' }">Installed</a>
-                    <a @click="setFilter('all')" :class="{ active: filter == 'all' }">All</a>
+                    <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }">Not Installed</a>
+                    <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }">Installed</a>
+                    <a @click="filter = 'all'" :class="{ active: filter == 'all' }">All</a>
                 </div>
             </div>
             <div class="addon-grid my-4">
@@ -83,12 +83,6 @@
             }
         },
 
-        created() {
-            this.rows = this.getAddons();
-
-            this.$events.$on('composer-finished', this.getAddons);
-        },
-
         watch: {
             page() {
                 this.getAddons();
@@ -96,11 +90,19 @@
 
             searchQuery() {
                 this.page = 1;
-
-                this.$nextTick(function () {
-                    this.getAddons();
-                });
+                this.getAddons();
             },
+
+            filter() {
+                this.page = 1;
+                this.getAddons();
+            },
+        },
+
+        created() {
+            this.rows = this.getAddons();
+
+            this.$events.$on('composer-finished', this.getAddons);
         },
 
         methods: {
@@ -135,17 +137,6 @@
                 this.$nextTick(() => {
                     this.$modal.show('addon-modal');
                 });
-            },
-
-            setFilter(filter) {
-                if (this.filter === filter) {
-                    return;
-                }
-
-                this.page = 1;
-                this.filter = filter;
-
-                this.getAddons();
             },
         }
     }
