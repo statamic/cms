@@ -307,6 +307,8 @@ class CascadeTest extends TestCase
             ->get();
         $cascade = $this->cascade()->withContent($page);
 
+        $this->assertEquals($page, $cascade->content());
+
         tap($cascade->hydrate()->toArray(), function ($cascade) use ($vars) {
             $this->assertArrayHasKey('page', $cascade);
             $this->assertArraySubset($vars, $cascade['page']);
@@ -366,6 +368,32 @@ class CascadeTest extends TestCase
         });
     }
 
+    /** @test */
+    function it_merges_view_model_data()
+    {
+        // Add a collection to the stache
+        $collection = \Statamic\API\Collection::create('example');
+        $this->app->make(Stache::class)
+            ->store('collections')
+            ->setItem('example', $collection)
+            ->setPath('example', 'collections/example.yaml');
+
+        $page = \Statamic\API\Entry::create('test')
+            ->collection('example')
+            ->with([
+                'foo' => 'foo defined in page',
+                'view_model' => 'Tests\FakeViewModel',
+            ])
+            ->get();
+
+        $cascade = $this->cascade()->withContent($page);
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('foo defined in view model', $cascade['foo']);
+            $this->assertEquals('foo defined in page', $cascade['page']['foo']);
+        });
+    }
+
     private function fakeSiteConfig()
     {
         config(['app.url' => 'http://test.com']);
@@ -395,5 +423,15 @@ class FakeSite extends \Statamic\Sites\Site
     public function __construct()
     {
         parent::__construct('en', config('statamic.sites.en'));
+    }
+}
+
+class FakeViewModel extends \Statamic\View\ViewModel
+{
+    public function data(): array
+    {
+        return [
+            'foo' => 'foo defined in view model',
+        ];
     }
 }
