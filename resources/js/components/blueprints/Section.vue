@@ -7,7 +7,7 @@
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="px-2 py-1 flex-1">
                     <span class="font-medium mr-1">
-                        <input type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
+                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
                 <div class="flex items-center px-1">
@@ -105,6 +105,10 @@ export default {
 
         fieldComponent(field) {
             return (field.type === 'import') ? 'ImportField' : 'RegularField';
+        },
+
+        focus() {
+            this.$refs.displayInput.select();
         }
 
     }
