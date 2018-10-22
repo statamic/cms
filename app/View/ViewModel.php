@@ -2,8 +2,6 @@
 
 namespace Statamic\View;
 
-use Statamic\Cascade;
-
 abstract class ViewModel
 {
     protected $cascade;

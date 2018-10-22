@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests;
+namespace Tests\View;
 
 use Mockery;
-use Statamic\Cascade;
+use Tests\TestCase;
 use Statamic\API\Site;
 use Statamic\API\User;
 use Statamic\API\File;
+use Statamic\View\Cascade;
 use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Carbon;
@@ -382,7 +383,7 @@ class CascadeTest extends TestCase
             ->collection('example')
             ->with([
                 'foo' => 'foo defined in page',
-                'view_model' => 'Tests\FakeViewModel',
+                'view_model' => 'Tests\View\FakeViewModel',
             ])
             ->get();
 

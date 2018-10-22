@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic;
+namespace Statamic\View;
 
 use Statamic\Sites\Site;
 use Statamic\API\GlobalSet;
