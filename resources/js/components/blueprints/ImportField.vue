@@ -1,6 +1,6 @@
 <template>
 
-    <div class="blueprint-section-field blueprint-section-import">
+    <div class="blueprint-section-field blueprint-section-import blueprint-section-field-w-full">
         <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">

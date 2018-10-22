@@ -96,7 +96,7 @@ export default {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
-                plugins: [Plugins.SwapAnimation]
+                // plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
                 if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {
                     this.moveFieldToNewSection(e);

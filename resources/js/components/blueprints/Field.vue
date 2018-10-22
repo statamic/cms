@@ -10,7 +10,8 @@ export default {
             type: Boolean,
             default: true
         },
-        isEditing: Boolean
+        isEditing: Boolean,
+        isSectionExpanded: Boolean
     },
 
     watch: {

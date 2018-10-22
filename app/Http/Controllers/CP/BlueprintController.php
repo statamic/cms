@@ -117,10 +117,10 @@ class BlueprintController extends CpController
 
     private function inlineSectionField(array $submitted)
     {
-        return [
+        return array_filter([
             'handle' => $submitted['handle'],
             'field' => array_except($submitted['config'], ['isNew'])
-        ];
+        ]);
     }
 
     private function referenceSectionField(array $submitted)
@@ -174,21 +174,26 @@ class BlueprintController extends CpController
             $config = array_get($field, 'config', [])
         );
 
+        $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
+
         return [
             'handle' => $field['handle'],
             'type' => 'reference',
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
-            'config_overrides' => array_keys($config),
+            'config_overrides' => array_keys($config)
         ];
     }
 
     private function inlineFieldToVue($field): array
     {
+        $config = $field['field'];
+        $config['width'] = $config['width'] ?? 100;
+
         return [
             'handle' => $field['handle'],
             'type' => 'inline',
-            'config' => $field['field']
+            'config' => $config,
         ];
     }
 

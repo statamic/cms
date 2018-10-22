@@ -1,6 +1,6 @@
 <template>
 
-    <div class="blueprint-section">
+    <div class="blueprint-section" :class="{ 'w-full': isEditing }">
         <div class="blueprint-section-card card p-0 h-full flex flex-col">
 
             <div class="bg-grey-lightest border-b text-sm flex rounded-t;">
@@ -11,20 +11,22 @@
                     </span>
                 </div>
                 <div class="flex items-center px-1">
-                    <button class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-cog" /></button>
+                    <button v-show="!isEditing" @click.prevent="isEditing = true" class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-resize-full-screen" /></button>
+                    <button v-show="isEditing" @click.prevent="isEditing = false" class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-resize-100" /></button>
                     <button @click.prevent="$emit('deleted')" class="opacity-50 hover:opacity-100"><span class="icon icon-cross" /></button>
                 </div>
             </div>
 
-            <div class="p-2 flex flex-col flex-1">
+            <div class="flex flex-col">
 
-                <div class="blueprint-section-draggable-zone flex-1 mb-2">
+                <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-2 px-1 pt-2">
                     <component
                         v-for="(field, i) in section.fields"
                         :is="fieldComponent(field)"
                         :key="field._id"
                         :field="field"
                         :is-editing="editingField === field._id"
+                        :is-section-expanded="isEditing"
                         @edit="editingField = field._id"
                         @editor-closed="editingField = null"
                         @updated="fieldUpdated(i, $event)"
@@ -32,7 +34,7 @@
                     />
                 </div>
 
-                <div>
+                <div class="p-2 pt-0">
                     <add-field @added="fieldAdded" />
                 </div>
 
@@ -65,6 +67,7 @@ export default {
 
     data() {
         return {
+            isEditing: false,
             isAddingField: true,
             editingField: null
         }
