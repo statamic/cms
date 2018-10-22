@@ -1,49 +1,62 @@
 <template>
 
-    <div class="card p-0 mt-3">
+    <div class="mt-3">
 
-        <div v-if="fieldtypesLoading" class="p-3 text-center"><loading-graphic  /></div>
+        <div v-if="fieldtypesLoading" class="card p-3 text-center">
+            <loading-graphic  />
+        </div>
 
-        <data-list :rows="fields" :columns="['display', 'handle', 'type']" :sort="false" v-if="fieldtypesLoaded">
-            <div slot-scope="{}">
-                <data-table>
-                    <template slot="cell-display" slot-scope="{ row: field }">
-                        <input
-                            type="text"
-                            class="bg-transparent outline-none w-full"
-                            v-model="field.display"
-                            :placeholder="field.handle"
-                            @focus="$event.target.select()" />
-                    </template>
-                    <template slot="cell-handle" slot-scope="{ row: field }">
-                        <input
-                            type="text"
-                            class="bg-transparent text-xs font-mono outline-none w-full"
-                            v-model="field.handle"
-                            @focus="$event.target.select()" />
-                    </template>
-                    <template slot="cell-type" slot-scope="{ value: type }">
-                        <div class="flex">
-                            <svg-icon :name="fieldtype(type).icon" class="w-4 h-4 mr-1" />
-                            <span v-text="fieldtype(type).title" />
-                        </div>
-                    </template>
-                    <template slot="actions" slot-scope="{ row: field }">
-                        <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
-                        <portal to="modals" v-if="editingField === field._id">
-                            <modal :name="`${field._id}-field-settings`" width="90%" height="90%">
-                                <field-settings
-                                    ref="settings"
-                                    :root="isRootLevel"
-                                    :type="field.type"
-                                    v-model="field" />
-                            </modal>
-                        </portal>
-                    </template>
-                </data-table>
-            </div>
-        </data-list>
+        <template v-if="fieldtypesLoaded">
 
+            <data-list :rows="fields" :columns="['display', 'handle', 'type']" :sort="false">
+                <div class="card p-0 mb-3" slot-scope="{}">
+                    <data-table>
+                        <template slot="cell-display" slot-scope="{ row: field }">
+                            <input
+                                type="text"
+                                class="bg-transparent outline-none w-full"
+                                v-model="field.display"
+                                :placeholder="field.handle"
+                                @focus="$event.target.select()" />
+                        </template>
+                        <template slot="cell-handle" slot-scope="{ row: field }">
+                            <input
+                                type="text"
+                                class="bg-transparent text-xs font-mono outline-none w-full"
+                                v-model="field.handle"
+                                @focus="$event.target.select()" />
+                        </template>
+                        <template slot="cell-type" slot-scope="{ value: type }">
+                            <div class="flex">
+                                <svg-icon :name="fieldtype(type).icon" class="w-4 h-4 mr-1" />
+                                <span v-text="fieldtype(type).title" />
+                            </div>
+                        </template>
+                        <template slot="actions" slot-scope="{ row: field }">
+                            <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
+                            <portal to="modals" v-if="editingField === field._id">
+                                <modal :name="`${field._id}-field-settings`" width="90%" height="90%">
+                                    <field-settings
+                                        ref="settings"
+                                        :root="isRootLevel"
+                                        :type="field.type"
+                                        v-model="field" />
+                                </modal>
+                            </portal>
+                        </template>
+                    </data-table>
+                </div>
+            </data-list>
+
+            <button class="btn btn-default" @click="addField">+ {{ __('Add Field') }}</button>
+
+            <portal to="modals" v-if="selectingFieldtype">
+                <modal name="fieldtype-selector" width="90%" height="90%">
+                    <fieldtype-selector @selected="fieldtypeSelected" />
+                </modal>
+            </portal>
+
+        </template>
 
     </div>
 
@@ -53,10 +66,14 @@
 import uniqid from 'uniqid';
 import FieldSettings from '../fields/Settings.vue';
 import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
+import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 
 export default {
 
-    components: { FieldSettings },
+    components: {
+        FieldSettings,
+        FieldtypeSelector,
+     },
 
     mixins: [ProvidesFieldtypes],
 
@@ -71,7 +88,8 @@ export default {
     data() {
         return {
             fields: null,
-            editingField: null
+            editingField: null,
+            selectingFieldtype: false,
         }
     },
 
@@ -100,7 +118,24 @@ export default {
 
         fieldtype(type) {
             return _.findWhere(this.fieldtypes, { handle: type });
-        }
+        },
+
+        addField() {
+            this.selectingFieldtype = true;
+            this.$nextTick(() => this.$modal.show('fieldtype-selector'));
+        },
+
+        fieldtypeSelected(field) {
+            const id = uniqid();
+            this.fields.push({
+                ...field,
+                _id: id,
+                handle: 'new_field',
+                display: 'New Field'
+            });
+            this.selectingFieldtype = false;
+            this.edit(id);
+        },
 
     }
 
