@@ -31,7 +31,7 @@ trait FakesViews
     {
         $this->withFakeViews();
 
-        $this->viewShouldReturnRaw('errors.layout', '{{ template_contents }}');
+        $this->viewShouldReturnRaw('errors.layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('errors.404', 'The 404 template.');
     }
 
