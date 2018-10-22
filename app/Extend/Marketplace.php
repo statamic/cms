@@ -296,7 +296,13 @@ class Marketplace
             return true;
         }
 
-        return str_contains(strtolower($property), $this->searchQuery);
+        return collect(explode(' ', $this->searchQuery))
+            ->filter()
+            ->map(function ($term) use ($property) {
+                return str_contains(strtolower($property), $term);
+            })
+            ->filter()
+            ->isNotEmpty();
     }
 
     /**
