@@ -32,8 +32,9 @@
                                 <span v-text="fieldtype(type).title" />
                             </div>
                         </template>
-                        <template slot="actions" slot-scope="{ row: field }">
+                        <template slot="actions" slot-scope="{ row: field, index }">
                             <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
+                            <a class="mr-1 text-grey" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
                             <portal to="modals" v-if="editingField === field._id">
                                 <modal :name="`${field._id}-field-settings`" width="90%" height="90%">
                                     <field-settings
@@ -114,6 +115,10 @@ export default {
         edit(id) {
             this.editingField = id;
             this.$nextTick(() => this.$modal.show(`${id}-field-settings`));
+        },
+
+        destroy(index) {
+            this.fields.splice(index, 1);
         },
 
         fieldtype(type) {
