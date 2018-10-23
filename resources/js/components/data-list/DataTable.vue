@@ -70,12 +70,14 @@ export default {
     methods: {
 
         changeSortColumn(column) {
+            this.sharedState.currentPage = 1;
             if (this.sharedState.sortColumn === column) this.swapSortDirection();
             this.sharedState.sortColumn = column;
             this.$emit('sorted', this.sharedState.sortColumn, this.sharedState.sortDirection);
         },
 
         swapSortDirection() {
+            this.sharedState.currentPage = 1;
             this.sharedState.sortDirection = this.sharedState.sortDirection === 'asc' ? 'desc' : 'asc';
         }
 
