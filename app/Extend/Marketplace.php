@@ -3,6 +3,8 @@
 namespace Statamic\Extend;
 
 use GuzzleHttp\Client;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\Addon as AddonAPI;
 
@@ -29,6 +31,21 @@ class Marketplace
     protected $verifySsl = true;
 
     /**
+     * @var bool
+     */
+    protected $addLocalData = true;
+
+    /**
+     * @var string
+     */
+    protected $filter;
+
+    /**
+     * @var string
+     */
+    protected $searchQuery;
+
+    /**
      * Instantiate marketplace API wrapper.
      */
     public function __construct()
@@ -40,35 +57,111 @@ class Marketplace
     }
 
     /**
-     * Get addons.
+     * Query and cache payload from statamic.com marketplace API, then add local data to payload.
      *
-     * @param boolean $addLocalData
-     * @return mixed
+     * @return $this
      */
-    public function get($addLocalData = true)
+    public function query()
     {
-        $payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
+        $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
             return $this->apiRequest('addons');
         });
 
-        if ($addLocalData) {
-            $payload = $this->addLocalMetaToPayload($payload);
-            $payload = $this->addLocalDevelopmentAddonsToPayload($payload);
+        if ($this->addLocalData) {
+            $this->addLocalDataToPayload();
+            $this->addLocalDevelopmentAddonsToPayload();
         }
 
-        return $payload;
+        return $this;
     }
 
     /**
-     * Find addon by github repo.
+     * Query without local data.
      *
-     * @param string $githubRepo
-     * @param boolean $addLocalData
+     * @return $this
+     */
+    public function withoutLocalData()
+    {
+        $this->addLocalData = false;
+
+        return $this;
+    }
+
+    /**
+     * Set filter.
+     *
+     * @param mixed $filter
+     * @return $this
+     */
+    public function filter($filter)
+    {
+        $this->filter = $filter;
+
+        return $this;
+    }
+
+    /**
+     * Set search query.
+     *
+     * @param mixed $searchQuery
+     * @return $this
+     */
+    public function search($searchQuery)
+    {
+        $this->searchQuery = $searchQuery;
+
+        return $this;
+    }
+
+    /**
+     * Get addons.
+     *
      * @return mixed
      */
-    public function findByGithubRepo($githubRepo, $addLocalData = true)
+    public function get()
     {
-        return collect($this->get($addLocalData)['data'])->first(function ($addon) use ($githubRepo) {
+        $this->query();
+
+        if ($this->filter) {
+            $this->filterPayload();
+        }
+
+        if ($this->searchQuery) {
+            $this->searchPayload();
+        }
+
+        return $this->payload;
+    }
+
+    /**
+     * Get paginated addons.
+     *
+     * @param int $perPage
+     * @return mixed
+     */
+    public function paginate($perPage)
+    {
+        $data = collect($this->get()['data']);
+
+        $currentPage = request()->input('page', 1);
+        $items = $data->forPage($currentPage, $perPage)->values();
+        $total = $data->count();
+        $options = ['path' => collect(explode('?', request()->getUri()))->first()];
+
+        $paginator = new LengthAwarePaginator($items, $total, $perPage, $currentPage, $options);
+
+        return Resource::collection($paginator)->additional($this->installedMeta());
+    }
+
+    /**
+     * Find addon by github repo (ie. 'vendor/package').
+     *
+     * @param string $githubRepo
+     * @return mixed
+     */
+    public function findByGithubRepo($githubRepo)
+    {
+        return collect($this->get()['data'])->first(function ($addon) use ($githubRepo) {
             return data_get($addon, 'variants.0.githubRepo') === $githubRepo;
         });
     }
@@ -103,27 +196,22 @@ class Marketplace
     }
 
     /**
-     * Add local meta to whole payload.
-     *
-     * @param mixed $payload
-     * @return array
+     * Add local data to whole payload.
      */
-    protected function addLocalMetaToPayload($payload)
+    protected function addLocalDataToPayload()
     {
-        $payload['data'] = collect($payload['data'])->map(function ($addon) {
-            return $this->addLocalMetaToAddon($addon);
+        $this->payload['data'] = collect($this->payload['data'])->map(function ($addon) {
+            return $this->addLocalDataToAddon($addon);
         });
-
-        return $payload;
     }
 
     /**
-     * Add local meta to addon paylod.
+     * Add local data to addon paylod.
      *
      * @param array $addon
      * @return array
      */
-    protected function addLocalMetaToAddon($addon)
+    protected function addLocalDataToAddon($addon)
     {
         return array_merge($addon, [
             'installed' => AddonAPI::all()->keys()->contains($addon['variants'][0]['githubRepo']),
@@ -133,16 +221,12 @@ class Marketplace
     /**
      * Add local development addons to payload.
      *
-     * @param array $payload
-     * @return array
      */
-    protected function addLocalDevelopmentAddonsToPayload($payload)
+    protected function addLocalDevelopmentAddonsToPayload()
     {
-        AddonAPI::all()->reject->marketplaceProductId()->each(function ($addon) use (&$payload) {
-            $payload['data'][] = $this->buildAddonPayloadFromLocalData($addon);
+        AddonAPI::all()->reject->marketplaceProductId()->each(function ($addon) {
+            $this->payload['data'][] = $this->buildAddonPayloadFromLocalData($addon);
         });
-
-        return $payload;
     }
 
     /**
@@ -171,6 +255,67 @@ class Marketplace
                 'avatar' => null,
             ],
             'installed' => true,
+        ];
+    }
+
+    /**
+     * Filter payload.
+     */
+    protected function filterPayload()
+    {
+        if ($this->filter === 'installable') {
+            $this->payload['data'] = collect($this->payload['data'])->reject->installed->values()->all();
+        } elseif ($this->filter === 'installed') {
+            $this->payload['data'] = collect($this->payload['data'])->filter->installed->values()->all();
+        }
+    }
+
+    /**
+     * Search payload.
+     */
+    protected function searchPayload()
+    {
+        $this->payload['data'] = collect($this->payload['data'])
+             ->filter(function ($addon) {
+                 return $this->searchProperty($addon['name'])
+                     || $this->searchProperty($addon['seller']['name'] ?? true);
+             })
+             ->values()
+             ->all();
+    }
+
+    /**
+     * Search property.
+     *
+     * @param mixed $property
+     * @return bool
+     */
+    protected function searchProperty($property)
+    {
+        if ($property === true) {
+            return true;
+        }
+
+        return collect(explode(' ', $this->searchQuery))
+            ->filter()
+            ->map(function ($term) use ($property) {
+                return str_contains(strtolower($property), $term);
+            })
+            ->filter()
+            ->isNotEmpty();
+    }
+
+    /**
+     * Get installed addon meta.
+     *
+     * @return array
+     */
+    protected function installedMeta()
+    {
+        return [
+            'meta' => [
+                'installed' => AddonAPI::all()->keys()->all()
+            ]
         ];
     }
 }

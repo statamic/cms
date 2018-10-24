@@ -54,11 +54,12 @@
             },
 
             stopComposer() {
-                this.polling = false;
-
                 window.clearInterval(this.composerProcess);
 
-                this.$events.$emit('composer-finished');
+                window.setTimeout(() => {
+                    this.polling = false;
+                    this.$events.$emit('composer-finished');
+                }, 1500);
             },
         }
     }

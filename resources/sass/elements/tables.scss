@@ -10,6 +10,10 @@
     @apply text-sm px-2 py-1 outline-none flex-1;
 }
 
+.data-list-footer {
+    @apply py-1.5 pr-2 flex items-center border-t;
+}
+
 table.data-table {
     @apply w-full text-left text-grey;
 

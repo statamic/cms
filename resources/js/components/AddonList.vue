@@ -1,5 +1,5 @@
 <template>
-    <data-list :columns="searchableColumns" :rows="rows" :visible-columns="searchableColumns" :search-query="searchQuery" v-if="loaded">
+    <data-list :columns="[]" :rows="rows" :visible-columns="[]" v-if="loaded">
         <div class="" slot-scope="{ rows: addons }">
             <div class="data-list-header flex items-center card p-0">
                 <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="addon-grid my-4">
-                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in filterAddons(addons)" :key="addon.id" @click="showAddon(addon)">
+                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                     <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                     <div class="px-3 mb-2 relative text-center">
                         <a :href="addon.seller.website" class="relative">
@@ -20,7 +20,14 @@
                         <p v-text="addon.variants[0].summary" class="text-sm"></p>
                     </div>
                 </div>
+
             </div>
+
+            <!-- I see there's a pagination component, maybe I could tie into that instead -->
+            <template v-if="links">
+                <button class="btn" @click="page--; getAddons">Previous Page</button>
+                <button class="btn" @click="page++; getAddons">Next Page</button>
+            </template>
 
             <portal to="modals" v-if="showingAddon">
                 <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
@@ -55,29 +62,56 @@
 
         data() {
             return {
+                loaded: false,
                 rows: [],
+                links: {},
+                meta: {},
                 searchQuery: '',
                 filter: 'installable',
-                loaded: false,
+                page: 1,
                 showingAddon: false,
-                searchableColumns: [
-                    'name',
-                    'seller', // TODO?
-                ],
             }
         },
 
+        computed: {
+            params() {
+                return {
+                    page: this.page,
+                    filter: this.filter,
+                    q: this.searchQuery,
+                };
+            }
+        },
+
+        watch: {
+            page() {
+                this.getAddons();
+            },
+
+            searchQuery() {
+                this.page = 1;
+                this.getAddons();
+            },
+
+            filter() {
+                this.page = 1;
+                this.getAddons();
+            },
+        },
+
         created() {
-            this.rows = this.getAddons()
+            this.rows = this.getAddons();
 
             this.$events.$on('composer-finished', this.getAddons);
         },
 
         methods: {
             getAddons() {
-                this.axios.get('/cp/marketplace/addons').then(response => {
-                    this.rows = response.data.data;
+                axios.get('/cp/api/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
+                    this.rows = response.data.data;
+                    this.links = response.data.links;
+                    this.meta = response.data.meta;
 
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
@@ -86,7 +120,7 @@
             },
 
             refreshShowingAddon() {
-                this.showingAddon.installed = _.find(this.rows, {id: this.showingAddon.id}).installed;
+                this.showingAddon.installed = _.contains(this.meta.installed, this.showingAddon.variants[0].githubRepo);
 
                 this.$events.$emit('addon-refreshed');
             },
@@ -104,16 +138,6 @@
                     this.$modal.show('addon-modal');
                 });
             },
-
-            filterAddons(addons) {
-                if (this.filter === 'installable') {
-                    return _.reject(addons, (addon) => addon.installed);
-                } else if (this.filter === 'installed') {
-                    return _.filter(addons, (addon) => addon.installed);
-                }
-
-                return addons;
-            }
         }
     }
 </script>

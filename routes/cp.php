@@ -61,8 +61,10 @@ Route::group([
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
 
-    // Marketplace
-    Route::get('marketplace/addons', 'MarketplaceController@addons');
+    // Local API
+    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
+        Route::resource('addons', 'AddonsController');
+    });
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');

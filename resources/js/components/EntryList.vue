@@ -1,5 +1,5 @@
 <template>
-    <data-list :columns="columns" :rows="rows" :visible-columns="visibleColumns" :search-query="searchQuery">
+    <data-list :columns="columns" :rows="rows" :visible-columns="visibleColumns" :search-query="searchQuery" :pagination="true">
         <div class="card p-0" slot-scope="{ }">
             <div class="data-list-header">
                 <data-list-toggle-all></data-list-toggle-all>
@@ -28,6 +28,9 @@
                     </dropdown-list>
                 </template>
             </data-table>
+            <div class="data-list-footer" v-if="hasPagination">
+                <data-list-pagination></data-list-pagination>
+            </div>
         </div>
     </data-list>
 </template>
@@ -43,6 +46,11 @@ export default {
         return {
             rows: this.initialRows,
             searchQuery: ''
+        }
+    },
+    computed: {
+        hasPagination() {
+            return this.rows.length > window.Statamic.paginationSize;
         }
     },
     methods: {

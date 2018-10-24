@@ -20,6 +20,7 @@ Vue.component('data-list-search', require('../components/data-list/DataListSearc
 Vue.component('data-list-bulk-actions', require('../components/data-list/DataListBulkActions.vue'));
 Vue.component('data-list-column-picker', require('../components/data-list/DataListColumnPicker.vue'));
 Vue.component('data-list-toggle-all', require('../components/data-list/DataListToggleAll.vue'));
+Vue.component('data-list-pagination', require('../components/data-list/DataListPagination.vue'));
 Vue.component('data-table', require('../components/data-list/DataTable.vue'));
 
 // Resource Type Lists
