@@ -145,7 +145,7 @@ class FrontendTest extends TestCase
             'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
         ];
 
-        $cascade = $this->app['Statamic\Cascade']->toArray();
+        $cascade = $this->app['Statamic\View\Cascade']->toArray();
 
         foreach ($keys as $key) {
             $this->assertArrayHasKey($key, $cascade);

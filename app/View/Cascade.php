@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic;
+namespace Statamic\View;
 
 use Statamic\Sites\Site;
 use Statamic\API\GlobalSet;
@@ -44,6 +44,11 @@ class Cascade
         return $this;
     }
 
+    public function content()
+    {
+        return $this->content;
+    }
+
     public function get($key)
     {
         return array_get($this->data, $key);
@@ -65,7 +70,8 @@ class Cascade
             ->hydrateVariables()
             ->hydrateSegments()
             ->hydrateGlobals()
-            ->hydrateContent();
+            ->hydrateContent()
+            ->hydrateViewModel();
     }
 
     private function hydrateVariables()
@@ -164,5 +170,15 @@ class Cascade
             'locale_full' => $siteLocale,
             'locale_url' => $siteUrl,
         ];
+    }
+
+    protected function hydrateViewModel()
+    {
+        if ($class = $this->get('view_model')) {
+            $viewModel = new $class($this);
+            $this->data = array_merge($this->data, $viewModel->data());
+        }
+
+        return $this;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Cascade;
 use Statamic\View\Store;
 use Statamic\View\Modify;
+use Statamic\View\Cascade;
 use Statamic\View\Antlers\Parser;
 use Statamic\Extensions\View\Factory;
 use Illuminate\View\Engines\EngineResolver;

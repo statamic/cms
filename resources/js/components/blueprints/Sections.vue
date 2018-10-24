@@ -5,6 +5,7 @@
         <div ref="sections" class="blueprint-sections flex flex-wrap -mx-1 text-sm outline-none">
 
             <blueprint-section
+                ref="section"
                 v-for="(section, i) in sections"
                 :key="section._id"
                 :section="section"
@@ -96,7 +97,7 @@ export default {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
-                plugins: [Plugins.SwapAnimation]
+                // plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
                 if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {
                     this.moveFieldToNewSection(e);
@@ -142,6 +143,7 @@ export default {
             });
 
             this.$nextTick(() => {
+                this.$refs.section[this.sections.length-1].focus();
                 this.makeSortable();
             })
         },

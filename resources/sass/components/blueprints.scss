@@ -20,7 +20,11 @@
 }
 
 .blueprint-section-field {
-    @apply border rounded my-1 bg-grey-lightest shadow-sm flex outline-none z-10;
+    @apply relative mb-1 mx-1 z-10;
+
+    .blueprint-section-field-inner {
+        @apply relative border rounded bg-grey-lightest shadow-sm flex outline-none z-10;
+    }
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -30,6 +34,23 @@
         @apply shadow-lg;
     }
 }
+
+.blueprint-section-import {
+    &:before {
+        content: '';
+        @apply border rounded absolute bg-grey-lightest shadow-sm;
+        top: -3px; left: 3px; right: -3px; bottom: 3px; z-index: 1;
+    }
+}
+
+// These are applied here rather than the utility classes so they don't override
+// the inline widths defined by the draggable library.
+.blueprint-section-field-w-1\/4 { @apply w-1/4 };
+.blueprint-section-field-w-1\/3 { @apply w-1/3 };
+.blueprint-section-field-w-1\/2 { @apply w-1/2 };
+.blueprint-section-field-w-2\/3 { @apply w-2/3 };
+.blueprint-section-field-w-3\/4 { @apply w-3/4 };
+.blueprint-section-field-w-full { @apply w-full };
 
 .blueprint-add-section-container {
     @apply p-1 flex min-h-48;

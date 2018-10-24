@@ -102,17 +102,25 @@ class BlueprintController extends CpController
 
     private function sectionField(array $submitted)
     {
-        return ($submitted['type'] === 'inline')
-            ? $this->inlineSectionField($submitted)
-            : $this->referenceSectionField($submitted);
+        $method = $submitted['type'] . 'SectionField';
+
+        return $this->$method($submitted);
+    }
+
+    private function importSectionField(array $submitted)
+    {
+        return array_filter([
+            'import' => $submitted['fieldset'],
+            'prefix' => $submitted['prefix'] ?? null
+        ]);
     }
 
     private function inlineSectionField(array $submitted)
     {
-        return [
+        return array_filter([
             'handle' => $submitted['handle'],
             'field' => array_except($submitted['config'], ['isNew'])
-        ];
+        ]);
     }
 
     private function referenceSectionField(array $submitted)
@@ -148,6 +156,10 @@ class BlueprintController extends CpController
 
     private function fieldToVue($field): array
     {
+        if (isset($field['import'])) {
+            return $this->importFieldToVue($field);
+        }
+
         return (is_string($field['field']))
             ? $this->referenceFieldToVue($field)
             : $this->inlineFieldToVue($field);
@@ -162,21 +174,34 @@ class BlueprintController extends CpController
             $config = array_get($field, 'config', [])
         );
 
+        $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
+
         return [
             'handle' => $field['handle'],
             'type' => 'reference',
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
-            'config_overrides' => array_keys($config),
+            'config_overrides' => array_keys($config)
         ];
     }
 
     private function inlineFieldToVue($field): array
     {
+        $config = $field['field'];
+        $config['width'] = $config['width'] ?? 100;
+
         return [
             'handle' => $field['handle'],
             'type' => 'inline',
-            'config' => $field['field']
+            'config' => $config,
+        ];
+    }
+
+    private function importFieldToVue($field): array
+    {
+        return [
+            'type' => 'import',
+            'fieldset' => $field['import']
         ];
     }
 

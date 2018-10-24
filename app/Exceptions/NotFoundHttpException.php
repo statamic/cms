@@ -2,8 +2,8 @@
 
 namespace Statamic\Exceptions;
 
-use Facades\Statamic\Cascade;
 use Statamic\View\Antlers\View;
+use Facades\Statamic\View\Cascade;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;
 
 class NotFoundHttpException extends SymfonyException

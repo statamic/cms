@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Responses;
 
-use Facades\Statamic\Cascade;
 use Statamic\View\Antlers\View;
+use Facades\Statamic\View\Cascade;
 use Statamic\Events\ResponseCreated;
 use Statamic\Auth\Protect\Protection;
 use Illuminate\Contracts\Support\Responsable;
