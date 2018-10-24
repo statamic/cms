@@ -59,7 +59,7 @@
                 window.setTimeout(() => {
                     this.polling = false;
                     this.$events.$emit('composer-finished');
-                }, 1000);
+                }, 1500);
             },
         }
     }
