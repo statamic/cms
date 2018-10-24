@@ -1,5 +1,5 @@
 <template>
-    <ul class="w-full flex justify-center list-reset">
+    <ul v-if="hasMultiplePages" class="w-full flex justify-center list-reset">
         <li v-if="hasPrevious" class="mx-1">
             <a @click.prevent="selectPreviousPage"><span>&laquo;</span></a>
         </li>
@@ -18,16 +18,16 @@
 
 <script>
     export default {
-        inject: ['sharedState'],
-
-        props: [
-            'total',
-            'current',
-        ],
+        props: {
+            resourceMeta: {
+                type: Object,
+                required: true
+            }
+        },
 
         computed: {
             totalPages() {
-                return this.total || Math.ceil(this.$parent.rows.length / window.Statamic.paginationSize);
+                return this.resourceMeta.last_page;
             },
 
             pages() {
@@ -35,7 +35,11 @@
             },
 
             currentPage() {
-                return this.current || this.sharedState.currentPage;
+                return this.resourceMeta.current_page;
+            },
+
+            hasMultiplePages() {
+                return this.totalPages > 1;
             },
 
             hasPrevious() {
@@ -49,9 +53,13 @@
 
         methods: {
             selectPage(page) {
-                this.sharedState.currentPage = page;
+                if (page === this.currentPage) {
+                    return;
+                }
 
-                this.$emit('selected', page);
+                this.$emit('pageSelected', page);
+
+                window.scrollTo(0, 0);
             },
 
             selectPreviousPage() {

@@ -119,7 +119,6 @@ class Statamic
                 'MediumEditorExtensions' => [],
                 'flash' => [],
                 'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-                'paginationSize' => config('statamic.cp.pagination_size'),
             ];
         }
 

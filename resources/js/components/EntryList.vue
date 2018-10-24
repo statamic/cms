@@ -28,9 +28,6 @@
                     </dropdown-list>
                 </template>
             </data-table>
-            <div class="data-list-footer" v-if="hasPagination">
-                <data-list-pagination></data-list-pagination>
-            </div>
         </div>
     </data-list>
 </template>
@@ -46,11 +43,6 @@ export default {
         return {
             rows: this.initialRows,
             searchQuery: ''
-        }
-    },
-    computed: {
-        hasPagination() {
-            return this.rows.length > window.Statamic.paginationSize;
         }
     },
     methods: {

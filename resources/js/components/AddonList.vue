@@ -23,11 +23,7 @@
 
             </div>
 
-            <!-- I see there's a pagination component, maybe I could tie into that instead -->
-            <template v-if="links">
-                <button class="btn" @click="page--; getAddons">Previous Page</button>
-                <button class="btn" @click="page++; getAddons">Next Page</button>
-            </template>
+            <data-list-pagination :resource-meta="meta" @pageSelected="setPage"></data-list-pagination>
 
             <portal to="modals" v-if="showingAddon">
                 <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
@@ -64,7 +60,6 @@
             return {
                 loaded: false,
                 rows: [],
-                links: {},
                 meta: {},
                 searchQuery: '',
                 filter: 'installable',
@@ -110,13 +105,16 @@
                 axios.get('/cp/api/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
                     this.rows = response.data.data;
-                    this.links = response.data.links;
                     this.meta = response.data.meta;
 
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
                     }
                 });
+            },
+
+            setPage(page) {
+                this.page = page;
             },
 
             refreshShowingAddon() {

@@ -30,10 +30,6 @@ export default {
             type: Boolean,
             default: true
         },
-        pagination: {
-            type: Boolean,
-            default: false
-        },
     },
     provide() {
         return {
@@ -51,7 +47,6 @@ export default {
                 rows: [],
                 selections: this.selections,
                 maxSelections: this.maxSelections,
-                currentPage: 1,
             }
         }
     },
@@ -61,8 +56,7 @@ export default {
         filteredRows() {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
-            rows = this.sortRows(rows);
-            return this.showPage(rows);
+            return this.sortRows(rows);
         }
 
     },
@@ -110,14 +104,6 @@ export default {
 
             return rows;
         },
-
-        showPage(rows) {
-            if (! this.pagination) return rows;
-
-            rows = _.chunk(rows, window.Statamic.paginationSize)[this.sharedState.currentPage - 1];
-
-            return rows;
-        }
 
     },
 
