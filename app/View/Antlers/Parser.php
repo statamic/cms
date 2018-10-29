@@ -58,23 +58,23 @@ class Parser
         // Different from variable regex somehow.
         $this->callbackNameRegex = '\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
 
-        $this->variableLoopRegex = '/\{\{\s*('.$this->looseVariableRegex.')\s*\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
+        $this->variableLoopRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}(.*?){{\s*\/\1\s*}}/ms';
 
         // expanded to allow `or` options in variable tags
-        $this->variableTagRegex = '/\{\{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*\}\}/m';
+        $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
 
         // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
-        $this->callbackBlockRegex = '/\{\{\s*('.$this->variableRegex.')(\s.*?)?\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(\s.*?)?}}(.*?){{\s*\/\1\s*}}/ms';
 
-        $this->recursiveRegex = '/\{\{\s*\*recursive\s*('.$this->variableRegex.')\*\s*\}\}/ms';
+        $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 
-        $this->noparseRegex = '/\{\{\s*noparse\s*\}\}(.*?)\{\{\s*\/noparse\s*\}\}/ms';
+        $this->noparseRegex = '/{{\s*noparse\s*}}(.*?){{\s*\/noparse\s*}}/ms';
 
         $this->ignoreRegex = '/@{{(?:(?!}}).)*}}/';
 
-        $this->conditionalRegex = '/\{\{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*\}\}/ms';
-        $this->conditionalElseRegex = '/\{\{\s*else\s*\}\}/ms';
-        $this->conditionalEndRegex = '/\{\{\s*(?:endif|\/if|\/unless)\s*\}\}/ms';
+        $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*}}/ms';
+        $this->conditionalElseRegex = '/{{\s*else\s*}}/ms';
+        $this->conditionalEndRegex = '/{{\s*(?:endif|\/if|\/unless)\s*}}/ms';
         $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
         $this->conditionalNotRegex = '/(\s+|^)not(\s+|$)/ms';
 
@@ -150,7 +150,7 @@ class Parser
      */
     public function stripComments($text)
     {
-        return preg_replace('/\{\{#.*?#\}\}/s', '', $text);
+        return preg_replace('/{{#.*?#}}/s', '', $text);
     }
 
     /**
@@ -384,7 +384,7 @@ class Parser
      */
     public function parseVariablesWithParameterStyleModifiers($text, $data, $callback)
     {
-        $regex = '/\{\{\s*(' . $this->looseVariableRegex . ')(\s+.*?)?\s*\}\}/ms';
+        $regex = '/{{\s*(' . $this->looseVariableRegex . ')(\s+.*?)?\s*}}/ms';
 
         if (preg_match_all($regex, $text, $data_matches, PREG_SET_ORDER + PREG_OFFSET_CAPTURE)) {
             foreach ($data_matches as $match) {
@@ -452,9 +452,9 @@ class Parser
         }
 
         if ($inCondition) {
-            $regex = '/\{\{?\s*(' . $this->variableRegex . ')(\s+.*?)?\s*\}\}?/ms';
+            $regex = '/{{?\s*(' . $this->variableRegex . ')(\s+.*?)?\s*}}?/ms';
         } else {
-            $regex = '/\{\{\s*(' . $this->variableRegex . ')(\s+.*?)?\s*(\/)?\}\}/ms';
+            $regex = '/{{\s*(' . $this->variableRegex . ')(\s+.*?)?\s*(\/)?}}/ms';
         }
 
         // Make a clean copy of the collective callback data
@@ -490,14 +490,14 @@ class Parser
                 $parameters = $this->parseVariablesInsideParameters($parameters, $data, $callback);
             }
 
-            if (preg_match('/\{\{\s*\/' . preg_quote($name, '/') . '\s*\}\}/m', $text_subselection, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
+            if (preg_match('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', $text_subselection, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
                 $content = substr($text_subselection, 0, $match[0][1]);
                 $tag .= $content . $match[0][0];
 
                 // Is there a nested block under this one existing with the same name?
-                $nested_regex = '/\{\{\s*(' . preg_quote($name, '/') . ')(\s.*?)\}\}(.*?)\{\{\s*\/\1\s*\}\}/ms';
+                $nested_regex = '/{{\s*(' . preg_quote($name, '/') . ')(\s.*?)}}(.*?){{\s*\/\1\s*}}/ms';
                 if (preg_match($nested_regex, $content . $match[0][0], $nested_matches)) {
-                    $nested_content = preg_replace('/\{\{\s*\/' . preg_quote($name, '/') . '\s*\}\}/m', '', $nested_matches[0]);
+                    $nested_content = preg_replace('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', '', $nested_matches[0]);
                     $content = $this->createExtraction('nested_looped_tags', $nested_content, $nested_content, $content);
                 }
             }
