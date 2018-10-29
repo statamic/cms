@@ -70,7 +70,7 @@ class Parser
 
         $this->noparseRegex = '/{{\s*noparse\s*}}(.*?){{\s*\/noparse\s*}}/ms';
 
-        $this->ignoreRegex = '/@{{(?:(?!}}).)*}}/';
+        $this->ignoreRegex = '/@{{[^}]*}}/';
 
         $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*}}/ms';
         $this->conditionalElseRegex = '/{{\s*else\s*}}/ms';
