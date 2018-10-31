@@ -155,6 +155,6 @@ class Composer extends Process
      */
     private function normalizeVersion(string $version)
     {
-        return str_replace('v', '', $version);
+        return ltrim($version, 'v');
     }
 }
