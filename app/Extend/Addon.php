@@ -34,6 +34,14 @@ final class Addon
     protected $marketplaceVariantId;
 
     /**
+     * The marketplace slug of the addon.
+     *
+     * @var int
+     */
+    protected $marketplaceSlug;
+
+    /**
+     *
      * The addon's namespace. eg. "Statamic\Addons\Bloodhound"
      *
      * @var string
@@ -139,8 +147,8 @@ final class Addon
         $instance = self::create($package['id']);
 
         $keys = [
-            'id', 'marketplaceProductId', 'marketplaceVariantId', 'name', 'namespace', 'directory', 'autoload',
-            'description', 'package', 'version', 'url', 'developer', 'developerUrl', 'isCommercial',
+            'id', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
+            'autoload', 'description', 'package', 'version', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
         foreach (Arr::only($package, $keys) as $key => $value) {
@@ -187,6 +195,19 @@ final class Addon
         return $id
             ? $this->marketplaceVariantId = $id
             : $this->marketplaceVariantId;
+    }
+
+    /**
+     * The marketplace slug of the addon.
+     *
+     * @param string $slug
+     * @return string
+     */
+    public function marketplaceSlug($slug = null)
+    {
+        return $slug
+            ? $this->marketplaceSlug = $slug
+            : $this->marketplaceSlug;
     }
 
     /**

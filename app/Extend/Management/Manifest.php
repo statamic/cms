@@ -54,6 +54,7 @@ class Manifest extends PackageManifest
             'id' => Arr::last($providerParts),
             'marketplaceProductId' => data_get($marketplaceData, 'id', null),
             'marketplaceVariantId' => data_get($marketplaceData, 'variants.0.id', null), // How to detect which variant ID they installed?
+            'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
             'package' => $package['name'],
             'version' => $package['version'], // Is this syncronized with git tag?
             'namespace' => $namespace,
