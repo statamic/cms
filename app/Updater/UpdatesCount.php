@@ -2,9 +2,9 @@
 
 namespace Statamic\Updater;
 
-use Facades\Statamic\Updater\CoreUpdater;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Statamic;
+use Illuminate\Support\Facades\Cache;
+use Facades\Statamic\Updater\CoreUpdater;
 
 class UpdatesCount
 {

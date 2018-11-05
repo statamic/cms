@@ -2,24 +2,28 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Updater\CoreChangelog;
-use Facades\Statamic\Updater\CoreUpdater;
-use Facades\Statamic\Updater\UpdatesCount;
-use Illuminate\Http\Request;
-use Statamic\API\Addon;
+use Statamic\Atatamic;
 use Statamic\Statamic;
+use Statamic\API\Addon;
+use Illuminate\Http\Request;
+use Statamic\Updater\Updater;
+use Statamic\Updater\Changelog;
+use Facades\Statamic\Updater\UpdatesCount;
+use Facades\Statamic\Console\Processes\Composer;
 
 class UpdateProductController extends CpController
 {
-    const CORE_SLUG = 'statamic';
-
     public function __construct()
     {
         // Temporarily using PackToTheFuture to fake version tags until we get this hooked up to statamic/cms.
         require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
     }
 
+    /**
+     * Product updates overview.
+     *
+     * @param string $product
+     */
     public function index($product)
     {
         $this->access('updater');
@@ -27,43 +31,70 @@ class UpdateProductController extends CpController
         $package = $this->getPackage($product);
 
         return view('statamic::updater.index', [
-            'title' => 'Updates'
+            'title' => 'Updates',
+            'slug' => $product,
+            'package' => $package,
         ]);
     }
 
+    /**
+     * Product changelog.
+     *
+     * @param string $product
+     */
     public function changelog($product)
     {
         $this->access('updater');
 
-        $package = $this->getPackage($product);
+        $changelog = Changelog::product($product);
 
         return [
-            'changelog' => CoreChangelog::get(),
-            'currentVersion' => Statamic::version(),
+            'changelog' => $changelog->get(),
+            'currentVersion' => $changelog->currentVersion(),
             'lastInstallLog' => Composer::lastCachedOutput(Statamic::CORE_REPO),
         ];
     }
 
+    /**
+     * Update using version constraint.
+     *
+     * @param string $product
+     */
     public function update($product)
     {
-        return CoreUpdater::update();
+        return Updater::product($product)->update();
     }
 
-    public function updateToLatest()
+    /**
+     * Update to latest version.
+     *
+     * @param string $product
+     */
+    public function updateToLatest($product)
     {
-        // Normally we can run this, but we can't require using a 2.10.* version constraint on a fake path repo.
-        // return CoreUpdater::updateToLatest();
+        // Temp!
+        if ($product == Statamic::CORE_SLUG) {
+            \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.7');
+            return Updater::product($product)->installExplicitVersion('2.10.7');
+        }
 
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.6'); // Temp!
-
-        return CoreUpdater::installExplicitVersion('2.10.6');
+        return Updater::product($product)->updateToLatest();
     }
 
-    public function installExplicitVersion(Request $request)
+    /**
+     * Install explicit version.
+     *
+     * @param string $product
+     * @param Request $request
+     */
+    public function installExplicitVersion($product, Request $request)
     {
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion($request->version); // Temp!
+        // Temp!
+        if ($product == Statamic::CORE_SLUG) {
+            \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion($request->version);
+        }
 
-        return CoreUpdater::installExplicitVersion($request->version);
+        return Updater::product($product)->installExplicitVersion($request->version);
     }
 
     /**
@@ -74,7 +105,7 @@ class UpdateProductController extends CpController
      */
     private function getPackage(string $product)
     {
-        if ($product === self::CORE_SLUG) {
+        if ($product === Statamic::CORE_SLUG) {
             return Statamic::CORE_REPO;
         }
 

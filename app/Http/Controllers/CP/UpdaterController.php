@@ -2,12 +2,15 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Facades\Statamic\Updater\UpdatesCount;
-use Illuminate\Http\Request;
 use Statamic\API\Addon;
+use Illuminate\Http\Request;
+use Facades\Statamic\Updater\UpdatesCount;
 
 class UpdaterController extends CpController
 {
+    /**
+     * Updates overview.
+     */
     public function index()
     {
         $this->access('updater');
@@ -22,6 +25,11 @@ class UpdaterController extends CpController
         // return redirect()->route('statamic.cp.updater.product.index', ['statamic']);
     }
 
+    /**
+     * Updates count.
+     *
+     * @param Request $request
+     */
     public function count(Request $request)
     {
         $this->access('updater');

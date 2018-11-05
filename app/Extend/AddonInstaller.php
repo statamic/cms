@@ -68,5 +68,6 @@ class AddonInstaller
             ->filter();
 
         // Todo: doesn't currently output local addons!
+        // Can we check for path repository maybe?
     }
 }

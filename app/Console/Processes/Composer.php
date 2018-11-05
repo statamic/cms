@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Processes;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Jobs\RunComposer;
+use Illuminate\Support\Facades\Cache;
 
 class Composer extends Process
 {

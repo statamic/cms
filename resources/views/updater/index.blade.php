@@ -1,5 +1,5 @@
 @extends('statamic::layout')
 
 @section('content')
-    <updater package="statamic/cms"></updater>
+    <updater slug="{{ $slug }}" package="{{ $package }}"></updater>
 @endsection

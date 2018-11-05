@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class Statamic
 {
+    const CORE_SLUG = 'statamic';
     const CORE_REPO = 'test/package'; // Will be `statamic/cms` on release.
 
     protected static $scripts = [];
