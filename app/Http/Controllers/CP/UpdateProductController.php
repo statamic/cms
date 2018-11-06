@@ -12,12 +12,6 @@ use Facades\Statamic\Console\Processes\Composer;
 
 class UpdateProductController extends CpController
 {
-    public function __construct()
-    {
-        // Temporarily using PackToTheFuture to fake version tags until we get this hooked up to statamic/cms.
-        require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
-    }
-
     /**
      * Product updates overview.
      *
@@ -71,12 +65,6 @@ class UpdateProductController extends CpController
      */
     public function updateToLatest($product)
     {
-        // Temp!
-        if ($product == Statamic::CORE_SLUG) {
-            \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.7');
-            return Updater::product($product)->installExplicitVersion('2.10.7');
-        }
-
         return Updater::product($product)->updateToLatest();
     }
 
@@ -88,11 +76,6 @@ class UpdateProductController extends CpController
      */
     public function installExplicitVersion($product, Request $request)
     {
-        // Temp!
-        if ($product == Statamic::CORE_SLUG) {
-            \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion($request->version);
-        }
-
         return Updater::product($product)->installExplicitVersion($request->version);
     }
 

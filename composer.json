@@ -12,6 +12,7 @@
         "league/glide": "^1.1",
         "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
+        "statamic/definitely-not-v3": "^3.0",
         "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*"
     },

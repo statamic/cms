@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'test/package'; // Will be `statamic/cms` on release.
+    const CORE_REPO = 'statamic/definitely-not-v3'; // TODO: Change to `statamic/cms`
 
     protected static $scripts = [];
     protected static $styles = [];
