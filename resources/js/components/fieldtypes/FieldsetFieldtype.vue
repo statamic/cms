@@ -7,31 +7,37 @@
 
         <div v-if="!loading">
 
-            <div class="input-group" v-show="creating">
+            <div class="flex" v-if="creating">
                 <input type="text"
-                       ref="create-field"
-                       class="form-control"
+                       ref="createField"
+                       class="form-control flex-1"
                        v-model="newFieldsetName"
                        @keydown.enter.prevent="create"
                        @keydown.esc="cancelAdd"
                 />
-                <div class="input-group-btn">
-                    <button class="btn btn-primary" @click.prevent="create" :disabled="storePending">{{ translate('cp.create') }}</button>
-                    <button class="btn btn-default" @click.prevent="cancelAdd">{{ translate('cp.cancel') }}</button>
+                <div class="flex">
+                    <button class="btn btn-primary ml-1" @click.prevent="create" :disabled="storePending">{{ translate('cp.create') }}</button>
+                    <button class="btn btn-default ml-1" @click.prevent="cancelAdd">{{ translate('cp.cancel') }}</button>
                 </div>
             </div>
 
-            <div class="input-group" v-show="!creating">
-                <select-fieldtype :name="name" :data.sync="data" :config="selectConfig"></select-fieldtype>
+            <div class="flex" v-if="!creating">
+                <div class="flex-1">
+                    <select-fieldtype
+                        :name="name"
+                        :value="value"
+                        :config="selectConfig"
+                        @updated="update" />
+                </div>
 
-                <span class="input-group-btn">
-                    <button class="btn" @click.prevent="add" v-if="canAdd">
+                <div class="flex">
+                    <button class="btn ml-1" @click.prevent="add" v-if="canAdd">
                         <span class="icon icon-plus"></span>
                     </button>
-                    <button class="btn" @click.prevent="refresh">
+                    <button class="btn ml-1" @click.prevent="refresh">
                         <span class="icon icon-cycle"></span>
                     </button>
-                </span>
+                </div>
             </div>
 
         </div>
@@ -40,6 +46,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 
 export default {
 
@@ -47,17 +54,15 @@ export default {
 
     props: {
         required: Boolean,
-        url: String,
     },
 
-    data: function() {
+    data() {
         return {
             loading: true,
             creating: false,
             storePending: false,
             newFieldsetName: '',
-            options: {},
-            autoBindChangeWatcher: false
+            options: {}
         }
     },
 
@@ -69,7 +74,8 @@ export default {
         },
 
         canAdd() {
-            return Vue.can('super');
+            return true;
+            return Vue.can('super'); // TODO
         }
     },
 
@@ -94,11 +100,12 @@ export default {
 
             this.storePending = true;
 
-            this.$http.post(cp_url('fieldsets/quick'), { name: this.newFieldsetName }).success((response) => {
-                this.data = this.newFieldsetName;
+            axios.post(cp_url('fieldsets/quick'), { title: this.newFieldsetName }).then(response => {
+                this.update(this.newFieldsetName);
                 this.storePending = false;
                 this.cancelAdd();
                 this.refresh();
+                this.$notify.success('Fieldset created');
             });
         },
 
@@ -108,41 +115,15 @@ export default {
         },
 
         getFieldsets() {
-            var url = cp_url('fieldsets-json');
-            var params = {};
-
-            if (this.url) {
-                // Append the URL if we want to get available fieldsets for a particular page.
-                params.url = this.url;
-            }
-
-            if (this.config && ! this.config.hidden) {
-                // By default we don't get hidden fieldsets.
-                // You can specify hidden: true to get them.
-                params.hidden = false;
-            }
-
-            url += '?' + $.param(params);
-
-            this.$http.get(url, function(data) {
-                // If a value is required, don't add a blank row.
-                var options = (this.required) ? [] : [{ value: null, text: '' }];
-
-                _.each(data.items, function(fieldset) {
-                    options.push({
-                        value: fieldset.uuid,
+            axios.get(cp_url('fieldsets')).then(response => {
+                this.options = response.data.map(fieldset => {
+                    return {
+                        value: fieldset.id,
                         text: fieldset.title
-                    });
+                    };
                 });
-                this.options = options;
+
                 this.loading = false;
-
-                // If a value is required and we don't already have a value, select the first one.
-                if (this.required && !this.data) {
-                    this.data = this.options[0].value;
-                }
-
-                this.bindChangeWatcher();
             });
         }
 

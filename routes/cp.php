@@ -40,6 +40,7 @@ Route::group([
 
     // Fields
     Route::resource('fieldsets', 'FieldsetController');
+    Route::post('fieldsets/quick', 'FieldsetController@quickStore');
     Route::resource('blueprints', 'BlueprintController');
     Route::get('fieldtypes', 'FieldtypesController@index');
     Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');

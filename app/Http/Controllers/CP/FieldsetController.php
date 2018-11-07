@@ -8,7 +8,7 @@ use Statamic\Fields\Fieldset;
 
 class FieldsetController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('index', Fieldset::class, 'You are not authorized to access fieldsets.');
 
@@ -21,6 +21,10 @@ class FieldsetController extends CpController
                 'edit_url' => $fieldset->editUrl(),
             ];
         })->values();
+
+        if ($request->wantsJson()) {
+            return $fieldsets;
+        }
 
         return view('statamic::fieldsets.index', compact('fieldsets'));
     }
@@ -74,6 +78,27 @@ class FieldsetController extends CpController
         session()->flash('message', __('Saved'));
 
         return ['redirect' => $fieldset->editUrl()];
+    }
+
+    /**
+     * Quickly create a new barebones fieldset from within the fieldtype
+     *
+     * @return array
+     */
+    public function quickStore(Request $request)
+    {
+        $title = $request->title;
+
+        if (API\Fieldset::exists($handle = snake_case($title))) {
+            return ['success' => true];
+        }
+
+        $fieldset = (new Fieldset)->setHandle($handle)->setContents([
+            'title' => $request->title,
+            'fields' => []
+        ])->save();
+
+        return ['success' => true];
     }
 
     private function save(Fieldset $fieldset, Request $request)
