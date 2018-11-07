@@ -19,14 +19,20 @@
                     <div class="mb-1">More options:</div>
                     <ul class="pl-2">
                         <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>
-                        <li><button class="text-blue" @click.prevent="">Create a new reusable field</button></li>
+                        <li><button class="text-blue" @click.prevent="createFieldsetField">Create a new reusable field</button></li>
                         <li><button class="text-blue" @click="addImportField">Import a fieldset</button></li>
                     </ul>
                 </div>
 
                 <portal to="modals" v-if="selectingFieldtype">
                     <modal name="fieldtype-selector" width="90%" height="90%">
-                        <fieldtype-selector @selected="fieldtypeSelected" />
+                        <fieldtype-selector :in-modal="true" @selected="fieldtypeSelected" />
+                    </modal>
+                </portal>
+
+                <portal to="modals" v-if="creatingFieldsetField">
+                    <modal name="fieldset-field-form" width="90%" height="90%">
+                        <fieldset-field-form @created="fieldsetFieldCreated" />
                     </modal>
                 </portal>
 
@@ -46,18 +52,21 @@
 import uniqid from 'uniqid';
 import Popper from 'vue-popperjs';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
+import FieldsetFieldForm from './FieldsetFieldForm.vue';
 
 export default {
 
     components: {
         Popper,
-        FieldtypeSelector
+        FieldtypeSelector,
+        FieldsetFieldForm
     },
 
     data() {
         return {
             fieldReference: null,
             selectingFieldtype: false,
+            creatingFieldsetField: false,
             suggestions: Object.values(window.Statamic.fieldsetFields).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
@@ -122,6 +131,17 @@ export default {
                 fieldset: null,
                 prefix: null,
             });
+        },
+
+        createFieldsetField() {
+            this.creatingFieldsetField = true;
+            this.$nextTick(() => this.$modal.show('fieldset-field-form'));
+        },
+
+        fieldsetFieldCreated(reference) {
+            this.$modal.hide('fieldset-field-form');
+            this.creatingFieldsetField = false;
+            this.addReferenceField(reference);
         }
 
     }
