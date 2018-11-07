@@ -54,7 +54,7 @@
                     v-for="configField in filteredFieldtypeConfig"
                     :key="configField.handle"
                     :config="configField"
-                    :value="field[configField.handle]"
+                    :value="values[configField.handle]"
                     @updated="updateField"
                 />
 
