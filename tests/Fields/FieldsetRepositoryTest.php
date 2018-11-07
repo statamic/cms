@@ -85,6 +85,18 @@ EOT;
     }
 
     /** @test */
+    function it_checks_if_a_fieldset_exists()
+    {
+        file_put_contents($this->tempDir.'/test.yaml', '');
+
+        $this->assertTrue($this->repo->exists('test'));
+        $this->assertFalse($this->repo->exists('unknown'));
+
+        $this->repo->setDirectory(__DIR__.'/nope');
+        $this->assertFalse($this->repo->exists('test'));
+    }
+
+    /** @test */
     function it_gets_all_fieldsets()
     {
         $firstContents = <<<'EOT'

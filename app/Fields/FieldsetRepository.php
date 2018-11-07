@@ -37,6 +37,14 @@ class FieldsetRepository
             ->setContents(YAML::parse($this->files->get($path)));
     }
 
+    public function exists(string $handle): bool
+    {
+        $handle = str_replace('/', '.', $handle);
+        $path = str_replace('.', '/', $handle);
+
+        return $this->files->exists($path = "{$this->directory}/{$path}.yaml");
+    }
+
     public function all(): Collection
     {
         if (! $this->files->exists($this->directory)) {
