@@ -4,7 +4,9 @@
         <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex-1 px-2 py-1">
+                <div class="flex-1 px-2 py-1 pl-1">
+                    <span v-if="isReferenceField" class="icon icon-link text-grey-light mr-1"></span>
+                    <span v-if="isInlineField" class="icon icon-layers text-grey-light mr-1"></span>
                     <span class="font-medium mr-1">{{ field.config.display || field.handle }}</span>
                     <span class="font-mono text-2xs text-grey-light">{{ field.handle }}</span>
                 </div>
@@ -46,6 +48,14 @@ export default {
     },
 
     computed: {
+
+        isReferenceField() {
+            return this.field.hasOwnProperty('field_reference');
+        },
+
+        isInlineField() {
+            return !this.isReferenceField;
+        },
 
         fieldConfig() {
             return Object.assign({}, this.field.config, {
