@@ -23,7 +23,10 @@ class AddonsController extends CpController
 
     public function install(Request $request)
     {
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setAddon($request->addon, '1.0.0'); // Temp!
+        // if ($changelog = Changelog::product($request->addon)->latest()) {
+
+        // }
+        // \Tests\Fakes\Composer\Package\PackToTheFuture::setAddon($request->addon, '1.0.0'); // Temp!
 
         return AddonInstaller::install($request->addon);
     }

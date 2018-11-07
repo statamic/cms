@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Processes;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Jobs\RunComposer;
+use Illuminate\Support\Facades\Cache;
 
 class Composer extends Process
 {
@@ -155,6 +155,6 @@ class Composer extends Process
      */
     private function normalizeVersion(string $version)
     {
-        return str_replace('v', '', $version);
+        return ltrim($version, 'v');
     }
 }

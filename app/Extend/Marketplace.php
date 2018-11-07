@@ -3,10 +3,10 @@
 namespace Statamic\Extend;
 
 use GuzzleHttp\Client;
+use Statamic\API\Addon as AddonAPI;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Cache;
-use Statamic\API\Addon as AddonAPI;
 
 class Marketplace
 {
@@ -134,6 +134,19 @@ class Marketplace
     }
 
     /**
+     * Show addon.
+     *
+     * @param mixed $addon
+     * @return mixed
+     */
+    public function show($addon)
+    {
+        return Cache::remember("marketplace-addons/{$addon}", static::CACHE_FOR_MINUTES, function () use ($addon) {
+            return $this->apiRequest("addons/{$addon}");
+        });
+    }
+
+    /**
      * Get paginated addons.
      *
      * @param int $perPage
@@ -162,7 +175,7 @@ class Marketplace
     public function findByGithubRepo($githubRepo)
     {
         return collect($this->get()['data'])->first(function ($addon) use ($githubRepo) {
-            return data_get($addon, 'variants.0.githubRepo') === $githubRepo;
+            return strtolower(data_get($addon, 'variants.0.githubRepo')) === strtolower($githubRepo);
         });
     }
 
@@ -220,7 +233,6 @@ class Marketplace
 
     /**
      * Add local development addons to payload.
-     *
      */
     protected function addLocalDevelopmentAddonsToPayload()
     {

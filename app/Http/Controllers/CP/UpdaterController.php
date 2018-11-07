@@ -2,28 +2,37 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Updater\CoreChangelog;
-use Facades\Statamic\Updater\CoreUpdater;
-use Facades\Statamic\Updater\UpdatesCount;
+use Statamic\API\Addon;
 use Illuminate\Http\Request;
-use Statamic\Statamic;
+use Facades\Statamic\Updater\UpdatesCount;
 
 class UpdaterController extends CpController
 {
-    public function __construct()
-    {
-        // Temporarily using PackToTheFuture to fake version tags until we get this hooked up to statamic/cms.
-        require(base_path('vendor/statamic/cms/tests/Fakes/Composer/Package/PackToTheFuture.php'));
-    }
-
+    /**
+     * Updates overview.
+     */
     public function index()
     {
         $this->access('updater');
 
-        return redirect()->route('statamic.cp.updater.product.index', ['statamic']);
+        $updatableAddons = $this->getUpdatableAddons();
+
+        if ($updatableAddons->isEmpty()) {
+            return redirect()->route('statamic.cp.updater.product.index', ['statamic']);
+        }
+
+        // Todo: view
+        echo '<a href="' . route('statamic.cp.updater.product.index', 'statamic') . '">statamic core</a><br><br>';
+        $updatableAddons->each(function ($addon) {
+            echo '<a href="' . route('statamic.cp.updater.product.index', $addon) . '">' . $addon . '</a><br>';
+        });
     }
 
+    /**
+     * Updates count.
+     *
+     * @param Request $request
+     */
     public function count(Request $request)
     {
         $this->access('updater');
@@ -31,45 +40,13 @@ class UpdaterController extends CpController
         return UpdatesCount::get($request->input('clearCache', false));
     }
 
-    public function product()
+    /**
+     * Get updatable addons.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getUpdatableAddons()
     {
-        $this->access('updater');
-
-        return view('statamic::updater.index', [
-            'title' => 'Updates'
-        ]);
-    }
-
-    public function changelog()
-    {
-        $this->access('updater');
-
-        return [
-            'changelog' => CoreChangelog::get(),
-            'currentVersion' => Statamic::version(),
-            'lastInstallLog' => Composer::lastCachedOutput(Statamic::CORE_REPO),
-        ];
-    }
-
-    public function update()
-    {
-        return CoreUpdater::update();
-    }
-
-    public function updateToLatest()
-    {
-        // Normally we can run this, but we can't require using a 2.10.* version constraint on a fake path repo.
-        // return CoreUpdater::updateToLatest();
-
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion('2.10.6'); // Temp!
-
-        return CoreUpdater::installExplicitVersion('2.10.6');
-    }
-
-    public function installExplicitVersion(Request $request)
-    {
-        \Tests\Fakes\Composer\Package\PackToTheFuture::setVersion($request->version); // Temp!
-
-        return CoreUpdater::installExplicitVersion($request->version);
+        return Addon::all()->map->marketplaceSlug()->filter();
     }
 }

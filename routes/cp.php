@@ -50,11 +50,11 @@ Route::group([
     // Updater
     Route::get('updater', 'UpdaterController@index')->name('updater.index');
     Route::get('updater/count', 'UpdaterController@count');
-    Route::get('updater/{product}', 'UpdaterController@product')->name('updater.product.index');
-    Route::get('updater/{product}/changelog', 'UpdaterController@changelog');
-    Route::post('updater/{product}/update', 'UpdaterController@update');
-    Route::post('updater/{product}/update-to-latest', 'UpdaterController@updateToLatest');
-    Route::post('updater/{product}/install-explicit-version', 'UpdaterController@installExplicitVersion');
+    Route::get('updater/{product}', 'UpdateProductController@index')->name('updater.product.index');
+    Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
+    Route::post('updater/{product}/update', 'UpdateProductController@update');
+    Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');
+    Route::post('updater/{product}/install-explicit-version', 'UpdateProductController@installExplicitVersion');
 
     // Addons
     Route::get('addons', 'AddonsController@index')->name('addons.index');

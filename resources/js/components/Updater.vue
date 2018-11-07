@@ -86,6 +86,7 @@
 
     export default {
         props: [
+            'slug',
             'package',
         ],
 
@@ -126,7 +127,7 @@
             getChangelog() {
                 this.gettingChangelog = true;
 
-                axios.get('/cp/updater/statamic/changelog').then(response => {
+                axios.get(`/cp/updater/${this.slug}/changelog`).then(response => {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
@@ -135,7 +136,7 @@
             },
 
             update() {
-                axios.post('/cp/updater/statamic/update', {}, this.toEleven);
+                axios.post(`/cp/updater/${this.slug}/update`, {}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -147,7 +148,7 @@
             },
 
             updateToLatest() {
-                axios.post('/cp/updater/statamic/update-to-latest', {}, this.toEleven);
+                axios.post(`/cp/updater/${this.slug}/update-to-latest`, {}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -159,7 +160,7 @@
             },
 
             installExplicitVersion(version) {
-                axios.post('/cp/updater/statamic/install-explicit-version', {'version': version}, this.toEleven);
+                axios.post(`/cp/updater/${this.slug}/install-explicit-version`, {'version': version}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,

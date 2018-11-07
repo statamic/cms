@@ -2,9 +2,9 @@
 
 namespace Statamic\Updater;
 
-use Facades\Statamic\Updater\CoreUpdater;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Statamic;
+use Statamic\API\Addon;
+use Illuminate\Support\Facades\Cache;
 
 class UpdatesCount
 {
@@ -39,7 +39,7 @@ class UpdatesCount
      */
     protected function checkForStatamicUpdates()
     {
-        if (Statamic::version() != CoreUpdater::latestVersion()) {
+        if (Statamic::version() != Changelog::product(Statamic::CORE_SLUG)->latest()->version) {
             $this->count++;
         }
 
@@ -53,7 +53,15 @@ class UpdatesCount
      */
     protected function checkForAddonUpdates()
     {
-        //
+        Addon::all()
+            ->filter
+            ->marketplaceSlug()
+            ->filter(function ($addon) {
+                return Changelog::product($addon->marketplaceSlug())->latest()->type === 'upgrade';
+            })
+            ->each(function () {
+                $this->count++;
+            });
 
         return $this;
     }
