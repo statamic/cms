@@ -166,13 +166,7 @@ class Asset extends Data implements AssetContract
      */
     public function absoluteUrl()
     {
-        $url = $this->url();
-
-        if ($this->driver() === 'local') {
-            $url = URL::prependSiteRoot($url);
-        }
-
-        return URL::makeAbsolute($url);
+        return URL::makeAbsolute($this->url());
     }
 
     /**
