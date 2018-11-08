@@ -2,10 +2,9 @@
 
 namespace Statamic\Contracts\Data\Taxonomies;
 
-use Statamic\Contracts\HasFieldset;
 use Statamic\Contracts\Data\DataFolder;
 
-interface Taxonomy extends DataFolder, HasFieldset
+interface Taxonomy extends DataFolder
 {
     /**
      * Get the terms

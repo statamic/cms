@@ -2,10 +2,9 @@
 
 namespace Statamic\Contracts\Data\Entries;
 
-use Statamic\Contracts\HasFieldset;
 use Statamic\Contracts\Data\DataFolder;
 
-interface Collection extends DataFolder, HasFieldset
+interface Collection extends DataFolder
 {
     /**
      * Get the entries in the folder
