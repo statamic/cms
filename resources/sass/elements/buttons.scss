@@ -7,16 +7,26 @@
 .btn-default {
     @include button(#fff, $color_gray_dark);
     @apply shadow-button;
-    .icon { color: #777; }
+
+    // The larger shadow on the default button makes it look too tall compared,
+    // to form inputs and other buttons, so we adjust this to provide
+    // the illusion of equal height when elements are inline.
+    height: 37px;
+
+    .icon { color: #777; } // @TODO use standardized grey
 }
+
 
 .btn-primary {
     @include button($brand-primary, rgba(255,255,255,.9));
+
+    background: linear-gradient(to bottom, $brand-primary, #2096df) !important;
+
     box-shadow:
         rgba($brand-primary, .05) 0 2px 5px 0,
         rgba(0,0,0,.07) 0 1px 2px 0,
         rgba(0,0,0,.08) 0 1px 3px 0;
-    border-bottom: 1px solid #2090d5;
+    border-bottom: 1px solid #3282b3;
 
     &:hover:not(:disabled),
     &.depressed {
@@ -25,27 +35,67 @@
             0 2px 4px 0 rgba(50,50,93,.08),
             0 1px 2px 0 rgba(0,0,0,.08),
             0 1px 3px 0 rgba(0,0,0,.08);
-        border-bottom: 1px solid rgba(#2090d5, .9);
     }
 }
 
-.btn-secondary {
-    @include button(config('colors.grey-darker'));
-}
-
 .btn-danger {
-    @include button($color_red, white);
+    @include button(transparent, $color_red);
+    border: 1px solid $color_red;
 
-    &:hover { color: white; }
+    box-shadow:
+        rgba($color_red, .05) 0 2px 5px 0,
+        rgba(0,0,0,.07) 0 1px 2px 0,
+        rgba(0,0,0,.08) 0 1px 3px 0;
+
+    &:hover:not(:disabled),
+    &.depressed {
+        color: $color_red;
+        box-shadow:
+            0 2px 5px 0 rgba($color_red,.1),
+            0 2px 4px 0 rgba($color_red,.08),
+            0 1px 2px 0 rgba(0,0,0,.08),
+            0 1px 3px 0 rgba(0,0,0,.08);
+    }
 }
+
+/* Size Variations
+  ========================================================================== */
+
+.btn-sm {
+    height: 28px;
+    line-height: 28px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+.btn-lg {
+    font-size: 16px;
+    height: 48px;
+    line-height: 42px;
+    padding: 2px 40px;
+}
+
+
+/* Shape Variations
+  ========================================================================== */
+
+.btn.round {
+    width: 32px;
+}
+
+.btn-circle {
+    svg path, svg circle {
+        fill: #2d393c;
+    }
+}
+
+
+/* With Icons
+  ========================================================================== */
 
 .btn-icon {
     padding: 1px 8px;
     border-radius: 2px;
-}
-
-.btn.round {
-    width: 32px;
 }
 
 .btn-primary.btn-icon .icon,
@@ -53,15 +103,7 @@
     color: #fff;
 }
 
-.btn.btn-small {
-    height: 24px;
-    line-height: 24px;
-    font-size: 12px;
-    padding: 0 8px;
-    border-radius: 2px;
-}
-
-.btn.btn-round {
+.btn-round {
     height: 32px;
     width: 32px;
     border-radius: 9999px;
@@ -110,18 +152,6 @@ td .btn-icon {
     }
 }
 
-
-.btn.btn-lg {
-    font-size: 16px;
-    height: 48px;
-    line-height: 42px;
-    padding: 2px 40px;
-}
-
-.btn-white {
-    @include button(#fff, $color_gray_dark);
-}
-
 .btn i.icon {
     color: #d0d4d7;
 }
@@ -130,10 +160,8 @@ td .btn-icon {
 }
 
 
-
-/* ==========================================================================
-   BUTTON GROUPS
-   ========================================================================== */
+/* Button Groups
+  ========================================================================== */
 
 .btn-group {
     border-radius: 3px;
@@ -214,6 +242,8 @@ td .btn-icon {
 }
 
 
+/* Specialty Buttons
+  ========================================================================== */
 
 .btn-upload {
     @apply .shadow-inner;
@@ -278,9 +308,3 @@ td .btn-icon {
 }
 
 .btn-more:before { line-height: 0; }
-
-.btn-circle {
-    svg path, svg circle {
-        fill: #2d393c;
-    }
-}

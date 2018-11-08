@@ -22,6 +22,11 @@
                 <option value="">Oh hai Mark</option>
             </select>
         </div>
+        <div class="mb-2 flex">
+            <input type="text" class="input-text" placeholder="v3 style">
+            <button class="btn ml-1">Default Button</button>
+            <button class="btn-primary ml-1">Primary Button</button>
+        </div>
         <div class="mb-2">
             <textarea name="" class="input-text" placeholder="v3 style"></textarea>
         </div>
@@ -56,19 +61,27 @@
         <div class="mb-4">
             <button class="btn mr-2">Default Button</button>
             <button class="btn btn-primary mr-2">Primary Button</button>
-            <button class="btn btn-secondary mr-2">Secondary Button</button>
+            <button class="btn btn-danger mr-2">Danger Button</button>
         </div>
         <h6 class="mb-2">Disabled States</h6>
         <div class="mb-4">
             <button disabled class="btn disabled mr-2">Default Button</button>
             <button disabled class="btn btn-primary disabled mr-2">Primary Button</button>
-            <button disabled class="btn btn-secondary disabled mr-2">Secondary Button</button>
+            <button disabled class="btn btn-danger disabled mr-2">Danger Button</button>
         </div>
+
+        <h6 class="mb-2">Small Variation</h6>
+        <div class="mb-4">
+            <button class="btn btn-sm mr-2">Default Button</button>
+            <button class="btn btn-primary btn-sm mr-2">Primary Button</button>
+            <button class="btn btn-danger btn-sm mr-2">Danger Button</button>
+        </div>
+
         <h6 class="mb-2">Large Variation</h6>
         <div>
             <button class="btn btn-lg mr-2">Default Button</button>
             <button class="btn btn-primary btn-lg mr-2">Primary Button</button>
-            <button class="btn btn-secondary btn-lg mr-2">Secondary Button</button>
+            <button class="btn btn-danger btn-lg mr-2">Danger Button</button>
         </div>
     </div>
 

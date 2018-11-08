@@ -3,12 +3,12 @@
    ========================================================================== */
 
 @mixin button($background, $text: #fff) {
-    @apply select-none border-0 rounded inline-block text-xs relative align-middle text-center;
+    @apply select-none border-0 rounded inline-block text-xs relative align-middle text-center whitespace-no-wrap;
     background: $background;
     color: $text;
-    height: 34px;
+    height: 38px;
     padding: 0 16px;
-    line-height: 34px;
+    line-height: 38px;
 
     &:hover, &:active, &:focus, &:active:focus {
         background: $background;
@@ -32,6 +32,7 @@
 
     &:disabled {
         @apply opacity-75;
+        cursor: not-allowed;
     }
 }
 

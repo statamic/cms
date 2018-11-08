@@ -30,6 +30,9 @@ select {
     @apply appearance-none bg-grey-lighten-6 w-full border p-1 rounded shadow-inner;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
+
+    height: 38px;
+
     &:focus {
         @apply border-blue-light;
         outline: 0;
