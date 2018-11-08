@@ -10,6 +10,7 @@ class BlueprintRepository
 {
     protected $files;
     protected $directory;
+    protected $fallbackDirectory;
 
     public function __construct(Filesystem $files)
     {
@@ -23,10 +24,19 @@ class BlueprintRepository
         return $this;
     }
 
+    public function setFallbackDirectory(string $directory)
+    {
+        $this->fallbackDirectory = $directory;
+
+        return $this;
+    }
+
     public function find($handle): ?Blueprint
     {
         if (! $this->files->exists($path = "{$this->directory}/{$handle}.yaml")) {
-            return null;
+            if (! $this->files->exists($path = "{$this->fallbackDirectory}/{$handle}.yaml")) {
+                return null;
+            }
         }
 
         return (new Blueprint)

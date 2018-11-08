@@ -69,6 +69,24 @@ EOT;
     }
 
     /** @test */
+    function it_gets_fallback_blueprint()
+    {
+        $dir = $this->tempDir . '/fallbacks';
+        mkdir($dir);
+        $contents = <<<'EOT'
+title: Test
+sections: []
+EOT;
+        file_put_contents($dir . '/test-fallback.yaml', $contents);
+        $this->repo->setFallbackDirectory($dir);
+
+        $blueprint = $this->repo->find('test-fallback');
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertEquals('test-fallback', $blueprint->handle());
+    }
+
+    /** @test */
     function it_gets_all_blueprints()
     {
         $firstContents = <<<'EOT'

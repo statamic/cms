@@ -99,7 +99,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function ($app) {
             return (new \Statamic\Fields\BlueprintRepository($app['files']))
-                ->setDirectory(resource_path('blueprints'));
+                ->setDirectory(resource_path('blueprints'))
+                ->setFallbackDirectory(__DIR__.'/../../resources/blueprints');
         });
 
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
