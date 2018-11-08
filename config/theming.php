@@ -62,16 +62,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default fieldsets
+    | Default blueprints
     |--------------------------------------------------------------------------
     |
     | When creating or editing a particular content type in the Control Panel
-    | and a fieldset hasn't been explicitly defined, Statamic will attempt
-    | to load one with the corresponding default fieldset names below.
+    | and a blueprint hasn't been explicitly defined, Statamic will attempt
+    | to load one with the corresponding default blueprint handles below.
     |
     */
 
-    'fieldsets' => [
+    'blueprints' => [
         'page' => 'page',
         'entry' => 'entry',
         'term' => 'term',

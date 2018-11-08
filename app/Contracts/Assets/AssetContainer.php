@@ -117,11 +117,11 @@ interface AssetContainer extends Editable
     public function delete();
 
     /**
-     * Get or set the fieldset to be used by assets in this container
+     * Get or set the blueprint to be used by assets in this container
      *
-     * @param string $fieldset
+     * @param string $blueprint
      */
-    public function fieldset($fieldset = null);
+    public function blueprint($blueprint = null);
 
     /**
      * Whether the container's assets are web-accessible

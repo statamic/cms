@@ -291,7 +291,7 @@ export default {
          * Load the fieldset
          */
         getFieldset() {
-            const url = cp_url(`publish-fieldsets/${this.asset.fieldset}`);
+            const url = cp_url(`publish-blueprints/${this.asset.blueprint}`);
 
             axios.get(url).then(response => {
                 const fieldset = new Fieldset(response.data);

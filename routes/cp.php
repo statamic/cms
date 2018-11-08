@@ -44,7 +44,7 @@ Route::group([
     Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
     Route::resource('blueprints', 'BlueprintController');
     Route::get('fieldtypes', 'FieldtypesController@index');
-    Route::get('publish-fieldsets/{fieldset}', 'PublishFieldsetController@show');
+    Route::get('publish-blueprints/{blueprint}', 'PublishBlueprintController@show');
 
     // Composer
     Route::get('composer/check', 'ComposerOutputController@check');

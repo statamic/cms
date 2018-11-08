@@ -4,10 +4,10 @@ namespace Statamic\Assets;
 
 use Statamic\API\Folder;
 use Statamic\API\Str;
-use Statamic\API\Fieldset;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Parse;
+use Statamic\API\Blueprint;
 use Statamic\API\Asset as AssetAPI;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
@@ -191,26 +191,26 @@ class AssetContainer implements AssetContainerContract
     }
 
     /**
-     * Get or set the fieldset to be used by assets in this container
+     * Get or set the blueprint to be used by assets in this container
      *
-     * @param string $fieldset
-     * @return \Statamic\Fields\Fieldset
+     * @param string $blueprint
+     * @return \Statamic\Fields\Blueprint
      */
-    public function fieldset($fieldset = null)
+    public function blueprint($blueprint = null)
     {
-        if (is_null($fieldset)) {
-            if (! $fieldset = array_get($this->data, 'fieldset')) {
+        if (is_null($blueprint)) {
+            if (! $blueprint = array_get($this->data, 'blueprint')) {
                 return null;
             }
 
-            return Fieldset::get($fieldset);
+            return Blueprint::find($blueprint);
         }
 
-        if ($fieldset === false) {
-            $fieldset = null;
+        if ($blueprint === false) {
+            $blueprint = null;
         }
 
-        $this->data['fieldset'] = $fieldset;
+        $this->data['blueprint'] = $blueprint;
     }
 
     /**

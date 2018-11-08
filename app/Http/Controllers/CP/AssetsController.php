@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Asset;
 use Illuminate\Http\Request;
+use Statamic\Fields\Validation;
 use Statamic\CP\Publish\ProcessesFields;
 
 class AssetsController extends CpController
@@ -23,7 +24,10 @@ class AssetsController extends CpController
 
         $asset = $this->supplementAssetForEditing($asset);
 
-        $fields = $this->addBlankFields($asset->fieldset(), $asset->processedData());
+        $fields = $asset->blueprint()->fields()
+            ->addValues($asset->data())
+            ->preProcess()
+            ->values();
 
         return ['asset' => $asset->toArray(), 'fields' => $fields];
     }
@@ -50,16 +54,15 @@ class AssetsController extends CpController
         $asset = Asset::find(base64_decode($asset));
 
         // TODO: Auth
-        // TODO: Validation
 
-        $request->validate([
-            'title' => 'required',
-            'alt' => 'required',
-        ]);
+        $fields = $asset->blueprint()->fields()->addValues($request->all())->process();
 
-        $fieldset = $asset->fieldset();
-        $fields = $this->processFields($fieldset, $this->request->all());
-        $asset->data($fields);
+        $request->validate((new Validation)->fields($fields)->rules());
+
+        foreach ($fields->values() as $key => $value) {
+            $asset->set($key, $value);
+        }
+
         $asset->save();
 
         if ($asset->isImage()) {

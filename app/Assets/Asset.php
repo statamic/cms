@@ -13,7 +13,7 @@ use Statamic\API\Event;
 use Statamic\API\Image;
 use Statamic\Data\Data;
 use Statamic\API\Config;
-use Statamic\API\Fieldset;
+use Statamic\API\Blueprint;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Statamic\Events\Data\AssetReplaced;
@@ -430,7 +430,7 @@ class Asset extends Data implements AssetContract
             'is_previewable' => $this->isPreviewable(),
             'is_image'       => $this->isImage(),
             'is_video'       => $this->isVideo(),
-            'fieldset'       => $this->fieldset()->name(),
+            'blueprint'      => $this->blueprint()->handle(),
             'edit_url'       => $this->editUrl(),
             'container'      => $this->container()->id(),
             'folder'         => $this->folder(),
@@ -564,26 +564,20 @@ class Asset extends Data implements AssetContract
     }
 
     /**
-     * Get or set the fieldset
+     * Get the blueprint
      *
-     * @param string|null $fieldset
-     * @return \Statamic\Fields\Fieldset
-     * @throws \Exception
-     * @throws \Statamic\Exceptions\FileNotFoundException
+     * @param string|null $blueprint
+     * @return \Statamic\Fields\Blueprint
      */
-    public function fieldset($fieldset = null)
+    public function blueprint()
     {
-        if (! is_null($fieldset)) {
-            throw new \Exception('You cannot set an asset fieldset.');
-        }
-
         // Check the container
-        if ($fieldset = $this->container()->fieldset()) {
-            return $fieldset;
+        if ($blueprint = $this->container()->blueprint()) {
+            return $blueprint;
         }
 
-        // Then the default asset fieldset
-        return Fieldset::get(config('statamic.theming.fieldsets.asset'));
+        // Then the default asset blueprint
+        return Blueprint::find(config('statamic.theming.blueprints.asset')) ?? Blueprint::find('asset');
     }
 
     /**
