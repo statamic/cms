@@ -4,6 +4,7 @@
         name="asset-editor"
         width="90%"
         height="90%"
+        @closed="$emit('closed')"
     >
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
