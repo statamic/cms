@@ -15,9 +15,9 @@
     </div>
 
     <div class="card" v-pre>
-        <table class="dossier mt-0">
-            <tr>
-                <th width="25%">{{ t('date') }}</th>
+        <table class="data-table mt-0">
+            <tr class="border-none">
+                <th width="25%">{{ __('Date') }}</th>
                 <td>{{ $submission->formattedDate() }}</td>
             </tr>
             @foreach($submission->fields() as $name => $field)
