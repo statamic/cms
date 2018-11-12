@@ -8,7 +8,7 @@
         <data-list v-if="!loading" :visible-columns="columns" :columns="columns" :rows="submissions">
             <div class="card p-0" slot-scope="{ filteredRows: rows }">
                 <data-table>
-                    <template slot="cell-date" slot-scope="{ row: submission, value }">
+                    <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
                         <a :href="submission.edit_url">{{ value }}</a>
                     </template>
                 </data-table>
@@ -31,12 +31,13 @@ export default {
         return {
             loading: true,
             submissions: [],
-            columns: ['date', 'name', 'email']
+            columns: []
         }
     },
 
     created() {
         axios.get(cp_url(`forms/${this.form}/submissions`)).then(response => {
+            this.columns = response.data.meta.columns.map(column => column.field);
             this.submissions = response.data.data;
             this.loading = false;
         })
