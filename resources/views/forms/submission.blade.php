@@ -2,9 +2,16 @@
 
 @section('content')
 
-    <div class="flex items-center mb-3">
-        <a href="{{ cp_route('forms.show', $submission->form->name) }}" class="btn icon round mr-2">&larr;</a>
-        <h1>{{ translate_choice('cp.submissions', 1) }}</h1>
+    <div class="flex mb-3">
+        <h1>
+            <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
+            @svg('chevron-right')
+            <a href="{{ cp_route('forms.show', $submission->form->handle()) }}">
+                {{ $submission->form->title() }}
+            </a>
+            @svg('chevron-right')
+            {{ __('Submission') }}
+        </h1>
     </div>
 
     <div class="card" v-pre>
