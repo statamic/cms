@@ -119,6 +119,12 @@ class Form implements FormContract
         $this->name = $name;
     }
 
+    // TODO: Deprecate name and replace with this
+    public function handle($handle = null)
+    {
+        return $this->name($handle);
+    }
+
     /**
      * Get or set the title
      *

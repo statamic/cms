@@ -63,6 +63,10 @@ Route::group([
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
 
+    // Forms
+    Route::resource('forms', 'FormsController');
+    Route::resource('forms.submissions', 'FormSubmissionsController');
+
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');

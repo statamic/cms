@@ -38,7 +38,7 @@ class Form
      * Get all Forms
      *
      * @param  string $name
-     * @return array of Statamic\Contracts\Forms\Forms
+     * @return \Illuminate\Support\Collection
      */
     public function all()
     {
@@ -52,13 +52,13 @@ class Form
             $submissions = $form->submissions();
 
             $form = $form->toArray();
-            $form['count'] = count($submissions);
-            $form['show_url'] = route('form.show', $form['name']);
+            $form['submissions'] = count($submissions);
+            $form['show_url'] = cp_route('forms.show', $form['name']);
 
             $forms[] = $form;
         }
 
-        return $forms;
+        return collect($forms);
     }
 
     /**

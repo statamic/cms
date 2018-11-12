@@ -47,8 +47,8 @@
             </ul>
             <h6>Tools</h6>
             <ul>
-                <li>
-                    <a href="">
+                <li class="{{ current_class('forms*') }}">
+                    <a href="{{ cp_route('forms.index') }}">
                         <i>@svg('drawer-file')</i><span>Forms</span>
                     </a>
                 </li>

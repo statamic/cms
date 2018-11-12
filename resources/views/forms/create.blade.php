@@ -4,7 +4,7 @@
 
 
         <formset-builder :create="true"
-                         save-url="{{ route('form.store') }}">
+                         save-url="{{ cp_route('forms.store') }}">
         </formset-builder>
 
 
