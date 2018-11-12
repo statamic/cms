@@ -59,7 +59,7 @@ class FormSubmissionsController extends CpController
         $paginator = new LengthAwarePaginator($submissions, $totalSubmissionCount, $perPage, $currentPage);
 
         return [
-            'data' => $submissions,
+            'data' => $submissions->values(),
             'meta' => [
                 'columns' => $columns,
             ]
