@@ -66,6 +66,7 @@ Route::group([
     // Forms
     Route::resource('forms', 'FormsController');
     Route::resource('forms.submissions', 'FormSubmissionsController');
+    Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
 
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
