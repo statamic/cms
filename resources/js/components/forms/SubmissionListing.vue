@@ -5,9 +5,16 @@
             <loading-graphic />
         </div>
 
-        <data-list v-if="!loading" :visible-columns="columns" :columns="columns" :rows="submissions">
+        <data-list
+            v-if="!loading"
+            :columns="columns"
+            :rows="submissions"
+            :sort="false"
+            :sort-column="sortColumn"
+            :sort-direction="sortDirection"
+        >
             <div class="card p-0" slot-scope="{ filteredRows: rows }">
-                <data-table>
+                <data-table @sorted="sorted">
                     <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
                         <a :href="submission.edit_url">{{ value }}</a>
                     </template>
@@ -31,16 +38,55 @@ export default {
         return {
             loading: true,
             submissions: [],
-            columns: []
+            columns: [],
+            sortColumn: null,
+            sortDirection: 'asc'
         }
     },
 
+    computed: {
+
+        parameters() {
+            return {
+                sort: this.sortColumn,
+                order: this.sortDirection,
+                // page: this.selectedPage
+            }
+        }
+
+    },
+
     created() {
-        axios.get(cp_url(`forms/${this.form}/submissions`)).then(response => {
-            this.columns = response.data.meta.columns.map(column => column.field);
-            this.submissions = response.data.data;
-            this.loading = false;
-        })
+        this.request();
+    },
+
+    watch: {
+
+        parameters() {
+            this.request();
+        }
+
+    },
+
+    methods: {
+
+        request() {
+            this.loading = true;
+            const url = cp_url(`forms/${this.form}/submissions`);
+
+            axios.get(url, { params: this.parameters }).then(response => {
+                this.columns = response.data.meta.columns.map(column => column.field);
+                this.sortColumn = response.data.meta.sortColumn;
+                this.submissions = response.data.data;
+                this.loading = false;
+            });
+        },
+
+        sorted(column, direction) {
+            this.sortColumn = column;
+            this.sortDirection = direction;
+        }
+
     }
 
 }

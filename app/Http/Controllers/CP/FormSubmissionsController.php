@@ -62,6 +62,7 @@ class FormSubmissionsController extends CpController
             'data' => $submissions->values(),
             'meta' => [
                 'columns' => $columns,
+                'sortColumn' => $sort,
             ]
             // 'pagination' => [
             //     'totalItems' => $totalSubmissionCount,
