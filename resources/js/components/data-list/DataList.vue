@@ -30,6 +30,11 @@ export default {
             type: Boolean,
             default: true
         },
+        sortColumn: String,
+        sortDirection: {
+            type: String,
+            default: 'asc'
+        }
     },
     provide() {
         return {
@@ -42,8 +47,8 @@ export default {
                 searchQuery: this.searchQuery,
                 columns: this.columns,
                 visibleColumns: this.visibleColumns,
-                sortColumn: this.sort ? this.visibleColumns[0] : null,
-                sortDirection: 'asc',
+                sortColumn: null,
+                sortDirection: this.sortDirection,
                 rows: [],
                 selections: this.selections,
                 maxSelections: this.maxSelections,
@@ -74,6 +79,10 @@ export default {
             this.$emit('selections-updated', selections);
         }
 
+    },
+
+    created() {
+        this.sharedState.sortColumn = this.sortColumn || (this.sort ? this.visibleColumns[0] : null);
     },
 
     methods: {
