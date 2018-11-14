@@ -42,10 +42,10 @@ class Submission implements SubmissionContract
     public function id($id = null)
     {
         if (is_null($id)) {
-            return $this->id ?: time();
+            $id = $this->id ?: microtime(true);
         }
 
-        $this->id = $id;
+        return $this->id = $id;
     }
 
     /**
