@@ -52,6 +52,8 @@ class Tags extends CollectionTags
         if ($this->hasErrors()) {
             $data['error']  = $this->getErrors();
             $data['errors'] = $this->getErrorMessages();
+        } else {
+            $data['errors'] = [];
         }
 
         if (session()->exists("form.{$this->formsetName}.success")) {
