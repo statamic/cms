@@ -124,6 +124,7 @@ class PasswordReset
 
         $template = ($this->user->status() === 'pending') ? 'user-activation' : 'user-reset';
 
+        // TODO: Make it work with mailables. Email API is gone.
         Email::to($this->user->email())
              ->subject($subject)
              ->template($template)
