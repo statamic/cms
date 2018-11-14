@@ -11,7 +11,7 @@ Route::group(['prefix' => Config::get('statamic.assets.image_manipulation.route'
 });
 
 Route::group(['prefix' => config('statamic.routes.action')], function () {
-    Route::post('form/create', 'FormController@create');
+    Route::post('forms', 'FormController@store')->name('forms.store');
 
     Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
     Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');

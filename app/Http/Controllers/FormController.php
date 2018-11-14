@@ -24,7 +24,7 @@ class FormController extends Controller
      *
      * @return mixed
      */
-    public function create()
+    public function store()
     {
         $fields = Request::all();
 
