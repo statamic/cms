@@ -62,7 +62,7 @@ export default {
     },
 
     created() {
-        this.data = this.data || [];
+        this.data = this.value || [];
 
         if (this.componentType === 'keyed') {
             this.data = (this.data.length === 0) ? {} : this.data;
