@@ -61,7 +61,11 @@ class Tags extends CollectionTags
         }
 
         // Make formset data available to the tag
-        $data['fields'] = (Form::fields($formset));
+        $data['fields'] = collect(Form::fields($formset))->map(function ($item) use ($data) {
+            $errors = array_get($data, 'error', []);
+            $item['error'] = array_get($errors, $item['field']);
+            return $item;
+        })->all();
 
         $this->addToDebugBar($data);
 
