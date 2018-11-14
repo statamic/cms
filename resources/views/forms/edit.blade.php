@@ -4,9 +4,12 @@
 @section('content')
 
 
-        <formset-builder formset-title="{{ $form->title() }}"
-                         formset-name="{{ $form->name() }}"
-                         save-url="{{ route('form.update', $form->name()) }}">
+        <formset-builder
+                         :initial-formset="{{ $formset }}"
+                         formset-title="{{ $form->title() }}"
+                         formset-name="{{ $form->handle() }}"
+                         save-method="patch"
+                         save-url="{{ cp_route('forms.update', $form->handle()) }}">
         </formset-builder>
 
 

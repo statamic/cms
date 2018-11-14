@@ -39,12 +39,8 @@ class FormsController extends CpController
         return view('statamic::forms.show', compact('form'));
     }
 
-    public function getForm($form)
+    public function getFormsetJson($form)
     {
-        $this->access('forms');
-
-        $form = Form::get($form);
-
         $array = $form->toArray();
 
         $array['honeypot'] = $form->honeypot();
@@ -65,7 +61,7 @@ class FormsController extends CpController
             $array['fields'][] = $field;
         }
 
-        return $array;
+        return json_encode($array);
     }
 
     /**
@@ -130,7 +126,7 @@ class FormsController extends CpController
 
         return [
             'success' => true,
-            'redirect' => route('form.edit', $form->name())
+            'redirect' => $form->editUrl()
         ];
     }
 
@@ -139,8 +135,9 @@ class FormsController extends CpController
         $this->access('super');
 
         $form = Form::get($form);
+        $formset = $this->getFormsetJson($form);
 
-        return view('statamic::forms.edit', compact('form'));
+        return view('statamic::forms.edit', compact('form', 'formset'));
     }
 
     public function update($form)
@@ -162,7 +159,7 @@ class FormsController extends CpController
 
         return [
             'success' => true,
-            'redirect' => route('form.edit', $form->name())
+            'redirect' => $form->editUrl()
         ];
     }
 
@@ -180,7 +177,7 @@ class FormsController extends CpController
                 $metric[$param['value']] = $param['text'];
             }
 
-            unset($metric['params']);
+            unset($metric['params'], $metric['_id']);
 
             $metrics[] = $metric;
         }
@@ -198,7 +195,7 @@ class FormsController extends CpController
         $emails = [];
 
         foreach ($this->request->input('formset.email') as $email) {
-            $emails[] = array_filter($email);
+            $emails[] = array_except(array_filter($email), '_id');
         }
 
         return $emails;

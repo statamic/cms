@@ -53,7 +53,6 @@ var vm = new Vue({
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue'),
         EntryPublishForm: require('./components/publish/forms/EntryPublishForm.vue'),
-        FormsetBuilder: require('./components/formset-builder/formset-builder'),
         Installer: require('./components/installer/installer'),
         Importer: require('./components/importer/importer'),
         Roles: require('./components/roles/roles'),
@@ -64,6 +63,7 @@ var vm = new Vue({
         BlueprintBuilder: require('./components/blueprints/Builder.vue'),
         FormListing: require('./components/forms/Listing.vue'),
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue'),
+        FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
     },
 
     mixins: [ Notifications ],

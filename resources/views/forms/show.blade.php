@@ -9,8 +9,9 @@
             {{ $form->title() }}
         </h1>
 
-        <a class="btn" href="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true">{{ __('Export CSV') }}</a>
-        <a class="btn ml-2" href="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true">{{ __('Export JSON') }}</a>
+        <a class="btn" href="{{ cp_route('forms.edit', $form->handle()) }}">{{ __('Edit') }}</a>
+        <a class="btn ml-1" href="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true">{{ __('Export CSV') }}</a>
+        <a class="btn ml-1" href="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true">{{ __('Export JSON') }}</a>
     </div>
 
     @if (! empty($form->metrics()))
