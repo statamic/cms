@@ -14,7 +14,7 @@
 
     <div class="flex items-center px-3 border-l h-full text-sm">
         <div class="dropdown">
-            <button class="flex outline-none items-center dropdown-toggle anti text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="block h-6 w-6 mr-1">@svg('content-writing')</i><span>Shortcuts</span>
             </button>
             <ul class="dropdown-menu">
@@ -31,7 +31,7 @@
 
     <div class="head-link border-l h-full px-3 flex items-center">
         <div class="dropdown">
-            <a class="h-6 w-6 block p-sm text-grey-light hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @svg('book-open')
             </a>
             <ul class="dropdown-menu">
@@ -54,7 +54,7 @@
                 </li>
             </ul>
         </div>
-        <a class="h-6 w-6 block p-sm text-grey-light ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
+        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
             @svg('browser-com')
         </a>
         <div class="dropdown">

@@ -15,10 +15,10 @@
     }
 
     li a {
-        @apply p-0 flex items-center text-grey;
+        @apply p-0 flex items-center text-grey-dark;
 
         &:hover {
-            @apply font-medium text-grey-dark
+            @apply font-medium text-grey-darker;
         }
 
         i {

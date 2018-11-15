@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply .font-sans .text-grey-dark .text-base .tracking-normal;
+    @apply .font-sans .text-grey-darker .text-base .tracking-normal;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings: "zero", "ss01";
 }
@@ -13,7 +13,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    @apply text-2xl font-normal;
+    @apply text-2xl font-bold;
     letter-spacing: -0.014em;
 }
 
