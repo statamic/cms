@@ -58,7 +58,6 @@ class Email extends Mailable
     {
         $html = array_get($this->config, 'html');
         $text = array_get($this->config, 'text');
-        $markdown = array_get($this->config, 'markdown');
 
         if (!$text && !$html) {
             return $this->automagic();
@@ -68,13 +67,7 @@ class Email extends Mailable
             $this->text($text);
         }
 
-        if (array_get($this->config, 'markdown')) {
-            $this->markdown($html);
-        } else {
-            $this->view($html);
-        }
-
-        return $this;
+        return $this->view($html);
     }
 
     protected function addData()
