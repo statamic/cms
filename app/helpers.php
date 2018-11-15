@@ -603,3 +603,10 @@ if (! function_exists('back_or_route')) {
         return back();
     }
 }
+
+if (! function_exists('__n')) {
+    function __n($key, $number, $replace = [], $locale = null)
+    {
+        return trans_choice(__($key, $replace, $locale), $number);
+    }
+}
