@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
 
 class CpServiceProvider extends ServiceProvider
@@ -17,6 +18,11 @@ class CpServiceProvider extends ServiceProvider
         tap($this->app->make('view'), function ($view) {
             $view->composer('statamic::layout', 'Statamic\Http\ViewComposers\PermissionComposer');
         });
+
+        Statamic::provideToScript([
+            'translationLocale' => $this->app['translator']->locale(),
+            'translations' => $this->app['translator']->toJson()
+        ]);
     }
 
     public function register()
@@ -27,8 +33,12 @@ class CpServiceProvider extends ServiceProvider
 
         $this->registerPublishers();
 
-        $this->app->extend('translator', function ($translator) {
-            return new Translator($translator->getLoader(), $translator->getLocale());
+        $this->app->extend('translation.loader', function ($loader, $app) {
+            return new Loader($loader, $app['path.lang']);
+        });
+
+        $this->app->extend('translator', function ($translator, $app) {
+            return new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
         });
     }
 

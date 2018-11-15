@@ -9,8 +9,11 @@ window.AutoSlug = AutoSlug;
 
 Vue.mixin({
     methods: {
-        __(key) {
-            return __(key);
+        __(key, replacements) {
+            return __(key, replacements);
+        },
+        __n(key, number, replacements) {
+            return __n(key, number, replacements);
         }
     }
 })

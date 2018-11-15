@@ -1,4 +1,5 @@
 import marked from 'marked';
+import { translate, translateChoice } from '../translations/translator';
 
 global.cp_url = function(url) {
     url = Statamic.cpRoot + '/' + url;
@@ -67,6 +68,9 @@ global.markdown = function (value) {
     return marked(value);
 };
 
-global.__ = function (string) {
-    return string;
+global.__ = function (string, replacements) {
+    return translate(string, replacements);
+}
+global.__n = function (string, number, replacements) {
+    return translateChoice(string, number, replacements);
 }
