@@ -14,6 +14,9 @@ Vue.mixin({
         },
         __n(key, number, replacements) {
             return __n(key, number, replacements);
+        },
+        translate(key, replacements) { // TODO: Remove
+            return __(key, replacements);
         }
     }
 })
