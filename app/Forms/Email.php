@@ -26,11 +26,12 @@ class Email extends Mailable
     {
         $this
             ->subject($this->config['subject'] ?? __('Form Submission'))
-            ->buildAddresses()
-            ->buildView();
+            ->addAddresses()
+            ->addViews()
+            ->addData();
     }
 
-    protected function buildAddresses()
+    protected function addAddresses()
     {
         $this->to($this->addresses(array_get($this->config, 'to')));
 
@@ -53,7 +54,7 @@ class Email extends Mailable
         return $this;
     }
 
-    protected function buildView()
+    protected function addViews()
     {
         $html = array_get($this->config, 'html');
         $text = array_get($this->config, 'text');
@@ -73,7 +74,7 @@ class Email extends Mailable
             $this->view($html);
         }
 
-        return $this->addData();
+        return $this;
     }
 
     protected function addData()
