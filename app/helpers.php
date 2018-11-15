@@ -73,6 +73,11 @@ function temp_path($path = null)
     return path(storage_path('statamic/temp'), $path);
 }
 
+function site_handle($handle = null)
+{
+    return site_locale($handle);
+}
+
 /**
  * Gets or sets the site locale
  *
