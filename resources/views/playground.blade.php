@@ -3,6 +3,17 @@
 @section('content')
 
     <div class="max-w-xl mx-auto rounded shadow bg-white">
+        <div class="max-w-md mx-auto pt-6 relative">
+            <div class="w-full absolute h-2 bg-grey-lighter pin-l" style="margin-top: 18px;">
+                <div class="w-1/5 bg-blue h-2"></div>
+            </div>
+            <div class="flex justify-between relative z-20">
+                <div class="h-10 w-10 bg-blue text-white rounded-full text-center" style="line-height: 40px">1</div>
+                <div class="h-10 w-10 bg-grey-lighter text-grey rounded-full text-center" style="line-height: 40px">2</div>
+                <div class="h-10 w-10 bg-grey-lighter text-grey rounded-full text-center" style="line-height: 40px">3</div>
+                <div class="h-10 w-10 bg-grey-lighter text-grey rounded-full text-center" style="line-height: 40px">4</div>
+            </div>
+        </div>
         <div class="max-w-md mx-auto py-6 text-center">
             <h1 class="mb-3">Create a new Collection</h1>
             <p class="text-grey">A Collection is a group of entries that holds similar content and shares behavior and attributes, like URL patterns, ordering, and visibility.</p>
