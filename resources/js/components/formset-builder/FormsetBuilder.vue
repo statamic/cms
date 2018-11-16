@@ -170,10 +170,18 @@ export default {
                         instructions: __('cp.formset_emails_grid_subject_instructions')
                     },
                     {
-                        handle: 'template',
-                        display: __('Template'),
+                        handle: 'html',
+                        display: __('HTML View'),
                         type: 'text',
-                        instructions: __('cp.formset_emails_grid_template_instructions')
+                        instructions: __('cp.formset_emails_grid_html_instructions'),
+                        width: 50
+                    },
+                    {
+                        handle: 'text',
+                        display: __('Text View'),
+                        type: 'text',
+                        instructions: __('cp.formset_emails_grid_view_instructions'),
+                        width: 50
                     }
                 ]
             };
