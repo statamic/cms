@@ -23,7 +23,7 @@
         @endif
 
     @if(count($forms) > 0)
-        <form-listing :forms="{{ $forms }}"></form-listing>
+        <form-listing :forms="{{ json_encode($forms) }}"></form-listing>
     @endif
 
 @endsection
