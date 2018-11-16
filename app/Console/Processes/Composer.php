@@ -97,10 +97,7 @@ class Composer extends Process
      */
     public function lastCachedOutput(string $package)
     {
-        // TODO: Key composer cache by package!
-        // return parent::lastCachedOutput("composer.{$package}");
-
-        return parent::lastCachedOutput('composer');
+        return parent::lastCachedOutput($this->getCacheKey($package));
     }
 
     /**
@@ -108,6 +105,8 @@ class Composer extends Process
      */
     public function clearOutputCache()
     {
+        // TODO: cache key is more specific now...
+
         Cache::forget('composer');
     }
 
@@ -125,11 +124,15 @@ class Composer extends Process
     /**
      * Queue composer command.
      *
-     * @param mixed $parts
+     * @param string $command
+     * @param string $package
+     * @param mixed $extraParams
      */
-    private function queueComposerCommand(...$parts)
+    private function queueComposerCommand($command, $package, ...$extraParams)
     {
-        dispatch(new RunComposer($this->prepareProcessArguments($parts)));
+        $parts = array_merge([$command, $package], $extraParams);
+
+        dispatch(new RunComposer($this->prepareProcessArguments($parts), $this->getCacheKey($package)));
     }
 
     /**
@@ -156,5 +159,16 @@ class Composer extends Process
     private function normalizeVersion(string $version)
     {
         return ltrim($version, 'v');
+    }
+
+    /**
+     * Get cache key for composer output storage.
+     *
+     * @param string $package
+     * @return string
+     */
+    private function getCacheKey($package)
+    {
+        return "composer.{$package}";
     }
 }
