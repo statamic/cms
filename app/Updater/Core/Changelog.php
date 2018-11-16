@@ -50,6 +50,16 @@ class Changelog extends BaseChangelog
     }
 
     /**
+     * Get composer package.
+     *
+     * @return string
+     */
+    public function composerPackage()
+    {
+        return Statamic::CORE_REPO;
+    }
+
+    /**
      * Get releases.
      *
      * @return \Illuminate\Support\Collection

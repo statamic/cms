@@ -44,7 +44,7 @@ class UpdateProductController extends CpController
         return [
             'changelog' => $changelog->get(),
             'currentVersion' => $changelog->currentVersion(),
-            'lastInstallLog' => Composer::lastCachedOutput(Statamic::CORE_REPO),
+            'lastInstallLog' => Composer::lastCompletedCachedOutput($changelog->composerPackage())['output'],
         ];
     }
 

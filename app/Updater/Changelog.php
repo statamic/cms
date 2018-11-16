@@ -23,6 +23,11 @@ class Changelog
     protected $currentVersion;
 
     /**
+     * @var \Statamic\Extend\Addon
+     */
+    protected $installedAddon;
+
+    /**
      * Instantiate product changelog.
      *
      * @param string $slug
@@ -55,7 +60,17 @@ class Changelog
      */
     public function currentVersion()
     {
-        return $this->getInstalledAddon()->version();
+        return $this->installedAddon()->version();
+    }
+
+    /**
+     * Get composer package.
+     *
+     * @return string
+     */
+    public function composerPackage()
+    {
+        return $this->installedAddon()->package();
     }
 
     /**
@@ -91,11 +106,12 @@ class Changelog
      *
      * @return \Statamic\Extend\Addon
      */
-    protected function getInstalledAddon()
+    protected function installedAddon()
     {
-        return Addon::all()->first(function ($addon) {
-            return $addon->marketplaceSlug() === $this->slug;
-        });
+        return $this->installedAddon
+            ?? $this->installedAddon = Addon::all()->first(function ($addon) {
+                return $addon->marketplaceSlug() === $this->slug;
+            });
     }
 
     /**

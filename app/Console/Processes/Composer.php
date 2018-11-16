@@ -90,24 +90,33 @@ class Composer extends Process
     }
 
     /**
-     * Get last cached output.
+     * Get cached output for package process.
      *
      * @param string $package
      * @return mixed
      */
-    public function lastCachedOutput(string $package)
+    public function cachedOutput(string $package)
     {
-        return parent::lastCachedOutput($this->getCacheKey($package));
+        return parent::cachedOutput($this->getCacheKey($package));
+    }
+
+    /**
+     * Get cached output for last completed package process.
+     *
+     * @param string $package
+     * @return mixed
+     */
+    public function lastCompletedCachedOutput(string $package)
+    {
+        return parent::lastCompletedCachedOutput($this->getCacheKey($package));
     }
 
     /**
      * Clear output cache.
      */
-    public function clearOutputCache()
+    public function clearOutputCache(string $package)
     {
-        // TODO: cache key is more specific now...
-
-        Cache::forget('composer');
+        Cache::forget($this->getCacheKey($package));
     }
 
     /**

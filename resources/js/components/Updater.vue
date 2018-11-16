@@ -75,7 +75,7 @@
                 @opened="modalOpen = true; $events.$emit('start-composer')"
                 @closed="modalOpen = false"
             >
-                <composer-output class="m-3"></composer-output>
+                <composer-output :package="package" class="m-3"></composer-output>
             </modal>
         </portal>
     </div>

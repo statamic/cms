@@ -65,7 +65,7 @@ class Updater
     {
         // It can take time to figure out the latest version constraint below,
         // so here we preemptively clear the output cache for the composer ajax polling.
-        Composer::clearOutputCache();
+        Composer::clearOutputCache($this->getPackage());
 
         return Composer::require($this->getPackage(), $this->latestVersionConstraint());
     }

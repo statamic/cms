@@ -2,8 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Http\Controllers\Controller;
+use Facades\Statamic\Console\Processes\Composer;
 
 class ComposerOutputController extends Controller
 {
@@ -12,8 +14,8 @@ class ComposerOutputController extends Controller
      *
      * @return mixed
      */
-    public function check()
+    public function check(Request $request)
     {
-        return Cache::get('composer') ?? ['output' => false];
+        return Composer::cachedOutput($request->package);
     }
 }

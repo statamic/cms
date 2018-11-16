@@ -12,6 +12,13 @@
     import axios from 'axios';
 
     export default {
+        props: {
+            package: {
+                type: String,
+                required: true
+            }
+        },
+
         data() {
             return {
                 output: false,
@@ -22,6 +29,10 @@
         computed: {
             composer() {
                 return this.$store.state.statamic.composer;
+            },
+
+            params() {
+                return {package: this.package};
             }
         },
 
@@ -44,7 +55,7 @@
             },
 
             checkComposer() {
-                axios.get('/cp/composer/check').then(response => {
+                axios.get('/cp/composer/check', {params: this.params}).then(response => {
                     this.output = response.data.output;
 
                     if (response.data.output === false || response.data.completed) {

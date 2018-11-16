@@ -63,7 +63,7 @@ class Process
         $this->output = null;
 
         $process->run(function ($type, $buffer) use (&$output) {
-            $this->output .= $buffer;
+            $this->output .= $this->plainText($buffer);
         });
 
         return $this->output;
@@ -84,7 +84,7 @@ class Process
         $this->appendOutputToCache($cacheKey, null);
 
         $process->run(function ($type, $buffer) use ($cacheKey) {
-            $this->appendOutputToCache($cacheKey, $buffer);
+            $this->appendOutputToCache($cacheKey, $this->plainText($buffer));
         });
 
         $this->setCompletedOnCache($cacheKey);
@@ -118,14 +118,25 @@ class Process
     }
 
     /**
-     * Get last cached output.
+     * Get cached output.
      *
      * @param string $cacheKey
-     * @return mixed
+     * @return array
      */
-    public function lastCachedOutput(string $cacheKey)
+    public function cachedOutput(string $cacheKey)
     {
-        return Cache::get($cacheKey)['completed'] ? Cache::get($cacheKey)['output'] : false;
+        return Cache::get($cacheKey) ?? ['output' => false];
+    }
+
+    /**
+     * Get cached output for last completed process.
+     *
+     * @param string $cacheKey
+     * @return array
+     */
+    public function lastCompletedCachedOutput(string $cacheKey)
+    {
+        return Cache::get($cacheKey)['completed'] ? Cache::get($cacheKey) : ['output' => false];
     }
 
     /**
@@ -146,5 +157,18 @@ class Process
         @ini_set('memory_limit', config('statamic.system.php_memory_limit'));
 
         @set_time_limit(config('statamic.system.php_max_execution_time'));
+    }
+
+    /**
+     * Convert output to plain text.
+     *
+     * @param string $output
+     */
+    private function plainText(string $output)
+    {
+        // Remove terminal color codes.
+        $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
+
+        return $output;
     }
 }

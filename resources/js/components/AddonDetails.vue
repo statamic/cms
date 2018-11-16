@@ -9,7 +9,7 @@
             <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall">Uninstall Addon</button>
             <button v-else class="btn" :disabled="processing" @click="install">Install Addon</button>
         </div>
-        <composer-output v-show="composer.status" class="m-3"></composer-output>
+        <composer-output v-show="composer.status" :package="package" class="m-3"></composer-output>
         <div v-if="! composer.status" class="p-4">{{ addon.variants[0].description }}</div>
     </div>
 </template>
