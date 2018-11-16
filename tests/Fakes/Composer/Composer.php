@@ -40,7 +40,17 @@ class Composer
         $this->putPackageIntoInstalled($package, $this->incrementVersion($this->installed->get($package)->version));
     }
 
-    public function clearOutputCache()
+    public function cachedOutput(string $package)
+    {
+        //
+    }
+
+    public function lastCompletedCachedOutput(string $package)
+    {
+        //
+    }
+
+    public function clearCachedOutput(string $package)
     {
         //
     }

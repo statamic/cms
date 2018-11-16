@@ -112,9 +112,9 @@ class Composer extends Process
     }
 
     /**
-     * Clear output cache.
+     * Clear cached output.
      */
-    public function clearOutputCache(string $package)
+    public function clearCachedOutput(string $package)
     {
         Cache::forget($this->getCacheKey($package));
     }
