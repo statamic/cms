@@ -27,8 +27,8 @@
                     <div v-show="canShowDividerAtEnd(index)" class="bard-divider bard-divider-end" @click="addTextBlock(index)"></div>
                 </template>
                 <template slot="expand-collapse">
-                    <li><a @click="collapseAll">{{ translate('cp.collapse_all') }}</a></li>
-                    <li><a @click="expandAll">{{ translate('cp.expand_all') }}</a></li>
+                    <li><a @click="collapseAll">{{ __('Collapse All') }}</a></li>
+                    <li><a @click="expandAll">{{ __('Expand All') }}</a></li>
                 </template>
             </component>
         </div>

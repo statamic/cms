@@ -24,9 +24,9 @@
                     <i class="icon icon-dots-three-vertical"></i>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a @click="closeDropdownAndEditAsset">{{ translate('cp.edit') }}</a></li>
+                    <li><a @click="closeDropdownAndEditAsset">{{ __('Edit') }}</a></li>
                     <li class="divider"></li>
-                    <li class="warning"><a href="" @click.prevent="closeDropdownAndDeleteAsset">{{ translate('cp.delete') }}</a></li>
+                    <li class="warning"><a href="" @click.prevent="closeDropdownAndDeleteAsset">{{ __('Delete') }}</a></li>
                 </ul>
             </div>
 

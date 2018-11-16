@@ -3,8 +3,8 @@
     <div class="focal-point">
         <div class="focal-point-toolbox card">
             <div class="form-group">
-                <label>{{ translate('cp.focal_point_label') }}</label>
-                <small class="help-block">{{ translate('cp.focal_point_instructions') }}</small>
+                <label>{{ __('Focal Point') }}</label>
+                <small class="help-block">{{ __('cp.focal_point_instructions') }}</small>
                 <div class="focal-point-image inline-block">
                     <img :src="image" @click="define" />
                     <div class="focal-point-reticle" :style="{ top: y+'%', left: x+'%' }"></div>
@@ -12,9 +12,9 @@
             </div>
             <div class="flex items-center justify-between">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-default" @click.prevent="close">{{ translate('cp.cancel') }}</button>
-                    <button type="button" class="btn btn-default" @click.prevent="reset">{{ translate('cp.reset') }}</button>
-                    <button type="button" class="btn btn-primary" @click="select">{{ translate('cp.select') }}</button>
+                    <button type="button" class="btn btn-default" @click.prevent="close">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn btn-default" @click.prevent="reset">{{ __('Reset') }}</button>
+                    <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
                 </div>
                 <div class="focal-point-coordinates">
                     <div class="pair">

@@ -2,7 +2,7 @@
 
     <div class="asset-upload-listing">
         <div class="asset-upload-listing-header">
-            <h6>{{ translate_choice('cp.uploads', uploads.length) }}</h6>
+            <h6>{{ __n('Upload|Uploads', uploads) }}</h6>
         </div>
         <table>
             <tbody>

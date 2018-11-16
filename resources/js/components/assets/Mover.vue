@@ -2,7 +2,7 @@
 
     <modal :show.sync="show" :saving="saving" class="modal-small">
         <template slot="header">
-            {{ translate('cp.move_file') }}
+            {{ __('Move File') }}
         </template>
 
         <template slot="body">
@@ -13,7 +13,7 @@
             </div>
 
             <div class="form-group">
-                <label>{{ translate('cp.folder') }}</label>
+                <label>{{ __('Folder') }}</label>
                 <asset_folder-fieldtype
                     :data.sync="selectedFolder"
                     :config="fieldtypeConfig">
@@ -23,7 +23,7 @@
 
         <template slot="footer">
             <button class="btn btn-primary" :disabled="!hasChanged" @click="save">Save</button>
-            <button type="button" class="btn" @click="cancel">{{ translate('cp.cancel') }}</button>
+            <button type="button" class="btn" @click="cancel">{{ __('Cancel') }}</button>
         </template>
     </modal>
 
@@ -42,7 +42,7 @@ export default {
             selectedFolder: null,
             saving: false,
             errors: null,
-            warningText: translate('cp.move_file_warning')
+            warningText: __('cp.move_file_warning')
         }
     },
 

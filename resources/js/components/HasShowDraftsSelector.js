@@ -10,8 +10,8 @@ export default {
 
         draftOptions() {
             return [
-                { value: true, text: translate('cp.show_drafts') },
-                { value: false, text: translate('cp.hide_drafts') }
+                { value: true, text: __('Show Drafts') },
+                { value: false, text: __('Hide Drafts') }
             ];
         }
 

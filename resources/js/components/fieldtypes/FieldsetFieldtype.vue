@@ -2,7 +2,7 @@
     <div class="template-fieldtype-wrapper">
 
         <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
         </div>
 
         <div v-if="!loading">
@@ -16,8 +16,8 @@
                        @keydown.esc="cancelAdd"
                 />
                 <div class="flex">
-                    <button class="btn btn-primary ml-1" @click.prevent="create" :disabled="storePending">{{ translate('cp.create') }}</button>
-                    <button class="btn btn-default ml-1" @click.prevent="cancelAdd">{{ translate('cp.cancel') }}</button>
+                    <button class="btn btn-primary ml-1" @click.prevent="create" :disabled="storePending">{{ __('Create') }}</button>
+                    <button class="btn btn-default ml-1" @click.prevent="cancelAdd">{{ __('Cancel') }}</button>
                 </div>
             </div>
 

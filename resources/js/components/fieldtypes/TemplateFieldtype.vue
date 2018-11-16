@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
         </div>
 
         <select-fieldtype v-if="!loading" :name="name" :data.sync="data" :config="selectConfig"></select-fieldtype>

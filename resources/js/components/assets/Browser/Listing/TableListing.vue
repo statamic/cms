@@ -90,16 +90,16 @@ export default {
             columns: [
                 {
                     field: 'title',
-                    label: translate('cp.title'),
+                    label: __('Title'),
                 },
                 {
                     field: 'size',
-                    label: translate('cp.filesize'),
+                    label: __('File size'),
                     extra: true
                 },
                 {
                     field: 'lastModified',
-                    label: translate('cp.date_modified'),
+                    label: __('Date modified'),
                     extra: true
                 }
             ]

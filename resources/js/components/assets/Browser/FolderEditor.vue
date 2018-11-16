@@ -7,8 +7,8 @@
         </template>
 
         <template slot="header">
-            <h1 v-if="create">{{ translate('cp.create_folder') }}</h1>
-            <h1 v-if="!create">{{ translate('cp.edit_folder') }}</h1>
+            <h1 v-if="create">{{ __('Create Folder') }}</h1>
+            <h1 v-if="!create">{{ __('Edit Folder') }}</h1>
         </template>
 
         <template slot="body">
@@ -18,22 +18,22 @@
             </div>
 
             <div class="form-group" v-if="create">
-                <label class="block">{{ translate('cp.name') }}</label>
-                <small class="help-block">{{ translate('cp.folder_directory_instructions') }}</small>
+                <label class="block">{{ __('Name') }}</label>
+                <small class="help-block">{{ __('cp.folder_directory_instructions') }}</small>
                 <input type="text" class="form-control" v-model="form.basename" @keyup.esc="close" v-focus="create">
             </div>
 
             <div class="form-group">
-                <label class="block">{{ translate('cp.title') }}</label>
-                <small class="help-block">{{ translate('cp.folder_title_instructions') }}</small>
+                <label class="block">{{ __('Title') }}</label>
+                <small class="help-block">{{ __('cp.folder_title_instructions') }}</small>
                 <input type="text" class="form-control" v-model="form.title" @keyup.esc="close" v-focus="! create">
             </div>
 
         </template>
 
         <template slot="footer">
-            <button type="button" class="btn" @click="close">{{ translate('cp.close') }}</button>
-            <button type="button" class="btn btn-primary" @click="save">{{ translate('cp.save') }}</button>
+            <button type="button" class="btn" @click="close">{{ __('Close') }}</button>
+            <button type="button" class="btn btn-primary" @click="save">{{ __('Save') }}</button>
         </template>
     </modal>
 

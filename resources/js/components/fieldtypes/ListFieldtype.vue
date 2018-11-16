@@ -18,7 +18,7 @@
 	</li>
 	<li>
 		<input type="text" class="form-control new-item" v-model="newItem"
-            :placeholder="`${translate('cp.add_another_item')}...`"
+            :placeholder="`${__('Add another item')}...`"
             @keydown.enter.prevent="addItem"
             @blur="addItem"
             @keyup.up="goUp"

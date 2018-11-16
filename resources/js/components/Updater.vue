@@ -14,7 +14,7 @@
                 </template>
                 <template v-else>Last Install Log</template>
             </button>
-            <button v-if="showActions && ! onLatestVersion" class="btn btn-primary ml-2" @click="updateToLatest()">{{ translate('Update to Latest') }}</button>
+            <button v-if="showActions && ! onLatestVersion" class="btn btn-primary ml-2" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
         </div>
 
         <div class="card mb-5 text-grey-light flex items-center" v-if="onLatestVersion">

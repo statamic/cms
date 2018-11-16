@@ -23,9 +23,9 @@
 
                 <div class="has-collection flex items-center pl-2" v-if="hasEntries">
                     <svg-icon name="entries" class="pr-1 text-grey h-6 w-6"></svg-icon>
-                    <a :href="createEntryUrl">{{ translate('cp.add') }}</a>
-                    <span class="mx-sm text-grey text-2xs">{{ translate('cp.or') }}</span>
-                    <a :href="entriesUrl">{{ translate('cp.edit') }}</a>
+                    <a :href="createEntryUrl">{{ __('Add') }}</a>
+                    <span class="mx-sm text-grey text-2xs">{{ __('or') }}</span>
+                    <a :href="entriesUrl">{{ __('Edit') }}</a>
                 </div>
             </div>
 
@@ -37,14 +37,14 @@
                     <div class="btn-group page-action action-more px-sm">
                         <i class="icon icon-dots-three-vertical opacity-25 hover:opacity-75" data-toggle="dropdown"></i>
                         <ul class="dropdown-menu">
-                            <li v-if="can('pages:create')"><a href="" @click.prevent="createPage">{{ translate('cp.create_page_button') }}</a></li>
+                            <li v-if="can('pages:create')"><a href="" @click.prevent="createPage">{{ __('Create Page') }}</a></li>
                             <li v-if="can('super')">
-                                <a href="" @click.prevent="mountCollection" v-if="!hasEntries">{{ translate('cp.mount_collection') }}</a>
-                                <a href="" @click.prevent="unmountCollection" v-if="hasEntries">{{ translate('cp.unmount_collection') }}</a>
+                                <a href="" @click.prevent="mountCollection" v-if="!hasEntries">{{ __('Mount Collection') }}</a>
+                                <a href="" @click.prevent="unmountCollection" v-if="hasEntries">{{ __('Unmount Collection') }}</a>
                             </li>
-                            <li v-if="can('pages:create')"><a href="" @click.prevent="duplicatePage">{{ translate('cp.duplicate') }}</a></li>
+                            <li v-if="can('pages:create')"><a href="" @click.prevent="duplicatePage">{{ __('Duplicate') }}</a></li>
                             <li v-if="can('pages:create') && can('pages:delete')" class="divider"></li>
-                            <li v-if="can('pages:delete')" class="warning"><a href="" @click.prevent="deletePage">{{ translate('cp.delete') }}</a></li>
+                            <li v-if="can('pages:delete')" class="warning"><a href="" @click.prevent="deletePage">{{ __('Delete') }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -119,10 +119,10 @@ export default {
 
             swal({
                 type: 'warning',
-                title: translate('cp.are_you_sure'),
-                text: translate_choice('cp.confirm_delete_page', 1),
-                confirmButtonText: translate('cp.yes_im_sure'),
-                cancelButtonText: translate('cp.cancel'),
+                title: __('Are you sure?'),
+                text: __n('cp.confirm_delete_page', 1),
+                confirmButtonText: __('Yes, I\'m sure'),
+                cancelButtonText: __('Cancel'),
                 showCancelButton: true
             }, function() {
                 self.$http.post(cp_url('pages/delete'), { uuid: self.uuid }).success(function() {

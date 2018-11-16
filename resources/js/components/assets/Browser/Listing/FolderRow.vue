@@ -30,7 +30,7 @@
                 <ul class="dropdown-menu">
                     <li>
                         <a href="" @click.prevent="editFolder">
-                            {{ translate('cp.edit') }}
+                            {{ __('Edit') }}
                         </a>
                     </li>
 
@@ -38,7 +38,7 @@
 
                     <li class="warning">
                         <a href="#" @click.prevent="deleteFolder">
-                            {{ translate('cp.delete') }}
+                            {{ __('Delete') }}
                         </a>
                     </li>
                 </ul>

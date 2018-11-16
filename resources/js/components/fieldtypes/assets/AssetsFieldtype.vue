@@ -11,12 +11,12 @@
         @drop="dragStop">
 
         <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
         </div>
 
         <div class="drag-notification" v-if="containerSpecified && draggingFile && !showSelector">
             <i class="icon icon-download"></i>
-            <h3>{{ translate('cp.drop_to_upload') }}</h3>
+            <h3>{{ __('Drop to Upload') }}</h3>
         </div>
 
         <template v-if="!loading">
@@ -25,7 +25,7 @@
 
                 <div v-if="!containerSpecified">
                     <i class="icon icon-warning"></i>
-                    {{ translate('cp.no_asset_container_specified') }}
+                    {{ __('cp.no_asset_container_specified') }}
                 </div>
 
                 <template v-else>
@@ -36,7 +36,7 @@
                         @keyup.space.enter="openSelector"
                         tabindex="0">
                         <span class="icon icon-folder-images"></span>
-                        {{ translate('cp.browse_assets') }}
+                        {{ __('Browse Assets') }}
                     </button>
 
                     <button
@@ -44,10 +44,10 @@
                         class="btn btn-with-icon"
                         @click.prevent="uploadFile">
                         <span class="icon icon-upload-to-cloud"></span>
-                        {{ translate('cp.upload') }}
+                        {{ __('Upload') }}
                     </button>
 
-                    <p>{{ translate('cp.or_drag_and_drop_files') }}</p>
+                    <p>{{ __('or drag and drop files') }}</p>
 
                     <button
                         type="button"

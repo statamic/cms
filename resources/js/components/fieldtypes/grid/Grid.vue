@@ -19,7 +19,7 @@
         <button
             class="btn"
             v-if="canAddRows"
-            v-text="translate('Add Row')"
+            v-text="__('Add Row')"
             @click.prevent="addRow" />
 
     </div>
@@ -113,7 +113,7 @@ export default {
         },
 
         removed(index) {
-            if (confirm(translate('Are you sure?'))) {
+            if (confirm(__('Are you sure?'))) {
                 this.rows.splice(index, 1);
             }
         },

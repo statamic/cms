@@ -21,7 +21,7 @@
             >
 
                 <template slot="actions" slot-scope="{ ids }">
-                    <button class="btn ml-1" @click="openAssetMover">{{ translate('cp.move') }}</button>
+                    <button class="btn ml-1" @click="openAssetMover">{{ __('Move') }}</button>
                     <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">Delete</button>
                 </template>
 

@@ -88,10 +88,10 @@ export default {
 
             swal({
                 type: 'warning',
-                title: translate('cp.are_you_sure'),
-                text: translate_choice('cp.confirm_delete_folder'),
-                confirmButtonText: translate('cp.yes_im_sure'),
-                cancelButtonText: translate('cp.cancel'),
+                title: __('Are you sure?'),
+                text: __('This folder will be deleted'),
+                confirmButtonText: __('Yes, I\'m sure'),
+                cancelButtonText: __('Cancel'),
                 showCancelButton: true
             }, () => {
                 this.$http.delete(url, {

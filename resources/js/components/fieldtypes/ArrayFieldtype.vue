@@ -85,15 +85,15 @@ export default {
         },
 
         addRowButton: function() {
-            return this.config.add_row || translate_choice('cp.add_row', 1);
+            return this.config.add_row || __('Row');
         },
 
         valueHeader: function() {
-            return this.config.value_header || 'Value';
+            return this.config.value_header || __('Value');
         },
 
         textHeader: function() {
-            return this.config.text_header || 'Text';
+            return this.config.text_header || __('Text');
         }
     },
 

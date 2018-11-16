@@ -22,21 +22,21 @@
                         {{ asset.path }}
                     </div>
                     <div class="meta-item" v-if="isImage">
-                        <span class="meta-label">{{ translate('cp.dimensions') }}</span>
+                        <span class="meta-label">{{ __('Dimensions') }}</span>
                         <span class="meta-value">{{ asset.width }} x {{ asset.height }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">{{ translate('cp.size') }}</span>
+                        <span class="meta-label">{{ __('Size') }}</span>
                         <span class="meta-value">{{ asset.size }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">{{ translate('cp.last_modified') }}</span>
+                        <span class="meta-label">{{ __('Last Modified') }}</span>
                         <span class="meta-value" :title="asset.last_modified">{{ asset.last_modified_relative }}</span>
                     </div>
                 </div>
 
                 <div class="asset-editor-meta-actions">
-                    <a @click="open" :title="translate('cp.open')">
+                    <a @click="open" :title="__('Open')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
                             <path d="m20.121 18.882 2.121-2.121.00000003-.00000003c.781207-.780931.781431-2.04729.00049994-2.8285-.780931-.781207-2.04729-.781431-2.8285-.00049994l-2.121 2.122"/>
@@ -51,7 +51,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click="download" :title="translate('cp.download')">
+                    <a @click="download" :title="__('Download')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="23" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
                             <path d="M21.1219828 6.85714286C21.1219828 6.85714286 20.0297414 6.69642857 18.9655172 6.85714286M3.01724138 6C3.01724138 4.10657143 4.5612069 2.57142857 6.46551724 2.57142857 8.36982759 2.57142857 9.9137931 4.10657143 9.9137931 6"/>
@@ -59,7 +59,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click="close" title="translate('cp.close')">
+                    <a @click="close" title="__('Close')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.545)">
                             <path d="M16 0L.160533333 15.8389333M16 15.8389333L.160533333 0"/>
@@ -100,17 +100,17 @@
                         <button
                             v-if="isImage"
                             type="button" class="btn"
-                            @click.prevent="openFocalPointEditor">{{ translate('cp.focal_point') }}
+                            @click.prevent="openFocalPointEditor">{{ __('Focal Point') }}
                         </button>
 
                         <button
                             type="button" class="btn"
-                            @click.prevent="openRenamer">{{ translate('cp.rename_file') }}
+                            @click.prevent="openRenamer">{{ __('Rename File') }}
                         </button>
 
                         <button
                             type="button" class="btn"
-                            @click.prevent="openMover">{{ translate('cp.move_file') }}
+                            @click.prevent="openMover">{{ __('Move File') }}
                         </button>
 
                         <!--
@@ -144,10 +144,10 @@
 
                         <div class="editor-form-actions">
                             <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
-                                {{ translate('cp.delete') }}
+                                {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn btn-primary" @click="save">
-                                {{ translate('cp.save') }}
+                                {{ __('Save') }}
                             </button>
                         </div>
 
@@ -367,7 +367,7 @@ export default {
          * Delete the asset
          */
         destroy() {
-            if (! confirm(translate('cp.are_you_sure'))) {
+            if (! confirm(__('Are you sure?'))) {
                 return;
             }
 

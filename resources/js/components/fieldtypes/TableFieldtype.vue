@@ -25,10 +25,10 @@
 
     	<div class="btn-group">
     		<a class="btn btn-default" @click="addRow" v-if="canAddRows">
-    			{{ translate_choice('cp.rows', 1) }} <i class="icon icon-plus icon-right"></i>
+    			{{ __('Row') }} <i class="icon icon-plus icon-right"></i>
     		</a>
     		<a class="btn btn-default" @click="addColumn" v-if="canAddColumns">
-    			{{ translate_choice('cp.columns', 1) }} <i class="icon icon-plus icon-right"></i>
+    			{{ __('Column') }} <i class="icon icon-plus icon-right"></i>
     		</a>
     	</div>
     </div>
@@ -154,9 +154,9 @@ export default {
 
             swal({
                 type: 'warning',
-                title: translate('cp.are_you_sure'),
-                confirmButtonText: translate('cp.yes_im_sure'),
-                cancelButtonText: translate('cp.cancel'),
+                title: __('Are you sure?'),
+                confirmButtonText: __('Yes, I\'m sure'),
+                cancelButtonText: __('Cancel'),
                 showCancelButton: true
             }, function() {
                 self.data.splice(index, 1);
@@ -168,10 +168,10 @@ export default {
 
             swal({
                 type: 'warning',
-                title: translate('cp.are_you_sure'),
-                text: translate_choice('cp.confirm_delete_items', 1),
-                confirmButtonText: translate('cp.yes_im_sure'),
-                cancelButtonText: translate('cp.cancel'),
+                title: __('Are you sure?'),
+                text: __n('cp.confirm_delete_items', 1),
+                confirmButtonText: __('Yes I\'m sure'),
+                cancelButtonText: __('Cancel'),
                 showCancelButton: true
             }, function() {
                 var rows = self.data.length;

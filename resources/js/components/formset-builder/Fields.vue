@@ -4,9 +4,9 @@
         <table class="fields-table bordered-table">
             <thead>
                 <tr>
-                    <th>{{ translate('cp.handle') }}</th>
-                    <th>{{ translate('cp.label') }}</th>
-                    <th class="col-column">{{ translate_choice('cp.columns', 1) }}</th>
+                    <th>{{ __('Handle') }}</th>
+                    <th>{{ __('Label') }}</th>
+                    <th class="col-column">{{ __('Column') }}</th>
                     <th class="row-controls"></th>
                 </tr>
             </thead>
@@ -33,7 +33,7 @@
             </modal>
         </portal>
 
-        <button type="button" class="btn btn-default" @click="addField">{{ translate_choice('cp.fields', 1) }} <i class="icon icon-plus icon-right"></i></button>
+        <button type="button" class="btn btn-default" @click="addField">{{ __('Field') }} <i class="icon icon-plus icon-right"></i></button>
     </div>
 
 

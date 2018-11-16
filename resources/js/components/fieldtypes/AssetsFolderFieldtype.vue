@@ -1,8 +1,8 @@
 <template>
     <div class="asset-folder-fieldtype-wrapper">
-        <small class="help-block" v-if="!container">{{ translate('cp.select_asset_container') }}</small>
+        <small class="help-block" v-if="!container">{{ __('cp.select_asset_container') }}</small>
         <div v-if="container && loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
         </div>
         <select-fieldtype v-if="container && !loading" :name="name" :data.sync="data" :config="selectConfig"></select-fieldtype>
     </div>

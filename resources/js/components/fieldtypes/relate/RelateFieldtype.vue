@@ -2,7 +2,7 @@
     <div class="relate-fieldtype">
 
         <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
         </div>
 
         <relate-tags

@@ -16,7 +16,7 @@
                     </li>
                     <li v-if="isBlank">
                         <a @click.prevent="$emit('deleted', index)">
-                            <i class="icon icon-trash"></i> {{ translate('cp.delete') }}
+                            <i class="icon icon-trash"></i> {{ __('Delete') }}
                         </a>
                     </li>
                 </ul>
@@ -219,7 +219,7 @@
 
                     return {
                         name: button,
-                        aria: translate('cp.' + localizations[button]),
+                        aria: __('cp.' + localizations[button]),
                     };
                 })
             },
@@ -248,8 +248,8 @@
                     targetBlank:    this.$parent.config.target_blank || false,
                     linkValidation: this.$parent.config.link_validation || false,
                     anchor: {
-                        placeholderText: translate('cp.paste_or_type_link'),
-                        aria: translate('cp.link'),
+                        placeholderText: __('Paste or type link'),
+                        aria: __('Link'),
                     },
                     extensions
                 };
@@ -316,7 +316,7 @@
                     name: 'assets',
                     tagNames: ['a'],
                     contentDefault: '<span class="icon icon-images"></span>',
-                    aria: translate('cp.nav_assets'),
+                    aria: __('Assets'),
                     handleClick: function () {
                         let toolbar = this.base.getExtensionByName('toolbar');
                         if (toolbar) toolbar.hideToolbar();

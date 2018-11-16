@@ -2,7 +2,7 @@
     <div class="datetime clearfix">
 
     	<button type="button" class="btn btn-default add-date" v-if="!hasDate" @click="addDate" tabindex="0">
-    		{{ translate('cp.add_date') }}
+    		{{ __('Add Date') }}
     	</button>
 
     	<div v-if="hasDate" class="date-time-container">

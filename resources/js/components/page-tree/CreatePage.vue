@@ -1,7 +1,7 @@
 <template>
     <div>
         <modal :show="show" :saving="saving" :loading="loading" class="modal-small" :dismissible="true">
-            <template slot="header">{{ translate('cp.choose_page_type') }}</template>
+            <template slot="header">{{ __('Choose Page Type') }}</template>
 
             <template slot="body">
                 <ul class="chooser">
@@ -12,8 +12,8 @@
             </template>
 
             <template slot="footer">
-                <div class="float-left">{{ translate('cp.parent_page') }}: <code>{{ parent }}</code></div>
-                <button type="button" class="btn" @click="cancel">{{ translate('cp.cancel') }}</button>
+                <div class="float-left">{{ __('Parent Page') }}: <code>{{ parent }}</code></div>
+                <button type="button" class="btn" @click="cancel">{{ __('Cancel') }}</button>
             </template>
         </modal>
     </div>

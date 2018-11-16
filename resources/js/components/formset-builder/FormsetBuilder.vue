@@ -2,15 +2,15 @@
     <div>
         <div class="sticky flex items-center mb-3 w-full">
             <h1 class="flex-1" v-if="create">
-                {{ translate('cp.create_formset') }}
+                {{ __('Create Formset') }}
             </h1>
 
             <h1 class="flex-1" v-if="!create">
-                {{ translate('cp.editing_formset') }}:
+                {{ __('Editing Formset') }}:
                 <strong>{{ formsetTitle }}</strong>
             </h1>
 
-            <button type="button" class="btn btn-primary" v-on:click="save()">{{ translate('cp.save') }}</button>
+            <button type="button" class="btn btn-primary" v-on:click="save()">{{ __('Save') }}</button>
         </div>
 
         <div class="px-3">
@@ -18,38 +18,38 @@
                 <div class="fieldset-builder">
 
                     <div class="form-group">
-                        <label class="block">{{ translate('cp.title') }}</label>
-                        <small class="help-block">{{ translate('cp.formset_title_instructions') }}</small>
+                        <label class="block">{{ __('Title') }}</label>
+                        <small class="help-block">{{ __('cp.formset_title_instructions') }}</small>
                         <input type="text" class="form-control" v-model="formset.title" autofocus="autofocus" />
                     </div>
 
                     <div class="form-group" v-if="create">
-                        <label class="block">{{ translate('cp.slug') }}</label>
-                        <small class="help-block">{{ translate('cp.formset_slug_instructions') }}</small>
+                        <label class="block">{{ __('Slug') }}</label>
+                        <small class="help-block">{{ __('cp.formset_slug_instructions') }}</small>
                         <input type="text" class="form-control" v-model="slug" />
                     </div>
 
                     <div class="form-group">
-                        <label class="block">{{ translate_choice('cp.metrics', 2) }}</label>
-                        <small class="help-block">{{ translate('cp.formset_metrics_instructions') }}</small>
+                        <label class="block">{{ __('Metrics') }}</label>
+                        <small class="help-block">{{ __('cp.formset_metrics_instructions') }}</small>
                         <grid-fieldtype :value="formset.metrics" :config="metricsGridConfig" name="metrics" @updated="formset.metrics = $event"></grid-fieldtype>
                     </div>
 
                     <div class="form-group">
-                        <label class="block">{{ translate_choice('cp.emails', 2) }}</label>
-                        <small class="help-block">{{ translate('cp.formset_emails_instructions') }}</small>
+                        <label class="block">{{ __('Emails') }}</label>
+                        <small class="help-block">{{ __('cp.formset_emails_instructions') }}</small>
                         <grid-fieldtype :value="formset.email" :config="emailGridConfig" name="email" @updated="formset.email = $event"></grid-fieldtype>
                     </div>
 
                     <div class="form-group">
-                        <label class="block">{{ translate('cp.formset_honeypot_field') }}</label>
-                        <small class="help-block">{{ translate('cp.formset_honeypot_instructions') }} <a href="https://docs.statamic.com/forms#honeypot">{{ translate('cp.formset_honeypot_link') }}</a></small>
+                        <label class="block">{{ __('Honeypot Field') }}</label>
+                        <small class="help-block">{{ __('cp.formset_honeypot_instructions') }} <a href="https://docs.statamic.com/forms#honeypot">{{ __('What\'s a honeypot?') }}</a></small>
                         <input type="text" class="form-control" v-model="formset.honeypot" />
                     </div>
 
                     <div class="form-group">
-                        <label class="block">{{ translate('cp.formset_store_field') }}</label>
-                        <small class="help-block">{{ translate('cp.formset_store_instructions') }}</small>
+                        <label class="block">{{ __('Store Submissions') }}</label>
+                        <small class="help-block">{{ __('cp.formset_store_instructions') }}</small>
                         <toggle-fieldtype :value="formset.store" :config="{}" name="store"></toggle-fieldtype>
                     </div>
 
@@ -58,8 +58,8 @@
 
             <div class="card p-3">
                 <div class="head clearfix">
-                    <h2 class="m-0">{{ translate_choice('cp.fields', 2) }}</h2>
-                    <small class="help-block">{{ translate('cp.formset_fields_instructions') }}</small>
+                    <h2 class="m-0">{{ __('Fields') }}</h2>
+                    <small class="help-block">{{ __('cp.formset_fields_instructions') }}</small>
                 </div>
 
                 <formset-fields-builder v-model="formset.fields"></formset-fields-builder>
@@ -110,29 +110,29 @@ export default {
 
         metricsGridConfig: function() {
             return {
-                add_row: translate('cp.formset_metrics_grid_add_row'),
+                add_row: __('Metric'),
                 mode: 'stacked',
                 fields: [
                     {
                         handle: 'type',
-                        display: translate('cp.formset_metrics_grid_type_field'),
+                        display: __('Metric Type'),
                         width: 25,
                         type: 'select',
                         options: [
-                            { value: 'sum', text: translate('cp.formset_metrics_grid_type_option_sum') },
-                            { value: 'total', text: translate('cp.formset_metrics_grid_type_option_total') },
-                            { value: 'average', text: translate('cp.formset_metrics_grid_type_option_average') }
+                            { value: 'sum', text: __('Sum') },
+                            { value: 'total', text: __('Total') },
+                            { value: 'average', text: __('Average') }
                         ]
                     },
                     {
                         handle: 'label',
-                        display: translate('cp.formset_metrics_grid_label_field'),
+                        display: __('Label'),
                         type: 'text',
                         width: 75
                     },
                     {
                         handle: 'params',
-                        display: translate('cp.formset_metrics_grid_params_field'),
+                        display: __('Parameters'),
                         type: 'array'
                     }
                 ]
@@ -141,39 +141,39 @@ export default {
 
         emailGridConfig: function() {
             return {
-                add_row: translate('cp.formset_emails_grid_add_row'),
+                add_row: __('Email'),
                 mode: 'stacked',
                 fields: [
                     {
                         handle: 'to',
-                        display: translate('cp.formset_emails_grid_to_field'),
+                        display: __('Recipient (To)'),
                         type: 'text',
                         width: 50,
-                        instructions: translate('cp.formset_emails_grid_to_instructions')
+                        instructions: __('cp.formset_emails_grid_to_instructions')
                     },
                     {
                         handle: 'from',
-                        display: translate('cp.formset_emails_grid_from_field'),
+                        display: __('Sender (From)'),
                         type: 'text',
                         width: 50,
-                        instructions: translate('cp.formset_emails_grid_from_instructions')
+                        instructions: __('cp.formset_emails_grid_from_instructions')
                     },
                     {
                         handle: 'reply_to',
-                        display: translate('cp.formset_emails_grid_reply_to_field'),
+                        display: __('Reply to'),
                         type: 'text'
                     },
                     {
                         handle: 'subject',
-                        display: translate('cp.formset_emails_grid_subject_field'),
+                        display: __('Subject'),
                         type: 'text',
-                        instructions: translate('cp.formset_emails_grid_subject_instructions')
+                        instructions: __('cp.formset_emails_grid_subject_instructions')
                     },
                     {
                         handle: 'template',
-                        display: translate('cp.formset_emails_grid_template_field'),
+                        display: __('Template'),
                         type: 'text',
-                        instructions: translate('cp.formset_emails_grid_template_instructions')
+                        instructions: __('cp.formset_emails_grid_template_instructions')
                     }
                 ]
             };
@@ -192,7 +192,7 @@ export default {
 
         save: function() {
             if (! this.formset.title) {
-                this.$notify.error(translate('validation.required', { attribute: 'title' }));
+                this.$notify.error(__('validation.required', { attribute: 'title' }));
                 return;
             }
 

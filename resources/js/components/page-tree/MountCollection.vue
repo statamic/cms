@@ -1,6 +1,6 @@
 <template>
     <modal :show="show" :saving="saving" :loading="loading" class="modal-small">
-        <template slot="header">{{ translate('cp.mount_collection') }}</template>
+        <template slot="header">{{ __('Mount Collection') }}</template>
 
         <template slot="body">
             <ul class="chooser">
@@ -11,7 +11,7 @@
         </template>
 
         <template slot="footer">
-            <button type="button" class="btn" @click="cancel">{{ translate('cp.cancel') }}</button>
+            <button type="button" class="btn" @click="cancel">{{ __('Cancel') }}</button>
         </template>
     </modal>
 </template>

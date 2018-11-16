@@ -89,7 +89,7 @@ class Fieldset {
         const sidebar = _.find(this.sections, { handle: 'sidebar' });
 
         if (! sidebar) {
-            this.sections.push({ handle: 'sidebar', display: translate('cp.meta'), fields: [] });
+            this.sections.push({ handle: 'sidebar', display: __('Meta'), fields: [] });
         }
     }
 

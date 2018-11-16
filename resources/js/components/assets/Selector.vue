@@ -21,29 +21,31 @@
                         @asset-doubleclicked="select">
 
                         <template slot="contextual-actions" v-if="browserSelections.length">
-                            <button class="btn action mb-3" @click="browserSelections = []">{{ translate('cp.uncheck_all') }}</button>
+                            <button class="btn action mb-3" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
                         </template>
 
                     </asset-browser>
                 </div>
 
                 <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
-                    <div class="text-sm text-grey-light">
-                        {{ browserSelections.length }}<span v-if="maxFiles">/{{ maxFiles }}</span> {{ translate('cp.selected') }}
+                    <div class="text-sm text-grey-light"
+                        v-text="maxFiles
+                            ? __n(':count/:max selected', browserSelections, { max: maxFiles })
+                            : __n(':count selected', browserSelections)">
                     </div>
                     <div>
                         <button
                             type="button"
                             class="btn"
                             @click="close">
-                            {{ translate('cp.cancel') }}
+                            {{ __('Cancel') }}
                         </button>
 
                         <button
                             type="button"
                             class="btn btn-primary ml-1"
                             @click="select">
-                            {{ translate('cp.select') }}
+                            {{ __('Select') }}
                         </button>
                     </div>
                 </div>

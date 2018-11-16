@@ -87,22 +87,22 @@ module.exports = {
 
         label: function (group) {
             if (this.startsWith(group, 'collections')) {
-                return translate_choice('cp.collections', 1) + ': ' + this.title(group);
+                return __('Collection') + ': ' + this.title(group);
             }
 
             if (this.startsWith(group, 'taxonomies')) {
-                return translate_choice('cp.taxonomies', 1) + ': ' + this.title(group);
+                return __('Taxonomy') + ': ' + this.title(group);
             }
 
             if (this.startsWith(group, 'globals')) {
-                return translate_choice('cp.globals', 1) + ': ' + this.title(group);
+                return __('Globals') + ': ' + this.title(group);
             }
 
             if (this.startsWith(group, 'assets')) {
-                return translate_choice('cp.asset_containers', 2) + ': ' + this.title(group);
+                return __('Asset Container') + ': ' + this.title(group);
             }
 
-            return translate('permissions.group_'+group);
+            return __('permissions.group_'+group);
         }
     }
 

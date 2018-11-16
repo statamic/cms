@@ -17,7 +17,7 @@
             ></radio-fieldtype>
 
             <template v-if="isStandard">
-                <small class="help-block">{{ translate('cp.display_standard_instructions') }}</small>
+                <small class="help-block">{{ __('cp.display_standard_instructions') }}</small>
 
                 <table v-if="hasConditions" class="table">
                     <tr is="condition"
@@ -31,12 +31,12 @@
                 </table>
 
                 <button class="btn btn-default" @click="add">
-                    {{ translate('cp.add_condition') }}
+                    {{ __('Add Condition') }}
                 </button>
             </template>
 
             <template v-if="isCustom">
-                <small class="help-block">{{ translate('cp.display_custom_instructions') }}</small>
+                <small class="help-block">{{ __('cp.display_custom_instructions') }}</small>
                 <input type="text" class="form-control" v-model="data.custom" />
             </template>
 
@@ -62,16 +62,16 @@ export default {
             conditions: [],
             conditionSelectFieldtypeConfig: {
                 options: [
-                    {text: translate('cp.always_show'), value: null},
-                    {text: translate('cp.show_when'), value: 'show'},
-                    {text: translate('cp.hide_when'), value: 'hide'}
+                    {text: __('Always show'), value: null},
+                    {text: `${__('Show when')}...`, value: 'show'},
+                    {text: `${__('Hide when')}...`, value: 'hide'}
                 ]
             },
             styleRadioFieldtypeConfig: {
                 inline: true,
                 options: [
-                    {text: translate('cp.standard'), value: 'standard'},
-                    {text: translate('cp.custom'), value: 'custom'}
+                    {text: __('Standard'), value: 'standard'},
+                    {text: __('Custom'), value: 'custom'}
                 ]
             }
         }

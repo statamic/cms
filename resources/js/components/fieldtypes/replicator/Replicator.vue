@@ -94,7 +94,7 @@ export default {
         },
 
         removed(index) {
-            if (confirm(translate('Are you sure?'))) {
+            if (confirm(__('Are you sure?'))) {
                 this.values.splice(index, 1);
             }
         },

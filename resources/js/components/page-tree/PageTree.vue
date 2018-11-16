@@ -216,7 +216,7 @@ export default {
                 this.getPages();
                 this.changed = false;
                 this.saving = false;
-                this.$events.$emit('setFlashSuccess', translate('cp.pages_reordered'))
+                this.$events.$emit('setFlashSuccess', __('Pages reordered successfully'))
             });
         },
 

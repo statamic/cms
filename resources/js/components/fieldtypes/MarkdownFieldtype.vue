@@ -4,10 +4,10 @@
         <div class="markdown-toolbar">
             <ul class="markdown-modes">
                 <li :class="{ 'active': mode == 'write' }">
-                    <a href="" @click.prevent="mode = 'write'" tabindex="-1">{{ translate('cp.write') }}</a>
+                    <a href="" @click.prevent="mode = 'write'" tabindex="-1">{{ __('Write') }}</a>
                 </li>
                 <li :class="{ 'active': mode == 'preview' }">
-                    <a href="" @click.prevent="mode = 'preview'" tabindex="-1">{{ translate('cp.preview') }}</a>
+                    <a href="" @click.prevent="mode = 'preview'" tabindex="-1">{{ __('Preview') }}</a>
                 </li>
             </ul>
 
@@ -45,17 +45,17 @@
                     <div class="markdown-cheatsheet-helper" v-if="cheatsheet">
                         <a href="" @click.prevent="showCheatsheet = true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" mask="url(#a)"/></svg>
-                            {{ translate('cp.markdown_cheatsheet') }}
+                            {{ __('Markdown Cheatsheet') }}
                         </a>
                     </div>
                     <div class="markdown-asset-helper" v-if="assetsEnabled">
-                        <a href="" @click.prevent="addAsset"><span class="icon icon-image"></span> {{ translate('cp.add_asset') }}</a> (or drag &amp; drop)
+                        <a href="" @click.prevent="addAsset"><span class="icon icon-image"></span> {{ __('Add Asset') }}</a> (or drag &amp; drop)
                     </div>
                 </div>
 
                 <div class="drag-notification" v-if="assetsEnabled && draggingFile">
                     <i class="icon icon-download"></i>
-                    <h3>{{ translate('cp.drop_to_upload') }}</h3>
+                    <h3>{{ __('Drop to Upload') }}</h3>
                 </div>
             </div>
 
@@ -83,8 +83,8 @@
 
         <!-- TODO: Bring this back.
         <modal :show.sync="showCheatsheet" class="markdown-modal">
-            <template slot="header">{{ translate('cp.markdown_cheatsheet') }}</template>
-            <template slot="body" v-html="translate('markdown.cheatsheet')"></template>
+            <template slot="header">{{ __('cp.markdown_cheatsheet') }}</template>
+            <template slot="body" v-html="__('markdown.cheatsheet')"></template>
         </modal>
         -->
 

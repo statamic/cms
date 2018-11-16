@@ -1,13 +1,13 @@
 <template>
     <div class="suggest-fieldtype-wrapper">
         <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ translate('cp.loading') }}
+            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
         </div>
 
         <select v-if="!loading"
                 ref="select"
                 :name="name"
-                :placeholder="translate('cp.please_select')"
+                :placeholder="__('Please Select')"
                 :multiple="true">
         </select>
     </div>

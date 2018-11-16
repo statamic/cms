@@ -8,7 +8,7 @@
 
         <div class="p-3" v-if="fieldtypesLoaded">
             <div class="filter mb-0">
-                <a @click="filterBy = 'all'" :class="{'active': filterBy == 'all'}">{{ translate('cp.all') }}</a>
+                <a @click="filterBy = 'all'" :class="{'active': filterBy == 'all'}">{{ __('All') }}</a>
                 <a @click="filterBy = filter" v-for="filter in filteredFilters" :class="{'active': filterBy == filter}">
                     {{ __(filter) }}
                 </a>
@@ -19,7 +19,7 @@
         <div class="flex-1 overflow-scroll p-3 pt-0" v-if="fieldtypesLoaded">
             <div class="fieldtype-selector">
                 <div :class="['search', { 'is-searching': isSearching }]">
-                    <input type="text" v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${translate('cp.search')}...`" />
+                    <input type="text" v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
                 </div>
                 <div class="flex flex-wrap -mx-1 fieldtype-list">
                     <div class="w-1/2 sm:w-1/3 md:w-1/4 p-1" v-for="option in fieldtypeOptions">
@@ -80,9 +80,9 @@ export default {
                 return {text: fieldtype.title, value: fieldtype.handle, categories: fieldtype.categories, icon: fieldtype.icon};
             });
 
-            if (this.allowDate) options.unshift({text: translate('cp.publish_date'), value: 'date', categories: ['system'], isMeta: true, icon: 'date'});
-            if (this.allowSlug) options.unshift({text: translate('cp.slug'), value: 'slug', categories: ['system'], isMeta: true, icon: 'slug'});
-            if (this.allowTitle) options.unshift({text: translate('cp.title'), value: 'title', categories: ['system'], isMeta: true, icon: 'title'});
+            if (this.allowDate) options.unshift({text: __('Publish Date'), value: 'date', categories: ['system'], isMeta: true, icon: 'date'});
+            if (this.allowSlug) options.unshift({text: __('Slug'), value: 'slug', categories: ['system'], isMeta: true, icon: 'slug'});
+            if (this.allowTitle) options.unshift({text: __('Title'), value: 'title', categories: ['system'], isMeta: true, icon: 'title'});
 
             return options;
         },
@@ -155,7 +155,7 @@ export default {
             let field = this.createField(fieldtype);
 
             field = Object.assign({
-                display: translate(`cp.${selection.value}`),
+                display: __(`cp.${selection.value}`),
                 handle: selection.value,
                 type: fieldtype,
                 isMeta: true

@@ -41,12 +41,12 @@
                     <button
                         @click="edit"
                         class="btn btn-icon icon icon-pencil"
-                        :alt="translate('cp.edit')"></button>
+                        :alt="__('Edit')"></button>
 
                     <button
                         @click="remove"
                         class="btn btn-icon icon icon-trash"
-                        :alt="translate('cp.remove')"></button>
+                        :alt="__('Remove')"></button>
                 </div>
             </div>
         </div>

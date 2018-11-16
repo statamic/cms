@@ -2,7 +2,7 @@
 
     <modal :show.sync="show" :saving="saving" class="modal-small">
         <template slot="header">
-            {{ translate('cp.rename_file') }}
+            {{ __('Rename File') }}
         </template>
 
         <template slot="body">
@@ -24,7 +24,7 @@
 
         <template slot="footer">
             <button class="btn btn-primary" :disabled="!hasChanged" @click="save">Save</button>
-            <button type="button" class="btn" @click="cancel">{{ translate('cp.cancel') }}</button>
+            <button type="button" class="btn" @click="cancel">{{ __('Cancel') }}</button>
         </template>
     </modal>
 
@@ -43,7 +43,7 @@ export default {
             filename: null,
             saving: false,
             errors: null,
-            warningText: translate('cp.rename_file_warning')
+            warningText: __('cp.rename_file_warning')
         }
     },
 

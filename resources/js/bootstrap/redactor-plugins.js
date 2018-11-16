@@ -8,7 +8,7 @@ $.Redactor.prototype.assets = function () {
                 return;
             }
 
-            var button = this.button.add('assets', translate_choice('cp.assets', 2));
+            var button = this.button.add('assets', __('Assets'));
             this.button.addCallback(button, this.assets.show);
         },
 

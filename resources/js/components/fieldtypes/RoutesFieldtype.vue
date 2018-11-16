@@ -13,10 +13,10 @@ export default {
     data: function() {
         return {
             gridConfig: {
-                add_row: translate('cp.add_locale'),
+                add_row: __('Add Locale'),
                 fields: [
-                    { name: 'locale', type: 'text', display: translate('cp.locale'), width: '20' },
-                    { name: 'route', type: 'text', display: translate('cp.route') },
+                    { name: 'locale', type: 'text', display: __('Locale'), width: '20' },
+                    { name: 'route', type: 'text', display: __('Route') },
                 ]
             }
         }
