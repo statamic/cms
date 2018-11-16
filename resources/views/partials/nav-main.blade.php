@@ -16,30 +16,30 @@
             <h6>Content</h6>
             <ul>
                 @can('index', 'Statamic\Contracts\Data\Entries\Collection')
-                <li>
+                <li class="{{ current_class('collections*') }}">
                     <a href="{{ cp_route('collections.index') }}">
                         <i class="">@svg('content-writing')</i><span>Collections</span>
                     </a>
                 </li>
                 @endcan
                 @can('index', 'Statamic\Contracts\Data\Structures\Structure')
-                <li>
+                <li class="{{ current_class('structures*') }}">
                     <a href="{{ cp_route('structures.index') }}" class="active">
                         <i>@svg('hierarchy-files')</i><span>Structure</span>
                     </a>
                 </li>
                 @endcan
-                <li>
+                <li class="{{ current_class('taxonomies*') }}">
                     <a href="">
-                        <i>@svg('tags')</i><span>Tags</span>
+                        <i>@svg('tags')</i><span>Taxonomies</span>
                     </a>
                 </li>
-                <li>
+                <li class="{{ current_class('assets*') }}">
                     <a href="{{ cp_route('assets.index') }}">
                         <i>@svg('assets')</i><span>Assets</span>
                     </a>
                 </li>
-                <li>
+                <li class="{{ current_class('forms*') }}">
                     <a href="">
                         <i>@svg('earth')</i><span>Globals</span>
                     </a>
@@ -52,7 +52,7 @@
                         <i>@svg('drawer-file')</i><span>Forms</span>
                     </a>
                 </li>
-                <li>
+                <li class="{{ current_class('updater*') }}">
                     <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('loading-bar')</i><span>Updates</span>
                         <updates-badge class="ml-1"></updates-badge>
@@ -94,12 +94,12 @@
                         <i>@svg('hammer-wench')</i><span>Preferences</span>
                     </a>
                 </li>
-                <li>
+                <li class="{{ current_class('fieldsets*') }}">
                     <a href="{{ cp_route('fieldsets.index') }}">
                         <i>@svg('wireframe')</i><span>Fieldsets</span>
                     </a>
                 </li>
-                <li>
+                <li class="{{ current_class('blueprints*') }}">
                     <a href="{{ cp_route('blueprints.index') }}">
                         <i>@svg('blueprints')</i><span>Blueprints</span>
                     </a>
