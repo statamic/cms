@@ -66,8 +66,8 @@
             </ul>
             <h6>Users</h6>
             <ul>
-                <li>
-                    <a href="">
+                <li class="{{ current_class('users*') }}">
+                    <a href="{{ cp_route('users.index') }}">
                         <i>@svg('users-box')</i><span>Users</span>
                     </a>
                 </li>
