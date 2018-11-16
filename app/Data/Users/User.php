@@ -520,7 +520,7 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function editUrl()
     {
-        return cp_route('users.edit', $this->username());
+        return cp_route('users.edit', $this->id());
     }
 
     /**

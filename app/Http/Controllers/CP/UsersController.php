@@ -9,6 +9,7 @@ use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
 use Illuminate\Http\Request;
+use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
@@ -125,53 +126,63 @@ class UsersController extends CpController
         ]);
     }
 
-    /**
-     * Edit a user
-     *
-     * @param string $username
-     * @return \Illuminate\View\View
-     */
-    public function edit($username)
+    public function edit($id)
     {
-        $this->user = User::whereUsername($username);
+        $this->user = $user = User::find($id);
 
-        // Users can always manage their data
-        if ($this->user !== User::getCurrent()) {
+        // Users can always manage their data // TODO
+        if ($user !== User::getCurrent()) {
             $this->authorize('users:view');
         }
 
-        $data = $this->populateWithBlanks($this->user);
+        $values = $user->blueprint()
+            ->fields()
+            ->addValues($user->data())
+            ->preProcess()
+            ->values();
+
 
         if (Config::get('statamic.users.login_type') === 'email') {
-            $data['email'] = $this->user->email();
+            $values['email'] = $user->email();
         } else {
-            $data['username'] = $this->user->username();
+            $values['username'] = $user->username();
         }
 
-        $data['roles'] = $this->user->roles()->map(function ($role) {
+        $values['roles'] = $user->roles()->map(function ($role) {
             return $role->uuid();
         });
-        $data['user_groups'] = $this->user->groups()->keys();
-        $data['status'] = $this->user->status();
+        $values['user_groups'] = $user->groups()->keys();
+        $values['status'] = $user->status();
 
-        return view('statamic::publish', [
-            'extra'             => [],
-            'is_new'            => false,
-            'content_data'      => $data,
-            'content_type'      => 'user',
-            'fieldset'          => $this->user->fieldset()->name(),
-            'title'             => $this->user->username(),
-            'uuid'              => $this->user->id(),
-            'url'               => null,
-            'uri'               => null,
-            'parent_url'        => null,
-            'slug'              => $this->user->username(),
-            'status'            => $this->user->status(),
-            'locale'            => default_locale(),
-            'is_default_locale' => true,
-            'locales'           => [],
-            'taxonomies'         => $this->getTaxonomies($this->user->fieldset())
+        return view('statamic::users.edit', [
+            'user' => $user,
+            'values' => $values
         ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        $this->authorize('edit', $user);
+
+        $fields = $user->blueprint()->fields()->addValues($request->all())->process();
+
+        $validation = (new Validation)->fields($fields)->withRules([
+            'username' => 'required', // TODO: Needs to be more clever re: different logic for email as login
+        ]);
+
+        $request->validate($validation->rules());
+
+        foreach (array_except($fields->values(), 'username') as $key => $value) {
+            $user->set($key, $value);
+        }
+
+        $user
+            ->username($request->username)
+            ->save();
+
+        return response('', 204);
     }
 
     /**
