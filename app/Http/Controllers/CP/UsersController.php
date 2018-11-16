@@ -8,9 +8,11 @@ use Statamic\API\Email;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
+use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
+use Statamic\Contracts\Users\User as UserContract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 class UsersController extends CpController
@@ -100,30 +102,34 @@ class UsersController extends CpController
      */
     public function create()
     {
-        $this->authorize('users:create');
+        $this->authorize('create', UserContract::class, 'You are not authorized to create users.');
 
-        $fieldset = 'user';
+        $blueprint = Blueprint::find('user');
 
-        $data = $this->populateWithBlanks($fieldset);
-
-        return view('statamic::publish', [
-            'extra'             => [],
-            'is_new'            => true,
-            'content_data'      => $data,
-            'content_type'      => 'user',
-            'fieldset'          => $fieldset,
-            'title'             => trans('cp.create_a_user'),
-            'uuid'              => null,
-            'url'               => null,
-            'parent_url'        => null,
-            'slug'              => null,
-            'status'            => null,
-            'uri'               =>  null,
-            'locale'            => default_locale(),
-            'is_default_locale' => true,
-            'locales'           => [],
-            'taxonomies'        => $this->getTaxonomies(Fieldset::get($fieldset))
+        return view('statamic::users.create', [
+            'blueprint' => $blueprint,
+            'values' => $blueprint->fields()->values()
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $blueprint = Blueprint::find('user');
+
+        $fields = $blueprint->fields()->addValues($request->all())->process();
+
+        $validation = (new Validation)->fields($fields)->withRules([
+            'username' => 'required', // TODO: Needs to be more clever re: different logic for email as login
+        ]);
+
+        $request->validate($validation->rules());
+
+        $user = User::create()
+            ->username($request->username)
+            ->with(array_except($fields->values(), 'username'))
+            ->save();
+
+        return ['redirect' => $user->editUrl()];
     }
 
     public function edit($id)
@@ -202,42 +208,6 @@ class UsersController extends CpController
         }
 
         return ['success' => true];
-    }
-
-    /**
-     * Create the data array, populating it with blank values for all fields in
-     * the fieldset, then overriding with the actual data where applicable.
-     *
-     * @param string|\Statamic\Contracts\Data\Users\User $arg
-     * @return array
-     */
-    private function populateWithBlanks($arg)
-    {
-        // Get a fieldset and data
-        if ($arg instanceof \Statamic\Contracts\Data\Users\User) {
-            $fieldset = $arg->fieldset();
-            $data = $arg->processedData();
-        } else {
-            $fieldset = Fieldset::get($arg);
-            $data = [];
-        }
-
-        // Get the fieldtypes
-        $fieldtypes = collect($fieldset->fieldtypes())->keyBy(function ($ft) {
-            return $ft->getName();
-        });
-
-        // Build up the blanks
-        $blanks = [];
-        foreach ($fieldset->fields() as $name => $config) {
-            if (! $default = array_get($config, 'default')) {
-                $default = $fieldtypes->get($name)->blank();
-            }
-
-            $blanks[$name] = $default;
-        }
-
-        return array_merge($blanks, $data);
     }
 
     public function getResetUrl($username)

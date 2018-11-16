@@ -7,7 +7,8 @@ export default {
     props: {
         initialFieldset: Object,
         initialValues: Object,
-        action: String
+        action: String,
+        method: String
     },
 
     data() {
@@ -41,8 +42,10 @@ export default {
         save() {
             this.clearErrors();
 
-            axios.patch(this.action, this.values).then(response => {
+            axios[this.method](this.action, this.values).then(response => {
                 this.$notify.success('Saved');
+                const redirect = response.data.redirect;
+                if (redirect) window.location = redirect;
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
