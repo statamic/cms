@@ -99,30 +99,30 @@ class Statamic
 
     public static function jsonVariables(Request $request)
     {
-        return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
+        $defaults = [
+            'version' => static::version(),
+            'csrfToken' => csrf_token(),
+            'siteRoot' => site_root(),
+            'cpRoot' => cp_root(),
+            'urlPath' => '/' . request()->path(),
+            'resourceUrl' => cp_resource_url('/'),
+            'locales' => \Statamic\API\Config::get('statamic.system.locales'),
+            'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
+            'conditions' => [],
+            'MediumEditorExtensions' => [],
+            'flash' => [],
+            'ajaxTimeout' => config('statamic.system.ajax_timeout'),
+        ];
+
+        $vars = array_merge($defaults, static::$jsonVariables);
+
+        return collect($vars)->map(function ($variable) use ($request) {
             return is_callable($variable) ? $variable($request) : $variable;
         })->all();
     }
 
     public static function provideToScript(array $variables)
     {
-        if (empty(static::$jsonVariables)) {
-            static::$jsonVariables = [
-                'version' => static::version(),
-                'csrfToken' => csrf_token(),
-                'siteRoot' => site_root(),
-                'cpRoot' => cp_root(),
-                'urlPath' => '/' . request()->path(),
-                'resourceUrl' => cp_resource_url('/'),
-                'locales' => \Statamic\API\Config::get('statamic.system.locales'),
-                'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
-                'conditions' => [],
-                'MediumEditorExtensions' => [],
-                'flash' => [],
-                'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-            ];
-        }
-
         static::$jsonVariables = array_merge(static::$jsonVariables, $variables);
 
         return new static;
