@@ -39,6 +39,7 @@ var units = {
     '5':   '40px',
     '6':   '64px',
     '7':   '80px',
+    '8':   '120px'
 }
 
 module.exports = {
