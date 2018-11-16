@@ -74,4 +74,9 @@ class UserFactory implements UserFactoryContract
 
         return $user;
     }
+
+    public function save()
+    {
+        return $this->get()->save();
+    }
 }
