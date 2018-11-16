@@ -44,6 +44,8 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
         }
 
         $this->attributes['username'] = $username;
+
+        return $this;
     }
 
     /**
