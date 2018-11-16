@@ -66,6 +66,7 @@ Route::group([
     Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
 
     Route::resource('users', 'UsersController');
+    Route::get('account', 'AccountController')->name('account');
 
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
@@ -76,7 +77,6 @@ Route::group([
 Route::view('/playground', 'statamic::playground')->name('playground');
 
 // Just to make stuff work.
-Route::get('/account', function () { return ''; })->name('account');
 Route::get('/search', function () { return ''; })->name('search.global');
 Route::get('/account/password', function () { return ''; })->name('account.password');
 

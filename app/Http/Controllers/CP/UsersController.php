@@ -24,16 +24,6 @@ class UsersController extends CpController
      */
     private $user;
 
-    /**
-     * Redirect to the current user's edit page
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function account()
-    {
-        return redirect()->route('user.edit', User::getCurrent()->username());
-    }
-
     public function index(Request $request)
     {
         $this->access('users:view');
