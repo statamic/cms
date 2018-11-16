@@ -610,3 +610,10 @@ if (! function_exists('__n')) {
         return trans_choice(__($key, $replace, $locale), $number);
     }
 }
+
+if (! function_exists('me')) {
+    function me()
+    {
+        return auth()->user();
+    }
+}
