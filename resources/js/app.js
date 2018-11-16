@@ -63,6 +63,7 @@ var vm = new Vue({
         FormListing: require('./components/forms/Listing.vue'),
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue'),
         FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
+        UserListing: require('./components/users/Listing.vue'),
     },
 
     mixins: [ Notifications ],

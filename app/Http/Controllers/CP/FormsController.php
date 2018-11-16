@@ -13,7 +13,7 @@ class FormsController extends CpController
 
         $data = [
             'title' => 'Forms',
-            'forms' => Form::all()->toJson()
+            'forms' => Form::all()->toArray()
         ];
 
         return view('statamic::forms.index', $data);

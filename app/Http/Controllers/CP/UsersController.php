@@ -8,6 +8,7 @@ use Statamic\API\Email;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
+use Illuminate\Http\Request;
 use Statamic\Auth\PasswordReset;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
@@ -30,20 +31,15 @@ class UsersController extends CpController
         return redirect()->route('user.edit', User::getCurrent()->username());
     }
 
-    /**
-     * List users
-     *
-     * @return \Illuminate\View\View
-     */
-    public function index()
+    public function index(Request $request)
     {
         $this->access('users:view');
 
-        $data = [
-            'title' => 'Users'
-        ];
+        if ($request->wantsJson()) {
+            return $this->json();
+        }
 
-        return view('statamic::users.index', $data);
+        return view('statamic::users.index');
     }
 
     /**
@@ -51,7 +47,7 @@ class UsersController extends CpController
      *
      * @return array
      */
-    public function get()
+    public function json()
     {
         $users = User::all()->supplement('checked', function () {
             return false;
@@ -62,11 +58,9 @@ class UsersController extends CpController
          * trigger a change on it. So it's better to sort it with the first
          * name when the name is being used.
          */
-        if ($sort = request('sort')) {
-            $sort = ($sort == 'name') ? 'first_name' : $sort;
-
-            $users = $users->multisort($sort . ':' . request('order'));
-        }
+        $sort = request('sort', 'username');
+        $multisort = ($sort == 'name') ? 'first_name' : $sort;
+        $users = $users->multisort($multisort . ':' . request('order'));
 
         // Set up the paginator, since we don't want to display all the users.
         $totalUserCount = $users->count();
@@ -77,8 +71,15 @@ class UsersController extends CpController
         $paginator = new LengthAwarePaginator($users, $totalUserCount, $perPage, $currentPage);
 
         return [
-            'items'   => $users->toArray(),
-            'columns' => ['name', 'username', 'email'],
+            'data'   => $users->toArray(),
+            'meta' => [
+                'sortColumn' => $sort,
+                'columns' => [
+                    ['label' => 'name', 'field' => 'name'],
+                    ['label' => 'username', 'field' => 'username'],
+                    ['label' => 'email', 'field' => 'email'],
+                ],
+            ],
             'pagination' => [
                 'totalItems' => $totalUserCount,
                 'itemsPerPage' => $perPage,

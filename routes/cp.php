@@ -18,9 +18,6 @@ Route::group([
     Route::redirect('/', 'cp/dashboard')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
-    // Bringing back debugbar with this temp dummy route.
-    Route::get('user/edit', function () {})->name('user.edit');
-
     // Structures
     Route::resource('structures', 'StructuresController');
 
@@ -67,6 +64,8 @@ Route::group([
     Route::resource('forms', 'FormsController');
     Route::resource('forms.submissions', 'FormSubmissionsController');
     Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
+
+    Route::resource('users', 'UsersController');
 
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
