@@ -59,7 +59,11 @@
         </a>
         <div class="dropdown">
             <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <div class="icon-user-initials rounded-full text-2xs bg-pink shadow">ME</div>
+                @if ($user->avatar())
+                    <div class="icon-header-avatar"><img src="{{ $user->avatar() }}" /></div>
+                @else
+                    <div class="icon-header-avatar icon-user-initials">{{ $user->initials() }}</div>
+                @endif
             </a>
             <ul class="dropdown-menu hide md:block">
                 <li class="px-1">

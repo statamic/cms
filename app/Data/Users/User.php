@@ -48,6 +48,11 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
         return $this;
     }
 
+    public function initials()
+    {
+        return strtoupper(substr($this->username(), 0, 1));
+    }
+
     /**
      * Get or set a user's email address
      *
@@ -339,9 +344,9 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      *
      * @return string
      */
-    public function getAvatar($size = 64)
+    public function avatar($size = 64)
     {
-        return Config::get('statamic.users.enable_gravatar') ? gravatar($this->email(), $size) : 'INSERT FALLBACK';
+        return config('statamic.users.gravatar') ? gravatar($this->email(), $size) : null;
     }
 
     /**
