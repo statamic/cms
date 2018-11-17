@@ -25,6 +25,10 @@ Route::group([
     Route::resource('collections', 'CollectionsController');
     Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
 
+    // Collections
+    Route::resource('globals', 'GlobalsController');
+    Route::resource('globals.sets', 'GlobalSetsController', ['except' => 'show']);
+
     // Assets
     Route::resource('asset-containers', 'AssetContainersController');
     Route::get('assets/browse', 'AssetBrowserController@index')->name('assets.browse.index');

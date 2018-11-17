@@ -14,15 +14,12 @@ class GlobalsController extends CpController
     {
         $this->access('globals:*:view');
 
-        $globals = GlobalSet::all();
+        $data = [
+            'title' => __('Global Sets'),
+            'globals' => GlobalSet::all()->toArray()
+        ];
 
-        if (count($globals) === 1) {
-            return redirect()->route('globals.edit', $globals->first()->slug());
-        }
-
-        return view('statamic::globals.index', [
-            'title' => t('cp.globals')
-        ]);
+        return view('statamic::globals.index', $data);
     }
 
     public function manage()

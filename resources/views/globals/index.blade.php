@@ -2,30 +2,28 @@
 
 @section('content')
 
-    <globals-listing inline-template v-cloak>
-        <div>
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">{{ t('global_sets') }}</h1>
-                @can('super')
-                    <a href="{{ route('globals.manage') }}" class="btn">{{ translate('cp.manage_global_sets') }}</a>
-                @endcan
-            </div>
-
-            <template v-if="noItems">
-                <div class="no-results">
-                    <span class="icon icon-documents"></span>
-                    <h2>{{ trans('cp.globals_empty_heading') }}</h2>
-                    <h3>{{ trans('cp.globals_empty') }}</h3>
-                    @can('super')
-                        <a href="{{ route('globals.manage') }}" class="btn btn-default btn-lg">{{ trans('cp.manage_global_sets') }}</a>
-                    @endcan
-                </div>
-            </template>
-
-            <div class="card flush">
-                <dossier-table v-if="hasItems" :items="items" :options="tableOptions"></dossier-table>
-            </div>
+    @if(count($globals) == 0)
+        <div class="text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
+            @svg('empty/global')
+            <h1 class="my-3">{{ __('Create your first Global Set now') }}</h1>
+            <p class="text-grey mb-3">
+                {{ __('Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.') }}
+            </p>
+            @can('super')
+                <a href="{{ cp_route('forms.create') }}" class="btn-primary btn-lg">{{ __('Create Global Set') }}</a>
+            @endcan
         </div>
-    </globals-listing>
+    @endif
+
+    @if(count($globals) > 0)
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">{{ $title }}</h1>
+            @can('super')
+                <a href="{{ cp_route('forms.create') }}" class="btn btn-primary">{{ __('Create Global Set') }}</a>
+            @endcan
+        </div>
+
+        <global-listing :globals="{{ json_encode($globals) }}"></global-listing>
+    @endif
 
 @endsection

@@ -3,7 +3,7 @@
 @section('content')
 
     @if(count($collections) == 0)
-        <div class="text-center max-w-sm mx-auto pt-8 screen-centered">
+        <div class="text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
             @svg('empty/collection')
             <h1 class="my-3">{{ __('Create your first Collection now') }}</h1>
             <p class="text-grey mb-3">

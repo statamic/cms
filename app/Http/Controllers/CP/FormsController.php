@@ -12,7 +12,7 @@ class FormsController extends CpController
         $this->access('forms');
 
         $data = [
-            'title' => 'Forms',
+            'title' => __('Forms'),
             'forms' => Form::all()->toArray()
         ];
 
