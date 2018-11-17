@@ -23,7 +23,7 @@ return [
     'redis_write_file' => true,
     'login_type' => 'username',
     'new_user_roles' => [],
-    'enable_gravatar' => true,
+    'gravatar' => true,
 
     /*
     |--------------------------------------------------------------------------

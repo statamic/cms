@@ -9,19 +9,24 @@
 /* Sticky Header
   ========================================================================== */
 
-  .sticky {
-      background: linear-gradient($bg 95%, rgba($bg, 0));
-      position: sticky;
-      top: 0;
-      padding: 12px 24px 16px;
-      margin: -16px 0 8px !important;
-      z-index: 102;
-  }
+.sticky {
+    background: linear-gradient($bg 95%, rgba($bg, 0));
+    position: sticky;
+    top: 0;
+    padding: 12px 24px 16px;
+    margin: -16px 0 8px !important;
+    z-index: 102;
+}
 
 
 
 /* Misc
   ========================================================================== */
+
+.screen-centered {
+    position: relative;
+    left: -100px;
+}
 
 .ease-quick {
     transition: all 60ms ease;

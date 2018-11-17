@@ -2,6 +2,20 @@
 
 @section('content')
 
+    @if(count($forms) == 0)
+        <div class="text-center max-w-sm mx-auto pt-8 screen-centered">
+            @svg('empty/form')
+            <h1 class="my-3">{{ __('Create your first Form now') }}</h1>
+            <p class="text-grey mb-3">
+                {{ __('Forms are used to collect information from your visitors and dispatch notifications to you and your team of new submissions') }}
+            </p>
+            @can('super')
+                <a href="{{ cp_route('forms.create') }}" class="btn-primary btn-lg">{{ __('Create Form') }}</a>
+            @endcan
+        </div>
+    @endif
+
+    @if(count($forms) > 0)
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Forms') }}</h1>
             @can('super')
@@ -9,20 +23,6 @@
             @endcan
         </div>
 
-        @if(count($forms) == 0)
-        <div class="card">
-            <div class="no-results">
-                <span class="icon icon-download"></span>
-                <h2>{{ __('Forms') }}</h2>
-                <h3>{{ __('Forms collect, display, and report user submitted responses.') }}</h3>
-                @can('super')
-                    <a href="{{ cp_route('forms.create') }}" class="btn btn-default btn-lg">{{ __('Create Form') }}</a>
-                @endcan
-            </div>
-        </div>
-        @endif
-
-    @if(count($forms) > 0)
         <form-listing :forms="{{ json_encode($forms) }}"></form-listing>
     @endif
 

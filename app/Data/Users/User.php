@@ -9,7 +9,7 @@ use Statamic\API\Hash;
 use Statamic\API\YAML;
 use Statamic\Data\Data;
 use Statamic\API\Config;
-use Statamic\API\Fieldset;
+use Statamic\API\Blueprint;
 use Statamic\Permissions\Permissible;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -44,6 +44,13 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
         }
 
         $this->attributes['username'] = $username;
+
+        return $this;
+    }
+
+    public function initials()
+    {
+        return strtoupper(substr($this->username(), 0, 1));
     }
 
     /**
@@ -337,9 +344,9 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      *
      * @return string
      */
-    public function getAvatar($size = 64)
+    public function avatar($size = 64)
     {
-        return Config::get('statamic.users.enable_gravatar') ? gravatar($this->email(), $size) : 'INSERT FALLBACK';
+        return config('statamic.users.gravatar') ? gravatar($this->email(), $size) : null;
     }
 
     /**
@@ -518,22 +525,22 @@ class User extends Data implements UserContract, Authenticatable, PermissibleCon
      */
     public function editUrl()
     {
-        return cp_route('users.edit', $this->username());
+        return cp_route('users.edit', $this->id());
     }
 
     /**
-     * Get or set the fieldset
+     * Get or set the blueprint
      *
      * @param string|null|bool
-     * @return \Statamic\Fields\Fieldset
+     * @return \Statamic\Fields\Blueprint
      */
-    public function fieldset($fieldset = null)
+    public function blueprint($blueprint = null)
     {
-        if (is_null($fieldset)) {
-            return Fieldset::get('user');
+        if (is_null($blueprint)) {
+            return Blueprint::find('user');
         }
 
-        $this->set('fieldset', $fieldset);
+        $this->set('blueprint', $blueprint);
     }
 
     /**
