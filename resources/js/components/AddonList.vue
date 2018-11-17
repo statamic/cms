@@ -1,40 +1,46 @@
 <template>
-    <data-list :columns="[]" :rows="rows" :visible-columns="[]" v-if="loaded">
-        <div class="" slot-scope="{ rows: addons }">
-            <div class="data-list-header flex items-center card p-0">
-                <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
-                <div class="filter bg-white ml-3 mb-0">
-                    <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }">Not Installed</a>
-                    <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }">Installed</a>
-                    <a @click="filter = 'all'" :class="{ active: filter == 'all' }">All</a>
-                </div>
-            </div>
-            <div class="addon-grid my-4">
-                <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
-                    <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
-                    <div class="px-3 mb-2 relative text-center">
-                        <a :href="addon.seller.website" class="relative">
-                            <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 z-30 bg-white relative -mt-4 border-2 border-white">
-                        </a>
-                        <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
-                        <p v-text="addon.variants[0].summary" class="text-sm"></p>
+    <div>
+        <div v-if="! loaded" class="card p-3 text-center">
+            <loading-graphic  />
+        </div>
+
+        <data-list :columns="[]" :rows="rows" :visible-columns="[]" v-if="loaded">
+            <div class="" slot-scope="{ rows: addons }">
+                <div class="data-list-header flex items-center card p-0">
+                    <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
+                    <div class="filter bg-white ml-3 mb-0">
+                        <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }">Not Installed</a>
+                        <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }">Installed</a>
+                        <a @click="filter = 'all'" :class="{ active: filter == 'all' }">All</a>
                     </div>
                 </div>
+                <div class="addon-grid my-4">
+                    <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
+                        <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
+                        <div class="px-3 mb-2 relative text-center">
+                            <a :href="addon.seller.website" class="relative">
+                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 z-30 bg-white relative -mt-4 border-2 border-white">
+                            </a>
+                            <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
+                            <p v-text="addon.variants[0].summary" class="text-sm"></p>
+                        </div>
+                    </div>
 
+                </div>
+
+                <data-list-pagination :resource-meta="meta" @pageSelected="setPage"></data-list-pagination>
+
+                <portal to="modals" v-if="showingAddon">
+                    <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
+                        <addon-details
+                            :addon="showingAddon"
+                            :cover="getCover(showingAddon)">
+                        </addon-details>
+                    </modal>
+                </portal>
             </div>
-
-            <data-list-pagination :resource-meta="meta" @pageSelected="setPage"></data-list-pagination>
-
-            <portal to="modals" v-if="showingAddon">
-                <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
-                    <addon-details
-                        :addon="showingAddon"
-                        :cover="getCover(showingAddon)">
-                    </addon-details>
-                </modal>
-            </portal>
-        </div>
-    </data-list>
+        </data-list>
+    </div>
 </template>
 
 <style>
