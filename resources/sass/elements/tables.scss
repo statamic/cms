@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply py-1.5 pr-2 flex items-center;
+    @apply py-1.5 pr-2 flex items-center border-b;
 }
 
 .data-list-search-input {
@@ -14,14 +14,20 @@
     @apply py-1.5 pr-2 flex items-center border-t;
 }
 
-table.data-table {
+.data-table {
     @apply w-full text-left text-grey;
 
     thead {
-        @apply bg-grey-lightest border-t text-grey-darker uppercase text-2xs tracking-wide;
+        @apply bg-grey-lightest text-grey-darker uppercase text-2xs tracking-wide;
 
         th {
             @apply font-medium px-2 py-1.5;
+            &:first-child {
+                @apply .rounded-tl;
+            }
+            &:last-child {
+                @apply .rounded-tr;
+            }
         }
     }
     tbody {
@@ -63,6 +69,12 @@ table.data-table {
             transform: scaleY(-1);
         }
 
+    }
+}
+
+.data-list-header ~ .data-table {
+    thead th {
+        border-radius: 0;
     }
 }
 
