@@ -216,4 +216,10 @@ class Collection extends DataFolder implements CollectionContract
     {
         return $this->blueprints()->first();
     }
+
+    // TODO: Deprecate path
+    public function handle($handle = null)
+    {
+        return $this->path($handle);
+    }
 }

@@ -25,6 +25,12 @@ class GlobalSet extends Content implements GlobalContract
         $this->attributes['slug'] = $slug;
     }
 
+    // TODO: Probably deprecate slug
+    public function handle($handle = null)
+    {
+        return $this->slug($handle);
+    }
+
     /**
      * Get or set the path
      *
