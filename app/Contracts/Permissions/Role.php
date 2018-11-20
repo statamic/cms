@@ -8,7 +8,7 @@ interface Role
 {
     public function title(string $title = null);
     public function handle(string $handle = null);
-    public function permissions(): Collection;
+    public function permissions($permissions = null);
     public function hasPermission(string $permission): bool;
     public function addPermission($permission);
     public function removePermission($permission);

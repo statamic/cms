@@ -39,9 +39,15 @@ class Role implements RoleContract
         return $this;
     }
 
-    public function permissions(): Collection
+    public function permissions($permissions = null)
     {
-        return $this->permissions;
+        if (is_null($permissions)) {
+            return $this->permissions;
+        }
+
+        $this->permissions = collect($permissions);
+
+        return $this;
     }
 
     public function addPermission($permission)

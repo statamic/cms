@@ -48,6 +48,19 @@ class RoleTest extends TestCase
     }
 
     /** @test */
+    function it_sets_all_permissions()
+    {
+        $role = new Role;
+        $role->addPermission('one');
+
+        $return = $role->permissions(['two', 'three']);
+
+        $this->assertInstanceOf(Collection::class, $role->permissions());
+        $this->assertEquals(['two', 'three'], $role->permissions()->all());
+        $this->assertEquals($role, $return);
+    }
+
+    /** @test */
     function permissions_get_deduplicated()
     {
         $role = new Role;
