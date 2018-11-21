@@ -12,6 +12,11 @@ class Role
         return call_user_func_array([$this->repo(), $method], $args);
     }
 
+    public function create()
+    {
+        return app(config('statamic.users.roles.role'));
+    }
+
     public function save(RoleContract $role)
     {
         $this->repo()->save($role);
