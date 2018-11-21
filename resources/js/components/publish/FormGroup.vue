@@ -3,6 +3,7 @@
     <publish-field
         :config="config"
         :value="value"
+        :errors="errors"
         @updated="updated"
     />
 
@@ -44,6 +45,10 @@ export default {
 
         autofocus: {
             type: Boolean
+        },
+
+        errors: {
+            type: Array
         }
 
     },
