@@ -146,7 +146,7 @@ trait PermissibleContractTests
             {
                 return 'direct';
             }
-            public function permissions(): Collection
+            public function permissions($permissions = null)
             {
                 return collect([
                     'permission one directly through role',
@@ -159,7 +159,7 @@ trait PermissibleContractTests
             {
                 return 'usergrouprole';
             }
-            public function permissions(): Collection
+            public function permissions($permissions = null)
             {
                 return collect([
                     'permission one through user group',

@@ -257,7 +257,7 @@ class UserGroupTest extends TestCase
     function it_checks_if_it_has_permission()
     {
         $role = new class extends Role {
-            public function permissions(): Collection {
+            public function permissions($permissions = null) {
                 return collect(['one']);
             }
         };
@@ -272,12 +272,12 @@ class UserGroupTest extends TestCase
     function it_checks_if_it_has_super_permissions()
     {
         $superRole = new class extends Role {
-            public function permissions(): Collection {
+            public function permissions($permissions = null) {
                 return collect(['super']);
             }
         };
         $nonSuperRole = new class extends Role {
-            public function permissions(): Collection {
+            public function permissions($permissions = null) {
                 return collect(['test']);
             }
         };
