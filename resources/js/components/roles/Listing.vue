@@ -2,8 +2,11 @@
     <data-list :rows="rows" :columns="columns">
         <div class="card p-0" slot-scope="{ }">
             <data-table>
-                <template slot="cell-title" slot-scope="{ row: role }">
+                <template slot="cell-title" slot-scope="{ row: role, index }">
                     <a :href="role.edit_url">{{ role.title }}</a>
+                </template>
+                <template slot="cell-handle" slot-scope="{ value: handle }">
+                    <span class="font-mono text-xs">{{ handle }}</span>
                 </template>
                 <template slot="actions" slot-scope="{ row: role, index }">
                     <dropdown-list>
@@ -28,7 +31,7 @@ export default {
     data() {
         return {
             rows: this.initialRows,
-            columns: ['title']
+            columns: ['title', 'handle', 'permissions']
         }
     },
 
