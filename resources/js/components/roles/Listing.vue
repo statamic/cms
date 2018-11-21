@@ -1,7 +1,7 @@
 <template>
     <data-list :rows="rows" :columns="columns">
-        <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-table :rows="rows">
+        <div class="card p-0" slot-scope="{ }">
+            <data-table>
                 <template slot="cell-title" slot-scope="{ row: role }">
                     <a :href="role.edit_url">{{ role.title }}</a>
                 </template>
