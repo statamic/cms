@@ -24,6 +24,13 @@ class Role
         // TODO: RoleSaved::dispatch($role);
     }
 
+    public function delete(RoleContract $role)
+    {
+        $this->repo()->delete($role);
+
+        // TODO: RoleDeleted::dispatch();
+    }
+
     protected function repo()
     {
         return app(RoleRepository::class);

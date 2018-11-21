@@ -100,6 +100,6 @@ class Role implements RoleContract
 
     public function delete()
     {
-
+        API\Role::delete($this);
     }
 }

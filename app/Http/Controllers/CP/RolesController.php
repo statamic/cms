@@ -93,6 +93,19 @@ class RolesController extends CpController
         return ['redirect' => cp_route('roles.edit', $role->handle())];
     }
 
+    public function destroy($role)
+    {
+        $this->authorize('super');
+
+        if (! $role = Role::find($role)) {
+            return $this->pageNotFound();
+        }
+
+        $role->delete();
+
+        return response('', 204);
+    }
+
     protected function toTreeArray($tree, $role = null)
     {
         return $tree->map(function ($item) use ($role) {

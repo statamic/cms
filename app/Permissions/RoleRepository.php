@@ -53,7 +53,16 @@ class RoleRepository implements RepositoryContract
             $roles->forget($original);
         }
 
-        File::put($this->path, YAML::dump($roles->all()));
+        $this->write($roles);
+    }
+
+    public function delete(Role $role)
+    {
+        $roles = $this->raw();
+
+        $roles->forget($role->handle());
+
+        $this->write($roles);
     }
 
     protected function raw()
@@ -63,5 +72,10 @@ class RoleRepository implements RepositoryContract
         }
 
         return collect(YAML::parse(File::get($this->path)));
+    }
+
+    protected function write($roles)
+    {
+        File::put($this->path, YAML::dump($roles->all()));
     }
 }
