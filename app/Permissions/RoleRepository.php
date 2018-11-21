@@ -45,4 +45,20 @@ class RoleRepository implements RepositoryContract
     {
         return $this->find($id) !== null;
     }
+
+    public function save(Role $role)
+    {
+        $roles = $this->all();
+
+        $roles->put($role->handle(), [
+            'title' => $role->title(),
+            'permissions' => $role->permissions()->all()
+        ]);
+
+        if ($original = $role->originalHandle()) {
+            $roles->forget($original);
+        }
+
+        File::put($this->path, YAML::dump($roles->all()));
+    }
 }

@@ -2,14 +2,17 @@
 
 namespace Statamic\Permissions;
 
+use Statamic\API;
 use Statamic\API\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Permissions\RoleRepository;
 use Statamic\Contracts\Permissions\Role as RoleContract;
 
 class Role implements RoleContract
 {
     protected $title;
     protected $handle;
+    protected $originalHandle;
     protected $permissions;
 
     public function __construct()
@@ -34,9 +37,18 @@ class Role implements RoleContract
             return $this->handle;
         }
 
+        if (! $this->originalHandle) {
+            $this->originalHandle = $this->handle;
+        }
+
         $this->handle = $handle;
 
         return $this;
+    }
+
+    public function originalHandle()
+    {
+        return $this->originalHandle;
     }
 
     public function permissions($permissions = null)
@@ -81,7 +93,7 @@ class Role implements RoleContract
 
     public function save()
     {
-
+        API\Role::save($this);
     }
 
     public function delete()
