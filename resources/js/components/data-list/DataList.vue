@@ -50,6 +50,7 @@ export default {
                 sortColumn: null,
                 sortDirection: this.sortDirection,
                 rows: [],
+                originalRows: this.rows,
                 selections: this.selections,
                 maxSelections: this.maxSelections,
             }

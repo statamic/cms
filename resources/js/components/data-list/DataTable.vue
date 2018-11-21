@@ -31,12 +31,23 @@
                     />
                 </td>
                 <td v-for="column in sharedState.visibleColumns" :key="column">
-                    <slot :name="`cell-${column}`" :value="row[column]" :row="row" :index="index" :checkbox-id="`checkbox-${row.id}`">
+                    <slot
+                        :name="`cell-${column}`"
+                        :value="row[column]"
+                        :row="row"
+                        :index="actualIndex(row)"
+                        :display-index="index"
+                        :checkbox-id="`checkbox-${row.id}`">
                         {{ row[column] }}
                     </slot>
                 </td>
                 <td class="text-right">
-                    <slot name="actions" :row="row" :index="index"></slot>
+                    <slot
+                        name="actions"
+                        :row="row"
+                        :index="actualIndex(row)"
+                        :display-index="index"
+                    ></slot>
                 </td>
             </tr>
         </tbody>
@@ -79,6 +90,10 @@ export default {
         swapSortDirection() {
             this.sharedState.currentPage = 1;
             this.sharedState.sortDirection = this.sharedState.sortDirection === 'asc' ? 'desc' : 'asc';
+        },
+
+        actualIndex(row) {
+            return _.findIndex(this.sharedState.originalRows, row);
         }
 
     }
