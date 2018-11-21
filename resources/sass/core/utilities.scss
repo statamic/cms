@@ -52,6 +52,8 @@
     }
 }
 
+[v-cloak] { display: none }
+
 .loading-blocker {
     @apply absolute pin z-10;
     background: rgba(white, .7);
