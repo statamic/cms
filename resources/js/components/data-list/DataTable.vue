@@ -1,6 +1,6 @@
 <template>
     <table class="data-table">
-        <thead>
+        <thead v-if="sharedState.visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions"></th>
                 <th
