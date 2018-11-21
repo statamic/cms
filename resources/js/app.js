@@ -54,7 +54,6 @@ var vm = new Vue({
         LoginModal: require('./components/login/LoginModal.vue'),
         EntryPublishForm: require('./components/publish/forms/EntryPublishForm.vue'),
         Importer: require('./components/importer/importer'),
-        Roles: require('./components/roles/roles'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
         FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue'),
@@ -66,6 +65,8 @@ var vm = new Vue({
         FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
         UserListing: require('./components/users/Listing.vue'),
         UserPublishForm: require('./components/users/PublishForm.vue'),
+        RoleListing: require('./components/roles/Listing.vue'),
+        RolePublishForm: require('./components/roles/PublishForm.vue'),
     },
 
     mixins: [ Notifications ],

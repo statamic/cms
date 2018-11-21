@@ -2,228 +2,73 @@
 
 namespace Statamic\Permissions;
 
-use Statamic\API\AssetContainer;
-use Statamic\API\Collection;
-use Statamic\API\GlobalSet;
-use Statamic\API\Str;
-use Statamic\API\Taxonomy;
+use Illuminate\Support\Facades\Gate;
 
 class Permissions
 {
-    private $permissions = [];
+    protected static $permissions = [];
 
-    public function all($wildcards = false)
+    public function make(string $value)
     {
-        if ($wildcards) {
-            return $this->permissions;
-        }
-
-        return collect($this->permissions)->reject(function ($permission) {
-            return Str::contains($permission, '*');
-        })->all();
+        return (new Permission)->value($value);
     }
 
-    public function build()
+    public function register($permission, $callback = null)
     {
-        $permissions = [
-            'super',                           // can do everything
-            'cp:access',                       // access the cp
-            'content:view_drafts_on_frontend', // can view drafts
-            'pages:view',                      // can view existing pages
-            'pages:edit',                      // can edit existing pages
-            'pages:create',                    // can create new pages
-            'pages:delete',                    // can delete pages
-            'pages:reorder',                   // can reorder pages
-            'forms',                           // can access forms
-            'updater',                         // can access the updater to see updates
-            'updater:update',                  // can perform updates
-            'importer',                        // can import data
-            'users:view',                      // can view users
-            'users:edit',                      // can edit users
-            'users:create',                    // can create users
-            'users:delete',                    // can delete users
-            'resolve_duplicates',              // can resolve duplicate ids
-        ];
+        if (! $permission instanceof Permission) {
+            $permission = self::make($permission);
 
-        $permissions = array_merge($permissions, self::buildCollectionsPermissions());
-        $permissions = array_merge($permissions, self::buildTaxonomiesPermissions());
-        $permissions = array_merge($permissions, self::buildGlobalsPermissions());
-        $permissions = array_merge($permissions, self::buildAssetsPermissions());
+            if ($callback) {
+                $callback($permission);
+            }
+        }
 
-        $this->permissions = $permissions;
+        static::$permissions[] = $permission;
+
+        if (! $permission->placeholder()) {
+            $permission->permissions(true)->each(function ($permission) {
+                Gate::define($permission->value(), function ($user) use ($permission) {
+                    return $user->hasPermission($permission->value());
+                });
+            });
+        }
+
+        return $permission;
     }
 
-    private function buildCollectionsPermissions()
+    public function all()
     {
-        $permissions = [
-            'collections:*:view',
-            'collections:*:edit'
-        ];
-
-        foreach (Collection::handles() as $collection) {
-            $permissions[] = "collections:{$collection}:view";
-            $permissions[] = "collections:{$collection}:edit";
-            $permissions[] = "collections:{$collection}:create";
-            $permissions[] = "collections:{$collection}:delete";
-        }
-
-        return $permissions;
+        return collect(static::$permissions)->flatMap(function ($permission) {
+            return $this->mergePermissions($permission);
+        })->keyBy->value();
     }
 
-    private function buildTaxonomiesPermissions()
+    protected function mergePermissions($permission)
     {
-        $permissions = [
-            'taxonomies:*:view',
-            'taxonomies:*:edit'
-        ];
-
-        foreach (Taxonomy::handles() as $taxonomy) {
-            $permissions[] = "taxonomies:{$taxonomy}:view";
-            $permissions[] = "taxonomies:{$taxonomy}:edit";
-            $permissions[] = "taxonomies:{$taxonomy}:create";
-            $permissions[] = "taxonomies:{$taxonomy}:delete";
-        }
-
-        return $permissions;
+        return $permission->permissions()
+            ->merge($permission->children()->flatMap(function ($perm) {
+                return $this->mergePermissions($perm);
+            }));
     }
 
-    private function buildGlobalsPermissions()
+    public function tree()
     {
-        $permissions = [
-            'globals:*:view',
-            'globals:*:edit'
-        ];
-
-        foreach (GlobalSet::all() as $global) {
-            $permissions[] = "globals:{$global->slug()}:view";
-            $permissions[] = "globals:{$global->slug()}:edit";
-        }
-
-        return $permissions;
+        return collect(static::$permissions)->flatMap(function ($permission) {
+            return $permission->permissions();
+        })->map(function ($permission) {
+            return $permission->toTree();
+        });
     }
 
-    private function buildAssetsPermissions()
+    protected function toTree($permissions)
     {
-        $permissions =[
-            'assets:*:view',
-            'assets:*:edit'
-        ];
-
-        foreach (AssetContainer::all() as $container) {
-            $permissions[] = "assets:{$container->id()}:view";
-            $permissions[] = "assets:{$container->id()}:edit";
-            $permissions[] = "assets:{$container->id()}:create";
-            $permissions[] = "assets:{$container->id()}:delete";
-        }
-
-        return $permissions;
-    }
-
-    public function structured()
-    {
-        $structure = [
-            'general' => ['cp:access', 'content:view_drafts_on_frontend', 'resolve_duplicates'],
-            'pages' => [
-                'pages:view' => ['pages:edit' => ['pages:create', 'pages:delete', 'pages:reorder']]
-            ]
-        ];
-
-        foreach (Collection::handles() as $collection) {
-            $structure['collections:'.$collection] = [
-                "collections:{$collection}:view" => [
-                    "collections:{$collection}:edit" => [
-                        "collections:{$collection}:create",
-                        "collections:{$collection}:delete"
-                    ]
-                ]
-            ];
-        }
-
-        foreach (Taxonomy::handles() as $taxonomy) {
-            $structure['taxonomies:'.$taxonomy] = [
-                "taxonomies:{$taxonomy}:view" => [
-                    "taxonomies:{$taxonomy}:edit" => [
-                        "taxonomies:{$taxonomy}:create",
-                        "taxonomies:{$taxonomy}:delete"
-                    ]
-                ]
-            ];
-        }
-
-        foreach (GlobalSet::all() as $set) {
-            $structure['globals:'.$set->slug()] = [
-                "globals:{$set->slug()}:view" => ["globals:{$set->slug()}:edit"]
-            ];
-        }
-
-        foreach (AssetContainer::all() as $container) {
-            $structure['assets:'.$container->id()] = [
-                "assets:{$container->id()}:view" => [
-                    "assets:{$container->id()}:edit" => [
-                        "assets:{$container->id()}:create",
-                        "assets:{$container->id()}:delete"
-                    ]
-                ]
-            ];
-        }
-
-        $structure = array_merge($structure, [
-            'forms' => ['forms'],
-            'updater' => [
-                'updater' => ['updater:update']
-            ],
-            'importer' => ['importer'],
-            'users' => [
-                'users:view' => [
-                    'users:edit' => ['users:create', 'users:delete']
-                ]
-            ]
-        ]);
-
-        return $structure;
-    }
-
-    // TODO: Get rid of this when we implement it correctly.
-    public function temporaryPermissions()
-    {
-        return [
-            "super",
-            "cp:access",
-            "content:view_drafts_on_frontend",
-            "structures:pages:reorder",
-            "forms",
-            "updater",
-            "updater:update",
-            "importer",
-            "users:view",
-            "users:edit",
-            "users:edit-passwords",
-            "users:edit-roles",
-            "users:create",
-            "users:delete",
-            "resolve_duplicates",
-            "collections:*:view",
-            "collections:*:edit",
-            "collections:pages:view",
-            "collections:pages:edit",
-            "collections:pages:create",
-            "collections:pages:delete",
-            "taxonomies:*:view",
-            "taxonomies:*:edit",
-            "taxonomies:tags:view",
-            "taxonomies:tags:edit",
-            "taxonomies:tags:create",
-            "taxonomies:tags:delete",
-            "globals:*:view",
-            "globals:*:edit",
-            "globals:global:view",
-            "globals:global:edit",
-            "assets:*:view",
-            "assets:*:edit",
-            "assets:main:view",
-            "assets:main:edit",
-            "assets:main:create",
-            "assets:main:delete",
-        ];
+        return $permissions
+            ->keyBy->value()
+            ->map(function($permission) {
+                return [
+                    'permission' => $permission,
+                    'children' => $this->toTree($permission->children())
+                ];
+            });
     }
 }

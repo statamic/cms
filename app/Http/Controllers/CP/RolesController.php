@@ -2,14 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\AssetContainer;
-use Statamic\API\Collection;
-use Statamic\API\GlobalSet;
-use Statamic\API\Permission;
 use Statamic\API\Role;
-use Statamic\API\Str;
-use Statamic\API\Helper;
-use Statamic\API\Taxonomy;
+use Illuminate\Http\Request;
+use Statamic\API\Permission;
 
 class RolesController extends CpController
 {
@@ -17,163 +12,97 @@ class RolesController extends CpController
     {
         $this->authorize('super');
 
-        return view('statamic::roles.index', [
-            'title' => 'Roles'
-        ]);
-    }
-
-    public function get()
-    {
-        $roles = [];
-
-        foreach ($this->getRoles() as $key => $role) {
-            $roles[] = [
+        $roles = Role::all()->map(function ($role) {
+            return [
+                'id' => $role->handle(),
                 'title' => $role->title(),
-                'edit_url' => route('user.role', $key),
-                'uuid' => $role->uuid(), // TODO: remove.
-                'id' => $role->uuid()
+                'edit_url' => cp_route('roles.edit', $role->handle())
             ];
-        }
+        })->values();
 
-        return ['columns' => ['title'], 'items' => $roles];
-    }
-
-    /**
-     * @param $role
-     * @return \Statamic\Contracts\Permissions\Role
-     */
-    private function getRole($role)
-    {
-        return array_get($this->getRoles(), $role);
-    }
-
-    /**
-     * @return \Statamic\Contracts\Permissions\Role[]
-     */
-    public function getRoles()
-    {
-        return Role::all();
-    }
-
-    public function edit($role)
-    {
-        $this->authorize('super');
-
-        $role = $this->getRole($role);
-
-        $data = [
-            'title' => 'Edit role',
-            'role' => $role,
-            'content_titles' => $this->getContentTitles(),
-            'permissions' => Permission::structured(),
-            'selected' => $this->getPermissions($role)
-        ];
-
-        return view('statamic::roles.edit', $data);
-    }
-
-    private function getContentTitles()
-    {
-        $titles = [];
-
-        foreach (Collection::all() as $slug => $collection) {
-            $titles['collections'][$slug] = $collection->title();
-        }
-
-        foreach (Taxonomy::all() as $slug => $taxonomy) {
-            $titles['taxonomies'][$slug] = $taxonomy->title();
-        }
-
-        foreach (GlobalSet::all() as $global) {
-            $titles['globals'][$global->slug()] = $global->title();
-        }
-
-        foreach (AssetContainer::all() as $id => $container) {
-            $titles['assets'][$id] = $container->title();
-        }
-
-        return $titles;
-    }
-
-    /**
-     * Get an array of permissions that have been added to the given role.
-     *
-     * @param null|\Statamic\Contracts\Permissions\Role $role
-     * @return array
-     */
-    private function getPermissions($role = null)
-    {
-        $results = [];
-
-        foreach (Permission::all() as $permission) {
-            if ($role->hasPermission($permission)) {
-                $results[] = $permission;
-            }
-        }
-
-        return $results;
-    }
-
-    public function update($role)
-    {
-        $role = $this->getRole($role);
-
-        $permissions = $this->request->input('permissions', []);
-
-        $role->permissions($permissions);
-
-        $title = $this->request->input('title');
-        $role->title($title);
-        $role->slug($this->request->input('slug', Str::slug($title)));
-
-        $role->save();
-
-        return redirect()->back()->with('success', 'Role updated.');
+        return view('statamic::roles.index', [
+            'roles' => $roles
+        ]);
     }
 
     public function create()
     {
         $this->authorize('super');
 
-        $data = [
-            'title' => 'Create role',
-            'content_titles' => $this->getContentTitles(),
-            'permissions' => Permission::structured(),
-            'selected' => []
-        ];
-
-        return view('statamic::roles.create', $data);
+        return view('statamic::roles.create', [
+            'permissions' => $this->toTreeArray(Permission::tree()),
+        ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
         $this->authorize('super');
 
-        $title = $this->request->input('title');
+        $request->validate([
+            'title' => 'required',
+            'handle' => 'alpha_dash',
+            'super' => 'boolean',
+            'permissions' => 'array',
+        ]);
 
-        $data = [
-            'title' => $title,
-            'slug' => $this->request->input('slug', Str::snake($title)),
-            'permissions' => $this->request->input('permissions', [])
-        ];
+        $role = Role::create()
+            ->title($request->title)
+            ->handle($request->handle ?: snake_case($request->title))
+            ->permissions($request->super ? ['super'] : $request->permissions)
+            ->save();
 
-        $role = app('Statamic\Contracts\Permissions\RoleFactory')->create($data);
-
-        $role->save();
-
-        return redirect()->route('user.role', $role->uuid())->with('success', 'Role updated.');
+        return ['redirect' => cp_route('roles.edit', $role->handle())];
     }
 
-    public function delete()
+    public function edit($role)
     {
         $this->authorize('super');
 
-        $ids = Helper::ensureArray($this->request->input('ids'));
-
-        foreach ($ids as $id) {
-            Role::find($id)->delete();
+        if (! $role = Role::find($role)) {
+            return $this->pageNotFound();
         }
 
-        return ['success' => true];
+        return view('statamic::roles.edit', [
+            'role' => $role,
+            'super' => $role->isSuper(),
+            'permissions' => $this->toTreeArray(Permission::tree(), $role),
+        ]);
+    }
+
+    public function update(Request $request, $role)
+    {
+        $this->authorize('super');
+
+        if (! $role = Role::find($role)) {
+            return $this->pageNotFound();
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'handle' => 'alpha_dash',
+            'super' => 'boolean',
+            'permissions' => 'array',
+        ]);
+
+        $role
+            ->title($request->title)
+            ->handle($request->handle ?: snake_case($request->title))
+            ->permissions($request->super ? ['super'] : $request->permissions)
+            ->save();
+
+        return ['redirect' => cp_route('roles.edit', $role->handle())];
+    }
+
+    protected function toTreeArray($tree, $role = null)
+    {
+        return $tree->map(function ($item) use ($role) {
+            $permission = $item['permission'];
+            return [
+                'value' => $permission->value(),
+                'label' => $permission->label(),
+                'checked' => $role ? $role->hasPermission($permission->value()) : false,
+                'children' => $this->toTreeArray($item['children'], $role),
+            ];
+        });
     }
 }

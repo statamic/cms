@@ -2,31 +2,13 @@
 
 @section('content')
 
-    <user-role-listing inline-template v-cloak>
+    <div class="flex mb-3">
+        <h1 class="flex-1">
+            {{ __('Roles & Permissions') }}
+        </h1>
+        <a href="{{ cp_route('roles.create') }}" class="btn btn-primary">{{ __('Create Role') }}</a>
+    </div>
 
-        <div class="listing user-roles-listing">
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">{{ translate('cp.nav_user-roles') }}</h1>
-                <div class="controls flex items-center">
-                    @can('users:create')
-                        <search v-model="keyword"></search>
-                            <a href="{{ route('user.role.create') }}" class="btn btn-primary ml-1">{{ translate('cp.create_role_button') }}</a>
-                    @endcan
-                </div>
-            </div>
-            <div class="card flush">
-                <template v-if="noItems" v-cloak>
-                    <div class="no-results">
-                        <span class="icon icon-documents"></span>
-                        <h2>{{ translate('cp.roles_empty_heading') }}</h2>
-                        <h3>{{ translate('cp.roles_empty') }}</h3>
-                        <a href="{{ route('user.role.create') }}" class="btn btn-default btn-lg">{{ translate('cp.create_role_button') }}</a>
-                    </div>
-                </template>
-                <dossier-table v-if="hasItems" :items="items" :keyword.sync="keyword" :options="tableOptions"></dossier-table>
-            </div>
-        </div>
-
-    </user-role-listing>
+    <role-listing :initial-rows="{{ json_encode($roles) }}"></role-listing>
 
 @endsection

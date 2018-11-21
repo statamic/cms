@@ -21,13 +21,7 @@ class RoleRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        if (! File::exists($this->path)) {
-            return collect();
-        }
-
-        $roles = YAML::parse(File::get($this->path));
-
-        return collect($roles)->map(function ($role, $handle) {
+        return $this->raw()->map(function ($role, $handle) {
             // TODO: Use a factory
             return app(Role::class)
                 ->handle($handle)
@@ -48,7 +42,7 @@ class RoleRepository implements RepositoryContract
 
     public function save(Role $role)
     {
-        $roles = $this->all();
+        $roles = $this->raw();
 
         $roles->put($role->handle(), [
             'title' => $role->title(),
@@ -60,5 +54,14 @@ class RoleRepository implements RepositoryContract
         }
 
         File::put($this->path, YAML::dump($roles->all()));
+    }
+
+    protected function raw()
+    {
+        if (! File::exists($this->path)) {
+            return collect();
+        }
+
+        return collect(YAML::parse(File::get($this->path)));
     }
 }

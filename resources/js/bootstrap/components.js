@@ -37,9 +37,10 @@ Vue.component('loading-graphic', require('../components/LoadingGraphic.vue'));
 Vue.component('dropdown-list', require('../components/DropdownList'));
 Vue.component('validation-errors', require('../components/ValidationErrors'));
 
-// Recursive from page tree
+// Recursive
 Vue.component('branch', require('../components/page-tree/Branch.vue'));
 Vue.component('branches', require('../components/page-tree/Branches.vue'));
+Vue.component('role-permission-tree', require('../components/roles/PermissionTree.vue'));
 
 // Modals
 // Vue.component('modal', require('../components/Modal.vue'));

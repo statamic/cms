@@ -76,8 +76,8 @@
                         <i>@svg('users-multiple')</i><span>Groups</span>
                     </a>
                 </li>
-                <li>
-                    <a href="">
+                <li class="{{ current_class('roles*') }}">
+                    <a href="{{ cp_route('roles.index') }}">
                         <i>@svg('shield-key')</i><span>Permissions</span>
                     </a>
                 </li>

@@ -94,6 +94,8 @@ class Role implements RoleContract
     public function save()
     {
         API\Role::save($this);
+
+        return $this;
     }
 
     public function delete()

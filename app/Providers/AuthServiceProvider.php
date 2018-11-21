@@ -10,6 +10,7 @@ use Statamic\Contracts\Permissions\Role;
 use Statamic\Extensions\FileUserProvider;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Permissions\UserGroup;
+use Facades\Statamic\Permissions\CorePermissions;
 use Statamic\Contracts\Permissions\RoleRepository;
 
 class AuthServiceProvider extends ServiceProvider
@@ -49,14 +50,7 @@ class AuthServiceProvider extends ServiceProvider
             return $user->isSuper() ? true : null;
         });
 
-        collect([
-            'access cp',
-            'view drafts on frontend',
-        ])->each(function ($ability) {
-            Gate::define($ability, function ($user) use ($ability) {
-                return $user->hasPermission($ability);
-            });
-        });
+        CorePermissions::boot();
 
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);
