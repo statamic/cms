@@ -8,7 +8,7 @@ interface UserGroup
 {
     public function title(string $title = null);
     public function handle(string $slug = null);
-    public function users(): Collection;
+    public function users($users = null);
     public function addUser($user);
     public function removeUser($user);
     public function hasUser($user): bool;
