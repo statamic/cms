@@ -14,7 +14,7 @@ class Role
 
     public function create()
     {
-        return app(config('statamic.users.roles.role'));
+        return app(RoleContract::class);
     }
 
     public function save(RoleContract $role)
