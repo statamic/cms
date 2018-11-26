@@ -80,6 +80,29 @@ class UserGroupTest extends TestCase
     }
 
     /** @test */
+    function it_sets_all_users()
+    {
+        $userOne = new class extends User {
+            public function username($username = null) { return 'one'; }
+        };
+        $userTwo = new class extends User {
+            public function username($username = null) { return 'two'; }
+        };
+        $userThree = new class extends User {
+            public function username($username = null) { return 'three'; }
+        };
+
+        $group = new UserGroup;
+        $group->addUser($userOne);
+
+        $return = $group->users([$userTwo, $userThree]);
+
+        $this->assertInstanceOf(Collection::class, $group->users());
+        $this->assertEquals(['two', 'three'], $group->users()->map->username()->values()->all());
+        $this->assertEquals($group, $return);
+    }
+
+    /** @test */
     function it_removes_a_user()
     {
         $userA = new class extends User {
@@ -149,6 +172,30 @@ class UserGroupTest extends TestCase
 
         $this->assertTrue($group->hasUser('123'));
         $this->assertFalse($group->hasUser('456'));
+    }
+
+    /** @test */
+    function it_tracks_original_users()
+    {
+        $userA = new class extends User {
+            public function id($id = null) { return 'a'; }
+        };
+        $userB = new class extends User {
+            public function id($id = null) { return 'b'; }
+        };
+        $userC = new class extends User {
+            public function id($id = null) { return 'c'; }
+        };
+        $group = (new UserGroup)->users([$userA, $userB]);
+
+        $this->assertNull($group->originalUsers());
+
+        $group->resetOriginalUsers();
+        $group->addUser($userC)->removeUser($userA);
+
+        $this->assertInstanceOf(Collection::class, $group->originalUsers());
+        $this->assertEquals(['a', 'b'], $group->originalUsers()->map->id()->values()->all());
+        $this->assertEquals(['b', 'c'], $group->users()->map->id()->values()->all());
     }
 
     /** @test */

@@ -15,6 +15,7 @@ class UserGroup implements UserGroupContract
     protected $handle;
     protected $originalHandle;
     protected $users;
+    protected $originalUsers;
     protected $roles;
 
     public function __construct()
@@ -54,9 +55,31 @@ class UserGroup implements UserGroupContract
         return $this->originalHandle;
     }
 
-    public function users(): Collection
+    public function users($users = null)
     {
-        return $this->users;
+        if (is_null($users)) {
+            return $this->users;
+        }
+
+        $this->users = collect();
+
+        foreach ($users as $user) {
+            $this->addUser($user);
+        }
+
+        return $this;
+    }
+
+    public function originalUsers()
+    {
+        return $this->originalUsers;
+    }
+
+    public function resetOriginalUsers()
+    {
+        $this->originalUsers = collect($this->users);
+
+        return $this;
     }
 
     public function addUser($user)
