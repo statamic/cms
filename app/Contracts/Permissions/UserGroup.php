@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 
 interface UserGroup
 {
+    public function id(): string;
     public function title(string $title = null);
     public function handle(string $slug = null);
     public function users($users = null);
