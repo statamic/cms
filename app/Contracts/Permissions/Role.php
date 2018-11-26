@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 
 interface Role
 {
+    public function id(): string;
     public function title(string $title = null);
     public function handle(string $handle = null);
     public function permissions($permissions = null);

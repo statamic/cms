@@ -31,6 +31,11 @@ class Role implements RoleContract
         return $this;
     }
 
+    public function id(): string
+    {
+        return $this->handle();
+    }
+
     public function handle(string $handle = null)
     {
         if (is_null($handle)) {
