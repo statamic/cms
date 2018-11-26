@@ -31,7 +31,8 @@ import axios from 'axios';
 export default {
 
     props: {
-        form: String
+        form: String,
+        group: String,
     },
 
     data() {
@@ -48,6 +49,7 @@ export default {
 
         parameters() {
             return {
+                group: this.group,
                 sort: this.sortColumn,
                 order: this.sortDirection,
             }

@@ -38,15 +38,6 @@
                     v-model="roles"
                 />
 
-                <form-group
-                    fieldtype="users"
-                    :display="__('Users')"
-                    handle="users"
-                    :errors="errors.users"
-                    v-model="users"
-                    :config="{ mode: 'panes' }"
-                />
-
             </div>
 
         </div>

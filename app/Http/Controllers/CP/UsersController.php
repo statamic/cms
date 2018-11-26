@@ -9,6 +9,7 @@ use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
 use Statamic\API\Blueprint;
+use Statamic\API\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
@@ -29,7 +30,7 @@ class UsersController extends CpController
         $this->access('users:view');
 
         if ($request->wantsJson()) {
-            return $this->json();
+            return $this->json($request);
         }
 
         return view('statamic::users.index');
@@ -40,9 +41,13 @@ class UsersController extends CpController
      *
      * @return array
      */
-    public function json()
+    public function json($request)
     {
-        $users = User::all()->supplement('checked', function () {
+        $users = $request->group
+            ? collect_users(UserGroup::find($request->group)->users())
+            : User::all();
+
+        $users = $users->supplement('checked', function () {
             return false;
         });
 

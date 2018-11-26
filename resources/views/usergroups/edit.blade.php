@@ -22,4 +22,6 @@
 
     </user-group-publish-form>
 
+    <user-listing group="{{ $group->id() }}"></user-listing>
+
 @endsection

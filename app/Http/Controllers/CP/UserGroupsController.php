@@ -40,7 +40,6 @@ class UserGroupsController extends CpController
         return view('statamic::usergroups.edit', [
             'group' => $group,
             'roles' => $group->roles()->map->handle()->values()->all(),
-            'users' => $group->users()->map->id()->values()->all(),
             'roleSuggestions' => $this->roleSuggestions(),
             'userSuggestions' => $this->userSuggestions(),
         ]);
@@ -58,14 +57,12 @@ class UserGroupsController extends CpController
             'title' => 'required',
             'handle' => 'alpha_dash',
             'roles' => 'required|array',
-            'users' => 'array',
         ]);
 
         $group
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
             ->roles($request->roles)
-            ->users($request->users)
             ->save();
 
         return ['redirect' => cp_route('user-groups.edit', $group->handle())];
@@ -89,14 +86,12 @@ class UserGroupsController extends CpController
             'title' => 'required',
             'handle' => 'alpha_dash',
             'roles' => 'required|array',
-            'users' => 'array',
         ]);
 
         $group = UserGroup::create()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
             ->roles($request->roles)
-            ->users($request->users)
             ->save();
 
         return ['redirect' => cp_route('user-groups.edit', $group->handle())];
