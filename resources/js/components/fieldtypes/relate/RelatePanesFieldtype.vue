@@ -17,11 +17,12 @@
 
             <div class="relate-items">
                 <div class="item"
-                     v-for="item in availableSuggestions"
+                     v-for="(item, $index) in availableSuggestions"
+                     :key="item.value"
                      :class="{ 'active': $index === active }"
                      @click.prevent="select(item)"
                 >
-                    <template v-html="item.text"></template>
+                    <span v-html="item.text"></span>
                     <span class="icon icon-chevron-right"></span>
                 </div>
             </div>
@@ -30,14 +31,14 @@
         <div class="relate-pane pane-selections">
             <div class="pane-header">Selected</div>
             <div class="relate-items" ref="sortable">
-                <div class="item" v-for="item in selected">
+                <div class="item" v-for="item in selected" :key="item.value">
                     <span class="item-remove" @click.prevent="remove(item)">&times;</span>
-                    <template v-html="item.text"></template>
+                    <span v-html="item.text"></span>
                 </div>
             </div>
         </div>
 
-        <input type="hidden" :name="name" :value="data | json" />
+        <input type="hidden" :name="name" :value="JSON.stringify(data)" />
     </div>
 
 </template>
@@ -47,7 +48,7 @@ export default {
 
     props: [
         'name',
-        'data',
+        'value',
         'suggestions',
         'maxItems'
     ],
@@ -55,6 +56,7 @@ export default {
 
     data() {
         return {
+            data: this.value,
             search: null,
             active: -1
         }
@@ -161,21 +163,24 @@ export default {
 
     },
 
-
-    mounted() {
-        this.initSortable();
-
-        this.$watch('search', function() {
+    watch: {
+        search: function() {
             if (this.availableSuggestions.length <= this.active) {
                 this.active = this.availableSuggestions.length-1;
             }
-        });
+        },
 
-        this.$watch('data', function() {
+        data: function(data) {
+            this.$emit('updated', data);
+
             this.$nextTick(function() {
                 $(this.$refs.sortable).sortable('refresh');
             });
-        })
+        }
+    },
+
+    mounted() {
+        this.initSortable();
     }
 
 }

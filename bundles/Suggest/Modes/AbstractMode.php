@@ -10,8 +10,6 @@ use Statamic\Addons\Suggest\RequestAdapter;
 
 abstract class AbstractMode implements Mode
 {
-    use Extensible;
-
     protected $config;
     protected $request;
 

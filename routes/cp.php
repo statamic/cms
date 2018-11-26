@@ -75,6 +75,8 @@ Route::group([
     Route::resource('user-groups', 'UserGroupsController');
     Route::resource('roles', 'RolesController');
 
+    Route::get('suggestions/{type}', 'SuggestionController@show');
+
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');

@@ -2,8 +2,8 @@
 
     <div>
         <relate-fieldtype
-            v-ref=relate
-            :data.sync="data"
+            ref="relate"
+            :value="value"
             :name="name"
             :config="config">
         </relate-fieldtype>
@@ -14,7 +14,7 @@
 <script>
 export default {
 
-    props: ['data', 'config', 'name'],
+    mixins: [Fieldtype],
 
     methods: {
 

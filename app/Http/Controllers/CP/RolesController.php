@@ -8,7 +8,7 @@ use Statamic\API\Permission;
 
 class RolesController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('super');
 
@@ -21,6 +21,10 @@ class RolesController extends CpController
                 'edit_url' => cp_route('roles.edit', $role->handle())
             ];
         })->values();
+
+        if ($request->wantsJson()) {
+            return $roles;
+        }
 
         return view('statamic::roles.index', [
             'roles' => $roles

@@ -1,34 +1,35 @@
 <template>
     <div class="relate-fieldtype">
 
-        <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
-        </div>
+        <loading-graphic v-if="loading" :size="16" :inline="true" />
 
         <relate-tags
             v-if="!loading && (tags || single)"
-            v-ref=tags
-            :data.sync="data"
+            ref="tags"
+            :data="data"
             :suggestions="suggestions"
             :max-items="maxItems"
             :create="canCreate"
             :name="name"
-            :disabled="disabled">
+            :disabled="disabled"
+            @updated="update($event)">
         </relate-tags>
 
         <relate-panes
             v-if="!loading && panes && !single"
-            v-ref=panes
-            :data.sync="data"
+            ref="panes"
+            :value="data"
             :suggestions="suggestions"
             :max-items="maxItems"
-            :name="name">
+            :name="name"
+            @updated="update($event)">
         </relate-panes>
 
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import RelatePanes from './RelatePanesFieldtype.vue'
 import RelateTags from './RelateTagsFieldtype.vue'
 import GetsSuggestKey from '../GetsSuggestKey';
@@ -38,8 +39,8 @@ export default {
     mixins: [Fieldtype, GetsSuggestKey],
 
     components: {
-        'relate-panes': RelatePanes,
-        'relate-tags': RelateTags
+        RelatePanes,
+        RelateTags
     },
 
     props: [
@@ -50,6 +51,7 @@ export default {
     data: function() {
         return {
             loading: true,
+            data: null,
             suggestions: [],
             autoBindChangeWatcher: false,
             shouldFocusWhenLoaded: false
@@ -93,8 +95,9 @@ export default {
                 if (prefetched) {
                     this.populateSuggestions(prefetched);
                 } else {
-                    this.$http.post(cp_url('addons/suggest/suggestions'), this.config, function(data) {
-                        this.populateSuggestions(data);
+                    const type = this.config.type;
+                    axios.get(cp_url(`suggestions/${type}`), { params: this.config }).then(response => {
+                        this.populateSuggestions(response.data);
                     });
                 }
             }
@@ -104,7 +107,7 @@ export default {
             this.suggestions = suggestions;
             this.removeInvalidData();
             this.loading = false;
-            this.bindChangeWatcher();
+
             if (this.shouldFocusWhenLoaded) {
                 this.$nextTick(() => this.focus());
             }
@@ -156,10 +159,8 @@ export default {
 
     },
 
-    mounted() {
-        if (!this.data) {
-            this.data = [];
-        }
+    created() {
+        this.data = this.value || [];
 
         if (!this.config) {
             this.config = [];

@@ -3,7 +3,7 @@
 <div>
     <select ref="tags" multiple tabindex="0" ></select>
 
-    <input type="hidden" :name="name" :value="data|json" class="form-control" />
+    <input type="hidden" :name="name" :value="JSON.stringify(data)" class="form-control" />
 </div>
 
 </template>
@@ -35,7 +35,7 @@ export default {
             maxItems: this.maxItems,
             plugins: ['drag_drop', 'remove_button'],
             onChange: function(value) {
-                self.data = value;
+                self.$emit('updated', value);
             },
             create: this.create
         });

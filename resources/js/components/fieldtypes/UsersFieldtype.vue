@@ -1,27 +1,19 @@
 <template>
     <div class="users-fieldtype">
-        <relate-fieldtype :data.sync="data" :name="name" :config="config" v-if="config.type"></relate-fieldtype>
+        <relate-fieldtype :value="value" :name="name" :config="fieldConfig" @updated="update($event)"></relate-fieldtype>
     </div>
 </template>
 
 <script>
 export default {
 
-    props: {
-        name: String,
-        data: {
-            default: function() {
-                return [];
-            }
-        },
-        config: {
-            type: Object,
-            default: function() { return {}; }
-        }
-    },
+    mixins: [Fieldtype],
 
-    mounted() {
-        Vue.set(this.config, 'type', 'users');
+    computed: {
+
+        fieldConfig() {
+            return { ...this.config, type: 'users' }
+        }
     }
 };
 </script>

@@ -31,21 +31,20 @@
                 </div>
 
                 <form-group
-                    fieldtype="checkboxes"
+                    fieldtype="user_roles"
                     :display="__('Roles')"
                     handle="roles"
                     :errors="errors.roles"
                     v-model="roles"
-                    :config="{ options: roleSuggestions }"
                 />
 
                 <form-group
-                    fieldtype="checkboxes"
+                    fieldtype="users"
                     :display="__('Users')"
                     handle="users"
                     :errors="errors.users"
                     v-model="users"
-                    :config="{ options: userSuggestions }"
+                    :config="{ mode: 'panes' }"
                 />
 
             </div>
