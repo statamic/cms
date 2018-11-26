@@ -8,9 +8,6 @@
         initial-title="{{ $group->title() }}"
         initial-handle="{{ $group->handle() }}"
         :initial-roles="{{ json_encode($roles) }}"
-        :initial-users="{{ json_encode($users) }}"
-        :role-suggestions="{{ json_encode($roleSuggestions) }}"
-        :user-suggestions="{{ json_encode($userSuggestions) }}"
         v-cloak
     >
 

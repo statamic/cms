@@ -40,8 +40,6 @@ class UserGroupsController extends CpController
         return view('statamic::usergroups.edit', [
             'group' => $group,
             'roles' => $group->roles()->map->handle()->values()->all(),
-            'roleSuggestions' => $this->roleSuggestions(),
-            'userSuggestions' => $this->userSuggestions(),
         ]);
     }
 
@@ -72,10 +70,7 @@ class UserGroupsController extends CpController
     {
         $this->authorize('super');
 
-        return view('statamic::usergroups.create', [
-            'roleSuggestions' => $this->roleSuggestions(),
-            'userSuggestions' => $this->userSuggestions(),
-        ]);
+        return view('statamic::usergroups.create');
     }
 
     public function store(Request $request)
@@ -108,27 +103,5 @@ class UserGroupsController extends CpController
         $group->delete();
 
         return response('', 204);
-    }
-
-    protected function roleSuggestions()
-    {
-        // TODO: Remove this and replace with the user roles fieldtype once it has been fixed for v3.
-        return Role::all()->map(function ($role) {
-            return [
-                'text' => $role->title(),
-                'value' => $role->id(),
-            ];
-        })->values()->all();
-    }
-
-    protected function userSuggestions()
-    {
-        // TODO: Remove this and replace with the users fieldtype once it has been fixed for v3.
-        return User::all()->map(function ($user) {
-            return [
-                'text' => $user->username(),
-                'value' => $user->id(),
-            ];
-        })->values()->all();
     }
 }

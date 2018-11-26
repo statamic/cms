@@ -54,8 +54,6 @@ export default {
         initialHandle: String,
         initialRoles: Array,
         initialUsers: Array,
-        roleSuggestions: Array,
-        userSuggestions: Array,
         action: String,
         method: String
     },

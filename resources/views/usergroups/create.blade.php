@@ -5,8 +5,6 @@
     <user-group-publish-form
         action="{{ cp_route('user-groups.store') }}"
         method="post"
-        :role-suggestions="{{ json_encode($roleSuggestions) }}"
-        :user-suggestions="{{ json_encode($userSuggestions) }}"
         v-cloak
     >
 
