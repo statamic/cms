@@ -13,6 +13,7 @@ class UserGroup implements UserGroupContract
 {
     protected $title;
     protected $handle;
+    protected $originalHandle;
     protected $users;
     protected $roles;
 
@@ -39,9 +40,18 @@ class UserGroup implements UserGroupContract
             return $this->handle;
         }
 
+        if (! $this->originalHandle) {
+            $this->originalHandle = $this->handle;
+        }
+
         $this->handle = $handle;
 
         return $this;
+    }
+
+    public function originalHandle()
+    {
+        return $this->originalHandle;
     }
 
     public function users(): Collection

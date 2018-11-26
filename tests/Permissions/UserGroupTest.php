@@ -29,11 +29,17 @@ class UserGroupTest extends TestCase
     {
         $group = new UserGroup;
         $this->assertNull($group->handle());
+        $this->assertNull($group->originalHandle());
 
         $return = $group->handle('test');
 
         $this->assertEquals('test', $group->handle());
         $this->assertEquals($group, $return);
+
+        $group->handle('modified');
+
+        $this->assertEquals('modified', $group->handle());
+        $this->assertEquals('test', $group->originalHandle());
     }
 
     /** @test */
