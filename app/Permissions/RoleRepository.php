@@ -49,8 +49,8 @@ class RoleRepository implements RepositoryContract
             'permissions' => $role->permissions()->all()
         ]);
 
-        if ($original = $role->originalHandle()) {
-            $roles->forget($original);
+        if ($role->handle() !== $role->originalHandle()) {
+            $roles->forget($role->originalHandle());
         }
 
         $this->write($roles);
