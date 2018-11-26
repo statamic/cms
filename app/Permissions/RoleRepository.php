@@ -2,6 +2,7 @@
 
 namespace Statamic\Permissions;
 
+use Statamic\API;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Illuminate\Support\Collection;
@@ -22,8 +23,7 @@ class RoleRepository implements RepositoryContract
     public function all(): Collection
     {
         return $this->raw()->map(function ($role, $handle) {
-            // TODO: Use a factory
-            return app(Role::class)
+            return API\Role::create()
                 ->handle($handle)
                 ->title(array_get($role, 'title'))
                 ->addPermission(array_get($role, 'permissions', []));
