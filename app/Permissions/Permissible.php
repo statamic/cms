@@ -88,7 +88,7 @@ trait Permissible
         return collect($this->get('groups', []))
             ->map(function ($group) {
                 return UserGroupAPI::find($group);
-            })->keyBy->handle();
+            })->filter()->keyBy->handle();
     }
 
     public function isInGroup($group)
