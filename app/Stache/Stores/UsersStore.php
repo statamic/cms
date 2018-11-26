@@ -4,9 +4,12 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\API\User;
 use Statamic\API\YAML;
+use Statamic\API\UserGroup;
 
 class UsersStore extends BasicStore
 {
+    protected $groups = [];
+
     public function key()
     {
         return 'users';
@@ -16,10 +19,14 @@ class UsersStore extends BasicStore
     {
         // TODO: TDD
         return $cache->map(function ($item) {
-            return User::create()
+            $user = User::create()
                 ->username($item['attributes']['username'])
                 ->with($item['data'][default_locale()])
                 ->get();
+
+            $this->queueGroups($user);
+
+            return $user;
         });
     }
 
@@ -37,6 +44,8 @@ class UsersStore extends BasicStore
             $user->securePassword(true, true);
         }
 
+        $this->queueGroups($user);
+
         return $user;
     }
 
@@ -48,5 +57,25 @@ class UsersStore extends BasicStore
     public function filter($file)
     {
         return $file->getExtension() === 'yaml';
+    }
+
+    protected function queueGroups($user)
+    {
+        if (! $groups = $user->get('groups')) {
+            return;
+        }
+
+        foreach ($groups as $group) {
+            $this->groups[$group][] = $user;
+        }
+    }
+
+    public function loadingComplete()
+    {
+        foreach ($this->groups as $group => $users) {
+            if ($group = UserGroup::find($group)) {
+                $group->users($users)->resetOriginalUsers();
+            }
+        }
     }
 }

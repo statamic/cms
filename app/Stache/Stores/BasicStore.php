@@ -133,7 +133,14 @@ abstract class BasicStore extends Store
     {
         $this->loaded = true;
 
+        $this->loadingComplete();
+
         return $this;
+    }
+
+    protected function loadingComplete()
+    {
+        //
     }
 
     public function load()

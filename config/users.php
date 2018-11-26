@@ -62,6 +62,7 @@ return [
         'path' => config_path('statamic/user_groups.yaml'),
 
         'group' => \Statamic\Permissions\UserGroup::class,
+        'repository' => \Statamic\Permissions\UserGroupRepository::class,
 
     ],
 

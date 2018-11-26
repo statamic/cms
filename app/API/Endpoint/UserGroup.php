@@ -2,60 +2,30 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Data\Services\UserGroupsService;
-use Statamic\Contracts\Permissions\Permissible;
+use Statamic\Contracts\Permissions\UserGroupRepository;
+use Statamic\Contracts\Permissions\UserGroup as UserGroupContract;
 
 class UserGroup
 {
-    /**
-     * Get all the groups
-     */
-    public function all()
+    public function __call($method, $args)
     {
-        return app(UserGroupsService::class)->all();
+        return call_user_func_array([$this->repo(), $method], $args);
     }
 
-    /**
-     * Get a user group by ID
-     *
-     * @param string $id
-     * @return \Statamic\Contracts\Permissions\UserGroup
-     */
-    public function find($id)
+    public function create()
     {
-        return app(UserGroupsService::class)->id($id);
+        return app(UserGroupContract::class);
     }
 
-    /**
-     * Get a group by handle
-     *
-     * @param  string $handle
-     * @return \Statamic\Contracts\Permissions\UserGroup
-     */
-    public function whereHandle($handle)
+    public function save(UserGroupContract $group)
     {
-        return app(UserGroupsService::class)->handle($handle);
+        $this->repo()->save($group);
+
+        // TODO: UserGroupSaved::dispatch($group);
     }
 
-    /**
-     * Get the user groups for a given user
-     *
-     * @param string|\Statamic\Contracts\Permissions\Permissible $user
-     * @return \Illuminate\Support\Collection
-     */
-    public function whereUser($user)
+    protected function repo()
     {
-        $groups = [];
-
-        // If a User object was provided, we'll just get the ID
-        $user = ($user instanceof Permissible) ? $user->id() : $user;
-
-        foreach (self::all() as $group_id => $group) {
-            if ($group->hasUser($user)) {
-                $groups[$group_id] = $group;
-            }
-        }
-
-        return collect($groups);
+        return app(UserGroupRepository::class);
     }
 }

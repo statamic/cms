@@ -2,21 +2,24 @@
 
 @section('content')
 
-    <form method="post" action="{{ route('user.group', $group->uuid()) }}" class="card">
-        {!! csrf_field() !!}
+    <user-group-publish-form
+        action="{{ cp_route('user-groups.update', $group->handle()) }}"
+        method="patch"
+        initial-title="{{ $group->title() }}"
+        initial-handle="{{ $group->handle() }}"
+        :initial-roles="{{ json_encode($roles) }}"
+        :initial-users="{{ json_encode($users) }}"
+        :role-suggestions="{{ json_encode($roleSuggestions) }}"
+        :user-suggestions="{{ json_encode($userSuggestions) }}"
+        v-cloak
+    >
 
-        <div class="head">
-            <h1>{{ translate('cp.editing_usergroup') }}: <strong>{{ $group->title() }}</strong></h1>
+        <h1 class="flex-1" slot="heading" slot-scope="{ title }">
+            <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
+            @svg('chevron-right')
+            @{{ title }}
+        </h1>
 
-            <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
-        </div>
+    </user-group-publish-form>
 
-        <hr>
-
-        @include('statamic::usergroups.partials.form', [
-            'group_title' => $group->title(),
-            'group_slug' => $group->slug()
-        ])
-
-    </form>
 @endsection

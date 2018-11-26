@@ -72,6 +72,7 @@ Route::group([
     // Users
     Route::resource('users', 'UsersController');
     Route::get('account', 'AccountController')->name('account');
+    Route::resource('user-groups', 'UserGroupsController');
     Route::resource('roles', 'RolesController');
 
     // Local API

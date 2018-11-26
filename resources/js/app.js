@@ -67,6 +67,8 @@ var vm = new Vue({
         UserPublishForm: require('./components/users/PublishForm.vue'),
         RoleListing: require('./components/roles/Listing.vue'),
         RolePublishForm: require('./components/roles/PublishForm.vue'),
+        UserGroupListing: require('./components/user-groups/Listing.vue'),
+        UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
     },
 
     mixins: [ Notifications ],

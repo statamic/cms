@@ -2,9 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Str;
-use Statamic\API\Helper;
+use Statamic\API\Role;
+use Statamic\API\User;
 use Statamic\API\UserGroup;
+use Illuminate\Http\Request;
 
 class UserGroupsController extends CpController
 {
@@ -12,152 +13,127 @@ class UserGroupsController extends CpController
     {
         $this->access('super');
 
-        return view('statamic::usergroups.index', [
-            'title' => 'Roles'
-        ]);
-    }
-
-    public function get()
-    {
-        $rows = [];
-
-        foreach ($this->getGroups() as $key => $group) {
-            $rows[] = [
+        $groups = UserGroup::all()->map(function ($group) {
+            return [
+                'id' => $group->handle(),
                 'title' => $group->title(),
-                'id' => $group->id(),
+                'handle' => $group->handle(),
                 'users' => $group->users()->count(),
-                'edit_url' => $group->editUrl()
+                'roles' => $group->roles()->count(),
+                'edit_url' => cp_route('user-groups.edit', $group->handle())
             ];
-        }
+        })->values();
 
-        return ['columns' => ['title'], 'items' => $rows];
-    }
-
-    /**
-     * @param $group
-     * @return \Statamic\Contracts\Permissions\UserGroup
-     */
-    private function getGroup($group)
-    {
-        return array_get($this->getGroups(), $group);
-    }
-
-    /**
-     * @return \Statamic\Contracts\Permissions\UserGroup[]
-     */
-    public function getGroups()
-    {
-        return UserGroup::all();
+        return view('statamic::usergroups.index', [
+            'groups' => $groups
+        ]);
     }
 
     public function edit($group)
     {
         $this->authorize('super');
 
-        $group = $this->getGroup($group);
+        if (! $group = UserGroup::find($group)) {
+            return $this->pageNotFound();
+        }
 
-        $roles = $group->roles()->map(function($role) {
-            return $role->uuid();
-        })->values();
-
-        $users = $group->users()->filter(function ($user) {
-            return $user !== null;
-        })->map(function ($user) {
-            return $user->id();
-        })->all();
-
-        $data = compact('group', 'roles', 'users');
-        $data['title'] = 'Edit group';
-
-        return view('statamic::usergroups.edit', $data);
+        return view('statamic::usergroups.edit', [
+            'group' => $group,
+            'roles' => $group->roles()->map->handle()->values()->all(),
+            'users' => $group->users()->map->id()->values()->all(),
+            'roleSuggestions' => $this->roleSuggestions(),
+            'userSuggestions' => $this->userSuggestions(),
+        ]);
     }
 
-    public function update($group)
+    public function update(Request $request, $group)
     {
         $this->authorize('super');
 
-        $group = $this->getGroup($group);
-
-        $title = $this->request->input('title');
-        $group->title($title);
-        $group->slug($this->request->input('slug', Str::slug($title)));
-
-        if ($roles = $this->request->input('roles')) {
-            $roles = json_decode($roles);
-        } else {
-            $roles = [];
+        if (! $group = UserGroup::find($group)) {
+            return $this->pageNotFound();
         }
 
-        $group->roles($roles);
+        $request->validate([
+            'title' => 'required',
+            'handle' => 'alpha_dash',
+            'roles' => 'required|array',
+            'users' => 'array',
+        ]);
 
-        if ($users = $this->request->input('users')) {
-            $users = json_decode($users);
-        } else {
-            $users = [];
-        }
+        $group
+            ->title($request->title)
+            ->handle($request->handle ?: snake_case($request->title))
+            ->roles($request->roles)
+            ->users($request->users)
+            ->save();
 
-        $group->users($users);
-
-        $group->save();
-
-        return redirect()->route('user.group', $group->id())
-                         ->with('success', 'Group updated.');
+        return ['redirect' => cp_route('user-groups.edit', $group->handle())];
     }
 
     public function create()
     {
         $this->authorize('super');
 
-        $data = [
-            'title' => 'Create group',
-            'roles' => [],
-            'users' => []
-        ];
-
-        return view('statamic::usergroups.create', $data);
+        return view('statamic::usergroups.create', [
+            'roleSuggestions' => $this->roleSuggestions(),
+            'userSuggestions' => $this->userSuggestions(),
+        ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
         $this->authorize('super');
 
-        $title = $this->request->input('title');
+        $request->validate([
+            'title' => 'required',
+            'handle' => 'alpha_dash',
+            'roles' => 'required|array',
+            'users' => 'array',
+        ]);
 
-        if ($roles = $this->request->input('roles')) {
-            $roles = json_decode($roles);
-        } else {
-            $roles = [];
-        }
+        $group = UserGroup::create()
+            ->title($request->title)
+            ->handle($request->handle ?: snake_case($request->title))
+            ->roles($request->roles)
+            ->users($request->users)
+            ->save();
 
-        if ($users = $this->request->input('users')) {
-            $users = json_decode($users);
-        } else {
-            $users = [];
-        }
-
-        $data = [
-            'title' => $title,
-            'roles' => $roles,
-            'users' => $users
-        ];
-
-        $group = app('Statamic\Contracts\Permissions\UserGroupFactory')->create($data);
-
-        $group->save();
-
-        return redirect()->route('user.group', $group->uuid())->with('success', 'Group created.');
+        return ['redirect' => cp_route('user-groups.edit', $group->handle())];
     }
 
-    public function delete()
+    public function destroy($group)
     {
         $this->authorize('super');
 
-        $ids = Helper::ensureArray($this->request->input('ids'));
-
-        foreach ($ids as $id) {
-            UserGroup::find($id)->delete();
+        if (! $group = UserGroup::find($group)) {
+            return $this->pageNotFound();
         }
 
-        return ['success' => true];
+        $group->delete();
+
+        return response('', 204);
+    }
+
+    protected function roleSuggestions()
+    {
+        // TODO: Remove this and replace with the user roles fieldtype once it has been fixed for v3.
+        return Role::all()->map(function ($role) {
+            return [
+                'text' => $role->title(),
+                'value' => $role->id(),
+            ];
+        })->values()->all();
+    }
+
+    protected function userSuggestions()
+    {
+        // TODO: Remove this and replace with the users fieldtype once it has been fixed for v3.
+        return User::all()->map(function ($user) {
+            return [
+                'text' => $user->username(),
+                'value' => $user->id(),
+            ];
+        })->values()->all();
     }
 }

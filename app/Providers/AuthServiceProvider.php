@@ -12,6 +12,7 @@ use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Permissions\UserGroup;
 use Facades\Statamic\Permissions\CorePermissions;
 use Statamic\Contracts\Permissions\RoleRepository;
+use Statamic\Contracts\Permissions\UserGroupRepository;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,12 @@ class AuthServiceProvider extends ServiceProvider
             return app()
                 ->make(config('statamic.users.roles.repository'))
                 ->path(config('statamic.users.roles.path'));
+        });
+
+        $this->app->singleton(UserGroupRepository::class, function () {
+            return app()
+                ->make(config('statamic.users.groups.repository'))
+                ->path(config('statamic.users.groups.path'));
         });
 
         $this->app->bind(UserGroup::class, config('statamic.users.groups.group'));

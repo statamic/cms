@@ -1,7 +1,7 @@
 <template>
 
     <publish-field
-        :config="config"
+        :config="fieldConfig"
         :value="value"
         :errors="errors"
         @updated="updated"
@@ -49,14 +49,19 @@ export default {
 
         errors: {
             type: Array
+        },
+
+        config: {
+            type: Object
         }
 
     },
 
     computed: {
 
-        config() {
+        fieldConfig() {
             return {
+                ...this.config,
                 type: this.fieldtype,
                 handle: this.handle,
                 display: this.display,

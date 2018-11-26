@@ -2,6 +2,7 @@
 
 namespace Statamic\Permissions;
 
+use Statamic\API;
 use Statamic\API\User;
 use Statamic\API\Role as RoleAPI;
 use Illuminate\Support\Collection;
@@ -173,9 +174,15 @@ class UserGroup implements UserGroupContract
 
     public function save()
     {
+        API\UserGroup::save($this);
+
+        return $this;
     }
 
     public function delete()
     {
+        API\UserGroup::delete($this);
+
+        return $this;
     }
 }

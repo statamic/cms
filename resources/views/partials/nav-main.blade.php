@@ -71,8 +71,8 @@
                         <i>@svg('users-box')</i><span>Users</span>
                     </a>
                 </li>
-                <li>
-                    <a href="">
+                <li class="{{ current_class('user-groups*') }}">
+                    <a href="{{ cp_route('user-groups.index') }}">
                         <i>@svg('users-multiple')</i><span>Groups</span>
                     </a>
                 </li>
