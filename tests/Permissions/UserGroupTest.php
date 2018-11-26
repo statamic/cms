@@ -244,6 +244,29 @@ class UserGroupTest extends TestCase
     }
 
     /** @test */
+    function it_sets_all_roles()
+    {
+        RoleAPI::shouldReceive('find')->with('one')->andReturn($roleOne = new class extends Role {
+            public function handle(string $handle = null) { return 'one'; }
+        });
+        RoleAPI::shouldReceive('find')->with('two')->andReturn($roleTwo = new class extends Role {
+            public function handle(string $handle = null) { return 'two'; }
+        });
+        RoleAPI::shouldReceive('find')->with('three')->andReturn($roleThree = new class extends Role {
+            public function handle(string $handle = null) { return 'three'; }
+        });
+
+        $group = new UserGroup;
+        $group->assignRole('one');
+
+        $return = $group->roles(['two', 'three']);
+
+        $this->assertInstanceOf(Collection::class, $group->roles());
+        $this->assertEquals(['two', 'three'], $group->roles()->map->handle()->values()->all());
+        $this->assertEquals($group, $return);
+    }
+
+    /** @test */
     function it_removes_a_role()
     {
         $role = new class extends Role {

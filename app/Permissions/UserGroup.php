@@ -115,7 +115,17 @@ class UserGroup implements UserGroupContract
 
     public function roles($roles = null)
     {
-        return $this->roles;
+        if (is_null($roles)) {
+            return $this->roles;
+        }
+
+        $this->roles = collect();
+
+        foreach ($roles as $role) {
+            $this->assignRole($role);
+        }
+
+        return $this;
     }
 
     public function assignRole($role)
