@@ -75,6 +75,9 @@ Route::group([
     Route::resource('user-groups', 'UserGroupsController');
     Route::resource('roles', 'RolesController');
 
+    // Tools
+    Route::get('phpinfo', 'PhpInfoController')->name('phpinfo');
+
     Route::get('suggestions/{type}', 'SuggestionController@show');
 
     // Local API

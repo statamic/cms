@@ -58,9 +58,9 @@
                         <updates-badge class="ml-1"></updates-badge>
                     </a>
                 </li>
-                <li>
-                    <a href="">
-                        <i>@svg('seo-search-graph')</i><span>SEO Pro</span>
+                <li class="{{ current_class('phpinfo') }}">
+                    <a href="{{ cp_route('phpinfo') }}">
+                        <i>@svg('settings-slider')</i><span>{{ __('PHP Info') }}</span>
                     </a>
                 </li>
             </ul>
