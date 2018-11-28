@@ -2,110 +2,131 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Folder;
-use Statamic\API\GlobalSet;
 use Statamic\API\Helper;
-use Statamic\API\Str;
-use Statamic\API\Fieldset;
+use Statamic\API\GlobalSet;
+use Illuminate\Http\Request;
+use Statamic\Fields\Validation;
+use Statamic\Contracts\Data\Globals\GlobalSet as GlobalSetContract;
 
 class GlobalsController extends CpController
 {
     public function index()
     {
-        $this->access('globals:*:view');
+        // TODO: Authorization
 
-        $data = [
-            'title' => __('Global Sets'),
+        return view('statamic::globals.index', [
             'globals' => GlobalSet::all()->toArray()
-        ];
-
-        return view('statamic::globals.index', $data);
-    }
-
-    public function manage()
-    {
-        return view('statamic::globals.configure', [
-            'title' => t('cp.globals')
         ]);
     }
 
-    public function get()
+    public function edit($set)
     {
-        $this->access('globals:*:view');
+        if (! $set = GlobalSet::find($set)) {
+            return $this->pageNotFound();
+        }
 
-        $globals = GlobalSet::all()->supplement('title', function ($global) {
-            return $global->title();
-        })->toArray();
+        // TODO: Authorization
 
-        return ['columns' => ['title'], 'items' => $globals];
+        $blueprint = $set->blueprint();
+
+        // event(new PublishBlueprintFound($blueprint, 'globals', $set)); // TODO
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($set->data())
+            ->preProcess();
+
+        $values = $fields->values();
+
+        return view('statamic::globals.edit', [
+            'set' => $set,
+            'blueprint' => $blueprint,
+            'values' => $values,
+        ]);
+    }
+
+    public function update(Request $request, $set)
+    {
+        if (! $set = GlobalSet::find($set)) {
+            return $this->pageNotFound();
+        }
+
+        // TODO: Authorization
+
+        $fields = $set->blueprint()->fields()->addValues($request->all())->process();
+
+        $validation = (new Validation)->fields($fields);
+
+        $request->validate($validation->rules());
+
+        foreach ($fields->values() as $key => $value) {
+            $set->set($key, $value);
+        }
+
+        $set->save();
+
+        // TODD: Localization
+
+        return response('', 204);
+    }
+
+    public function updateMeta(Request $request, $set)
+    {
+        if (! $set = GlobalSet::find($set)) {
+            return $this->pageNotFound();
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'handle' => 'nullable|alpha_dash',
+            'blueprint' => 'nullable'
+        ]);
+
+        $set
+            ->set('title', $request->title)
+            ->set('blueprint', $request->blueprint)
+            ->handle($request->handle ?? snake_case($request->title))
+            ->save();
+
+        return response('', 204);
     }
 
     public function create()
     {
-        return view('statamic::globals.create', [
-            'title' => translate('cp.create_global_set')
-        ]);
+        return view('statamic::globals.create');
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $this->access('globals:*:edit');
+        $this->authorize('store', GlobalSetContract::class, 'You are not authorized to create global sets.');
 
-        $title = $this->request->input('title');
-
-        $slug = ($this->request->has('slug')) ? $this->request->input('slug') : Str::slug($title, '_');
-
-        $this->validate($this->request, [
+        $data = $request->validate([
             'title' => 'required',
-            'slug' => 'alpha_dash',
-            'fieldset' => 'required'
+            'handle' => 'nullable|alpha_dash',
+            'blueprint' => 'nullable'
         ]);
 
-        $global = GlobalSet::create($slug)->with([
-            'fieldset' => $this->request->input('fieldset', 'globals'),
-            'title' => $title
-        ])->get();
+        $handle = $request->handle ?? snake_case($request->title);
 
-        $global->ensureId();
+        $global = GlobalSet::create($handle)
+            ->with(array_except($data, 'handle'))
+            ->ensureId() // TODO: Shouldn't need to do this.
+            ->save();
 
-        $global->save();
-
-        return redirect()->route('globals.edit', $slug)->with('success', translate('cp.global_set_created', ['type' => $title]));
+        return redirect($global->editUrl())
+            ->with('success', __('Global Set created'));
     }
 
-    public function delete()
+    public function destroy($set)
     {
-        $ids = Helper::ensureArray($this->request->input('ids'));
+        // TODO: Authorization
 
-        foreach ($ids as $id) {
-            GlobalSet::find($id)->delete();
+        if (! $set = GlobalSet::find($set)) {
+            return $this->pageNotFound();
         }
 
-        return ['success' => true];
-    }
+        $set->delete();
 
-    public function configure($global)
-    {
-        $global = GlobalSet::whereHandle($global);
-
-        return view('statamic::globals.edit', compact('global'));
-    }
-
-    public function update($global)
-    {
-        $this->validate($this->request, [
-            'title' => 'required',
-            'slug' => 'alpha_dash',
-            'fieldset' => 'required'
-        ]);
-
-        $global = GlobalSet::whereHandle($global);
-
-        $global->title($this->request->input('title'));
-        $global->fieldset($this->request->input('fieldset'));
-
-        $global->save();
-
-        return back()->with('success', trans('cp.globals_updated'));
+        return response('', 204);
     }
 }

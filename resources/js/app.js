@@ -62,6 +62,7 @@ var vm = new Vue({
         FormListing: require('./components/forms/Listing.vue'),
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue'),
         GlobalListing: require('./components/globals/Listing.vue'),
+        GlobalPublishForm: require('./components/globals/PublishForm.vue'),
         FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
         UserListing: require('./components/users/Listing.vue'),
         UserPublishForm: require('./components/users/PublishForm.vue'),

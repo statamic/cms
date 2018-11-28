@@ -57,6 +57,11 @@ class Blueprint
         }, new Fields);
     }
 
+    public function isEmpty(): bool
+    {
+        return $this->fields()->all()->isEmpty();
+    }
+
     public function title()
     {
         return array_get($this->contents, 'title', Str::humanize($this->handle));

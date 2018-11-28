@@ -249,13 +249,6 @@ abstract class Content extends Data implements ContentContract
     }
 
     /**
-     * Get the fieldset
-     *
-     * @return string|null
-     */
-    abstract protected function getFieldset();
-
-    /**
      * Get the content type
      *
      * @return string

@@ -27,7 +27,7 @@ Route::group([
 
     // Collections
     Route::resource('globals', 'GlobalsController');
-    Route::resource('globals.sets', 'GlobalSetsController', ['except' => 'show']);
+    Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
 
     // Assets
     Route::resource('asset-containers', 'AssetContainersController');

@@ -2,29 +2,55 @@
 
 @section('content')
 
-    <form method="post" action="{{ route('globals.update', $global->slug()) }}">
-        {!! csrf_field() !!}
+    <global-publish-form
+        action="{{ cp_route('globals.update', $set->id()) }}"
+        :initial-fieldset="{{ json_encode($blueprint->toPublishArray()) }}"
+        :initial-values="{{ json_encode($values, JSON_FORCE_OBJECT) }}"
+        inline-template
+    >
+        <div>
+            <div class="flex mb-3">
+                <h1 class="flex-1">
+                    <a href="{{ cp_route('globals.index') }}">{{ __('Globals') }}</a>
+                    @svg('chevron-right')
+                    {{ $set->get('title') }}
+                </h1>
+                <configure-set
+                    save-url="{{ cp_route('globals.update-meta', $set->id()) }}"
+                    id="{{ $set->id() }}"
+                    initial-title="{{ $set->title() }}"
+                    initial-handle="{{ $set->handle() }}"
+                    initial-blueprint="{{ $set->blueprint()->handle() }}"
+                ></configure-set>
 
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">{{ t('configuring_global_set') }}: {{ $global->title() }}</h1>
-                <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
+                @if (! $blueprint->isEmpty())
+                    <a href="" class="btn btn-primary ml-2" @click.prevent="save">{{ __('Save') }}</a>
+                @endif
             </div>
 
-            <div class="publish-fields card">
-
-                <div class="form-group">
-                    <label class="block">{{ t('title') }}</label>
-                    <small class="help-block">{{ t('globals_title_instructions') }}</small>
-                    <input type="text" name="title" class="form-control" value="{{ $global->title() }}" />
+            @if ($blueprint->isEmpty())
+                <div class="text-center mt-5 border-2 border-dashed rounded-lg px-4 py-8">
+                    <div class="max-w-md mx-auto opacity-50">
+                        @svg('empty/global')
+                        <h1 class="my-3">This Global Set has no fields.</h1>
+                        <p>You can add fields to the Blueprint, or you can manually add variables to the set itself.</p>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="block">{{ t('fieldset') }}</label>
-                    <fieldset-fieldtype name="fieldset" data="{{ $global->fieldset()->name() }}"></fieldset-fieldtype>
-                </div>
-
-            </div>
+            @else
+                <publish-container
+                    name="base"
+                    :fieldset="fieldset"
+                    :values="initialValues"
+                    :errors="errors"
+                    @updated="values = $event"
+                >
+                    <div slot-scope="{ }">
+                        <div class="alert alert-danger mb-2" v-if="error" v-text="error" v-cloak></div>
+                        <publish-sections></publish-sections>
+                    </div>
+                </publish-container>
+            @endif
         </div>
-    </form>
+    </global-publish-form>
 
 @endsection

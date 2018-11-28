@@ -2,35 +2,44 @@
 
 @section('content')
 
-    <form method="post" action="{{ route('globals.store') }}">
-        {!! csrf_field() !!}
+    <form method="POST" action="{{ cp_route('globals.store') }}">
+        @csrf
 
-        <div class="publish-form">
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">{{ translate('cp.create_global_set') }}</h1>
-                <button type="submit" class="btn btn-primary">{{ translate('cp.save') }}</button>
-            </div>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">
+                <a href="{{ cp_route('globals.index') }}">{{ __('Globals') }}</a>
+                @svg('chevron-right')
+                {{ __('Create Global Set') }}
+            </h1>
+            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+        </div>
 
-            <div class="publish-fields card">
+        <div class="publish-fields card p-0">
 
-                <div class="form-group">
-                    <label class="block">{{ translate('cp.title') }}</label>
-                    <small class="help-block">{{ translate('cp.globals_title_instructions') }}</small>
-                    <input type="text" name="title" value="{{ old('title') }}" class="form-control" autofocus="autofocus" />
-                </div>
+            <form-group
+                handle="title"
+                display="{{ __('Title') }}"
+                instructions="{{ __s('global_set_title_instructions') }}"
+                value="{{ old('title') }}"
+                error="{{ $errors->first('title') }}"
+                autofocus
+            ></form-group>
 
-                <div class="form-group">
-                    <label class="block">{{ translate('cp.slug') }}</label>
-                    <small class="help-block">{!! translate('cp.globals_slug_instructions') !!}</small>
-                    <input type="text" name="slug" value="{{ old('slug') }}" class="form-control" />
-                </div>
+            <form-group
+                handle="handle"
+                display="{{ __('Handle') }}"
+                instructions="{{ __s('global_set_handle_instructions') }}"
+                value="{{ old('handle') }}"
+                error="{{ $errors->first('handle') }}"
+            ></form-group>
 
-                <div class="form-group">
-                    <label class="block">{{ translate('cp.fieldset') }}</label>
-                    <small class="help-block">{{ translate('cp.globals_fieldset_instructions') }}</small>
-                    <fieldset-fieldtype name="fieldset"></fieldset-fieldtype>
-                </div>
-            </div>
+            <form-group
+                handle="blueprint"
+                display="{{ __('Blueprint') }}"
+                instructions="{{ __s('global_set_blueprint_instructions') }}"
+                value="{{ old('blueprint') }}"
+                error="{{ $errors->first('blueprint') }}"
+            ></form-group>
 
         </div>
     </form>
