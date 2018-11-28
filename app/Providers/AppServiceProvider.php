@@ -8,10 +8,12 @@ use Statamic\Sites\Sites;
 use Statamic\Statamic;
 use Stringy\StaticStringy;
 use Statamic\Routing\Router;
+use Statamic\Exceptions\Handler;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -73,6 +75,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $this->app->singleton(ExceptionHandler::class, Handler::class);
+
         $this->app->singleton('Statamic\DataStore', function() {
             return new DataStore;
         });
