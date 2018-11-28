@@ -192,6 +192,9 @@ class Marketplace
 
         $response = $client->request($method, $this->buildEndpoint($endpoint), [
             'verify' => $this->verifySsl,
+            'query' => [
+                'statamicVersion' => 3,
+            ],
         ]);
 
         return json_decode($response->getBody(), true);
