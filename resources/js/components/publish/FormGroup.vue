@@ -3,7 +3,7 @@
     <publish-field
         :config="fieldConfig"
         :value="value"
-        :errors="errors"
+        :errors="fieldErrors"
         @updated="updated"
     />
 
@@ -51,6 +51,11 @@ export default {
             type: Array
         },
 
+        // A single error, useful when using this component directly in Blade views.
+        error: {
+            type: String
+        },
+
         config: {
             type: Object
         }
@@ -69,6 +74,10 @@ export default {
                 width: this.width,
                 autofocus: this.autofocus
             };
+        },
+
+        fieldErrors() {
+            return this.error ? [this.error] : this.errors;
         }
 
     },
