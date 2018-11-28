@@ -8,8 +8,8 @@
 <body>
     <div id="statamic">
 
-      @include('statamic::partials.alerts')
       @include('statamic::partials.global-header')
+      @include('statamic::partials.alerts')
 
       <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen}">
             @include('statamic::partials.nav-main')
