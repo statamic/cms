@@ -157,6 +157,8 @@ abstract class BasicStore extends Store
 
         $this->markAsLoaded();
 
+        debugbar()->addMessage("Loaded [{$this->key()}] store", 'stache');
+
         return $this;
     }
 
