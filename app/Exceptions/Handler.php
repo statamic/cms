@@ -10,6 +10,15 @@ use Symfony\Component\Debug\Exception\FlattenException;
 
 class Handler extends ExceptionHandler
 {
+    public function render($request, Exception $e)
+    {
+        if ($e instanceof AuthorizationException && !$request->expectsJson()) {
+            return back_or_route('statamic.cp.index')->withError($e->getMessage());
+        }
+
+        return parent::render($request, $e);
+    }
+
     /**
      * Temporarily disable Whoops even if it's installed.
      *
