@@ -71,6 +71,8 @@ class EntriesController extends CpController
             ->slug($request->slug)
             ->save();
 
+        // TODD: Localization
+
         return response('', 204);
     }
 
