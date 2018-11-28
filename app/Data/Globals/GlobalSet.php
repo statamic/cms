@@ -23,6 +23,8 @@ class GlobalSet extends Content implements GlobalContract
         }
 
         $this->attributes['slug'] = $slug;
+
+        return $this;
     }
 
     // TODO: Probably deprecate slug
