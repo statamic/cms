@@ -12,13 +12,6 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected function access($area)
-    {
-        if (! User::getCurrent()->can($area)) {
-            throw $this->createGateUnauthorizedException($area, []);
-        }
-    }
-
     /**
      * Set the successful flash message
      *
