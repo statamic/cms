@@ -7,6 +7,7 @@ use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Config;
 use Statamic\API\Fieldset;
+use Statamic\API\Blueprint;
 use Statamic\Data\Content\Content;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Events\Data\EntrySaved;
@@ -357,7 +358,7 @@ class Entry extends Content implements EntryContract
     public function blueprint()
     {
         if ($blueprint = $this->get('blueprint')) {
-            return \Facades\Statamic\Fields\BlueprintRepository::find($blueprint);
+            return Blueprint::find($blueprint);
         }
 
         return $this->collection()->blueprint();
