@@ -84,4 +84,11 @@ class CpController extends Controller
             throw new AuthorizationException($message);
         }
     }
+
+    public function authorizeIf($condition, ...$args)
+    {
+        if ($condition) {
+            return $this->authorize(...$args);
+        }
+    }
 }

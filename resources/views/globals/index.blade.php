@@ -9,7 +9,7 @@
             <p class="text-grey mb-3">
                 {{ __('Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.') }}
             </p>
-            @can('super')
+            @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
                 <a href="{{ cp_route('globals.create') }}" class="btn-primary btn-lg">{{ __('Create Global Set') }}</a>
             @endcan
         </div>
@@ -18,7 +18,7 @@
     @if(count($globals) > 0)
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Globals') }}</h1>
-            @can('super')
+            @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
                 <a href="{{ cp_route('globals.create') }}" class="btn btn-primary">{{ __('Create Global Set') }}</a>
             @endcan
         </div>

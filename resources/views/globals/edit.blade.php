@@ -15,13 +15,16 @@
                     @svg('chevron-right')
                     {{ $set->get('title') }}
                 </h1>
-                <configure-set
-                    save-url="{{ cp_route('globals.update-meta', $set->id()) }}"
-                    id="{{ $set->id() }}"
-                    initial-title="{{ $set->title() }}"
-                    initial-handle="{{ $set->handle() }}"
-                    initial-blueprint="{{ $set->blueprint()->handle() }}"
-                ></configure-set>
+
+                @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
+                    <configure-set
+                        save-url="{{ cp_route('globals.update-meta', $set->id()) }}"
+                        id="{{ $set->id() }}"
+                        initial-title="{{ $set->title() }}"
+                        initial-handle="{{ $set->handle() }}"
+                        initial-blueprint="{{ $set->blueprint()->handle() }}"
+                    ></configure-set>
+                @endcan
 
                 @if (! $blueprint->isEmpty())
                     <a href="" class="btn btn-primary ml-2" @click.prevent="save">{{ __('Save') }}</a>

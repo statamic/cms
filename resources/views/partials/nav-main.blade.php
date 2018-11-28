@@ -39,11 +39,13 @@
                         <i>@svg('assets')</i><span>Assets</span>
                     </a>
                 </li>
+                @can('index', 'Statamic\Contracts\Data\Globals\GlobalSet')
                 <li class="{{ current_class('globals*') }}">
                     <a href="{{ cp_route('globals.index') }}">
                         <i>@svg('earth')</i><span>Globals</span>
                     </a>
                 </li>
+                @endif
             </ul>
             <h6>Tools</h6>
             <ul>

@@ -12,10 +12,14 @@ class GlobalsController extends CpController
 {
     public function index()
     {
-        // TODO: Authorization
+        $globals = GlobalSet::all()->filter(function ($set) {
+            return user()->can('view', $set);
+        })->tap(function ($globals) {
+            $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
+        })->toArray();
 
         return view('statamic::globals.index', [
-            'globals' => GlobalSet::all()->toArray()
+            'globals' => $globals
         ]);
     }
 
@@ -25,7 +29,7 @@ class GlobalsController extends CpController
             return $this->pageNotFound();
         }
 
-        // TODO: Authorization
+        $this->authorize('edit', $set, 'You cant edit this global.');
 
         $blueprint = $set->blueprint();
 
@@ -51,7 +55,7 @@ class GlobalsController extends CpController
             return $this->pageNotFound();
         }
 
-        // TODO: Authorization
+        $this->authorize('edit', $set);
 
         $fields = $set->blueprint()->fields()->addValues($request->all())->process();
 
@@ -76,6 +80,8 @@ class GlobalsController extends CpController
             return $this->pageNotFound();
         }
 
+        $this->authorize('create', $set);
+
         $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
@@ -93,12 +99,14 @@ class GlobalsController extends CpController
 
     public function create()
     {
+        $this->authorize('create', GlobalSetContract::class);
+
         return view('statamic::globals.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('store', GlobalSetContract::class, 'You are not authorized to create global sets.');
+        $this->authorize('store', GlobalSetContract::class);
 
         $data = $request->validate([
             'title' => 'required',
@@ -119,11 +127,11 @@ class GlobalsController extends CpController
 
     public function destroy($set)
     {
-        // TODO: Authorization
-
         if (! $set = GlobalSet::find($set)) {
             return $this->pageNotFound();
         }
+
+        $this->authorize('delete', $set);
 
         $set->delete();
 
