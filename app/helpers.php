@@ -611,6 +611,13 @@ if (! function_exists('__n')) {
     }
 }
 
+if (! function_exists('__s')) {
+    function __s($key, $replace = [], $locale = null)
+    {
+        return trans('statamic::messages.'.$key, $replace, $locale);
+    }
+}
+
 if (! function_exists('me')) {
     function me()
     {
