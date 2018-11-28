@@ -618,9 +618,23 @@ if (! function_exists('__s')) {
     }
 }
 
+if (! function_exists('user')) {
+    function user()
+    {
+        return auth()->user();
+    }
+}
+
 if (! function_exists('me')) {
     function me()
     {
-        return auth()->user();
+        return user();
+    }
+}
+
+if (! function_exists('my')) {
+    function my()
+    {
+        return user();
     }
 }

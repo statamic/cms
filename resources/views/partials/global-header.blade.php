@@ -59,10 +59,10 @@
         </a>
         <div class="dropdown">
             <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @if (me()->avatar())
-                    <div class="icon-header-avatar"><img src="{{ me()->avatar() }}" /></div>
+                @if (my()->avatar())
+                    <div class="icon-header-avatar"><img src="{{ my()->avatar() }}" /></div>
                 @else
-                    <div class="icon-header-avatar icon-user-initials">{{ me()->initials() }}</div>
+                    <div class="icon-header-avatar icon-user-initials">{{ my()->initials() }}</div>
                 @endif
             </a>
             <ul class="dropdown-menu hide md:block">
