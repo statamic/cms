@@ -15,11 +15,7 @@ Route::group([
 ], function () {
     Statamic::additionalCpRoutes();
 
-    Route::get('/', function () {
-        session()->reflash();
-        return redirect()->route('statamic.cp.dashboard');
-    })->name('index');
-
+    Route::get('/', 'StartPageController')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
     // Structures
