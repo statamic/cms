@@ -36,7 +36,7 @@ class GlobalsController extends CpController
             return $this->pageNotFound();
         }
 
-        $this->authorize('edit', $set, 'You cant edit this global.');
+        $this->authorize('edit', $set);
 
         $blueprint = $set->blueprint();
 
