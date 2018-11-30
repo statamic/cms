@@ -16,7 +16,14 @@ class GlobalsController extends CpController
             return user()->can('view', $set);
         })->tap(function ($globals) {
             $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
-        })->toArray();
+        })->map(function ($set) {
+            return [
+                'id' => $set->id(),
+                'handle' => $set->handle(),
+                'title' => $set->title(),
+                'deleteable' => user()->can('delete', $set),
+            ];
+        });
 
         return view('statamic::globals.index', [
             'globals' => $globals
