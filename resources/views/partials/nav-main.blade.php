@@ -45,7 +45,7 @@
                         <i>@svg('earth')</i><span>Globals</span>
                     </a>
                 </li>
-                @endif
+                @endcan
             </ul>
             <h6>Tools</h6>
             <ul>
@@ -64,17 +64,19 @@
                     <a href="{{ cp_route('utilities.phpinfo') }}">
                         <i>@svg('settings-slider')</i><span>{{ __('Utilities') }}</span>
                     </a>
-                    <ul>
-                        <li class="{{ current_class('utilities/phpinfo') }}">
-                            <a href="{{ cp_route('utilities.phpinfo') }}">{{ __('PHP Info') }}</a>
-                        </li>
-                        <li class="{{ current_class('utilities/clear-cache') }}">
-                            <a href="{{ cp_route('utilities.clear-cache.index') }}">{{ __('Clear Cache') }}</a>
-                        </li>
-                        <li class="{{ current_class('utilities/rebuild-search') }}">
-                            <a href="{{ cp_route('utilities.rebuild-search') }}">{{ __('Rebuild Search') }}</a>
-                        </li>
-                    </ul>
+                    @if (is_current('utilities*'))
+                        <ul>
+                            <li class="{{ current_class('utilities/phpinfo') }}">
+                                <a href="{{ cp_route('utilities.phpinfo') }}">{{ __('PHP Info') }}</a>
+                            </li>
+                            <li class="{{ current_class('utilities/clear-cache') }}">
+                                <a href="{{ cp_route('utilities.clear-cache.index') }}">{{ __('Clear Cache') }}</a>
+                            </li>
+                            <li class="{{ current_class('utilities/rebuild-search') }}">
+                                <a href="{{ cp_route('utilities.rebuild-search') }}">{{ __('Rebuild Search') }}</a>
+                            </li>
+                        </ul>
+                    @endif
                 </li>
             </ul>
             <h6>Users</h6>
