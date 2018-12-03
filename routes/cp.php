@@ -75,8 +75,10 @@ Route::group([
     Route::resource('user-groups', 'UserGroupsController');
     Route::resource('roles', 'RolesController');
 
-    // Tools
-    Route::get('phpinfo', 'PhpInfoController')->name('phpinfo');
+    // Utilities
+    Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
+    Route::get('utilities/clear-cache', 'ClearCacheController')->name('utilities.clear-cache');
+    Route::get('utilities/rebuild-search', 'RebuildSearchController')->name('utilities.rebuild-search');
 
     Route::get('suggestions/{type}', 'SuggestionController@show');
 

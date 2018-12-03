@@ -8,7 +8,7 @@ class PhpInfoController extends CpController
 {
     public function __invoke(Request $request)
     {
-        return view('statamic::phpinfo', [
+        return view('statamic::utilities.phpinfo', [
             'phpinfo' => $this->phpinfo()
         ]);
     }

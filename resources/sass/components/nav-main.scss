@@ -27,11 +27,19 @@
         }
     }
 
-    li.current a {
+    li.current > a {
         @apply text-grey-darker font-medium;
 
         i {
             @apply bg-white;
+        }
+    }
+
+    li ul {
+        margin-left: 1.5rem;
+
+        li {
+            margin-left: 12px;
         }
     }
 }
