@@ -19,7 +19,7 @@ class UpdateProductController extends CpController
      */
     public function index($product)
     {
-        // TODO: Setup permissions to see this.
+        $this->authorize('view updates');
 
         $package = $this->getPackage($product);
 
@@ -37,7 +37,7 @@ class UpdateProductController extends CpController
      */
     public function changelog($product)
     {
-        $this->access('updater');
+        $this->authorize('view updates');
 
         $changelog = Changelog::product($product);
 
@@ -55,6 +55,8 @@ class UpdateProductController extends CpController
      */
     public function update($product)
     {
+        $this->authorize('perform updates');
+
         return Updater::product($product)->update();
     }
 
@@ -65,6 +67,8 @@ class UpdateProductController extends CpController
      */
     public function updateToLatest($product)
     {
+        $this->authorize('perform updates');
+
         return Updater::product($product)->updateToLatest();
     }
 
@@ -76,6 +80,8 @@ class UpdateProductController extends CpController
      */
     public function installExplicitVersion($product, Request $request)
     {
+        $this->authorize('perform updates');
+
         return Updater::product($product)->installExplicitVersion($request->version);
     }
 

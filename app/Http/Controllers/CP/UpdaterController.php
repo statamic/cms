@@ -13,7 +13,7 @@ class UpdaterController extends CpController
      */
     public function index()
     {
-        // TODO: Setup permissions to see this.
+        $this->authorize('view updates');
 
         $updatableAddons = $this->getUpdatableAddons();
 
@@ -35,7 +35,7 @@ class UpdaterController extends CpController
      */
     public function count(Request $request)
     {
-        // TODO: Setup permissions to see this.
+        $this->authorize('view updates');
 
         return UpdatesCount::get($request->input('clearCache', false));
     }
