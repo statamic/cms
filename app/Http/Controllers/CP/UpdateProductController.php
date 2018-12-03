@@ -19,7 +19,7 @@ class UpdateProductController extends CpController
      */
     public function index($product)
     {
-        $this->access('updater');
+        // TODO: Setup permissions to see this.
 
         $package = $this->getPackage($product);
 

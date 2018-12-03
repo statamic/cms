@@ -10,6 +10,8 @@ class AddonsController extends CpController
 {
     public function index()
     {
+        // TODO: Setup permissions to see this.
+
         return view('statamic::addons.index', [
             'title' => 'Addons'
         ]);

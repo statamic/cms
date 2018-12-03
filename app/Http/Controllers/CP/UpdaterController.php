@@ -13,7 +13,7 @@ class UpdaterController extends CpController
      */
     public function index()
     {
-        $this->access('updater');
+        // TODO: Setup permissions to see this.
 
         $updatableAddons = $this->getUpdatableAddons();
 
@@ -21,7 +21,7 @@ class UpdaterController extends CpController
             return redirect()->route('statamic.cp.updater.product.index', ['statamic']);
         }
 
-        // Todo: view
+        // TODO: Proper view instead of this inline html.
         echo '<a href="' . route('statamic.cp.updater.product.index', 'statamic') . '">statamic core</a><br><br>';
         $updatableAddons->each(function ($addon) {
             echo '<a href="' . route('statamic.cp.updater.product.index', $addon) . '">' . $addon . '</a><br>';
@@ -35,7 +35,7 @@ class UpdaterController extends CpController
      */
     public function count(Request $request)
     {
-        $this->access('updater');
+        // TODO: Setup permissions to see this.
 
         return UpdatesCount::get($request->input('clearCache', false));
     }
