@@ -43,6 +43,10 @@
             @apply text-xs;
             margin-left: 12px;
         }
+
+        li a {
+            @apply text-grey;
+        }
     }
 }
 
