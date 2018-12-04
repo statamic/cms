@@ -36,9 +36,11 @@
     }
 
     li ul {
+        @apply mt-1 mb-2;
         margin-left: 1.5rem;
 
         li {
+            @apply text-xs;
             margin-left: 12px;
         }
     }
