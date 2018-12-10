@@ -8,6 +8,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp()
     {
+        require_once(__DIR__.'/ExceptionHandler.php');
+
         parent::setUp();
 
         $uses = array_flip(class_uses_recursive(static::class));
