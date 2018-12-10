@@ -35,17 +35,19 @@
                         <svg-icon name="visit" class="opacity-25 hover:opacity-75 h-4 w-4"></svg-icon>
                     </a>
                     <div class="btn-group page-action action-more px-sm">
-                        <i class="icon icon-dots-three-vertical opacity-25 hover:opacity-75" data-toggle="dropdown"></i>
-                        <ul class="dropdown-menu">
-                            <li v-if="can('pages:create')"><a href="" @click.prevent="createPage">{{ __('Create Page') }}</a></li>
-                            <li v-if="can('super')">
-                                <a href="" @click.prevent="mountCollection" v-if="!hasEntries">{{ __('Mount Collection') }}</a>
-                                <a href="" @click.prevent="unmountCollection" v-if="hasEntries">{{ __('Unmount Collection') }}</a>
-                            </li>
-                            <li v-if="can('pages:create')"><a href="" @click.prevent="duplicatePage">{{ __('Duplicate') }}</a></li>
-                            <li v-if="can('pages:create') && can('pages:delete')" class="divider"></li>
-                            <li v-if="can('pages:delete')" class="warning"><a href="" @click.prevent="deletePage">{{ __('Delete') }}</a></li>
-                        </ul>
+                        <dropdown-list>
+                            <i class="icon icon-dots-three-vertical opacity-25 hover:opacity-75" slot="trigger"></i>
+                            <ul class="dropdown-menu">
+                                <li v-if="can('pages:create')"><a href="" @click.prevent="createPage">{{ __('Create Page') }}</a></li>
+                                <li v-if="can('super')">
+                                    <a href="" @click.prevent="mountCollection" v-if="!hasEntries">{{ __('Mount Collection') }}</a>
+                                    <a href="" @click.prevent="unmountCollection" v-if="hasEntries">{{ __('Unmount Collection') }}</a>
+                                </li>
+                                <li v-if="can('pages:create')"><a href="" @click.prevent="duplicatePage">{{ __('Duplicate') }}</a></li>
+                                <li v-if="can('pages:create') && can('pages:delete')" class="divider"></li>
+                                <li v-if="can('pages:delete')" class="warning"><a href="" @click.prevent="deletePage">{{ __('Delete') }}</a></li>
+                            </ul>
+                        </dropdown-list>
                     </div>
                 </div>
             </div>

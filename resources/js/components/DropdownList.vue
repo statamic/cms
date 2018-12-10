@@ -1,5 +1,5 @@
 <template>
-    <div class="dropdown" :class="{'open': isOpen}" v-on-clickaway="close">
+    <div class="dropdown relative" :class="{'open': isOpen}" v-on-clickaway="close">
         <div @click="toggle" aria-haspopup="true" :aria-expanded="isOpen">
             <slot name="trigger">
                 <a class="text-grey">

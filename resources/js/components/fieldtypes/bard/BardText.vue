@@ -3,8 +3,8 @@
     <div class="bard-block bard-text">
 
         <div class="bard-set-selector" v-show="hasSets && isShowingOptions" :style="optionStyles">
-            <div class="blerp">
-                <button type="button" class="btn btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <dropdown-list>
+                <button type="button" class="btn btn-round" slot="trigger">
                     <span class="icon icon-plus"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -20,7 +20,7 @@
                         </a>
                     </li>
                 </ul>
-            </div>
+            </dropdown-list>
         </div>
 
         <textarea
