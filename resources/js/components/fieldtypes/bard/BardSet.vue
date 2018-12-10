@@ -24,7 +24,9 @@
                 </div>
                 <div>
                     <dropdown-list>
-                        <li class="warning"><a @click.prevent="destroy">Delete Set</a></li>
+                        <ul class="dropdown-menu">
+                            <li class="warning"><a @click.prevent="destroy">Delete Set</a></li>
+                        </ul>
                     </dropdown-list>
                 </div>
             </div>

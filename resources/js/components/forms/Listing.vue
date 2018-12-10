@@ -7,8 +7,10 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: form }">
                     <dropdown-list>
-                        <li><a :href="form.edit_url">Edit</a></li>
-                        <li class="warning"><a @click.prevent="destroy(form.id)">Delete</a></li>
+                        <ul class="dropdown-menu">
+                            <li><a :href="form.edit_url">Edit</a></li>
+                            <li class="warning"><a @click.prevent="destroy(form.id)">Delete</a></li>
+                        </ul>
                     </dropdown-list>
                 </template>
             </data-table>
