@@ -26,7 +26,7 @@ class StoreFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create('test')->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $this
             ->from('/original')
@@ -45,7 +45,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function fieldset_gets_created()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
 
         $this
@@ -101,7 +101,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function handle_is_required()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
 
         $this
@@ -115,7 +115,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
 
         $this
@@ -129,7 +129,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function fields_are_required()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
 
         $this
@@ -143,7 +143,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function fields_must_be_an_array()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Fieldset::all());
 
         $this

@@ -9,7 +9,7 @@ use Statamic\Extend\Controller;
 use Statamic\Auth\PasswordReset;
 use Statamic\Auth\UserRegistrar;
 use Illuminate\Support\MessageBag;
-use Statamic\Contracts\Data\Users\User as UserContract;
+use Statamic\Contracts\Auth\User as UserContract;
 
 class UserController extends Controller
 {

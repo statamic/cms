@@ -486,11 +486,11 @@ function gravatar($email, $size = null)
 
 /**
  * @param array $value
- * @return \Statamic\Data\Users\UserCollection
+ * @return \Statamic\Auth\UserCollection
  */
 function collect_users($value = [])
 {
-    return new \Statamic\Data\Users\UserCollection($value);
+    return new \Statamic\Auth\UserCollection($value);
 }
 
 /**

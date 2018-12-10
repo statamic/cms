@@ -22,7 +22,7 @@
 
             <portal to="modals" v-if="showLoginModal">
                 <login-modal
-                      username="{{ \Statamic\API\User::getCurrent()->username() }}"
+                      email="{{ \Statamic\API\User::getCurrent()->email() }}"
                       @closed="showLoginModal = false"
                 ></login-modal>
             </portal>

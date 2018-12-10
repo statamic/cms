@@ -540,37 +540,6 @@ abstract class Data implements DataContract, Responsable
     }
 
     /**
-     * Get or set the path
-     *
-     * @param string|null $path
-     * @return string
-     */
-    abstract public function path($path = null);
-
-    /**
-     * Get the path to a localized version
-     *
-     * @param string $locale
-     * @return string
-     */
-    abstract public function localizedPath($locale);
-
-    /**
-     * Get the path before the object was modified.
-     *
-     * @return string
-     */
-    abstract public function originalPath();
-
-    /**
-     * Get the path to a localized version before the object was modified.
-     *
-     * @param string $locale
-     * @return string
-     */
-    abstract public function originalLocalizedPath($locale);
-
-    /**
      * Get or set the ID
      *
      * @param mixed $id

@@ -17,7 +17,7 @@ class DeleteCollectionTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
 
         $collection = Collection::create('test')->save();
         $this->assertCount(1, Collection::all());
@@ -36,7 +36,7 @@ class DeleteCollectionTest extends TestCase
     function it_deletes_the_collection()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
 
         $collection = Collection::create('test')->save();
         $this->assertCount(1, Collection::all());

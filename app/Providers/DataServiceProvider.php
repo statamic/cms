@@ -79,40 +79,6 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Assets\AssetContainerFactory::class
         );
 
-        $this->app->bind(\Statamic\Contracts\Data\Users\User::class, function () {
-            $driver = Config::get('statamic.users.driver');
-
-            if ($driver === 'eloquent') {
-                $class = \Statamic\Data\Users\Eloquent\User::class;
-            } elseif ($driver === 'redis') {
-                $class = \Statamic\Data\Users\Redis\User::class;
-            } else {
-                $class = \Statamic\Data\Users\User::class;
-            }
-
-            return app($class);
-        });
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Users\UserFactory::class,
-            \Statamic\Data\Users\UserFactory::class
-        );
-
-        $this->app->singleton(
-            \Statamic\Contracts\Permissions\RoleFactory::class,
-            \Statamic\Permissions\File\RoleFactory::class
-        );
-
-        $this->app->singleton(\Statamic\Contracts\Permissions\UserGroupFactory::class, function () {
-            if (Config::get('statamic.users.driver') === 'redis') {
-                $class = \Statamic\Permissions\Redis\UserGroupFactory::class;
-            } else {
-                $class = \Statamic\Permissions\File\UserGroupFactory::class;
-            }
-
-            return app($class);
-        });
-
         $this->app->singleton(
             \Statamic\CP\Navigation\Nav::class,
             \Statamic\CP\Navigation\Nav::class

@@ -19,10 +19,10 @@ class UsersStore extends BasicStore
     {
         // TODO: TDD
         return $cache->map(function ($item) {
-            $user = User::create()
-                ->username($item['attributes']['username'])
-                ->with($item['data'][default_locale()])
-                ->get();
+            $user = User::make()
+                ->email($item['attributes']['email'])
+                ->data($item['data'][default_locale()])
+                ->syncOriginal();
 
             $this->queueGroups($user);
 
@@ -34,15 +34,16 @@ class UsersStore extends BasicStore
     {
         $data = YAML::parse($contents);
 
-        $user = User::create()
-            ->username(pathinfo($path, PATHINFO_FILENAME))
-            ->with($data)
-            ->get();
+        $user = User::make()
+            ->email(pathinfo($path, PATHINFO_FILENAME))
+            ->data($data);
 
         // TODO: TDD
         if ($rawPassword = array_get($data, 'password')) {
             $user->securePassword(true, true);
         }
+
+        $user->syncOriginal();
 
         $this->queueGroups($user);
 

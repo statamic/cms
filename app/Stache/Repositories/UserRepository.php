@@ -3,17 +3,30 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
-use Statamic\Contracts\Data\Users\User;
-use Statamic\Data\Users\UserCollection;
-use Statamic\Contracts\Data\Repositories\UserRepository as RepositoryContract;
+use Statamic\Auth\UserFactory;
+use Statamic\Auth\UserCollection;
+use Statamic\Contracts\Auth\User;
+use Statamic\Auth\File\RoleRepository;
+use Statamic\Auth\File\User as FileUser;
+use Statamic\Auth\File\UserGroupRepository;
+use Statamic\Auth\UserRepository as BaseRepository;
 
-class UserRepository implements RepositoryContract
+class UserRepository extends BaseRepository
 {
     protected $store;
+    protected $config;
+    protected $roleRepository = RoleRepository::class;
+    protected $userGroupRepository = UserGroupRepository::class;
 
-    public function __construct(Stache $stache)
+    public function __construct(Stache $stache, array $config = [])
     {
         $this->store = $stache->store('users');
+        $this->config = $config;
+    }
+
+    public function make(): User
+    {
+        return new FileUser;
     }
 
     public function all(): UserCollection
@@ -26,11 +39,11 @@ class UserRepository implements RepositoryContract
         return $this->store->getItem($id);
     }
 
-    public function username($username)
+    public function findByEmail(string $email): ?User
     {
         // TODO: TDD
-        return $this->store->getItems()->first(function ($user) use ($username) {
-            return $user->username() === $username;
+        return $this->store->getItems()->first(function ($user) use ($email) {
+            return $user->email() === $email;
         });
     }
 }

@@ -98,14 +98,14 @@ class UpdateCollectionTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return User::create('test')->get()->assignRole('test');
+        return User::make()->assignRole('test');
     }
 
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
 
-        return User::create('test')->get()->assignRole('test');
+        return User::make()->assignRole('test');
     }
 
     private function assertCollectionUnchanged($collection)

@@ -1,27 +1,21 @@
 <template>
     <div>
-        <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
-        </div>
-
-        <div v-if="!loading && !canEdit">
-            <template v-for="group in selectedGroupNames">
-                {{ group }}<template v-if="$index !== selectedGroupNames.length-1">,</template>
-            </template>
-        </div>
-
-        <div class="user_groups-fieldtype" v-if="!loading && canEdit">
-            <relate-fieldtype :data.sync="data"
+        <loading-graphic v-if="loading" :size="16" :inline="true" />
+        <div class="user_groups-fieldtype" v-if="!loading">
+            <relate-fieldtype :value="value"
                               :name="name"
                               :config="config"
                               :suggestions-prop="groups"
-                              v-ref=relate>
+                              :disabled="!canEdit"
+                              ref="relate"
+                              @updated="update($event)">
             </relate-fieldtype>
         </div>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import AdaptsRelateFieldtype from './AdaptsRelateFieldtype.vue';
 
 export default {
@@ -38,6 +32,7 @@ export default {
     computed: {
 
         canEdit: function() {
+            return true; // TODO
             return Vue.can('super');
         },
 
@@ -53,16 +48,13 @@ export default {
     methods: {
 
         getGroups: function() {
-            this.$http.get(cp_url('users/groups/get'), function(data) {
-                var groups = [];
-                _.each(data.items, function(group) {
-                    groups.push({
+            axios.get(cp_url('user-groups')).then(response => {
+                this.groups = response.data.map(group => {
+                    return {
                         value: group.id,
                         text: group.title
-                    });
+                    };
                 });
-
-                this.groups = groups;
                 this.loading = false;
             });
         }

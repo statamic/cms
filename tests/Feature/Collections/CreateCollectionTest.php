@@ -17,7 +17,7 @@ class CreateCollectionTest extends TestCase
     function it_shows_the_create_page_if_you_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
 
         $this
             ->actingAs($user)
@@ -29,7 +29,7 @@ class CreateCollectionTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
 
         $this
             ->from('/original')

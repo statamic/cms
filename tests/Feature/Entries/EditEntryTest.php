@@ -20,7 +20,7 @@ class EditEntryTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
         $collection = Collection::create('blog')->save();
 
         $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->save();
@@ -38,7 +38,7 @@ class EditEntryTest extends TestCase
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
         $collection = Collection::create('blog')->save();
 
         $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with(['blueprint' => 'test'])->save();
@@ -56,7 +56,7 @@ class EditEntryTest extends TestCase
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
         $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
         $collection = Collection::create('blog')->save();
         $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with(['blueprint' => 'test'])->save();
 

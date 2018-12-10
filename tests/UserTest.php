@@ -4,7 +4,7 @@ use Statamic\API\User;
 
 class UserTest extends TestCase
 {
-    /** @var \Statamic\Contracts\Data\Users\User */
+    /** @var \Statamic\Contracts\Auth\User */
     private $user;
 
     public function setUp()
@@ -18,7 +18,7 @@ class UserTest extends TestCase
             'id' => '123'
         ];
 
-        $this->user = User::create()->username('john')->with($attributes)->get();
+        $this->user = User::make()->username('john')->data($attributes);
     }
 
     public function testGetsData()

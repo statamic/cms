@@ -3,16 +3,21 @@
 namespace Statamic\Providers;
 
 use Statamic\Policies;
+use Statamic\Auth\UserProvider;
+use Statamic\Contracts\Auth\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Statamic\Contracts\Auth\UserGroup;
+use Statamic\Contracts\Auth\UserStore;
 use Illuminate\Support\ServiceProvider;
-use Statamic\Contracts\Permissions\Role;
-use Statamic\Extensions\FileUserProvider;
+use Statamic\Auth\UserRepositoryManager;
+use Facades\Statamic\Auth\CorePermissions;
 use Statamic\Auth\Protect\ProtectorManager;
-use Statamic\Contracts\Permissions\UserGroup;
-use Facades\Statamic\Permissions\CorePermissions;
-use Statamic\Contracts\Permissions\RoleRepository;
-use Statamic\Contracts\Permissions\UserGroupRepository;
+use Statamic\Contracts\Auth\RoleRepository;
+use Statamic\Contracts\Auth\UserRepository;
+use Statamic\Contracts\Auth\UserGroupRepository;
+use Statamic\Auth\Eloquent\UserRepository as EloquentUsers;
+use Statamic\Stache\Repositories\UserRepository as StacheUsers;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,21 +30,21 @@ class AuthServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->bind(Role::class, config('statamic.users.roles.role'));
-
-        $this->app->singleton(RoleRepository::class, function () {
-            return app()
-                ->make(config('statamic.users.roles.repository'))
-                ->path(config('statamic.users.roles.path'));
+        $this->app->singleton(UserRepositoryManager::class, function ($app) {
+            return new UserRepositoryManager($app);
         });
 
-        $this->app->singleton(UserGroupRepository::class, function () {
-            return app()
-                ->make(config('statamic.users.groups.repository'))
-                ->path(config('statamic.users.groups.path'));
+        $this->app->singleton(UserRepository::class, function ($app) {
+            return $app[UserRepositoryManager::class]->repository();
         });
 
-        $this->app->bind(UserGroup::class, config('statamic.users.groups.group'));
+        $this->app->singleton(RoleRepository::class, function ($app) {
+            return $app[UserRepository::class]->roleRepository();
+        });
+
+        $this->app->singleton(UserGroupRepository::class, function ($app) {
+            return $app[UserRepository::class]->userGroupRepository();
+        });
 
         $this->app->singleton(ProtectorManager::class, function ($app) {
             return new ProtectorManager($app);
@@ -50,8 +55,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->autoConfigure();
 
-        Auth::provider('file', function () {
-            return new FileUserProvider;
+        Auth::provider('statamic', function () {
+            return new UserProvider;
         });
 
         Gate::before(function ($user, $ability) {
@@ -67,13 +72,9 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function autoConfigure()
     {
-        if (! config('statamic.users.auto_configure')) {
-            return;
-        }
-
         config(['auth.providers' => [
             'users' => [
-                'driver' => 'file',
+                'driver' => 'statamic',
             ]
         ]]);
     }

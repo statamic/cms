@@ -35,13 +35,7 @@
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
             <div class="mb-4">
-                <label class="mb-1">
-                @if (\Statamic\API\Config::get('users.login_type') === 'email')
-                    {{ __('Email') }}
-                @else
-                    {{ __('Username') }}
-                @endif
-                </label>
+                <label class="mb-1">{{ __('Email') }}</label>
                 <input type="text" class="input-text form-control" name="username" value="{{ old('username') }}" autofocus>
             </div>
 

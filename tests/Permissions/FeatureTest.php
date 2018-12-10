@@ -6,8 +6,8 @@ use Tests\TestCase;
 use Statamic\API\File;
 use Statamic\API\Role as RoleAPI;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Permissions\Role;
-use Statamic\Contracts\Permissions\RoleRepository;
+use Statamic\Contracts\Auth\Role;
+use Statamic\Contracts\Auth\RoleRepository;
 
 class FeatureTest extends TestCase
 {

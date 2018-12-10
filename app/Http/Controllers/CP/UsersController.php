@@ -21,13 +21,13 @@ class UsersController extends CpController
     use GetsTaxonomiesFromFieldsets;
 
     /**
-     * @var \Statamic\Contracts\Data\Users\User|\Statamic\Contracts\Permissions\Permissible
+     * @var UserContract
      */
     private $user;
 
     public function index(Request $request)
     {
-        $this->access('users:view');
+        $this->authorize('users:view');
 
         if ($request->wantsJson()) {
             return $this->json($request);
@@ -51,14 +51,8 @@ class UsersController extends CpController
             return false;
         });
 
-        /**
-         * Since the `name` field is a computed value, sorting doesn't seem
-         * trigger a change on it. So it's better to sort it with the first
-         * name when the name is being used.
-         */
         $sort = request('sort', 'username');
-        $multisort = ($sort == 'name') ? 'first_name' : $sort;
-        $users = $users->multisort($multisort . ':' . request('order'));
+        $users = $users->multisort($sort . ':' . request('order'));
 
         // Set up the paginator, since we don't want to display all the users.
         $totalUserCount = $users->count();
@@ -74,7 +68,6 @@ class UsersController extends CpController
                 'sortColumn' => $sort,
                 'columns' => [
                     ['label' => 'name', 'field' => 'name'],
-                    ['label' => 'username', 'field' => 'username'],
                     ['label' => 'email', 'field' => 'email'],
                 ],
             ],
@@ -119,9 +112,10 @@ class UsersController extends CpController
 
         $request->validate($validation->rules());
 
-        $user = User::create()
+        $user = User::make()
             ->username($request->username)
-            ->with(array_except($fields->values(), 'username'))
+            // ->password('secret') // TODO: Either accept input, hash some garbage, or make password nullable in migration.
+            ->data(array_except($fields->values(), 'username'))
             ->save();
 
         return ['redirect' => $user->editUrl()];
@@ -142,17 +136,9 @@ class UsersController extends CpController
             ->preProcess()
             ->values();
 
-
-        if (Config::get('statamic.users.login_type') === 'email') {
-            $values['email'] = $user->email();
-        } else {
-            $values['username'] = $user->username();
-        }
-
-        $values['roles'] = $user->roles()->map(function ($role) {
-            return $role->uuid();
-        });
-        $values['user_groups'] = $user->groups()->keys();
+        $values['email'] = $user->email();
+        $values['roles'] = $user->roles()->map->id()->values()->all();
+        $values['groups'] = $user->groups()->map->id()->values()->all();
         $values['status'] = $user->status();
 
         return view('statamic::users.edit', [
@@ -170,39 +156,37 @@ class UsersController extends CpController
         $fields = $user->blueprint()->fields()->addValues($request->all())->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
-            'username' => 'required', // TODO: Needs to be more clever re: different logic for email as login
+            'email' => 'required', // TODO: Needs to be more clever re: different logic for username as login
         ]);
 
         $request->validate($validation->rules());
 
-        foreach (array_except($fields->values(), 'username') as $key => $value) {
+        $values = array_except($fields->values(), ['email', 'groups', 'roles']);
+
+        foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
 
         $user
-            ->username($request->username)
+            ->email($request->email)
+            ->roles($request->roles)
+            ->groups($request->groups)
             ->save();
 
         return response('', 204);
     }
 
-    /**
-     * Delete a user
-     *
-     * @return array
-     */
-
-    public function delete()
+    public function destroy($user)
     {
-        $this->authorize('users:delete');
-
-        $ids = Helper::ensureArray($this->request->input('ids'));
-
-        foreach ($ids as $id) {
-            User::find($id)->delete();
+        if (! $user = User::find($user)) {
+            return $this->pageNotFound();
         }
 
-        return ['success' => true];
+        $this->authorize('delete', $user);
+
+        $user->delete();
+
+        return response('', 204);
     }
 
     public function getResetUrl($username)

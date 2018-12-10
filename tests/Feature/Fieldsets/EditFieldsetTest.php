@@ -24,7 +24,7 @@ class EditFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create('test')->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -39,7 +39,7 @@ class EditFieldsetTest extends TestCase
     function it_provides_the_fieldset()
     {
         $this->withoutExceptionHandling();
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this

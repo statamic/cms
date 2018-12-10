@@ -22,7 +22,7 @@ class UpdateEntryTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
         $collection = Collection::create('blog')->save();
         $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->id('1')->save();
 
@@ -37,10 +37,9 @@ class UpdateEntryTest extends TestCase
     /** @test */
     function entry_gets_saved()
     {
-        $this->withoutExceptionHandling();
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
         $collection = Collection::create('blog')->save();
         $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with([
             'id' => 1,
@@ -72,7 +71,7 @@ class UpdateEntryTest extends TestCase
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text', 'validate' => 'required']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
-        $user = User::create('test')->get()->assignRole('test');
+        $user = User::make()->assignRole('test');
         $collection = Collection::create('blog')->save();
         $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with([
             'id' => 1,

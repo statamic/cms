@@ -23,7 +23,7 @@ class StoreBlueprintTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create('test')->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
         $this->assertCount(0, API\Blueprint::all());
 
         $this
@@ -39,7 +39,7 @@ class StoreBlueprintTest extends TestCase
     /** @test */
     function blueprint_gets_saved()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Blueprint::all());
 
         $this
@@ -59,7 +59,7 @@ class StoreBlueprintTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
 
         $this
             ->from('/original')

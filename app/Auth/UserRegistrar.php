@@ -48,7 +48,7 @@ class UserRegistrar
     /**
      * Create the user
      *
-     * @return \Statamic\Contracts\Data\Users\User
+     * @return \Statamic\Contracts\Auth\User
      */
     public function create()
     {

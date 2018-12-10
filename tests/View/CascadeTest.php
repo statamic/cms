@@ -86,7 +86,7 @@ class CascadeTest extends TestCase
     /** @test */
     function it_hydrates_auth_when_logged_in()
     {
-        $this->actingAs(User::create()->get())->get('/');
+        $this->actingAs(User::make())->get('/');
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertTrue($cascade['logged_in']);

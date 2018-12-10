@@ -4,26 +4,64 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Automatic Configuration
+    | User Repository
     |--------------------------------------------------------------------------
     |
-    | By default, Laravel comes equipped to store users in a database.
-    | However, Statamic knows you probably want to store them in files and
-    | will try to override the configuration to use its our custom user provider.
+    | Statamic assumes you will be storing users in the filesystem inside the
+    | "Stache" datastore. You are free to customize the storage method here.
     |
-    | You are free to disable this and configure it manually. You may want to
-    | do this if you have a custom setup or plan to store users in a database.
+    | Supported: "stache", "eloquent", "redis"
     |
     */
 
-    'auto_configure' => true,
+    'repository' => env('STATAMIC_USERS', 'file'),
+
+    'repositories' => [
+
+        'file' => [
+            'driver' => 'file',
+            'paths' => [
+                'users' => base_path('users'),
+                'roles' => config_path('statamic/user_roles.yaml'),
+                'groups' => config_path('statamic/user_groups.yaml'),
+            ]
+        ],
+
+        'eloquent' => [
+            'driver' => 'eloquent',
+            'model' => \Statamic\Auth\Eloquent\Model::class,
+        ],
+
+    ],
 
 
-    'driver' => 'file',
-    'redis_write_file' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login type
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic uses the username field for authentication, and
+    | doesn't require email addresses. You may swap this behavior.
+    |
+    | Supported: "username" or "email"
+    |
+    */
+
     'login_type' => 'username',
-    'new_user_roles' => [],
-    'gravatar' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Avatars
+    |--------------------------------------------------------------------------
+    |
+    | User avatars are provided by the Gravatar.com service by default.
+    |
+    | Supported: "gravatar", "initials", or a custom class name.
+    |
+    */
+
+    'avatars' => 'gravatar',
 
     /*
     |--------------------------------------------------------------------------
@@ -40,8 +78,8 @@ return [
 
         'path' => config_path('statamic/user_roles.yaml'),
 
-        'role' => \Statamic\Permissions\Role::class,
-        'repository' => \Statamic\Permissions\RoleRepository::class,
+        'role' => \Statamic\Auth\Role::class,
+        'repository' => \Statamic\Auth\RoleRepository::class,
 
     ],
 
@@ -61,8 +99,8 @@ return [
 
         'path' => config_path('statamic/user_groups.yaml'),
 
-        'group' => \Statamic\Permissions\UserGroup::class,
-        'repository' => \Statamic\Permissions\UserGroupRepository::class,
+        'group' => \Statamic\Auth\UserGroup::class,
+        'repository' => \Statamic\Auth\UserGroupRepository::class,
 
     ],
 

@@ -8,7 +8,7 @@ use Statamic\API\User as UserAPI;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\UsersStore;
-use Statamic\Contracts\Data\Users\User;
+use Statamic\Contracts\Auth\User;
 
 class UsersStoreTest extends TestCase
 {
@@ -66,11 +66,10 @@ class UsersStoreTest extends TestCase
     /** @test */
     function it_makes_user_instances_from_files()
     {
-        $item = $this->store->createItemFromFile($this->tempDir.'/john.yaml', "id: 123\nname: John Doe\nemail: john@example.com");
+        $item = $this->store->createItemFromFile($this->tempDir.'/john@example.com.yaml', "id: 123\nname: John Doe\nemail: john@example.com");
 
         $this->assertInstanceOf(User::class, $item);
         $this->assertEquals('123', $item->id());
-        $this->assertEquals('john', $item->username());
         $this->assertEquals('john@example.com', $item->email());
         $this->assertEquals('John Doe', $item->get('name'));
         $this->assertEquals(['id' => '123', 'name' => 'John Doe', 'email' => 'john@example.com'], $item->data());

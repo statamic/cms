@@ -92,7 +92,7 @@ class FrontendTest extends TestCase
     function drafts_are_visible_if_logged_in_with_correct_permission()
     {
         $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
-        $user = User::create()->get()->assignRole('draft_viewer');
+        $user = User::make()->assignRole('draft_viewer');
 
         $page = $this->createPage('/about');
         $page->published(false);
@@ -119,7 +119,7 @@ class FrontendTest extends TestCase
         $this->markTestIncomplete(); // todo: live preview
 
         $this->fakeRoles(['cp_accessor' => ['permissions' => ['cp:access']]]);
-        $user = User::create()->with(['roles' => ['cp_accessor']])->get();
+        $user = User::make()->data(['roles' => ['cp_accessor']]);
 
         $page = $this->createPage('/about');
         $page->set('content', 'Testing 123');

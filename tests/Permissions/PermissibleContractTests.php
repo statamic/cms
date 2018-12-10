@@ -2,13 +2,13 @@
 
 namespace Tests\Permissions;
 
-use Statamic\Permissions\Role;
+use Statamic\Auth\File\Role;
 use Statamic\API\Role as RoleAPI;
 use Illuminate\Support\Collection;
-use Statamic\Permissions\UserGroup;
+use Statamic\Auth\File\UserGroup;
 use Statamic\API\UserGroup as UserGroupAPI;
-use Statamic\Contracts\Permissions\Role as RoleContract;
-use Statamic\Contracts\Permissions\UserGroup as UserGroupContract;
+use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
 trait PermissibleContractTests
 {
@@ -99,6 +99,7 @@ trait PermissibleContractTests
         };
 
         RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
+        RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
 
         $user = $this->createPermissible()->assignRole([$roleA, $roleB, $roleC, $roleD]);
 

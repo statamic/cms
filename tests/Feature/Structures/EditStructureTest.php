@@ -6,7 +6,7 @@ use Mockery;
 use Statamic\API;
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\Data\Users\User;
+use Statamic\Auth\User;
 use Statamic\Data\Structures\Structure;
 
 class EditStructureTest extends TestCase
@@ -21,7 +21,7 @@ class EditStructureTest extends TestCase
         API\Structure::shouldReceive('find')->andReturn($structure);
 
         $this->setTestRoles(['test' => ['access cp', 'edit foo structure']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -38,7 +38,7 @@ class EditStructureTest extends TestCase
         API\Structure::shouldReceive('find')->andReturn($structure);
 
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->from('/cp/original')

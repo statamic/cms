@@ -4,8 +4,8 @@ namespace Tests\Permissions;
 
 use Tests\TestCase;
 use Faker\Generator as Faker;
-use Statamic\Data\Users\Eloquent\User;
-use Statamic\Data\Users\Eloquent\Model;
+use Statamic\Auth\Eloquent\User;
+use Statamic\Auth\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factory;
 
 class EloquentPermissibleTest extends TestCase

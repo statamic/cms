@@ -7,7 +7,7 @@ use Statamic\API\User;
 use Statamic\API\Request;
 use Statamic\Extend\Tags;
 use Statamic\Exceptions\RedirectException;
-use Statamic\Contracts\Data\Users\User as UserContract;
+use Statamic\Contracts\Auth\User as UserContract;
 
 class UserTags extends Tags
 {

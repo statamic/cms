@@ -3,7 +3,7 @@
 namespace Tests\Permissions;
 
 use Tests\TestCase;
-use Statamic\Permissions\Role;
+use Statamic\Auth\File\Role;
 use Illuminate\Support\Collection;
 
 class RoleTest extends TestCase

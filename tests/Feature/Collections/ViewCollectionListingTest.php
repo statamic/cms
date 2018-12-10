@@ -6,7 +6,7 @@ use Mockery;
 use Statamic\API;
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\Data\Users\User;
+use Statamic\Auth\User;
 use Statamic\Data\Entries\Collection;
 
 class ViewCollectionListingTest extends TestCase
@@ -27,7 +27,7 @@ class ViewCollectionListingTest extends TestCase
             'bar' => $collectionB = $this->createCollection('bar')
         ]));
 
-        $user = API\User::create('test')->with(['super' => true])->get();
+        $user = User::make()->makeSuper();
 
         $response = $this
             ->actingAs($user)
@@ -43,7 +43,7 @@ class ViewCollectionListingTest extends TestCase
     /** @test */
     function it_shows_no_results_when_there_are_no_collections()
     {
-        $user = API\User::create('test')->with(['super' => true])->get();
+        $user = User::make()->makeSuper();
 
         $response = $this
             ->actingAs($user)
@@ -61,7 +61,7 @@ class ViewCollectionListingTest extends TestCase
             'bar' => $collectionB = $this->createCollection('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'view bar collection']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -81,7 +81,7 @@ class ViewCollectionListingTest extends TestCase
             'bar' => $collectionB = $this->createCollection('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'configure collections', 'view bar collection']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -103,7 +103,7 @@ class ViewCollectionListingTest extends TestCase
         ]));
 
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->from('/cp/original')
@@ -116,7 +116,7 @@ class ViewCollectionListingTest extends TestCase
     function create_collection_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -128,7 +128,7 @@ class ViewCollectionListingTest extends TestCase
     function create_collection_button_is_not_visible_without_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -144,7 +144,7 @@ class ViewCollectionListingTest extends TestCase
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -160,7 +160,7 @@ class ViewCollectionListingTest extends TestCase
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'view foo collection']]);
-        $user = API\User::create()->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)

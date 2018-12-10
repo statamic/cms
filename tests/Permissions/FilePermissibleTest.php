@@ -3,7 +3,7 @@
 namespace Tests\Permissions;
 
 use Tests\TestCase;
-use Statamic\Data\Users\User;
+use Statamic\Auth\File\User;
 
 class FilePermissibleTest extends TestCase
 {

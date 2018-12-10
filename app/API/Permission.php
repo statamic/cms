@@ -2,7 +2,7 @@
 
 namespace Statamic\API;
 
-use Statamic\Permissions\Permissions;
+use Statamic\Auth\Permissions;
 use Illuminate\Support\Facades\Facade;
 
 class Permission extends Facade

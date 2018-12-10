@@ -18,17 +18,18 @@ class CreatePermissibleTestUserTables extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->boolean('super')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
 
-        Schema::create('user_roles', function (Blueprint $table) {
+        Schema::create('role_user', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('role_id');
         });
 
-        Schema::create('user_groups', function (Blueprint $table) {
+        Schema::create('group_user', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('group_id');

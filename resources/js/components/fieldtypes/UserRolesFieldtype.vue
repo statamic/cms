@@ -32,6 +32,7 @@ export default {
     computed: {
 
         canEdit: function() {
+            return true; // TODO
             return Vue.can('users:edit-roles');
         },
 

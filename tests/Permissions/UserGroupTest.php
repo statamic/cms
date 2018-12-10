@@ -3,12 +3,12 @@
 namespace Tests\Permissions;
 
 use Tests\TestCase;
-use Statamic\Data\Users\User;
-use Statamic\Permissions\Role;
+use Statamic\Auth\File\User;
+use Statamic\Auth\File\Role;
 use Statamic\API\Role as RoleAPI;
 use Statamic\API\User as UserAPI;
 use Illuminate\Support\Collection;
-use Statamic\Permissions\UserGroup;
+use Statamic\Auth\File\UserGroup;
 
 class UserGroupTest extends TestCase
 {

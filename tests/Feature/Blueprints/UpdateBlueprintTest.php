@@ -26,7 +26,7 @@ class UpdateBlueprintTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create('test')->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -43,7 +43,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function blueprint_gets_saved()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -110,7 +110,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
@@ -127,7 +127,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function sections_are_required()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
@@ -147,7 +147,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function sections_must_be_an_array()
     {
-        $user = API\User::create('test')->get()->makeSuper();
+        $user = API\User::make()->makeSuper();
         $this->assertCount(0, API\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',

@@ -1,35 +1,27 @@
 hide: true
 fields:
   -
-    handle: username
+    handle: name
     field:
       type: text
-      display: Username
-      width: 50
-  # -
-  #   handle: roles
-  #   field:
-  #     type: user_roles
-  #     width: 50
+      display: Name
   -
     handle: email
     field:
       type: text
       display: Email address
   -
-    handle: first_name
+    handle: roles
     field:
-      type: text
-      display: First Name
+      type: user_roles
       width: 50
   -
-    handle: last_name
+    handle: groups
     field:
-      type: text
-      display: Last Name
+      type: user_groups
       width: 50
   -
-    handle: content
+    handle: biography
     field:
       type: textarea
       display: Biography

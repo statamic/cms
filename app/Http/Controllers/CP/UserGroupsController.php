@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 
 class UserGroupsController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $this->access('super');
+        $this->authorize('super');
 
         $groups = UserGroup::all()->map(function ($group) {
             return [
@@ -23,6 +23,10 @@ class UserGroupsController extends CpController
                 'edit_url' => cp_route('user-groups.edit', $group->handle())
             ];
         })->values();
+
+        if ($request->wantsJson()) {
+            return $groups;
+        }
 
         return view('statamic::usergroups.index', [
             'groups' => $groups

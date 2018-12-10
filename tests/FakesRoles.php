@@ -2,17 +2,17 @@
 
 namespace Tests;
 
+use Statamic\API\Role;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Permissions\Role;
-use Statamic\Permissions\RoleRepository;
-use Statamic\Contracts\Permissions\RoleRepository as RepositoryContract;
+use Statamic\Auth\RoleRepository;
+use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
 
 trait FakesRoles
 {
     private function setTestRoles($roles)
     {
         $roles = collect($roles)->map(function ($permissions, $handle) {
-            return app(Role::class)
+            return Role::make()
                 ->handle($handle)
                 ->addPermission($permissions);
         });
@@ -28,5 +28,6 @@ trait FakesRoles
         };
 
         app()->instance(RepositoryContract::class, $fake);
+        Role::swap($fake);
     }
 }

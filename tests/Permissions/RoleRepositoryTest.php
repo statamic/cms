@@ -5,8 +5,8 @@ namespace Tests\Permissions;
 use Tests\TestCase;
 use Statamic\API\File;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Permissions\Role;
-use Statamic\Permissions\RoleRepository;
+use Statamic\Contracts\Auth\Role;
+use Statamic\Auth\File\RoleRepository;
 
 class RoleRepositoryTest extends TestCase
 {

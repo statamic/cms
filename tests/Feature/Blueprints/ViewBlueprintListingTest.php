@@ -6,7 +6,7 @@ use Mockery;
 use Statamic\API;
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\Data\Users\User;
+use Statamic\Auth\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Data\Entries\Collection;
 
@@ -22,7 +22,7 @@ class ViewBlueprintListingTest extends TestCase
             'bar' => $blueprintB = $this->createBlueprint('bar')
         ]));
 
-        $user = API\User::create('test')->with(['super' => true])->get();
+        $user = API\User::make()->makeSuper();
 
         $response = $this
             ->actingAs($user)
@@ -53,7 +53,7 @@ class ViewBlueprintListingTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::create('test')->get()->assignRole('test');
+        $user = API\User::make()->assignRole('test');
 
         $response = $this
             ->from('/cp/original')
