@@ -18,6 +18,12 @@
                     <template slot="cell-name" slot-scope="{ row: user, value }">
                         <a :href="user.edit_url">{{ value }}</a>
                     </template>
+                    <template slot="actions" slot-scope="{ row: user, index }">
+                        <dropdown-list>
+                            <li><a :href="user.edit_url">Edit</a></li>
+                            <li class="warning"><a @click.prevent="destroy(user.id, index)">Delete</a></li>
+                        </dropdown-list>
+                    </template>
                 </data-table>
             </div>
         </data-list>
@@ -86,6 +92,16 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
+        },
+
+        destroy(id, index) {
+            const url = cp_url(`users/${id}`);
+            axios.delete(url).then(response => {
+                this.users.splice(index, 1);
+                this.$notify.success(__('User deleted'));
+            }).catch(error => {
+                this.$notify.error(error.response.data.message);
+            })
         }
 
     }
