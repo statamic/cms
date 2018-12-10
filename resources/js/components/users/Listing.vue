@@ -15,7 +15,7 @@
         >
             <div class="card p-0" slot-scope="{ filteredRows: rows }">
                 <data-table @sorted="sorted">
-                    <template slot="cell-username" slot-scope="{ row: user, value }">
+                    <template slot="cell-name" slot-scope="{ row: user, value }">
                         <a :href="user.edit_url">{{ value }}</a>
                     </template>
                 </data-table>
