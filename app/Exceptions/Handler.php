@@ -14,7 +14,7 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $e)
     {
         if ($e instanceof IlluminateAuthException && !$request->expectsJson()) {
-            return back_or_route('statamic.cp.index')->withError($e->getMessage());
+            return back_or_route('statamic.cp.index')->withErrors($e->getMessage());
         }
 
         return parent::render($request, $e);
