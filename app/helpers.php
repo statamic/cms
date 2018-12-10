@@ -638,3 +638,10 @@ if (! function_exists('my')) {
         return user();
     }
 }
+
+if (! function_exists('debugbar')) {
+    function debugbar()
+    {
+        return optional();
+    }
+}
