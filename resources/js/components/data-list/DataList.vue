@@ -103,6 +103,8 @@ export default {
         },
 
         sortRows(rows) {
+            if (! this.sort) return rows;
+
             // If no column is selected, don't sort.
             if (! this.sharedState.sortColumn) return rows;
 
