@@ -7,12 +7,13 @@ use Statamic\Statamic;
 use Illuminate\Support\Facades\View;
 use App\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
 
 class Handler extends ExceptionHandler
 {
     public function render($request, Exception $e)
     {
-        if ($e instanceof AuthorizationException && !$request->expectsJson()) {
+        if ($e instanceof IlluminateAuthException && !$request->expectsJson()) {
             return back_or_route('statamic.cp.index')->withError($e->getMessage());
         }
 
