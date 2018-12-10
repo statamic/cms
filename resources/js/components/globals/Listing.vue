@@ -10,8 +10,10 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: global, index }">
                     <dropdown-list>
-                        <li><a :href="global.edit_url">Edit</a></li>
-                        <li class="warning" v-if="global.deleteable"><a @click.prevent="destroy(global.id, index)">Delete</a></li>
+                        <ul class="dropdown-menu">
+                            <li><a :href="global.edit_url">Edit</a></li>
+                            <li class="warning" v-if="global.deleteable"><a @click.prevent="destroy(global.id, index)">Delete</a></li>
+                        </ul>
                     </dropdown-list>
                 </template>
             </data-table>

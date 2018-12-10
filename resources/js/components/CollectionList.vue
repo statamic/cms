@@ -7,8 +7,10 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: collection }">
                     <dropdown-list>
-                        <li><a :href="collection.edit_url">Edit</a></li>
-                        <li class="warning"><a @click.prevent="deleteCollection(collection.id)">Delete</a></li>
+                        <ul class="dropdown-menu">
+                            <li><a :href="collection.edit_url">Edit</a></li>
+                            <li class="warning"><a @click.prevent="deleteCollection(collection.id)">Delete</a></li>
+                        </ul>
                     </dropdown-list>
                 </template>
             </data-table>

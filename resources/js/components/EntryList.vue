@@ -22,9 +22,11 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: entry }">
                     <dropdown-list>
-                        <li><a :href="entry.permalink">View</a></li>
-                        <li><a :href="entry.edit_url">Edit</a></li>
-                        <li class="warning"><a :href="entry.edit_url">Delete</a></li>
+                        <ul class="dropdown-menu">
+                            <li><a :href="entry.permalink">View</a></li>
+                            <li><a :href="entry.edit_url">Edit</a></li>
+                            <li class="warning"><a :href="entry.edit_url">Delete</a></li>
+                        </ul>
                     </dropdown-list>
                 </template>
             </data-table>

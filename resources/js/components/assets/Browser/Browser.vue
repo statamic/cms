@@ -77,8 +77,10 @@
 
                     <template slot="actions" slot-scope="{ row: asset }">
                         <dropdown-list>
-                            <li><a @click="edit(asset.id)">Edit</a></li>
-                            <li class="warning"><a @click="destroy(asset.id)">Delete</a></li>
+                            <ul class="dropdown-menu">
+                                <li><a @click="edit(asset.id)">Edit</a></li>
+                                <li class="warning"><a @click="destroy(asset.id)">Delete</a></li>
+                            </ul>
                         </dropdown-list>
                     </template>
 

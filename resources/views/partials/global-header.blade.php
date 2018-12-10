@@ -13,8 +13,8 @@
     </div>
 
     <div class="flex items-center px-3 border-l h-full text-sm">
-        <div class="dropdown">
-            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <dropdown-list>
+            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" slot="trigger">
                 <i class="block h-6 w-6 mr-1">@svg('content-writing')</i><span>Shortcuts</span>
             </button>
             <ul class="dropdown-menu">
@@ -26,12 +26,12 @@
                 <li class="divider"></li>
                 <li><a href="" class="text-grey hover:text-white">Customize Shortcuts</a></li>
             </ul>
-        </div>
+        </dropdown-list>
     </div>
 
     <div class="head-link border-l h-full px-3 flex items-center">
-        <div class="dropdown">
-            <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <dropdown-list>
+            <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark" slot="trigger">
                 @svg('book-open')
             </a>
             <ul class="dropdown-menu">
@@ -53,12 +53,12 @@
                     </a>
                 </li>
             </ul>
-        </div>
+        </dropdown-list>
         <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-dark" href="{{ route('site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
             @svg('browser-com')
         </a>
-        <div class="dropdown">
-            <a class="dropdown-toggle ml-2 hide md:block" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <dropdown-list>
+            <a class="dropdown-toggle ml-2 hide md:block" slot="trigger">
                 @if (my()->avatar())
                     <div class="icon-header-avatar"><img src="{{ my()->avatar() }}" /></div>
                 @else
@@ -75,6 +75,6 @@
                 <li><a href="{{ route('statamic.cp.account.password') }}">{{ __('Change Password') }}</a></li>
                 <li><a href="{{ route('statamic.cp.logout') }}">{{ __('Logout') }}</a></li>
             </ul>
-        </div>
+        </dropdown-list>
     </div>
 </div>
