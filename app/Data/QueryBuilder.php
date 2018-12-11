@@ -69,6 +69,11 @@ abstract class QueryBuilder
         return $this;
     }
 
+    public function count()
+    {
+        return $this->getFilteredAndLimitedItems()->count();
+    }
+
     public function get()
     {
         $items = $this->getFilteredItems();
@@ -77,7 +82,7 @@ abstract class QueryBuilder
             $items = $items->multisort($this->orderBy . ':' . $this->orderDirection);
         }
 
-        return $items->slice($this->offset, $this->limit);
+        return $this->limitItems($items);
     }
 
     protected function getFilteredItems()
@@ -87,6 +92,16 @@ abstract class QueryBuilder
         $items = $this->filterWheres($items);
 
         return $items;
+    }
+
+    protected function getFilteredAndLimitedItems()
+    {
+        return $this->limitItems($this->getFilteredItems());
+    }
+
+    protected function limitItems($items)
+    {
+        return $items->slice($this->offset, $this->limit);
     }
 
     abstract protected function getBaseItems();
