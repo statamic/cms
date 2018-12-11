@@ -18,6 +18,12 @@
     z-index: 102;
 }
 
+/* Rotation
+  ========================================================================== */
+.rotate-90 { transform: rotate(90deg); }
+.rotate-180 { transform: rotate(180deg); }
+.-rotate-90 { transform: rotate(-90deg); }
+.-rotate-180 { transform: rotate(-180deg); }
 
 
 /* Misc
