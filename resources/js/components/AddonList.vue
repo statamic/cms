@@ -28,7 +28,7 @@
 
                 </div>
 
-                <data-list-pagination :resource-meta="meta" @pageSelected="setPage"></data-list-pagination>
+                <data-list-pagination :resource-meta="meta" @page-selected="setPage"></data-list-pagination>
 
                 <portal to="modals" v-if="showingAddon">
                     <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">

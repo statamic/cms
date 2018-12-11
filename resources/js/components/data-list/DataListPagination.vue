@@ -57,7 +57,7 @@
                     return;
                 }
 
-                this.$emit('pageSelected', page);
+                this.$emit('page-selected', page);
 
                 window.scrollTo(0, 0);
             },
