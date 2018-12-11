@@ -22,12 +22,8 @@
 
         th {
             @apply font-medium px-2 py-1.5;
-            &:first-child {
-                @apply .rounded-tl;
-            }
-            &:last-child {
-                @apply .rounded-tr;
-            }
+            &:first-child { @apply .rounded-tl; }
+            &:last-child { @apply .rounded-tr; }
         }
     }
     tbody {
@@ -37,6 +33,9 @@
             &:hover {
                 @apply bg-grey-lightest;
             }
+
+            td:first-child { @apply .rounded-bl; }
+            td:last-child { @apply .rounded-br; }
 
             td {
                 @apply py-1 px-2;
