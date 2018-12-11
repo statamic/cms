@@ -45,7 +45,6 @@ import axios from 'axios';
 export default {
 
     props: {
-        form: String,
         group: String,
     },
 

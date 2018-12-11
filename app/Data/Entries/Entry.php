@@ -124,6 +124,8 @@ class Entry extends Content implements EntryContract
         }
 
         $this->attributes['collection'] = $collection;
+
+        return $this;
     }
 
     /**

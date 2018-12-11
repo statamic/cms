@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Auth\Eloquent;
+namespace Statamic\Eloquent\Auth;
 
 use Statamic\API\Role;
 use Statamic\API\UserGroup;

@@ -10,11 +10,6 @@
         <a href="{{ cp_route('collections.entries.create', $collection->path()) }}" class="btn btn-primary">{{ __('Create Entry') }}</a>
     </div>
 
-    <entry-list
-        :columns="['title', 'last_modified', 'order', 'published', 'slug']"
-        :visible-columns="['title', 'slug']"
-        :initial-rows="{{ $entries }}"
-        :endpoints="{ bulkDelete: '/bulk/delete/route' }">
-    </entry-list>
+    <entry-list collection="{{ $collection->handle() }}"></entry-list>
 
 @endsection

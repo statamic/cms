@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
+use Statamic\Data\Entries\QueryBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
 use Statamic\Contracts\Data\Repositories\StructureRepository;
@@ -65,5 +66,10 @@ class EntryRepository implements RepositoryContract
         $this->store->store($entry->collectionName())->insert($entry);
 
         $this->store->save($entry);
+    }
+
+    public function query()
+    {
+        return new QueryBuilder;
     }
 }

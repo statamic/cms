@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Auth\Eloquent;
+namespace Statamic\Eloquent\Auth;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;

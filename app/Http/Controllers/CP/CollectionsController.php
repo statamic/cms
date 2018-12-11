@@ -21,7 +21,7 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->path(),
                 'title' => $collection->title(),
-                'entries' => $collection->entries()->count(),
+                'entries' => \Statamic\API\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
                 'entries_url' => cp_route('collections.show', $collection->path())
             ];
@@ -36,10 +36,9 @@ class CollectionsController extends CpController
 
     public function show($collection)
     {
-        $collection = Collection::whereHandle($collection);
-        $entries = $collection->entries()->values()->toJson();
-
-        return view('statamic::collections.show', compact('collection', 'entries'));
+        return view('statamic::collections.show', [
+            'collection' => Collection::whereHandle($collection)
+        ]);
     }
 
     public function create()

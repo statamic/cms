@@ -2,7 +2,6 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Data\Entries\QueryBuilder;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 use Statamic\Contracts\Data\Repositories\StructureRepository;
 
@@ -20,7 +19,12 @@ class Entry
 
     public function query()
     {
-        return new QueryBuilder;
+        return $this->service()->query();
+    }
+
+    public function make()
+    {
+        return $this->service()->make();
     }
 
     /**

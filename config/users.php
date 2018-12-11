@@ -29,7 +29,7 @@ return [
 
         'eloquent' => [
             'driver' => 'eloquent',
-            'model' => \Statamic\Auth\Eloquent\Model::class,
+            'model' => \Statamic\Eloquent\Auth\Model::class,
         ],
 
     ],

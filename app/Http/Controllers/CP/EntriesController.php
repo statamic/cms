@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
 use Statamic\CP\Publish\ProcessesFields;
+use Illuminate\Http\Resources\Json\Resource;
 
 class EntriesController extends CpController
 {
@@ -14,8 +15,20 @@ class EntriesController extends CpController
 
     public function index($collection)
     {
-        // TODO: Bring over the rest of the logic.
-        return Entry::whereCollection($collection)->toArray();
+        $sort = request('sort', 'title');
+
+        $entries = Entry::query()
+            ->where('collection', $collection)
+            ->orderBy($sort, request('order', 'asc'))
+            ->paginate();
+
+        return Resource::collection($entries)->additional(['meta' => [
+            'sortColumn' => $sort,
+            'columns' => [
+                ['label' => __('Title'), 'field' => 'title'],
+                ['label' => __('Slug'), 'field' => 'slug'],
+            ],
+        ]]);
     }
 
     public function edit(Request $request, $collection, $slug)

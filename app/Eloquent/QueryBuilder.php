@@ -1,12 +1,14 @@
 <?php
 
-namespace Statamic\Auth\Eloquent;
+namespace Statamic\Eloquent;
 
-class UserQueryBuilder
+use Illuminate\Database\Eloquent\Builder;
+
+abstract class QueryBuilder
 {
     protected $builder;
 
-    public function __construct($builder)
+    public function __construct(Builder $builder)
     {
         $this->builder = $builder;
     }
@@ -32,10 +34,10 @@ class UserQueryBuilder
         );
     }
 
-    protected function transform($items)
+    public function count()
     {
-        return collect_users($items)->map(function ($model) {
-            return User::fromModel($model);
-        });
+        return $this->builder->count();
     }
+
+    abstract protected function transform($items);
 }
