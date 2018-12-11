@@ -87,6 +87,11 @@ var vm = new Vue({
             e.preventDefault();
             this.toggleNav();
         });
+
+    },
+
+    created() {
+        this.navOpen = localStorage.getItem('statamic.nav') == 'open';
     },
 
     methods: {
@@ -100,6 +105,7 @@ var vm = new Vue({
 
         toggleNav() {
             this.navOpen = ! this.navOpen;
+            localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
         }
     }
 

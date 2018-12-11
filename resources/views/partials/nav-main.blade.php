@@ -1,5 +1,5 @@
 @section('nav-main')
-    <nav class="nav-main">
+    <nav class="nav-main" v-cloak>
         <div class="nav-main-wrapper">
             <ul class="mt-sm">
                 <li class="{{ current_class('dashboard') }}">
