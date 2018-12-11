@@ -22,9 +22,9 @@ class QueryBuilder extends BaseQueryBuilder
     protected function getBaseItems()
     {
         if ($this->collection) {
-            return Entry::whereCollection($this->collection);
+            return Entry::whereCollection($this->collection)->values();
         }
 
-        return Entry::all();
+        return Entry::all()->values();
     }
 }
