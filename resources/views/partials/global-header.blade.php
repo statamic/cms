@@ -1,6 +1,7 @@
 <div class="global-header">
     <div class="flex items-center flex-1">
-        <div class="w-54 pl-3">
+        <div class="w-54 pl-3 flex items-center">
+            <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
             <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
                 <div v-popover:tooltip.bottom="version">
                     @svg('statamic-wordmark')
