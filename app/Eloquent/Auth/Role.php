@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Auth\Eloquent;
+namespace Statamic\Eloquent\Auth;
 
 use Statamic\Auth\File\Role as FileRole;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Auth\Eloquent;
+namespace Statamic\Eloquent\Auth;
 
 use Illuminate\Support\Facades\DB;
 use Statamic\Contracts\Auth\User as UserContract;

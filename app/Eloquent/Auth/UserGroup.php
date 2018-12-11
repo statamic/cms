@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Auth\Eloquent;
+namespace Statamic\Eloquent\Auth;
 
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Auth\File\UserGroup as FileUserGroup;
