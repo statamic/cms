@@ -6,7 +6,7 @@
 
         <!-- Do we want to bring back segments, slider, ellipses, etc.? -->
 
-        <li v-for="page in pages" class="mx-1" :class="{ 'font-bold': page == currentPage }">
+        <li v-for="page in pages" :key="page" class="mx-1" :class="{ 'font-bold': page == currentPage }">
             <a @click.prevent="selectPage(page)">{{ page }}</a>
         </li>
 
