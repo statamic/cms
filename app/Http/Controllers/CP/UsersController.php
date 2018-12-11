@@ -79,7 +79,7 @@ class UsersController extends CpController
         $fields = $blueprint->fields()->addValues($request->all())->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
-            'username' => 'required', // TODO: Needs to be more clever re: different logic for email as login
+            'email' => 'required', // TODO: Needs to be more clever re: different logic for email as login
         ]);
 
         $request->validate($validation->rules());
