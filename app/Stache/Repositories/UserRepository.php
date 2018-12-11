@@ -7,6 +7,7 @@ use Statamic\Auth\UserFactory;
 use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Auth\User;
 use Statamic\Auth\File\RoleRepository;
+use Statamic\Auth\File\UserQueryBuilder;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\File\UserGroupRepository;
 use Statamic\Auth\UserRepository as BaseRepository;
@@ -45,5 +46,10 @@ class UserRepository extends BaseRepository
         return $this->store->getItems()->first(function ($user) use ($email) {
             return $user->email() === $email;
         });
+    }
+
+    public function query()
+    {
+        return new UserQueryBuilder;
     }
 }

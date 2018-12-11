@@ -9,21 +9,15 @@ class UserGroup extends FileUserGroup
 {
     public function users($users = null)
     {
-        $userIds = \DB::table('group_user')
-            ->where('group_id', $this->id())
-            ->pluck('user_id');
-
-        return $this
-            ->model('whereIn', 'id', $userIds->all())
-            ->get()
-            ->keyBy('id')
-            ->map(function ($model) {
-                return User::fromModel($model);
-            });
+        return $this->queryUsers()
+            ->whereIn('id', $this->getUserIds())
+            ->get();
     }
 
-    protected function model($method, ...$args)
+    protected function getUserIds()
     {
-        return app(UserRepository::class)->model($method, ...$args);
+        return \DB::table('group_user')
+            ->where('group_id', $this->id())
+            ->pluck('user_id');
     }
 }

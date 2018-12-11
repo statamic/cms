@@ -13,8 +13,8 @@ use Statamic\API\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
+use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Contracts\Users\User as UserContract;
-use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 class UsersController extends CpController
 {
@@ -36,51 +36,23 @@ class UsersController extends CpController
         return view('statamic::users.index');
     }
 
-    /**
-     * Get users as JSON
-     *
-     * @return array
-     */
     public function json($request)
     {
-        $users = $request->group
-            ? collect_users(UserGroup::find($request->group)->users())
-            : User::all();
+        $query = $request->group
+            ? UserGroup::find($request->group)->queryUsers()
+            : User::query();
 
-        $users = $users->supplement('checked', function () {
-            return false;
-        });
+        $users = $query
+            ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
+            ->paginate();
 
-        $sort = request('sort', 'username');
-        $users = $users->multisort($sort . ':' . request('order'));
-
-        // Set up the paginator, since we don't want to display all the users.
-        $totalUserCount = $users->count();
-        $perPage = Config::get('statamic.cp.pagination_size');
-        $currentPage = (int) $this->request->page ?: 1;
-        $offset = ($currentPage - 1) * $perPage;
-        $users = $users->slice($offset, $perPage);
-        $paginator = new LengthAwarePaginator($users, $totalUserCount, $perPage, $currentPage);
-
-        return [
-            'data'   => $users->toArray(),
-            'meta' => [
-                'sortColumn' => $sort,
-                'columns' => [
-                    ['label' => 'name', 'field' => 'name'],
-                    ['label' => 'email', 'field' => 'email'],
-                ],
+        return Resource::collection($users)->additional(['meta' => [
+            'sortColumn' => $sort,
+            'columns' => [
+                ['label' => 'name', 'field' => 'name'],
+                ['label' => 'email', 'field' => 'email'],
             ],
-            'pagination' => [
-                'totalItems' => $totalUserCount,
-                'itemsPerPage' => $perPage,
-                'totalPages'    => $paginator->lastPage(),
-                'currentPage'   => $paginator->currentPage(),
-                'prevPage'      => $paginator->previousPageUrl(),
-                'nextPage'      => $paginator->nextPageUrl(),
-                'segments'      => array_get($paginator->renderArray(), 'segments')
-            ]
-        ];
+        ]]);
     }
 
     /**

@@ -13,18 +13,26 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div class="card p-0" slot-scope="{ filteredRows: rows }">
-                <data-table @sorted="sorted">
-                    <template slot="cell-name" slot-scope="{ row: user, value }">
-                        <a :href="user.edit_url">{{ value }}</a>
-                    </template>
-                    <template slot="actions" slot-scope="{ row: user, index }">
-                        <dropdown-list>
-                            <li><a :href="user.edit_url">Edit</a></li>
-                            <li class="warning"><a @click.prevent="destroy(user.id, index)">Delete</a></li>
-                        </dropdown-list>
-                    </template>
-                </data-table>
+            <div slot-scope="{ filteredRows: rows }">
+                <div class="card p-0">
+                    <data-table @sorted="sorted">
+                        <template slot="cell-name" slot-scope="{ row: user, value }">
+                            <a :href="user.edit_url">{{ value }}</a>
+                        </template>
+                        <template slot="actions" slot-scope="{ row: user, index }">
+                            <dropdown-list>
+                                <li><a :href="user.edit_url">Edit</a></li>
+                                <li class="warning"><a @click.prevent="destroy(user.id, index)">Delete</a></li>
+                            </dropdown-list>
+                        </template>
+                    </data-table>
+                </div>
+
+                <data-list-pagination
+                    class="mt-3"
+                    :resource-meta="meta"
+                    @page-selected="page = $event"
+                />
             </div>
         </data-list>
 
@@ -47,7 +55,9 @@ export default {
             users: [],
             columns: [],
             sortColumn: null,
-            sortDirection: 'asc'
+            sortDirection: 'asc',
+            meta: null,
+            page: 1
         }
     },
 
@@ -58,6 +68,7 @@ export default {
                 group: this.group,
                 sort: this.sortColumn,
                 order: this.sortDirection,
+                page: this.page,
             }
         }
 
@@ -85,6 +96,7 @@ export default {
                 this.columns = response.data.meta.columns.map(column => column.field);
                 this.sortColumn = response.data.meta.sortColumn;
                 this.users = response.data.data;
+                this.meta = response.data.meta;
                 this.loading = false;
             });
         },

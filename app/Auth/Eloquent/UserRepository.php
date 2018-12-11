@@ -64,4 +64,9 @@ class UserRepository extends BaseRepository
     {
         return User::fromModel($model);
     }
+
+    public function query()
+    {
+        return new UserQueryBuilder($this->model('query'));
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
+use Statamic\Data\Entries\QueryBuilder;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 use Statamic\Contracts\Data\Repositories\StructureRepository;
 
@@ -15,6 +16,11 @@ class Entry
     private function service()
     {
         return app(\Statamic\Contracts\Data\Repositories\EntryRepository::class);
+    }
+
+    public function query()
+    {
+        return new QueryBuilder;
     }
 
     /**
