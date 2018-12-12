@@ -3,20 +3,17 @@
 namespace Statamic\Providers;
 
 use Statamic\API\URL;
-use Statamic\API\Image;
 use League\Glide\Server;
 use Statamic\API\Config;
-use League\Glide\ServerFactory;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\PresetGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
 use Illuminate\Support\ServiceProvider;
+use Facades\Statamic\Imaging\GlideServer;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Contracts\Imaging\ImageManipulator;
-// use League\Glide\Responses\LaravelResponseFactory;
-use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 
 class GlideServiceProvider extends ServiceProvider
 {
@@ -35,21 +32,7 @@ class GlideServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Server::class, function () {
-            $presets = Config::getImageManipulationPresets();
-
-            if (config('statamic.cp.enabled')) {
-                $presets = array_merge($presets, Image::getCpImageManipulationPresets());
-            }
-
-            return ServerFactory::create([
-                'source'   => base_path(), // this gets overriden on the fly by the image generator
-                'cache'    => Config::get('statamic.assets.image_manipulation.cache') ? Config::get('statamic.assets.image_manipulation.cache_path') : storage_path('glide'),
-                'base_url' => Config::get('statamic.assets.image_manipulation.route', 'img'),
-                'response' => new LaravelResponseFactory(app('request')),
-                'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
-                'cache_with_file_extensions' => true,
-                'presets' => $presets,
-            ]);
+            return GlideServer::create();
         });
 
         $this->app->bind(PresetGenerator::class, function ($app) {
