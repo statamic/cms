@@ -117,7 +117,7 @@ class User extends BaseUser
             File::disk('users')->put($this->path(), $contents);
 
             // Has this been renamed?
-            if ($this->path() !== $this->originalPath()) {
+            if ($this->originalPath() && $this->path() !== $this->originalPath()) {
                 File::disk('users')->delete($this->originalPath());
             }
         }
@@ -372,6 +372,10 @@ class User extends BaseUser
      */
     public function originalPath()
     {
+        if (! $this->original) {
+            return null;
+        }
+
         if (! $path = $this->original['attributes']['email']) {
             throw new \Exception('Cannot get the path of a user without an email.');
         }
