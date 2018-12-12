@@ -5,21 +5,21 @@ namespace Statamic\Console\Commands;
 use Statamic\API\File;
 use Illuminate\Console\Command;
 
-class UserMigrationCommand extends Command
+class MakeUserMigration extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:user-migration';
+    protected $signature = 'statamic:make:user-migration';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Makes the user migration file.';
+    protected $description = 'Makes the user migration file';
 
     /**
      * Execute the console command.
