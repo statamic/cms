@@ -25,7 +25,12 @@ abstract class User extends Data implements UserContract, Authenticatable
 
     public function avatar($size = 64)
     {
-        return config('statamic.users.gravatar') ? gravatar($this->email(), $size) : null;
+        // If avatars config is `gravatar`, and `gravatar` is true on this user...
+        if (config('statamic.users.avatars') === 'gravatar' && $this->get('gravatar')) {
+            return gravatar($this->email(), $size);
+        }
+
+        return null;
     }
 
     public function isTaxonomizable()
