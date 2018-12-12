@@ -89,17 +89,10 @@ class UsersController extends CpController
         $user = User::make()
             ->email($request->email)
             // ->password('secret') // TODO: Either accept input, hash some garbage, or make password nullable in migration.
-            ->data($values);
-
-        if ($roles = $request->roles) {
-            $user->roles($roles);
-        }
-
-        if ($groups = $request->groups) {
-            $user->roles($groups);
-        }
-
-        $user->save();
+            ->data($values)
+            ->roles($request->roles ?? [])
+            ->groups($request->groups ?? [])
+            ->save();
 
         return ['redirect' => $user->editUrl()];
     }
