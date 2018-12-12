@@ -5,7 +5,7 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class InstallCommand extends Command
+class Install extends Command
 {
     /**
      * The name and signature of the console command.
@@ -46,7 +46,7 @@ class InstallCommand extends Command
 
     protected function addons()
     {
-        $this->call('package:discover-addons');
+        $this->call('statamic:addons:discover');
 
         return $this;
     }
