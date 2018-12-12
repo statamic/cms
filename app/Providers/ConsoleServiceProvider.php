@@ -21,9 +21,7 @@ class ConsoleServiceProvider extends ServiceProvider
     public function boot()
     {
         Artisan::starting(function ($artisan) {
-            foreach ($this->commands as $command) {
-                $artisan->resolve($command);
-            }
+            $artisan->resolveCommands($this->commands);
         });
     }
 }
