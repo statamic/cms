@@ -9,8 +9,13 @@ use Illuminate\Console\Application as Artisan;
 class ConsoleServiceProvider extends ServiceProvider
 {
     protected $commands = [
-        Commands\InstallCommand::class,
-        Commands\DiscoverAddonPackages::class,
+        Commands\AddonsDiscover::class,
+        Commands\GlideClear::class,
+        Commands\Install::class,
+        Commands\StacheClear::class,
+        Commands\StaticClear::class,
+        // Commands\MakeUserMigration::class,
+        // Commands\SiteClear::class,
     ];
 
     public function boot()
