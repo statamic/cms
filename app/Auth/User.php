@@ -61,15 +61,13 @@ abstract class User extends Data implements UserContract, Authenticatable
             $this->supplements['name'] = $name;
         }
 
-        // TODO
-        // foreach ($this->roles() as $role) {
-        //     $this->supplements['is_'.Str::slug($role->title(), '_')] = true;
-        // }
+        foreach ($this->roles() as $role) {
+            $this->supplements['is_'.$role->handle()] = true;
+        }
 
-        // TODO
-        // foreach ($this->groups() as $group) {
-        //     $this->supplements['in_'.Str::slug($group->title(), '_')] = true;
-        // }
+        foreach ($this->groups() as $group) {
+            $this->supplements['in_'.$group->handle()] = true;
+        }
 
         if ($this->supplement_taxonomies) {
             $this->addTaxonomySupplements();
