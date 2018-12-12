@@ -52,4 +52,11 @@ class UserRepository extends BaseRepository
     {
         return new UserQueryBuilder;
     }
+
+    public function save(User $user)
+    {
+        $this->store->insert($user);
+
+        $this->store->save($user);
+    }
 }

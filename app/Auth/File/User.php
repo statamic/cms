@@ -100,55 +100,6 @@ class User extends BaseUser
     }
 
     /**
-     * Save a user to file
-     *
-     * @return $this
-     */
-    public function save()
-    {
-        $this->ensureSecured();
-        $this->ensureId();
-
-        if ($this->shouldWriteFile()) {
-            $data = $this->toSavableArray();
-            $content = array_pull($data, 'content');
-            $contents = YAML::dump($data, $content);
-
-            File::disk('users')->put($this->path(), $contents);
-
-            // Has this been renamed?
-            if ($this->originalPath() && $this->path() !== $this->originalPath()) {
-                File::disk('users')->delete($this->originalPath());
-            }
-        }
-
-        $this->syncOriginal();
-
-        event('user.saved', $this);
-
-        return $this;
-    }
-
-    /**
-     * Get an array of data that should be persisted.
-     *
-     * @return array
-     */
-    protected function toSavableArray()
-    {
-        return tap($this->data(), function (&$data) {
-            if (Config::get('statamic.users.login_type') === 'email') {
-                unset($data['email']);
-            }
-
-            $content = array_get($data, 'content');
-            if ($content || $content == '') {
-                unset($data['content']);
-            }
-        });
-    }
-
-    /**
      * Whether a file should be written to disk when saving.
      *
      * @return bool

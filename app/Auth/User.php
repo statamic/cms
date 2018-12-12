@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\API;
 use Statamic\Data\Data;
 use Statamic\API\Blueprint;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -102,5 +103,20 @@ abstract class User extends Data implements UserContract, Authenticatable
         }
 
         $this->set('blueprint', $blueprint);
+    }
+
+    public function save()
+    {
+        $this
+            ->ensureId()
+            ->ensureSecured();
+
+        API\User::save($this);
+
+        $this->syncOriginal();
+
+        // TODO: dispatch event
+
+        return $this;
     }
 }

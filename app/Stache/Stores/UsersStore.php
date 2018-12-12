@@ -79,4 +79,31 @@ class UsersStore extends BasicStore
             }
         }
     }
+
+    public function save($user)
+    {
+        $data = $user->data();
+        $content = array_pull($data, 'content');
+        $data = $this->removeNullValues($data);
+        $contents = YAML::dump($data, $content);
+
+        $path = sprintf('%s/%s.yaml', $this->directory, $user->email());
+
+        $this->files->put($path, $contents);
+
+        // TODO: Logic for deleting the old file if the email had changed.
+    }
+
+    /**
+     * TODO: Replace this with Arr::removeNullValues from v2.
+     * I copied this temporarily to get it working without porting all of the Arr class.
+     */
+    protected function removeNullValues($data)
+    {
+        return array_filter($data, function ($item) {
+            return is_array($item)
+                ? !empty($item)
+                : !in_array($item, [null, ''], true);
+        });
+    }
 }
