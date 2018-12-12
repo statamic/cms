@@ -2,10 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Stache;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Statamic\StaticCaching\Cacher as StaticCacher;
+use Illuminate\Support\Facades\Artisan;
 
 class ClearCacheController extends CpController
 {
@@ -21,19 +19,19 @@ class ClearCacheController extends CpController
         ])['caches']);
 
         if ($caches->contains('cache')) {
-            Cache::clear();
+            Artisan::call('cache:clear');
         }
 
         if ($caches->contains('stache')) {
-            Stache::clear();
+            Artisan::call('statamic:stache:clear');
         }
 
         if ($caches->contains('static')) {
-            app(StaticCacher::class)->flush();
+            Artisan::call('statamic:static:clear');
         }
 
         if ($caches->contains('glide')) {
-            // TODO: Do we still want to offer clearing glide image cache?
+            Artisan::call('statamic:glide:clear');
         }
 
         return back()->withSuccess('Cache successfully cleared.');
