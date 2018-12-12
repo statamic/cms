@@ -39,7 +39,7 @@ class Bootstrapper
         $update = $this->shouldUpdate();
 
         try {
-            (new Loader($stache))->load();
+            $stache->load();
         } catch (EmptyStacheException $e) {
             $update = true;
         }
