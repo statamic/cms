@@ -107,6 +107,17 @@ abstract class AggregateStore extends Store
         $this->stores->each->load();
     }
 
+    public function isUpdated()
+    {
+        foreach ($this->stores as $store) {
+            if ($store->isUpdated()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getItems()
     {
         return $this->stores->map(function ($store) {
@@ -167,7 +178,10 @@ abstract class AggregateStore extends Store
     public function cache()
     {
         $this->stores->each->cache();
+    }
 
+    public function cacheMetaKeys()
+    {
         Cache::forever($this->getMetaKeysCacheKey(), $this->stores->keys()->all());
     }
 

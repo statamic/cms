@@ -372,6 +372,18 @@ class AggregateStoreTest extends TestCase
         $this->assertEquals('789', $this->store->getIdFromUri('/three'));
         $this->assertEquals('101', $this->store->getIdFromUri('/four'));
     }
+
+    /** @test */
+    function it_checks_if_updated()
+    {
+        $one = $this->store->store('one');
+        $two = $this->store->store('two');
+        $this->assertFalse($this->store->isUpdated());
+
+        $one->markAsUpdated();
+
+        $this->assertTrue($this->store->isUpdated());
+    }
 }
 
 class TestAggregateStore extends AggregateStore

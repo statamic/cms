@@ -24,39 +24,46 @@ class BasicStoreTest extends TestCase
     /** @test */
     function it_gets_and_sets_paths()
     {
+        $this->assertFalse($this->store->isUpdated());
         $this->assertEquals([], $this->store->getPaths()->all());
 
         $return = $this->store->setPaths($paths = ['one.md', 'two.md']);
 
         $this->assertEquals($this->store, $return);
         $this->assertEquals($paths, $this->store->getPaths()->all());
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     function it_gets_and_sets_single_paths()
     {
+        $this->assertFalse($this->store->isUpdated());
         $this->assertNull($this->store->getPath('one'));
 
         $return = $this->store->setPath('one', 'one.md');
 
         $this->assertEquals($this->store, $return);
         $this->assertEquals('one.md', $this->store->getPath('one'));
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     function it_gets_and_sets_a_uri_for_a_site()
     {
+        $this->assertFalse($this->store->isUpdated());
         $this->assertNull($this->store->getSiteUri('en', '123'));
 
         $return = $this->store->setSiteUri('en', '123', '/one');
 
         $this->assertEquals('/one', $this->store->getSiteUri('en', '123'));
         $this->assertEquals($this->store, $return);
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     public function it_gets_and_sets_a_sites_uris()
     {
+        $this->assertFalse($this->store->isUpdated());
         $this->assertEquals([], $this->store->getSiteUris('en')->all());
         $this->assertEquals([], $this->store->getSiteUris('fr')->all());
 
@@ -66,11 +73,13 @@ class BasicStoreTest extends TestCase
         $this->assertEquals($this->store, $return);
         $this->assertEquals($enUris, $this->store->getSiteUris('en')->all());
         $this->assertEquals($frUris, $this->store->getSiteUris('fr')->all());
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     function it_gets_and_sets_uris_for_all_sites()
     {
+        $this->assertFalse($this->store->isUpdated());
         $this->assertEquals([], $this->store->getSiteUris('en')->all());
         $this->assertEquals([], $this->store->getSiteUris('fr')->all());
         $this->assertEquals(['en' => collect(), 'fr' => collect()], $this->store->getUris()->all());
@@ -84,11 +93,14 @@ class BasicStoreTest extends TestCase
         $this->assertEquals($enUris, $this->store->getSiteUris('en')->all());
         $this->assertEquals($frUris, $this->store->getSiteUris('fr')->all());
         $this->assertEquals(['en' => collect($enUris), 'fr' => collect($frUris)], $this->store->getUris()->all());
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     function inserting_an_item_will_set_the_item_and_path_and_uris()
     {
+        $this->assertFalse($this->store->isUpdated());
+
         // Inserting an object with an id method should use that as the key
         $return = $this->store->insert($object = new class {
             public function id() { return '123'; }
@@ -116,11 +128,14 @@ class BasicStoreTest extends TestCase
                 '123' => '/the/uri',
             ]
         ], $this->store->getUris()->toArray());
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     function it_gets_an_id_from_a_uri()
     {
+        $this->assertFalse($this->store->isUpdated());
+
         $this->store->setUris([
             'en' => $enUris = ['123' => '/one', '456' => '/two'],
             'fr' => $frUris = ['123' => '/un', '456' => '/deux'],
@@ -135,6 +150,7 @@ class BasicStoreTest extends TestCase
         $this->assertNull($this->store->getIdFromUri('/unknown'));
         $this->assertNull($this->store->getIdFromUri('/unknown', 'en'));
         $this->assertNull($this->store->getIdFromUri('/unknown', 'fr'));
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
@@ -269,17 +285,20 @@ class BasicStoreTest extends TestCase
     /** @test */
     function it_sets_an_item_by_key()
     {
+        $this->assertFalse($this->store->isUpdated());
         $this->assertNull($this->store->getItem('123'));
 
         $return = $this->store->setItem('123', $item = ['title' => 'Item title']);
 
         $this->assertEquals($item, $this->store->getItem('123'));
         $this->assertEquals($this->store, $return);
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
     function it_removes_an_item_by_key()
     {
+        $this->assertFalse($this->store->isUpdated());
         $item = ['title' => 'Item one'];
         Cache::shouldReceive('get')->with('stache::items/test')->andReturn(['123' => $item]);
         $this->assertEquals($item, $this->store->getItem('123'));
@@ -288,6 +307,7 @@ class BasicStoreTest extends TestCase
 
         $this->assertNull($this->store->getItem('123'));
         $this->assertEquals($this->store, $return);
+        $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */

@@ -13,6 +13,8 @@ abstract class BasicStore extends Store
     protected $uris;
     protected $items;
     protected $loaded = false;
+    protected $updated = false;
+    protected $markUpdates = true;
     protected $files;
 
     public function __construct(Stache $stache, Filesystem $files)
@@ -24,8 +26,10 @@ abstract class BasicStore extends Store
         $this->uris = collect();
         $this->items = collect();
 
-        $this->forEachSite(function ($site) {
-            $this->setSiteUris($site, []);
+        $this->withoutMarkingAsUpdated(function () {
+            $this->forEachSite(function ($site) {
+                $this->setSiteUris($site, []);
+            });
         });
     }
 
@@ -47,6 +51,8 @@ abstract class BasicStore extends Store
     {
         $this->paths = collect($paths);
 
+        $this->markAsUpdated();
+
         return $this;
     }
 
@@ -58,6 +64,8 @@ abstract class BasicStore extends Store
     public function setPath($key, $path)
     {
         $this->paths->put($key, $path);
+
+        $this->markAsUpdated();
 
         return $this;
     }
@@ -71,6 +79,8 @@ abstract class BasicStore extends Store
     {
         $this->uris->get($site)->put($key, $uri);
 
+        $this->markAsUpdated();
+
         return $this;
     }
 
@@ -82,6 +92,8 @@ abstract class BasicStore extends Store
     public function setSiteUris($site, $uris)
     {
         $this->uris->put($site, collect($uris));
+
+        $this->markAsUpdated();
 
         return $this;
     }
@@ -138,6 +150,31 @@ abstract class BasicStore extends Store
         return $this;
     }
 
+    public function isUpdated()
+    {
+        return $this->updated;
+    }
+
+    public function markAsUpdated()
+    {
+        if ($this->markUpdates) {
+            $this->updated = true;
+        }
+
+        return $this;
+    }
+
+    public function withoutMarkingAsUpdated($callback)
+    {
+        $this->markUpdates = false;
+
+        $return = $callback();
+
+        $this->markUpdates = true;
+
+        return $return;
+    }
+
     protected function loadingComplete()
     {
         //
@@ -149,10 +186,12 @@ abstract class BasicStore extends Store
             return $this;
         }
 
-        $cache = Cache::get($this->getItemsCacheKey());
+        $this->withoutMarkingAsUpdated(function () {
+            $cache = Cache::get($this->getItemsCacheKey());
 
-        $this->getItemsFromCache(collect($cache))->each(function ($item, $key) {
-            $this->setItem($key, $item);
+            $this->getItemsFromCache(collect($cache))->each(function ($item, $key) {
+                $this->setItem($key, $item);
+            });
         });
 
         $this->markAsLoaded();
@@ -171,12 +210,16 @@ abstract class BasicStore extends Store
     {
         $this->items->put($key, $item);
 
+        $this->markAsUpdated();
+
         return $this;
     }
 
     public function removeItem($key)
     {
         $this->items->forget($key);
+
+        $this->markAsUpdated();
 
         return $this;
     }
@@ -224,9 +267,11 @@ abstract class BasicStore extends Store
 
     public function loadMeta($data)
     {
-        $this
-            ->setPaths($data['paths'])
-            ->setUris($data['uris']);
+        $this->withoutMarkingAsUpdated(function () use ($data) {
+            $this
+                ->setPaths($data['paths'])
+                ->setUris($data['uris']);
+        });
     }
 
     public function insert($item, $key = null, $path = null)
@@ -242,6 +287,8 @@ abstract class BasicStore extends Store
                 $store->setSiteUri($site, $key, $item->uri());
             });
         }
+
+        $this->markAsUpdated();
 
         return $this;
     }

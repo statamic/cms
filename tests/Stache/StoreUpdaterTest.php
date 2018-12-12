@@ -171,8 +171,9 @@ EOT;
         ]));
 
         Cache::shouldReceive('forever')->once()->with('stache::timestamps/test-store-key', $traversedFiles);
-        Cache::shouldReceive('forever')->once()->with('stache::items/test-store-key', \Mockery::any());
-        Cache::shouldReceive('forever')->once()->with('stache::meta/test-store-key', \Mockery::any());
+        // TODO: The caching of the items has been moved into the Persister class, which doesn't have any test coverage.
+        // Cache::shouldReceive('forever')->once()->with('stache::items/test-store-key', \Mockery::any());
+        // Cache::shouldReceive('forever')->once()->with('stache::meta/test-store-key', \Mockery::any());
 
         $this->assertEquals('Item title', $this->store->getItem('123')->data()['title']);
 

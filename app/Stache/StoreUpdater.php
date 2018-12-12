@@ -88,7 +88,5 @@ class StoreUpdater
         }
 
         Cache::forever($this->timestampsCacheKey(), $this->files()->all());
-
-        $this->store->cache();
     }
 }

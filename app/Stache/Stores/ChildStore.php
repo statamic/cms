@@ -14,6 +14,11 @@ class ChildStore extends BasicStore
         return $this;
     }
 
+    public function parent()
+    {
+        return $this->parent;
+    }
+
     public function setKey($key)
     {
         $this->key = $key;
@@ -29,5 +34,12 @@ class ChildStore extends BasicStore
     public function getItemsFromCache($cache)
     {
         return $this->parent->getItemsFromCache($cache);
+    }
+
+    public function cache()
+    {
+        parent::cache();
+
+        $this->parent->cacheMetaKeys();
     }
 }
