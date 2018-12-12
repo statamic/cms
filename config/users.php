@@ -55,13 +55,14 @@ return [
     | Avatars
     |--------------------------------------------------------------------------
     |
-    | User avatars are provided by the Gravatar.com service by default.
+    | User avatars are initials by default, with custom options for services
+    | like Gravatar.com.
     |
-    | Supported: "gravatar", "initials", or a custom class name.
+    | Supported: "initials", "gravatar", or a custom class name.
     |
     */
 
-    'avatars' => 'gravatar',
+    'avatars' => 'initials',
 
     /*
     |--------------------------------------------------------------------------
