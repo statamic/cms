@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
-use Illuminate\Console\Command;
+use Statamic\Console\Commands\Command;
 use Statamic\Extend\Management\Manifest;
 
 class AddonsDiscover extends Command

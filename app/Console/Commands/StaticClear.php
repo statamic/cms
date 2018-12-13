@@ -2,17 +2,17 @@
 
 namespace Statamic\Console\Commands;
 
-use Illuminate\Console\Command;
+use Statamic\Console\Commands\Command;
 use Statamic\StaticCaching\Cacher as StaticCacher;
 
 class StaticClear extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'statamic:static:clear';
+    protected $signature = 'statamic:static:clear';
 
     /**
      * The console command description.

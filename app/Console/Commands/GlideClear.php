@@ -5,17 +5,17 @@ namespace Statamic\Console\Commands;
 use Statamic\API\File;
 use Statamic\API\Cache;
 use Statamic\API\Folder;
-use Illuminate\Console\Command;
+use Statamic\Console\Commands\Command;
 use Facades\Statamic\Imaging\GlideServer;
 
 class GlideClear extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'statamic:glide:clear';
+    protected $signature = 'statamic:glide:clear';
 
     /**
      * The console command description.

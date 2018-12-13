@@ -3,7 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\API\File;
-use Illuminate\Console\Command;
+use Statamic\Console\Commands\Command;
 
 class MakeUserMigration extends Command
 {

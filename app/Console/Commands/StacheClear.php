@@ -3,16 +3,16 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\API\Stache;
-use Illuminate\Console\Command;
+use Statamic\Console\Commands\Command;
 
 class StacheClear extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'statamic:stache:clear';
+    protected $signature = 'statamic:stache:clear';
 
     /**
      * The console command description.

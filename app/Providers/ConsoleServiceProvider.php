@@ -23,5 +23,9 @@ class ConsoleServiceProvider extends ServiceProvider
         Artisan::starting(function ($artisan) {
             $artisan->resolveCommands($this->commands);
         });
+
+        $this->publishes([
+            __DIR__.'/../Console/Please/please.stub' => base_path('please'),
+        ], 'statamic');
     }
 }
