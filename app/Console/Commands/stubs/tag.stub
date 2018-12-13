@@ -4,5 +4,5 @@ namespace DummyNamespace;
 
 class DummyClass
 {
-    //
+    // TODO: flesh out a default tag method
 }
