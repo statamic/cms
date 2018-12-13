@@ -1,31 +1,33 @@
 <?php
 
-/**
- * Glide
- * On-the-fly URL-based image transforms.
- */
-Route::group(['prefix' => Config::get('statamic.assets.image_manipulation.route')], function () {
-    Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
-    Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
-    Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
-});
-
-Route::group(['prefix' => config('statamic.routes.action')], function () {
-    Route::post('forms', 'FormController@store')->name('forms.store');
-
-    Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
-    Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
-
-    Route::group(['prefix' => 'user'], function () {
-        Route::post('login', 'UserController@login');
-        Route::get('logout', 'UserController@logout');
-        Route::post('register', 'UserController@register');
-        Route::get('reset', 'UserController@reset');
-        Route::post('reset', 'UserController@reset');
-        Route::post('forgot', 'UserController@forgot');
+Route::name('statamic.')->group(function () {
+    /**
+     * Glide
+     * On-the-fly URL-based image transforms.
+     */
+    Route::group(['prefix' => Config::get('statamic.assets.image_manipulation.route')], function () {
+        Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
+        Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
+        Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
     });
 
-    Statamic::additionalActionRoutes();
+    Route::group(['prefix' => config('statamic.routes.action')], function () {
+        Route::post('forms', 'FormController@store')->name('forms.store');
+
+        Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
+        Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
+
+        Route::group(['prefix' => 'user'], function () {
+            Route::post('login', 'UserController@login');
+            Route::get('logout', 'UserController@logout');
+            Route::post('register', 'UserController@register');
+            Route::get('reset', 'UserController@reset');
+            Route::post('reset', 'UserController@reset');
+            Route::post('forgot', 'UserController@forgot');
+        });
+
+        Statamic::additionalActionRoutes();
+    });
 });
 
 Statamic::additionalWebRoutes();
@@ -34,5 +36,5 @@ Statamic::additionalWebRoutes();
  * Front-end
  * All front-end website requests go through a single controller method.
  */
-Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('site')
+Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('statamic.site')
      ->middleware(\Statamic\StaticCaching\Middleware\Cache::class);
