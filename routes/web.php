@@ -19,7 +19,7 @@ Route::name('statamic.')->group(function () {
 
         Route::group(['prefix' => 'auth'], function () {
             Route::post('login', 'UserController@login');
-            Route::get('logout', 'UserController@logout');
+            Route::get('logout', 'UserController@logout')->name('logout');
             Route::post('register', 'UserController@register');
 
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');

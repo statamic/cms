@@ -162,7 +162,7 @@ class UserTags extends Tags
             $url .= '?redirect='.$redirect;
         }
 
-        return $this->eventUrl($url);
+        return route('statamic.logout');
     }
 
     /**
