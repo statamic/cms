@@ -2,10 +2,15 @@
 @section('body_class', 'rad-mode')
 
 @section('content')
-
-    <h1 class="mb-3 pt-7 text-center text-grey-dark">{{ __('Reset Password') }}</h1>
+    <div class="logo pt-7">
+        {!! inline_svg('statamic-wordmark') !!}
+    </div>
 
     <div class="card auth-card mx-auto">
+        <div class="text-center pb-2 mb-2">
+            <h1 class="mb-2 text-lg text-grey-dark">{{ __('Forgot Your Password?') }}</h1>
+            <p class="text-sm text-grey">{{ __('Enter your email address we’ll send you instructions to reset your password.') }}</p>
+        </div>
 
         @if (session('status'))
             <div class="alert alert-success mb-3">
@@ -23,12 +28,17 @@
                 @endif
                 <input id="email" type="text" class="input-text form-control" name="email" value="{{ old('email') }}" >
             </div>
-
             <button type="submit" class="btn btn-primary">
-                {{ __('Send Password Reset Link') }}
+                {{ __('Submit') }}
             </button>
         </form>
 
+    </div>
+
+    <div class="w-full text-center mt-2">
+        <a href="{{ cp_route('login')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
+            {{ __('Actually, I remember my password') }}
+        </a>
     </div>
 
 @endsection
