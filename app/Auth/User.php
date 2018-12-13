@@ -5,13 +5,17 @@ namespace Statamic\Auth;
 use Statamic\API;
 use Statamic\Data\Data;
 use Statamic\API\Blueprint;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Statamic\Contracts\Auth\User as UserContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
-abstract class User extends Data implements UserContract, Authenticatable
+abstract class User extends Data implements UserContract, Authenticatable, CanResetPasswordContract
 {
-    use Authorizable;
+    use Authorizable, Notifiable, CanResetPassword;
 
     public function username($username = null)
     {
@@ -118,5 +122,15 @@ abstract class User extends Data implements UserContract, Authenticatable
         // TODO: dispatch event
 
         return $this;
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->email();
+    }
+
+    public function routeNotificationForMail($notification = null)
+    {
+        return $this->email();
     }
 }

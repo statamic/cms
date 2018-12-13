@@ -16,5 +16,6 @@ class Factory extends ViewFactory
         'antlers.php' => 'antlers',
         'blade.php' => 'blade',
         'php' => 'php',
+        'css' => 'file',
     ];
 }

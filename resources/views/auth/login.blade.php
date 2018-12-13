@@ -36,7 +36,7 @@
 
             <div class="mb-4">
                 <label class="mb-1">{{ __('Email') }}</label>
-                <input type="text" class="input-text form-control" name="username" value="{{ old('username') }}" autofocus>
+                <input type="text" class="input-text form-control" name="email" value="{{ old('email') }}" autofocus>
             </div>
 
             <div class="mb-4">
@@ -55,7 +55,7 @@
 </div>
 @if (! $oauth)
     <div class="w-full text-center mt-2">
-        <a href="{{ route('statamic.cp.login.reset')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
+        <a href="{{ cp_route('password.request')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}
         </a>
     </div>

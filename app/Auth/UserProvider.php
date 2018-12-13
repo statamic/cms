@@ -58,7 +58,7 @@ class UserProvider implements UserProviderContract
      */
     public function retrieveByCredentials(array $credentials)
     {
-        return User::findByEmail($credentials['username']);
+        return User::findByEmail($credentials['email']);
     }
 
     /**

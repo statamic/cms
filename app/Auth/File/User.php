@@ -239,43 +239,6 @@ class User extends BaseUser
     }
 
     /**
-     * Set the reset token/code for a password reset
-     *
-     * @param  string $token
-     * @return void
-     */
-    public function setPasswordResetToken($token)
-    {
-        $yaml = YAML::parse(File::get($this->passwordResetPath(), ''));
-
-        $yaml[$this->id()] = $token;
-
-        $yaml = array_filter($yaml);
-
-        File::put($this->passwordResetPath(), YAML::dump($yaml));
-    }
-
-    /**
-     * Get the reset token/code for a password reset
-     *
-     * @return string
-     */
-    public function getPasswordResetToken()
-    {
-        $yaml = YAML::parse(File::get($this->passwordResetPath(), ''));
-
-        return array_get($yaml, $this->id());
-    }
-
-    /**
-     * Get the path to the password reset file
-     */
-    private function passwordResetPath()
-    {
-        return cache_path('password_resets.yaml');
-    }
-
-    /**
      * Get the user's OAuth ID for the requested provider
      *
      * @return string

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Auth;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Statamic\Http\Middleware\CP\RedirectIfAuthenticated;
 
 class LoginController extends CpController
 {
@@ -17,7 +18,7 @@ class LoginController extends CpController
      */
     public function __construct()
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware(RedirectIfAuthenticated::class)->except('logout');
     }
 
     /**
@@ -43,18 +44,8 @@ class LoginController extends CpController
         return $view;
     }
 
-    /**
-     * Get the login username to be used by the controller.
-     *
-     * @return string
-     */
-    public function username()
+    public function redirectPath()
     {
-        return 'username';
-    }
-
-    public function redirectTo()
-    {
-        return route('statamic.cp.index');
+        return cp_route('index');
     }
 }

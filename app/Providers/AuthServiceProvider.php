@@ -7,6 +7,7 @@ use Statamic\Auth\UserProvider;
 use Statamic\Contracts\Auth\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Http\Kernel;
 use Statamic\Contracts\Auth\UserGroup;
 use Statamic\Contracts\Auth\UserStore;
 use Illuminate\Support\ServiceProvider;
@@ -15,7 +16,10 @@ use Facades\Statamic\Auth\CorePermissions;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserRepository;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Statamic\Contracts\Auth\UserGroupRepository;
+use Illuminate\Notifications\Messages\MailMessage;
+use Statamic\Auth\Passwords\PasswordBrokerManager;
 use Statamic\Auth\Eloquent\UserRepository as EloquentUsers;
 use Statamic\Stache\Repositories\UserRepository as StacheUsers;
 
@@ -68,6 +72,18 @@ class AuthServiceProvider extends ServiceProvider
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);
         }
+
+        $this->app->extend('auth.password', function ($broker, $app) {
+            return new PasswordBrokerManager($app);
+        });
+
+        ResetPassword::toMailUsing(function ($notifiable, $token) {
+            return (new MailMessage)
+                ->subject(__('Reset Password Notification'))
+                ->line(__('You are receiving this email because we received a password reset request for your account.'))
+                ->action(__('Reset Password'), cp_route('password.reset', $token))
+                ->line(__('If you did not request a password reset, no further action is required.'));
+        });
     }
 
     protected function autoConfigure()
