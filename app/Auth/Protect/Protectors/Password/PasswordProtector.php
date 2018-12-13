@@ -49,7 +49,7 @@ class PasswordProtector extends Protector
 
     protected function getPasswordFormUrl()
     {
-        return url($this->config['form_url'] ?? route('protect.password.show'));
+        return url($this->config['form_url'] ?? route('statamic.protect.password.show'));
     }
 
     protected function generateToken()

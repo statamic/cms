@@ -47,7 +47,7 @@ class Tags extends CollectionTags
         $this->formsetName = $formset = $this->getFormset();
         $this->errorBag = $this->getErrorBag();
 
-        $html = $this->formOpen(route('forms.store'));
+        $html = $this->formOpen(route('statamic.forms.store'));
 
         if ($this->hasErrors()) {
             $data['error']  = $this->getErrors();
