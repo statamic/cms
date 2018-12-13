@@ -7,10 +7,14 @@
 
     <div class="card auth-card mx-auto">
 
-        <form method="POST" action="{{ cp_route('password.request') }}">
+        <form method="POST" action="{{ route('statamic.password.reset.action') }}">
             @csrf
 
             <input type="hidden" name="token" value="{{ $token }}">
+
+            @if (request('redirect'))
+                <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+            @endif
 
             <div class="mb-4">
                 <label for="email"  class="mb-1">{{ __('Email Address') }}</label>

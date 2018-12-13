@@ -1,34 +1,18 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Auth;
+namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
-use Statamic\Http\Middleware\CP\RedirectIfAuthenticated;
+use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
-
     use ResetsPasswords {
         resetPassword as protected traitResetPassword;
     }
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware(RedirectIfAuthenticated::class);
@@ -43,7 +27,7 @@ class ResetPasswordController extends Controller
 
     public function redirectPath()
     {
-        return cp_route('index');
+        return request('redirect') ?? route('statamic.site');
     }
 
     protected function resetPassword($user, $password)

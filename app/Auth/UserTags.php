@@ -193,17 +193,19 @@ class UserTags extends Tags
      */
     public function forgotPasswordForm()
     {
-        $data = [];
+        $data = [
+            'errors' => [],
+        ];
 
         if (session('email_sent')) {
             return $this->parse(['email_sent' => true, 'success' => true]);
         }
 
         if (session('errors')) {
-            $data = ['errors' => session('errors')->all()];
+            $data['errors'] = session('errors')->all();
         }
 
-        $html = $this->formOpen('forgot');
+        $html = $this->formOpen(route('statamic.password.email'));
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
@@ -229,35 +231,21 @@ class UserTags extends Tags
      */
     public function resetPasswordForm()
     {
-        $data = [];
+        $data = [
+            'errors' => [],
+        ];
 
         if (session('success')) {
             return $this->parse(['success' => true]);
         }
 
-        $id = Request::get('user');
-        $code = Request::get('code');
-
-        if (! $user = User::find($id)) {
-            dd('Invalid user'); // TODO: make better.
-        }
-
-        $resetter = new PasswordReset;
-        $resetter->code($code);
-        $resetter->user($user);
-
-        if (! $resetter->valid()) {
-            return $this->parse(['url_invalid' => true]);
-        }
-
         if (session('errors')) {
-            $data = ['errors' => session('errors')->all()];
+            $data['errors'] = session('errors')->all();
         }
 
-        $html = $this->formOpen('reset');
+        $html = $this->formOpen(route('statamic.password.reset.action'));
 
-        $html .= '<input type="hidden" name="user" value="'.$id.'" />';
-        $html .= '<input type="hidden" name="code" value="'.$code.'" />';
+        $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
 
         if ($redirect = $this->get('redirect')) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';

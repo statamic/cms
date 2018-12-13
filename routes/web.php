@@ -17,13 +17,14 @@ Route::name('statamic.')->group(function () {
         Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
         Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
 
-        Route::group(['prefix' => 'user'], function () {
+        Route::group(['prefix' => 'auth'], function () {
             Route::post('login', 'UserController@login');
             Route::get('logout', 'UserController@logout');
             Route::post('register', 'UserController@register');
-            Route::get('reset', 'UserController@reset');
-            Route::post('reset', 'UserController@reset');
-            Route::post('forgot', 'UserController@forgot');
+
+            Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+            Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
+            Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
         });
 
         Statamic::additionalActionRoutes();

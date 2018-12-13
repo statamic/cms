@@ -13,6 +13,7 @@ use Statamic\Contracts\Auth\UserStore;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Facades\Statamic\Auth\CorePermissions;
+use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserRepository;
@@ -81,7 +82,7 @@ class AuthServiceProvider extends ServiceProvider
             return (new MailMessage)
                 ->subject(__('Reset Password Notification'))
                 ->line(__('You are receiving this email because we received a password reset request for your account.'))
-                ->action(__('Reset Password'), cp_route('password.reset', $token))
+                ->action(__('Reset Password'), PasswordReset::url($token))
                 ->line(__('If you did not request a password reset, no further action is required.'));
         });
     }
