@@ -4,9 +4,17 @@ namespace Statamic\Console\Please;
 
 use Statamic\Console\Commands\Traits\RunsInPlease;
 use Illuminate\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 class Application extends ConsoleApplication
 {
+    /**
+     * Deferred artisan commands.
+     *
+     * @var array
+     */
+    protected $deferredCommands;
+
     /**
      * Add a command, resolving through the application.
      *
@@ -18,11 +26,40 @@ class Application extends ConsoleApplication
         $command = $this->laravel->make($command);
 
         if (! in_array(RunsInPlease::class, class_uses($command))) {
+            $this->deferredCommands[] = $command;
             return;
         }
 
         $command->removeStatamicGrouping();
 
         return $this->add($command);
+    }
+
+    /**
+     * Finds a command by name or alias.  If doesn't exist, resolve deferred artisan commands and try again.
+     *
+     * @param string $name A command name or a command alias
+     * @throws CommandNotFoundException When command name is incorrect or ambiguous
+     * @return \Illuminate\Console\Command
+     */
+    public function find($name)
+    {
+        try {
+            return parent::find($name);
+        } catch (CommandNotFoundException $exception) {
+            $this->resolveDeferredCommands();
+        }
+
+        return parent::find($name);
+    }
+
+    /**
+     * Resolve deferred commands.
+     */
+    protected function resolveDeferredCommands()
+    {
+        foreach ($this->deferredCommands as $command) {
+            $this->add($command);
+        }
     }
 }
