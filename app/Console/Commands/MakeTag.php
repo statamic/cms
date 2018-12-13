@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Statamic\Console\Commands\Traits\RunsInPlease;
+use Symfony\Component\Console\Input\InputArgument;
 
 class MakeTag extends GeneratorCommand
 {
@@ -31,6 +32,18 @@ class MakeTag extends GeneratorCommand
     protected $type = 'Tag';
 
     /**
+     * Execute the console command.
+     *
+     * @return bool|null
+     */
+    public function handle()
+    {
+        // TODO: Handle optional `addon` location argument.
+
+        return parent::handle();
+    }
+
+    /**
      * Get the stub file for the generator.
      *
      * @return string
@@ -49,6 +62,18 @@ class MakeTag extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Tags';
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return array_merge(parent::getArguments(), [
+            ['addon', InputArgument::OPTIONAL, 'The name of your addon'],
+        ]);
     }
 }
 
