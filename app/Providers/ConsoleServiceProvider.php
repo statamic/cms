@@ -12,6 +12,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AddonsDiscover::class,
         Commands\GlideClear::class,
         Commands\Install::class,
+        Commands\MakeTag::class,
         Commands\StacheClear::class,
         Commands\StaticClear::class,
         // Commands\MakeUserMigration::class,
