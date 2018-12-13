@@ -3,10 +3,13 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\API\Stache;
-use Statamic\Console\Commands\Command;
+use Illuminate\Console\Command;
+use Statamic\Console\Commands\Traits\RunsInPlease;
 
 class StacheClear extends Command
 {
+    use RunsInPlease;
+
     /**
      * The name and signature of the console command.
      *

@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Please;
 
+use Statamic\Console\Commands\Traits\RunsInPlease;
 use Illuminate\Console\Application as ConsoleApplication;
 
 class Application extends ConsoleApplication
@@ -14,15 +15,13 @@ class Application extends ConsoleApplication
      */
     public function resolve($command)
     {
-        if (! str_contains($command, 'Statamic\\')) {
+        $command = $this->laravel->make($command);
+
+        if (! in_array(RunsInPlease::class, class_uses($command))) {
             return;
         }
 
-        $command = $this->laravel->make($command);
-
-        if (method_exists($command, 'removeStatamicGrouping')) {
-            $command->removeStatamicGrouping();
-        }
+        $command->removeStatamicGrouping();
 
         return $this->add($command);
     }

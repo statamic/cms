@@ -5,11 +5,14 @@ namespace Statamic\Console\Commands;
 use Statamic\API\File;
 use Statamic\API\Cache;
 use Statamic\API\Folder;
-use Statamic\Console\Commands\Command;
+use Illuminate\Console\Command;
 use Facades\Statamic\Imaging\GlideServer;
+use Statamic\Console\Commands\Traits\RunsInPlease;
 
 class GlideClear extends Command
 {
+    use RunsInPlease;
+
     /**
      * The name and signature of the console command.
      *
