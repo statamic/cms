@@ -68,8 +68,10 @@
             </a>
             <ul class="dropdown-menu hide md:block">
                 <li class="px-1">
-                    <div class="text-base mb-px">dev@statamic.com</div>
-                    <div class="text-2xs mt-px text-grey-light">Super Admin</div>
+                    <div class="text-base mb-px">{{ my()->email() }}</div>
+                    @if (me()->isSuper())
+                        <div class="text-2xs mt-px text-grey-light">{{ __('Super Admin') }}</div>
+                    @endif
                 </li>
                 <li class="divider"></li>
                 <li><a href="{{ route('statamic.cp.account') }}">{{ __('Profile') }}</a></li>
