@@ -22,8 +22,9 @@ class GlobalsController extends CpController
                 'handle' => $set->handle(),
                 'title' => $set->title(),
                 'deleteable' => user()->can('delete', $set),
+                'edit_url' => $set->editUrl(),
             ];
-        });
+        })->values();
 
         return view('statamic::globals.index', [
             'globals' => $globals
