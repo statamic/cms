@@ -91,7 +91,8 @@ var vm = new Vue({
     },
 
     created() {
-        this.navOpen = localStorage.getItem('statamic.nav') == 'open';
+        const state = localStorage.getItem('statamic.nav') || 'open';
+        this.navOpen = state === 'open';
     },
 
     methods: {
