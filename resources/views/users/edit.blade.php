@@ -17,8 +17,7 @@
                     {{ $user->username() }}
                 </h1>
 
-                {{-- TODO: @if(can edit this user's password) --}}
-                @if (true)
+                @can('editPassword', $user)
                     <change-password
                         save-url="{{ cp_route('users.password.update', $user->id()) }}"
                     ></change-password>

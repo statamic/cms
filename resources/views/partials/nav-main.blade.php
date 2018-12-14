@@ -81,11 +81,13 @@
             </ul>
             <h6>Users</h6>
             <ul>
+                @can('index', 'Statamic\Contracts\Auth\User')
                 <li class="{{ current_class('users*') }}">
                     <a href="{{ cp_route('users.index') }}">
                         <i>@svg('users-box')</i><span>Users</span>
                     </a>
                 </li>
+                @endcan
                 <li class="{{ current_class('user-groups*') }}">
                     <a href="{{ cp_route('user-groups.index') }}">
                         <i>@svg('users-multiple')</i><span>Groups</span>

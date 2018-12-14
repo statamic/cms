@@ -6,7 +6,10 @@
         <h1 class="flex-1">
             {{ __('Users') }}
         </h1>
-        <a href="{{ cp_route('users.create') }}" class="btn btn-primary">{{ __('Create User') }}</a>
+
+        @can('create', 'Statamic\Contracts\Auth\User')
+            <a href="{{ cp_route('users.create') }}" class="btn btn-primary">{{ __('Create User') }}</a>
+        @endcan
     </div>
 
     <user-listing></user-listing>

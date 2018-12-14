@@ -11,7 +11,7 @@ class UserPasswordController extends CpController
     {
         $user = User::find($user);
 
-        // TODO: Authorization
+        $this->authorize('editPassword', $user);
 
         $request->validate([
             'password' => 'required|confirmed'

@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
 use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Contracts\Users\User as UserContract;
+use Statamic\Contracts\Auth\User as UserContract;
 
 class UsersController extends CpController
 {
@@ -27,7 +27,7 @@ class UsersController extends CpController
 
     public function index(Request $request)
     {
-        $this->authorize('users:view');
+        $this->authorize('index', UserContract::class);
 
         if ($request->wantsJson()) {
             return $this->json($request);
@@ -36,7 +36,7 @@ class UsersController extends CpController
         return view('statamic::users.index');
     }
 
-    public function json($request)
+    protected function json($request)
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
@@ -45,6 +45,10 @@ class UsersController extends CpController
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
             ->paginate();
+
+        $users->setCollection($users->getCollection()->supplement(function ($user) use ($request) {
+            return ['deleteable' => $request->user()->can('delete', $user)];
+        }));
 
         return Resource::collection($users)->additional(['meta' => [
             'sortColumn' => $sort,
@@ -62,7 +66,7 @@ class UsersController extends CpController
      */
     public function create()
     {
-        $this->authorize('create', UserContract::class, 'You are not authorized to create users.');
+        $this->authorize('create', UserContract::class);
 
         $blueprint = Blueprint::find('user');
 
@@ -74,6 +78,8 @@ class UsersController extends CpController
 
     public function store(Request $request)
     {
+        $this->authorize('create', UserContract::class);
+
         $blueprint = Blueprint::find('user');
 
         $fields = $blueprint->fields()->addValues($request->all())->process();
@@ -99,12 +105,9 @@ class UsersController extends CpController
 
     public function edit($id)
     {
-        $this->user = $user = User::find($id);
+        $user = User::find($id);
 
-        // Users can always manage their data // TODO
-        if ($user !== User::getCurrent()) {
-            $this->authorize('users:view');
-        }
+        $this->authorize('edit', $user);
 
         $values = $user->blueprint()
             ->fields()
