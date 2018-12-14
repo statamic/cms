@@ -34,7 +34,5 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app['router']->prependMiddlewareToGroup('web', Retrieve::class);
 
         Event::subscribe(Invalidate::class);
-
-        $this->commands(ClearStaticCommand::class);
     }
 }

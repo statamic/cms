@@ -33,6 +33,6 @@ class StaticClear extends Command
     {
         app(StaticCacher::class)->flush();
 
-        $this->info('The static page cache has been cleared.');
+        $this->info('Your static page cache is now so very, very empty.');
     }
 }
