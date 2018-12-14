@@ -65,6 +65,8 @@ class User extends BaseUser
         $this->remove('password_hash');
 
         $this->securePassword(false);
+
+        return $this;
     }
 
     /**
