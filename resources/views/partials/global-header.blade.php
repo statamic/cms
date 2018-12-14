@@ -73,7 +73,6 @@
                 </li>
                 <li class="divider"></li>
                 <li><a href="{{ route('statamic.cp.account') }}">{{ __('Profile') }}</a></li>
-                <li><a href="{{ route('statamic.cp.account.password') }}">{{ __('Change Password') }}</a></li>
                 <li><a href="{{ route('statamic.cp.logout') }}">{{ __('Logout') }}</a></li>
             </ul>
         </dropdown-list>

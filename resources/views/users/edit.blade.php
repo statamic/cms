@@ -16,7 +16,15 @@
                     @svg('chevron-right')
                     {{ $user->username() }}
                 </h1>
-                <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>
+
+                {{-- TODO: @if(can edit this user's password) --}}
+                @if (true)
+                    <change-password
+                        save-url="{{ cp_route('users.password.update', $user->id()) }}"
+                    ></change-password>
+                @endcan
+
+                <a href="" class="btn btn-primary ml-2" @click.prevent="save">{{ __('Save') }}</a>
             </div>
 
             <publish-container

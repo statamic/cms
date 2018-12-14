@@ -73,6 +73,7 @@ Route::group([
 
     // Users
     Route::resource('users', 'UsersController');
+    Route::patch('users/{user}/password', 'UserPasswordController@update')->name('users.password.update');
     Route::get('account', 'AccountController')->name('account');
     Route::resource('user-groups', 'UserGroupsController');
     Route::resource('roles', 'RolesController');
@@ -95,6 +96,5 @@ Route::view('/playground', 'statamic::playground')->name('playground');
 
 // Just to make stuff work.
 Route::get('/search', function () { return ''; })->name('search.global');
-Route::get('/account/password', function () { return ''; })->name('account.password');
 
 Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');

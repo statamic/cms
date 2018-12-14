@@ -1,8 +1,13 @@
 <script>
 import axios from 'axios';
 import Fieldset from '../publish/Fieldset';
+import ChangePassword from './ChangePassword.vue';
 
 export default {
+
+    components: {
+        ChangePassword,
+    },
 
     props: {
         initialFieldset: Object,
