@@ -8,6 +8,6 @@ class Stache extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Endpoint\Stache::class;
+        return \Statamic\Stache\Stache::class;
     }
 }
