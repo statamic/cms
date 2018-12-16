@@ -13,7 +13,8 @@
         "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
         "symfony/yaml": "^4.1@dev",
-        "webpatser/laravel-uuid": "1.*"
+        "webpatser/laravel-uuid": "1.*",
+        "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "codedungeon/phpunit-result-printer": "0.22",
