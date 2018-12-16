@@ -89,6 +89,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 page: this.page,
+                search: this.searchQuery,
             }
         }
 

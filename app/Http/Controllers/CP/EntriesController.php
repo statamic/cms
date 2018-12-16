@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Entry;
+use Statamic\API\Search;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
@@ -15,11 +16,9 @@ class EntriesController extends CpController
 
     public function index($collection)
     {
-        $sort = request('sort', 'title');
-
-        $entries = Entry::query()
-            ->where('collection', $collection)
-            ->orderBy($sort, request('order', 'asc'))
+        $entries = $this
+            ->indexQuery($collection)
+            ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
             ->paginate();
 
         return Resource::collection($entries)->additional(['meta' => [
@@ -29,6 +28,16 @@ class EntriesController extends CpController
                 ['label' => __('Slug'), 'field' => 'slug'],
             ],
         ]]);
+    }
+
+    protected function indexQuery($collection)
+    {
+        if ($search = request('search')) {
+            // TODO: Don't assume the index is named the same as the collection
+            return Search::index($collection)->ensureExists()->search($search);
+        }
+
+        return Entry::query()->where('collection', $collection);
     }
 
     public function edit(Request $request, $collection, $slug)
