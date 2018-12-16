@@ -11,7 +11,7 @@ use Illuminate\Support\Collection as IlluminateCollection;
 /**
  * An abstract collection of data types
  */
-abstract class DataCollection extends IlluminateCollection
+class DataCollection extends IlluminateCollection
 {
     /**
      * Limit a collection
@@ -75,12 +75,25 @@ abstract class DataCollection extends IlluminateCollection
      */
     protected function getSortableValues($sort, $a, $b)
     {
+        return [
+            $this->getSortableValue($sort, $a),
+            $this->getSortableValue($sort, $b)
+        ];
+    }
+
+    protected function getSortableValue($sort, $item)
+    {
+        if (is_array($item)) {
+            return $item[$sort] ?? null;
+        }
+
         $method = Str::camel($sort);
 
-        $one = (method_exists($a, $method)) ? call_user_func([$a, $method]) : $a->getWithDefaultLocale($sort);
-        $two = (method_exists($b, $method)) ? call_user_func([$b, $method]) : $b->getWithDefaultLocale($sort);
+        $value = (method_exists($item, $method))
+            ? call_user_func([$item, $method])
+            : $item->getWithDefaultLocale($sort);
 
-        return [$this->normalizeSortableValue($one), $this->normalizeSortableValue($two)];
+        return $this->normalizeSortableValue($value);
     }
 
     /**

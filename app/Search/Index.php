@@ -2,144 +2,84 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\Config;
-use Partyline as Console;
-use Statamic\Search\Comb\Index as Comb;
-use Statamic\Search\Algolia\Index as Algolia;
+use Statamic\API\Arr;
 
 abstract class Index
 {
-    /**
-     * @var string
-     */
     protected $name;
+    protected $config;
 
-    /**
-     * @var ItemResolver
-     */
-    protected $itemResolver;
+    abstract public function search($query);
+    abstract protected function insertDocuments(Documents $documents);
+    abstract protected function deleteIndex();
 
-    public function __construct(ItemResolver $itemResolver)
+    public function __construct($name, array $config)
     {
-        $this->itemResolver = $itemResolver->setIndex($this);
+        $this->name = $name;
+        $this->config = $config;
     }
 
-    /**
-     * Get the index name.
-     *
-     * @return string
-     */
     public function name()
     {
         return $this->name;
     }
 
-    /**
-     * Set the index name.
-     *
-     * @param string $name
-     * @return Index
-     */
-    public function setName($name)
+    public function title()
     {
-        $this->name = $name;
-
-        return $this;
+        return $this->config['title'] ?? title_case($this->name);
     }
 
-    /**
-     * Factory method for making Index instances.
-     *
-     * @param string $name
-     * @param string|null $driver
-     * @return Index
-     */
-    public static function make($name, $driver = null)
+    public function config()
     {
-        if (! $driver) {
-            $driver = Config::get('search.driver');
-        }
-
-        switch ($driver) {
-            case 'algolia':
-                $index = app(Algolia::class);
-                break;
-
-            default:
-                $index = app(Comb::class);
-        }
-
-        return $index->setName($name);
+        return $this->config;
     }
 
-    /**
-     * Insert a document into the index.
-     *
-     * @param string $id
-     * @param array $fields
-     */
-    abstract public function insert($id, $fields);
-
-    /**
-     * Insert multiple documents into the index.
-     *
-     * @param array $documents  Array of documents, keyed by their ids.
-     */
-    abstract public function insertMultiple($documents);
-
-    /**
-     * Delete a document from the index.
-     *
-     * @param string $id
-     */
-    abstract public function delete($id);
-
-    /**
-     * Perform a search.
-     *
-     * @param string $query  The search term.
-     * @param array $fields  Restrict the search to these fields.
-     * @return \Illuminate\Support\Collection
-     */
-    abstract public function search($query, $fields = null);
-
-    /**
-     * Delete the entire index.
-     *
-     * @return void
-     */
-    abstract public function deleteIndex();
-
-    /**
-     * Whether the index exists.
-     *
-     * @return bool
-     */
-    abstract public function exists();
+    public function for($query)
+    {
+        return $this->search($query);
+    }
 
     public function update()
     {
         $this->deleteIndex();
 
-        $fields = $this->itemResolver->getFields();
-
-        $documents = [];
-        $items = $this->itemResolver->getItems();
-
-        $bar = Console::getOutput()->createProgressBar($items->count());
-
-        foreach ($items as $id => $item) {
-            $documents[$id] = $item->toSearchableArray($fields);
-            $bar->advance();
-        }
-
-        $this->insertMultiple($documents);
-
-        $bar->finish();
-        Console::getOutput()->newLine();
-        Console::checkInfo("Index {$this->name()} updated.");
-        Console::getOutput()->newLine();
+        $this->insertMultiple($this->searchables()->all());
 
         return $this;
+    }
+
+    public function ensureExists()
+    {
+        if (! $this->exists()) {
+            $this->update();
+        }
+
+        return $this;
+    }
+
+    public function insert($document)
+    {
+        return $this->insertMultiple(Arr::wrap($document));
+    }
+
+    public function insertMultiple($documents)
+    {
+        $documents = (new Documents($documents))->mapWithKeys(function ($item) {
+            return [$item->id() => $this->searchables()->fields($item)];
+        });
+
+        $this->insertDocuments($documents);
+
+        return $this;
+    }
+
+    public function shouldIndex($searchable)
+    {
+        return $this->searchables()->contains($searchable);
+    }
+
+    public function searchables()
+    {
+        return new Searchables($this);
     }
 }

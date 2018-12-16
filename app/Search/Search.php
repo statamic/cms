@@ -4,73 +4,40 @@ namespace Statamic\Search;
 
 class Search
 {
-    private $defaultDriver;
-    private $defaultIndexName;
-    private $indexes;
+    protected $indexes;
 
-    /**
-     * Create a new Search instance
-     *
-     * @param array $config
-     * @param \Illuminate\Support\Collection $indexes
-     */
-    public function __construct(array $config, $indexes = null)
+    public function __construct(IndexManager $indexes)
     {
-        $this->defaultDriver = $config['default_driver'];
-        $this->defaultIndexName = $config['default_index'];
         $this->indexes = $indexes;
     }
 
-    /**
-     * Perform a search
-     *
-     * @param  string $query String to search
-     * @param  array|null $fields Fields to search in, or null to search all fields
-     * @return array
-     */
-    public function search($query, $fields = null)
+    public function indexes()
     {
-        return $this->index()->search($query, $fields);
+        return $this->indexes->all();
     }
 
-    /**
-     * Get a search index
-     *
-     * @param  string $index Name of the index
-     * @return Index
-     */
     public function index($index = null)
     {
-        if (! $index || $index === $this->defaultIndexName) {
-            return Index::make($this->defaultIndexName, $this->defaultDriver);
-        }
-
-        return Index::make(
-            $index,
-            data_get($this->indexes, $index.'.driver')
-        );
+        return $this->indexes->index($index);
     }
 
-    /**
-     * Update a search index
-     *
-     * @param  string $index Name of the index
-     * @return void
-     */
-    public function update($index = null)
+    public function in($index = null)
     {
-        $this->index($index)->update();
+        return $this->index($index);
     }
 
-    /**
-     * Provide convenient access to methods on the default index
-     *
-     * @param  string $method
-     * @param  array  $arguments
-     * @return mixed
-     */
-    public function __call($method, array $arguments)
+    public function clearIndex($index = null)
     {
-        return call_user_func_array(array($this->index(), $method), $arguments);
+        return $this->index($index)->clear();
+    }
+
+    public function indexExists($index = null)
+    {
+        return $this->index($index)->exists();
+    }
+
+    public function __call($method, $parameters)
+    {
+        return $this->index()->$method(...$parameters);
     }
 }

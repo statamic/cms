@@ -8,6 +8,6 @@ class Search extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Endpoint\Search::class;
+        return \Statamic\Search\Search::class;
     }
 }

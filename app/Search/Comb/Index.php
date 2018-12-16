@@ -2,58 +2,59 @@
 
 namespace Statamic\Search\Comb;
 
-use Statamic\API\File;
-use Statamic\Events\SearchQueryPerformed;
+use Statamic\Search\Documents;
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
-use Statamic\Search\Index as AbstractIndex;
 use Statamic\Search\Comb\Exceptions\BadData;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 
-class Index extends AbstractIndex
+class Index extends BaseIndex
 {
-    /**
-     * @inheritdoc
-     */
-    public function insert($id, $fields)
+    protected $files;
+
+    public function __construct(Filesystem $files, $name, array $config)
     {
-        try {
-            $data = $this->getIndexData();
-        } catch (IndexNotFoundException $e) {
-            $data = [];
-        }
+        $this->files = $files;
 
-        $data[$id] = $fields;
-
-        File::put($this->getPath(), json_encode($data));
+        parent::__construct($name, $config);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function insertMultiple($documents)
+    public function search($query)
     {
-        try {
-            $data = $this->getIndexData();
-        } catch (IndexNotFoundException $e) {
-            $data = [];
-        }
-
-        foreach ($documents as $id => $document) {
-            $data[$id] = $document;
-        }
-
-        File::put($this->getPath(), json_encode($data));
+        return (new Query($this))->query($query);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function search($query, $fields = null)
+    public function lookup($query)
     {
-        event(new SearchQueryPerformed($query));
+        $data = $this->data()->map(function ($item, $id) {
+            return $item + ['id' => $id];
+        })->values();
 
-        $settings = array(
+        $comb = new Comb($data, $this->settings());
+
+        try {
+            $results = $comb->lookUp($query)['data'];
+        } catch (NoResultsFound | NotEnoughCharacters | BadData $e) {
+            return collect();
+        }
+
+        return collect($results)->map(function ($result) {
+            $data = $result['data'];
+            $data['search_score'] = $result['score'];
+            return array_except($data, '_category');
+        });
+    }
+
+    protected function data()
+    {
+        return collect(json_decode($this->raw(), true));
+    }
+
+    protected function settings()
+    {
+        return array_merge([
             'match_weights' => null,
             'min_characters' => null,
             'min_word_characters' => null,
@@ -68,81 +69,42 @@ class Index extends AbstractIndex
             'exclude_properties' => null,
             'include_properties' => null,
             'stop_words' => ['the', 'a', 'an'],
-        );
-
-        $settings['include_properties'] = $fields;
-
-        $data = collect($this->getIndexData())->map(function ($item, $id) {
-            $item['id'] = $id;
-            return $item;
-        })->values()->all();
-
-        try {
-            $comb = new \Statamic\Search\Comb\Comb($data, $settings);
-            $results = $comb->lookUp($query)['data'];
-        } catch (NoResultsFound $e) {
-            return collect();
-        } catch (NotEnoughCharacters $e) {
-            return collect();
-        } catch (BadData $e) {
-            return collect();
-        }
-
-        return collect($results)->map(function ($result) {
-            $data = $result['data'];
-            $data['search_score'] = $result['score'];
-            return $data;
-        });
+            'include_properties' => $this->config['fields'] ?? ['title']
+        ], $this->config);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function delete($id)
-    {
-        // TODO: Implement delete() method.
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteIndex()
-    {
-        if ($this->exists()) {
-            File::delete($this->getPath());
-        }
-    }
-
-    /**
-     * Get the data/contents from the index.
-     *
-     * @return array
-     * @throws IndexNotFoundException
-     */
-    private function getIndexData()
+    public function raw()
     {
         if (! $this->exists()) {
-            throw new IndexNotFoundException("Index [$this->name] does not exist.");
+            throw new IndexNotFoundException;
         }
 
-        return json_decode(File::get($this->getPath()), true);
+        return $this->files->get($this->path());
     }
 
-    /**
-     * @inheritdoc
-     */
     public function exists()
     {
-        return File::exists($this->getPath());
+        return $this->files->exists($this->path());
     }
 
-    /**
-     * Get the path to the index file.
-     *
-     * @return string
-     */
-    private function getPath()
+    public function path()
     {
-        return 'local/storage/search/' . $this->name . '.json';
+        return sprintf('%s/%s.json', $this->config['path'], $this->name);
+    }
+
+    protected function insertDocuments(Documents $documents)
+    {
+        try {
+            $data = $this->data();
+        } catch (IndexNotFoundException $e) {
+            $data = collect();
+        }
+
+        $this->files->put($this->path(), $documents->union($data)->toJson());
+    }
+
+    public function deleteIndex()
+    {
+        $this->files->delete($this->path());
     }
 }
