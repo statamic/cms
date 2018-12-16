@@ -72,8 +72,8 @@
                             <li class="{{ current_class('utilities/clear-cache') }}">
                                 <a href="{{ cp_route('utilities.clear-cache.index') }}">{{ __('Clear Cache') }}</a>
                             </li>
-                            <li class="{{ current_class('utilities/rebuild-search') }}">
-                                <a href="{{ cp_route('utilities.rebuild-search') }}">{{ __('Rebuild Search') }}</a>
+                            <li class="{{ current_class('utilities/search') }}">
+                                <a href="{{ cp_route('utilities.search') }}">{{ __('Search') }}</a>
                             </li>
                         </ul>
                     @endif

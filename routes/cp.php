@@ -85,7 +85,8 @@ Route::group([
     Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
     Route::get('utilities/clear-cache', 'ClearCacheController@index')->name('utilities.clear-cache.index');
     Route::post('utilities/clear-cache', 'ClearCacheController@clear')->name('utilities.clear-cache.clear');
-    Route::get('utilities/rebuild-search', 'RebuildSearchController')->name('utilities.rebuild-search');
+    Route::get('utilities/search', 'UpdateSearchController@index')->name('utilities.search');
+    Route::post('utilities/search', 'UpdateSearchController@update');
 
     Route::get('suggestions/{type}', 'SuggestionController@show');
 
