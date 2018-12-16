@@ -22,7 +22,9 @@ class EntryRepository implements RepositoryContract
 
     public function all(): EntryCollection
     {
-        return collect_entries($this->store->getItems()->flatten());
+        return collect_entries($this->store->getItems()->mapWithKeys(function ($item) {
+            return $item;
+        }));
     }
 
     public function whereCollection(string $handle): EntryCollection
