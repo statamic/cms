@@ -39,6 +39,8 @@ abstract class Content extends Data implements ContentContract
         }
 
         $this->attributes['order'] = $order;
+
+        return $this;
     }
 
     /**
