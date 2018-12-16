@@ -78,6 +78,9 @@ Route::group([
     Route::resource('user-groups', 'UserGroupsController');
     Route::resource('roles', 'RolesController');
 
+    // Search
+    Route::get('search', 'SearchController')->name('search');
+
     // Utilities
     Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
     Route::get('utilities/clear-cache', 'ClearCacheController@index')->name('utilities.clear-cache.index');
@@ -93,8 +96,5 @@ Route::group([
 });
 
 Route::view('/playground', 'statamic::playground')->name('playground');
-
-// Just to make stuff work.
-Route::get('/search', function () { return ''; })->name('search.global');
 
 Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');

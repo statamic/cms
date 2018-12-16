@@ -9,7 +9,7 @@
             </a>
         </div>
 
-        <global-search class="pl-2" endpoint="{{ route('statamic.cp.search.global') }}" :limit="10" placeholder="{{ __('Search...') }}">
+        <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>
 
