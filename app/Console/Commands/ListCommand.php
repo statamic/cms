@@ -3,7 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 
 class ListCommand extends Command

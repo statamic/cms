@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Commands;
 
+use Statamic\Console\RunsInPlease;
 use Illuminate\Console\GeneratorCommand;
-use Statamic\Console\Commands\Traits\RunsInPlease;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeTag extends GeneratorCommand

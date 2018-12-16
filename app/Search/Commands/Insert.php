@@ -5,7 +5,7 @@ namespace Statamic\Search\Commands;
 use Statamic\API\Search;
 use Statamic\API\Content;
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 
 class Insert extends Command
 {

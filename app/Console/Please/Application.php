@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Please;
 
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 use Illuminate\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 

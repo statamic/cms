@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Console\Commands\Traits;
+namespace Statamic\Console;
 
 trait RunsInPlease
 {

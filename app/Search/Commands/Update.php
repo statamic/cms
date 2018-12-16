@@ -4,7 +4,7 @@ namespace Statamic\Search\Commands;
 
 use Statamic\API\Search;
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 
 class Update extends Command
 {

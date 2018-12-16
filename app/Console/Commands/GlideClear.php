@@ -6,8 +6,8 @@ use Statamic\API\File;
 use Statamic\API\Cache;
 use Statamic\API\Folder;
 use Illuminate\Console\Command;
+use Statamic\Console\RunsInPlease;
 use Facades\Statamic\Imaging\GlideServer;
-use Statamic\Console\Commands\Traits\RunsInPlease;
 
 class GlideClear extends Command
 {

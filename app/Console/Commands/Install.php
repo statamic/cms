@@ -3,8 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\RunsInPlease;
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Console\Commands\Traits\RunsInPlease;
 
 class Install extends Command
 {

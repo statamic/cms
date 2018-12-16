@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Statamic\API\File;
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 
 class MakeUserMigration extends Command
 {

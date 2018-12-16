@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Statamic\API\Stache;
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 
 class StacheRefresh extends Command
 {

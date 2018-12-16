@@ -6,7 +6,7 @@ use Statamic\API\File;
 use Statamic\API\Config;
 use Statamic\API\Folder;
 use Illuminate\Console\Command;
-use Statamic\Console\Commands\Traits\RunsInPlease;
+use Statamic\Console\RunsInPlease;
 
 class SiteClear extends Command
 {
