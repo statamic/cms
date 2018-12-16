@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Please;
 
+use Statamic\Statamic;
 use App\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
 
@@ -14,6 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function getArtisan()
     {
-        return new Please($this->app, $this->events, $this->app->version());
+        return tap(
+            new Please($this->app, $this->events, Statamic::version())
+        )->setName('Statamic');
     }
 }
