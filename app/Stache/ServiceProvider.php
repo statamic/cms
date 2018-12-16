@@ -27,8 +27,8 @@ class ServiceProvider extends LaravelServiceProvider
             return app($config['class'])->directory($config['directory']);
         })->all());
 
-        $this->app['events']->listen(RequestHandled::class, function () {
-            $this->app[Persister::class]->persist();
+        $this->app['events']->listen(RequestHandled::class, function () use ($stache) {
+            $stache->persist();
         });
     }
 }

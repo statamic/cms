@@ -134,6 +134,13 @@ class Stache
         return $this;
     }
 
+    public function update()
+    {
+        (new StacheUpdater($this))->update();
+
+        return $this;
+    }
+
     public function boot()
     {
         if ($this->shouldBoot && !$this->booted) {
@@ -189,5 +196,24 @@ class Stache
     public function getStoreById($id)
     {
         return $this->store($this->idMap()->get($id));
+    }
+
+    public function persist()
+    {
+        app(Persister::class)->persist();
+    }
+
+    public function clear()
+    {
+        // TODO: This is temporary. It wont work for other cache drivers like Redis.
+        // We need to track all the cache keys, then loop through and forget them all.
+        app('files')->deleteDirectory(base_path('storage/framework/cache/data/stache'));
+
+        return $this;
+    }
+
+    public function refresh()
+    {
+        $this->clear()->update()->persist();
     }
 }

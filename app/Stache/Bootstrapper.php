@@ -45,7 +45,7 @@ class Bootstrapper
         }
 
         if ($update) {
-            (new StacheUpdater($stache))->update();
+            $stache->update();
         }
 
         $stache->heat();
