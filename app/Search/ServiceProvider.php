@@ -3,9 +3,9 @@
 namespace Statamic\Search;
 
 use Statamic\API\Search;
-use Statamic\Events\Data\EntrySaved;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\Search\UpdateItemIndexes;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -25,14 +25,6 @@ class ServiceProvider extends LaravelServiceProvider
             ]);
         }
 
-        Event::listen(EntrySaved::class, function ($event) {
-            $item = $event->data;
-
-            Search::indexes()
-                ->filter->shouldIndex($item)
-                ->each(function ($index) use ($item) {
-                    $index->exists() ? $index->insert($item) : $index->update();
-                });
-        });
+        Event::subscribe(UpdateItemIndexes::class);
     }
 }
