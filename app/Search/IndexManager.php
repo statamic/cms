@@ -3,7 +3,9 @@
 namespace Statamic\Search;
 
 use Statamic\Manager;
+use Algolia\AlgoliaSearch\SearchClient;
 use Statamic\Search\Comb\Index as CombIndex;
+use Statamic\Search\Algolia\Index as AlgoliaIndex;
 
 class IndexManager extends Manager
 {
@@ -32,6 +34,15 @@ class IndexManager extends Manager
     public function createLocalDriver(array $config, $name)
     {
         return new CombIndex($name, $config);
+    }
+
+    public function createAlgoliaDriver(array $config, $name)
+    {
+        $credentials = $config['credentials'];
+
+        $client = SearchClient::create($credentials['id'], $credentials['secret']);
+
+        return new AlgoliaIndex($client, $name, $config);
     }
 
     protected function getConfig($name)
