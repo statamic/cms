@@ -35,12 +35,12 @@
                         <template slot="cell-slug" slot-scope="{ row: entry }">
                             <span class="font-mono text-2xs">{{ entry.slug }}</span>
                         </template>
-                        <template slot="actions" slot-scope="{ row: entry }">
+                        <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
                                 <ul class="dropdown-menu">
                                     <li><a :href="entry.permalink">View</a></li>
                                     <li><a :href="entry.edit_url">Edit</a></li>
-                                    <li class="warning"><a :href="entry.edit_url">Delete</a></li>
+                                    <li class="warning" v-if="entry.deleteable"><a @click.prevent="destroy(entry.id, index)">Delete</a></li>
                                 </ul>
                             </dropdown-list>
                         </template>
@@ -128,7 +128,13 @@ export default {
         },
 
         destroy(id, index) {
-            //
+            const url = cp_url(`collections/${this.collection}/entries/${id}`);
+            axios.delete(url).then(response => {
+                this.entries.splice(index, 1);
+                this.$notify.success(__('Entry deleted'));
+            }).catch(error => {
+                this.$notify.error(error.response.data.message);
+            })
         },
 
         updateColumns() {

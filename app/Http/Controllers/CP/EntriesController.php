@@ -21,6 +21,10 @@ class EntriesController extends CpController
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
             ->paginate();
 
+        $entries->setCollection($entries->getCollection()->supplement(function ($entry) {
+            return ['deleteable' => me()->can('delete', $entry)];
+        }));
+
         return Resource::collection($entries)->additional(['meta' => [
             'sortColumn' => $sort,
             'columns' => [
@@ -108,8 +112,16 @@ class EntriesController extends CpController
 
     }
 
-    public function destroy($slug)
+    public function destroy($collection, $entry)
     {
+        if (! $entry = Entry::find($entry)) {
+            return $this->pageNotFound();
+        }
 
+        $this->authorize('delete', $entry);
+
+        $entry->delete();
+
+        return response('', 204);
     }
 }
