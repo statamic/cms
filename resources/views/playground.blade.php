@@ -2,56 +2,12 @@
 
 @section('content')
 
-    <div class="max-w-xl mx-auto rounded shadow bg-white">
-        <div class="max-w-lg mx-auto pt-6 relative">
-            <div class="wizard">
-                <div class="step complete">
-                    <div class="ball">1</div>
-                    <div class="label">Words etc.</div>
-                </div>
-                <div class="step complete">
-                    <div class="ball">2</div>
-                    <div class="label">Words etc.</div>
-                </div>
-                <div class="step">
-                    <div class="ball">3</div>
-                    <div class="label">Words etc.</div>
-                </div>
-                <div class="step">
-                    <div class="ball">4</div>
-                    <div class="label">Words etc.</div>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-md mx-auto py-6 text-center">
-            <h1 class="mb-3">Create a new Collection</h1>
-            <p class="text-grey">A Collection is a group of entries that holds similar content and shares behavior and attributes, like URL patterns, ordering, and visibility.</p>
-        </div>
-        <div class="max-w-md mx-auto pb-7">
-            <label class="font-bold text-base mb-sm" for="name">Name of your Collection</label>
-            <input type="text" name="name" class="input-text">
-            <div class="text-2xs text-grey-light mt-1 flex items-center">
-                <div class="mr-sm flex items-center mb-px">@svg('info-circle')</div>
-                Usually a noun, like "Blog" or "Product".
-            </div>
-        </div>
-        <div class="max-w-md mx-auto pb-7">
-            <label class="font-bold text-base mb-sm" for="name">Handle</label>
-            <input type="text" name="name" class="input-text">
-            <div class="text-2xs text-grey-light mt-1 flex items-center">
-                <div class="mr-sm flex items-center mb-px">@svg('info-circle')</div>
-                How you'll refer to this collection in your templates. Cannot be easily changed.
-            </div>
-        </div>
-        <div class="border-t p-2">
-            <div class="max-w-md mx-auto">
-                <button class="btn-primary px-5">Next &rarr;</button>
-            </div>
-        </div>
-    </div>
+    <wizard :steps="['Naming', 'Ordering', 'Behavior', 'Routing', 'Schema']">
+    </wizard>
+
 @stop
 
-@section('xcontent')
+@section('nontent')
     <div class="flex mb-5">
         <h1>{{ __('The Statamic Playground') }}</h1>
     </div>
