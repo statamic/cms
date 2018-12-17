@@ -83,6 +83,19 @@ class Index extends BaseIndex
         return sprintf('%s/%s.json', $this->config['path'], $this->name);
     }
 
+    public function delete($document)
+    {
+        try {
+            $data = $this->data();
+        } catch (IndexNotFoundException $e) {
+            return;
+        }
+
+        $data->forget($document->id());
+
+        $this->save($data);
+    }
+
     protected function insertDocuments(Documents $documents)
     {
         try {
@@ -91,11 +104,16 @@ class Index extends BaseIndex
             $data = collect();
         }
 
-        File::put($this->path(), $documents->union($data)->toJson());
+        $this->save($documents->union($data));
     }
 
     public function deleteIndex()
     {
         File::delete($this->path());
+    }
+
+    protected function save($documents)
+    {
+        File::put($this->path(), $documents->toJson());
     }
 }
