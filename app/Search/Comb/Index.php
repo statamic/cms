@@ -2,8 +2,8 @@
 
 namespace Statamic\Search\Comb;
 
+use Statamic\API\File;
 use Statamic\Search\Documents;
-use Illuminate\Filesystem\Filesystem;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
 use Statamic\Search\Comb\Exceptions\BadData;
@@ -12,15 +12,6 @@ use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 
 class Index extends BaseIndex
 {
-    protected $files;
-
-    public function __construct(Filesystem $files, $name, array $config)
-    {
-        $this->files = $files;
-
-        parent::__construct($name, $config);
-    }
-
     public function search($query)
     {
         return (new Query($this))->query($query);
@@ -79,12 +70,12 @@ class Index extends BaseIndex
             throw new IndexNotFoundException;
         }
 
-        return $this->files->get($this->path());
+        return File::get($this->path());
     }
 
     public function exists()
     {
-        return $this->files->exists($this->path());
+        return File::exists($this->path());
     }
 
     public function path()
@@ -100,11 +91,11 @@ class Index extends BaseIndex
             $data = collect();
         }
 
-        $this->files->put($this->path(), $documents->union($data)->toJson());
+        File::put($this->path(), $documents->union($data)->toJson());
     }
 
     public function deleteIndex()
     {
-        $this->files->delete($this->path());
+        File::delete($this->path());
     }
 }

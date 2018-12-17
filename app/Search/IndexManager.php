@@ -31,7 +31,7 @@ class IndexManager extends Manager
 
     public function createLocalDriver(array $config, $name)
     {
-        return new CombIndex($this->app['files'], $name, $config);
+        return new CombIndex($name, $config);
     }
 
     protected function getConfig($name)
