@@ -219,10 +219,10 @@ class Comb {
         }
 
         reset($data);
-        $first = each($data);
+        $firstKey = array_keys($data)[0];
         reset($data);
 
-        if (!is_numeric($first['key'])) {
+        if (!is_numeric($firstKey)) {
             $this->is_haystack_categorized = true;
         }
 
@@ -374,7 +374,7 @@ class Comb {
      */
     private function preformat($raw_query)
     {
-        return trim(preg_replace("/[^\w\d\-\.:+\s&’'‘]/i", "", $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s&’'‘]", "", $raw_query));
     }
 
 
@@ -1072,4 +1072,3 @@ class Comb {
         return new Comb($data, $config);
     }
 }
-
