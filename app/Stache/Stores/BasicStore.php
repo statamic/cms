@@ -70,6 +70,15 @@ abstract class BasicStore extends Store
         return $this;
     }
 
+    public function removePath($key)
+    {
+        $this->paths->forget($key);
+
+        $this->markAsUpdated();
+
+        return $this;
+    }
+
     public function getSiteUri($site, $key)
     {
         return $this->uris->get($site)->get($key);
@@ -78,6 +87,15 @@ abstract class BasicStore extends Store
     public function setSiteUri($site, $key, $uri)
     {
         $this->uris->get($site)->put($key, $uri);
+
+        $this->markAsUpdated();
+
+        return $this;
+    }
+
+    public function removeSiteUri($site, $key)
+    {
+        $this->uris->get($site)->forget($key);
 
         $this->markAsUpdated();
 
@@ -117,6 +135,11 @@ abstract class BasicStore extends Store
         $site = $site ?? $this->stache->sites()->first();
 
         return $this->getSiteUris($site)->filter()->flip()->get($uri);
+    }
+
+    public function getIdFromPath($path)
+    {
+        return $this->getPaths()->filter()->flip()->get($path);
     }
 
     public function getIdMap()
@@ -289,6 +312,21 @@ abstract class BasicStore extends Store
         }
 
         $this->markAsUpdated();
+
+        return $this;
+    }
+
+    public function remove($item)
+    {
+        $key = is_object($item) ? $item->id() : $item;
+
+        $this
+            ->removeItem($key)
+            ->removePath($key);
+
+        $this->forEachSite(function ($site, $store) use ($item, $key) {
+            $store->removeSiteUri($site, $key);
+        });
 
         return $this;
     }

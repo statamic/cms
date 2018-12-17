@@ -72,6 +72,15 @@ abstract class AggregateStore extends Store
         return $this;
     }
 
+    public function getIdFromPath($path)
+    {
+        foreach ($this->stores() as $store) {
+            if ($match = $store->getIdFromPath($path)) {
+                return $match;
+            }
+        }
+    }
+
     public function getIdMap()
     {
         return $this->stores->mapWithKeys(function ($store) {
@@ -209,6 +218,15 @@ abstract class AggregateStore extends Store
         }
 
         $this->store($store)->insert($item, $id, $path);
+
+        return $this;
+    }
+
+    public function remove($item)
+    {
+        list(, $store) = $this->extractKeys($this->getIdMap()->get($item));
+
+        $this->store($store)->remove($item);
 
         return $this;
     }

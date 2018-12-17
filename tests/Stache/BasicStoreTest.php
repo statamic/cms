@@ -132,6 +132,55 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
+    function removing_an_item_will_remove_the_item_and_path_and_uris()
+    {
+        $firstItem = new class {
+            public function id() { return '123'; }
+            public function path() { return '/first/path'; }
+            public function uri() { return '/first/uri'; }
+        };
+        $secondItem = new class {
+            public function id() { return '456'; }
+            public function path() { return '/second/path'; }
+        };
+        $fourthItem = new class {
+            public function id() { return '131415'; }
+            public function path() { return '/fourth/path'; }
+            public function uri() { return '/fourth/uri'; }
+        };
+        $this->store->withoutMarkingAsUpdated(function () use ($firstItem, $secondItem, $fourthItem) {
+            $this->store->insert($firstItem);
+            $this->store->insert($secondItem);
+            $this->store->insert(['title' => 'Item three'], '789', '/third/path');
+            $this->store->insert($fourthItem);
+        });
+        $this->assertFalse($this->store->isUpdated());
+        $this->assertEquals(4, $this->store->getItemsWithoutLoading()->count());
+        $this->assertEquals([
+            '123' => '/first/uri',
+            '131415' => '/fourth/uri',
+        ], $this->store->getSiteUris('en')->all());
+
+        $return = $this->store->remove('123');
+        $this->store->remove($secondItem);
+
+        $this->assertEquals($this->store, $return);
+        $this->assertEquals([
+            '789' => ['title' => 'Item three'],
+            '131415' => $fourthItem,
+        ], $this->store->getItems()->all());
+        $this->assertEquals([
+            '789' => '/third/path',
+            '131415' => '/fourth/path',
+        ], $this->store->getPaths()->all());
+        $this->assertEquals([
+            'en' => ['131415' => '/fourth/uri'],
+            'fr' => ['131415' => '/fourth/uri']
+        ], $this->store->getUris()->toArray());
+        $this->assertTrue($this->store->isUpdated());
+    }
+
+    /** @test */
     function it_gets_an_id_from_a_uri()
     {
         $this->assertFalse($this->store->isUpdated());
@@ -150,6 +199,21 @@ class BasicStoreTest extends TestCase
         $this->assertNull($this->store->getIdFromUri('/unknown'));
         $this->assertNull($this->store->getIdFromUri('/unknown', 'en'));
         $this->assertNull($this->store->getIdFromUri('/unknown', 'fr'));
+        $this->assertTrue($this->store->isUpdated());
+    }
+
+    /** @test */
+    function it_gets_an_id_from_a_path()
+    {
+        $this->assertFalse($this->store->isUpdated());
+
+        $this->store->setPaths([
+            '123' => '/one',
+            '456' => '/two'
+        ]);
+
+        $this->assertEquals('123', $this->store->getIdFromPath('/one'));
+        $this->assertEquals('456', $this->store->getIdFromPath('/two'));
         $this->assertTrue($this->store->isUpdated());
     }
 

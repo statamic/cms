@@ -246,6 +246,48 @@ class AggregateStoreTest extends TestCase
     }
 
     /** @test */
+    function removing_an_item_will_remove_the_item_and_path_and_uris_in_each_child_store()
+    {
+        $objectForStoreOne = new class {
+            public function id() { return '123'; }
+            public function path() { return '/path/to/object'; }
+            public function uri() { return '/the/uri'; }
+        };
+        $objectForStoreTwo = new class {
+            public function id() { return '321'; }
+            public function path() { return '/path/to/object/in/store/two'; }
+            public function uri() { return '/the/uri/in/store/two'; }
+        };
+        $this->store->insert($objectForStoreOne, 'one::123');
+        $this->store->insert($objectForStoreTwo, 'two::321');
+        $this->assertEquals(2, $this->store->getItemsWithoutLoading()->count());
+
+        $return = $this->store->remove('123');
+
+        $this->assertEquals($this->store, $return);
+        $this->assertEquals([
+            'one' => [],
+            'two' => [
+                '321' => $objectForStoreTwo,
+            ],
+        ], $this->store->getItemsWithoutLoading()->toArray());
+        $this->assertEquals([], $this->store->store('one')->getPaths()->all());
+        $this->assertEquals(['321' => '/path/to/object/in/store/two'], $this->store->store('two')->getPaths()->all());
+        $this->assertEquals([
+            'en' => [],
+            'fr' => []
+        ], $this->store->store('one')->getUris()->toArray());
+        $this->assertEquals([
+            'en' => [
+                '321' => '/the/uri/in/store/two',
+            ],
+            'fr' => [
+                '321' => '/the/uri/in/store/two',
+            ]
+        ], $this->store->store('two')->getUris()->toArray());
+    }
+
+    /** @test */
     function it_can_perform_an_action_for_each_child_stores_site()
     {
         $arguments = [];
@@ -371,6 +413,18 @@ class AggregateStoreTest extends TestCase
         $this->assertEquals('456', $this->store->getIdFromUri('/two'));
         $this->assertEquals('789', $this->store->getIdFromUri('/three'));
         $this->assertEquals('101', $this->store->getIdFromUri('/four'));
+    }
+
+    /** @test */
+    function it_gets_an_id_from_a_path()
+    {
+        $this->store->store('one')->setPaths(['123' => '/one', '456' => '/two']);
+        $this->store->store('two')->setPaths(['789' => '/three', '101' => '/four']);
+
+        $this->assertEquals('123', $this->store->getIdFromPath('/one'));
+        $this->assertEquals('456', $this->store->getIdFromPath('/two'));
+        $this->assertEquals('789', $this->store->getIdFromPath('/three'));
+        $this->assertEquals('101', $this->store->getIdFromPath('/four'));
     }
 
     /** @test */

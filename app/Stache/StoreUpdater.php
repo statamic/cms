@@ -72,8 +72,8 @@ class StoreUpdater
         }
 
         foreach ($this->deletedFiles() as $path) {
-            $id = $this->store->getPaths()->flip()->get($path);
-            $this->store->removeItem($id);
+            $id = $this->store->getIdFromPath($path);
+            $this->store->remove($id);
         }
 
         $this->store->markAsLoaded();
