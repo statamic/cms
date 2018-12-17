@@ -3,13 +3,14 @@
 namespace Statamic\Events\Data;
 
 use Statamic\Events\Event;
+use Statamic\Contracts\Data\Data;
 
 abstract class DataDeleted extends Event
 {
     /**
-     * @var string
+     * @var Data
      */
-    public $id;
+    public $data;
 
     /**
      * @var array
@@ -17,12 +18,12 @@ abstract class DataDeleted extends Event
     public $paths;
 
     /**
-     * @param string $id
+     * @param Data $data
      * @param array  $paths
      */
-    public function __construct($id, array $paths)
+    public function __construct(Data $data, array $paths)
     {
-        $this->id = $id;
+        $this->data = $data;
         $this->paths = $paths;
     }
 }

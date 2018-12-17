@@ -296,7 +296,7 @@ abstract class Content extends Data implements ContentContract
 
         // Whoever wants to know about it can do so now.
         $event_class = 'Statamic\Events\Data\\' . ucfirst($this->contentType()) . 'Deleted';
-        event(new $event_class($this->id(), $paths->all()));
+        event(new $event_class($this, $paths->all()));
     }
 
     /**
