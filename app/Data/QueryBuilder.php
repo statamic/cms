@@ -114,6 +114,11 @@ abstract class QueryBuilder
         return $this->getFilteredAndLimitedItems()->count();
     }
 
+    public function first()
+    {
+        return $this->get()->first();
+    }
+
     public function get()
     {
         $items = $this->getFilteredItems();
