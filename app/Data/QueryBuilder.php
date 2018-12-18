@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use InvalidArgumentException;
 use Illuminate\Pagination\Paginator;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
@@ -12,6 +13,10 @@ abstract class QueryBuilder
     protected $wheres = [];
     protected $orderBy;
     protected $orderDirection;
+    protected $operators = [
+        '=' => 'Equals',
+        'like' => 'Like',
+    ];
 
     public function limit($value)
     {
@@ -47,15 +52,50 @@ abstract class QueryBuilder
         return $this;
     }
 
-    public function where($column, $value)
+    public function where($column, $operator = null, $value = null)
     {
-        $this->wheres[] = [
-            'type' => 'Basic',
-            'column' => $column,
-            'value' => $value,
-        ];
+        // Here we will make some assumptions about the operator. If only 2 values are
+        // passed to the method, we will assume that the operator is an equals sign
+        // and keep going. Otherwise, we'll require the operator to be passed in.
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            list($value, $operator) = [$operator, '='];
+        }
+
+        $type = 'Basic';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'operator');
 
         return $this;
+    }
+
+    public function prepareValueAndOperator($value, $operator, $useDefault = false)
+    {
+        if ($useDefault) {
+            return [$operator, '='];
+        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+            throw new InvalidArgumentException('Illegal operator and value combination.');
+        }
+
+
+        return [$value, $operator];
+    }
+
+    protected function invalidOperatorAndValue($operator, $value)
+    {
+        return is_null($value) && in_array($operator, array_keys($this->operators)) &&
+             ! in_array($operator, ['=', '<>', '!=']);
+    }
+
+    protected function invalidOperator($operator)
+    {
+        return ! in_array(strtolower($operator), array_keys($this->operators), true);
     }
 
     public function whereIn($column, $values)
@@ -156,8 +196,23 @@ abstract class QueryBuilder
     {
         return $entries->filter(function ($entry) use ($where) {
             $value = $this->getFilterItemValue($entry, $where['column']);
-            return $value === $where['value'];
+            $method = 'filterTest' . $this->operators[$where['operator']];
+            return $this->{$method}($value, $where['value']);
         });
+    }
+
+    protected function filterTestEquals($item, $value)
+    {
+        return strtolower($item) === strtolower($value);
+    }
+
+    protected function filterTestLike($item, $like)
+    {
+        $like = strtolower($like);
+
+        $pattern = '/' . str_replace(['%', '_'], ['.*', '.'], $like) . '/';
+
+        return preg_match($pattern, strtolower($item));
     }
 
     protected function getFilterItemValue($item, $column)

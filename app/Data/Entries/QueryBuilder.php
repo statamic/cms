@@ -9,14 +9,14 @@ class QueryBuilder extends BaseQueryBuilder
 {
     protected $collection;
 
-    public function where($column, $value)
+    public function where($column, $operator = null, $value = null)
     {
         if ($column === 'collection') {
-            $this->collection = $value;
+            $this->collection = $operator;
             return $this;
         }
 
-        return parent::where($column, $value);
+        return parent::where($column, $operator, $value);
     }
 
     protected function getBaseItems()
