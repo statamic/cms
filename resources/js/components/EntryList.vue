@@ -9,6 +9,7 @@
             v-if="!loading"
             :rows="entries"
             :columns="columns"
+            :search="false"
             :search-query="searchQuery"
             :sort="false"
             :sort-column="sortColumn"

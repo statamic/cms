@@ -15,6 +15,10 @@ export default {
             type: Array,
             required: true,
         },
+        search: {
+            type: Boolean,
+            default: true
+        },
         searchQuery: {
             type: String,
             default: ''
@@ -89,7 +93,7 @@ export default {
     methods: {
 
         filterBySearch(rows) {
-            if (! this.searchQuery) return rows;
+            if (!this.search || !this.searchQuery) return rows;
 
             // TODO: Ensure instance respects updates to visibleColumns
             const fuse = new Fuse(rows, {
