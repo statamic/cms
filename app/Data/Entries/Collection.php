@@ -2,13 +2,14 @@
 
 namespace Statamic\Data\Entries;
 
-use Statamic\API\Entry as EntryAPI;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Config;
 use Statamic\API\Folder;
+use Statamic\API\Search;
 use Statamic\API\Fieldset;
 use Statamic\Data\DataFolder;
+use Statamic\API\Entry as EntryAPI;
 use Statamic\Events\Data\CollectionDeleted;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
@@ -221,5 +222,24 @@ class Collection extends DataFolder implements CollectionContract
     public function handle($handle = null)
     {
         return $this->path($handle);
+    }
+
+    public function queryEntries()
+    {
+        return EntryAPI::query()->where('collection', $this->handle());
+    }
+
+    public function searchIndex()
+    {
+        if (! $index = $this->get('search_index')) {
+            return null;
+        }
+
+        return Search::index($index);
+    }
+
+    public function hasSearchIndex()
+    {
+        return $this->searchIndex() !== null;
     }
 }

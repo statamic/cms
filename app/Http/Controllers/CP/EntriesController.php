@@ -16,6 +16,8 @@ class EntriesController extends CpController
 
     public function index($collection)
     {
+        $collection = Collection::whereHandle($collection);
+
         $entries = $this
             ->indexQuery($collection)
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
@@ -36,12 +38,17 @@ class EntriesController extends CpController
 
     protected function indexQuery($collection)
     {
+        $query = $collection->queryEntries();
+
         if ($search = request('search')) {
-            // TODO: Don't assume the index is named the same as the collection
-            return Search::index($collection)->ensureExists()->search($search);
+            if ($collection->hasSearchIndex()) {
+                return $collection->searchIndex()->ensureExists()->search($search);
+            }
+
+            $query->where('title', $search);
         }
 
-        return Entry::query()->where('collection', $collection);
+        return $query;
     }
 
     public function edit(Request $request, $collection, $slug)
