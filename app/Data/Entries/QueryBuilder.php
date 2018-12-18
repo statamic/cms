@@ -27,4 +27,9 @@ class QueryBuilder extends BaseQueryBuilder
 
         return Entry::all()->values();
     }
+
+    protected function collect($items = [])
+    {
+        return collect_entries($items);
+    }
 }

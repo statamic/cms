@@ -114,7 +114,7 @@ abstract class QueryBuilder
 
         $total = $this->getCountForPagination();
 
-        $results = $total ? $this->forPage($page, $perPage)->get() : collect();
+        $results = $total ? $this->forPage($page, $perPage)->get() : $this->collect();
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -169,5 +169,10 @@ abstract class QueryBuilder
         return method_exists($item, $column)
             ? $item->{$column}()
             : $item->get($column);
+    }
+
+    protected function collect($items = [])
+    {
+        return collect($items);
     }
 }

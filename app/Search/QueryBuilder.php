@@ -45,8 +45,13 @@ abstract class QueryBuilder extends BaseQueryBuilder
             return new \Statamic\Data\DataCollection($results);
         }
 
-        return collect_entries($results)->map(function ($result) {
+        return $this->collect($results)->map(function ($result) {
             return Content::find($result['id']);
         })->filter();
+    }
+
+    protected function collect($items = [])
+    {
+        return collect_entries($items);
     }
 }
