@@ -45,7 +45,7 @@ class EntriesController extends CpController
                 return $collection->searchIndex()->ensureExists()->search($search);
             }
 
-            $query->where('title', $search);
+            $query->where('title', 'like', '%'.$search.'%');
         }
 
         return $query;
