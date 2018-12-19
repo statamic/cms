@@ -59,7 +59,7 @@
                 <li class="{{ current_class('updater*') }}">
                     <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('loading-bar')</i><span>Updates</span>
-                        <updates-badge class="ml-1"></updates-badge>
+                        <updates-badge class="ml-1" :initial-count="{{ Facades\Statamic\Updater\UpdatesCount::get() }}"></updates-badge>
                     </a>
                 </li>
                 <li class="{{ current_class('utilities*') }}">

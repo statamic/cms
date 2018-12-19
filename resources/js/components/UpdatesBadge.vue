@@ -8,14 +8,14 @@
     import axios from 'axios';
 
     export default {
-        data() {
-            return {
-                count: 0,
-            };
+        props: {
+            initialCount: Number
         },
 
-        mounted() {
-            this.getCount(false);
+        data() {
+            return {
+                count: this.initialCount,
+            };
         },
 
         created() {
