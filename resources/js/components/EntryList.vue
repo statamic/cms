@@ -112,7 +112,7 @@ export default {
         loading: {
             immediate: true,
             handler(loading) {
-                this.$progress.loading(loading);
+                this.$progress.loading('entries', loading);
             }
         }
 
