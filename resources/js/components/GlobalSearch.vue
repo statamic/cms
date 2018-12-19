@@ -116,6 +116,10 @@ export default {
     watch: {
         query(query) {
             this.update();
+        },
+
+        searching(searching) {
+            this.$progress.loading('global-search', searching);
         }
     },
 
