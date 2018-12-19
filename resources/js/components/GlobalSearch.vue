@@ -66,7 +66,7 @@ export default {
     },
 
     methods: {
-        update() {
+        update: _.debounce(function () {
             if (!this.query) {
                 this.reset();
                 return;
@@ -82,7 +82,7 @@ export default {
                     this.current = -1;
                     this.searching = false;
                 });
-        },
+        }, 300),
 
         reset() {
             this.results = [];
