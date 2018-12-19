@@ -11,7 +11,7 @@
         @drop="dragStop">
 
         <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
+            <loading-graphic :inline="true" />
         </div>
 
         <div class="drag-notification" v-if="containerSpecified && draggingFile && !showSelector">
