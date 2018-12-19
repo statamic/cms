@@ -65,7 +65,9 @@ import axios from 'axios';
 export default {
 
     props: {
-        collection: String
+        collection: String,
+        initialSortColumn: String,
+        initialSortDirection: String,
     },
 
     data() {
@@ -74,8 +76,8 @@ export default {
             loading: true,
             entries: [],
             columns: [],
-            sortColumn: null,
-            sortDirection: 'asc',
+            sortColumn: this.initialSortColumn,
+            sortDirection: this.initialSortDirection,
             meta: null,
             page: 1,
             searchQuery: '',

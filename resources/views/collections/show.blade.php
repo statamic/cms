@@ -10,6 +10,10 @@
         <a href="{{ cp_route('collections.entries.create', $collection->path()) }}" class="btn btn-primary">{{ __('Create Entry') }}</a>
     </div>
 
-    <entry-list collection="{{ $collection->handle() }}"></entry-list>
+    <entry-list
+        collection="{{ $collection->handle() }}"
+        initial-sort-column="title"
+        initial-sort-direction="asc"
+    ></entry-list>
 
 @endsection
