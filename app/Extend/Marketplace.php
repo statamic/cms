@@ -261,6 +261,7 @@ class Marketplace
                     'number' => 1,
                     'description' => 'N/A',
                     'assets' => [],
+                    'githubRepo' => $addon->package(),
                 ]
             ],
             'seller' => [
