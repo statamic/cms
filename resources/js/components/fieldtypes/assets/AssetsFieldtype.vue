@@ -433,6 +433,13 @@ export default {
          */
         assets(val) {
             this.update(_.pluck(this.assets, 'url'));
+        },
+
+        loading: {
+            immediate: true,
+            handler(loading) {
+                this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+            }
         }
 
     },
