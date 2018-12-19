@@ -126,26 +126,6 @@ class Formset implements FormsetContract
     }
 
     /**
-     * The URL to view submissions in the CP
-     *
-     * @return string
-     */
-    public function url()
-    {
-        return cp_route('form.show', $this->name());
-    }
-
-    /**
-     * The URL to edit it in the CP
-     *
-     * @return string
-     */
-    public function editUrl()
-    {
-        return cp_route('forms.edit', $this->name());
-    }
-
-    /**
      * Save the formset
      *
      * @return void

@@ -2,10 +2,9 @@
 
 namespace Statamic\Contracts\Forms;
 
-use Statamic\Contracts\CP\Editable;
 use Illuminate\Contracts\Support\Arrayable;
 
-interface Formset extends Arrayable, Editable
+interface Formset extends Arrayable
 {
     /**
      * Get or set the name

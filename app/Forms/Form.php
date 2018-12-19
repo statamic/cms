@@ -251,7 +251,7 @@ class Form implements FormContract
      */
     public function url()
     {
-        return $this->formset()->url();
+        return cp_route('forms.show', $this->name());
     }
 
     /**
@@ -261,7 +261,7 @@ class Form implements FormContract
      */
     public function editUrl()
     {
-        return $this->formset()->editUrl();
+        return cp_route('forms.edit', $this->name());
     }
 
     /**
