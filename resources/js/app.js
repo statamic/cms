@@ -32,7 +32,7 @@ Vue.use(Vuex);
 // });
 
 require('./components/NotificationBus');
-require('./components/ProgressBus');
+require('./components/ProgressBar');
 
 var vm = new Vue({
     el: '#statamic',
