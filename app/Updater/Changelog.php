@@ -121,17 +121,9 @@ class Changelog
      */
     protected function getReleases()
     {
-        // Some things to think about...
-        //
-        // - The statamic.com API currently only outputs published variant data.
-        // - The statamic.com API currently only outputs github tags with associated releases.
-        //
-        // Therefore, it's possible that running composer require/update can install a version that's
-        // not visible in the changelog.  How do we want to deal with this?
-
         return collect(Marketplace::show($this->slug)['data']['variants'])
-              ->pluck('releases')
-              ->flatten(1);
+            ->pluck('releases')
+            ->flatten(1);
     }
 
     /**
