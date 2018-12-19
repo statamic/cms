@@ -69,5 +69,6 @@ class AddonInstaller
 
         // Todo: doesn't currently output local addons!
         // Can we check for path repository maybe?
+        // This is okay though, for now they can just manually composer require local addons.
     }
 }
