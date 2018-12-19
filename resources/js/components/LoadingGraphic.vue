@@ -3,8 +3,8 @@
         'flex items-center leading-loose': inline
     }">
         <svg xmlns="http://www.w3.org/2000/svg"
-            :width="`${size}px`"
-            :height="`${size}px`"
+            :width="`${computedSize}px`"
+            :height="`${computedSize}px`"
             viewBox="0 0 40 40"
             stroke="#737f8c">
             <g fill="none" fill-rule="evenodd">
@@ -39,13 +39,22 @@ export default {
             default: 'Loading'
         },
         size: {
-            type: Number,
-            default: 24
+            type: Number
         },
         inline: {
             type: Boolean,
             default: false
         }
+    },
+
+    computed: {
+
+        computedSize() {
+            if (this.size) return this.size;
+
+            return this.inline ? 16 : 24;
+        }
+
     }
 
 }
