@@ -1,12 +1,12 @@
 <template>
     <div>
 
-        <div v-if="loading" class="card loading">
+        <div v-if="initializing" class="card loading">
             <loading-graphic />
         </div>
 
         <data-list
-            v-if="!loading"
+            v-if="!initializing"
             :rows="entries"
             :columns="columns"
             :search="false"
@@ -29,7 +29,7 @@
                         </data-list-bulk-actions>
                         <data-list-column-picker @change="updateColumns"></data-list-column-picker>
                     </div>
-                    <data-table :allow-bulk-actions="true" @sorted="sorted">
+                    <data-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </template>
@@ -70,6 +70,7 @@ export default {
 
     data() {
         return {
+            initializing: true,
             loading: true,
             entries: [],
             columns: [],
@@ -104,6 +105,13 @@ export default {
 
         parameters() {
             this.request();
+        },
+
+        loading: {
+            immediate: true,
+            handler(loading) {
+                this.$progress.loading(loading);
+            }
         }
 
     },
@@ -120,6 +128,7 @@ export default {
                 this.entries = response.data.data;
                 this.meta = response.data.meta;
                 this.loading = false;
+                this.initializing = false;
             });
         },
 

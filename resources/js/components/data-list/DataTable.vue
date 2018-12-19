@@ -1,5 +1,5 @@
 <template>
-    <table class="data-table">
+    <table class="data-table" :class="{ 'opacity-50': loading }">
         <thead v-if="sharedState.visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions"></th>
@@ -58,6 +58,10 @@
 export default {
 
     props: {
+        loading: {
+            type: Boolean,
+            default: false
+        },
         allowBulkActions: {
             default: false,
             type: Boolean

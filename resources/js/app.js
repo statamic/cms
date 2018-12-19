@@ -32,6 +32,7 @@ Vue.use(Vuex);
 // });
 
 require('./components/NotificationBus');
+require('./components/ProgressBus');
 
 var vm = new Vue({
     el: '#statamic',
@@ -71,8 +72,6 @@ var vm = new Vue({
         UserGroupListing: require('./components/user-groups/Listing.vue'),
         UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
     },
-
-    mixins: [ Notifications ],
 
     data: {
         version: Statamic.version,
