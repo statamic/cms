@@ -9,28 +9,16 @@ class FormsController extends CpController
 {
     public function index()
     {
-        $this->access('forms');
+        $this->authorize('forms');
 
-        $data = [
-            'title' => __('Forms'),
+        return view('statamic::forms.index', [
             'forms' => Form::all()->toArray()
-        ];
-
-        return view('statamic::forms.index', $data);
-    }
-
-    public function get()
-    {
-        $this->access('forms');
-
-        $forms = Form::all();
-
-        return ['items' => $forms];
+        ]);
     }
 
     public function show($form)
     {
-        $this->access('forms');
+        $this->authorize('forms');
 
         if (! $form = Form::get($form)) {
             return $this->pageNotFound();
@@ -96,7 +84,7 @@ class FormsController extends CpController
 
     public function create()
     {
-        $this->access('super');
+        $this->authorize('super');
 
         return view('statamic::forms.create', [
             'title' => t('creating_formset')
@@ -105,7 +93,7 @@ class FormsController extends CpController
 
     public function store()
     {
-        $this->authorize('super');
+        $this->authorize('forms');
 
         $slug = ($this->request->has('slug'))
                 ? $this->request->input('slug')
@@ -122,7 +110,7 @@ class FormsController extends CpController
 
         $form->save();
 
-        $this->success(translate('cp.form_created'));
+        $this->success(__('Created'));
 
         return [
             'success' => true,
@@ -132,7 +120,7 @@ class FormsController extends CpController
 
     public function edit($form)
     {
-        $this->access('super');
+        $this->authorize('super');
 
         $form = Form::get($form);
         $formset = $this->getFormsetJson($form);
@@ -142,7 +130,7 @@ class FormsController extends CpController
 
     public function update($form)
     {
-        $this->access('super');
+        $this->authorize('forms');
 
         $form = Form::get($form);
 
@@ -155,7 +143,7 @@ class FormsController extends CpController
 
         $form->save();
 
-        $this->success(translate('cp.form_updated'));
+        $this->success(__('Saved'));
 
         return [
             'success' => true,

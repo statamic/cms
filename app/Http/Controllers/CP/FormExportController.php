@@ -11,7 +11,7 @@ class FormExportController extends CpController
 {
     public function export($form, $type)
     {
-        $this->access('forms');
+        $this->authorize('forms');
 
         $form = Form::get($form);
 

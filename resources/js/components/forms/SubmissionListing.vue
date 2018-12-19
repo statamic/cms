@@ -5,6 +5,8 @@
             <loading-graphic />
         </div>
 
+        <slot name="no-results" v-if="!loading && submissions.length === 0" />
+
         <data-list
             v-if="!loading"
             :columns="columns"
@@ -13,10 +15,18 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div class="card p-0" slot-scope="{ filteredRows: rows }">
-                <data-table @sorted="sorted">
+            <div class="card p-0" slot-scope="{ rows }">
+                <data-table v-if="rows.length" @sorted="sorted">
                     <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
                         <a :href="submission.edit_url">{{ value }}</a>
+                    </template>
+                    <template slot="actions" slot-scope="{ row: submission, index }">
+                        <dropdown-list>
+                            <ul class="dropdown-menu">
+                                <li><a :href="submission.edit_url">Edit</a></li>
+                                <li class="warning" v-if="submission.deleteable"><a @click.prevent="destroy(submission.id, index)">Delete</a></li>
+                            </ul>
+                        </dropdown-list>
                     </template>
                 </data-table>
             </div>
@@ -85,7 +95,17 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
-        }
+        },
+
+        destroy(id, index) {
+            const url = cp_url(`forms/${this.form}/submissions/${id}`);
+            axios.delete(url).then(response => {
+                this.submissions.splice(index, 1);
+                this.$notify.success(__('Submission deleted'));
+            }).catch(error => {
+                this.$notify.error(error.response.data.message);
+            })
+        },
 
     }
 

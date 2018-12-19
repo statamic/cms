@@ -12,7 +12,7 @@ class FormSubmissionsController extends CpController
 {
     public function index($form)
     {
-        $this->access('forms');
+        $this->authorize('forms');
 
         $form = Form::get($form);
 
@@ -30,6 +30,7 @@ class FormSubmissionsController extends CpController
             $submission['datestamp'] = $submission['date']->timestamp;
             $submission['edit_url'] = cp_route('forms.submissions.show', [$form->name(), $submission['id']]);
             $submission['delete_url'] = cp_route('forms.submissions.destroy', [$form->name(), $submission['id']]);
+            $submission['deleteable'] = me()->can('forms');
             return $submission;
         });
 
@@ -104,22 +105,20 @@ class FormSubmissionsController extends CpController
         return ($is_arr) ? $values : $values[0];
     }
 
-    public function deleteSubmission($form, $id)
+    public function destroy($form, $id)
     {
-        $this->access('super');
+        $this->authorize('forms');
 
         $form = Form::get($form);
 
         $form->deleteSubmission($id);
 
-        $this->success(t('form_submission_deleted'));
-
-        return redirect()->back();
+        return response('', 204);
     }
 
     public function show($form, $submission)
     {
-        $this->access('forms');
+        $this->authorize('forms');
 
         $form = Form::get($form);
 
