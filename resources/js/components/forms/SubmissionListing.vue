@@ -18,12 +18,12 @@
             <div class="card p-0" slot-scope="{ rows }">
                 <data-table v-if="rows.length" @sorted="sorted">
                     <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
-                        <a :href="submission.edit_url">{{ value }}</a>
+                        <a :href="submission.url">{{ value }}</a>
                     </template>
                     <template slot="actions" slot-scope="{ row: submission, index }">
                         <dropdown-list>
                             <ul class="dropdown-menu">
-                                <li><a :href="submission.edit_url">Edit</a></li>
+                                <li><a :href="submission.url">View</a></li>
                                 <li class="warning" v-if="submission.deleteable"><a @click.prevent="destroy(submission.id, index)">Delete</a></li>
                             </ul>
                         </dropdown-list>

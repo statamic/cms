@@ -4,25 +4,38 @@ namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Str;
 use Statamic\API\Form;
+use Statamic\Contracts\Forms\Form as FormContract;
 
 class FormsController extends CpController
 {
     public function index()
     {
-        $this->authorize('forms');
+        $this->authorize('index', FormContract::class);
+
+        $forms = Form::all()->filter(function ($form) {
+            return request()->user()->can('view', $form);
+        })->map(function ($form) {
+            return [
+                'id' => $form->handle(),
+                'title' => $form->title(),
+                'submissions' => $form->submissions()->count(),
+                'show_url' => $form->url(),
+                'edit_url' => $form->editUrl(),
+            ];
+        })->values();
 
         return view('statamic::forms.index', [
-            'forms' => Form::all()->toArray()
+            'forms' => $forms
         ]);
     }
 
     public function show($form)
     {
-        $this->authorize('forms');
-
         if (! $form = Form::get($form)) {
             return $this->pageNotFound();
         }
+
+        $this->authorize('view', $form);
 
         return view('statamic::forms.show', compact('form'));
     }
@@ -84,7 +97,7 @@ class FormsController extends CpController
 
     public function create()
     {
-        $this->authorize('super');
+        $this->authorize('create', FormContract::class);
 
         return view('statamic::forms.create', [
             'title' => t('creating_formset')
@@ -93,7 +106,7 @@ class FormsController extends CpController
 
     public function store()
     {
-        $this->authorize('forms');
+        $this->authorize('create', FormContract::class);
 
         $slug = ($this->request->has('slug'))
                 ? $this->request->input('slug')
@@ -120,9 +133,10 @@ class FormsController extends CpController
 
     public function edit($form)
     {
-        $this->authorize('super');
-
         $form = Form::get($form);
+
+        $this->authorize('edit', $form);
+
         $formset = $this->getFormsetJson($form);
 
         return view('statamic::forms.edit', compact('form', 'formset'));
@@ -130,9 +144,9 @@ class FormsController extends CpController
 
     public function update($form)
     {
-        $this->authorize('forms');
-
         $form = Form::get($form);
+
+        $this->authorize('edit', $form);
 
         $form->title($this->request->input('formset.title'));
         $form->honeypot($this->request->input('formset.honeypot'));

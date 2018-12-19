@@ -20,6 +20,7 @@ return [
     'permission_upload_{container}_assets' => 'Upload new assets',
     'permission_edit_{container}_assets' => 'Edit asset meta data',
     'permission_delete_{container}_assets' => 'Delete assets',
-    'permission_forms' => 'Access Forms',
+    'permission_view_{form}_form_submissions' => 'View :form submissions',
+    'permission_delete_{form}_form_submissions' => 'Delete :form submissions',
 
 ];

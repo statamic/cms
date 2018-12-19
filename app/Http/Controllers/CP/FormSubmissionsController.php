@@ -12,9 +12,9 @@ class FormSubmissionsController extends CpController
 {
     public function index($form)
     {
-        $this->authorize('forms');
-
         $form = Form::get($form);
+
+        $this->authorize('view', $form);
 
         $columns = collect($form->columns())->map(function ($val, $column) {
             return ['label' => $column, 'field' => $column, 'translation' => $val];
@@ -23,15 +23,15 @@ class FormSubmissionsController extends CpController
             'field' => 'datestamp'
         ])->reverse()->values();
 
-        $submissions = collect($form->submissions()->each(function ($submission) {
-            return $this->sanitizeSubmission($submission);
-        })->toArray())->map(function ($submission) use ($form) {
-            $submission['datestring'] = $submission['date']->format($form->dateFormat());
-            $submission['datestamp'] = $submission['date']->timestamp;
-            $submission['edit_url'] = cp_route('forms.submissions.show', [$form->name(), $submission['id']]);
-            $submission['delete_url'] = cp_route('forms.submissions.destroy', [$form->name(), $submission['id']]);
-            $submission['deleteable'] = me()->can('forms');
-            return $submission;
+        $submissions = $form->submissions()->map(function ($submission) use ($form) {
+            $this->sanitizeSubmission($submission);
+
+            return array_merge($submission->toArray(), [
+                'datestring' => $submission->date()->format($form->dateFormat()),
+                'datestamp' => $submission->date()->timestamp,
+                'url' => cp_route('forms.submissions.show', [$form->name(), $submission->id()]),
+                'deleteable' => me()->can('delete', $submission),
+            ]);
         });
 
         // Set the default/fallback sort order
@@ -107,24 +107,24 @@ class FormSubmissionsController extends CpController
 
     public function destroy($form, $id)
     {
-        $this->authorize('forms');
+        $submission = Form::get($form)->submission($id);
 
-        $form = Form::get($form);
+        $this->authorize('delete', $submission);
 
-        $form->deleteSubmission($id);
+        $submission->delete();
 
         return response('', 204);
     }
 
     public function show($form, $submission)
     {
-        $this->authorize('forms');
-
         $form = Form::get($form);
 
         if (! $submission = $form->submission($submission)) {
             return $this->pageNotFound();
         }
+
+        $this->authorize('view', $submission);
 
         $this->sanitizeSubmission($submission);
 

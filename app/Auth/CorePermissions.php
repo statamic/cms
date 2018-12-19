@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\API\Form;
 use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
@@ -21,7 +22,7 @@ class CorePermissions
             ->registerAssetContainers()
             ->registerUpdates()
             ->registerUsers()
-            ->register('forms');
+            ->registerForms();
     }
 
     protected function register($permission)
@@ -122,6 +123,23 @@ class CorePermissions
                     Permission::make('edit roles'),
                 ]),
             ]);
+        });
+
+        return $this;
+    }
+
+    protected function registerForms()
+    {
+        Permission::register('configure forms');
+
+        Permission::register('view {form} form submissions', function ($permission) {
+            $permission->withChildren([
+                Permission::make('delete {form} form submissions')
+            ])->withReplacements('form', function () {
+                return Form::all()->map(function ($form) {
+                    return ['value' => $form->name(), 'label' => $form->title()];
+                });
+            });
         });
 
         return $this;

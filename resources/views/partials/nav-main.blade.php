@@ -49,11 +49,13 @@
             </ul>
             <h6>Tools</h6>
             <ul>
+                @can('index', 'Statamic\Contracts\Forms\Form')
                 <li class="{{ current_class('forms*') }}">
                     <a href="{{ cp_route('forms.index') }}">
                         <i>@svg('drawer-file')</i><span>Forms</span>
                     </a>
                 </li>
+                @endcan
                 <li class="{{ current_class('updater*') }}">
                     <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('loading-bar')</i><span>Updates</span>
