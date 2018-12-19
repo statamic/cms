@@ -48,14 +48,7 @@ class Form
         foreach ($files as $file) {
             $filename = pathinfo($file)['filename'];
 
-            $form = self::get($filename);
-            $submissions = $form->submissions();
-
-            $form = $form->toArray();
-            $form['submissions'] = count($submissions);
-            $form['show_url'] = cp_route('forms.show', $form['name']);
-
-            $forms[] = $form;
+            $forms[] = self::get($filename);
         }
 
         return collect($forms);
