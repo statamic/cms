@@ -23,6 +23,10 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
+        },
+
+        canSave() {
+            return this.$progress.isComplete();
         }
 
     },

@@ -17,7 +17,13 @@
                     @svg('chevron-right')
                     {{ $entry->get('title') }}
                 </h1>
-                <a href="" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</a>
+                <button
+                    class="btn btn-primary"
+                    :class="{ disabled: !canSave }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="__('Save')"
+                ></button>
             </div>
 
             <publish-container
