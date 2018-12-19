@@ -316,7 +316,7 @@ export default {
                 return;
             }
 
-            axios.get(cp_url('assets/data'), {
+            axios.get(cp_url('assets-fieldtype'), {
                 params: { assets }
             }).then(response => {
                 this.assets = response.data;
