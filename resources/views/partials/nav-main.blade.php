@@ -56,12 +56,14 @@
                     </a>
                 </li>
                 @endcan
+                @can('view updates')
                 <li class="{{ current_class('updater*') }}">
                     <a href="{{ route('statamic.cp.updater.index') }}">
                         <i>@svg('loading-bar')</i><span>Updates</span>
                         <updates-badge class="ml-1" :initial-count="{{ Facades\Statamic\Updater\UpdatesCount::get() }}"></updates-badge>
                     </a>
                 </li>
+                @endcan
                 <li class="{{ current_class('utilities*') }}">
                     <a href="{{ cp_route('utilities.phpinfo') }}">
                         <i>@svg('settings-slider')</i><span>{{ __('Utilities') }}</span>
