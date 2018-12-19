@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use GuzzleHttp\Client;
+use Facades\GuzzleHttp\Client;
 use Statamic\API\Addon as AddonAPI;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Resources\Json\Resource;
@@ -188,9 +188,7 @@ class Marketplace
      */
     protected function apiRequest($endpoint, $method = 'GET')
     {
-        $client = new Client;
-
-        $response = $client->request($method, $this->buildEndpoint($endpoint), [
+        $response = Client::request($method, $this->buildEndpoint($endpoint), [
             'verify' => $this->verifySsl,
             'query' => [
                 'statamicVersion' => 3,

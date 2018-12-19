@@ -3,7 +3,6 @@
 namespace Statamic\Updater;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
 use Statamic\Statamic;
 use Statamic\API\Addon;
 use Facades\Statamic\Extend\Marketplace;

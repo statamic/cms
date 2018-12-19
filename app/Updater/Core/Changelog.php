@@ -2,8 +2,8 @@
 
 namespace Statamic\Updater\Core;
 
-use GuzzleHttp\Client;
 use Statamic\Statamic;
+use Facades\GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Updater\Changelog as BaseChangelog;
 
@@ -78,9 +78,7 @@ class Changelog extends BaseChangelog
      */
     protected function queryApi()
     {
-        $client = new Client;
-
-        return $client->get("{$this->domain}/api/v1/three/changelog", [
+        return Client::get("{$this->domain}/api/v1/three/changelog", [
             'verify' => $this->verifySsl,
         ]);
     }
