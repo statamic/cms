@@ -43,7 +43,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'arr', 'asset_container', 'asset_folder', 'assets', 'bard', 'checkboxes', 'code', 'collection', 'collections',
+        'arr', 'asset_container', 'asset_folder', 'bard', 'checkboxes', 'code', 'collection', 'collections',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
@@ -258,6 +258,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
 
+        $this->app['statamic.fieldtypes']['assets'] = \Statamic\Fields\Fieldtypes\Assets::class;
         $this->app['statamic.fieldtypes']['form'] = \Statamic\Forms\Fieldtype::class;
         $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
         $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
