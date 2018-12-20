@@ -75,6 +75,23 @@ class ChangelogTest extends TestCase
         });
     }
 
+    /** @test */
+    function it_can_get_latest_release()
+    {
+        Client::shouldReceive('request')
+            ->andReturn($this->fakeMarketplaceShowResponse(['1.0.2', '1.0.1', '1.0.0']));
+
+        Changelog::swap(RealChangelog::product('deaths-tar-vulnerability'));
+        Changelog::shouldReceive('currentVersion')->andReturn('1.0.1');
+        Changelog::makePartial();
+
+        $latest = Changelog::latest();
+
+        $this->assertEquals('1.0.2', $latest->version);
+        $this->assertEquals('upgrade', $latest->type);
+        $this->assertTrue($latest->latest);
+    }
+
     private function fakeCoreChangelogResponse($versions)
     {
         return new Response(200, [], json_encode([
