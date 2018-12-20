@@ -37,9 +37,11 @@ $color: hsla(200, 80%, 50%, 1);
     display: block;
     position: fixed;
     z-index: 1031;
-    top: 14px;
-    left: 27px;
+    top: 9px;
+    left: 22px;
     background: white;
+    border-radius: 50%;
+    padding: 5px;
 }
 
 #nprogress .spinner-icon {
