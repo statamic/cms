@@ -20,7 +20,7 @@
         </thead>
         <tbody>
             <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id">
+            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)">
                 <td class="checkbox-column" v-if="allowBulkActions">
                     <input
                         type="checkbox"
@@ -65,6 +65,10 @@ export default {
         allowBulkActions: {
             default: false,
             type: Boolean
+        },
+        toggleSelectionOnRowClick: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -98,6 +102,22 @@ export default {
 
         actualIndex(row) {
             return _.findIndex(this.sharedState.originalRows, row);
+        },
+
+        rowClicked(row, i) {
+            if (this.toggleSelectionOnRowClick) {
+                this.toggleSelection(row.id);
+            }
+        },
+
+        toggleSelection(id) {
+            const i = this.sharedState.selections.indexOf(id);
+
+            if (i != -1) {
+                this.sharedState.selections.splice(i, 1);
+            } else if (! this.reachedSelectionLimit) {
+                this.sharedState.selections.push(id);
+            }
         }
 
     }

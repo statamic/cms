@@ -24,6 +24,7 @@
                             <data-table
                                 :loading="loading"
                                 :allow-bulk-actions="true"
+                                :toggle-selection-on-row-click="true"
                                 @sorted="sorted"
                             >
                                 <template slot="cell-url" slot-scope="{ row: entry }">
