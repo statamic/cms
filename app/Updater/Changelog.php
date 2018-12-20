@@ -34,7 +34,6 @@ class Changelog
     public function __construct(string $slug)
     {
         $this->slug = $slug;
-        $this->currentVersion = $this->currentVersion();
     }
 
     /**
@@ -59,7 +58,8 @@ class Changelog
      */
     public function currentVersion()
     {
-        return $this->installedAddon()->version();
+        return $this->currentVersion
+            ?? $this->currentVersion = $this->installedAddon()->version();
     }
 
     /**
@@ -133,9 +133,9 @@ class Changelog
      */
     protected function parseReleaseType($releaseVersion)
     {
-        if (version_compare($releaseVersion, $this->currentVersion, '=')) {
+        if (version_compare($releaseVersion, $this->currentVersion(), '=')) {
             return 'current';
-        } elseif (version_compare($releaseVersion, $this->currentVersion, '>')) {
+        } elseif (version_compare($releaseVersion, $this->currentVersion(), '>')) {
             return 'upgrade';
         }
 
