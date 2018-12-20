@@ -39,7 +39,11 @@ class UpdatesCount
      */
     protected function checkForStatamicUpdates()
     {
-        if (Statamic::version() != Changelog::product(Statamic::CORE_SLUG)->latest()->version) {
+        if (! $latest = Changelog::product(Statamic::CORE_SLUG)->latest()) {
+            return $this;
+        }
+
+        if (Statamic::version() != $latest->version) {
             $this->count++;
         }
 
