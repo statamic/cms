@@ -4,21 +4,12 @@
         <loading-graphic v-if="initializing" :inline="true" />
 
         <div v-if="!initializing">
-            <div
+            <related-item
                 v-for="(item, i) in items"
                 :key="item.id"
-                class="text-sm mb-1"
-            >
-                <div class="border shadow-inner bg-grey-lightest rounded-md leading-loose px-1 inline-flex items-center cursor-pointer">
-                    <div class="little-dot bg-green mr-1" />
-                    {{ item.title }}
-                    <button
-                        class="text-xs text-grey ml-1 font-bold outline-none hover:text-red"
-                        @click.prevent="remove(i)">
-                        &times;
-                    </button>
-                </div>
-            </div>
+                :item="item"
+                @removed="remove(i)"
+            />
 
             <button
                 class="btn btn-sm"
@@ -42,6 +33,7 @@
 
 <script>
 import axios from 'axios';
+import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
 
 export default {
@@ -49,7 +41,8 @@ export default {
     mixins: [Fieldtype],
 
     components: {
-        ItemSelector
+        ItemSelector,
+        RelatedItem
     },
 
     data() {

@@ -142,7 +142,7 @@
                             <publish-fields :fields="fields" />
                         </div>
 
-                        <div class="editor-form-actions">
+                        <div class="editor-form-actions text-right">
                             <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
                                 {{ __('Delete') }}
                             </button>

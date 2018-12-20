@@ -26,12 +26,7 @@ class RelationshipFieldtypeController extends CpController
     public function data(Request $request)
     {
         $items = collect($request->selections)->map(function ($id) {
-            $entry = Entry::find($id);
-
-            return [
-                'id' => $id,
-                'title' => $entry->get('title'),
-            ];
+            return Entry::find($id);
         });
 
         return Resource::collection($items);

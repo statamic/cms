@@ -866,42 +866,6 @@
     }
 }
 
-.asset-editor .editor-form {
-    position: relative;
-
-    .editor-form-fields {
-        // Could have done this with flexbox but firefox was pushing
-        // out the height if there were many publish fields.
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 60px;
-        right: 0;
-        overflow: auto;
-    }
-
-    .editor-form-actions {
-        padding: 15px;
-        text-align: right;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        left: 0;
-
-        // a fade so it indicates you can scroll.
-        &:after {
-            content: "";
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            width: 100%;
-            height: 30px;
-            background: linear-gradient(to bottom, rgba(white, 0), white);
-        }
-    }
-}
-
-
 
 
 /* In a Replicator fieldtype

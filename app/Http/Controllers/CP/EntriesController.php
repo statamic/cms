@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Entry;
-use Statamic\API\Search;
+use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
@@ -73,11 +73,22 @@ class EntriesController extends CpController
             'slug' => $entry->slug()
         ]);
 
-        return view('statamic::entries.edit', [
-            'entry' => $entry,
+        $viewData = [
+            'actions' => [
+                'update' => cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()])
+            ],
             'values' => $values,
+            'blueprint' => $entry->blueprint()->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry)
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::entries.edit', array_merge($viewData, [
+            'entry' => $entry
+        ]));
     }
 
     public function update(Request $request, $collection, $slug)
@@ -106,7 +117,7 @@ class EntriesController extends CpController
 
         // TODD: Localization
 
-        return response('', 204);
+        return $entry->toArray();
     }
 
     public function create()

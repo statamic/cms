@@ -92,6 +92,37 @@ code.parent-url {
 }
 
 
+
+/* Inline publish form
+   Used in popovers and in the asset editor modal.
+   ========================================================================== */
+
+.editor-form {
+    position: relative;
+
+    .editor-form-fields {
+        // Could have done this with flexbox but firefox was pushing
+        // out the height if there were many publish fields.
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 68px;
+        right: 0;
+        overflow: auto;
+    }
+
+    .editor-form-actions {
+        padding: 15px;
+        position: absolute;
+        z-index: 2;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        border-top: 1px solid $border;
+    }
+}
+
+
 /* Responsive Wangjangling
    ========================================================================== */
 
