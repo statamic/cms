@@ -106,4 +106,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $this->assertEquals($expected, file_get_contents($filename));
     }
+
+    protected function assertContainsHtml($string)
+    {
+        preg_match("/<[^<]+>/", $string, $matches);
+
+        $this->assertNotEmpty($matches, 'Failed asserting that string contains HTML.');
+    }
 }
