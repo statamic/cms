@@ -2,7 +2,7 @@
 
 namespace Tests\Fakes\Composer;
 
-use Facades\Statamic\Updater\CoreUpdater;
+use Facades\Statamic\Updater\Updater;
 
 class Composer
 {
@@ -61,8 +61,10 @@ class Composer
             $version = $this->installed->get($package)->version;
         }
 
+        // Just like actual composer would resolve an x.x.* constraint to an actual version number,
+        // Our fake composer instance will resolve to x.x.9 for the purposes of testing.
         if (str_contains($version, '*')) {
-            $version = CoreUpdater::latestVersion();
+            $version = str_replace('*', '9', $version);
         }
 
         $this->installed->put($package, (object) [
