@@ -2,8 +2,32 @@
 
 namespace Tests\Fakes\Composer;
 
-class CoreChangelog
+use Facades\Statamic\Console\Processes\Composer;
+
+class Changelog
 {
+    protected $slug;
+
+    public function __construct(string $slug)
+    {
+        $this->slug = $slug;
+    }
+
+    public static function product(string $slug)
+    {
+        return new static($slug);
+    }
+
+    public function currentVersion()
+    {
+        return Composer::installedVersion($this->slug);
+    }
+
+    public function composerPackage()
+    {
+        //
+    }
+
     public function get()
     {
         return collect(['1.1.2', '1.1.1', '1.1.0', '1.0.1', '1.0.0'])
