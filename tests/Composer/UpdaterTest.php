@@ -30,7 +30,7 @@ class UpdaterTest extends TestCase
     }
 
     /** @test */
-    function it_can_update_an_addon()
+    function it_can_update()
     {
         Updater::update();
 
@@ -38,7 +38,7 @@ class UpdaterTest extends TestCase
     }
 
     /** @test */
-    function it_can_downgrade_core_to_explicit_version()
+    function it_can_downgrade_to_explicit_version()
     {
         Updater::update();
 
