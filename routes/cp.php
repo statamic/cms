@@ -90,6 +90,9 @@ Route::group([
 
     Route::get('suggestions/{type}', 'SuggestionController@show');
 
+    Route::get('relationship-fieldtype', 'RelationshipFieldtypeController@index');
+    Route::get('relationship-fieldtype/data', 'RelationshipFieldtypeController@data');
+
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');

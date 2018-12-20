@@ -262,6 +262,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.fieldtypes']['form'] = \Statamic\Forms\Fieldtype::class;
         $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
         $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
+        $this->app['statamic.fieldtypes']['relationship'] = \Statamic\Fields\Fieldtypes\Relationship::class;
     }
 
     /**
