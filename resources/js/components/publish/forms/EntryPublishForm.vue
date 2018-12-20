@@ -12,6 +12,7 @@ export default {
 
     data() {
         return {
+            saving: false,
             fieldset: null,
             values: _.clone(this.initialValues),
             error: null,
@@ -39,6 +40,14 @@ export default {
             .getFieldset();
     },
 
+    watch: {
+
+        saving(saving) {
+            this.$progress.loading('entry-publish-form', saving);
+        }
+
+    },
+
     methods: {
 
         clearErrors() {
@@ -47,6 +56,7 @@ export default {
         },
 
         save() {
+            this.saving = true;
             this.clearErrors();
 
             axios.patch(this.action, this.values).then(response => {
@@ -60,6 +70,8 @@ export default {
                 } else {
                     this.$notify.error('Something went wrong');
                 }
+            }).finally(() => {
+                this.saving = false;
             });
         }
 
