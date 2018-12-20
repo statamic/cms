@@ -40,16 +40,6 @@ class Updater
         return new static($slug);
     }
 
-    // /**
-    //  * Get current version.
-    //  *
-    //  * @return string
-    //  */
-    // public function currentVersion()
-    // {
-    //     return Changelog::curversion();
-    // }
-
     /**
      * Update core to latest constrained version.
      */
