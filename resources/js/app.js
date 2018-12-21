@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Notifications from './mixins/Notifications.js';
+// import Wizard from './mixins/Wizard.js';
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
@@ -71,6 +72,7 @@ var vm = new Vue({
         RolePublishForm: require('./components/roles/PublishForm.vue'),
         UserGroupListing: require('./components/user-groups/Listing.vue'),
         UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
+        CollectionWizard: require('./components/collections/Wizard.vue')
     },
 
     data: {

@@ -42,11 +42,6 @@ Vue.component('branch', require('../components/page-tree/Branch.vue'));
 Vue.component('branches', require('../components/page-tree/Branches.vue'));
 Vue.component('role-permission-tree', require('../components/roles/PermissionTree.vue'));
 
-// Wizards
-Vue.component('wizard', require('../components/wizard/Wizard.vue'));
-
-Vue.component('collection-wizard', require('../components/collections/Wizard.vue'));
-
 
 // Modals
 // Vue.component('modal', require('../components/Modal.vue'));

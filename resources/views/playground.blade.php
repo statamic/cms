@@ -2,8 +2,8 @@
 
 @section('content')
 
-    <wizard :steps="['Naming', 'Ordering', 'Behavior', 'Routing', 'Schema']">
-    </wizard>
+    <collection-wizard :steps="['Naming', 'Ordering', 'Behavior', 'Routing', 'Schema']">
+    </collection-wizard>
 
 @stop
 
