@@ -132,6 +132,8 @@ export default {
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
+            }).on('drag:start', e => {
+                if (this.selections.length === 1) e.cancel();
             }).on('sortable:stop', e => {
                 this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
                 this.items.splice(e.newIndex, 0, this.items.splice(e.oldIndex, 1)[0]);
