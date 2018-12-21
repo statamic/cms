@@ -84,7 +84,7 @@ class MakeTag extends GeneratorCommand
     {
         $class = parent::buildClass($name);
 
-        $class = str_replace('dummy_addon', snake_case($this->getNameInput()), $class);
+        $class = str_replace('dummy_tag', snake_case($this->getNameInput()), $class);
 
         return $class;
     }

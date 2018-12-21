@@ -7,7 +7,7 @@ use Statamic\Extend\Tags;
 class DummyClass extends Tags
 {
     /**
-     * The {{ dummy_addon }} tag
+     * The {{ dummy_tag }} tag
      *
      * @return string|array
      */
@@ -17,7 +17,7 @@ class DummyClass extends Tags
     }
 
     /**
-     * The {{ dummy_addon:example }} tag
+     * The {{ dummy_tag:example }} tag
      *
      * @return string|array
      */
