@@ -1,10 +1,10 @@
 <template>
 
     <div
-        class="text-sm mb-1"
+        class="item text-sm mb-1"
         @dblclick="isEditing = true"
     >
-        <div class="border shadow-inner bg-grey-lightest rounded-md leading-loose px-1 inline-flex items-center cursor-pointer select-none">
+        <div class="item-inner border shadow-inner bg-grey-lightest rounded-md leading-loose px-1 inline-flex items-center cursor-pointer select-none">
             <div class="little-dot bg-green mr-1" />
 
             {{ item.title }}

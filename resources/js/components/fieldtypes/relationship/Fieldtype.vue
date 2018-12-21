@@ -4,12 +4,15 @@
         <loading-graphic v-if="initializing" :inline="true" />
 
         <div v-if="!initializing">
-            <related-item
-                v-for="(item, i) in items"
-                :key="item.id"
-                :item="item"
-                @removed="remove(i)"
-            />
+            <div ref="items" class="outline-none">
+                <related-item
+                    v-for="(item, i) in items"
+                    :key="item.id"
+                    :item="item"
+                    class="item outline-none"
+                    @removed="remove(i)"
+                />
+            </div>
 
             <button
                 class="btn btn-sm"
@@ -31,10 +34,18 @@
 
 </template>
 
+<style>
+.relationship-fieldtype .item.draggable-source--is-dragging {
+    opacity: 0.5;
+}
+</style>
+
+
 <script>
 import axios from 'axios';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
+import {Sortable, Plugins} from '@shopify/draggable';
 
 export default {
 
@@ -56,8 +67,8 @@ export default {
         }
     },
 
-    created() {
-        this.getData();
+    mounted() {
+        this.getData().then(() => this.makeSortable());
     },
 
     watch: {
@@ -92,10 +103,24 @@ export default {
             const url = cp_url(`relationship-fieldtype/data`);
             const params = { selections: this.selections };
 
-            axios.get(url, { params }).then(response => {
+            return axios.get(url, { params }).then(response => {
                 this.loading = false;
                 this.initializing = false;
                 this.items = response.data.data;
+            });
+        },
+
+        makeSortable() {
+            new Sortable(this.$refs.items, {
+                draggable: '.item',
+                handle: '.item-inner',
+                mirror: { constrainDimensions: true },
+                swapAnimation: { vertical: true },
+                plugins: [Plugins.SwapAnimation],
+                delay: 200
+            }).on('sortable:stop', e => {
+                this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
+                this.items.splice(e.newIndex, 0, this.items.splice(e.oldIndex, 1)[0]);
             });
         }
 
