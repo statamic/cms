@@ -17,4 +17,15 @@ class Relationship extends Fieldtype
     {
         return Arr::wrap($data);
     }
+
+    public function rules(): array
+    {
+        $rules = ['array'];
+
+        if ($max = $this->config('max_items')) {
+            $rules[] = 'max:' . $max;
+        }
+
+        return $rules;
+    }
 }
