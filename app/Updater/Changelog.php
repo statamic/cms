@@ -97,7 +97,7 @@ class Changelog
      */
     public function latest()
     {
-        return $this->get()->first();
+        return optional($this->get()->first());
     }
 
     /**
