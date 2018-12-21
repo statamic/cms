@@ -65,6 +65,21 @@ class MakeTag extends GeneratorCommand
     }
 
     /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $class = parent::buildClass($name);
+
+        $class = str_replace('dummy_addon', snake_case($this->getNameInput()), $class);
+
+        return $class;
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array

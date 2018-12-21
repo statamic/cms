@@ -2,7 +2,27 @@
 
 namespace DummyNamespace;
 
-class DummyClass
+use Statamic\Extend\Tags;
+
+class DummyClass extends Tags
 {
-    // TODO: flesh out a default tag method
+    /**
+     * The {{ dummy_addon }} tag
+     *
+     * @return string|array
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * The {{ dummy_addon:example }} tag
+     *
+     * @return string|array
+     */
+    public function example()
+    {
+        //
+    }
 }
