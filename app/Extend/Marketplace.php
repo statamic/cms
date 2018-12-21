@@ -73,12 +73,16 @@ class Marketplace
             return $this;
         }
 
+        $cacheKey = 'marketplace-addons';
+
         try {
-            $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
+            $this->payload = Cache::remember($cacheKey, static::CACHE_FOR_MINUTES, function () {
                 return $this->apiRequest('addons');
             });
         } catch (RequestException $exception) {
-            $this->payload = ['data' => []];
+            $this->payload = Cache::remember($cacheKey, 5, function () {
+                return ['data' => []];
+            });
         }
 
         if ($this->addLocalData) {
@@ -155,12 +159,16 @@ class Marketplace
      */
     public function show($addon)
     {
+        $cacheKey = "marketplace-addons/{$addon}";
+
         try {
-            return Cache::remember("marketplace-addons/{$addon}", static::CACHE_FOR_MINUTES, function () use ($addon) {
+            return Cache::remember($cacheKey, static::CACHE_FOR_MINUTES, function () use ($addon) {
                 return $this->apiRequest("addons/{$addon}");
             });
         } catch (RequestException $exception) {
-            return null;
+            return Cache::remember($cacheKey, 5, function () use ($addon) {
+                return null;
+            });
         }
     }
 

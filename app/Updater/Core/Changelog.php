@@ -67,12 +67,16 @@ class Changelog extends BaseChangelog
      */
     protected function getReleases()
     {
+        $cacheKey = 'statamic/changelog';
+
         try {
-            return Cache::remember("statamic/changelog", static::CACHE_FOR_MINUTES, function () {
+            return Cache::remember($cacheKey, static::CACHE_FOR_MINUTES, function () {
                 return collect(json_decode($this->queryApi()->getBody(), true)['data']);
             });
         } catch (RequestException $exception) {
-            return collect();
+            return Cache::remember($cacheKey, 5, function () {
+                return collect();
+            });
         }
     }
 
