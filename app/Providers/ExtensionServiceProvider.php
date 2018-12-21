@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extend\Management\Manifest;
+use Illuminate\Console\DetectsApplicationNamespace;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
+    use DetectsApplicationNamespace;
+
     /**
      * Tags bundled with Statamic.
      *
@@ -159,7 +162,7 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register tags located in the App directory.
+     * Register tags located in the app directory.
      *
      * This prevents requiring users to manually bind their tags.
      *
@@ -173,7 +176,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($tagsPath) as $file) {
             $tag = snake_case($class = $file->getBasename('.php'));
-            $this->app['statamic.tags'][$tag] = "App\\Tags\\{$class}";
+            $this->app['statamic.tags'][$tag] = $this->getAppNamespace() . "Tags\\{$class}";
         }
     }
 
@@ -212,7 +215,7 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register modifiers located in the App directory.
+     * Register modifiers located in the app directory.
      *
      * This prevents requiring users to manually bind their modifiers.
      *
@@ -226,7 +229,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($modifiersPath) as $file) {
             $modifier = snake_case($class = $file->getBasename('.php'));
-            $this->app['statamic.modifiers'][$modifier] = "App\\Modifiers\\{$class}";
+            $this->app['statamic.modifiers'][$modifier] = $this->getAppNamespace() . "Modifiers\\{$class}";
         }
     }
 
