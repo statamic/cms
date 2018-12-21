@@ -7,22 +7,34 @@ use Statamic\Data\QueryBuilder as BaseQueryBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
-    protected $collection;
+    protected $collections;
 
     public function where($column, $operator = null, $value = null)
     {
         if ($column === 'collection') {
-            $this->collection = $operator;
+            $this->collections[] = $operator;
             return $this;
         }
 
         return parent::where($column, $operator, $value);
     }
 
+    public function whereIn($column, $values)
+    {
+        if (in_array($column, ['collection', 'collections'])) {
+            $this->collections = array_merge($this->collections ?? [], $values);
+            return $this;
+        }
+
+        return parent::whereIn($column, $values);
+    }
+
     protected function getBaseItems()
     {
-        if ($this->collection) {
-            return Entry::whereCollection($this->collection)->values();
+        if ($this->collections) {
+            return collect_entries($this->collections)->flatMap(function ($collection) {
+                return Entry::whereCollection($collection);
+            })->values();
         }
 
         return Entry::all()->values();
