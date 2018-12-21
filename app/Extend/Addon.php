@@ -123,7 +123,7 @@ final class Addon
      */
     public function __construct($id)
     {
-        $this->id = Str::studly($id);
+        $this->id = $id;
     }
 
     /**
