@@ -67,13 +67,13 @@ class Changelog extends BaseChangelog
      */
     protected function getReleases()
     {
-        return Cache::remember("statamic/changelog", static::CACHE_FOR_MINUTES, function () {
-            try {
+        try {
+            return Cache::remember("statamic/changelog", static::CACHE_FOR_MINUTES, function () {
                 return collect(json_decode($this->queryApi()->getBody(), true)['data']);
-            } catch (RequestException $e) {
-                return collect();
-            }
-        });
+            });
+        } catch (RequestException $exception) {
+            return collect();
+        }
     }
 
     /**
