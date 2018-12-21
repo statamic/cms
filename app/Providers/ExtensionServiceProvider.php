@@ -243,6 +243,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance('statamic.fieldtypes', collect());
 
         $this->registerBundledFieldtypes();
+        $this->registerAppFieldtypes();
     }
 
     /**
@@ -266,6 +267,25 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
         $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
         $this->app['statamic.fieldtypes']['relationship'] = \Statamic\Fields\Fieldtypes\Relationship::class;
+    }
+
+    /**
+     * Register fieldtypes located in the app directory.
+     *
+     * This prevents requiring users to manually bind their fieldtypes.
+     *
+     * @return void
+     */
+    protected function registerAppFieldtypes()
+    {
+        if (! $this->app['files']->exists($fieldtypesPath = app_path('Fieldtypes'))) {
+            return;
+        }
+
+        foreach ($this->app['files']->files($fieldtypesPath) as $file) {
+            $fieldtype = snake_case($class = $file->getBasename('.php'));
+            $this->app['statamic.fieldtypes'][$fieldtype] = $this->getAppNamespace() . "Fieldtypes\\{$class}";
+        }
     }
 
     /**
