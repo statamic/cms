@@ -62,7 +62,7 @@ export default {
         return {
             isSelecting: false,
             selections: this.value,
-            items: [],
+            itemData: [],
             initializing: true,
             loading: true,
             inline: false
@@ -70,6 +70,16 @@ export default {
     },
 
     computed: {
+
+        items() {
+            return this.selections.map(selection => {
+                const data = _.findWhere(this.itemData, { id: selection });
+
+                if (! data) return { id: selection, title: selection };
+
+                return data;
+            });
+        },
 
         maxItems() {
             return this.config.max_items || Infinity;
@@ -82,7 +92,8 @@ export default {
     },
 
     mounted() {
-        this.getData().then(() => this.makeSortable());
+        this.getDataForSelections(this.selections)
+            .then(() => this.makeSortable());
     },
 
     watch: {
@@ -104,23 +115,25 @@ export default {
 
         remove(index) {
             this.selections.splice(index, 1);
-            this.items.splice(index, 1);
         },
 
         selectionsUpdated(selections) {
-            this.selections = selections;
-            this.getData();
+            this.getDataForSelections(selections);
         },
 
-        getData() {
+        getDataForSelections(selections) {
             this.loading = true;
             const url = cp_url(`relationship-fieldtype/data`);
-            const params = { selections: this.selections };
+            const params = { selections };
 
             return axios.get(url, { params }).then(response => {
                 this.loading = false;
                 this.initializing = false;
-                this.items = response.data.data;
+
+                this.itemData = response.data.data;
+                this.selections = this.itemData.map(item => {
+                    return item.id;
+                });
             });
         },
 
@@ -136,7 +149,6 @@ export default {
                 if (this.selections.length === 1) e.cancel();
             }).on('sortable:stop', e => {
                 this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
-                this.items.splice(e.newIndex, 0, this.items.splice(e.oldIndex, 1)[0]);
             });
         }
 
