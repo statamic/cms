@@ -136,7 +136,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance('statamic.tags', collect());
 
         $this->registerBundledTags();
-        $this->registerAppTags();
+        $this->registerExtensionsInAppFolder('Tags');
     }
 
     /**
@@ -162,25 +162,6 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register tags located in the app directory.
-     *
-     * This prevents requiring users to manually bind their tags.
-     *
-     * @return void
-     */
-    protected function registerAppTags()
-    {
-        if (! $this->app['files']->exists($tagsPath = app_path('Tags'))) {
-            return;
-        }
-
-        foreach ($this->app['files']->files($tagsPath) as $file) {
-            $tag = snake_case($class = $file->getBasename('.php'));
-            $this->app['statamic.tags'][$tag] = $this->getAppNamespace() . "Tags\\{$class}";
-        }
-    }
-
-    /**
      * Register tags.
      *
      * @return void
@@ -190,7 +171,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance('statamic.modifiers', collect());
 
         $this->registerBundledModifiers();
-        $this->registerAppModifiers();
+        $this->registerExtensionsInAppFolder('Modifiers');
     }
 
     /**
@@ -215,25 +196,6 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register modifiers located in the app directory.
-     *
-     * This prevents requiring users to manually bind their modifiers.
-     *
-     * @return void
-     */
-    protected function registerAppModifiers()
-    {
-        if (! $this->app['files']->exists($modifiersPath = app_path('Modifiers'))) {
-            return;
-        }
-
-        foreach ($this->app['files']->files($modifiersPath) as $file) {
-            $modifier = snake_case($class = $file->getBasename('.php'));
-            $this->app['statamic.modifiers'][$modifier] = $this->getAppNamespace() . "Modifiers\\{$class}";
-        }
-    }
-
-    /**
      * Register fieldtypes.
      *
      * @return void
@@ -243,7 +205,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance('statamic.fieldtypes', collect());
 
         $this->registerBundledFieldtypes();
-        $this->registerAppFieldtypes();
+        $this->registerExtensionsInAppFolder('Fieldtypes');
     }
 
     /**
@@ -267,25 +229,6 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
         $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
         $this->app['statamic.fieldtypes']['relationship'] = \Statamic\Fields\Fieldtypes\Relationship::class;
-    }
-
-    /**
-     * Register fieldtypes located in the app directory.
-     *
-     * This prevents requiring users to manually bind their fieldtypes.
-     *
-     * @return void
-     */
-    protected function registerAppFieldtypes()
-    {
-        if (! $this->app['files']->exists($fieldtypesPath = app_path('Fieldtypes'))) {
-            return;
-        }
-
-        foreach ($this->app['files']->files($fieldtypesPath) as $file) {
-            $fieldtype = snake_case($class = $file->getBasename('.php'));
-            $this->app['statamic.fieldtypes'][$fieldtype] = $this->getAppNamespace() . "Fieldtypes\\{$class}";
-        }
     }
 
     /**
@@ -313,5 +256,26 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         $this->app['statamic.widgets']['form'] = \Statamic\Forms\Widget::class;
+    }
+
+    /**
+     * Register extensions in a specific app folder.
+     *
+     * This prevents requiring users to manually bind their extensions.
+     *
+     * @param string $folder
+     * @return void
+     */
+    protected function registerExtensionsInAppFolder($folder)
+    {
+        if (! $this->app['files']->exists($path = app_path($folder))) {
+            return;
+        }
+
+        foreach ($this->app['files']->files($path) as $file) {
+            $id = snake_case($class = $file->getBasename('.php'));
+            $extensionType = strtolower($folder);
+            $this->app["statamic.{$extensionType}"][$id] = $this->getAppNamespace() . "{$folder}\\{$class}";
+        }
     }
 }
