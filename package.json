@@ -33,6 +33,7 @@
     "nested-sortable": "file:resources/js/vendor/nested-sortable",
     "nprogress": "^0.2.0",
     "portal-vue": "^1.3.0",
+    "qs": "^6.6.0",
     "rangy": "^1.3.0",
     "redactor": "file:resources/js/vendor/redactor",
     "selectize": "^0.12.5",

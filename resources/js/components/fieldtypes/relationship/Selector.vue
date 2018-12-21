@@ -68,6 +68,7 @@ import axios from 'axios';
 export default {
 
     props: {
+        url: String,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -132,9 +133,8 @@ export default {
 
         request() {
             this.loading = true;
-            const url = cp_url(`relationship-fieldtype`);
 
-            axios.get(url, { params: this.parameters }).then(response => {
+            axios.get(this.url, { params: this.parameters }).then(response => {
                 this.columns = response.data.meta.columns.map(column => column.field);
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;

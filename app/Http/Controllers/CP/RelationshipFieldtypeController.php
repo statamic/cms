@@ -10,7 +10,13 @@ class RelationshipFieldtypeController extends CpController
 {
     public function index()
     {
-        $items = Entry::query()
+        $query = Entry::query();
+
+        if ($collections = request('collections')) {
+            $query->whereIn('collection', $collections);
+        }
+
+        $items = $query
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
             ->paginate();
 

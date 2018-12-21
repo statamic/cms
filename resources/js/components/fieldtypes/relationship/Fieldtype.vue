@@ -23,6 +23,7 @@
 
             <portal to="modals" v-if="isSelecting">
                 <item-selector
+                    :url="selectionsUrl"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="selections"
@@ -44,6 +45,7 @@
 
 
 <script>
+import qs from 'qs';
 import axios from 'axios';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
@@ -87,6 +89,20 @@ export default {
 
         maxItemsReached() {
             return this.selections.length >= this.maxItems;
+        },
+
+        selectionsUrl() {
+            return cp_url(`relationship-fieldtype`) + '?' + qs.stringify(this.selectionsUrlParameters);
+        },
+
+        selectionsUrlParameters() {
+            let params = {};
+
+            if (this.config.collections) {
+                params.collections = this.config.collections;
+            }
+
+            return params;
         }
 
     },
