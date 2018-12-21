@@ -54,6 +54,16 @@ class MakeTag extends GeneratorCommand
     }
 
     /**
+     * Get the desired class name from the input.
+     *
+     * @return string
+     */
+    protected function getNameInput()
+    {
+        return studly_case(parent::getNameInput());
+    }
+
+    /**
      * Get the default namespace for the class.
      *
      * @param  string  $rootNamespace
