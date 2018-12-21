@@ -84,7 +84,7 @@ export default {
             sortDirection: this.initialSortDirection,
             page: 1,
             searchQuery: '',
-            selections: this.initialSelections
+            selections: _.clone(this.initialSelections)
         }
     },
 
