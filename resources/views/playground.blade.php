@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <collection-wizard :steps="['Naming', 'Ordering', 'Behavior', 'Routing', 'Schema']">
+    <collection-wizard :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Front-End']">
     </collection-wizard>
 
 @stop

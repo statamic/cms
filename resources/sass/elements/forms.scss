@@ -73,6 +73,13 @@ textarea.input-text {
     }
 }
 
+.radio-box {
+    @apply border rounded cursor-pointer relative p-2 h-full;
+    &.selected {
+        @apply border-blue text-blue shadow;
+    }
+}
+
 
 /* Select Fields
   ========================================================================== */
