@@ -5,7 +5,7 @@
         @dblclick="isEditing = true"
     >
         <div class="item-inner border shadow-inner bg-grey-lightest rounded-md leading-loose px-1 inline-flex items-center cursor-pointer select-none">
-            <div class="little-dot bg-green mr-1" />
+            <div class="little-dot mr-1" :class="{ 'bg-green': item.published, 'bg-grey-light': !item.published }" />
 
             {{ item.title }}
 
