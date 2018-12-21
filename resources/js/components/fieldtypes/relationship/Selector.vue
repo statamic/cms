@@ -12,12 +12,12 @@
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     :selections="selections"
-                    :max-selections="maxItems"
+                    :max-selections="maxSelections"
                     @selections-updated="selectionsUpdated"
                 >
                     <div slot-scope="{ filteredRows: rows }" class="flex flex-col h-full justify-start">
                         <div class="data-list-header">
-                            <data-list-toggle-all v-if="!maxItems" />
+                            <data-list-toggle-all v-if="!hasMaxSelections" />
                             <data-list-search v-model="searchQuery" />
                         </div>
                         <div class="flex-1 overflow-scroll">
@@ -38,8 +38,8 @@
 
             <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
                 <div class="text-sm text-grey-light"
-                    v-text="maxItems
-                        ? __n(':count/:max selected', selections, { max: maxItems })
+                    v-text="hasMaxSelections
+                        ? __n(':count/:max selected', selections, { max: maxSelections })
                         : __n(':count selected', selections)"
                 />
                 <div>
@@ -71,7 +71,7 @@ export default {
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
-        maxItems: Number
+        maxSelections: Number
     },
 
     data() {
@@ -97,6 +97,10 @@ export default {
                 page: this.page,
                 search: this.searchQuery,
             }
+        },
+
+        hasMaxSelections() {
+            return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
         }
 
     },

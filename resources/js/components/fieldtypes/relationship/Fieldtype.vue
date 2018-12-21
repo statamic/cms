@@ -15,6 +15,7 @@
             </div>
 
             <button
+                v-if="!maxItemsReached"
                 class="btn btn-sm"
                 :class="{ 'mt-1': items.length > 0 }"
                 @click.prevent="isSelecting = true"
@@ -25,6 +26,7 @@
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="selections"
+                    :max-selections="maxItems"
                     @selected="selectionsUpdated"
                     @closed="isSelecting = false"
                 />
@@ -65,6 +67,18 @@ export default {
             loading: true,
             inline: false
         }
+    },
+
+    computed: {
+
+        maxItems() {
+            return this.config.max_items || Infinity;
+        },
+
+        maxItemsReached() {
+            return this.selections.length >= this.maxItems;
+        }
+
     },
 
     mounted() {
