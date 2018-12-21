@@ -5,6 +5,7 @@ namespace Statamic\Extend;
 use Facades\GuzzleHttp\Client;
 use Statamic\API\Addon as AddonAPI;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -46,6 +47,11 @@ class Marketplace
     protected $searchQuery;
 
     /**
+     * @var array
+     */
+    protected $payload;
+
+    /**
      * Instantiate marketplace API wrapper.
      */
     public function __construct()
@@ -63,9 +69,17 @@ class Marketplace
      */
     public function query()
     {
-        $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
-            return $this->apiRequest('addons');
-        });
+        if ($this->payload) {
+            return $this;
+        }
+
+        try {
+            $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_MINUTES, function () {
+                return $this->apiRequest('addons');
+            });
+        } catch (RequestException $exception) {
+            $this->payload = ['data' => []];
+        }
 
         if ($this->addLocalData) {
             $this->addLocalDataToPayload();
@@ -141,9 +155,13 @@ class Marketplace
      */
     public function show($addon)
     {
-        return Cache::remember("marketplace-addons/{$addon}", static::CACHE_FOR_MINUTES, function () use ($addon) {
-            return $this->apiRequest("addons/{$addon}");
-        });
+        try {
+            return Cache::remember("marketplace-addons/{$addon}", static::CACHE_FOR_MINUTES, function () use ($addon) {
+                return $this->apiRequest("addons/{$addon}");
+            });
+        } catch (RequestException $exception) {
+            return null;
+        }
     }
 
     /**
