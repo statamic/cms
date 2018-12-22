@@ -11,49 +11,21 @@
 </template>
 
 <script>
-import qs from 'qs';
+import RelationshipFieldtype from './RelationshipFieldtype.vue';
 
 export default {
 
-    mixins: [Fieldtype],
-
-    data() {
-        return {
-            selections: typeof this.value === 'string' ? [this.value] : this.value,
-        }
-    },
+    mixins: [RelationshipFieldtype],
 
     computed: {
-
-        maxItems() {
-            return this.config.max_items || Infinity;
-        },
 
         itemDataUrl() {
             return cp_url(`fieldtypes/collections/data`);
         },
 
-        selectionsUrl() {
-            return cp_url(`fieldtypes/collections`) + '?' + qs.stringify(this.selectionsUrlParameters);
+        baseSelectionsUrl() {
+            return cp_url(`fieldtypes/collections`);
         },
-
-        selectionsUrlParameters() {
-            let params = {};
-
-            if (this.config.collections) {
-                params.collections = this.config.collections;
-            }
-
-            return params;
-        }
-
-    },
-
-    watch: {
-
-        selections(selections) {
-            this.update(this.selections);
-        }
 
     }
 

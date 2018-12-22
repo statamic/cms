@@ -36,7 +36,11 @@ export default {
         },
 
         selectionsUrl() {
-            return cp_url(`fieldtypes/relationship`) + '?' + qs.stringify(this.selectionsUrlParameters);
+            return this.baseSelectionsUrl + '?' + qs.stringify(this.selectionsUrlParameters);
+        },
+
+        baseSelectionsUrl() {
+            return cp_url(`fieldtypes/relationship`);
         },
 
         selectionsUrlParameters() {
