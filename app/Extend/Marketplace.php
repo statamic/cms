@@ -73,17 +73,13 @@ class Marketplace
             return $this;
         }
 
-        $cacheKey = 'marketplace-addons';
-
-        try {
-            $this->payload = Cache::remember($cacheKey, static::CACHE_FOR_MINUTES, function () {
-                return $this->apiRequest('addons');
-            });
-        } catch (RequestException $exception) {
-            $this->payload = Cache::remember($cacheKey, 5, function () {
-                return ['data' => []];
-            });
-        }
+        $this->payload = Cache::rememberWithExpiration('marketplace-addons', function () {
+            try {
+                return [static::CACHE_FOR_MINUTES => $this->apiRequest('addons')];
+            } catch (RequestException $exception) {
+                return [5 => ['data' => []]];
+            }
+        });
 
         if ($this->addLocalData) {
             $this->addLocalDataToPayload();
@@ -154,22 +150,18 @@ class Marketplace
     /**
      * Show addon.
      *
-     * @param mixed $addon
+     * @param string $addon
      * @return mixed
      */
     public function show($addon)
     {
-        $cacheKey = "marketplace-addons/{$addon}";
-
-        try {
-            return Cache::remember($cacheKey, static::CACHE_FOR_MINUTES, function () use ($addon) {
-                return $this->apiRequest("addons/{$addon}");
-            });
-        } catch (RequestException $exception) {
-            return Cache::remember($cacheKey, 5, function () use ($addon) {
-                return null;
-            });
-        }
+        return Cache::rememberWithExpiration("marketplace-addons/{$addon}", function () use ($addon) {
+            try {
+                return [static::CACHE_FOR_MINUTES => $this->apiRequest("addons/{$addon}")];
+            } catch (RequestException $exception) {
+                return [5 => null];
+            }
+        });
     }
 
     /**
