@@ -46,7 +46,7 @@ class CacheServiceProvider extends ServiceProvider
             $value = reset($keyValuePair);
             $expirationInMinutes = key($keyValuePair);
 
-            Cache::remember($cacheKey, $expirationInMinutes, function () use ($value) {
+            return Cache::remember($cacheKey, $expirationInMinutes, function () use ($value) {
                 return $value;
             });
         });
