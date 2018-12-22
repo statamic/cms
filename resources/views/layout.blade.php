@@ -33,7 +33,11 @@
 
             <vue-toast ref="toast"></vue-toast>
 
-            <portal-target name="modals"></portal-target>
+            <portal-target
+                  v-for="(modal, i) in modals"
+                  :key="`modal-${modal}-${i}`"
+                  :name="`modal-${i}`"
+            ></portal-target>
       </div>
 
       @include('statamic::partials.nav-mobile')

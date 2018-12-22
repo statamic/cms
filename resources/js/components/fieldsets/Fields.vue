@@ -35,15 +35,13 @@
                         <template slot="actions" slot-scope="{ row: field, index }">
                             <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
                             <a class="mr-1 text-grey" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
-                            <portal to="modals" v-if="editingField === field._id">
-                                <modal :name="`${field._id}-field-settings`" width="90%" height="90%">
-                                    <field-settings
-                                        ref="settings"
-                                        :root="isRootLevel"
-                                        :type="field.type"
-                                        v-model="field" />
-                                </modal>
-                            </portal>
+                            <modal v-if="editingField === field._id" :name="`${field._id}-field-settings`" width="90%" height="90%">
+                                <field-settings
+                                    ref="settings"
+                                    :root="isRootLevel"
+                                    :type="field.type"
+                                    v-model="field" />
+                            </modal>
                         </template>
                     </data-table>
                 </div>
@@ -51,11 +49,9 @@
 
             <button class="btn btn-default" @click="addField">+ {{ __('Add Field') }}</button>
 
-            <portal to="modals" v-if="selectingFieldtype">
-                <modal name="fieldtype-selector" width="90%" height="90%">
-                    <fieldtype-selector @selected="fieldtypeSelected" />
-                </modal>
-            </portal>
+            <modal v-if="selectingFieldtype" name="fieldtype-selector" width="90%" height="90%" @closed="selectingFieldtype = false">
+                <fieldtype-selector @selected="fieldtypeSelected" />
+            </modal>
 
         </template>
 

@@ -23,18 +23,17 @@
                 @click.prevent="isSelecting = true"
                 v-text="__('Add Item')" />
 
-            <portal to="modals" v-if="isSelecting">
-                <item-selector
-                    :url="selectionsUrl"
-                    initial-sort-column="title"
-                    initial-sort-direction="asc"
-                    :initial-selections="selections"
-                    :initial-columns="columns"
-                    :max-selections="maxItems"
-                    @selected="selectionsUpdated"
-                    @closed="isSelecting = false"
-                />
-            </portal>
+            <item-selector
+                v-if="isSelecting"
+                :url="selectionsUrl"
+                initial-sort-column="title"
+                initial-sort-direction="asc"
+                :initial-selections="selections"
+                :initial-columns="columns"
+                :max-selections="maxItems"
+                @selected="selectionsUpdated"
+                @closed="isSelecting = false"
+            />
         </div>
     </div>
 

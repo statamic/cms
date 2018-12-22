@@ -1,6 +1,6 @@
 <template>
 
-    <modal name="item-selector" width="90%" height="90%">
+    <modal name="item-selector" width="90%" height="90%" @closed="close">
         <div class="flex flex-col justify-end h-full">
 
             <div class="flex-1 flex flex-col">
@@ -157,7 +157,6 @@ export default {
         },
 
         close() {
-            this.$modal.hide('item-selector');
             this.$emit('closed');
         },
 

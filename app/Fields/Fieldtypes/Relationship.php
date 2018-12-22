@@ -11,7 +11,7 @@ class Relationship extends Fieldtype
 
     protected $configFields = [
         'max_items' => ['type' => 'integer'],
-        'collections' => ['type' => 'list'],
+        'collections' => ['type' => 'collections'],
     ];
 
     public function preProcess($data)

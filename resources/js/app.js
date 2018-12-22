@@ -19,7 +19,7 @@ Vue.config.productionTip = false
 
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
-Vue.use(VModal)
+Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(Vuex);
 
 // Vue.http.interceptors.push({
@@ -33,6 +33,7 @@ Vue.use(Vuex);
 // });
 
 require('./components/NotificationBus');
+require('./components/ModalBus');
 require('./components/ProgressBar');
 
 var vm = new Vue({
@@ -78,7 +79,8 @@ var vm = new Vue({
     data: {
         version: Statamic.version,
         showLoginModal: false,
-        navOpen: true
+        navOpen: true,
+        modals: []
     },
 
     mounted() {

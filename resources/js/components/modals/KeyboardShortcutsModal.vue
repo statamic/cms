@@ -1,5 +1,5 @@
 <template>
-    <modal name="keyboard-shortcuts" width="380" height="auto" :pivotY=".1">
+    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" @closed="open = false">
         <h1 class="p-2 bg-grey-lightest border-b text-center">
             {{ __('Keyboard Shortcuts') }}
         </h1>
@@ -45,10 +45,27 @@
 
 <script>
 export default {
-    mounted() {
-        this.$mousetrap.bind('?', function(e) {
-            this.$modal.show('keyboard-shortcuts')
-        }.bind(this), 'keyup');
-    }
+
+    data() {
+        return {
+            open: false
+        }
+    },
+
+    watch: {
+
+        open(open) {
+            if (open) {
+                this.$mousetrap.bind('esc', () => this.open = false);
+            } else {
+                this.$mousetrap.unbind('esc');
+            }
+        }
+
+    },
+
+    created() {
+        this.$mousetrap.bind('?', () => this.open = !this.open);
+    },
 }
 </script>
