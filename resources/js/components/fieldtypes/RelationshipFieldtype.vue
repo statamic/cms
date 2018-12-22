@@ -5,7 +5,9 @@
         :max-items="maxItems"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
-        :columns="['title']"
+        :status-icons="true"
+        :editable-items="true"
+        :columns="['title', 'url']"
     />
 
 </template>
@@ -19,7 +21,7 @@ export default {
 
     data() {
         return {
-            selections: typeof this.value === 'string' ? [this.value] : this.value,
+            selections: this.value,
         }
     },
 
@@ -30,11 +32,11 @@ export default {
         },
 
         itemDataUrl() {
-            return cp_url(`fieldtypes/collections/data`);
+            return cp_url(`fieldtypes/relationship/data`);
         },
 
         selectionsUrl() {
-            return cp_url(`fieldtypes/collections`) + '?' + qs.stringify(this.selectionsUrlParameters);
+            return cp_url(`fieldtypes/relationship`) + '?' + qs.stringify(this.selectionsUrlParameters);
         },
 
         selectionsUrlParameters() {

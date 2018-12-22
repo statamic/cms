@@ -90,8 +90,13 @@ Route::group([
 
     Route::get('suggestions/{type}', 'SuggestionController@show');
 
-    Route::get('relationship-fieldtype', 'RelationshipFieldtypeController@index');
-    Route::get('relationship-fieldtype/data', 'RelationshipFieldtypeController@data');
+    // Fieldtypes
+    Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
+        Route::get('relationship', 'RelationshipFieldtypeController@index');
+        Route::get('relationship/data', 'RelationshipFieldtypeController@data');
+        Route::get('collections', 'CollectionsFieldtypeController@index');
+        Route::get('collections/data', 'CollectionsFieldtypeController@data');
+    });
 
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {

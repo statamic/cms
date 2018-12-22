@@ -9,6 +9,7 @@
             :class="{ 'border-red bg-red-lighter text-red': item.invalid }"
         >
             <div
+                v-if="statusIcon"
                 class="little-dot mr-1"
                 :class="{ 'bg-green': item.published, 'bg-grey-light': !item.published, 'bg-red': item.invalid }"
             />
@@ -64,7 +65,9 @@ export default {
     },
 
     props: {
-        item: Object
+        item: Object,
+        statusIcon: Boolean,
+        editable: Boolean
     },
 
     data() {
@@ -76,6 +79,7 @@ export default {
     methods: {
 
         edit() {
+            if (! this.editable) return;
             if (this.item.invalid) return;
             this.isEditing = true;
         }

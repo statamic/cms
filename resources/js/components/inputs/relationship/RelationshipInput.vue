@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="relationship-input">
         <loading-graphic v-if="initializing" :inline="true" />
 
         <div v-if="!initializing">
@@ -9,6 +9,8 @@
                     v-for="(item, i) in items"
                     :key="item.id"
                     :item="item"
+                    :status-icon="statusIcons"
+                    :editable="editableItems"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -27,6 +29,7 @@
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="selections"
+                    :initial-columns="columns"
                     :max-selections="maxItems"
                     @selected="selectionsUpdated"
                     @closed="isSelecting = false"
@@ -38,14 +41,13 @@
 </template>
 
 <style>
-.relationship-fieldtype .item.draggable-source--is-dragging {
+.relationship-input .item.draggable-source--is-dragging {
     opacity: 0.5;
 }
 </style>
 
 
 <script>
-import qs from 'qs';
 import axios from 'axios';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
@@ -53,7 +55,15 @@ import {Sortable, Plugins} from '@shopify/draggable';
 
 export default {
 
-    mixins: [Fieldtype],
+    props: {
+        value: { required: true },
+        maxItems: Number,
+        itemDataUrl: String,
+        selectionsUrl: String,
+        statusIcons: Boolean,
+        editableItems: Boolean,
+        columns: Array
+    },
 
     components: {
         ItemSelector,
@@ -83,27 +93,9 @@ export default {
             });
         },
 
-        maxItems() {
-            return this.config.max_items || Infinity;
-        },
-
         maxItemsReached() {
             return this.selections.length >= this.maxItems;
         },
-
-        selectionsUrl() {
-            return cp_url(`relationship-fieldtype`) + '?' + qs.stringify(this.selectionsUrlParameters);
-        },
-
-        selectionsUrlParameters() {
-            let params = {};
-
-            if (this.config.collections) {
-                params.collections = this.config.collections;
-            }
-
-            return params;
-        }
 
     },
 
@@ -115,7 +107,7 @@ export default {
     watch: {
 
         selections(selections) {
-            this.update(selections);
+            this.$emit('input', this.selections);
         },
 
         loading: {
@@ -139,10 +131,9 @@ export default {
 
         getDataForSelections(selections) {
             this.loading = true;
-            const url = cp_url(`relationship-fieldtype/data`);
             const params = { selections };
 
-            return axios.get(url, { params }).then(response => {
+            return axios.get(this.itemDataUrl, { params }).then(response => {
                 this.loading = false;
                 this.initializing = false;
 
