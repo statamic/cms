@@ -98,6 +98,8 @@ Route::group([
         Route::get('collections/data', 'CollectionsFieldtypeController@data');
     });
 
+    Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
+
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');
