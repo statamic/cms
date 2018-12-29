@@ -12,6 +12,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 
     Route::get('token', 'Auth\CsrfTokenController')->name('token');
+    Route::get('extend', 'Auth\ExtendSessionController')->name('extend');
 });
 
 Route::group([
