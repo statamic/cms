@@ -48,4 +48,11 @@ class LoginController extends CpController
     {
         return cp_route('index');
     }
+
+    protected function authenticated(Request $request, $user)
+    {
+        return $request->expectsJson()
+            ? response('Authenticated')
+            : redirect()->intended($this->redirectPath());
+    }
 }
