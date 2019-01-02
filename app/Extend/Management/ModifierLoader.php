@@ -14,8 +14,6 @@ class ModifierLoader
      */
     public function load($name)
     {
-        $name = snake_case($name);
-
         if (! ($modifiers = app('statamic.modifiers'))->has($name)) {
             throw new ResourceNotFoundException("Could not find files to load the `{$name}` modifier.");
         }

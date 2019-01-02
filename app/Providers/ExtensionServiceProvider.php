@@ -273,7 +273,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->app['files']->files($path) as $file) {
-            $id = snake_case($class = $file->getBasename('.php'));
+            $id = camel_case($class = $file->getBasename('.php'));
             $extensionType = strtolower($folder);
             $this->app["statamic.{$extensionType}"][$id] = $this->getAppNamespace() . "{$folder}\\{$class}";
         }
