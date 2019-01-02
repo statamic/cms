@@ -45,12 +45,9 @@ import Fieldset from '../../publish/Fieldset';
 
 export default {
 
-    props: {
-        item: Object
-    },
-
     data() {
         return {
+            action: null,
             loading: true,
             saving: false,
             fieldset: null,
@@ -85,11 +82,13 @@ export default {
     methods: {
 
         getItem() {
-            axios.get(this.item.edit_url).then(response => {
+            const url = cp_url('collections/blog/entries/create');
+
+            axios.get(url).then(response => {
                 const data = response.data;
                 this.updateFieldset(data.blueprint);
                 this.values = this.initialValues = data.values;
-                this.action = data.actions.update;
+                this.action = data.actions.store;
                 this.loading = false;
             });
         },
@@ -115,10 +114,10 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            axios.patch(this.action, this.values).then(response => {
+            axios.post(this.action, this.values).then(response => {
                 this.saving = false;
                 this.$notify.success('Saved');
-                this.$emit('updated', response.data);
+                this.$emit('created', response.data.entry);
                 this.$nextTick(() => this.close());
             }).catch(e => {
                 this.saving = false;

@@ -36,7 +36,7 @@
                 :options="{ placement: 'right' }"
             >
                 <div class="popover w-96 h-96 p-0">
-                    <inline-publish-form
+                    <inline-edit-form
                         :item="item"
                         @updated="item.title = $event.title"
                         @closed="isEditing = false"
@@ -55,13 +55,13 @@
 
 <script>
 import Popper from 'vue-popperjs';
-import InlinePublishForm from './InlinePublishForm.vue';
+import InlineEditForm from './InlineEditForm.vue';
 
 export default {
 
     components: {
         Popper,
-        InlinePublishForm
+        InlineEditForm
     },
 
     props: {

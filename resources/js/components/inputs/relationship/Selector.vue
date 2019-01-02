@@ -19,6 +19,33 @@
                         <div class="data-list-header">
                             <data-list-toggle-all v-if="!hasMaxSelections" />
                             <data-list-search v-model="searchQuery" />
+
+                            <button
+                                type="button"
+                                class="btn"
+                                @click="isCreating = true"
+                                v-text="__('Create')" />
+
+                            <popper
+                                v-if="isCreating"
+                                :force-show="isCreating"
+                                ref="popper"
+                                trigger="click"
+                                :append-to-body="true"
+                                boundaries-selector="body"
+                                :options="{ placement: 'bottom' }"
+                            >
+                                <div class="popover w-96 h-96 p-0">
+                                    <inline-create-form
+                                        @created="itemCreated"
+                                        @closed="stopCreating"
+                                    />
+                                </div>
+
+                                <!-- Popper needs a clickable element, but we don't want one.
+                                We'll show it programatically.  -->
+                                <div slot="reference" />
+                            </popper>
                         </div>
                         <div class="flex-1 overflow-scroll">
                             <data-table
@@ -64,8 +91,15 @@
 
 <script>
 import axios from 'axios';
+import Popper from 'vue-popperjs';
+import InlineCreateForm from './InlineCreateForm.vue';
 
 export default {
+
+    components: {
+        Popper,
+        InlineCreateForm
+    },
 
     props: {
         url: String,
@@ -86,7 +120,8 @@ export default {
             sortDirection: this.initialSortDirection,
             page: 1,
             searchQuery: '',
-            selections: _.clone(this.initialSelections)
+            selections: _.clone(this.initialSelections),
+            isCreating: false
         }
     },
 
@@ -136,7 +171,7 @@ export default {
         request() {
             this.loading = true;
 
-            axios.get(this.url, { params: this.parameters }).then(response => {
+            return axios.get(this.url, { params: this.parameters }).then(response => {
                 // this.columns = response.data.meta.columns.map(column => column.field);
                 // this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
@@ -162,6 +197,16 @@ export default {
 
         selectionsUpdated(selections) {
             this.selections = selections;
+        },
+
+        itemCreated(item) {
+            this.request();
+            this.selections.push(item.id);
+            this.stopCreating();
+        },
+
+        stopCreating() {
+            this.isCreating = false;
         }
 
     }

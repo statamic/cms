@@ -1,6 +1,7 @@
 
 .popover {
-    @apply bg-white p-2 rounded shadow-lg z-10;
+    @apply bg-white p-2 rounded shadow-lg;
+    z-index: 5000; // arbitrary to appear on top of modals.
 }
 .popover .popper__arrow {
     width: 0;
