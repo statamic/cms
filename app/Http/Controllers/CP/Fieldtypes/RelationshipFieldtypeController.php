@@ -42,6 +42,10 @@ class RelationshipFieldtypeController extends CpController
             $query->whereIn('collection', $collections);
         }
 
+        if ($search = request('search')) {
+            $query->where('title', 'like', '%'.$search.'%');
+        }
+
         return $query;
     }
 
