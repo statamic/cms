@@ -59,7 +59,8 @@ export default {
             remaining: this.lifetime, // The actual time remaining as per server responses
             errors: {},
             password: null,
-            pinging: false
+            pinging: false,
+            lastCount: moment()
         }
     },
 
@@ -90,9 +91,22 @@ export default {
                 return;
             }
 
-            if (count <= this.warnAt) {
+            // While we're in the warning period, we'll check every second so that any
+            // activity in another tab is picked up and the count will get restarted.
+            const withinWarningPeriod = count <= this.warnAt;
+
+            // We keep track of the last time a count was made. It will be every second while
+            // Javascript is being executed, but the count will have stopped if the computer
+            // has been put to sleep. If it's been a while since the last count, we'll
+            // also perform a timeout check. This will let things recalibrate.
+            const secondsSinceLastCount = moment().diff(this.lastCount, 'seconds');
+            const itsBeenAWhile = secondsSinceLastCount > 10;
+
+            if (withinWarningPeriod || itsBeenAWhile) {
                 this.ping().catch(e => {});
             }
+
+            this.lastCount = moment();
         }
 
     },
