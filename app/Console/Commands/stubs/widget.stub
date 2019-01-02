@@ -13,6 +13,6 @@ class DummyClass extends Widget
      */
     public function html()
     {
-        // return $this->view('widget');
+        // return view('widgets.widget_view');
     }
 }
