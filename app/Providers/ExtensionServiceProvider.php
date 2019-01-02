@@ -123,6 +123,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerTags();
         $this->registerModifiers();
         $this->registerFieldtypes();
+        $this->registerFilters();
         $this->registerWidgets();
     }
 
@@ -229,6 +230,42 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
         $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
         $this->app['statamic.fieldtypes']['relationship'] = \Statamic\Fields\Fieldtypes\Relationship::class;
+    }
+
+    /**
+     * Register filters.
+     *
+     * @return void
+     */
+    protected function registerFilters()
+    {
+        $this->app->instance('statamic.filters', collect());
+
+        $this->registerBundledFilters();
+        $this->registerExtensionsInAppFolder('Filters');
+    }
+
+    /**
+     * Register bundled filters.
+     *
+     * @return void
+     */
+    protected function registerBundledFilters()
+    {
+        // foreach ($this->bundledFieldtypes as $tag) {
+        //     $studly = studly_case($tag);
+        //     $this->app['statamic.fieldtypes'][$tag] = "Statamic\\Addons\\{$studly}\\{$studly}Fieldtype";
+        // }
+
+        // foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
+        //     $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
+        // }
+
+        // $this->app['statamic.fieldtypes']['assets'] = \Statamic\Fields\Fieldtypes\Assets::class;
+        // $this->app['statamic.fieldtypes']['form'] = \Statamic\Forms\Fieldtype::class;
+        // $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
+        // $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
+        // $this->app['statamic.fieldtypes']['relationship'] = \Statamic\Fields\Fieldtypes\Relationship::class;
     }
 
     /**
