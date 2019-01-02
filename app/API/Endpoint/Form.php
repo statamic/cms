@@ -10,6 +10,11 @@ use Statamic\API\Metrics;
 
 class Form
 {
+    public function find($id)
+    {
+        return $this->get($id);
+    }
+
     /**
      * Get a Form
      *

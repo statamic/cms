@@ -1,9 +1,33 @@
+<template>
+
+    <relationship-input
+        v-model="selections"
+        :max-items="maxItems"
+        :item-data-url="itemDataUrl"
+        :selections-url="selectionsUrl"
+        :columns="['title']"
+    />
+
+</template>
+
 <script>
-import AdaptsRelateFieldtype from './AdaptsRelateFieldtype.vue';
+import RelationshipFieldtype from './RelationshipFieldtype.vue';
 
 export default {
 
-    mixins: [AdaptsRelateFieldtype]
+    mixins: [RelationshipFieldtype],
+
+    computed: {
+
+        itemDataUrl() {
+            return cp_url(`fieldtypes/form/data`);
+        },
+
+        baseSelectionsUrl() {
+            return cp_url(`fieldtypes/form`);
+        },
+
+    }
 
 };
 </script>
