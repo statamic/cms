@@ -59,6 +59,11 @@
                                 </template>
                             </data-table>
                         </div>
+
+                        <data-list-pagination
+                            class="p-1 border-t shadow-lg"
+                            :resource-meta="meta"
+                            @page-selected="setPage" />
                     </div>
                 </data-list>
             </div>
@@ -115,6 +120,7 @@ export default {
             initializing: true,
             loading: true,
             items: [],
+            meta: {},
             columns: this.initialColumns,
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
@@ -184,6 +190,10 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
+        },
+
+        setPage(page) {
+            this.page = page;
         },
 
         select() {
