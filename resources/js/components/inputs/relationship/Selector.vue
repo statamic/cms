@@ -20,32 +20,35 @@
                             <data-list-toggle-all v-if="!hasMaxSelections" />
                             <data-list-search v-model="searchQuery" />
 
-                            <button
-                                type="button"
-                                class="btn"
-                                @click="isCreating = true"
-                                v-text="__('Create')" />
+                            <div>
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    @click="isCreating = true"
+                                    v-text="__('Create')" />
 
-                            <popper
-                                v-if="isCreating"
-                                :force-show="isCreating"
-                                ref="popper"
-                                trigger="click"
-                                :append-to-body="true"
-                                boundaries-selector="body"
-                                :options="{ placement: 'bottom' }"
-                            >
-                                <div class="popover w-96 h-96 p-0">
-                                    <inline-create-form
-                                        @created="itemCreated"
-                                        @closed="stopCreating"
-                                    />
-                                </div>
+                                <popper
+                                    v-if="isCreating"
+                                    :force-show="isCreating"
+                                    ref="popper"
+                                    trigger="click"
+                                    :append-to-body="true"
+                                    boundaries-selector="body"
+                                    :options="{ placement: 'bottom' }"
+                                >
+                                    <div class="popover w-96 h-96 p-0">
+                                        <inline-create-form
+                                            class="popover-inner"
+                                            @created="itemCreated"
+                                            @closed="stopCreating"
+                                        />
+                                    </div>
 
-                                <!-- Popper needs a clickable element, but we don't want one.
-                                We'll show it programatically.  -->
-                                <div slot="reference" />
-                            </popper>
+                                    <!-- Popper needs a clickable element, but we don't want one.
+                                    We'll show it programatically.  -->
+                                    <div slot="reference" />
+                                </popper>
+                            </div>
                         </div>
                         <div class="flex-1 overflow-scroll">
                             <data-table

@@ -37,6 +37,7 @@
             >
                 <div class="popover w-96 h-96 p-0">
                     <inline-edit-form
+                        class="popover-inner"
                         :item="item"
                         @updated="item.title = $event.title"
                         @closed="isEditing = false"
