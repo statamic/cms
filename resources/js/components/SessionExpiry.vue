@@ -144,8 +144,7 @@ export default {
         },
 
         showLogin() {
-            this.updateCsrfToken()
-                .then(() => this.isShowingLogin = true);
+            this.isShowingLogin = true;
         },
 
         updateCsrfToken() {
@@ -157,6 +156,12 @@ export default {
         },
 
         submit() {
+            this.updateCsrfToken().then(() => {
+                this.login();
+            });
+        },
+
+        login() {
             axios.post(cp_url('auth/login'), {
                 email: this.email,
                 password: this.password
