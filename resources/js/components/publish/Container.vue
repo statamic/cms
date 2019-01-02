@@ -83,7 +83,9 @@ export default {
 
         values: {
             deep: true,
-            handler() {
+            handler(after, before) {
+                if (JSON.stringify(after) === JSON.stringify(before)) return;
+
                 console.error(`The "values" prop is reserved for initializing the Publish store. You should use this.$store.commit('${this.name}/setValues', values) instead.`);
             }
         },
