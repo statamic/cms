@@ -10,6 +10,11 @@ class View
     protected $layout;
     protected $template;
 
+    public static function make()
+    {
+        return new static;
+    }
+
     public function data($data = null)
     {
         if (! $data) {
