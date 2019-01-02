@@ -241,6 +241,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app->instance('statamic.widgets', collect());
 
         $this->registerBundledWidgets();
+        $this->registerExtensionsInAppFolder('Widgets');
     }
 
     /**
