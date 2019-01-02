@@ -6,7 +6,7 @@ use Statamic\Events\ViewRendered;
 
 class View
 {
-    protected $data;
+    protected $data = [];
     protected $layout;
     protected $template;
 
