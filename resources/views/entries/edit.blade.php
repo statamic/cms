@@ -3,7 +3,8 @@
 @section('content')
 
     <entry-publish-form
-        action="{{ cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()]) }}"
+        action="{{ $actions['update'] }}"
+        method="patch"
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         inline-template
@@ -11,8 +12,8 @@
         <div>
             <div class="flex mb-3">
                 <h1 class="flex-1">
-                    <a href="{{ cp_route('collections.show', $entry->collectionName())}}">
-                        {{ $entry->collection()->title() }}
+                    <a href="{{ cp_route('collections.show', $collection->handle())}}">
+                        {{ $collection->title() }}
                     </a>
                     @svg('chevron-right')
                     {{ $entry->get('title') }}
@@ -35,7 +36,6 @@
                 @updated="values = $event"
             >
                 <div slot-scope="{ }">
-                    <div class="alert alert-danger mb-2" v-if="error" v-text="error" v-cloak></div>
                     <publish-sections></publish-sections>
                 </div>
             </publish-container>

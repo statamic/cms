@@ -9,6 +9,7 @@ use Statamic\API\Collection;
 use Statamic\Fields\Validation;
 use Statamic\CP\Publish\ProcessesFields;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {
@@ -78,7 +79,8 @@ class EntriesController extends CpController
                 'update' => cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()])
             ],
             'values' => $values,
-            'blueprint' => $entry->blueprint()->toPublishArray(),
+            'collection' => $entry->collection(),
+            'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry)
         ];
 
@@ -120,14 +122,70 @@ class EntriesController extends CpController
         return $entry->toArray();
     }
 
-    public function create()
+    public function create(Request $request, $collection)
     {
-        return view('statamic::entries.create');
+        $collection = Collection::whereHandle($collection);
+
+        if (! $blueprint = $collection->blueprint()) {
+            throw new \Exception('There is no blueprint defined for this collection.');
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'title' => null,
+            'slug' => null
+        ]);
+
+        $viewData = [
+            'actions' => [
+                'store' => cp_route('collections.entries.store', $collection->handle())
+            ],
+            'values' => $values,
+            'collection' => $collection,
+            'blueprint' => $blueprint->toPublishArray(),
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::entries.create', $viewData);
     }
 
-    public function store()
+    public function store(Request $request, $collection)
     {
+        $collection = Collection::whereHandle($collection);
 
+        $this->authorize('create', [EntryContract::class, $collection]);
+
+        $fields = $collection->blueprint()->fields()->addValues($request->all())->process();
+
+        $validation = (new Validation)->fields($fields)->withRules([
+            'title' => 'required',
+            'slug' => 'required',
+        ]);
+
+        $request->validate($validation->rules());
+
+        $entry = Entry::create($request->slug)
+            ->collection($collection)
+            ->with($fields->values());
+
+        if ($collection->order() === 'date') {
+            $entry->date($request->date ?? now());
+        }
+
+        // TODD: Localization
+
+        $entry = $entry->ensureId()->save();
+
+        return [
+            'redirect' => $entry->editUrl(),
+            'entry' => $entry->toArray()
+        ];
     }
 
     public function destroy($collection, $entry)

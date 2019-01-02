@@ -15,24 +15,14 @@ class EntryPolicy
             || $user->hasPermission("view {$entry->collectionName()} entries");
     }
 
-    public function edit($user, $entry)
+    public function update($user, $entry)
     {
         return $user->hasPermission("edit {$entry->collectionName()} entries");
     }
 
-    public function update($user, $entry)
+    public function create($user, $collection)
     {
-        //
-    }
-
-    public function create($user)
-    {
-        //
-    }
-
-    public function store($user)
-    {
-        //
+        return $user->hasPermission("create {$collection->handle()} entries");
     }
 
     public function delete($user, $entry)

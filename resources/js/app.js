@@ -55,7 +55,7 @@ var vm = new Vue({
         PageTree: require('./components/page-tree/PageTree.vue'),
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue'),
-        EntryPublishForm: require('./components/publish/forms/EntryPublishForm.vue'),
+        EntryPublishForm: require('./components/entries/PublishForm.vue'),
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
