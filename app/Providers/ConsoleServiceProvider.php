@@ -15,6 +15,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\Install::class,
         Commands\MakeModifier::class,
         Commands\MakeTag::class,
+        Commands\MakeWidget::class,
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
         Commands\StaticClear::class,
