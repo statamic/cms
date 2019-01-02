@@ -5,11 +5,11 @@
         <h1 class="flex-1">{{ __('Dashboard') }}</h1>
     </div>
 
-    {{-- <div class="widgets">
+    <div class="widgets">
         @foreach($widgets as $widget)
             <div class="widget {{ array_get($widget, 'width', 'half')}}">
                 {!! $widget['html'] !!}
             </div>
         @endforeach
-    </div> --}}
+    </div>
 @stop
