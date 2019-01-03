@@ -48,9 +48,9 @@ class DimensionBuilder
             return $cached;
         }
 
-        $pathMethod = 'get' . ucfirst($this->asset->driver()) . 'Path';
+        $path = $this->asset->resolvedPath();
 
-        $dimensions = $this->getImageDimensions($this->$pathMethod());
+        $dimensions = $this->getImageDimensions($path);
 
         $this->cache($dimensions);
 
@@ -75,29 +75,6 @@ class DimensionBuilder
     public function height()
     {
         return array_get($this->dimensions(), 1);
-    }
-
-    /**
-     * Get the path of an asset within a local driven container
-     *
-     * @return string
-     */
-    private function getLocalPath()
-    {
-        return Path::assemble(
-            $this->asset->disk()->filesystem()->getAdapter()->getPathPrefix(),
-            $this->asset->path()
-        );
-    }
-
-    /**
-     * Get the path of an asset within an Amazon S3 driven container
-     *
-     * @return string
-     */
-    private function getS3Path()
-    {
-        return URL::encode($this->asset->url());
     }
 
     /**
