@@ -1,0 +1,18 @@
+<?php
+
+namespace DummyNamespace;
+
+use Statamic\Extend\Filter;
+
+class DummyClass extends Filter
+{
+    /**
+     * Perform filtering on a collection
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function filter()
+    {
+        //
+    }
+}
