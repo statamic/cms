@@ -137,7 +137,7 @@ class AssetContainer implements AssetContainerContract
      */
     public function url()
     {
-        return array_get($this->diskConfig(), 'url');
+        return rtrim($this->disk()->url('/'), '/');
     }
 
     /**
