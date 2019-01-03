@@ -281,11 +281,16 @@ abstract class BasicStore extends Store
         return 'stache::meta/' . $this->key();
     }
 
+    public function cacheHasMeta()
+    {
+        return Cache::has($this->getMetaCacheKey());
+    }
+
     public function getMetaFromCache()
     {
-        if ($meta = Cache::get($this->getMetaCacheKey())) {
-            return [$this->key() => $meta];
-        }
+        $meta = Cache::get($this->getMetaCacheKey(), $this->getCacheableMeta());
+
+        return [$this->key() => $meta];
     }
 
     public function loadMeta($data)

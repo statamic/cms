@@ -76,7 +76,9 @@ class StoreUpdater
             $this->store->remove($id);
         }
 
-        $this->store->markAsLoaded();
+        $this->store
+            ->markAsLoaded()
+            ->markAsUpdated(); // TODO: TDD
 
         $this->cache();
     }

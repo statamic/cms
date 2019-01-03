@@ -111,6 +111,13 @@ abstract class AggregateStore extends Store
         return $this;
     }
 
+    public function markAsUpdated()
+    {
+        $this->stores->each->markAsUpdated();
+
+        return $this;
+    }
+
     public function load()
     {
         $this->stores->each->load();
@@ -192,6 +199,11 @@ abstract class AggregateStore extends Store
     public function cacheMetaKeys()
     {
         Cache::forever($this->getMetaKeysCacheKey(), $this->stores->keys()->all());
+    }
+
+    public function cacheHasMeta()
+    {
+        return Cache::get($this->getMetaKeysCacheKey());
     }
 
     public function getMetaFromCache()

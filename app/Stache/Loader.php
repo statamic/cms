@@ -27,8 +27,8 @@ class Loader
     public function getMetaFromCache()
     {
         return $this->stache->stores()->mapWithKeys(function ($store) {
-            if ($meta = $store->getMetaFromCache()) {
-                return $meta;
+            if ($store->cacheHasMeta()) {
+                return $store->getMetaFromCache();
             }
 
             throw new EmptyStacheException;
