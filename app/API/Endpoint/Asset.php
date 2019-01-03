@@ -4,6 +4,7 @@ namespace Statamic\API\Endpoint;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Site;
 use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Assets\AssetFactory;
@@ -56,11 +57,18 @@ class Asset
             return null;
         }
 
-        $containerUrl = ($container->driver() === 'local')
-            ? URL::makeRelative($container->url())
-            : $container->url();
+        $siteUrl = rtrim(Site::current()->absoluteUrl(), '/');
+        $containerUrl = $container->url();
 
-        $path = trim(Str::removeLeft($url, $containerUrl), '/');
+        if (starts_with($containerUrl, '/')) {
+            $containerUrl = $siteUrl . $containerUrl;
+        }
+
+        if (starts_with($containerUrl, $siteUrl)) {
+            $url = $siteUrl . $url;
+        }
+
+        $path = str_after($url, $containerUrl);
 
         return $container->asset($path);
     }
@@ -76,10 +84,8 @@ class Asset
         return AssetContainer::all()->sortBy(function ($container) {
             return strlen($container->url());
         })->first(function ($container, $id) use ($url) {
-            $containerUrl = ($container->driver() === 'local')
-                ? URL::makeRelative($container->url())
-                : $container->url();
-            return Str::startsWith($url, $containerUrl);
+            return starts_with($url, $container->url())
+                || starts_with(URL::makeAbsolute($url), $container->url());
         });
     }
 
