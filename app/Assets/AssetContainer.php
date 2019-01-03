@@ -106,18 +106,13 @@ class AssetContainer implements AssetContainerContract
     }
 
     /**
-     * Get or set the path
+     * Get the path
      *
-     * @param null|string $path
      * @return string
      */
-    public function path($path = null)
+    public function path()
     {
-        if ($path) {
-            $this->path = $path;
-        }
-
-        return $this->path;
+        return rtrim($this->disk()->path('/'), '/');
     }
 
     /**

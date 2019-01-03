@@ -77,4 +77,9 @@ class FlysystemAdapter extends AbstractAdapter
     {
         return $this->filesystem->url($path);
     }
+
+    public function path($path)
+    {
+        return $this->filesystem->path($path);
+    }
 }

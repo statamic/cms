@@ -39,12 +39,11 @@ interface AssetContainer extends Editable
     public function data($data = null);
 
     /**
-     * Get or set the path
+     * Get the path
      *
-     * @param null|string $path
      * @return string
      */
-    public function path($path = null);
+    public function path();
 
     /**
      * Get the full resolved path
