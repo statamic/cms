@@ -23,14 +23,6 @@ interface AssetContainer extends Editable
     public function handle($handle = null);
 
     /**
-     * Get or set the driver
-     *
-     * @param  null|string $driver
-     * @return string
-     */
-    public function driver($driver = null);
-
-    /**
      * Get or set the title
      *
      * @param null|string $title

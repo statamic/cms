@@ -28,11 +28,6 @@ class AssetContainer implements AssetContainerContract
     /**
      * @var string
      */
-    protected $driver = 'local';
-
-    /**
-     * @var string
-     */
     protected $path;
 
     /**
@@ -75,21 +70,6 @@ class AssetContainer implements AssetContainerContract
     public function uuid($uuid = null)
     {
         return $this->id($uuid);
-    }
-
-    /**
-     * Get or set the driver
-     *
-     * @param  null|string $driver
-     * @return string
-     */
-    public function driver($driver = null)
-    {
-        if (is_null($driver)) {
-            return $this->driver;
-        }
-
-        return $this->driver = $driver;
     }
 
     public function data($data = null)
