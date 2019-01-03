@@ -98,6 +98,8 @@ Route::group([
         Route::get('collections/data', 'CollectionsFieldtypeController@data');
         Route::get('form', 'FormFieldtypeController@index');
         Route::get('form/data', 'FormFieldtypeController@data');
+        Route::get('blueprints', 'BlueprintsFieldtypeController@index');
+        Route::get('blueprints/data', 'BlueprintsFieldtypeController@data');
     });
 
     // Local API

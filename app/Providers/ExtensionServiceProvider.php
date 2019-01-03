@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Statamic\DataStore;
 use Statamic\Extend\Modifier;
+use Statamic\Fields\Fieldtypes;
 use Statamic\View\BaseModifiers;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
@@ -105,6 +106,16 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected $bundledWidgets = [
         'collection', 'template', 'updater',
+    ];
+
+    protected $fieldtypes = [
+        'assets' => Fieldtypes\Assets::class,
+        'blueprints' => Fieldtypes\Blueprints::class,
+        'collections' => Fieldtypes\Collections::class,
+        'form' => \Statamic\Forms\Fieldtype::class,
+        'grid' => Fieldtypes\Grid::class,
+        'fields' => Fieldtypes\NestedFields::class,
+        'relationship' => Fieldtypes\Relationship::class,
     ];
 
     /**
@@ -225,12 +236,9 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
 
-        $this->app['statamic.fieldtypes']['assets'] = \Statamic\Fields\Fieldtypes\Assets::class;
-        $this->app['statamic.fieldtypes']['collections'] = \Statamic\Fields\Fieldtypes\Collections::class;
-        $this->app['statamic.fieldtypes']['form'] = \Statamic\Forms\Fieldtype::class;
-        $this->app['statamic.fieldtypes']['grid'] = \Statamic\Fields\Fieldtypes\Grid::class;
-        $this->app['statamic.fieldtypes']['fields'] = \Statamic\Fields\Fieldtypes\NestedFields::class;
-        $this->app['statamic.fieldtypes']['relationship'] = \Statamic\Fields\Fieldtypes\Relationship::class;
+        foreach ($this->fieldtypes as $handle => $class) {
+            $this->app['statamic.fieldtypes'][$handle] = $class;
+        }
     }
 
     /**
