@@ -8,6 +8,7 @@ use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\API\File;
 use Statamic\API\Path;
+use Statamic\API\Site;
 use Statamic\API\Cache;
 use Statamic\API\Event;
 use Statamic\API\Image;
@@ -167,6 +168,18 @@ class Asset extends Data implements AssetContract
     public function absoluteUrl()
     {
         return URL::makeAbsolute($this->url());
+    }
+
+    public function value()
+    {
+        $url = $this->url();
+        $siteUrl = Site::current()->absoluteUrl();
+
+        if (starts_with($url, $siteUrl)) {
+            return '/'.str_after($url, $siteUrl);
+        }
+
+        return $url;
     }
 
     /**
@@ -428,6 +441,7 @@ class Asset extends Data implements AssetContract
             'edit_url'       => $this->editUrl(),
             'container'      => $this->container()->id(),
             'folder'         => $this->folder(),
+            'value'          => $this->value(),
         ];
 
         if ($exists = $this->disk()->exists($this->path())) {
