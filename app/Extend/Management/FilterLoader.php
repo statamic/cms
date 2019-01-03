@@ -3,19 +3,17 @@
 namespace Statamic\Extend\Management;
 
 use Statamic\API\Str;
-use Statamic\SiteHelpers\Filters as SiteFilters;
+use Statamic\Exceptions\ResourceNotFoundException;
 
 class FilterLoader
 {
     public function load($name, $properties)
     {
-        $name = Str::studly($name);
-
-        if (class_exists(SiteFilters::class) && method_exists(SiteFilters::class, $name)) {
-            return $this->init(SiteFilters::class, $properties);
+        if (! ($filters = app('statamic.filters'))->has($name)) {
+            throw new ResourceNotFoundException("Could not find files to load the `{$name}` filter.");
         }
 
-        return $this->init("Statamic\\Addons\\{$name}\\{$name}Filter", $properties);
+        return $this->init($filters->get($name), $properties);
     }
 
     private function init($class, $properties)
