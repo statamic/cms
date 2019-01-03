@@ -43,6 +43,10 @@ class Assets extends Fieldtype
             return $data;
         }
 
+        if (is_null($data)) {
+            return [];
+        }
+
         return Helper::ensureArray($data);
     }
 
