@@ -2,7 +2,6 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Contracts\Assets\AssetContainerFactory;
 use Statamic\Contracts\Data\Repositories\AssetContainerRepository;
 
 class AssetContainer
@@ -49,7 +48,7 @@ class AssetContainer
      */
     public function create($driver = null)
     {
-        return app(AssetContainerFactory::class)->create($driver);
+        return $this->repo()->create($driver);
     }
 
     protected function repo()

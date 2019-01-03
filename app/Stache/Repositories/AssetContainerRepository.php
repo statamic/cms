@@ -26,4 +26,9 @@ class AssetContainerRepository implements RepositoryContract
     {
         return $this->store->getItem($handle);
     }
+
+    public function create()
+    {
+        return app(AssetContainer::class);
+    }
 }
