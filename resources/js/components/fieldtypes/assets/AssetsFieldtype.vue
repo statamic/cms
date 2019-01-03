@@ -259,7 +259,7 @@ export default {
             // If the value has an :: it's already an ID and we can return as-is.
             // Otherwise, we need to find the ID from the corresponding asset.
             return _(this.value).map((value) => {
-                return (value.includes('::')) ? value : _(this.assets).findWhere({ url: value }).id;
+                return (value.includes('::')) ? value : _(this.assets).findWhere({ value }).id;
             });
         },
 
@@ -435,12 +435,12 @@ export default {
 
         /**
          * The components deal with passing around asset objects, however our fieldtype is
-         * only concerned with their respective URLs. Note that if the asset belongs to
-         * a non-public container, the url property will just be the ID, so we're ok.
+         * only concerned with their respective values, which will either be a URLs or ID.
          */
         assets() {
             if (this.initializing) return;
-            this.update(_.pluck(this.assets, 'url'));
+
+            this.update(_.pluck(this.assets, 'value'));
         },
 
         loading: {
@@ -451,7 +451,6 @@ export default {
         }
 
     },
-
 
     mounted() {
         this.displayMode = this.isInsideGridField
