@@ -2,8 +2,10 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\API\Asset;
 use Statamic\API\Helper;
 use Statamic\Fields\Fieldtype;
+use Statamic\Assets\AssetCollection;
 
 class Assets extends Fieldtype
 {
@@ -53,5 +55,40 @@ class Assets extends Fieldtype
         }
 
         return $data;
+    }
+
+    public function preload()
+    {
+        $data = $this->getItemData($this->field->value());
+
+        return compact('data');
+    }
+
+    public function getItemData($items)
+    {
+        $assets = new AssetCollection;
+
+        foreach ($items as $url) {
+            if (! $asset = Asset::find($url)) {
+                continue;
+            }
+
+            if ($asset->isImage()) {
+                $asset->set('thumbnail', $this->thumbnail($asset, 'small'));
+                $asset->set('toenail', $this->thumbnail($asset, 'large'));
+            }
+
+            $assets->put($url, $asset);
+        }
+
+        return $assets->values();
+    }
+
+    protected function thumbnail($asset, $preset = null)
+    {
+        return cp_route('assets.thumbnails.show', [
+            'asset' => base64_encode($asset->id()),
+            'size' => $preset
+        ]);
     }
 }

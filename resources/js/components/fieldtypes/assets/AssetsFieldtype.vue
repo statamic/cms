@@ -228,7 +228,7 @@ export default {
          * The maximum number of files allowed.
          */
         maxFiles() {
-            if (! this.config.max_files) return 0;
+            if (! this.config.max_files) return Infinity;
 
             return parseInt(this.config.max_files);
         },
@@ -302,6 +302,16 @@ export default {
 
     methods: {
 
+        initializeAssets() {
+            if (! this.meta.data) {
+                return this.loadAssets(this.value);
+            }
+
+            this.loading = false;
+            this.assets = this.meta.data;
+            this.$nextTick(() => this.sortable());
+        },
+
         /**
          * Get asset data from the server
          *
@@ -321,16 +331,7 @@ export default {
             }).then(response => {
                 this.assets = response.data;
                 this.loading = false;
-
-                this.$nextTick(() => {
-                    // // Juggle the data to make parent components notice something changed.
-                    // // This makes nested replicators generate new preview text.
-                    // const data = this.data;
-                    // this.data = [];
-                    // this.data = data;
-
-                    this.sortable();
-                });
+                this.$nextTick(() => this.sortable());
             });
         },
 
@@ -452,8 +453,8 @@ export default {
 
         this.selectorViewMode = Cookies.get('statamic.assets.listing_view_mode') || 'grid';
 
-        // We only have URLs in the field data, so we'll need to request the asset data from the server.
-        this.loadAssets(this.value);
+        // We only have URLs in the field data, so we'll need to get the asset data.
+        this.initializeAssets();
     }
 
 }
