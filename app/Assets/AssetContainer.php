@@ -437,6 +437,11 @@ class AssetContainer implements AssetContainerContract
      */
     public function accessible()
     {
-        return $this->url() !== null;
+        return ! $this->private();
+    }
+
+    public function private()
+    {
+        return array_get($this->data, 'private', false);
     }
 }
