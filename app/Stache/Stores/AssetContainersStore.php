@@ -21,8 +21,6 @@ class AssetContainersStore extends BasicStore
 
         $container = AssetContainer::create();
         $container->id($id);
-        $container->driver($driver);
-        $container->path(array_get($data, 'path'));
         $container->data(YAML::parse($contents));
         // $container->url($this->getUrl($id, $driver, $data)); // TODO: TDD
 
