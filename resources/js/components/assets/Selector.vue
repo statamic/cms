@@ -29,7 +29,7 @@
 
                 <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
                     <div class="text-sm text-grey-light"
-                        v-text="maxFiles
+                        v-text="hasMaxFiles
                             ? __n(':count/:max selected', browserSelections, { max: maxFiles })
                             : __n(':count selected', browserSelections)">
                     </div>
@@ -81,6 +81,14 @@ export default {
             // them. They should be able to cancel at any time and have their updated selections discarded.
             browserSelections: this.selected
         }
+    },
+
+    computed: {
+
+        hasMaxFiles() {
+            return (this.maxFiles === Infinity) ? false : Boolean(this.maxFiles);
+        }
+
     },
 
 
