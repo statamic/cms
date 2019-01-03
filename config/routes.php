@@ -4,37 +4,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Collection Routes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may define the route schema for the entries in each collection.
-    | You are able to add variables from the entries enclosed in curlies,
-    | as well as some special variables such as month, day, and year.
-    |
-    | More info: https://docs.statamic.com/routing#controllers
-    |
-    */
-
-    'collections' => [
-        // 'blog' => '/blog/{year}/{month}/{day}/{slug}',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Taxonomy Routes
-    |--------------------------------------------------------------------------
-    |
-    | Here you may define the route schema for the terms in each taxonomy.
-    | The same rules apply here as the collection routes above.
-    |
-    */
-
-    'taxonomies' => [
-        // 'tags' => '/blog/tags/{slug}',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Routes
     |--------------------------------------------------------------------------
     |
