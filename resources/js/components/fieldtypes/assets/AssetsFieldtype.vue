@@ -176,6 +176,7 @@ export default {
         return {
             assets: [],
             loading: true,
+            initializing: true,
             showSelector: false,
             selectorViewMode: null,
             draggingFile: false,
@@ -304,12 +305,17 @@ export default {
 
         initializeAssets() {
             if (! this.meta.data) {
-                return this.loadAssets(this.value);
+                this.loadAssets(this.value);
+                this.initializing = false;
+                return;
             }
 
-            this.loading = false;
             this.assets = this.meta.data;
-            this.$nextTick(() => this.sortable());
+            this.$nextTick(() => {
+                this.initializing = false;
+                this.loading = false;
+                this.sortable();
+            });
         },
 
         /**
@@ -432,7 +438,8 @@ export default {
          * only concerned with their respective URLs. Note that if the asset belongs to
          * a non-public container, the url property will just be the ID, so we're ok.
          */
-        assets(val) {
+        assets() {
+            if (this.initializing) return;
             this.update(_.pluck(this.assets, 'url'));
         },
 
