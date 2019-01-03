@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
+use Statamic\API\File;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Illuminate\Filesystem\Filesystem;
@@ -23,15 +24,6 @@ class Install extends Command
      * @var string
      */
     protected $description = 'Install Statamic';
-
-    protected $files;
-
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-    }
 
     /**
      * Execute the console command.
@@ -66,8 +58,8 @@ class Install extends Command
         ];
 
         foreach ($dirs as $dir) {
-            if (! $this->files->exists($dir)) {
-                $this->files->makeDirectory($dir, 0777, true);
+            if (! File::exists($gitkeep = $dir.'/.gitkeep')) {
+                File::put($gitkeep, '');
                 $this->info("Created the <comment>[$dir]</comment> directory.");
             }
         }
