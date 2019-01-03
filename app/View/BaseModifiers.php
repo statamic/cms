@@ -1301,6 +1301,17 @@ class BaseModifiers extends Modifier
     }
 
     /**
+     * Return a random value from an array
+     *
+     * @param $value
+     * @return string
+     */
+    public function random($value)
+    {
+        return array_random($value);
+    }
+
+    /**
      * URL-encode according to RFC 3986
      *
      * @param $value
