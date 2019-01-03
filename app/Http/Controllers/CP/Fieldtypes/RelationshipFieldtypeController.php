@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Fieldtypes;
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Fields\Fieldtypes\Relationship;
 use Statamic\Http\Controllers\CP\CpController;
 
 class RelationshipFieldtypeController extends CpController
@@ -58,28 +59,15 @@ class RelationshipFieldtypeController extends CpController
 
     public function data(Request $request)
     {
-        $items = collect($request->selections)->map(function ($id) {
-            return $this->toItemArray($id);
-        });
+        $items = $this->fieldtype()
+            ->getItemData($request->selections)
+            ->values();
 
         return Resource::collection($items);
     }
 
-    protected function toItemArray($id)
+    protected function fieldtype()
     {
-        if ($entry = Entry::find($id)) {
-            return $entry->toArray();
-        }
-
-        return $this->invalidItemArray($id);
-    }
-
-    protected function invalidItemArray($id)
-    {
-        return [
-            'id' => $id,
-            'title' => $id,
-            'invalid' => true
-        ];
+        return new Relationship;
     }
 }

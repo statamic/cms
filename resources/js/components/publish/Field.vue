@@ -21,6 +21,7 @@
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
+                :meta="meta"
                 :name="config.handle"
                 @updated="updated"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
@@ -39,6 +40,8 @@ export default {
         },
         value: {
             required: true
+        },
+        meta: {
         },
         errors: {
             type: Array

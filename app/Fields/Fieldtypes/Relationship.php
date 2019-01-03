@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\API\Entry;
 use Illuminate\Support\Arr;
 use Statamic\Fields\Fieldtype;
 
@@ -28,5 +29,37 @@ class Relationship extends Fieldtype
         }
 
         return $rules;
+    }
+
+    public function preload()
+    {
+        $data = $this->getItemData($this->field->value())->all();
+
+        return compact('data');
+    }
+
+    public function getItemData($values)
+    {
+        return collect($values)->map(function ($id) {
+            return $this->toItemArray($id);
+        })->keyBy('id');
+    }
+
+    protected function toItemArray($id)
+    {
+        if ($entry = Entry::find($id)) {
+            return $entry->toArray();
+        }
+
+        return $this->invalidItemArray($id);
+    }
+
+    protected function invalidItemArray($id)
+    {
+        return [
+            'id' => $id,
+            'title' => $id,
+            'invalid' => true
+        ];
     }
 }

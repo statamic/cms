@@ -79,6 +79,7 @@ class EntriesController extends CpController
                 'update' => cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()])
             ],
             'values' => $values,
+            'meta' => $fields->meta(),
             'collection' => $entry->collection(),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry)

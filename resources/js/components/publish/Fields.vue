@@ -7,6 +7,7 @@
             :key="field.handle"
             :config="field"
             :value="values[field.handle]"
+            :meta="meta[field.handle]"
             :errors="errors[field.handle]"
             @updated="updated"
         />
@@ -39,6 +40,10 @@ export default {
 
         values() {
             return this.state.values;
+        },
+
+        meta() {
+            return this.state.meta;
         },
 
         errors() {

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
 use Statamic\API\Form;
+use Statamic\Forms\Fieldtype;
 
 class FormFieldtypeController extends RelationshipFieldtypeController
 {
@@ -16,15 +17,8 @@ class FormFieldtypeController extends RelationshipFieldtypeController
         })->values();
     }
 
-    protected function toItemArray($id)
+    protected function fieldtype()
     {
-        if ($form = Form::find($id)) {
-            return [
-                'title' => $form->title(),
-                'id' => $form->handle(),
-            ];
-        }
-
-        return $this->invalidItemArray($id);
+        return new Fieldtype;
     }
 }

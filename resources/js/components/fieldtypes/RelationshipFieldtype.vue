@@ -2,6 +2,7 @@
 
     <relationship-input
         v-model="selections"
+        :initial-data="initialData"
         :max-items="maxItems"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
@@ -22,6 +23,7 @@ export default {
     data() {
         return {
             selections: this.value,
+            initialData: this.meta.data
         }
     },
 

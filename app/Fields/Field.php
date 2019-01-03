@@ -155,4 +155,9 @@ class Field implements Arrayable
 
         return array_merge($this->config, $fields->preProcess()->values());
     }
+
+    public function meta()
+    {
+        return $this->fieldtype()->preload($this->value());
+    }
 }

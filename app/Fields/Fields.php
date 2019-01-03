@@ -132,4 +132,9 @@ class Fields
 
         return $fields->values()->all();
     }
+
+    public function meta()
+    {
+        return $this->fields->map->meta();
+    }
 }

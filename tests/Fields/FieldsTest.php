@@ -393,4 +393,31 @@ class FieldsTest extends TestCase
             'two' => 'bar preprocessed'
         ], $fields->preProcess()->values());
     }
+
+    /** @test */
+    function it_gets_meta_data_from_all_fields()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+            public function preload() {
+                return 'meta data from field ' . $this->field->handle() . ' is ' . ($this->field->value() * 2);
+            }
+        });
+
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'fieldtype']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'fieldtype']);
+        });
+
+        $fields = (new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two']
+        ]))->addValues(['one' => 10, 'two' => 20]);
+
+        $this->assertEquals([
+            'one' => 'meta data from field one is 20',
+            'two' => 'meta data from field two is 40',
+        ], $fields->meta()->all());
+    }
 }

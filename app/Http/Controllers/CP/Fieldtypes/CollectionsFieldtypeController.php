@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
 use Statamic\API\Collection;
+use Statamic\Fields\Fieldtypes\Collections as CollectionsFieldtype;
 
 class CollectionsFieldtypeController extends RelationshipFieldtypeController
 {
@@ -16,15 +17,8 @@ class CollectionsFieldtypeController extends RelationshipFieldtypeController
         })->values();
     }
 
-    protected function toItemArray($id)
+    protected function fieldtype()
     {
-        if ($collection = Collection::whereHandle($id)) {
-            return [
-                'title' => $collection->title(),
-                'id' => $collection->handle(),
-            ];
-        }
-
-        return $this->invalidItemArray($id);
+        return new CollectionsFieldtype;
     }
 }

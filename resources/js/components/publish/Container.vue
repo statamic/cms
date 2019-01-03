@@ -16,6 +16,10 @@ export default {
             type: Object,
             default: () => {}
         },
+        meta: {
+            type: Object,
+            default: () => {}
+        },
         errors: {
             type: Object
         }
@@ -41,6 +45,7 @@ export default {
                 state: {
                     fieldset: _.clone(this.fieldset),
                     values: _.clone(this.values),
+                    meta: _.clone(this.meta),
                     errors: {}
                 },
                 mutations: {

@@ -56,6 +56,7 @@ export default {
 
     props: {
         value: { required: true },
+        initialData: Object,
         maxItems: Number,
         itemDataUrl: String,
         selectionsUrl: String,
@@ -99,7 +100,7 @@ export default {
     },
 
     mounted() {
-        this.getDataForSelections(this.selections)
+        this.initializeData()
             .then(() => this.makeSortable());
     },
 
@@ -126,6 +127,17 @@ export default {
 
         selectionsUpdated(selections) {
             this.getDataForSelections(selections);
+        },
+
+        initializeData() {
+            if (!this.initialData) {
+                return this.getDataForSelections(this.selections);
+            }
+
+            this.itemData = this.initialData;
+            this.loading = false;
+            this.initializing = false;
+            return Promise.resolve();
         },
 
         getDataForSelections(selections) {

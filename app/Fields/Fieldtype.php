@@ -139,4 +139,9 @@ abstract class Fieldtype implements Arrayable
             ? $this->field->get($key, $fallback)
             : $this->field->config();
     }
+
+    public function preload()
+    {
+        //
+    }
 }

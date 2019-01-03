@@ -7,6 +7,7 @@
         method="patch"
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
+        :initial-meta="{{ json_encode($meta) }}"
         inline-template
     >
         <div>
@@ -32,6 +33,7 @@
                 name="base"
                 :fieldset="fieldset"
                 :values="initialValues"
+                :meta="initialMeta"
                 :errors="errors"
                 @updated="values = $event"
             >
