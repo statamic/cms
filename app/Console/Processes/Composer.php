@@ -32,7 +32,7 @@ class Composer extends Process
      */
     public function installed()
     {
-        return collect(json_decode($this->runComposerCommand('show', '--format=json'))->installed)
+        return collect(json_decode($this->runComposerCommand('show', '--direct', '--format=json'))->installed)
             ->keyBy('name')
             ->map(function ($package) {
                 $package->version = $this->normalizeVersion($package->version);
@@ -41,7 +41,9 @@ class Composer extends Process
     }
 
     /**
-     * Get installed version of a specific package, in a more performant way than calling composer show.
+     * Get installed version of a specific package.
+     *
+     * We can easily use composer.lock in this case, which is more performant than running composer show.
      *
      * @param string $package
      * @return string
