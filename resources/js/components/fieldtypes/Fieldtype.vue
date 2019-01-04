@@ -1,11 +1,6 @@
 <script>
 export default {
 
-    model: {
-        prop: 'value',
-        event: 'updated'
-    },
-
     props: {
         value: {
             required: true
