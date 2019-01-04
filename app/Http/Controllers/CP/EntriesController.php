@@ -145,6 +145,7 @@ class EntriesController extends CpController
                 'store' => cp_route('collections.entries.store', $collection->handle())
             ],
             'values' => $values,
+            'meta' => $fields->meta(),
             'collection' => $collection,
             'blueprint' => $blueprint->toPublishArray(),
         ];

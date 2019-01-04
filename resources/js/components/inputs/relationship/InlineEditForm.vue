@@ -11,6 +11,7 @@
             name="relate-fieldtype-inline"
             :fieldset="fieldset"
             :values="initialValues"
+            :meta="initialMeta"
             :errors="errors"
             @updated="values = $event"
         >
@@ -58,6 +59,7 @@ export default {
             fields: null,
             values: null,
             initialValues: null,
+            initialMeta: null,
             error: null,
             errors: {}
         }
@@ -90,6 +92,7 @@ export default {
                 const data = response.data;
                 this.updateFieldset(data.blueprint);
                 this.values = this.initialValues = data.values;
+                this.initialMeta = data.meta;
                 this.action = data.actions.update;
                 this.loading = false;
             });
