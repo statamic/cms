@@ -116,6 +116,8 @@ class MakeFieldtype extends GeneratorCommand
      */
     protected function generateVueComponent($name)
     {
+        // TODO: Maybe instead of checking version, we just check if `assets/js` exists 🤔
+        // It's possible they started with a 5.6 app and shifted to 5.7+, but kept old structure
         $path = version_compare(app()::VERSION, '5.7.0', '<')
             ? resource_path("assets/js/components/{$name}.vue")
             : resource_path("js/components/{$name}.vue");
