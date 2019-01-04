@@ -5,7 +5,7 @@
         @dblclick="edit"
     >
         <div
-            class="item-inner border shadow-inner bg-grey-lightest rounded-md leading-loose px-1 inline-flex items-center cursor-pointer select-none"
+            class="item-inner inline-flex items-center cursor-pointer select-none"
             :class="{ 'border-red bg-red-lighter text-red': item.invalid }"
         >
             <div
