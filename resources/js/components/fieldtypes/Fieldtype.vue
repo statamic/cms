@@ -7,13 +7,16 @@ export default {
         },
         config: {
             type: Object,
-            required: true
+            default: () => { return {}; }
         },
         name: {
             type: String,
             required: true
         },
-        meta: {}
+        meta: {
+            type: Object,
+            default: () => { return {}; }
+        }
     },
 
     methods: {
