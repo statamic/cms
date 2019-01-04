@@ -106,7 +106,12 @@
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
-                <blueprints-fieldtype v-model="blueprint" name="blueprint" :config="{ max_items: 1 }"></blueprints-fieldtype>
+                <blueprints-fieldtype
+                    name="blueprint"
+                    :config="{ max_items: 1 }"
+                    :value="blueprint ? [blueprint] : null"
+                    @updated="blueprint = $event[0]"
+                ></blueprints-fieldtype>
                 <div class="text-2xs text-grey-light mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     You can pick an existing Blueprint or create a new one.
