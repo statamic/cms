@@ -12,9 +12,12 @@ class View
     protected $template;
     protected $cascadeContent;
 
-    public static function make()
+    public static function make($template = null)
     {
-        return new static;
+        $view = new static;
+        $view->template($template);
+
+        return $view;
     }
 
     public function data($data = null)
