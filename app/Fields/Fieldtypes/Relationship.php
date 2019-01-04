@@ -20,6 +20,19 @@ class Relationship extends Fieldtype
         return Arr::wrap($data);
     }
 
+    public function process($data)
+    {
+        if ($data === null || $data === []) {
+            return null;
+        }
+
+        if ($this->field->get('max_items') === 1) {
+            return $data[0];
+        }
+
+        return $data;
+    }
+
     public function rules(): array
     {
         $rules = ['array'];
