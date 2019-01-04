@@ -23,7 +23,7 @@ export default {
 
     data() {
         return {
-            selections: this.value,
+            selections: _.clone(this.value),
             initialData: this.meta.data
         }
     },
