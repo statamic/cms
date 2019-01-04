@@ -148,13 +148,7 @@ export default {
     watch: {
 
         selections(selections) {
-            let value = this.selections;
-
-            if (this.maxItems === 1) {
-                value = value[0];
-            }
-
-            this.$emit('input', value);
+            this.$emit('input', this.selections);
         },
 
         loading: {
