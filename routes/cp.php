@@ -10,6 +10,9 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
     Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+
+    Route::get('token', 'Auth\CsrfTokenController')->name('token');
+    Route::get('extend', 'Auth\ExtendSessionController')->name('extend');
 });
 
 Route::group([
@@ -101,6 +104,8 @@ Route::group([
         Route::get('blueprints', 'BlueprintsFieldtypeController@index');
         Route::get('blueprints/data', 'BlueprintsFieldtypeController@data');
     });
+
+    Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
 
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {

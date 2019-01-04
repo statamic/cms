@@ -8,6 +8,12 @@
 <body>
     <div id="statamic">
 
+      <session-expiry
+          email="{{ my()->email() }}"
+          :warn-at="60"
+          :lifetime="{{ config('session.lifetime') * 60 }}"
+      ></session-expiry>
+
       @include('statamic::partials.global-header')
       @include('statamic::partials.alerts')
 

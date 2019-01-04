@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->swapSessionMiddleware();
+
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PermanentRedirects::class)
              ->pushMiddleware(\Statamic\Http\Middleware\VanityRedirects::class)
@@ -101,5 +103,13 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Fields\FieldsetRepository($app['files']))
                 ->setDirectory(resource_path('fieldsets'));
         });
+    }
+
+    protected function swapSessionMiddleware()
+    {
+        $this->app->singleton(
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Statamic\Http\Middleware\CP\StartSession::class
+        );
     }
 }
