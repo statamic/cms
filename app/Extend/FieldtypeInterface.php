@@ -42,19 +42,26 @@ interface FieldtypeInterface
      *
      * @return bool
      */
-    public function canBeValidated();
+    public function validatable();
 
     /**
      * Can this field be localized?
      *
      * @return bool
      */
-    public function canBeLocalized();
+    public function localizable();
 
     /**
      * Can this field have a default value?
      *
      * @return bool
      */
-    public function canHaveDefault();
+    public function defaultable();
+
+    /**
+     * Can this field be selectable?
+     *
+     * @return bool
+     */
+    public function selectable();
 }

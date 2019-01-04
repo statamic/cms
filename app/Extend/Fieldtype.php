@@ -13,11 +13,6 @@ use Statamic\API\Str;
 class Fieldtype implements FieldtypeInterface
 {
     /**
-     * Provides access to addon helper methods
-     */
-    use Extensible;
-
-    /**
      * The configuration of the field from within a fieldset
      * @var array
      */
@@ -58,8 +53,8 @@ class Fieldtype implements FieldtypeInterface
      */
     public function __construct()
     {
-        $this->bootstrap();
-        $this->init();
+        // $this->bootstrap();
+        // $this->init();
     }
 
     public function setFieldConfig($config)
@@ -260,7 +255,7 @@ class Fieldtype implements FieldtypeInterface
      *
      * @return bool
      */
-    public function canBeValidated()
+    public function validatable()
     {
         return true;
     }
@@ -270,7 +265,7 @@ class Fieldtype implements FieldtypeInterface
      *
      * @return bool
      */
-    public function canBeLocalized()
+    public function localizable()
     {
         return true;
     }
@@ -280,8 +275,48 @@ class Fieldtype implements FieldtypeInterface
      *
      * @return bool
      */
-    public function canHaveDefault()
+    public function defaultable()
     {
         return true;
+    }
+
+    /**
+     * Can this field be selectable?
+     *
+     * @return bool
+     */
+    public function selectable()
+    {
+        return true;
+    }
+
+    /**
+     * How should the field be categorized?
+     *
+     * By default, it will only show up under 'All'.
+     *
+     * @return array
+     */
+    public function categories()
+    {
+        return [];
+    }
+
+    public function toArray(): array
+    {
+        // Bring back Extensible trait in some form for /app extensions?
+        $addonName = explode('\\', get_called_class())[2];
+
+        return [
+            'handle' => snake_case($addonName),
+            'title' => ucwords(str_replace('_', ' ', snake_case($addonName))),
+            'localizable' => $this->localizable(),
+            'validatable' => $this->validatable(),
+            'defaultable' => $this->defaultable(),
+            'selectable'  => $this->selectable(),
+            'categories' => $this->categories(),
+            'icon' => 'generic',
+            'config' => $this->getFieldConfig(),
+        ];
     }
 }
