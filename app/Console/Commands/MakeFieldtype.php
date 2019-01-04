@@ -40,7 +40,16 @@ class MakeFieldtype extends GeneratorCommand
     {
         // TODO: Handle optional `addon` location argument.
 
-        return parent::handle();
+        $name = $this->getNameInput();
+
+        if ((! $this->hasOption('force') || ! $this->option('force')) && $this->alreadyExists($name)) {
+            $this->error($this->type.' already exists!');
+
+            return false;
+        }
+
+        $this->generateClass($name);
+        $this->generateVueComponent($name);
     }
 
     /**
@@ -51,6 +60,16 @@ class MakeFieldtype extends GeneratorCommand
     protected function getStub()
     {
         return __DIR__.'/stubs/fieldtype.stub';
+    }
+
+    /**
+     * Get the stub file for the generator.
+     *
+     * @return string
+     */
+    protected function getVueStub()
+    {
+        return __DIR__.'/stubs/fieldtype.vue.stub';
     }
 
     /**
@@ -74,20 +93,53 @@ class MakeFieldtype extends GeneratorCommand
         return $rootNamespace.'\Fieldtypes';
     }
 
-    // /**
-    //  * Build the class with the given name.
-    //  *
-    //  * @param  string  $name
-    //  * @return string
-    //  */
-    // protected function buildClass($name)
-    // {
-    //     $class = parent::buildClass($name);
+    /**
+     * Generate class.
+     *
+     * @param string $name
+     */
+    protected function generateClass($name)
+    {
+        $class = $this->qualifyClass($name);
+        $path = $this->getPath($class);
 
-    //     $class = str_replace('widget_view', str_slug(snake_case($this->getNameInput())), $class);
+        $this->makeDirectory($path);
+        $this->files->put($path, $this->buildClass($class));
 
-    //     return $class;
-    // }
+        $this->info($this->type.' php class created successfully.');
+    }
+
+    /**
+     * Generate vue component.
+     *
+     * @param string $name
+     */
+    protected function generateVueComponent($name)
+    {
+        $path = version_compare(app()::VERSION, '5.7.0', '<')
+            ? resource_path("assets/js/components/{$name}.vue")
+            : resource_path("js/components/{$name}.vue");
+
+        $this->files->put($path, $this->buildVueComponent($name));
+
+        $this->info($this->type.' vue component created successfully.');
+    }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function buildVueComponent($name)
+    {
+        $component = $this->files->get($this->getVueStub());
+
+        $component = str_replace('DummyName', $name, $component);
+        $component = str_replace('dummy_name', snake_case($name), $component);
+
+        return $component;
+    }
 
     /**
      * Get the console command arguments.
@@ -101,4 +153,3 @@ class MakeFieldtype extends GeneratorCommand
         ]);
     }
 }
-
