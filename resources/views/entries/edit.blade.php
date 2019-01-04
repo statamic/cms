@@ -30,6 +30,7 @@
 
             <publish-container
                 v-if="fieldset"
+                ref="container"
                 name="base"
                 :fieldset="fieldset"
                 :values="initialValues"

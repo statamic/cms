@@ -35,6 +35,7 @@ Vue.use(Vuex);
 require('./components/NotificationBus');
 require('./components/ModalBus');
 require('./components/ProgressBar');
+require('./components/DirtyState');
 
 var vm = new Vue({
     el: '#statamic',

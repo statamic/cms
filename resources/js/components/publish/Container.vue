@@ -29,6 +29,10 @@ export default {
         this.registerVuexModule();
     },
 
+    destroyed() {
+        this.removeNavigationWarning();
+    },
+
     provide() {
         return {
             storeName: this.name
@@ -75,11 +79,15 @@ export default {
 
         emitUpdatedEvent(values) {
             this.$emit('updated', values);
-            this.enableNavigationWarning();
+            this.$dirty.add(this.name);
         },
 
-        enableNavigationWarning() {
-            window.onbeforeunload = () => '';
+        saved() {
+            this.removeNavigationWarning();
+        },
+
+        removeNavigationWarning() {
+            this.$dirty.remove(this.name);
         }
 
     },

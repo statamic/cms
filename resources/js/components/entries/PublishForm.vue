@@ -64,6 +64,7 @@ export default {
 
             axios[this.method](this.action, this.values).then(response => {
                 this.$notify.success('Saved');
+                this.$refs.container.saved();
                 const redirect = response.data.redirect;
                 if (redirect) window.location = redirect;
             }).catch(e => {
