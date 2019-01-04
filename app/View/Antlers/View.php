@@ -10,6 +10,7 @@ class View
     protected $data = [];
     protected $layout;
     protected $template;
+    protected $cascadeContent;
 
     public static function make()
     {
@@ -51,8 +52,10 @@ class View
 
     public function render()
     {
-        $data = array_merge($this->data, [
-            'template_content' => view($this->template, $this->data)
+        $cascade = array_merge($this->data, $this->cascade());
+
+        $data = array_merge($cascade, [
+            'template_content' => view($this->template, $cascade)
         ]);
 
         $contents = view($this->layout, $data)->render();
@@ -62,9 +65,19 @@ class View
         return $contents;
     }
 
-    public function withCascade()
+    protected function cascade()
     {
-        return $this->data(Cascade::hydrate()->toArray());
+        return Cascade::instance()
+            ->withContent($this->cascadeContent)
+            ->hydrate()
+            ->toArray();
+    }
+
+    public function cascadeContent($content)
+    {
+        $this->cascadeContent = $content;
+
+        return $this;
     }
 
     public function __toString()

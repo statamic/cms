@@ -95,7 +95,7 @@ class DataResponse implements Responsable
         return (new View)
             ->template($this->template())
             ->layout($this->layout())
-            ->data($this->cascade()->toArray())
+            ->cascadeContent($this->data)
             ->render();
     }
 
