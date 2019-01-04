@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers;
 
 use Statamic\Events\ViewRendered;
+use Facades\Statamic\View\Cascade;
 
 class View
 {
@@ -59,6 +60,11 @@ class View
         ViewRendered::dispatch($this);
 
         return $contents;
+    }
+
+    public function withCascade()
+    {
+        return $this->data(Cascade::hydrate()->toArray());
     }
 
     public function __toString()
