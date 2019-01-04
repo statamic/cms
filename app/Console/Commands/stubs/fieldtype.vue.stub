@@ -1,0 +1,25 @@
+Vue.component('dummy_name-fieldtype', {
+
+    mixins: [Fieldtype],
+
+    template: '<div>DummyName</div>',
+
+    data: function() {
+        return {
+            //
+        };
+    },
+
+    computed: {
+        //
+    },
+
+    methods: {
+        //
+    },
+
+    ready: function() {
+        //
+    }
+
+});
