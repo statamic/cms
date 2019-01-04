@@ -94,7 +94,7 @@ export default {
 
     props: {
         value: { required: true },
-        initialData: Object,
+        initialData: Array,
         maxItems: Number,
         itemDataUrl: String,
         selectionsUrl: String,

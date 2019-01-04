@@ -55,7 +55,7 @@ class Relationship extends Fieldtype
     {
         return collect($values)->map(function ($id) {
             return $this->toItemArray($id);
-        });
+        })->values();
     }
 
     protected function toItemArray($id)
