@@ -59,6 +59,20 @@ class Composer extends Process
     }
 
     /**
+     * Get installed path of a specific package.
+     *
+     * @param string $package
+     * @return string
+     */
+    public function installedPath(string $package)
+    {
+        return collect(json_decode($this->runComposerCommand('show', '--direct', '--path', '--format=json'))->installed)
+            ->keyBy('name')
+            ->get($package)
+            ->path;
+    }
+
+    /**
      * Require a package.
      *
      * @param string $package
