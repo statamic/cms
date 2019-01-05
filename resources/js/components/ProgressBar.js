@@ -51,7 +51,7 @@ const vm = new Vue({
 
 class ProgressBar {
     loading(name, loading) {
-        loading ? this.start() : this.complete();
+        loading ? this.start(name) : this.complete(name);
     }
     start(name) {
         vm.add(name);
