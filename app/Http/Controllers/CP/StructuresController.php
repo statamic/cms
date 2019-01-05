@@ -14,7 +14,16 @@ class StructuresController extends CpController
         $this->authorize('index', StructureContract::class, 'You are not authorized to view any structures.');
 
         $structures = Structure::all()->filter(function ($structure) {
-            return request()->user()->can('view', $structure);
+            return me()->can('view', $structure);
+        })->map(function ($structure) {
+            return [
+                'id' => $structure->handle(),
+                'title' => $structure->title(),
+                'pages' => $structure->flattenedPages()->count(),
+                'show_url' => cp_route('structures.show', $structure->handle()),
+                'edit_url' => cp_route('structures.edit', $structure->handle()),
+                'deletetable' => me()->can('delete', $structure)
+            ];
         });
 
         return view('statamic::structures.index', compact('structures'));

@@ -15,39 +15,19 @@
         </div>
     @endif
 
-    @if(count($structures))
+    @if(count($structures) > 0)
+
         <div class="flex mb-3">
             <h1 class="flex-1">{{ __('Structures') }}</h1>
 
             @can('create', 'Statamic\Contracts\Data\Structures\Structure')
-                <a href="{{ cp_route('structures.create') }}" class="btn">{{ __('Create Structure') }}</a>
+                <a href="{{ cp_route('collections.create') }}" class="btn">{{ __('Create Structure') }}</a>
             @endcan
         </div>
-        <div class="card flush">
-            <div class="dossier-table-wrapper">
-                <table class="dossier">
-                    <tbody>
-                        @foreach($structures as $structure)
-                        <tr>
-                            <td class="cell-title first-cell flex items-center">
-                                <span class="column-label">{{ _('Title' )}}</span>
-                                <div class="stat">
-                                    <i class="icon icon-documents"></i>
-                                    {{ $structure->flattenedPages()->count() }}
-                                </div>
-                                <a href="{{ cp_route('structures.edit', $structure->handle()) }}">{{ $structure->title() }}</a>
 
-                                @can('delete', $structure)
-                                    <form method="POST" action="{{ cp_route('structures.destroy', $structure->handle()) }}">
-                                        @csrf @method('delete') <button>Delete</button>
-                                    </form>
-                                @endcan
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <structure-listing
+            :initial-rows="{{ json_encode($structures) }}">
+        </structure-listing>
     @endif
+
 @endsection

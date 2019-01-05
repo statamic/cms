@@ -76,6 +76,7 @@ var vm = new Vue({
         UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
         CollectionWizard: require('./components/collections/Wizard.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
+        StructureListing: require('./components/structures/Listing.vue'),
     },
 
     data: {
