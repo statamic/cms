@@ -86,18 +86,30 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function getAddonPath($addon)
     {
+        $fallbackPath = $this->laravel['path'];
+
+        // Attempt to get addon path.
         try {
-            return Composer::installedPath($addon) . '/src';
+            $path = Composer::installedPath($addon) . '/src';
         } catch (Exception $exception) {
-            $fallbackPath = $this->laravel['path'];
+            $path = $fallbackPath;
         }
 
-        if (! isset($this->shownAddonPathError)) {
+        // Ensure we don't use addon path if within composer vendor files.
+        if ($pathIsInVendor = str_contains($path, base_path('vendor'))) {
+            $path = $fallbackPath;
+        }
+
+        // Output helpful errors to clarify why we're falling back to app path.
+        if (! isset($this->shownAddonPathError) && $pathIsInVendor) {
+            $this->error('It not a good practice to modify vendor files, falling back to default path.');
+            $this->shownAddonPathError = true;
+        } elseif (! isset($this->shownAddonPathError) && $path == $fallbackPath) {
             $this->error('Could not find path for specified addon, falling back to default path.');
             $this->shownAddonPathError = true;
         }
 
-        return $fallbackPath;
+        return $path;
     }
 
     /**
