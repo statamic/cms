@@ -65,7 +65,7 @@ class MakeFieldtype extends GeneratorCommand
 
         $this->files->put($path, $this->buildVueComponent($name));
 
-        $projectPath = $this->getProjectPath($path);
+        $projectPath = $this->getRelativePath($path);
 
         $this->comment("Your {$this->type} vue component awaits at: {$projectPath}");
     }

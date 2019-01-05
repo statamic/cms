@@ -2,7 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
+use Exception;
 use Illuminate\Support\Str;
+use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
 
@@ -15,13 +17,11 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     public function handle()
     {
-        // TODO: Handle optional `addon` location argument.
-
         if (parent::handle() === false) {
             return false;
         }
 
-        $projectPath = $this->getProjectPath($this->getPath($this->qualifyClass($this->getNameInput())));
+        $projectPath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
 
         $this->comment("Your {$this->type} class awaits at: {$projectPath}");
     }
@@ -49,7 +49,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
@@ -58,12 +58,55 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     }
 
     /**
+     * Get the destination class path.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
+
+        $basePath = $this->laravel['path'];
+
+        if ($addon = $this->argument('addon')) {
+            $basePath = $this->getAddonPath($addon);
+        }
+
+        $path = $basePath.'/'.str_replace('\\', '/', $name).'.php';
+
+        return $path;
+    }
+
+    /**
+     * Get addon path.
+     *
+     * @param string $addon
+     * @return string
+     */
+    protected function getAddonPath($addon)
+    {
+        try {
+            return Composer::installedPath($addon);
+        } catch (Exception $exception) {
+            $fallbackPath = $this->laravel['path'];
+        }
+
+        if (! isset($this->shownAddonPathError)) {
+            $this->error('Could not find path for specified addon, falling back to default path.');
+            $this->shownAddonPathError = true;
+        }
+
+        return $fallbackPath;
+    }
+
+    /**
      * Get path relative to the project if possible, otherwise return absolute path.
      *
      * @param string $path
      * @return string
      */
-    protected function getProjectPath($path)
+    protected function getRelativePath($path)
     {
         return str_replace(base_path().'/', '', $path);
     }
