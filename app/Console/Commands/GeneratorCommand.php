@@ -3,7 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Exception;
-use Illuminate\Support\Str;
+use Statamic\API\Str;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
@@ -21,9 +21,9 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
             return false;
         }
 
-        $projectPath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
+        $relativePath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
 
-        $this->comment("Your {$this->type} class awaits at: {$projectPath}");
+        $this->comment("Your {$this->type} class awaits at: {$relativePath}");
     }
 
     /**
