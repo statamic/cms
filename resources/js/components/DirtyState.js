@@ -46,6 +46,9 @@ const vm = new Vue({
 });
 
 class DirtyState {
+    state(name, state) {
+        state ? this.add(name) : this.remove(name);
+    }
     add(name) {
         vm.add(name);
     }
