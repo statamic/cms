@@ -56,18 +56,14 @@ class MakeFieldtype extends GeneratorCommand
     protected function generateVueComponent()
     {
         $name = $this->getNameInput();
+        $path = $this->getJsPath("components/fieldtypes/{$name}.vue");
 
-        // TODO: Maybe instead of checking version, we just check if `assets/js` exists 🤔
-        // It's possible they started with a 5.6 app and shifted to 5.7+, but kept old structure
-        $path = version_compare(app()::VERSION, '5.7.0', '<')
-            ? resource_path("assets/js/components/{$name}.vue")
-            : resource_path("js/components/{$name}.vue");
-
+        $this->makeDirectory($path);
         $this->files->put($path, $this->buildVueComponent($name));
 
-        $projectPath = $this->getRelativePath($path);
+        $relativePath = $this->getRelativePath($path);
 
-        $this->comment("Your {$this->type} vue component awaits at: {$projectPath}");
+        $this->comment("Your {$this->type} vue component awaits at: {$relativePath}");
     }
 
     /**
