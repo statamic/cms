@@ -87,7 +87,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     protected function getAddonPath($addon)
     {
         try {
-            return Composer::installedPath($addon);
+            return Composer::installedPath($addon) . '/src';
         } catch (Exception $exception) {
             $fallbackPath = $this->laravel['path'];
         }
