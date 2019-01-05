@@ -3,7 +3,6 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
-use Symfony\Component\Console\Input\InputArgument;
 
 class MakeFieldtype extends GeneratorCommand
 {
@@ -31,80 +30,33 @@ class MakeFieldtype extends GeneratorCommand
     protected $type = 'Fieldtype';
 
     /**
+     * The stub to be used for generating the class.
+     *
+     * @var string
+     */
+    protected $stub = 'fieldtype.stub';
+
+    /**
      * Execute the console command.
      *
      * @return bool|null
      */
     public function handle()
     {
-        // TODO: Handle optional `addon` location argument.
-
-        $name = $this->getNameInput();
-
-        if ((! $this->hasOption('force') || ! $this->option('force')) && $this->alreadyExists($name)) {
-            $this->error($this->type.' already exists!');
-
+        if (parent::handle() === false) {
             return false;
         }
 
-        $this->generateClass($name);
-        $this->generateVueComponent($name);
-    }
-
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getStub()
-    {
-        return __DIR__.'/stubs/fieldtype.stub';
-    }
-
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getVueStub()
-    {
-        return __DIR__.'/stubs/fieldtype.vue.stub';
-    }
-
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        return $rootNamespace.'\Fieldtypes';
-    }
-
-    /**
-     * Generate class.
-     *
-     * @param string $name
-     */
-    protected function generateClass($name)
-    {
-        $class = $this->qualifyClass($name);
-        $path = $this->getPath($class);
-
-        $this->makeDirectory($path);
-        $this->files->put($path, $this->buildClass($class));
-
-        $this->info($this->type.' php class created successfully.');
+        $this->generateVueComponent();
     }
 
     /**
      * Generate vue component.
-     *
-     * @param string $name
      */
-    protected function generateVueComponent($name)
+    protected function generateVueComponent()
     {
+        $name = $this->getNameInput();
+
         // TODO: Maybe instead of checking version, we just check if `assets/js` exists 🤔
         // It's possible they started with a 5.6 app and shifted to 5.7+, but kept old structure
         $path = version_compare(app()::VERSION, '5.7.0', '<')
@@ -113,7 +65,9 @@ class MakeFieldtype extends GeneratorCommand
 
         $this->files->put($path, $this->buildVueComponent($name));
 
-        $this->info($this->type.' vue component created successfully.');
+        $projectPath = $this->getProjectPath($path);
+
+        $this->comment("Your {$this->type} vue component awaits at: {$projectPath}");
     }
 
     /**
@@ -133,14 +87,12 @@ class MakeFieldtype extends GeneratorCommand
     }
 
     /**
-     * Get the console command arguments.
+     * Get the stub file for the generator.
      *
-     * @return array
+     * @return string
      */
-    protected function getArguments()
+    protected function getVueStub()
     {
-        return array_merge(parent::getArguments(), [
-            ['addon', InputArgument::OPTIONAL, 'The name of your addon'],
-        ]);
+        return __DIR__.'/stubs/fieldtype.vue.stub';
     }
 }
