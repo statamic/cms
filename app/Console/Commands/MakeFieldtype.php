@@ -3,7 +3,6 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
-use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeFieldtype extends GeneratorCommand
@@ -70,16 +69,6 @@ class MakeFieldtype extends GeneratorCommand
     protected function getVueStub()
     {
         return __DIR__.'/stubs/fieldtype.vue.stub';
-    }
-
-    /**
-     * Get the desired class name from the input.
-     *
-     * @return string
-     */
-    protected function getNameInput()
-    {
-        return studly_case(parent::getNameInput());
     }
 
     /**

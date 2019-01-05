@@ -3,7 +3,6 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
-use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeModifier extends GeneratorCommand
@@ -51,16 +50,6 @@ class MakeModifier extends GeneratorCommand
     protected function getStub()
     {
         return __DIR__.'/stubs/modifier.stub';
-    }
-
-    /**
-     * Get the desired class name from the input.
-     *
-     * @return string
-     */
-    protected function getNameInput()
-    {
-        return studly_case(parent::getNameInput());
     }
 
     /**
