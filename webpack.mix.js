@@ -30,7 +30,6 @@ mix.extract([
     'medium-editor-autohr',
     'moment',
     'mousetrap',
-    'nested-sortable',
     'redactor',
     'selectize',
     'sweetalert',

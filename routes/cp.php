@@ -25,6 +25,7 @@ Route::group([
 
     // Structures
     Route::resource('structures', 'StructuresController');
+    Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
 
     // Collections
     Route::resource('collections', 'CollectionsController');

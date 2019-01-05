@@ -1,187 +1,21 @@
-/* ==========================================================================
-   PAGE TREE
-   ========================================================================== */
-
 .page-tree {
-    @apply .relative;
 
-    .branch {
-        @apply .mt-px .flex .flex-wrap;
+    .tree-node-inner {
+        @apply relative text-xs bg-white shadow rounded;
     }
 
-    .branch-row {
-        @apply .relative .text-xs .bg-white .shadow .rounded;
+    .draggable-placeholder-inner {
+        border: 1px dashed #0088F8;
+        background: rgba(0, 136, 249, 0.09);
+
+        * { display: none; }
     }
 
-    // Dragging placeholder
-    .branch-placeholder {
-        @apply .text-green .my-sm;
-    }
-
-    // The branch being dragged
-    .branch-dragged {
-        display: none;
-    }
-
-    ul.branches {
-        @apply .m-0 .p-0 .w-full .list-reset;
-        .branch {
-            @apply .ml-3;
-        }
-    }
-
-    ul.branches.depth-1 > .branch { margin-left: 0; }
-
-    .drag-handle {
-        @apply .rounded-l;
-        cursor: grab;
-        &:active { cursor: grabbing; }
-    }
 
     .page-move {
+        @apply w-6 border-r;
+        cursor: grab;
         background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
-        border-right: 1px solid $color_border;
         &:hover { @apply .bg-grey-lighter; }
     }
-
-    .page-text {
-        @apply .ml-sm;
-    }
-
-    .page-url {
-        display: none;
-    }
-
-    .page-actions {
-        @apply .flex .items-center;
-    }
-
-    .action-more i {
-        transition: transform .2s ease;
-    }
-
-    .action-more.open i {
-        transform: rotate(90deg);
-    }
-
-    .page-toggle {
-        user-select: none;
-
-        &.toggleable { cursor: pointer; }
-        .icon { transition: 0.1s all ease; }
-        .collapsed { transform: rotate(-90deg); }
-    }
-
-    .page-toggle {
-        user-select: none;
-
-        &.toggleable { cursor: pointer; }
-        .icon { transition: 0.1s all ease; }
-        .collapsed { transform: rotate(-90deg); }
-    }
-
-    .indent-arrow {
-        display: block;
-        background: url('../img/page-arrow.png') center no-repeat;
-        height: 10px;
-        width: 11px;
-    }
-
-    // Each nesting gets a bigger indent
-    $indent: 24px;
-    @for $i from 2 through 10 {
-        .depth-#{$i} .branch-row .page-indent {
-            width: $indent;
-            left: -#{$indent};
-            padding-left: $indent - 24px;
-            $indent: $indent + 24px;
-        }
-    }
-
-    // Top level pages have a little more oomph.
-    .depth-1 > .branch > .branch-row {
-        .page-text {
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .indent-arrow { display: none; }
-        .page-move { display: block; }
-    }
-
-    // Collapsed branches
-    .branches-collapsed {
-        border: 0;
-
-        // We want to hide all the branches
-        > li.branch {
-            display: none;
-        }
-
-        // But show any branches that are being dragged in
-        > li.branch-placeholder {
-            display: block;
-        }
-    }
-
-    // URL mode
-    &.show-urls {
-        .page-title { display: none; }
-        .page-url { display: block; }
-    }
-
-    // Drafts
-    .draft .page-title {
-        color: rgba($brand-darker, .5);
-        &:hover { color: rgba($brand-darker, .75); }
-    }
-
-    // Saving overlay
-    .saving {
-        @apply .absolute .pin .flex .items-center .rounded;
-        z-index: 200;
-        background: rgba(white, .7);
-
-        .inner {
-            text-align: center;
-            padding: 50px;
-            margin: 0 auto;
-        }
-
-        i {
-            position: relative;
-            top: -1px;
-            margin-right: 10px;
-        }
-    }
-
-    // The home branch needs individual attention
-    .tree-home {
-        margin: 0;
-        border: 0;
-
-        .branch-row {
-            border-top: 0;
-            cursor: default;
-        }
-
-        .page-text {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .home-handle {
-            @apply .flex .rounded-l .items-center .h-full .border-r .bg-grey-lighter;
-        }
-
-        .icon-home {
-            font-size: 12px;
-        }
-    }
-}
-
-
-// When dragging
-.page-tree-dragging {
-    cursor: grabbing;
-    @apply select-none;
 }

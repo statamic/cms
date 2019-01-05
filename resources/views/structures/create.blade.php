@@ -2,6 +2,6 @@
 
 @section('content')
 
-    TODO
+    TODO: Create a structure.
 
 @endsection
