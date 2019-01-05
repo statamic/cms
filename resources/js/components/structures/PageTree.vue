@@ -15,7 +15,6 @@
             :data="treeData"
             :space="1"
             :indent="24"
-            :ondragstart="onDragStart"
             @change="treeChanged"
         >
             <tree-branch
@@ -101,11 +100,6 @@ export default {
                 this.saving = false;
                 this.$notify.success(__('Pages reordered.'), { timeout: 3000 });
             });
-        },
-
-        onDragStart(node, helper) {
-            // Prevent dragging anywhere but the handle.
-            return helper.event.target.classList.contains('page-move');
         }
 
     }
