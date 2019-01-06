@@ -33,7 +33,7 @@ class View
 
     public function layout($layout = null)
     {
-        if (! $layout) {
+        if (count(func_get_args()) === 0) {
             return $this->layout;
         }
 
@@ -57,11 +57,13 @@ class View
     {
         $cascade = array_merge($this->data, $this->cascade());
 
-        $data = array_merge($cascade, [
-            'template_content' => view($this->template, $cascade)
-        ]);
+        $contents = view($this->template, $cascade);
 
-        $contents = view($this->layout, $data)->render();
+        if ($this->layout) {
+            $contents = view($this->layout, array_merge($cascade, [
+                'template_content' => $contents
+            ]))->render();
+        }
 
         ViewRendered::dispatch($this);
 
