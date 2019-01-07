@@ -23,7 +23,7 @@ class StructuresController extends CpController
                 'edit_url' => cp_route('structures.edit', $structure->handle()),
                 'deletetable' => me()->can('delete', $structure)
             ];
-        });
+        })->values();
 
         return view('statamic::structures.index', compact('structures'));
     }
