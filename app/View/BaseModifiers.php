@@ -6,6 +6,7 @@ use Statamic\API\Arr;
 use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Path;
+use Statamic\API\Site;
 use Statamic\API\Asset;
 use Statamic\API\Parse;
 use Statamic\API\Theme;
@@ -564,7 +565,7 @@ class BaseModifiers extends Modifier
      */
     public function fullUrls($value, $params)
     {
-        $domain = Config::getSiteURL();
+        $domain = Site::current()->absoluteUrl();
 
         return preg_replace_callback('/="(\/[^"]+)"/ism', function($item) use ($domain) {
             return '="' . Path::tidy($domain . $item[1]) . '"';
