@@ -46,6 +46,7 @@ export default {
     },
 
     props: {
+        initialPages: Array,
         pagesUrl: String,
         submitUrl: String,
         soundDropUrl: String
@@ -53,16 +54,12 @@ export default {
 
     data() {
         return {
-            loading: true,
+            loading: false,
             saving: false,
             changed: false,
-            pages: [],
-            treeData: []
+            pages: this.initialPages,
+            treeData: JSON.parse(JSON.stringify(this.initialPages))
         }
-    },
-
-    mounted() {
-        this.getPages();
     },
 
     watch: {

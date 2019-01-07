@@ -39,9 +39,12 @@ class StructuresController extends CpController
 
     public function show($structure)
     {
+        // TODO: Don't call a controller method, that's silly.
+        $pages = app(StructurePagesController::class)->index($structure)['pages'];
+
         $structure = Structure::find($structure);
 
-        return view('statamic::structures.show', compact('structure'));
+        return view('statamic::structures.show', compact('structure', 'pages'));
     }
 
     public function update(Request $request, $structure)
