@@ -44,7 +44,9 @@ class StructuresController extends CpController
 
         $structure = Structure::find($structure);
 
-        return view('statamic::structures.show', compact('structure', 'pages'));
+        $root = $structure->parent()->toArray();
+
+        return view('statamic::structures.show', compact('structure', 'pages', 'root'));
     }
 
     public function update(Request $request, $structure)

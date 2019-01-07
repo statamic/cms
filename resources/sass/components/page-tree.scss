@@ -18,4 +18,9 @@
         background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
         &:hover { @apply .bg-grey-lighter; }
     }
+
+    .page-root {
+        background: rgba($bg, .5);
+        @apply flex w-6 rounded-l items-center border-r;
+    }
 }

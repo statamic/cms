@@ -1,16 +1,26 @@
 <template>
-    <div>
+    <div class="page-tree">
 
         <div class="flex mb-3">
             <slot name="header" />
-            <button class="btn btn-primary" v-show="!changed">{{ __('Create Page') }}</button>
-            <button class="btn btn-primary" @click="save" v-show="changed">{{ __('Save') }}</button>
+
+            <a :href="editUrl" class="btn mr-1" v-text="__('Edit')" />
+
+            <button
+                class="btn btn-primary"
+                :class="{ 'disabled': !changed }"
+                :disabled="!changed"
+                @click="save"
+                v-text="__('Save Page Order')" />
         </div>
 
         <loading-graphic v-if="loading"></loading-graphic>
 
+        <div class="tree-node-inner mb-1">
+            <tree-branch :root="true" :page="root" :depth="1" />
+        </div>
+
         <draggable-tree
-            class="page-tree"
             draggable
             :data="treeData"
             :space="1"
@@ -49,7 +59,9 @@ export default {
         initialPages: Array,
         pagesUrl: String,
         submitUrl: String,
-        soundDropUrl: String
+        editUrl: String,
+        soundDropUrl: String,
+        root: Object
     },
 
     data() {
@@ -58,7 +70,7 @@ export default {
             saving: false,
             changed: false,
             pages: this.initialPages,
-            treeData: JSON.parse(JSON.stringify(this.initialPages))
+            treeData: JSON.parse(JSON.stringify(this.initialPages)),
         }
     },
 

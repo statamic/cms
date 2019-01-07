@@ -6,7 +6,9 @@
         :initial-pages="{{ json_encode($pages) }}"
         pages-url="{{ cp_route('structures.pages.index', $structure->handle()) }}"
         submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
+        edit-url="{{ cp_route('structures.edit', $structure->handle()) }}"
         sound-drop-url="{{ cp_resource_url('audio/click.mp3') }}"
+        :root="{{ json_encode($root) }}"
     >
         <template slot="header">
             <h1 class="flex-1">
