@@ -132,6 +132,9 @@ class DataResponse implements Responsable
             case 'xml':
                 $contentType = 'text/xml';
                 break;
+            case 'rss':
+                $contentType = 'application/rss+xml';
+                break;
             case 'atom':
                 $contentType = 'application/atom+xml; charset=UTF-8';
                 break;
