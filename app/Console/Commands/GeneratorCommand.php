@@ -29,11 +29,14 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     /**
      * Get the stub file for the generator.
      *
+     * @param string|null $stub
      * @return string
      */
-    protected function getStub()
+    protected function getStub($stub = null)
     {
-        return __DIR__ . '/stubs/' . $this->stub;
+        $stub = $stub ?? $this->stub;
+
+        return __DIR__ . '/stubs/' . $stub;
     }
 
     /**
