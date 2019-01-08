@@ -3,6 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
+use Illuminate\Support\Facades\Cache;
+use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeAddon extends GeneratorCommand
@@ -51,7 +53,10 @@ class MakeAddon extends GeneratorCommand
         $this->addRepositoryPath();
         $this->composerRequireAddon();
 
-        // TODO: handle flags for additional scaffolding
+        // TODO: handle flags for additional scaffolding, similar to `make:model`s flags. ie)
+        // -t to generate tag with addon
+        // -w to generate widget with addon
+        // -a to generate all the things with addon
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
@@ -71,6 +76,8 @@ class MakeAddon extends GeneratorCommand
         $json = str_replace('DummyTitle', $this->addonTitle(), $json);
 
         $this->files->put($this->addonPath('composer.json'), $json);
+
+        $this->info('Addon composer.json created successfully.');
     }
 
     /**
@@ -83,6 +90,8 @@ class MakeAddon extends GeneratorCommand
         $provider = str_replace('DummyNamespace', $this->addonNamespace(), $provider);
 
         $this->files->put($this->addonPath('src/ServiceProvider.php'), $provider);
+
+        $this->info('Addon service provider created successfully.');
     }
 
     /**
@@ -100,6 +109,8 @@ class MakeAddon extends GeneratorCommand
         $json = json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
         $this->files->put(base_path('composer.json'), $json);
+
+        $this->info('Addon repository added to application composer.json successfully.');
     }
 
     /**
@@ -107,7 +118,13 @@ class MakeAddon extends GeneratorCommand
      */
     protected function composerRequireAddon()
     {
-        // TODO: run composer require
+        $package = 'local/' . $this->addonSlug();
+
+        $this->info('Composer requiring package...');
+
+        Composer::require($package);
+
+        $this->line(Cache::get("composer.{$package}")['output']);
     }
 
     /**
