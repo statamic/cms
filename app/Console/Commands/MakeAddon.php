@@ -60,7 +60,7 @@ class MakeAddon extends GeneratorCommand
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
-        $this->info('Addon service provider created successfully.');
+        $this->info('Addon created successfully.');
         $this->comment("Your addon files await at: {$relativePath}");
     }
 
