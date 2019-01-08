@@ -6,6 +6,7 @@ use Statamic\Console\RunsInPlease;
 use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 class MakeAddon extends GeneratorCommand
 {
@@ -113,11 +114,19 @@ class MakeAddon extends GeneratorCommand
     {
         $package = 'local/' . $this->addonSlug();
 
+        // Though we could use Composer::require() to achieve this,
+        // instead we will new up a raw Symfony Process so that
+        // we can capture and display output in realtime.
+
+        $command = Composer::prepareProcessArguments(['require', $package]);
+        $process = new SymfonyProcess($command, base_path());
+        $output = null;
+
         $this->info('Installing your package...');
 
-        Composer::require($package);
-
-        $this->line($output = Cache::get("composer.{$package}")['output']);
+        $process->run(function ($type, $buffer) use (&$output) {
+            $output .= $this->outputFromSymfonyProcess($buffer);
+        });
 
         if (! str_contains($output, "Discovered Addon: {$package}")) {
             $this->error('An error was encountered while installing your package!');
@@ -171,6 +180,28 @@ class MakeAddon extends GeneratorCommand
     protected function addonTitle()
     {
         return str_replace('-', ' ', title_case($this->addonSlug()));
+    }
+
+    /**
+     * Clean up symfony process output and output to cli.
+     *
+     * @param string $output
+     * @return string
+     */
+    private function outputFromSymfonyProcess(string $output)
+    {
+        // Remove terminal color codes.
+        $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
+
+        // Remove new lines.
+        $output = preg_replace('/[\r\n]+$/', '', $output);
+
+        // If not a blank line, output to terminal.
+        if (! empty(trim($output))) {
+            $this->line($output);
+        }
+
+        return $output;
     }
 
     /**
