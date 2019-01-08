@@ -60,7 +60,7 @@ class MakeAddon extends GeneratorCommand
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
-        $this->info('Addon created successfully.');
+        $this->info('Addon service provider created successfully.');
         $this->comment("Your addon files await at: {$relativePath}");
     }
 
@@ -120,11 +120,15 @@ class MakeAddon extends GeneratorCommand
     {
         $package = 'local/' . $this->addonSlug();
 
-        $this->info('Composer requiring package...');
+        $this->info('Installing your package...');
 
         Composer::require($package);
 
-        $this->line(Cache::get("composer.{$package}")['output']);
+        $this->line($output = Cache::get("composer.{$package}")['output']);
+
+        if (! str_contains($output, "Discovered Addon: {$package}")) {
+            $this->error('An error was encountered while installing your package!');
+        }
     }
 
     /**
