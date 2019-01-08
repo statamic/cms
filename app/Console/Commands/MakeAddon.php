@@ -45,16 +45,15 @@ class MakeAddon extends GeneratorCommand
     public function handle()
     {
         $this->addonName = $this->getNameInput();
-        $this->addonPath = config('statamic.system.addons_path') . "/{$this->addonName}";
 
         $this->generateComposerJson();
         $this->generateServiceProvider();
+        $this->addRepositoryPath();
+        $this->composerRequireAddon();
 
-        // TODO: add path in app's composer.json
-        // TODO: run composer require
         // TODO: handle flags for additional scaffolding
 
-        $relativePath = $this->getRelativePath($this->addonPath);
+        $relativePath = $this->getRelativePath($this->addonPath());
 
         $this->info('Addon created successfully.');
         $this->comment("Your addon files await at: {$relativePath}");
@@ -68,8 +67,8 @@ class MakeAddon extends GeneratorCommand
         $json = $this->files->get($this->getStub('addon/composer.json.stub'));
 
         $json = str_replace('DummyNamespace', str_replace('\\', '\\\\', $this->addonNamespace()), $json);
-        $json = str_replace('dummy-slug', $slug = str_slug(snake_case($this->addonName)), $json);
-        $json = str_replace('DummyTitle', str_replace('-', ' ', title_case($slug)), $json);
+        $json = str_replace('dummy-slug', $this->addonSlug(), $json);
+        $json = str_replace('DummyTitle', $this->addonTitle(), $json);
 
         $this->files->put($this->addonPath('composer.json'), $json);
     }
@@ -87,14 +86,43 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Build absolute path for an addon file.
+     * Add repository path to app's composer.json file.
+     */
+    protected function addRepositoryPath()
+    {
+        $decoded = json_decode($this->files->get(base_path('composer.json')), true);
+
+        $decoded['repositories'][] = [
+            'type' => 'path',
+            'url' => 'addons/' . $this->addonSlug(),
+        ];
+
+        $json = json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+
+        $this->files->put(base_path('composer.json'), $json);
+    }
+
+    /**
+     * Composer require addon.
+     */
+    protected function composerRequireAddon()
+    {
+        // TODO: run composer require
+    }
+
+    /**
+     * Build absolute path for an addon or addon file, and ensure folder structure exists.
      *
-     * @param string $path
+     * @param string|null $file
      * @return string
      */
-    protected function addonPath($path)
+    protected function addonPath($file = null)
     {
-        $path = "{$this->addonPath}/{$path}";
+        $path = config('statamic.system.addons_path') . '/' . $this->addonSlug();
+
+        if ($file) {
+            $path .= "/{$file}";
+        }
 
         $this->makeDirectory($path);
 
@@ -109,6 +137,26 @@ class MakeAddon extends GeneratorCommand
     protected function addonNamespace()
     {
         return "Local\\{$this->addonName}";
+    }
+
+    /**
+     * Get addon slug.
+     *
+     * @return string
+     */
+    protected function addonSlug()
+    {
+        return str_slug(snake_case($this->addonName));
+    }
+
+    /**
+     * Get addon title.
+     *
+     * @return string
+     */
+    protected function addonTitle()
+    {
+        return str_replace('-', ' ', title_case($this->addonSlug()));
     }
 
     /**
