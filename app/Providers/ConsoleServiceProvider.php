@@ -13,6 +13,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AddonsDiscover::class,
         Commands\GlideClear::class,
         Commands\Install::class,
+        Commands\MakeAddon::class,
         Commands\MakeFieldtype::class,
         Commands\MakeFilter::class,
         Commands\MakeModifier::class,
