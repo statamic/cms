@@ -35,12 +35,12 @@
 
     .btn-primary {
         @apply .text-shadow .text-white .border-0 .rounded-md;
-        background: linear-gradient(45deg, #f64f59, #c471ed);
-        box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
+        background: linear-gradient(45deg, #f64f59, #c471ed) !important;
+        box-shadow: 0 2px 5px rgba(#f64f59, 0.3) !important;
         &:hover {
-            background: linear-gradient(45deg, mix(black, #f64f59, 5%), mix(black, #c471ed, 5%));
+            background: linear-gradient(45deg, mix(black, #f64f59, 5%), mix(black, #c471ed, 5%)) !important;
             color: #fff;
-            box-shadow: 0 2px 5px rgba(#f64f59, 0.3);
+            box-shadow: 0 2px 5px rgba(#f64f59, 0.3) !important;
         }
     }
 
