@@ -33,13 +33,6 @@ class MakeAddon extends GeneratorCommand
     protected $addonName;
 
     /**
-     * The path to where the addon will be generated.
-     *
-     * @var string
-     */
-    protected $addonPath;
-
-    /**
      * Execute the console command.
      *
      * @return void
