@@ -34,7 +34,7 @@ class MakeWidget extends GeneratorCommand
      *
      * @var string
      */
-    protected $stub = 'widget.stub';
+    protected $stub = 'widget.php.stub';
 
     /**
      * Build the class with the given name.

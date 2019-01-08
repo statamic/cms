@@ -34,7 +34,7 @@ class MakeTag extends GeneratorCommand
      *
      * @var string
      */
-    protected $stub = 'tag.stub';
+    protected $stub = 'tag.php.stub';
 
     /**
      * Build the class with the given name.

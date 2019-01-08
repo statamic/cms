@@ -34,5 +34,5 @@ class MakeFilter extends GeneratorCommand
      *
      * @var string
      */
-    protected $stub = 'filter.stub';
+    protected $stub = 'filter.php.stub';
 }

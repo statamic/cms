@@ -34,5 +34,5 @@ class MakeModifier extends GeneratorCommand
      *
      * @var string
      */
-    protected $stub = 'modifier.stub';
+    protected $stub = 'modifier.php.stub';
 }

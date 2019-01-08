@@ -34,7 +34,7 @@ class MakeFieldtype extends GeneratorCommand
      *
      * @var string
      */
-    protected $stub = 'fieldtype.stub';
+    protected $stub = 'fieldtype.php.stub';
 
     /**
      * Execute the console command.
@@ -74,21 +74,11 @@ class MakeFieldtype extends GeneratorCommand
      */
     protected function buildVueComponent($name)
     {
-        $component = $this->files->get($this->getVueStub());
+        $component = $this->files->get($this->getStub('fieldtype.vue.stub'));
 
         $component = str_replace('DummyName', $name, $component);
         $component = str_replace('dummy_name', snake_case($name), $component);
 
         return $component;
-    }
-
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getVueStub()
-    {
-        return __DIR__.'/stubs/fieldtype.vue.stub';
     }
 }
