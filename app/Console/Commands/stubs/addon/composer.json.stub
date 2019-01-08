@@ -1,0 +1,21 @@
+{
+    "name": "local/dummy-slug",
+    "version": "1.0.0",
+    "type": "statamic-addon",
+    "autoload": {
+        "psr-4": {
+            "DummyNamespace\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "DummyTitle",
+            "description": "DummyTitle addon"
+        },
+        "laravel": {
+            "providers": [
+                "DummyNamespace\\ServiceProvider"
+            ]
+        }
+    }
+}
