@@ -162,6 +162,21 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     }
 
     /**
+     * Build the directory for the path if necessary.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function makeDirectory($path)
+    {
+        $directory = $this->files->isDirectory(dirname($path)) ? $path : dirname($path);
+
+        $this->files->makeDirectory($directory, 0777, true, true);
+
+        return $directory;
+    }
+
+    /**
      * Get the console command arguments.
      *
      * @return array
