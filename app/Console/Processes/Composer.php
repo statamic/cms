@@ -136,6 +136,21 @@ class Composer extends Process
     }
 
     /**
+     * Propare process arguments.
+     *
+     * @param array $parts
+     * @return array
+     */
+    public function prepareProcessArguments($parts)
+    {
+        return array_merge([
+            $this->phpBinary(),
+            "-d memory_limit={$this->memoryLimit}",
+            'vendor/bin/composer'
+        ], $parts);
+    }
+
+    /**
      * Run composer command.
      *
      * @param mixed $parts
@@ -158,21 +173,6 @@ class Composer extends Process
         $parts = array_merge([$command, $package], $extraParams);
 
         dispatch(new RunComposer($this->prepareProcessArguments($parts), $this->getCacheKey($package)));
-    }
-
-    /**
-     * Propare process arguments.
-     *
-     * @param array $parts
-     * @return array
-     */
-    private function prepareProcessArguments($parts)
-    {
-        return array_merge([
-            $this->phpBinary(),
-            "-d memory_limit={$this->memoryLimit}",
-            'vendor/bin/composer'
-        ], $parts);
     }
 
     /**
