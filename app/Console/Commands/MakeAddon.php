@@ -75,6 +75,18 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
+     * Generate service provider.
+     */
+    protected function generateServiceProvider()
+    {
+        $provider = $this->files->get($this->getStub('addon/provider.php.stub'));
+
+        $provider = str_replace('DummyNamespace', $this->addonNamespace(), $provider);
+
+        $this->files->put($this->addonPath('src/ServiceProvider.php'), $provider);
+    }
+
+    /**
      * Build absolute path for an addon file.
      *
      * @param string $path

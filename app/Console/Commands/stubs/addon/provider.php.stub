@@ -1,0 +1,10 @@
+<?php
+
+namespace DummyNamespace;
+
+use Statamic\Extend\ServiceProvider as BaseProvider;
+
+class ServiceProvider extends BaseProvider
+{
+    //
+}
