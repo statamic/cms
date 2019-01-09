@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
 use Facades\Statamic\Console\Processes\Composer;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeAddon extends GeneratorCommand
@@ -25,6 +26,13 @@ class MakeAddon extends GeneratorCommand
     protected $description = 'Create a new addon';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Addon';
+
+    /**
      * The name of the addon.
      *
      * @var string
@@ -44,11 +52,7 @@ class MakeAddon extends GeneratorCommand
         $this->generateServiceProvider();
         $this->addRepositoryPath();
         $this->composerRequireAddon();
-
-        // TODO: handle flags for additional scaffolding, similar to `make:model`s flags. ie)
-        // -t to generate tag with addon
-        // -w to generate widget with addon
-        // -a to generate all the things with addon
+        $this->generateOptional();
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
@@ -121,6 +125,17 @@ class MakeAddon extends GeneratorCommand
         if (! str_contains($output, "Discovered Addon: {$package}")) {
             $this->error('An error was encountered while installing your addon!');
         }
+    }
+
+    /**
+     * Run optional generators.
+     */
+    protected function generateOptional()
+    {
+        // TODO: handle flags for additional scaffolding, similar to `make:model`s flags. ie)
+        // -t to generate tag with addon
+        // -w to generate widget with addon
+        // -a to generate all the things with addon
     }
 
     /**
@@ -204,5 +219,22 @@ class MakeAddon extends GeneratorCommand
         return [
             ['name', InputArgument::REQUIRED, 'The name of the addon'],
         ];
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['all',       'a', InputOption::VALUE_NONE, 'Generate everything and the kitchen sink with the addon'],
+            ['fieldtype', 'f', InputOption::VALUE_NONE, 'Create a new fieldtype with the addon'],
+            ['filter',    'r', InputOption::VALUE_NONE, 'Create a new filter with the addon'],
+            ['modifier',  'm', InputOption::VALUE_NONE, 'Create a new modifier with the addon'],
+            ['tag',       't', InputOption::VALUE_NONE, 'Create a new tag with the addon'],
+            ['widget',    'w', InputOption::VALUE_NONE, 'Create a new widget with the addon'],
+        ]);
     }
 }
