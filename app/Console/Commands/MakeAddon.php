@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
+use Statamic\API\Str;
 use Statamic\Console\RunsInPlease;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,6 +49,11 @@ class MakeAddon extends GeneratorCommand
     {
         $this->addonName = $this->getNameInput();
 
+        if (! $this->option('force') && $this->files->exists($this->addonPath())) {
+            $this->error('Addon already exists!');
+            return false;
+        }
+
         $this->generateComposerJson();
         $this->generateServiceProvider();
         $this->generateOptional();
@@ -91,6 +97,21 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
+     * Run optional generators.
+     */
+    protected function generateOptional()
+    {
+        collect(['fieldtype', 'filter', 'modifier', 'tag', 'widget'])
+            ->filter(function ($type) {
+                return $this->option($type) || $this->option('all');
+            })
+            ->each(function ($type) {
+                $this->prepareOptionalAddonDirectory($type);
+                $this->runExternalGenerator($type);
+            });
+    }
+
+    /**
      * Add repository path to app's composer.json file.
      */
     protected function addRepositoryPath()
@@ -128,17 +149,19 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Run optional generators.
+     * Prepare optional addon directory before running external generator command.
+     *
+     * @param string $type
      */
-    protected function generateOptional()
+    protected function prepareOptionalAddonDirectory($type)
     {
-        collect(['fieldtype', 'filter', 'modifier', 'tag', 'widget'])
-            ->filter(function ($type) {
-                return $this->option($type) || $this->option('all');
-            })
-            ->each(function ($type) {
-                $this->runExternalGenerator($type);
-            });
+        if (! $this->option('force')) {
+            return;
+        }
+
+        $directory = $this->addonPath('src/' . Str::modifyMultiple($type, ['title', 'plural']));
+
+        $this->files->deleteDirectory($directory);
     }
 
     /**
