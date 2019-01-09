@@ -5,6 +5,21 @@ namespace Statamic\Console;
 trait RunsInPlease
 {
     /**
+     * Is command running in please?
+     *
+     * @var bool
+     */
+    public $runningInPlease = false;
+
+    /**
+     * Set running in please.
+     */
+    public function setRunningInPlease()
+    {
+        $this->runningInPlease = true;
+    }
+
+    /**
      * Remove statamic grouping from signature for statamic please command.
      */
     public function removeStatamicGrouping()

@@ -30,6 +30,7 @@ class Application extends ConsoleApplication
             return;
         }
 
+        $command->setRunningInPlease();
         $command->removeStatamicGrouping();
         $command->setHiddenInPlease();
 
