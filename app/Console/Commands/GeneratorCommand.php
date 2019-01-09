@@ -12,6 +12,13 @@ use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
 abstract class GeneratorCommand extends IlluminateGeneratorCommand
 {
     /**
+     * Should path output be hidden?
+     *
+     * @var bool
+     */
+    public $hiddenPathOutput = false;
+
+    /**
      * Execute the console command.
      *
      * @return bool|null
@@ -20,6 +27,10 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     {
         if (parent::handle() === false) {
             return false;
+        }
+
+        if ($this->hiddenPathOutput) {
+            return;
         }
 
         $relativePath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
@@ -90,9 +101,17 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function getAddonPath($addon)
     {
+        // If explicitly setting addon path from an external command like `make:addon`,
+        // use explicit path and allow external command to handle path output.
+        if (starts_with($addon, '/') && $this->files->exists($addon)) {
+            $this->hiddenPathOutput = true;
+            return $addon;
+        }
+
+        // Set fallback path.
         $fallbackPath = $this->laravel['path'];
 
-        // Attempt to get addon path.
+        // Attempt to get addon path via composer.
         try {
             $path = Composer::installedPath($addon) . '/src';
         } catch (Exception $exception) {

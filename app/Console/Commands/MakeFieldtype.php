@@ -63,6 +63,10 @@ class MakeFieldtype extends GeneratorCommand
 
         $relativePath = $this->getRelativePath($path);
 
+        if ($this->hiddenPathOutput) {
+            return;
+        }
+
         $this->comment("Your {$this->typeLower} vue component awaits at: {$relativePath}");
     }
 

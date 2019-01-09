@@ -50,9 +50,9 @@ class MakeAddon extends GeneratorCommand
 
         $this->generateComposerJson();
         $this->generateServiceProvider();
+        $this->generateOptional();
         $this->addRepositoryPath();
         $this->composerRequireAddon();
-        $this->generateOptional();
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
@@ -73,7 +73,7 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put($this->addonPath('composer.json'), $json);
 
-        $this->info('Addon composer.json created successfully.');
+        $this->info('Composer configuration created successfully.');
     }
 
     /**
@@ -87,7 +87,7 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put($this->addonPath('src/ServiceProvider.php'), $provider);
 
-        $this->info('Addon service provider created successfully.');
+        $this->info('Service provider created successfully.');
     }
 
     /**
@@ -106,7 +106,7 @@ class MakeAddon extends GeneratorCommand
 
         $this->files->put(base_path('composer.json'), $json);
 
-        $this->info('Addon repository added to application composer.json successfully.');
+        $this->info('Repository added to your application composer configuration successfully.');
     }
 
     /**
@@ -132,10 +132,26 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateOptional()
     {
-        // TODO: handle flags for additional scaffolding, similar to `make:model`s flags. ie)
-        // -t to generate tag with addon
-        // -w to generate widget with addon
-        // -a to generate all the things with addon
+        collect(['fieldtype', 'filter', 'modifier', 'tag', 'widget'])
+            ->filter(function ($type) {
+                return $this->option($type) || $this->option('all');
+            })
+            ->each(function ($type) {
+                $this->runExternalGenerator($type);
+            });
+    }
+
+    /**
+     * Run external generator command.
+     *
+     * @param string $type
+     */
+    protected function runExternalGenerator($type)
+    {
+        $prefix = $this->runningInPlease ? '' : 'statamic:';
+        $arguments = ['name' => $this->addonName, 'addon' => $this->addonPath('src')];
+
+        $this->call("{$prefix}make:{$type}", $arguments);
     }
 
     /**
