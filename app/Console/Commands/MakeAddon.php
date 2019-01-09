@@ -108,7 +108,6 @@ class MakeAddon extends GeneratorCommand
             ->each(function ($type) {
                 $this->prepareOptionalAddonDirectory($type);
                 $this->runOptionalAddonGenerator($type);
-                $this->fixOptionalAddonNamespace($type);
             });
     }
 
@@ -176,24 +175,6 @@ class MakeAddon extends GeneratorCommand
         $arguments = ['name' => $this->addonName, 'addon' => $this->addonPath('src')];
 
         $this->call("{$prefix}make:{$type}", $arguments);
-    }
-
-    /**
-     * Fix optional addon namespace.
-     *
-     * @param mixed $type
-     */
-    protected function fixOptionalAddonNamespace($type)
-    {
-        $directory = Str::modifyMultiple($type, ['title', 'plural']);
-        $path = $this->addonPath("src/$directory/{$this->addonName}.php");
-        $namespace = $this->addonNamespace($directory);
-
-        $file = $this->files->get($path);
-
-        $file = preg_replace('/namespace.*;/', "namespace {$namespace};", $file);
-
-        $this->files->put($path, $file);
     }
 
     /**

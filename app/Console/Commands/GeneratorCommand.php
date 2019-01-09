@@ -73,6 +73,28 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     }
 
     /**
+     * Get the root namespace for the class.
+     *
+     * @return string
+     */
+    protected function rootNamespace()
+    {
+        $default = $this->laravel->getNamespace();
+
+        if ($addon = $this->argument('addon')) {
+            $composerPath = $this->getAddonPath($addon) . '/../composer.json';
+        } else {
+            return $default;
+        }
+
+        try {
+            return collect(json_decode($this->files->get($composerPath), true)['autoload']['psr-4'])->flip()->get('src');
+        } catch (Exception $exception) {
+            return $default;
+        }
+    }
+
+    /**
      * Get the destination class path.
      *
      * @param string $name
