@@ -170,7 +170,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function makeDirectory($path)
     {
-        $directory = $this->files->isDirectory(dirname($path)) ? $path : dirname($path);
+        $directory = $this->files->isDirectory($path) ? $path : dirname($path);
 
         $this->files->makeDirectory($directory, 0777, true, true);
 
