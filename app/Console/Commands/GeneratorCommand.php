@@ -61,27 +61,6 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     }
 
     /**
-     * Get type, with modifier handling.
-     *
-     * @param array $modifiers
-     * @return string
-     */
-    protected function getType($modifiers = [])
-    {
-        $type = $this->type;
-
-        if (in_array('lower', $modifiers)) {
-            $type = strtolower($type);
-        }
-
-        if (in_array('plural', $modifiers)) {
-            $type = str_plural($type);
-        }
-
-        return $type;
-    }
-
-    /**
      * Get the destination class path.
      *
      * @param string $name
@@ -230,8 +209,12 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     {
         $words = explode('_', snake_case($attribute));
 
-        return $words[0] === 'type'
-            ? $this->getType($words)
-            : $this->{$attribute};
+        // If trying to access `type` attribute, allow dynamic string manipulation like `typeLowerPlural`.
+        if ($words[0] === 'type') {
+            unset($words[0]);
+            return Str::modifyMultiple($this->type, $words);
+        }
+
+        return $this->{$attribute};
     }
 }

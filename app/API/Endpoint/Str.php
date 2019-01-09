@@ -83,4 +83,20 @@ class Str extends \Illuminate\Support\Str
 
         return (new Collator($locale))->compare($str1, $str2);
     }
+
+    /**
+     * Apply multiple string modifications via array.
+     *
+     * @param string $string
+     * @param array $modifications
+     * @return string
+     */
+    public static function modifyMultiple($string, $modifications)
+    {
+        foreach ($modifications as $modification) {
+            $string = self::$modification($string);
+        }
+
+        return $string;
+    }
 }
