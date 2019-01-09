@@ -23,7 +23,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
 
         $relativePath = $this->getRelativePath($this->getPath($this->qualifyClass($this->getNameInput())));
 
-        $this->comment("Your {$this->type} class awaits at: {$relativePath}");
+        $this->comment("Your {$this->typeLower} class awaits at: {$relativePath}");
     }
 
     /**
@@ -57,7 +57,28 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\\' . str_plural($this->type);
+        return "$rootNamespace\\{$this->typePlural}";
+    }
+
+    /**
+     * Get type, with modifier handling.
+     *
+     * @param array $modifiers
+     * @return string
+     */
+    protected function getType($modifiers = [])
+    {
+        $type = $this->type;
+
+        if (in_array('lower', $modifiers)) {
+            $type = strtolower($type);
+        }
+
+        if (in_array('plural', $modifiers)) {
+            $type = str_plural($type);
+        }
+
+        return $type;
     }
 
     /**
@@ -186,5 +207,31 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         return array_merge(parent::getArguments(), [
             ['addon', InputArgument::OPTIONAL, 'The name of your addon'],
         ]);
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['force', null, InputOption::VALUE_NONE, "Create the {$this->typeLower} even if it already exists"],
+        ];
+    }
+
+    /**
+     * Get attribute with special `type` modifier handling.
+     *
+     * @param mixed $attribute
+     */
+    public function __get($attribute)
+    {
+        $words = explode('_', snake_case($attribute));
+
+        return $words[0] === 'type'
+            ? $this->getType($words)
+            : $this->{$attribute};
     }
 }
