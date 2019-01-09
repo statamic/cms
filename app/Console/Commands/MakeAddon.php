@@ -199,18 +199,11 @@ class MakeAddon extends GeneratorCommand
     /**
      * Build addon namespace.
      *
-     * @param string|null $subdirectory
      * @return string
      */
-    protected function addonNamespace($subdirectory = null)
+    protected function addonNamespace()
     {
-        $namespace = "Local\\{$this->addonName}";
-
-        if ($subdirectory) {
-            $namespace .= "\\$subdirectory";
-        }
-
-        return $namespace;
+        return "Local\\{$this->addonName}";
     }
 
     /**
