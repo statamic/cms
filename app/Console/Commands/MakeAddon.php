@@ -112,14 +112,14 @@ class MakeAddon extends GeneratorCommand
     {
         $package = 'local/' . $this->addonSlug();
 
-        $this->info('Installing your package...');
+        $this->info('Installing your addon...');
 
         $output = Composer::runAndOperateOnOutput(['require', $package], function ($output) {
             return $this->outputFromSymfonyProcess($output);
         });
 
         if (! str_contains($output, "Discovered Addon: {$package}")) {
-            $this->error('An error was encountered while installing your package!');
+            $this->error('An error was encountered while installing your addon!');
         }
     }
 
