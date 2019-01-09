@@ -107,7 +107,8 @@ class MakeAddon extends GeneratorCommand
             })
             ->each(function ($type) {
                 $this->prepareOptionalAddonDirectory($type);
-                $this->runExternalGenerator($type);
+                $this->runOptionalAddonGenerator($type);
+                $this->fixOptionalAddonNamespace($type);
             });
     }
 
@@ -165,16 +166,34 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Run external generator command.
+     * Run optional addon generator command.
      *
      * @param string $type
      */
-    protected function runExternalGenerator($type)
+    protected function runOptionalAddonGenerator($type)
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
         $arguments = ['name' => $this->addonName, 'addon' => $this->addonPath('src')];
 
         $this->call("{$prefix}make:{$type}", $arguments);
+    }
+
+    /**
+     * Fix optional addon namespace.
+     *
+     * @param mixed $type
+     */
+    protected function fixOptionalAddonNamespace($type)
+    {
+        $directory = Str::modifyMultiple($type, ['title', 'plural']);
+        $path = $this->addonPath("src/$directory/{$this->addonName}.php");
+        $namespace = $this->addonNamespace($directory);
+
+        $file = $this->files->get($path);
+
+        $file = preg_replace('/namespace.*;/', "namespace {$namespace};", $file);
+
+        $this->files->put($path, $file);
     }
 
     /**
@@ -199,11 +218,18 @@ class MakeAddon extends GeneratorCommand
     /**
      * Build addon namespace.
      *
+     * @param string|null $subdirectory
      * @return string
      */
-    protected function addonNamespace()
+    protected function addonNamespace($subdirectory = null)
     {
-        return "Local\\{$this->addonName}";
+        $namespace = "Local\\{$this->addonName}";
+
+        if ($subdirectory) {
+            $namespace .= "\\$subdirectory";
+        }
+
+        return $namespace;
     }
 
     /**
