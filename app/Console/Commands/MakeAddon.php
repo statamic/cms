@@ -3,10 +3,8 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
-use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Process\Process as SymfonyProcess;
 
 class MakeAddon extends GeneratorCommand
 {
@@ -114,18 +112,10 @@ class MakeAddon extends GeneratorCommand
     {
         $package = 'local/' . $this->addonSlug();
 
-        // Though we could use Composer::require() to achieve this,
-        // instead we will new up a raw Symfony Process so that
-        // we can capture and display output in realtime.
-
-        $command = Composer::prepareProcessArguments(['require', $package]);
-        $process = new SymfonyProcess($command, base_path());
-        $output = null;
-
         $this->info('Installing your package...');
 
-        $process->run(function ($type, $buffer) use (&$output) {
-            $output .= $this->outputFromSymfonyProcess($buffer);
+        $output = Composer::runAndOperateOnOutput(['require', $package], function ($output) {
+            return $this->outputFromSymfonyProcess($output);
         });
 
         if (! str_contains($output, "Discovered Addon: {$package}")) {

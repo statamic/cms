@@ -35,7 +35,7 @@ class Process
      * Run the command.
      *
      * @param string|array $command
-     * @param string $cacheKey
+     * @param string|null $cacheKey
      * @return mixed
      * @throws ProcessFailedException
      */
@@ -50,6 +50,27 @@ class Process
         }
 
         return $this->runAndReturnOutput($process);
+    }
+
+    /**
+     * Run and externally operate on ouput.
+     *
+     * @param mixed $command
+     * @param mixed $operateOnOutput
+     * @return string
+     */
+    public function runAndOperateOnOutput($command, $operateOnOutput)
+    {
+        $process = new SymfonyProcess($command, $this->basePath);
+        $process->setTimeout(null);
+
+        $this->output = null;
+
+        $process->run(function ($type, $buffer) use (&$output, $operateOnOutput) {
+            $this->output .= $operateOnOutput($buffer);
+        });
+
+        return $this->output;
     }
 
     /**

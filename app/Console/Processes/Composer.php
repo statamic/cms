@@ -136,6 +136,20 @@ class Composer extends Process
     }
 
     /**
+     * Run composer and externally operate on ouput.
+     *
+     * @param mixed $command
+     * @param mixed $operateOnOutput
+     * @return string
+     */
+    public function runAndOperateOnOutput($command, $operateOnOutput)
+    {
+        $command = $this->prepareProcessArguments($command);
+
+        return parent::runAndOperateOnOutput($command, $operateOnOutput);
+    }
+
+    /**
      * Run composer command.
      *
      * @param mixed $parts
