@@ -18,6 +18,10 @@ class ListCommand extends Command
 
     protected $description = 'List the Statamic commands';
 
+    protected $hidden = true;
+
+    protected $hiddenInPlease = false;
+
     public function handle()
     {
         (new DescriptorHelper)->describe($this->output, $this->getApplication(), [

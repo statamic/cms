@@ -31,6 +31,7 @@ class Application extends ConsoleApplication
         }
 
         $command->removeStatamicGrouping();
+        $command->setHiddenInPlease();
 
         return $this->add($command);
     }

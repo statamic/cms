@@ -19,4 +19,14 @@ trait RunsInPlease
         $this->configureUsingFluentDefinition();
         $this->specifyParameters();
     }
+
+    /**
+     * If `hiddenInPlease` property is set, override hidden status when running please.
+     */
+    public function setHiddenInPlease()
+    {
+        if (isset($this->hiddenInPlease)) {
+            $this->setHidden($this->hiddenInPlease);
+        }
+    }
 }
