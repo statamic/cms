@@ -30,11 +30,11 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Fieldtypes/Cat.php');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:fieldtype', ['name' => 'Cat']);
 
-        $this->assertTrue($this->files->exists($path));
+        $this->assertFileExists($path);
         $this->assertContains('namespace App\Fieldtypes;', $this->files->get($path));
     }
 
@@ -43,11 +43,11 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Filters/Dog.php');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:filter', ['name' => 'Dog']);
 
-        $this->assertTrue($this->files->exists($path));
+        $this->assertFileExists($path);
         $this->assertContains('namespace App\Filters;', $this->files->get($path));
     }
 
@@ -56,11 +56,11 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Modifiers/Giraffe.php');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:modifier', ['name' => 'Giraffe']);
 
-        $this->assertTrue($this->files->exists($path));
+        $this->assertFileExists($path);
         $this->assertContains('namespace App\Modifiers;', $this->files->get($path));
     }
 
@@ -69,11 +69,11 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Tags/Donkey.php');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:tag', ['name' => 'Donkey']);
 
-        $this->assertTrue($this->files->exists($path));
+        $this->assertFileExists($path);
         $this->assertContains('namespace App\Tags;', $this->files->get($path));
     }
 
@@ -82,11 +82,11 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Widgets/Sloth.php');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:widget', ['name' => 'Sloth']);
 
-        $this->assertTrue($this->files->exists($path));
+        $this->assertFileExists($path);
         $this->assertContains('namespace App\Widgets;', $this->files->get($path));
     }
 
@@ -125,12 +125,12 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('addons/deaths-tar-vulnerability');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:addon', ['name' => 'DeathsTarVulnerability']);
 
-        $this->assertTrue($this->files->exists("$path/composer.json"));
-        $this->assertTrue($this->files->exists("$path/src/ServiceProvider.php"));
+        $this->assertFileExists("$path/composer.json");
+        $this->assertFileExists("$path/src/ServiceProvider.php");
         $this->assertContains('namespace Local\DeathsTarVulnerability;', $this->files->get("$path/src/ServiceProvider.php"));
     }
 
@@ -169,11 +169,11 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('addons/san-holo');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:addon', ['name' => 'SanHolo', '--tag' => null]);
 
-        $this->assertTrue($this->files->exists("$path/src/Tags/SanHolo.php"));
+        $this->assertFileExists("$path/src/Tags/SanHolo.php");
         $this->assertContains('namespace Local\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
     }
 
@@ -182,19 +182,19 @@ class GeneratorTest extends TestCase
     {
         $path = $this->preparePath('addons/san-holo');
 
-        $this->assertFalse($this->files->exists($path));
+        $this->assertFileNotExists($path);
 
         $this->artisan('statamic:make:addon', ['name' => 'SanHolo', '--all' => null]);
 
-        $this->assertTrue($this->files->exists("$path/src/Fieldtypes/SanHolo.php"));
+        $this->assertFileExists("$path/src/Fieldtypes/SanHolo.php");
         $this->assertContains('namespace Local\SanHolo\Fieldtypes;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
-        $this->assertTrue($this->files->exists("$path/src/Filters/SanHolo.php"));
+        $this->assertFileExists("$path/src/Filters/SanHolo.php");
         $this->assertContains('namespace Local\SanHolo\Filters;', $this->files->get("$path/src/Filters/SanHolo.php"));
-        $this->assertTrue($this->files->exists("$path/src/Modifiers/SanHolo.php"));
+        $this->assertFileExists("$path/src/Modifiers/SanHolo.php");
         $this->assertContains('namespace Local\SanHolo\Modifiers;', $this->files->get("$path/src/Modifiers/SanHolo.php"));
-        $this->assertTrue($this->files->exists("$path/src/Tags/SanHolo.php"));
+        $this->assertFileExists("$path/src/Tags/SanHolo.php");
         $this->assertContains('namespace Local\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
-        $this->assertTrue($this->files->exists("$path/src/Widgets/SanHolo.php"));
+        $this->assertFileExists("$path/src/Widgets/SanHolo.php");
         $this->assertContains('namespace Local\SanHolo\Widgets;', $this->files->get("$path/src/Widgets/SanHolo.php"));
     }
 
@@ -205,13 +205,13 @@ class GeneratorTest extends TestCase
 
         $this->artisan('statamic:make:addon', ['name' => 'BagOdah']);
 
-        $this->assertFalse($this->files->exists("$path/src/Tags/Yoda.php"));
+        $this->assertFileNotExists("$path/src/Tags/Yoda.php");
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
         $this->artisan('statamic:make:tag', ['name' => 'Yoda', 'addon' => 'local/bag-odah']);
 
-        $this->assertTrue($this->files->exists("$path/src/Tags/Yoda.php"));
+        $this->assertFileExists("$path/src/Tags/Yoda.php");
         $this->assertContains('namespace Local\BagOdah\Tags;', $this->files->get("$path/src/Tags/Yoda.php"));
     }
 
