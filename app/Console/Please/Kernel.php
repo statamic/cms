@@ -3,8 +3,8 @@
 namespace Statamic\Console\Please;
 
 use Statamic\Statamic;
-use App\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
