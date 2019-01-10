@@ -42,6 +42,24 @@ if (! function_exists('array_get_colon')) {
     }
 }
 
+if (! function_exists('array_has_colon')) {
+    /**
+     * Check if an item from an array exists using "dot" or "colon" notation.
+     *
+     * @param  array  $array
+     * @param  string $key
+     * @return mixed
+     */
+    function array_has_colon($array, $key)
+    {
+        if ($key) {
+            $key = str_replace(':', '.', $key);
+        }
+
+        return Arr::has($array, $key);
+    }
+}
+
 
 /**
  * Gets the site's default locale
