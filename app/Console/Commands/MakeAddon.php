@@ -2,7 +2,6 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\API\Str;
 use Statamic\Console\RunsInPlease;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputOption;
@@ -106,7 +105,6 @@ class MakeAddon extends GeneratorCommand
                 return $this->option($type) || $this->option('all');
             })
             ->each(function ($type) {
-                $this->prepareOptionalAddonDirectory($type);
                 $this->runOptionalAddonGenerator($type);
             });
     }
@@ -149,22 +147,6 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Prepare optional addon directory before running external generator command.
-     *
-     * @param string $type
-     */
-    protected function prepareOptionalAddonDirectory($type)
-    {
-        if (! $this->option('force')) {
-            return;
-        }
-
-        $directory = $this->addonPath('src/' . Str::modifyMultiple($type, ['title', 'plural']));
-
-        $this->files->deleteDirectory($directory);
-    }
-
-    /**
      * Run optional addon generator command.
      *
      * @param string $type
@@ -173,6 +155,10 @@ class MakeAddon extends GeneratorCommand
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
         $arguments = ['name' => $this->addonName, 'addon' => $this->addonPath('src')];
+
+        if ($this->option('force')) {
+            $arguments['--force'] = null;
+        }
 
         $this->call("{$prefix}make:{$type}", $arguments);
     }
