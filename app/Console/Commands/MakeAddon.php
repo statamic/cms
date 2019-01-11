@@ -53,11 +53,12 @@ class MakeAddon extends GeneratorCommand
             return false;
         }
 
-        $this->generateComposerJson();
-        $this->generateServiceProvider();
-        $this->generateOptional();
-        $this->addRepositoryPath();
-        $this->composerRequireAddon();
+        $this
+            ->generateComposerJson()
+            ->generateServiceProvider()
+            ->generateOptional()
+            ->addRepositoryPath()
+            ->installAddon();
 
         $relativePath = $this->getRelativePath($this->addonPath());
 
@@ -67,6 +68,8 @@ class MakeAddon extends GeneratorCommand
 
     /**
      * Generate composer.json.
+     *
+     * @return $this
      */
     protected function generateComposerJson()
     {
@@ -79,10 +82,14 @@ class MakeAddon extends GeneratorCommand
         $this->files->put($this->addonPath('composer.json'), $json);
 
         $this->info('Composer configuration created successfully.');
+
+        return $this;
     }
 
     /**
      * Generate service provider.
+     *
+     * @return $this
      */
     protected function generateServiceProvider()
     {
@@ -93,10 +100,14 @@ class MakeAddon extends GeneratorCommand
         $this->files->put($this->addonPath('src/ServiceProvider.php'), $provider);
 
         $this->info('Service provider created successfully.');
+
+        return $this;
     }
 
     /**
      * Run optional generators.
+     *
+     * @return $this
      */
     protected function generateOptional()
     {
@@ -107,10 +118,14 @@ class MakeAddon extends GeneratorCommand
             ->each(function ($type) {
                 $this->runOptionalAddonGenerator($type);
             });
+
+        return $this;
     }
 
     /**
      * Add repository path to app's composer.json file.
+     *
+     * @return $this
      */
     protected function addRepositoryPath()
     {
@@ -126,12 +141,16 @@ class MakeAddon extends GeneratorCommand
         $this->files->put(base_path('composer.json'), $json);
 
         $this->info('Repository added to your application composer configuration successfully.');
+
+        return $this;
     }
 
     /**
-     * Composer require addon.
+     * Install addon.
+     *
+     * @return $this
      */
-    protected function composerRequireAddon()
+    protected function installAddon()
     {
         $package = 'local/' . $this->addonSlug();
 
@@ -144,6 +163,8 @@ class MakeAddon extends GeneratorCommand
         if (! str_contains($output, "Discovered Addon: {$package}")) {
             $this->error('An error was encountered while installing your addon!');
         }
+
+        return $this;
     }
 
     /**
