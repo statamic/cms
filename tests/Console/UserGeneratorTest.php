@@ -10,7 +10,11 @@ class UserGeneratorTest extends TestCase
 {
     public function tearDown()
     {
-        app(Filesystem::class)->cleanDirectory(__DIR__.'/../__fixtures__/users');
+        $path = __DIR__.'/../__fixtures__/users';
+
+        $this->files = app(Filesystem::class);
+        $this->files->cleanDirectory($path);
+        $this->files->put($path.'/.gitkeep', null);
 
         parent::tearDown();
     }
