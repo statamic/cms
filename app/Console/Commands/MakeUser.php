@@ -52,7 +52,7 @@ class MakeUser extends Command
     {
         // If email argument exists, non-interactively create user.
         if ($this->email = $this->argument('email')) {
-            return $this->createuser();
+            return $this->createUser();
         }
 
         // Otherwise, interactively prompt for data and create user..
@@ -143,7 +143,7 @@ class MakeUser extends Command
             return;
         }
 
-        $user = User::make()
+        User::make()
             ->email($this->email)
             ->data($this->data)
             ->save();
