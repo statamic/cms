@@ -41,7 +41,7 @@ class MakeUser extends Command
      *
      * @var array
      */
-    protected $data;
+    protected $data = [];
 
     /**
      * Execute the console command.
@@ -143,13 +143,10 @@ class MakeUser extends Command
             return;
         }
 
-        // TODO: Actually make user, 😅
-        // $user = User::create()
-        //     ->username($this->email)
-        //     ->with(collect($this->data)->filter()->all())
-        //     ->save();
-
-        dump($this->email, $this->data);
+        $user = User::make()
+            ->email($this->email)
+            ->data($this->data)
+            ->save();
 
         Stache::update();
 
