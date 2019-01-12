@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Console\Processes\Composer;
 use Tests\Console\Foundation\InteractsWithConsole;
 
-class GeneratorTest extends TestCase
+class ExtensionGeneratorTest extends TestCase
 {
     public $testedPaths = [];
 
