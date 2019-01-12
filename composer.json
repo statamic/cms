@@ -20,7 +20,7 @@
         "codedungeon/phpunit-result-printer": "0.22",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
-        "orchestra/testbench": "3.6",
+        "orchestra/testbench": "3.7",
         "tightenco/mailthief": "dev-master"
     },
     "autoload": {
