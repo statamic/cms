@@ -148,7 +148,7 @@ class MakeUser extends Command
             ->data($this->data)
             ->save();
 
-        Stache::update();
+        Stache::update()->persist();
 
         $this->info('User created successfully.');
     }

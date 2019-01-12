@@ -56,7 +56,7 @@ class UserGeneratorTest extends TestCase
     {
         $this->assertEmpty(User::all());
 
-        // ???
+        // ??? Why won't this pass though?
         // $this->artisan('statamic:make:user', ['email' => 'jason'])
         //     ->expectsOutput('The input must be a valid email address.');
 
