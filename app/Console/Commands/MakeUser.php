@@ -128,7 +128,7 @@ class MakeUser extends Command
      */
     protected function promptSuper()
     {
-        $this->data['super'] = $this->confirm('Super user');
+        $this->data['super'] = (bool) $this->confirm('Super user', false);
 
         return $this;
     }
