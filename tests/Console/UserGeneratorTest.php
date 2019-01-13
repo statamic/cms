@@ -60,9 +60,9 @@ class UserGeneratorTest extends TestCase
     {
         $this->assertEmpty(User::all());
 
-        // ??? Why won't this pass though?
-        // $this->artisan('statamic:make:user', ['email' => 'jason'])
-        //     ->expectsOutput('The input must be a valid email address.');
+        // TODO: Figure out why this validation output isn't the same as laravel's default?
+        $this->artisan('statamic:make:user', ['email' => 'jason'])
+            ->expectsOutput('Must be a valid email address.');
 
         $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com'])
             ->expectsOutput('User created successfully.');
