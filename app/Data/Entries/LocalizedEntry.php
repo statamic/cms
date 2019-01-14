@@ -325,17 +325,6 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
 
     public function propagate()
     {
-    // loop through this collection's allowed sites
-        // $localized = $entry->in($site);
-            // if this entry has not already been localized for this site
-                // copy all fields -- $localized->data(...)->date(...)->etc(...)
-            // otherwise, loop through fields in the blueprint
-                // if its *not* translatable, copy it.
-                // translatable fields should only come from its own locale.
-                // $localized->set($field, $value)
-        // $localized->saveWithoutPropagating(); // dont want an infinite loop
-
-
         collect($this->collection()->sites())
             ->diff($this->locale())
             ->each(function ($site) {
