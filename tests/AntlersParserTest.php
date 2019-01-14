@@ -52,6 +52,34 @@ class AntlersParserTest extends TestCase
         $this->assertEquals(null, Antlers::parse($template, $this->variables));
     }
 
+    public function testStaticStringsWithDoubleQuotesShouldBeLeftAlone()
+    {
+        $template = '{{ "Thundercats are Go!" }}';
+
+        $this->assertEquals("Thundercats are Go!", Antlers::parse($template, $this->variables));
+    }
+
+    public function testStaticStringsWithSingleQuotesShouldBeLeftAlone()
+    {
+        $template = "{{ 'Thundercats are Go!' }}";
+
+        $this->assertEquals("Thundercats are Go!", Antlers::parse($template, $this->variables));
+    }
+
+    public function testStaticStringsWithDoubleQuotesCanBeModified()
+    {
+        $template = '{{ "Thundercats are Go!" | upper }}';
+
+        $this->assertEquals("THUNDERCATS ARE GO!", Antlers::parse($template, $this->variables));
+    }
+
+    public function testStaticStringsWithSingleQuotesCanBeModified()
+    {
+        $template = "{{ 'Thundercats are Go!' | upper }}";
+
+        $this->assertEquals("THUNDERCATS ARE GO!", Antlers::parse($template, $this->variables));
+    }
+
     public function testSingleBracesShouldNotBeParsed()
     {
         $template = "{string}";

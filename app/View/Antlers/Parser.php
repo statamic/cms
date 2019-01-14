@@ -50,13 +50,13 @@ class Parser
     public function __construct()
     {
         // expand allowed characters in variable regex
-        $this->variableRegex = "\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.':]*";
+        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
 
         // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?':]*";
+        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
 
         // Different from variable regex somehow.
-        $this->callbackNameRegex = '\b(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
+        $this->callbackNameRegex = '(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
 
         $this->variableLoopRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}(.*?){{\s*\/\1\s*}}/ms';
 
@@ -345,7 +345,7 @@ class Parser
                     // we only want to continue if:
                     //   - $val has no value according to the parser
                     //   - $val *does* have a value, it's falsey, there are multiple options, *and* we're not on the last one
-                    if ($val === '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1))) {
+                    if ($val == '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1))) {
                         continue;
                     } else {
                         // prevent arrays trying to be printed as a string
@@ -1073,41 +1073,25 @@ class Parser
      * @param  mixed        $default Default value to use if not found
      * @return mixed
      */
-    protected function getVariable($key, $data, $default = null)
+    protected function getVariable($key, $context, $default = null)
     {
-        $context = $data;
-
         list($key, $modifiers) = $this->parseModifiers($key);
 
-        if (strpos($key, ':') === false) {
-            $parts = explode('.', $key);
+        if ($this->isLiteralString($key)) {
+            $data = trim($key, '"\'');
         } else {
-            $parts = explode(':', $key);
-        }
-
-        foreach ($parts as $key_part) {
-            if (is_array($data)) {
-                if (! array_key_exists($key_part, $data)) {
-                    return $default;
-                }
-
-                $data = $data[$key_part];
-            } elseif (is_object($data)) {
-                if (! isset($data->{$key_part})) {
-                    return $default;
-                }
-
-                $data = $data->{$key_part};
-            } else {
+            if (! array_has_colon($context, $key)) {
                 return $default;
             }
+
+            $data = array_get_colon($context, $key); // @TODO: add data_get_colon() method
         }
 
         // execute the modifier chain
         if ($modifiers) {
             foreach ($modifiers as $modifier) {
-                $modifier_bits = explode(':', $modifier);
-                $data = $this->runModifier(array_get_colon($modifier_bits, 0), $data, array_slice($modifier_bits, 1), $context);
+                list($modifier, $parameters) = $this->unpackModifier($modifier);
+                $data = $this->runModifier($modifier, $data, $parameters, $context);
             }
         }
 
@@ -1117,6 +1101,29 @@ class Parser
         }
 
         return $data;
+    }
+
+    /**
+     * Splits a string into a modifier and its paraters
+     *
+     * @param string $text Text to evaluate
+     * @return array
+     */
+    protected function unpackModifier($modifier) {
+        $parts = explode(':', $modifier);
+
+        return [array_get($parts, 0), array_get($parts, 1)];
+    }
+
+    /**
+     * Checks if a string is wrapped in quotes and should be left alone
+     *
+     * @param string $string String to evaluate
+     * @return bool
+     */
+    protected function isLiteralString($string)
+    {
+        return preg_match('/^(["\']).*\1$/m', $string);
     }
 
     /**
