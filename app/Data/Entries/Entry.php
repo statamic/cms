@@ -100,6 +100,7 @@ class Entry implements Contract
         } catch (InvalidLocalizationException $e) {
             return clone $this->localizations
                 ->get($from ?? $this->localizations->keys()->first())
+                ->initialPath(null)
                 ->locale($site);
         }
     }

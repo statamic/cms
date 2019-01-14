@@ -139,19 +139,23 @@ class EntryTest extends TestCase
     function it_localized_version_or_clones_an_existing_one()
     {
         $entry = (new Entry)
-            ->addLocalization((new LocalizedEntry)->locale('en')->data(['foo' => 'bar']))
+            ->addLocalization((new LocalizedEntry)->locale('en')->initialPath('/path/to/en.md')->data(['foo' => 'bar']))
             ->addLocalization((new LocalizedEntry)->locale('de')->data(['foo' => 'das bar']))
             ->addLocalization((new LocalizedEntry)->locale('es')->data(['foo' => 'las bar']));
+
+        $this->assertEquals('/path/to/en.md', $entry->in('en')->initialPath());
 
         // Without second argument just clones the first localization
         $clone = $entry->inOrClone('fr');
         $this->assertEquals('fr', $clone->locale());
         $this->assertEquals(['foo' => 'bar'], $clone->data());
+        $this->assertNull($clone->initialPath());
 
         // Second argument specifies which one to clone
         $specficClone = $entry->inOrClone('fr', 'de');
         $this->assertEquals('fr', $specficClone->locale());
         $this->assertEquals(['foo' => 'das bar'], $specficClone->data());
+        $this->assertNull($clone->initialPath());
     }
 
     /** @test */
