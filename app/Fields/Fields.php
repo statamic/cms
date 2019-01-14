@@ -41,6 +41,20 @@ class Fields
         return $this->fields;
     }
 
+    public function localizable()
+    {
+        $this->fields = $this->fields->filter->isLocalizable();
+
+        return $this;
+    }
+
+    public function unlocalizable()
+    {
+        $this->fields = $this->fields->reject->isLocalizable();
+
+        return $this;
+    }
+
     public function merge($fields)
     {
         $items = $this->items->merge($fields->items());

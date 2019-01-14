@@ -420,4 +420,24 @@ class FieldsTest extends TestCase
             'two' => 'meta data from field two is 40',
         ], $fields->meta()->all());
     }
+
+    /** @test */
+    function it_filters_down_to_localizable_fields()
+    {
+        $items = [
+            ['handle' => 'one', 'field' => ['type' => 'text', 'localizable' => false]],
+            ['handle' => 'two', 'field' => ['type' => 'text', 'localizable' => false]],
+            ['handle' => 'three', 'field' => ['type' => 'text', 'localizable' => true]],
+        ];
+
+        $this->assertEquals(
+            ['one', 'two'],
+            $fields = (new Fields($items))->unlocalizable()->all()->keys()->all()
+        );
+
+        $this->assertEquals(
+            ['three'],
+            $fields = (new Fields($items))->localizable()->all()->keys()->all()
+        );
+    }
 }
