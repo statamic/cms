@@ -60,14 +60,13 @@ class UserGeneratorTest extends TestCase
     {
         $this->assertEmpty(User::all());
 
-        // TODO: Figure out why this validation output isn't the same as laravel's default?
         $this->artisan('statamic:make:user', ['email' => 'jason'])
-            ->expectsOutput('Must be a valid email address.');
+            ->expectsOutput(trans('validation.email'));
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com'])
+        $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
             ->expectsOutput('User created successfully.');
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com'])
+        $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
             ->expectsOutput('A user with this email already exists.');
     }
 }
