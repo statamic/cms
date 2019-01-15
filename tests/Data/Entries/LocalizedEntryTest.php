@@ -228,8 +228,29 @@ class LocalizedEntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_path()
+    function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
+        API\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => '/'],
+        ]]);
+
+        $collection = (new Collection)->handle('blog');
+        $parent = (new Entry)->collection($collection);
+        $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
+
+        $this->assertEquals('blog/post.md', $entry->path());
+        $this->assertEquals('blog/2018-01-02.post.md', $entry->order('2018-01-02')->path());
+        $this->assertEquals('blog/2.post.md', $entry->order('2')->path());
+    }
+
+    /** @test */
+    function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
+    {
+        API\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/'],
+        ]]);
+
         $collection = (new Collection)->handle('blog');
         $parent = (new Entry)->collection($collection);
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');

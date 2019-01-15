@@ -263,9 +263,10 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
             $prefix = $order . '.';
         }
 
-        return vsprintf('%s/%s/%s%s.%s', [
+        return vsprintf('%s/%s/%s%s%s.%s', [
+            rtrim(config('statamic.stache.stores.entries.directory'), '/'),
             $this->collectionHandle(),
-            $this->locale(),
+            Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug(),
             'md'
