@@ -238,9 +238,9 @@ class LocalizedEntryTest extends TestCase
         $parent = (new Entry)->collection($collection);
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
 
-        $this->assertEquals('blog/post.md', $entry->path());
-        $this->assertEquals('blog/2018-01-02.post.md', $entry->order('2018-01-02')->path());
-        $this->assertEquals('blog/2.post.md', $entry->order('2')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/post.md', $entry->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/2018-01-02.post.md', $entry->order('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/2.post.md', $entry->order('2')->path());
     }
 
     /** @test */
@@ -255,9 +255,9 @@ class LocalizedEntryTest extends TestCase
         $parent = (new Entry)->collection($collection);
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
 
-        $this->assertEquals('blog/en/post.md', $entry->path());
-        $this->assertEquals('blog/en/2018-01-02.post.md', $entry->order('2018-01-02')->path());
-        $this->assertEquals('blog/en/2.post.md', $entry->order('2')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/post.md', $entry->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2018-01-02.post.md', $entry->order('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2.post.md', $entry->order('2')->path());
     }
 
     /** @test */

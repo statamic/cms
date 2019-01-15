@@ -4,6 +4,8 @@ namespace Tests;
 
 trait PreventSavingStacheItemsToDisk
 {
+    protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
+
     protected function preventSavingStacheItemsToDisk()
     {
         $stores = collect([
@@ -11,7 +13,7 @@ trait PreventSavingStacheItemsToDisk
             NonSavingEntriesStore::class,
             NonSavingGlobalsStore::class,
         ])->map(function ($class) {
-            return app($class)->directory(__DIR__.'/__fixtures__/dev-null');
+            return app($class)->directory($this->fakeStacheDirectory);
         });
 
         $this->app['stache']->registerStores($stores->all());
