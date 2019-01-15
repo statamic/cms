@@ -112,13 +112,16 @@ code.parent-url {
     }
 
     .editor-form-actions {
-        padding: 15px;
-        position: absolute;
+        @apply absolute p-2;
         z-index: 2;
         bottom: 0;
         right: 0;
         left: 0;
         border-top: 1px solid $border;
+    }
+
+    .publish-fields .form-group {
+        padding: 16px 16px 0 16px;
     }
 }
 
