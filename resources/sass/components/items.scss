@@ -1,5 +1,5 @@
 .item {
-    @apply text-sm outline-none flex items-center rounded cursor-pointer border bg-white shadow-sm;
+    @apply text-sm outline-none flex items-center rounded cursor-pointer border bg-white shadow-sm select-none;
 
     .item-move {
         @apply w-4 border-r h-full p-1;
