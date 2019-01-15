@@ -26,8 +26,8 @@
                 </button>
 
                 <template v-if="searchable">
-                    <div class="flex items-center text-sm pl-sm">
-                        <div class="relative">
+                    <div class="flex flex-wrap items-center text-sm pl-sm -mb-1">
+                        <div class="relative mb-1">
                             <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center" @click="isCreating = true">
                                 <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                                 {{ __('Create & Link Entry') }}
@@ -54,7 +54,7 @@
                                 <div slot="reference" />
                             </popper>
                         </div>
-                        <button class="text-blue hover:text-grey-dark flex" @click.prevent="isSelecting = true">
+                        <button class="text-blue hover:text-grey-dark flex mb-1" @click.prevent="isSelecting = true">
                             <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                             Link Existing Entry
                         </button>
