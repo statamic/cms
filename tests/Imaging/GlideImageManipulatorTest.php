@@ -27,11 +27,6 @@ class GlideImageManipulatorTest extends TestCase
         );
     }
 
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     public function testAddsParams()
     {
         $this->man->setParam('w', 100);
