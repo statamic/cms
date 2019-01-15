@@ -6,6 +6,7 @@ use Statamic\API;
 use Statamic\API\URL;
 use Statamic\API\Site;
 use Statamic\API\YAML;
+use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Events\Data\EntrySaved;
 use Illuminate\Contracts\Support\Arrayable;
@@ -264,7 +265,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
-            rtrim(config('statamic.stache.stores.entries.directory'), '/'),
+            rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
             Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
