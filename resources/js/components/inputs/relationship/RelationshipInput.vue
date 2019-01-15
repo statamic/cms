@@ -155,10 +155,6 @@ export default {
             }
         },
 
-        searchQuery() {
-            this.request();
-        },
-
     },
 
     methods: {
@@ -213,7 +209,6 @@ export default {
         },
 
         itemCreated(item) {
-            this.request();
             this.selections.push(item.id);
             this.itemData.push(item);
             this.stopCreating();
