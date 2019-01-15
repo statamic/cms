@@ -70,9 +70,41 @@ class SitesTest extends TestCase
     }
 
     /** @test */
+    function checks_whether_there_are_multiple_sites()
+    {
+        $this->sites->setConfig([
+            'default' => 'foo',
+            'sites' => [
+                'foo' => [],
+                'bar' => [],
+            ]
+        ]);
+
+        $this->assertTrue($this->sites->hasMultiple());
+
+        $this->sites->setConfig([
+            'default' => 'foo',
+            'sites' => [
+                'foo' => [],
+            ]
+        ]);
+
+        $this->assertFalse($this->sites->hasMultiple());
+    }
+
+    /** @test */
     function gets_site_by_handle()
     {
         tap($this->sites->get('en'), function ($site) {
+            $this->assertInstanceOf(Site::class, $site);
+            $this->assertEquals('en', $site->handle());
+        });
+    }
+
+    /** @test */
+    function it_gets_the_default_site()
+    {
+        tap($this->sites->default(), function ($site) {
             $this->assertInstanceOf(Site::class, $site);
             $this->assertEquals('en', $site->handle());
         });

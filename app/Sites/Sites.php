@@ -21,6 +21,16 @@ class Sites
         return $this->sites;
     }
 
+    public function default()
+    {
+        return $this->sites->first();
+    }
+
+    public function hasMultiple()
+    {
+        return $this->sites->count() > 1;
+    }
+
     public function get($handle)
     {
         return $this->sites->get($handle);
