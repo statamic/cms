@@ -98,8 +98,8 @@ class UrlBuilder implements UrlBuilderContract
      */
     private function getValue($variable)
     {
-        if ($merged = array_get($this->merged, $variable)) {
-            return $merged;
+        if (array_has($this->merged, $variable)) {
+            return $this->merged[$variable];
         }
 
         // Handle special values like {year}, {month}, and {day}.
