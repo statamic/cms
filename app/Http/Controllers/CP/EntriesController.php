@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
@@ -52,9 +53,21 @@ class EntriesController extends CpController
         return $query;
     }
 
-    public function edit(Request $request, $collection, $slug)
+    public function edit(Request $request, $collection, $id, $slug, $site)
     {
-        $entry = Entry::findBySlug($slug, $collection);
+        if (! Site::get($site)) {
+            return $this->pageNotFound();
+        }
+
+        if (! $entry = Entry::find($id)) {
+            return $this->pageNotFound();
+        }
+
+        if (! $entry->collection()->sites()->contains($site)) {
+            return $this->pageNotFound();
+        }
+
+        $entry = $entry->inOrClone($site);
 
         $this->authorize('view', $entry);
 
@@ -76,7 +89,7 @@ class EntriesController extends CpController
 
         $viewData = [
             'actions' => [
-                'update' => cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()])
+                'update' => $entry->updateUrl()
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -94,9 +107,13 @@ class EntriesController extends CpController
         ]));
     }
 
-    public function update(Request $request, $collection, $slug)
+    public function update(Request $request, $collection, $id, $slug, $site)
     {
-        $entry = Entry::findBySlug($slug, $collection);
+        if (! $entry = Entry::find($id)) {
+            return $this->pageNotFound();
+        }
+
+        $entry = $entry->inOrClone($site);
 
         $this->authorize('edit', $entry);
 
@@ -109,7 +126,9 @@ class EntriesController extends CpController
 
         $request->validate($validation->rules());
 
-        foreach ($fields->values() as $key => $value) {
+        $values = array_except($fields->values(), ['slug']);
+
+        foreach ($values as $key => $value) {
             $entry->set($key, $value);
         }
 

@@ -19,6 +19,13 @@
                     @svg('chevron-right')
                     {{ $entry->get('title') }}
                 </h1>
+
+                <div class="mr-3 flex items-center">
+                    <a href="{{ $entry->entry()->inOrClone('default')->editUrl() }}" class="mr-1 @if (request()->route('site') == 'default')font-bold @endif">English</a>
+                    <a href="{{ $entry->entry()->inOrClone('fr')->editUrl() }}" class="mr-1 @if (request()->route('site') == 'fr')font-bold @endif">French</a>
+                    <a href="{{ $entry->entry()->inOrClone('de')->editUrl() }}" class="mr-1 @if (request()->route('site') == 'de')font-bold @endif">German</a>
+                </div>
+
                 <button
                     class="btn btn-primary"
                     :class="{ disabled: !canSave }"
