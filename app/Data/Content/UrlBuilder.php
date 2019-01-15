@@ -22,10 +22,6 @@ class UrlBuilder implements UrlBuilderContract
      */
     public function content($content)
     {
-        if (! in_array($content->contentType(), ['entry', 'term'])) {
-            throw new \Exception('Invalid content type. Must be entry or taxonomy.');
-        }
-
         $this->content = $content;
 
         return $this;
@@ -162,6 +158,14 @@ class UrlBuilder implements UrlBuilderContract
         // This will allow us to reference dynamic values like ->title() and so on.
         $method = Str::camel($variable);
 
-        return (method_exists($this->content, $method)) ? $this->content->$method() : null;
+        if (method_exists($this->content, $method)) {
+            return $this->content->$method();
+        }
+
+        try {
+            return $this->content->$method();
+        } catch (\BadMethodCallException $e) {
+
+        }
     }
 }

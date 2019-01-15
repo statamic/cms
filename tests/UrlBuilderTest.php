@@ -22,24 +22,22 @@ class UrlBuilderTest extends TestCase
     {
         parent::setUp();
 
-        // Add a blog collection to the stache
-        $collection = Entries::createCollection('blog');
-        $collection->data(['order' => 'date']);
-        $this->app->make(Stache::class)
-            ->store('collections')
-            ->setPath('blog', 'collections/blog/folder.yaml')
-            ->setItem('blog', $collection);
+        $this->entry = \Statamic\API\Entry::make()
+            ->id('post')
+            ->collection(
+                \Statamic\API\Collection::create('example')->order('date')
+            );
 
-        $this->entry = Entry::create('post')
-                      ->collection('blog')
-                      ->order('2015-01-02')
-                      ->with([
-                          'foo' => 'bar',
-                          'slashed' => 'foo/bar'
-                      ])
-                      ->get();
+        $this->entry->in('en', function ($loc) {
+            $loc
+                ->slug('post')
+                ->order('2015-01-02')
+                ->data(['foo' => 'bar', 'slashed' => 'foo/bar']);
+        });
 
-        $this->entry->in('fr')->set('slug', 'le-post');
+        $this->entry->addLocalization(
+            $this->entry->inOrClone('fr')->slug('le-post')
+        );
 
         $this->builder = app('Statamic\Contracts\Data\Content\UrlBuilder')->content($this->entry);
     }
