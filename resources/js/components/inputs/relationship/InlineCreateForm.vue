@@ -120,8 +120,10 @@ export default {
             axios.post(this.action, this.values).then(response => {
                 this.saving = false;
                 this.$notify.success('Saved');
-                this.$emit('created', response.data.entry);
-                this.$nextTick(() => this.close());
+                this.$nextTick(() => {
+                    this.$emit('created', response.data.entry);
+                    this.close();
+                });
             }).catch(e => {
                 this.saving = false;
                 if (e.response && e.response.status === 422) {
