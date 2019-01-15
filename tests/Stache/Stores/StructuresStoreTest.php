@@ -213,7 +213,7 @@ EOT;
         $this->store->setItem('pages', $structure);
 
         $this->assertEquals([
-            'paths' => [],
+            'paths' => ['en' => []],
             'uris' => ['en' => []],
             'entryUris' => [
                 'en' => [

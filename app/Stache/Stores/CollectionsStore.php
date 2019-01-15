@@ -15,12 +15,18 @@ class CollectionsStore extends BasicStore
 
     public function createItemFromFile($path, $contents)
     {
-        $id = pathinfo($path, PATHINFO_FILENAME);
+        $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
 
-        $collection = Collection::create($id);
-        $collection->data($data);
-        return $collection;
+        return Collection::create($handle)
+            ->title(array_get($data, 'title'))
+            ->route(array_get($data, 'route'))
+            ->order(array_get($data, 'order'))
+            ->sites(array_get($data, 'sites'))
+            ->template(array_get($data, 'template'))
+            ->layout(array_get($data, 'layout'))
+            ->data(array_get($data, 'data'))
+            ->entryBlueprints(array_get($data, 'blueprints'));
     }
 
     public function getItemKey($item, $path)
@@ -43,7 +49,7 @@ class CollectionsStore extends BasicStore
 
     public function save(CollectionContract $collection)
     {
-        $path = $this->directory . '/' . $collection->path() . '.yaml';
+        $path = $this->directory . '/' . $collection->handle() . '.yaml';
         $contents = YAML::dump($collection->data());
 
         $this->files->put($path, $contents);

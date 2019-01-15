@@ -274,9 +274,9 @@ class StacheTest extends TestCase
             $collectionsStore = new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class)),
             $entriesStore
         ]);
-        $entriesOne->setPath('123', '/onetwothree.md');
-        $entriesTwo->setPath('456', '/fourfivesix.md');
-        $collectionsStore->setPath('789', '/seveneightnine.md');
+        $entriesOne->setSitePath('en', '123', '/onetwothree.md');
+        $entriesTwo->setSitePath('en', '456', '/fourfivesix.md');
+        $collectionsStore->setSitePath('en', '789', '/seveneightnine.md');
 
         $this->assertEquals($entriesOne, $this->stache->getStoreById('123'));
         $this->assertEquals($entriesTwo, $this->stache->getStoreById('456'));

@@ -3,9 +3,9 @@
 namespace Tests\Stache\Stores;
 
 use Mockery;
+use Statamic\API;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
-use Statamic\API\Entry as EntryAPI;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Data\Entries\Entry;
@@ -51,23 +51,29 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_makes_entry_instances_from_cache()
     {
+        API\Collection::shouldReceive('whereHandle')->with('blog')->andReturn(new \Statamic\Data\Entries\Collection);
+
         $cache = collect([
-            '1' => [
-                'attributes' => [
-                    'slug' => 'test',
-                    'collection' => 'blog',
-                    'order' => '1',
-                    'published' => true,
-                    'data_type' => 'md',
-                ],
-                'data' => [
+            '123' => [
+                'collection' => 'blog',
+                'localizations' => [
                     'en' => [
-                        'id' => '1',
-                        'title' => 'Test Entry',
+                        'slug' => 'test',
+                        'order' => '1',
+                        'published' => true,
+                        'path' => '/path/to/en.md',
+                        'data' => [
+                            'title' => 'Test Entry',
+                        ]
                     ],
                     'fr' => [
-                        'id' => '1',
-                        'title' => 'Le Test Entry',
+                        'order' => '3',
+                        'published' => false,
+                        'slug' => 'le-test',
+                        'path' => '/path/to/fr.md',
+                        'data' => [
+                            'title' => 'Le Test Entry',
+                        ]
                     ]
                 ]
             ]
@@ -76,20 +82,33 @@ class EntriesStoreTest extends TestCase
         $items = $this->store->getItemsFromCache($cache);
 
         $this->assertCount(1, $items);
-        tap($items->first(), function ($entry) {
-            $this->assertInstanceOf(Entry::class, $entry);
-            $this->assertEquals('1', $entry->id());
-            $this->assertEquals('Test Entry', $entry->get('title'));
-            $this->assertEquals('Le Test Entry', $entry->in('fr')->get('title'));
+        $entry = $items->first();
+        $this->assertInstanceOf(Entry::class, $entry);
+        $this->assertCount(2, $entry->localizations());
+        $this->assertEquals('123', $entry->id());
+        tap($entry->in('en'), function ($entry) {
             $this->assertEquals('test', $entry->slug());
             $this->assertEquals('1', $entry->order());
+            $this->assertEquals('/path/to/en.md', $entry->initialPath());
             $this->assertTrue($entry->published());
+            $this->assertEquals('Test Entry', $entry->get('title'));
+        });
+        tap($entry->in('fr'), function ($entry) {
+            $this->assertEquals('le-test', $entry->slug());
+            $this->assertEquals('3', $entry->order());
+            $this->assertEquals('/path/to/fr.md', $entry->initialPath());
+            $this->assertFalse($entry->published());
+            $this->assertEquals('Le Test Entry', $entry->get('title'));
         });
     }
 
     /** @test */
     function it_makes_entry_instances_from_files()
     {
+        API\Collection::shouldReceive('whereHandle')->with('blog')->andReturn(
+            new \Statamic\Data\Entries\Collection
+        );
+
         $item = $this->store->createItemFromFile(
             $this->directory.'/blog/2017-01-02.my-post.md',
             "id: 123\ntitle: Example\nfoo: bar"
@@ -98,18 +117,18 @@ class EntriesStoreTest extends TestCase
         $this->assertInstanceOf(Entry::class, $item);
         $this->assertEquals('123', $item->id());
         $this->assertEquals('Example', $item->get('title'));
-        $this->assertEquals(['id' => '123', 'title' => 'Example', 'foo' => 'bar'], $item->data());
+        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
         $this->assertEquals('2017-01-02', $item->order());
         $this->assertEquals('my-post', $item->slug());
         $this->assertTrue($item->published());
     }
 
     /** @test */
-    function it_uses_the_id_of_the_entry_object_combined_with_collection_name_as_the_item_key()
+    function it_uses_the_id_of_the_entry_object_combined_with_collection_handle_as_the_item_key()
     {
         $entry = Mockery::mock();
         $entry->shouldReceive('id')->andReturn('test');
-        $entry->shouldReceive('collectionName')->andReturn('example');
+        $entry->shouldReceive('collectionHandle')->andReturn('example');
 
         $this->assertEquals(
             'example::test',
@@ -120,12 +139,17 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_saves_to_disk()
     {
-        $entry = EntryAPI::create('test')
+        API\Stache::shouldReceive('store')->with('entries')->andReturn($this->store);
+
+        $entry = (new \Statamic\Data\Entries\Entry)
             ->id('test-blog-entry')
-            ->collection('blog')
-            ->date('2017-07-04')
-            ->with(['foo' => 'bar', 'content' => 'test content'])
-            ->get();
+            ->collection((new \Statamic\Data\Entries\Collection)->handle('blog'))
+            ->in('en', function ($loc) {
+                $loc
+                    ->slug('test')
+                    ->order('2017-07-04')
+                    ->data(['foo' => 'bar', 'content' => 'test content']);
+            });
 
         $this->store->save($entry);
 

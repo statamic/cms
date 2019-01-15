@@ -22,6 +22,12 @@ class Entry
         return $this->service()->query();
     }
 
+    // TODO: Remove
+    public function create()
+    {
+        return $this->make();
+    }
+
     public function make()
     {
         return $this->service()->make();
@@ -79,9 +85,9 @@ class Entry
      * @param string $uri
      * @return \Statamic\Contracts\Data\Entries\Entry
      */
-    public function whereUri($uri)
+    public function whereUri($uri, $site = null)
     {
-        return $this->service()->findByUri($uri);
+        return $this->service()->findByUri($uri, $site);
     }
 
     /**
@@ -119,17 +125,6 @@ class Entry
     }
 
     /**
-     * Create an entry
-     *
-     * @param string $slug
-     * @return \Statamic\Contracts\Data\Entries\EntryFactory
-     */
-    public function create($slug)
-    {
-        return app('Statamic\Contracts\Data\Entries\EntryFactory')->create($slug);
-    }
-
-    /**
      * Get an entry from a collection, by its slug
      *
      * @param string       $collection
@@ -158,8 +153,13 @@ class Entry
         return self::find($uuid);
     }
 
-    public function save(EntryContract $entry)
+    public function save($entry)
     {
         $this->service()->save($entry);
+    }
+
+    public function propagate($entry)
+    {
+        $this->service()->propagate($entry);
     }
 }

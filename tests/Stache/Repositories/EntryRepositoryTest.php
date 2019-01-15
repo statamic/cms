@@ -4,6 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Tests\TestCase;
 use Statamic\Stache\Stache;
+use Statamic\API\Collection;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Data\Entries\Entry;
@@ -64,7 +65,7 @@ class EntryRepositoryTest extends TestCase
             $this->assertCount(3, $entries);
             $this->assertEveryItemIsInstanceOf(Entry::class, $entries);
             $this->assertEveryItem($entries, function ($item) {
-                return $item->collectionName() === 'alphabetical';
+                return $item->collectionHandle() === 'alphabetical';
             });
         });
 
@@ -73,7 +74,7 @@ class EntryRepositoryTest extends TestCase
             $this->assertCount(2, $entries);
             $this->assertEveryItemIsInstanceOf(Entry::class, $entries);
             $this->assertEveryItem($entries, function ($item) {
-                return $item->collectionName() === 'blog';
+                return $item->collectionHandle() === 'blog';
             });
         });
 
@@ -82,7 +83,7 @@ class EntryRepositoryTest extends TestCase
             $this->assertCount(3, $entries);
             $this->assertEveryItemIsInstanceOf(Entry::class, $entries);
             $this->assertEveryItem($entries, function ($item) {
-                return $item->collectionName() === 'numeric';
+                return $item->collectionHandle() === 'numeric';
             });
         });
 
@@ -91,7 +92,7 @@ class EntryRepositoryTest extends TestCase
             $this->assertCount(6, $entries);
             $this->assertEveryItemIsInstanceOf(Entry::class, $entries);
             $this->assertEveryItem($entries, function ($item) {
-                return $item->collectionName() === 'pages';
+                return $item->collectionHandle() === 'pages';
             });
         });
     }
@@ -161,13 +162,16 @@ class EntryRepositoryTest extends TestCase
     /** @test */
     function it_saves_an_entry_to_the_stache_and_to_a_file()
     {
-        $entry = EntryAPI::create('test')
+        $entry = EntryAPI::make()
             ->id('test-blog-entry')
-            ->collection('blog')
-            ->published(false)
-            ->date('2017-07-04')
-            ->with(['foo' => 'bar'])
-            ->get();
+            ->collection(Collection::whereHandle('blog'))
+            ->in('en', function ($loc) {
+                $loc
+                    ->slug('test')
+                    ->published(false)
+                    ->order('2017-07-04')
+                    ->data(['foo' => 'bar']);
+            });
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));

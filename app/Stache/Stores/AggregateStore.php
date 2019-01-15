@@ -244,4 +244,17 @@ abstract class AggregateStore extends Store
 
         return $this;
     }
+
+    // TODO: Test this.
+    // There's an equivalent test for the BasicStore.
+    public function removeByPath($path)
+    {
+        $id = $this->getIdFromPath($path);
+
+        list(, $store) = $this->extractKeys($this->getIdMap()->get($id));
+
+        $this->store($store)->removeByPath($path);
+
+        return $this;
+    }
 }

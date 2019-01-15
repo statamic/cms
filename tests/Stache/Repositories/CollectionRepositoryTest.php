@@ -32,8 +32,8 @@ class CollectionRepositoryTest extends TestCase
         $this->assertCount(4, $collections);
         $this->assertEveryItemIsInstanceOf(Collection::class, $collections);
 
-        $ordered = $collections->sortBy->path()->values();
-        $this->assertEquals(['alphabetical', 'blog', 'numeric', 'pages'], $ordered->map->path()->all()); // TODO: Support ->handle() or ->id()
+        $ordered = $collections->sortBy->handle()->values();
+        $this->assertEquals(['alphabetical', 'blog', 'numeric', 'pages'], $ordered->map->handle()->all());
         $this->assertEquals(['Alphabetical', 'Blog', 'Numeric', 'Pages'], $ordered->map->title()->all());
         $this->assertEquals(['alphabetical', 'date', 'number', 'alphabetical'], $ordered->map->order()->all());
     }
@@ -43,28 +43,28 @@ class CollectionRepositoryTest extends TestCase
     {
         tap($this->repo->findByHandle('alphabetical'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
-            $this->assertEquals('alphabetical', $collection->path());
+            $this->assertEquals('alphabetical', $collection->handle());
             $this->assertEquals('Alphabetical', $collection->title());
             $this->assertEquals('alphabetical', $collection->order());
         });
 
         tap($this->repo->findByHandle('blog'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
-            $this->assertEquals('blog', $collection->path());
+            $this->assertEquals('blog', $collection->handle());
             $this->assertEquals('Blog', $collection->title());
             $this->assertEquals('date', $collection->order());
         });
 
         tap($this->repo->findByHandle('numeric'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
-            $this->assertEquals('numeric', $collection->path());
+            $this->assertEquals('numeric', $collection->handle());
             $this->assertEquals('Numeric', $collection->title());
             $this->assertEquals('number', $collection->order());
         });
 
         tap($this->repo->findByHandle('pages'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
-            $this->assertEquals('pages', $collection->path());
+            $this->assertEquals('pages', $collection->handle());
             $this->assertEquals('Pages', $collection->title());
             $this->assertEquals('alphabetical', $collection->order());
         });

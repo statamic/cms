@@ -92,6 +92,8 @@ class GlobalsStoreTest extends TestCase
     /** @test */
     function it_gets_the_id_by_handle()
     {
+        $this->markTestIncomplete();// TODO: Revisit once globals have been refactored for multi site
+
         $this->store->setPath('123', $this->tempDir.'/test.yaml');
         $this->store->setPath('456', $this->tempDir.'/subdirectory/nested.yaml');
 

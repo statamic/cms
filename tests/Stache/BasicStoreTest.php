@@ -22,28 +22,51 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_paths()
+    function it_gets_and_sets_a_path_for_a_site()
     {
         $this->assertFalse($this->store->isUpdated());
-        $this->assertEquals([], $this->store->getPaths()->all());
+        $this->assertNull($this->store->getSitePath('en', '123'));
 
-        $return = $this->store->setPaths($paths = ['one.md', 'two.md']);
+        $return = $this->store->setSitePath('en', '123', '/one');
 
+        $this->assertEquals('/one', $this->store->getSitePath('en', '123'));
         $this->assertEquals($this->store, $return);
-        $this->assertEquals($paths, $this->store->getPaths()->all());
         $this->assertTrue($this->store->isUpdated());
     }
 
     /** @test */
-    function it_gets_and_sets_single_paths()
+    public function it_gets_and_sets_a_sites_paths()
     {
         $this->assertFalse($this->store->isUpdated());
-        $this->assertNull($this->store->getPath('one'));
+        $this->assertEquals([], $this->store->getSitePaths('en')->all());
+        $this->assertEquals([], $this->store->getSitePaths('fr')->all());
 
-        $return = $this->store->setPath('one', 'one.md');
+        $return = $this->store->setSitePaths('en', $enPaths = ['/one', '/two']);
+        $return = $this->store->setSitePaths('fr', $frPaths = ['/un', '/deux']);
 
         $this->assertEquals($this->store, $return);
-        $this->assertEquals('one.md', $this->store->getPath('one'));
+        $this->assertEquals($enPaths, $this->store->getSitePaths('en')->all());
+        $this->assertEquals($frPaths, $this->store->getSitePaths('fr')->all());
+        $this->assertTrue($this->store->isUpdated());
+    }
+
+    /** @test */
+    function it_gets_and_sets_paths_for_all_sites()
+    {
+        $this->assertFalse($this->store->isUpdated());
+        $this->assertEquals([], $this->store->getSitePaths('en')->all());
+        $this->assertEquals([], $this->store->getSitePaths('fr')->all());
+        $this->assertEquals(['en' => collect(), 'fr' => collect()], $this->store->getPaths()->all());
+
+        $return = $this->store->setPaths([
+            'en' => $enPaths = ['one.md', 'two.md'],
+            'fr' => $frPaths = ['un.md', 'deux.md'],
+        ]);
+
+        $this->assertEquals($this->store, $return);
+        $this->assertEquals($enPaths, $this->store->getSitePaths('en')->all());
+        $this->assertEquals($frPaths, $this->store->getSitePaths('fr')->all());
+        $this->assertEquals(['en' => collect($enPaths), 'fr' => collect($frPaths)], $this->store->getPaths()->all());
         $this->assertTrue($this->store->isUpdated());
     }
 
@@ -108,18 +131,12 @@ class BasicStoreTest extends TestCase
             public function uri() { return '/the/uri'; }
         });
 
-        // Inserting an item with the key and path parameters will use those
-        $this->store->insert(['title' => 'Item title'], '456', '/the/path');
-
         $this->assertEquals($this->store, $return);
+        $this->assertEquals(['123' => $object], $this->store->getItems()->all());
         $this->assertEquals([
-            '123' => $object,
-            '456' => ['title' => 'Item title'],
-        ], $this->store->getItems()->all());
-        $this->assertEquals([
-            '123' => '/path/to/object',
-            '456' => '/the/path',
-        ], $this->store->getPaths()->all());
+            'en' => ['123' => '/path/to/object'],
+            'fr' => []
+        ], $this->store->getPaths()->toArray());
         $this->assertEquals([
             'en' => [
                 '123' => '/the/uri',
@@ -132,7 +149,99 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
-    function removing_an_item_will_remove_the_item_and_path_and_uris()
+    function inserting_a_localizable_item_will_set_the_path_and_uri_for_each_site()
+    {
+        $entry = (new \Statamic\Data\Entries\Entry)->id('123');
+        $en = new class extends \Statamic\Data\Entries\LocalizedEntry {
+            public function path() { return '/path/to/en'; }
+            public function uri() { return '/en'; }
+        };
+        $fr = new class extends \Statamic\Data\Entries\LocalizedEntry {
+            public function path() { return '/path/to/fr'; }
+            public function uri() { return '/fr'; }
+        };
+        $entry
+            ->addLocalization($en->locale('en'))
+            ->addLocalization($fr->locale('fr'));
+
+        $this->store->insert($entry);
+
+        $this->assertEquals([
+            'en' => ['123' => '/path/to/en'],
+            'fr' => ['123' => '/path/to/fr'],
+        ], $this->store->getPaths()->toArray());
+        $this->assertEquals([
+            'en' => ['123' => '/en'],
+            'fr' => ['123' => '/fr'],
+        ], $this->store->getUris()->toArray());
+    }
+
+    /** @test */
+    function items_can_be_removed_by_path()
+    {
+        $collection = (new \Statamic\Data\Entries\Collection)->handle('test');
+
+        // an item that will remain at the end
+        $firstItem = (new \Statamic\Data\Entries\Entry)->id('first')->collection($collection)
+            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+                public function locale($locale = null) { return 'en'; }
+                public function path() { return '/path/to/first/item'; }
+                public function uri() { return '/uri/of/first/item'; }
+            });
+
+        // an item with 1 localization that will be removed
+        $secondItem = (new \Statamic\Data\Entries\Entry)->id('second')->collection($collection)
+            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+                public function locale($locale = null) { return 'en'; }
+                public function path() { return '/path/to/second/item'; }
+                public function uri() { return '/uri/of/second/item'; }
+            });
+
+        // an item with 2 localizations, one will be removed
+        $thirdItem = (new \Statamic\Data\Entries\Entry)->id('third')->collection($collection)
+            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+                public function locale($locale = null) { return 'en'; }
+                public function path() { return '/path/to/third/item'; }
+                public function uri() { return '/uri/of/third/item'; }
+            })
+            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+                public function locale($locale = null) { return 'fr'; }
+                public function path() { return '/path/to/third/item/in/french'; }
+                public function uri() { return '/uri/of/third/item/in/french'; }
+            });
+
+        // a non-localizable item that will be removed
+        $fourthItem = new class {
+            public function id() { return 'fourth'; }
+            public function path() { return '/path/to/fourth/item'; }
+            public function uri() { return '/uri/of/fourth/item'; }
+        };
+
+        $this->store->withoutMarkingAsUpdated(function () use ($firstItem, $secondItem, $thirdItem, $fourthItem) {
+            $this->store->insert($firstItem);
+            $this->store->insert($secondItem);
+            $this->store->insert($thirdItem);
+            $this->store->insert($fourthItem);
+        });
+
+        $this->assertFalse($this->store->isUpdated());
+        $this->assertEquals(4, $this->store->getItemsWithoutLoading()->count());
+
+        $return = $this->store->removeByPath('/path/to/second/item');
+        $this->store->removeByPath('/path/to/third/item/in/french');
+        $this->store->removeByPath('/path/to/fourth/item');
+
+        $this->assertEquals($this->store, $return);
+        $this->assertTrue($this->store->isUpdated());
+        $this->assertEquals([
+            'first' => $firstItem,
+            'third' => $thirdItem,
+        ], $this->store->getItems()->all());
+        $this->assertEquals(1, $this->store->getItem('third')->localizations()->count());
+    }
+
+    /** @test */
+    function removing_an_item_will_remove_the_item_and_paths_and_uris()
     {
         $firstItem = new class {
             public function id() { return '123'; }
@@ -151,11 +260,10 @@ class BasicStoreTest extends TestCase
         $this->store->withoutMarkingAsUpdated(function () use ($firstItem, $secondItem, $fourthItem) {
             $this->store->insert($firstItem);
             $this->store->insert($secondItem);
-            $this->store->insert(['title' => 'Item three'], '789', '/third/path');
             $this->store->insert($fourthItem);
         });
         $this->assertFalse($this->store->isUpdated());
-        $this->assertEquals(4, $this->store->getItemsWithoutLoading()->count());
+        $this->assertEquals(3, $this->store->getItemsWithoutLoading()->count());
         $this->assertEquals([
             '123' => '/first/uri',
             '131415' => '/fourth/uri',
@@ -166,13 +274,11 @@ class BasicStoreTest extends TestCase
 
         $this->assertEquals($this->store, $return);
         $this->assertEquals([
-            '789' => ['title' => 'Item three'],
             '131415' => $fourthItem,
         ], $this->store->getItems()->all());
         $this->assertEquals([
-            '789' => '/third/path',
             '131415' => '/fourth/path',
-        ], $this->store->getPaths()->all());
+        ], $this->store->getSitePaths('en')->all());
         $this->assertEquals([
             'en' => ['131415' => '/fourth/uri'],
             'fr' => ['131415' => '/fourth/uri']
@@ -207,13 +313,20 @@ class BasicStoreTest extends TestCase
     {
         $this->assertFalse($this->store->isUpdated());
 
-        $this->store->setPaths([
+        $this->store->setSitePaths('en', [
             '123' => '/one',
             '456' => '/two'
+        ]);
+        $this->store->setSitePaths('fr', [
+            '123' => '/un',
+            '789' => '/trois'
         ]);
 
         $this->assertEquals('123', $this->store->getIdFromPath('/one'));
         $this->assertEquals('456', $this->store->getIdFromPath('/two'));
+        $this->assertEquals('123', $this->store->getIdFromPath('/un'));
+        $this->assertEquals('789', $this->store->getIdFromPath('/trois'));
+        $this->assertNull($this->store->getIdFromPath('/unknown'));
         $this->assertTrue($this->store->isUpdated());
     }
 
@@ -377,7 +490,7 @@ class BasicStoreTest extends TestCase
     /** @test */
     function it_caches_items_and_meta_data()
     {
-        $this->store->setPath('1', '/path/to/one.txt');
+        $this->store->setSitePath('en', '1', '/path/to/one.txt');
         $this->store->setSiteUri('en', '1', '/one');
         $this->store->setItem('1', new class {
             public function toCacheableArray() {
@@ -385,7 +498,8 @@ class BasicStoreTest extends TestCase
             }
         });
 
-        $this->store->setPath('2', '/path/to/two.txt');
+        $this->store->setSitePath('en', '2', '/path/to/two.txt');
+        $this->store->setSitePath('fr', '2', '/path/to/deux.txt');
         $this->store->setSiteUri('en', '2', '/two');
         $this->store->setSiteUri('fr', '2', '/deux');
         $this->store->setItem('2', ['item' => 'two']);
@@ -395,8 +509,13 @@ class BasicStoreTest extends TestCase
         ]);
         Cache::shouldReceive('forever')->once()->with('stache::meta/test', [
             'paths' => [
-                '1' => '/path/to/one.txt',
-                '2' => '/path/to/two.txt',
+                'en' => [
+                    '1' => '/path/to/one.txt',
+                    '2' => '/path/to/two.txt',
+                ],
+                'fr' => [
+                    '2' => '/path/to/deux.txt',
+                ],
             ],
             'uris' => [
                 'en' => [
@@ -415,7 +534,7 @@ class BasicStoreTest extends TestCase
     /** @test */
     function gets_meta_data_from_cache_in_a_format_suitable_for_collection_mapWithKeys_method()
     {
-        Cache::shouldReceive('get')->with('stache::meta/test')->once()->andReturn('what was in the cache');
+        Cache::shouldReceive('get')->with('stache::meta/test', Mockery::any())->once()->andReturn('what was in the cache');
 
         $this->assertEquals(['test' => 'what was in the cache'], $this->store->getMetaFromCache());
     }
@@ -423,11 +542,13 @@ class BasicStoreTest extends TestCase
     /** @test */
     function it_gets_a_map_of_ids_to_the_stores()
     {
-        $this->store->setPaths(['123' => '/path/to/one.md', '456' => '/path/to/two.md']);
+        $this->store->setSitePaths('en', ['123' => '/path/to/one.md', '456' => '/path/to/two.md']);
+        $this->store->setSitePaths('fr', ['123' => '/path/to/deux.md', '789' => '/path/to/tres.md']);
 
         $this->assertEquals([
             '123' => 'test',
             '456' => 'test',
+            '789' => 'test',
         ], $this->store->getIdMap()->all());
     }
 }

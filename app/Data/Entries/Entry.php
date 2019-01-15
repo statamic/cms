@@ -125,4 +125,20 @@ class Entry implements Contract
 
         throw new \BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $method));
     }
+
+    public function toCacheableArray()
+    {
+        return [
+            'collection' => $this->collectionHandle(),
+            'localizations' => $this->localizations->map(function ($entry) {
+                return [
+                    'slug' => $entry->slug(),
+                    'order' => $entry->order(),
+                    'published' => $entry->published(),
+                    'path' => $entry->initialPath() ?? $entry->path(),
+                    'data' => $entry->data()
+                ];
+            })->all()
+        ];
+    }
 }

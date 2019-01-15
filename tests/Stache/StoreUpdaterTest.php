@@ -152,6 +152,7 @@ return new class {
     public function id() { return $this->data()['id']; }
     public function data() { return ['title' => 'Item title updated', 'id' => '123', 'uri' => '/updated-uri']; }
     public function uri() { return $this->data()['uri']; }
+    public function path() { return '/path'; }
     public function toCacheableArray() { return $this->data(); }
 };
 EOT;
@@ -191,6 +192,7 @@ EOT;
 return new class {
     public function id() { return $this->data()['id']; }
     public function data() { return ['title' => 'Item title updated', 'id' => '123', 'uri' => '/updated-uri']; }
+    public function path() { return '/path'; }
 
     // This method is explicitly *not* here.
     // public function uri() { }
@@ -218,7 +220,7 @@ EOT;
         ]);
         Cache::shouldReceive('forever');
         Traverser::shouldReceive('traverse')->once()->andReturn(collect([]));
-        $this->store->setPath('123', $this->tempDir.'/deleted.txt');
+        $this->store->setSitePath('en', '123', $this->tempDir.'/deleted.txt');
         $this->assertEquals('Item title', $this->store->getItem('123')->data()['title']);
         $this->assertEquals(1, $this->store->getItemsWithoutLoading()->count());
 
@@ -237,6 +239,7 @@ return new class {
     public function id() { return $this->data()['id']; }
     public function data() { return ['title' => 'Item title updated', 'id' => '123']; }
     public function uri() { return '/test'; }
+    public function path() { return '/test'; }
     public function toCacheableArray() { return $this->data(); }
 };
 EOT;

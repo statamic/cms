@@ -5,6 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Contracts\Data\Localizable;
 
 abstract class BasicStore extends Store
 {
@@ -28,6 +29,7 @@ abstract class BasicStore extends Store
 
         $this->withoutMarkingAsUpdated(function () {
             $this->forEachSite(function ($site) {
+                $this->setSitePaths($site, []);
                 $this->setSiteUris($site, []);
             });
         });
@@ -42,6 +44,43 @@ abstract class BasicStore extends Store
         return $this;
     }
 
+    public function getSitePath($site, $key)
+    {
+        return $this->paths->get($site)->get($key);
+    }
+
+    public function setSitePath($site, $key, $uri)
+    {
+        $this->paths->get($site)->put($key, $uri);
+
+        $this->markAsUpdated();
+
+        return $this;
+    }
+
+    public function removeSitePath($site, $key)
+    {
+        $this->paths->get($site)->forget($key);
+
+        $this->markAsUpdated();
+
+        return $this;
+    }
+
+    public function getSitePaths($site)
+    {
+        return $this->paths->get($site);
+    }
+
+    public function setSitePaths($site, $paths)
+    {
+        $this->paths->put($site, collect($paths));
+
+        $this->markAsUpdated();
+
+        return $this;
+    }
+
     public function getPaths()
     {
         return $this->paths;
@@ -49,32 +88,9 @@ abstract class BasicStore extends Store
 
     public function setPaths($paths)
     {
-        $this->paths = collect($paths);
-
-        $this->markAsUpdated();
-
-        return $this;
-    }
-
-    public function getPath($key)
-    {
-        return $this->paths->get($key);
-    }
-
-    public function setPath($key, $path)
-    {
-        $this->paths->put($key, $path);
-
-        $this->markAsUpdated();
-
-        return $this;
-    }
-
-    public function removePath($key)
-    {
-        $this->paths->forget($key);
-
-        $this->markAsUpdated();
+        foreach ($paths as $site => $sitePaths) {
+            $this->setSitePaths($site, $sitePaths);
+        }
 
         return $this;
     }
@@ -139,12 +155,18 @@ abstract class BasicStore extends Store
 
     public function getIdFromPath($path)
     {
-        return $this->getPaths()->filter()->flip()->get($path);
+        foreach ($this->paths as $site => $paths) {
+            if ($match = $paths->flip()->get($path)) {
+                return $match;
+            }
+        }
     }
 
     public function getIdMap()
     {
-        return $this->paths->keys()->mapWithKeys(function ($id) {
+        return $this->getPaths()->mapWithKeys(function ($paths) {
+            return $paths;
+        })->mapWithKeys(function ($path, $id) {
             return [$id => $this->key()];
         });
     }
@@ -302,21 +324,64 @@ abstract class BasicStore extends Store
         });
     }
 
-    public function insert($item, $key = null, $path = null)
+    public function insert($item, $key = null)
     {
         $key = $key ?? $item->id();
 
-        $this
-            ->setItem($key, $item)
-            ->setPath($key, $path ?? $item->path());
+        $this->setItem($key, $item);
 
-        if (method_exists($item, 'uri')) {
+        // TODO: This is ugly. Make it less ugly.
+        if ($item instanceof Localizable) {
             $this->forEachSite(function ($site, $store) use ($item, $key) {
-                $store->setSiteUri($site, $key, $item->uri());
+                if (! $item->existsIn($site)) {
+                    return;
+                }
+
+                $item = $item->in($site);
+                $store->setSitePath($site, $key, $item->path());
+                if (method_exists($item, 'uri')) {
+                    $store->setSiteUri($site, $key, $item->uri());
+                }
             });
+        } else {
+            $this->setSitePath($this->stache->sites()->first(), $key, $item->path());
+            if (method_exists($item, 'uri')) {
+                $this->forEachSite(function ($site, $store) use ($item, $key) {
+                    $store->setSiteUri($site, $key, $item->uri());
+                });
+            }
         }
 
         $this->markAsUpdated();
+
+        return $this;
+    }
+
+    public function removeByPath($path)
+    {
+        $id = $this->getIdFromPath($path);
+
+        $item = $this->getItem($id);
+
+        if ($item instanceof Localizable) {
+            $localization = $item->localizations()->first(function ($localized) use ($path) {
+                return $localized->path() === $path;
+            });
+
+            $this->removeSiteUri($localization->locale(), $id);
+            $this->removeSitePath($localization->locale(), $id);
+            $item->removeLocalization($localization);
+            $this->setItem($id, $item);
+
+            if ($item->localizations()->isEmpty()) {
+                $this->removeItem($id);
+            }
+        } else {
+            $this->removeItem($id);
+            $site = $this->stache->sites()->first();
+            $this->removeSiteUri($site, $id);
+            $this->removeSitePath($site, $id);
+        }
 
         return $this;
     }
@@ -325,9 +390,11 @@ abstract class BasicStore extends Store
     {
         $key = is_object($item) ? $item->id() : $item;
 
-        $this
-            ->removeItem($key)
-            ->removePath($key);
+        $this->removeItem($key);
+
+        // TODO, if localizable, it should loop over the locales and remove each respective path.
+        // If not localizable, remove the default site like we're doing now.
+        $this->removeSitePath($this->stache->sites()->first(), $key);
 
         $this->forEachSite(function ($site, $store) use ($item, $key) {
             $store->removeSiteUri($site, $key);
