@@ -22,21 +22,9 @@ class ContentCollection extends DataCollection
      */
     public function localize($locale)
     {
-        $items = new static($this->items);
-
-        // Filter out items that don't have the requested locale if it was prefixed with 'only'.
-        // For example 'only fr' would remove any items that don't have a french locale.
-        if (Str::startsWith($locale, 'only ')) {
-            $locale = explode('only ', $locale)[1];
-
-            $items = $this->filter(function ($item) use ($locale) {
-                return $item->hasLocale($locale);
-            });
-        }
-
-        return $items->map(function ($item) use ($locale) {
-            return $item->in($locale)->get();
-        });
+        return $this->map(function ($item) use ($locale) {
+            return $item->existsIn($locale) ? $item->in($locale) : null;
+        })->filter();
     }
 
     /**
