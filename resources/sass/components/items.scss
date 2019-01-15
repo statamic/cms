@@ -2,7 +2,7 @@
     @apply text-sm outline-none flex items-center rounded cursor-pointer border bg-white;
 
     .item-move {
-        @apply w-4 border-r h-full px-1 py-1.5;
+        @apply w-4 border-r h-full p-1;
         cursor: grab;
         background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
         &:hover { @apply .bg-grey-lighter; }
