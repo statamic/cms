@@ -1,30 +1,18 @@
 <template>
 
     <div
-        class="item text-sm mb-1"
-        @dblclick="edit"
+        class="item mb-1"
+        :class="{ 'published': item.published, 'unpublished': !item.published, 'invalid': item.invalid }"
     >
-        <div
-            class="item-inner inline-flex items-center cursor-pointer select-none"
-            :class="{ 'border-red bg-red-lighter text-red': item.invalid }"
-        >
-            <div
-                v-if="statusIcon"
-                class="little-dot mr-1"
-                :class="{ 'bg-green': item.published, 'bg-grey-light': !item.published, 'bg-red': item.invalid }"
-            />
+        <div class="item-move">&nbsp;</div>
+        <div class="item-inner">
+            <div v-if="statusIcon" class="little-dot mr-1" />
 
-            <span
+            <div
                 v-if="item.invalid"
                 v-popover:tooltip.top="__('An item with this ID could not be found')"
                 v-text="item.title" />
-            <span v-else v-text="item.title" />
-
-            <button
-                class="text-xs text-grey ml-1 font-bold outline-none hover:text-red"
-                @click.prevent="$emit('removed')">
-                &times;
-            </button>
+            <a v-else  @click="edit" v-text="item.title" />
 
             <popper
                 v-if="isEditing"
@@ -48,8 +36,16 @@
                 We'll show it programatically.  -->
                 <div slot="reference" class="-mr-1" />
             </popper>
-
         </div>
+
+        <!-- <div class="text-5xs px-1 font-bold text-grey-light antialiased uppercase" v-text="item.collection"></div> -->
+
+        <dropdown-list class="pr-1">
+            <ul class="dropdown-menu">
+                <li><a @click.prevent="edit" v-text="__('Edit')"></a></li>
+                <li class="warning"><a @click.prevent="$emit('removed')" v-text="__('Unlink')"></a></li>
+            </ul>
+        </dropdown-list>
     </div>
 
 </template>

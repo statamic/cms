@@ -124,6 +124,7 @@ module.exports = {
     */
 
     textSizes: {
+        '5xs':  '9px',
         '4xs':  '10px',
         '3xs':  '11px',
         '2xs':  '12px',
