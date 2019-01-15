@@ -21,45 +21,39 @@
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
-                <button v-if="!searchable" class="btn btn-sm" @click.prevent="isSelecting = true">
-                    {{ __('Add Item') }}
-                </button>
-
-                <template v-if="searchable">
-                    <div class="flex flex-wrap items-center text-sm pl-sm -mb-1">
-                        <div class="relative mb-1">
-                            <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center" @click="isCreating = true">
-                                <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                                {{ __('Create & Link Entry') }}
-                            </button>
-                            <popper
-                                v-if="isCreating"
-                                :force-show="isCreating"
-                                ref="popper"
-                                trigger="click"
-                                :append-to-body="true"
-                                boundaries-selector="body"
-                                :options="{ placement: 'left' }"
-                            >
-                                <div class="popover w-96 h-96 p-0">
-                                    <inline-create-form
-                                        class="popover-inner"
-                                        @created="itemCreated"
-                                        @closed="stopCreating"
-                                    />
-                                </div>
-
-                                <!-- Popper needs a clickable element, but we don't want one.
-                                We'll show it programatically.  -->
-                                <div slot="reference" />
-                            </popper>
-                        </div>
-                        <button class="text-blue hover:text-grey-dark flex mb-1" @click.prevent="isSelecting = true">
-                            <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                            Link Existing Entry
+                <div class="flex flex-wrap items-center text-sm pl-sm -mb-1">
+                    <div class="relative mb-1">
+                        <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center" @click="isCreating = true">
+                            <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
+                            {{ __('Create & Link Entry') }}
                         </button>
+                        <popper
+                            v-if="isCreating"
+                            :force-show="isCreating"
+                            ref="popper"
+                            trigger="click"
+                            :append-to-body="true"
+                            boundaries-selector="body"
+                            :options="{ placement: 'left' }"
+                        >
+                            <div class="popover w-96 h-96 p-0">
+                                <inline-create-form
+                                    class="popover-inner"
+                                    @created="itemCreated"
+                                    @closed="stopCreating"
+                                />
+                            </div>
+
+                            <!-- Popper needs a clickable element, but we don't want one.
+                            We'll show it programatically.  -->
+                            <div slot="reference" />
+                        </popper>
                     </div>
-                </template>
+                    <button class="text-blue hover:text-grey-dark flex mb-1" @click.prevent="isSelecting = true">
+                        <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
+                        Link Existing Entry
+                    </button>
+                </div>
             </div>
 
             <item-selector
@@ -96,8 +90,7 @@ export default {
         selectionsUrl: String,
         statusIcons: Boolean,
         editableItems: Boolean,
-        columns: Array,
-        searchable: Boolean
+        columns: Array
     },
 
     components: {
