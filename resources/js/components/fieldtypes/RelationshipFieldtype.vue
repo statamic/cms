@@ -9,7 +9,6 @@
         :status-icons="true"
         :editable-items="true"
         :columns="['title', 'url']"
-        :searchable="true"
     />
 
 </template>

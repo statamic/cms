@@ -1,59 +1,56 @@
 <template>
 
 <div>
+    <modal
+        name="asset-selector"
+        width="90%"
+        height="90%"
+        :resizable="true"
+    >
+        <div class="flex flex-col justify-end h-full">
 
-        <modal
-            name="asset-selector"
-            width="90%"
-            height="90%"
-            :resizable="true"
-        >
-            <div class="flex flex-col justify-end h-full">
+            <div class="flex-1 overflow-scroll">
+                <asset-browser
+                    :initial-container="container"
+                    :selected-path="folder"
+                    :selected-assets="browserSelections"
+                    :restrict-navigation="restrictNavigation"
+                    :max-files="maxFiles"
+                    @selections-updated="selectionsUpdated"
+                    @asset-doubleclicked="select">
 
-                <div class="flex-1 overflow-scroll">
-                    <asset-browser
-                        :initial-container="container"
-                        :selected-path="folder"
-                        :selected-assets="browserSelections"
-                        :restrict-navigation="restrictNavigation"
-                        :max-files="maxFiles"
-                        @selections-updated="selectionsUpdated"
-                        @asset-doubleclicked="select">
+                    <template slot="contextual-actions" v-if="browserSelections.length">
+                        <button class="btn action mb-3" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
+                    </template>
 
-                        <template slot="contextual-actions" v-if="browserSelections.length">
-                            <button class="btn action mb-3" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
-                        </template>
-
-                    </asset-browser>
-                </div>
-
-                <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
-                    <div class="text-sm text-grey-light"
-                        v-text="hasMaxFiles
-                            ? __n(':count/:max selected', browserSelections, { max: maxFiles })
-                            : __n(':count selected', browserSelections)">
-                    </div>
-                    <div>
-                        <button
-                            type="button"
-                            class="btn"
-                            @click="close">
-                            {{ __('Cancel') }}
-                        </button>
-
-                        <button
-                            type="button"
-                            class="btn btn-primary ml-1"
-                            @click="select">
-                            {{ __('Select') }}
-                        </button>
-                    </div>
-                </div>
-
+                </asset-browser>
             </div>
-        </modal>
 
+            <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
+                <div class="text-sm text-grey-light"
+                    v-text="hasMaxFiles
+                        ? __n(':count/:max selected', browserSelections, { max: maxFiles })
+                        : __n(':count selected', browserSelections)">
+                </div>
+                <div>
+                    <button
+                        type="button"
+                        class="btn"
+                        @click="close">
+                        {{ __('Cancel') }}
+                    </button>
 
+                    <button
+                        type="button"
+                        class="btn btn-primary ml-1"
+                        @click="select">
+                        {{ __('Select') }}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </modal>
 </div>
 
 </template>

@@ -6,6 +6,13 @@
    position: relative;
 }
 
+.dropdown .dropdown-icon {
+    @apply text-grey;
+    &:hover {
+        @apply text-grey-darker;
+    }
+}
+
 .dropdown .rotating-dots {
     transition: .12s ease-out;
 }

@@ -1,0 +1,40 @@
+.item {
+    @apply text-sm outline-none flex items-center rounded cursor-pointer border bg-white shadow-sm select-none;
+
+    .item-move {
+        @apply w-4 border-r h-full p-1;
+        cursor: grab;
+        background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
+        &:hover { @apply .bg-grey-lighter; }
+    }
+
+    .item-inner {
+        @apply w-full flex items-center px-1;
+    }
+
+    &.published {
+        .little-dot {
+            @apply bg-green;
+        }
+    }
+
+    &.unpublished {
+        .little-dot {
+            @apply bg-grey-light;
+        }
+    }
+
+    &.invalid {
+        .item-inner {
+            @apply border-red bg-red-lighter text-red;
+        }
+        .little-dot {
+            @apply bg-red;
+        }
+    }
+
+    // Drag interaction
+    .draggable-source--is-dragging {
+        opacity: 0.5;
+    }
+}
