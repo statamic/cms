@@ -116,8 +116,6 @@ export default {
             initializing: true,
             loading: true,
             inline: false,
-            searchQuery: '',
-            suggestions: []
         }
     },
 
@@ -173,12 +171,6 @@ export default {
             this.getDataForSelections(selections);
         },
 
-        select(item) {
-            this.selections.push(item.id);
-            this.$set(this.itemData, item.id, item);
-            this.searchQuery = '';
-        },
-
         initializeData() {
             if (!this.initialData) {
                 return this.getDataForSelections(this.selections);
@@ -217,27 +209,6 @@ export default {
                 if (this.selections.length === 1) e.cancel();
             }).on('sortable:stop', e => {
                 this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
-            });
-        },
-
-        updateSearchQuery: _.debounce(function (e) {
-            this.searchQuery = e.target.value;
-        }, 300),
-
-        request() {
-            if (! this.searchQuery) {
-                this.suggestions = [];
-                return;
-            }
-
-            this.loading = true;
-            const params = { search: this.searchQuery };
-
-            return axios.get(this.selectionsUrl, { params }).then(response => {
-                this.suggestions = response.data.data.filter(suggestion => {
-                    return !this.selections.includes(suggestion.id);
-                });
-                this.loading = false;
             });
         },
 
