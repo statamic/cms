@@ -105,38 +105,17 @@ class Entry implements Contract
         }
     }
 
-    public function get($key)
-    {
-        return $this->forCurrentSite()->get($key);
-    }
-
-    public function has($key)
-    {
-        return $this->forCurrentSite()->has($key);
-    }
-
-    public function slug()
-    {
-        return $this->forCurrentSite()->slug();
-    }
-
-    public function url()
-    {
-        return $this->forCurrentSite()->url();
-    }
-
-    public function data()
-    {
-        return $this->forCurrentSite()->data();
-    }
-
-    public function blueprint()
-    {
-        return $this->forCurrentSite()->blueprint();
-    }
-
     protected function forCurrentSite()
     {
         return $this->in(Site::current()->handle());
+    }
+
+    public function __call($method, $args = [])
+    {
+        if (in_array($method, ['slug', 'get', 'has', 'data', 'order', 'published', 'blueprint'])) {
+            return call_user_func_array([$this->forCurrentSite(), $method], $args);
+        }
+
+        throw new \BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $method));
     }
 }
