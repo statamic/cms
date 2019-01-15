@@ -55,6 +55,19 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    function it_removes_a_localized_entry()
+    {
+        $localization = (new LocalizedEntry)->locale('en');
+        $entry = (new Entry)->addLocalization($localization);
+        $this->assertCount(1, $entry->localizations());
+
+        $return = $entry->removeLocalization($localization);
+
+        $this->assertEquals($entry, $return);
+        $this->assertCount(0, $entry->localizations());
+    }
+
+    /** @test */
     function an_exception_is_thrown_when_getting_a_localization_that_doesnt_exist()
     {
         $this->expectException(InvalidLocalizationException::class);

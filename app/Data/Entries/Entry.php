@@ -59,6 +59,13 @@ class Entry implements Contract
         return $this;
     }
 
+    public function removeLocalization(LocalizedEntry $entry)
+    {
+        $this->localizations->forget($entry->locale());
+
+        return $this;
+    }
+
     public function existsIn($site)
     {
         return $this->localizations->has($site);
