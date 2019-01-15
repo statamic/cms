@@ -23,15 +23,9 @@ class Route implements Responsable
         return array_get($this->data, $key, $default);
     }
 
-    /**
-     * @return array
-     */
     public function template()
     {
-        return [
-            $this->get('template'),
-            config('statamic.theming.views.default')
-        ];
+        return $this->get('template', config('statamic.theming.views.default'));
     }
 
     public function layout()
