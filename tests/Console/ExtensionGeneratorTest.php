@@ -123,28 +123,44 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_can_make_an_addon()
     {
-        $path = $this->preparePath('addons/deaths-tar-vulnerability');
+        $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:addon', ['name' => 'DeathsTarVulnerability']);
+        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
 
-        $this->assertFileExists("$path/composer.json");
-        $this->assertFileExists("$path/src/ServiceProvider.php");
-        $this->assertContains('namespace Local\DeathsTarVulnerability;', $this->files->get("$path/src/ServiceProvider.php"));
+        $this->assertFileExists($composerJson = "$path/composer.json");
+        $this->assertContains('"Erso\\\DeathsTarVulnerability\\\": "src"', $this->files->get($composerJson));
+        $this->assertFileExists($provider = "$path/src/ServiceProvider.php");
+        $this->assertContains('namespace Erso\DeathsTarVulnerability;', $this->files->get($provider));
+    }
+
+    /** @test */
+    function it_cannot_make_addon_with_invalid_composer_package_name()
+    {
+        $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
+
+        $this->artisan('statamic:make:addon', ['package' => 'deaths-tar-vulnerability'])
+            ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
+
+        $this->artisan('statamic:make:addon', ['package' => 'some/path/deaths-tar-vulnerability'])
+            ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
+
+        $this->assertFileNotExists($path);
     }
 
     /** @test */
     function it_will_not_overwrite_an_existing_addon()
     {
-        $path = $this->preparePath('addons/deaths-tar-vulnerability');
+        $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
-        $this->artisan('statamic:make:addon', ['name' => 'DeathsTarVulnerability']);
+        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
         $this->files->put("$path/src/ServiceProvider.php", 'overwritten stuff');
 
         $this->assertContains('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
-        $this->artisan('statamic:make:addon', ['name' => 'DeathsTarVulnerability']);
+        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability'])
+            ->expectsOutput('Addon already exists!');
 
         $this->assertContains('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
@@ -152,14 +168,14 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function using_force_option_will_overwrite_original_addon()
     {
-        $path = $this->preparePath('addons/deaths-tar-vulnerability');
+        $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
-        $this->artisan('statamic:make:addon', ['name' => 'DeathsTarVulnerability']);
+        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
         $this->files->put("$path/src/ServiceProvider.php", 'overwritten stuff');
 
         $this->assertContains('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
 
-        $this->artisan('statamic:make:addon', ['name' => 'DeathsTarVulnerability', '--force' => null]);
+        $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability', '--force' => null]);
 
         $this->assertNotContains('overwritten stuff', $this->files->get("$path/src/ServiceProvider.php"));
     }
@@ -167,52 +183,53 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_can_make_an_addon_with_an_extension()
     {
-        $path = $this->preparePath('addons/san-holo');
+        $path = $this->preparePath('addons/ford/san-holo');
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:addon', ['name' => 'SanHolo', '--tag' => null]);
+        $this->artisan('statamic:make:addon', ['package' => 'ford/san-holo', '--tag' => null]);
 
         $this->assertFileExists("$path/src/Tags/SanHolo.php");
-        $this->assertContains('namespace Local\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
+        $this->assertContains('namespace Ford\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
     }
 
     /** @test */
     function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
     {
-        $path = $this->preparePath('addons/san-holo');
+        $path = $this->preparePath('addons/ford/san-holo');
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:addon', ['name' => 'SanHolo', '--all' => null]);
+        $this->artisan('statamic:make:addon', ['package' => 'ford/san-holo', '--all' => null]);
 
         $this->assertFileExists("$path/src/Fieldtypes/SanHolo.php");
-        $this->assertContains('namespace Local\SanHolo\Fieldtypes;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
+        $this->assertContains('namespace Ford\SanHolo\Fieldtypes;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
         $this->assertFileExists("$path/src/Filters/SanHolo.php");
-        $this->assertContains('namespace Local\SanHolo\Filters;', $this->files->get("$path/src/Filters/SanHolo.php"));
+        $this->assertContains('namespace Ford\SanHolo\Filters;', $this->files->get("$path/src/Filters/SanHolo.php"));
         $this->assertFileExists("$path/src/Modifiers/SanHolo.php");
-        $this->assertContains('namespace Local\SanHolo\Modifiers;', $this->files->get("$path/src/Modifiers/SanHolo.php"));
+        $this->assertContains('namespace Ford\SanHolo\Modifiers;', $this->files->get("$path/src/Modifiers/SanHolo.php"));
         $this->assertFileExists("$path/src/Tags/SanHolo.php");
-        $this->assertContains('namespace Local\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
+
+        $this->assertContains('namespace Ford\SanHolo\Tags;', $this->files->get("$path/src/Tags/SanHolo.php"));
         $this->assertFileExists("$path/src/Widgets/SanHolo.php");
-        $this->assertContains('namespace Local\SanHolo\Widgets;', $this->files->get("$path/src/Widgets/SanHolo.php"));
+        $this->assertContains('namespace Ford\SanHolo\Widgets;', $this->files->get("$path/src/Widgets/SanHolo.php"));
     }
 
     /** @test */
     function it_can_make_an_extension_into_an_addon()
     {
-        $path = $this->preparePath('addons/bag-odah');
+        $path = $this->preparePath('addons/yoda/bag-odah');
 
-        $this->artisan('statamic:make:addon', ['name' => 'BagOdah']);
+        $this->artisan('statamic:make:addon', ['package' => 'yoda/bag-odah']);
 
         $this->assertFileNotExists("$path/src/Tags/Yoda.php");
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->artisan('statamic:make:tag', ['name' => 'Yoda', 'addon' => 'local/bag-odah']);
+        $this->artisan('statamic:make:tag', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
         $this->assertFileExists("$path/src/Tags/Yoda.php");
-        $this->assertContains('namespace Local\BagOdah\Tags;', $this->files->get("$path/src/Tags/Yoda.php"));
+        $this->assertContains('namespace Yoda\BagOdah\Tags;', $this->files->get("$path/src/Tags/Yoda.php"));
     }
 
     private function preparePath($path)
