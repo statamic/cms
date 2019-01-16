@@ -3,13 +3,15 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
+use Statamic\Rules\ComposerPackage;
+use Statamic\Console\ValidatesInput;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeAddon extends GeneratorCommand
 {
-    use RunsInPlease;
+    use RunsInPlease, ValidatesInput;
 
     /**
      * The name of the console command.
@@ -33,11 +35,25 @@ class MakeAddon extends GeneratorCommand
     protected $type = 'Addon';
 
     /**
-     * The name of the addon.
+     * The composer package.
      *
      * @var string
      */
-    protected $addonName;
+    protected $package;
+
+    /**
+     * The vendor slug.
+     *
+     * @var string
+     */
+    protected $vendorSlug;
+
+    /**
+     * The name slug.
+     *
+     * @var string
+     */
+    protected $nameSlug;
 
     /**
      * Execute the console command.
@@ -46,11 +62,15 @@ class MakeAddon extends GeneratorCommand
      */
     public function handle()
     {
-        $this->addonName = $this->getNameInput();
+        if ($this->validationFails($this->package = $this->argument('package'), new ComposerPackage)) {
+            return;
+        }
 
-        if (! $this->option('force') && $this->files->exists($this->addonPath())) {
+        $this->normalizePackage();
+
+        if (! $this->option('force') && $this->addonAlreadyExists()) {
             $this->error('Addon already exists!');
-            return false;
+            return;
         }
 
         $this
@@ -67,6 +87,18 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
+     * Normalize package, and set reusable slugs.
+     */
+    protected function normalizePackage()
+    {
+        $parts = explode('/', $this->package);
+
+        $this->vendorSlug = str_slug(snake_case($parts[0]));
+        $this->nameSlug = str_slug(snake_case($parts[1]));
+        $this->package = "{$this->vendorSlug}/{$this->nameSlug}";
+    }
+
+    /**
      * Generate composer.json.
      *
      * @return $this
@@ -76,7 +108,7 @@ class MakeAddon extends GeneratorCommand
         $json = $this->files->get($this->getStub('addon/composer.json.stub'));
 
         $json = str_replace('DummyNamespace', str_replace('\\', '\\\\', $this->addonNamespace()), $json);
-        $json = str_replace('dummy-slug', $this->addonSlug(), $json);
+        $json = str_replace('dummy-package', $this->package, $json);
         $json = str_replace('DummyTitle', $this->addonTitle(), $json);
 
         $this->files->put($this->addonPath('composer.json'), $json);
@@ -133,7 +165,7 @@ class MakeAddon extends GeneratorCommand
 
         $decoded['repositories'][] = [
             'type' => 'path',
-            'url' => 'addons/' . $this->addonSlug(),
+            'url' => "addons/{$this->vendorSlug}/{$this->nameSlug}",
         ];
 
         $json = json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
@@ -152,15 +184,13 @@ class MakeAddon extends GeneratorCommand
      */
     protected function installAddon()
     {
-        $package = 'local/' . $this->addonSlug();
-
         $this->info('Installing your addon...');
 
-        $output = Composer::runAndOperateOnOutput(['require', $package], function ($output) {
+        $output = Composer::runAndOperateOnOutput(['require', $this->package], function ($output) {
             return $this->outputFromSymfonyProcess($output);
         });
 
-        if (! str_contains($output, "Discovered Addon: {$package}")) {
+        if (! str_contains($output, "Discovered Addon: {$this->package}")) {
             $this->error('An error was encountered while installing your addon!');
         }
 
@@ -175,7 +205,7 @@ class MakeAddon extends GeneratorCommand
     protected function runOptionalAddonGenerator($type)
     {
         $prefix = $this->runningInPlease ? '' : 'statamic:';
-        $arguments = ['name' => $this->addonName, 'addon' => $this->addonPath('src')];
+        $arguments = ['name' => studly_case($this->nameSlug), 'addon' => $this->addonPath('src')];
 
         if ($this->option('force')) {
             $arguments['--force'] = null;
@@ -185,20 +215,32 @@ class MakeAddon extends GeneratorCommand
     }
 
     /**
-     * Build absolute path for an addon or addon file, and ensure folder structure exists.
+     * Determine if addon already exists.
+     *
+     * @return bool
+     */
+    protected function addonAlreadyExists()
+    {
+        return $this->files->exists($this->addonPath(null, false));
+    }
+
+    /**
+     * Build absolute path for an addon or addon file.
      *
      * @param string|null $file
      * @return string
      */
-    protected function addonPath($file = null)
+    protected function addonPath($file = null, $makeDirectory = true)
     {
-        $path = config('statamic.system.addons_path') . '/' . $this->addonSlug();
+        $path = config('statamic.system.addons_path') . "/{$this->vendorSlug}/{$this->nameSlug}";
 
         if ($file) {
             $path .= "/{$file}";
         }
 
-        $this->makeDirectory($path);
+        if ($makeDirectory) {
+            $this->makeDirectory($path);
+        }
 
         return $path;
     }
@@ -210,17 +252,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonNamespace()
     {
-        return "Local\\{$this->addonName}";
-    }
-
-    /**
-     * Get addon slug.
-     *
-     * @return string
-     */
-    protected function addonSlug()
-    {
-        return str_slug(snake_case($this->addonName));
+        return studly_case($this->vendorSlug) . '\\' . studly_case($this->nameSlug);
     }
 
     /**
@@ -230,7 +262,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonTitle()
     {
-        return str_replace('-', ' ', title_case($this->addonSlug()));
+        return str_replace('-', ' ', title_case($this->nameSlug));
     }
 
     /**
@@ -263,7 +295,7 @@ class MakeAddon extends GeneratorCommand
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The name of the addon'],
+            ['package', InputArgument::REQUIRED, 'The package name of the addon (ie. john/myaddon)'],
         ];
     }
 

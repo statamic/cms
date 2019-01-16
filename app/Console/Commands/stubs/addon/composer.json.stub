@@ -1,5 +1,5 @@
 {
-    "name": "local/dummy-slug",
+    "name": "dummy-package",
     "type": "statamic-addon",
     "autoload": {
         "psr-4": {
