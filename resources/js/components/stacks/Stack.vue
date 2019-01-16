@@ -2,10 +2,10 @@
 
     <portal :to="portal" :order="depth">
         <div class="stack-container"
-            :style="{ zIndex: depth + 1, marginLeft: `${offset * depth}px` }"
+            :style="{ zIndex: depth + 1, left: `${offset * depth}px` }"
         >
-            <div class="stack-overlay" :style="{ marginLeft: `-${offset * depth}px` }" />
-            <div class="stack-hit-area" :style="{ marginLeft: `-${offset}px` }" @click="clickedHitArea" />
+            <div class="stack-overlay" :style="{ left: `-${offset * depth}px` }" />
+            <div class="stack-hit-area" :style="{ left: `-${offset}px` }" @click="clickedHitArea" />
 
             <div class="stack-content">
                 <button @click="close" class="stack-close btn btn-sm">Close</button>
@@ -40,7 +40,8 @@ export default {
         },
 
         offset() {
-            return 200; // should change based on number of stacks
+            // max of 200px, min of 80px
+            return Math.max(400 / (this.$stacks.count() + 1), 80)
         },
 
         hasChild() {
