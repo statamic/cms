@@ -4,13 +4,18 @@
         <div class="stack-container"
             :style="{ zIndex: depth + 1, left: `${offset * depth}px` }"
         >
-            <div class="stack-overlay" :style="{ left: `-${offset * depth}px` }" />
+            <transition name="stack-overlay">
+                <div class="stack-overlay" v-if="visible" :style="{ left: `-${offset * depth}px` }" />
+            </transition>
+
             <div class="stack-hit-area" :style="{ left: `-${offset}px` }" @click="clickedHitArea" />
 
-            <div class="stack-content">
-                <button @click="close" class="stack-close btn btn-sm">Close</button>
-                <slot name="default" :depth="depth" />
-            </div>
+            <transition name="stack-slide">
+                <div class="stack-content" v-if="visible">
+                    <button @click="close" class="stack-close btn btn-sm">Close</button>
+                    <slot name="default" :depth="depth" />
+                </div>
+            </transition>
         </div>
     </portal>
 
@@ -29,7 +34,8 @@ export default {
     data() {
         return {
             depth: null,
-            portal: null
+            portal: null,
+            visible: false
         }
     },
 
@@ -76,8 +82,11 @@ export default {
 
         close() {
             this.$emit('closed');
-        }
+        },
+    },
 
+    mounted() {
+        this.visible = true;
     }
 
 }

@@ -1,3 +1,7 @@
+/* ==========================================================================
+   STACKS ON STACKS ON STACKS
+   ========================================================================== */
+
 .stacks-on-stacks {
     position: absolute;
     top: 48px;
@@ -11,14 +15,15 @@
     .stack-container {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
+        transition: left .3s ease;
     }
 
     .stack-overlay {
-        @apply bg-black;
-        opacity: 0.2;
-        position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+        @apply bg-black absolute pin;
         z-index: 1;
+        opacity: 0.2;
         pointer-events: none;
+        transition: left .3s ease;
     }
 
     .stack-hit-area {
@@ -34,4 +39,35 @@
     .stack-close {
         position: absolute; top: 16px; right: 16px;
     }
+}
+
+
+/* Transitions
+  ========================================================================== */
+
+.stack-slide-enter-active {
+    transition: all .3s ease;
+}
+
+.stack-slide-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.stack-slide-enter,
+.stack-slide-leave-to {
+    transform: translateX(10px);
+    opacity: 0;
+}
+
+.stack-overlay-enter-active {
+  animation: overlay-fade-in .5s;
+}
+
+.stack-overlay-leave-active {
+  animation: overlay-fade-in .5s reverse;
+}
+
+@keyframes overlay-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 0.2; }
 }
