@@ -34,6 +34,7 @@ Vue.use(Vuex);
 
 require('./components/NotificationBus');
 require('./components/ModalBus');
+require('./components/stacks/Stacks');
 require('./components/ProgressBar');
 require('./components/DirtyState');
 
@@ -77,13 +78,29 @@ var vm = new Vue({
         CollectionWizard: require('./components/collections/Wizard.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
+        Stacks: require('./components/stacks/Stacks.vue'),
     },
 
     data: {
         version: Statamic.version,
         showLoginModal: false,
         navOpen: true,
-        modals: []
+        modals: [],
+        stacks: []
+    },
+
+    computed: {
+
+        computedNavOpen() {
+            if (this.stackCount > 0) return false;
+
+            return this.navOpen;
+        },
+
+        stackCount() {
+            return this.$stacks.count();
+        }
+
     },
 
     mounted() {

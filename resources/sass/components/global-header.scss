@@ -3,7 +3,8 @@
    ========================================================================== */
 
  .global-header {
-     @apply bg-white shadow h-12 mb-4 items-center justify-between hidden;
+     @apply bg-white shadow h-12 mb-4 items-center justify-between hidden relative;
+     z-index: 9999;
  }
 
  /* Responsive Wangjangling

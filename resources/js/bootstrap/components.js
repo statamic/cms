@@ -46,3 +46,6 @@ Vue.component('keyboard-shortcuts-modal', require('../components/modals/Keyboard
 // Vue.component('modal-dialog', require('../components/ModalDialog.vue'));
 
 Vue.component('pagination', require('../components/pagination/Pagination.vue'));
+
+Vue.component('stack', require('../components/stacks/Stack.vue'));
+Vue.component('stack-test', require('../components/stacks/StackTest.vue'));
