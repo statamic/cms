@@ -226,7 +226,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     protected function getArguments()
     {
         return array_merge(parent::getArguments(), [
-            ['addon', InputArgument::OPTIONAL, 'The name of your addon'],
+            ['addon', InputArgument::OPTIONAL, 'The package name of an addon (ie. john/my-addon)'],
         ]);
     }
 

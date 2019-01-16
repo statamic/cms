@@ -295,7 +295,7 @@ class MakeAddon extends GeneratorCommand
     protected function getArguments()
     {
         return [
-            ['package', InputArgument::REQUIRED, 'The package name of the addon (ie. john/myaddon)'],
+            ['package', InputArgument::REQUIRED, 'The package name of the addon (ie. john/my-addon)'],
         ];
     }
 
