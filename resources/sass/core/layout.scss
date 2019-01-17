@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    @apply .w-full .bg-grey-lighter;
+    @apply .w-full .bg-grey-lighter relative h-auto;
 }
 
 a {
