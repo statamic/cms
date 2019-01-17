@@ -34,6 +34,11 @@
     .stack-content {
         @apply h-full relative shadow-lg;
         z-index: 101;
+        transition: all 0.2s ease;
+    }
+
+    .hovering .stack-content {
+        transform: translateX(-16px);
     }
 }
 

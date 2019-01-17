@@ -2,14 +2,14 @@
 
     <portal :to="portal" :order="depth">
         <div class="stack-container"
-            :class="{ 'stack-is-current': isTopStack }"
+            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering }"
             :style="{ zIndex: (depth + 1) * 1000, left: `${offset * depth}px` }"
         >
             <transition name="stack-overlay">
                 <div class="stack-overlay" v-if="visible" :style="{ left: `-${offset * depth}px` }" />
             </transition>
 
-            <div class="stack-hit-area" :style="{ left: `-${offset}px` }" @click="clickedHitArea" />
+            <div class="stack-hit-area" :style="{ left: `-${offset}px` }" @click="clickedHitArea" @mouseenter="mouseEnterHitArea" @mouseout="mouseOutHitArea" />
 
             <transition name="stack-slide">
                 <div class="stack-content" v-if="visible">
@@ -39,7 +39,8 @@ export default {
         return {
             depth: null,
             portal: null,
-            visible: false
+            visible: false,
+            isHovering: false
         }
     },
 
@@ -68,10 +69,15 @@ export default {
         this.depth = this.$stacks.count() + 1;
         this.portal = `stack-${this.depth-1}`;
         this.$stacks.add(this);
+
+        this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
+        this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);
     },
 
     destroyed() {
         this.$stacks.remove(this);
+        this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
+        this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
     },
 
     render() {
@@ -82,6 +88,15 @@ export default {
 
         clickedHitArea() {
             this.$events.$emit(`stacks.hit-area-clicked`, this.depth - 1);
+        },
+
+        mouseEnterHitArea() {
+            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseenter`);
+        },
+
+        mouseOutHitArea() {
+            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-mouseout`);
+
         },
 
         runCloseCallback() {
