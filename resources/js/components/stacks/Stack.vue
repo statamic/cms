@@ -12,7 +12,6 @@
 
             <transition name="stack-slide">
                 <div class="stack-content" v-if="visible">
-                    <button @click="close" class="stack-close btn btn-sm">Close</button>
                     <slot name="default" :depth="depth" />
                 </div>
             </transition>

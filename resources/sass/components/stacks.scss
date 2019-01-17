@@ -32,12 +32,8 @@
     }
 
     .stack-content {
-        @apply bg-white h-full relative shadow-lg;
+        @apply h-full relative shadow-lg;
         z-index: 3;
-    }
-
-    .stack-close {
-        position: absolute; top: 16px; right: 16px;
     }
 }
 

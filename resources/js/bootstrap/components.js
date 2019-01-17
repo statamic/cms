@@ -14,6 +14,8 @@ Vue.component('publish-sections', require('../components/publish/Sections.vue'))
 Vue.component('publish-validation-errors', require('../components/publish/ValidationErrors'));
 Vue.component('form-group', require('../components/publish/FormGroup.vue'));
 
+Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue'));
+
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
 Vue.component('data-list-search', require('../components/data-list/DataListSearch.vue'));

@@ -1,7 +1,6 @@
 <template>
 
-    <modal name="item-selector" width="90%" height="90%" @closed="close">
-        <div class="flex flex-col justify-end h-full">
+        <div class="flex flex-col justify-end h-full bg-white">
 
             <div class="flex-1 flex flex-col">
                 <data-list
@@ -27,27 +26,12 @@
                                     @click="isCreating = true"
                                     v-text="__('Create')" />
 
-                                <popper
-                                    v-if="isCreating"
-                                    :force-show="isCreating"
-                                    ref="popper"
-                                    trigger="click"
-                                    :append-to-body="true"
-                                    boundaries-selector="body"
-                                    :options="{ placement: 'bottom' }"
-                                >
-                                    <div class="popover w-96 h-96 p-0">
-                                        <inline-create-form
-                                            class="popover-inner"
-                                            @created="itemCreated"
-                                            @closed="stopCreating"
-                                        />
-                                    </div>
-
-                                    <!-- Popper needs a clickable element, but we don't want one.
-                                    We'll show it programatically.  -->
-                                    <div slot="reference" />
-                                </popper>
+                                <stack name="inline-editor" v-if="isCreating">
+                                    <inline-create-form
+                                        @created="itemCreated"
+                                        @closed="stopCreating"
+                                    />
+                                </stack>
                             </div>
                         </div>
                         <div class="flex-1 overflow-scroll">
@@ -93,7 +77,6 @@
             </div>
 
         </div>
-    </modal>
 
 </template>
 
