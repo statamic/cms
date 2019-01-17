@@ -3,24 +3,24 @@
    ========================================================================== */
 
 .stacks-on-stacks {
-    position: absolute;
+    position: fixed;
     top: 48px;
     left: 0; right: 0; bottom: 0;
+    // padding-top: 48px;
+    z-index: 99;
 
     .vue-portal-target {
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
+        @apply absolute pin;
     }
 
     .stack-container {
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
+        @apply absolute pin;
         transition: left .3s ease;
     }
 
     .stack-overlay {
         @apply bg-black absolute pin;
-        z-index: 1;
+        z-index: 99;
         opacity: 0.2;
         pointer-events: none;
         transition: left .3s ease;
@@ -28,17 +28,12 @@
 
     .stack-hit-area {
         position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-        z-index: 2;
+        z-index: 100;
     }
 
     .stack-content {
         @apply h-full relative shadow-lg;
-        z-index: 3;
-        overflow: hidden;
-    }
-
-    .stack-container.stack-is-current .stack-content {
-        overflow: auto !important;
+        z-index: 101;
     }
 }
 

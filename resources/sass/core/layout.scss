@@ -21,6 +21,7 @@ body > svg { display: none; }
 
 #main {
     @apply flex;
+    padding-top: 74px;
 }
 
 #main .nav-main {
