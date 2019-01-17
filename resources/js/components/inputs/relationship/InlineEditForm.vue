@@ -8,9 +8,9 @@
 
         <entry-publish-form
             v-if="blueprint"
-            :publish-container="`relate-fieldtype-inline-${_uid}`"
             :action="action"
             method="patch"
+            :publish-container="publishContainer"
             :collection-title="collection.title"
             :collection-url="collection.url"
             :initial-title="item.title"
@@ -49,6 +49,14 @@ export default {
         }
     },
 
+    computed: {
+
+        publishContainer() {
+            return `relate-fieldtype-inline-${this._uid}`;
+        }
+
+    },
+
     created() {
         this.getItem();
     },
@@ -73,6 +81,12 @@ export default {
         },
 
         close() {
+            if (this.$dirty.has(this.publishContainer)) {
+                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                    return;
+                }
+            }
+
             this.$emit('closed');
         }
     }
