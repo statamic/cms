@@ -8,7 +8,7 @@
 
         <entry-publish-form
             v-if="blueprint"
-            publish-container="relate-fieldtype-inline"
+            :publish-container="`relate-fieldtype-inline-${_uid}`"
             :action="action"
             method="post"
             :collection-title="collection.title"
