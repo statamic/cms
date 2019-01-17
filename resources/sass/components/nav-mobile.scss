@@ -4,6 +4,7 @@
 
 .nav-mobile {
     @apply .bg-white border-t w-full fixed h-14 pin-b pin-l pin-r flex items-center justify-center;
+    z-index: 9999;
 
     a {
         @apply .flex flex-col .mx-1 .p-1 .text-grey text-center .text-3xs .flex-1;
