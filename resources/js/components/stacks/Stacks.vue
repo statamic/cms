@@ -10,6 +10,9 @@
 </template>
 
 <script>
+
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+
 export default {
 
     computed: {
@@ -24,6 +27,13 @@ export default {
         this.$events.$on('stacks.0.hit-area-clicked', () => {
             console.log(`bottom hit area clicked. all stacks will close`);
         });
+
+        disableBodyScroll(this.$el);
+    },
+
+    beforeDestroy() {
+        enableBodyScroll(this.$el);
+        clearAllBodyScrollLocks();
     },
 
     methods: {
@@ -33,7 +43,5 @@ export default {
         }
 
     }
-
 }
 </script>
-

@@ -2,6 +2,7 @@
 
     <portal :to="portal" :order="depth">
         <div class="stack-container"
+            :class="{ 'stack-is-current': isTopStack }"
             :style="{ zIndex: depth + 1, left: `${offset * depth}px` }"
         >
             <transition name="stack-overlay">
@@ -51,6 +52,10 @@ export default {
 
         hasChild() {
             return this.$stacks.count() > this.depth;
+        },
+
+        isTopStack() {
+            return this.$stacks.count() === this.depth;
         }
 
     },

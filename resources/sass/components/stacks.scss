@@ -34,6 +34,11 @@
     .stack-content {
         @apply h-full relative shadow-lg;
         z-index: 3;
+        overflow: hidden;
+    }
+
+    .stack-container.stack-is-current .stack-content {
+        overflow: auto !important;
     }
 }
 
