@@ -1,11 +1,10 @@
 <template>
 
     <div>
-        <div class="flex items-center mb-3 -mt-1">
+        <div class="flex items-center mb-3">
             <h1 class="flex-1">
-                <small class="block text-xs text-grey-light font-medium leading-none mb-1">
+                <small class="subhead block">
                     <a :href="collectionUrl" v-text="collectionTitle" class="text-grey hover:text-blue" />
-                    <span class="mx-1">&gt;</span>
                 </small>
                 {{ initialTitle }}
             </h1>
