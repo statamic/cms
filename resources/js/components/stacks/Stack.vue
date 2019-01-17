@@ -3,7 +3,7 @@
     <portal :to="portal" :order="depth">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack }"
-            :style="{ zIndex: depth + 1, left: `${offset * depth}px` }"
+            :style="{ zIndex: (depth + 1) * 1000, left: `${offset * depth}px` }"
         >
             <transition name="stack-overlay">
                 <div class="stack-overlay" v-if="visible" :style="{ left: `-${offset * depth}px` }" />
