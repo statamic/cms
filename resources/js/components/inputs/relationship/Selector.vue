@@ -40,6 +40,7 @@
                                 :allow-bulk-actions="true"
                                 :toggle-selection-on-row-click="true"
                                 @sorted="sorted"
+                                class="cursor-pointer"
                             >
                                 <template slot="cell-url" slot-scope="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
