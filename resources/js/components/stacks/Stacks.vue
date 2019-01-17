@@ -25,7 +25,7 @@ export default {
     created() {
         this.$events.$on('stacks.hit-area-clicked', (depth) => {
             for (let count = this.$stacks.count(); count > depth; count--) {
-                if (! this.$stacks.stacks[count-1].runClosingCallback()) {
+                if (! this.$stacks.stacks[count-1].runCloseCallback()) {
                     return;
                 }
             }

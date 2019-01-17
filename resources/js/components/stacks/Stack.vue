@@ -29,7 +29,7 @@ export default {
             type: String,
             required: true
         },
-        beforeClosing: {
+        beforeClose: {
             type: Function,
             default: () => true
         }
@@ -84,8 +84,8 @@ export default {
             this.$events.$emit(`stacks.hit-area-clicked`, this.depth - 1);
         },
 
-        runClosingCallback() {
-            const shouldClose = this.beforeClosing();
+        runCloseCallback() {
+            const shouldClose = this.beforeClose();
 
             if (! shouldClose) return false;
 
