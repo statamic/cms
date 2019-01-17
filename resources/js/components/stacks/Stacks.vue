@@ -1,6 +1,5 @@
 <template>
     <div class="stacks-on-stacks">
-        <div class="stack-hit-area" @click="clicked" :style="{ zIndex: 1 }" />
         <portal-target
             v-for="(stack, i) in stacks"
             :key="`stack-${stack}-${i}`"
@@ -24,24 +23,21 @@ export default {
     },
 
     created() {
-        this.$events.$on('stacks.0.hit-area-clicked', () => {
-            console.log(`bottom hit area clicked. all stacks will close`);
+        this.$events.$on('stacks.hit-area-clicked', (depth) => {
+            for (let count = this.$stacks.count(); count > depth; count--) {
+                if (! this.$stacks.stacks[count-1].runClosingCallback()) {
+                    return;
+                }
+            }
         });
 
         disableBodyScroll(this.$el);
     },
 
-    beforeDestroy() {
+    destroyed() {
+        this.$events.$off('stacks.hit-area-clicked');
         enableBodyScroll(this.$el);
         clearAllBodyScrollLocks();
-    },
-
-    methods: {
-
-        clicked() {
-            console.log('clicked bottom hit area');
-        }
-
     }
 }
 </script>

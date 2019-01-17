@@ -14,13 +14,12 @@
                 v-text="item.title" />
             <a v-else  @click="edit" v-text="item.title" />
 
-            <stack name="inline-editor" v-if="isEditing">
-                <inline-edit-form
-                    :item="item"
-                    @updated="item.title = $event.title"
-                    @closed="isEditing = false"
-                />
-            </stack>
+            <inline-edit-form
+                v-if="isEditing"
+                :item="item"
+                @updated="item.title = $event.title"
+                @closed="isEditing = false"
+            />
 
         </div>
 

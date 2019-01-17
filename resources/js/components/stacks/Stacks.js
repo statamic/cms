@@ -10,13 +10,17 @@ class Stacks {
         return this.stacks.length;
     }
 
-    add(name) {
-        this.stacks.push(name);
+    add(vm) {
+        this.stacks.push(vm);
     }
 
-    remove(name) {
-        const i = this.stacks.indexOf(name);
+    remove(vm) {
+        const i = _.indexOf(this.stacks, vm);
         this.stacks.splice(i, 1);
+    }
+
+    stacks() {
+        return this.stacks;
     }
 }
 

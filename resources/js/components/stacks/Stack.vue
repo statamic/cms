@@ -28,6 +28,10 @@ export default {
         name: {
             type: String,
             required: true
+        },
+        beforeClosing: {
+            type: Function,
+            default: () => true
         }
     },
 
@@ -63,15 +67,11 @@ export default {
     created() {
         this.depth = this.$stacks.count() + 1;
         this.portal = `stack-${this.depth-1}`;
-        this.$stacks.add(this.id);
-
-        this.$events.$on(`stacks.${this.depth}.hit-area-clicked`, () => {
-            console.log(`hit area for stack ${this.depth} clicked. everything above will close.`);
-        });
+        this.$stacks.add(this);
     },
 
     destroyed() {
-        this.$stacks.remove(this.id);
+        this.$stacks.remove(this);
     },
 
     render() {
@@ -81,7 +81,17 @@ export default {
     methods: {
 
         clickedHitArea() {
-            this.$events.$emit(`stacks.${this.depth - 1}.hit-area-clicked`);
+            this.$events.$emit(`stacks.hit-area-clicked`, this.depth - 1);
+        },
+
+        runClosingCallback() {
+            const shouldClose = this.beforeClosing();
+
+            if (! shouldClose) return false;
+
+            this.close();
+
+            return true;
         },
 
         close() {

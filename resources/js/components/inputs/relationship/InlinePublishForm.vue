@@ -1,5 +1,10 @@
 <template>
 
+    <div>
+    <stack name="inline-editor"
+        :before-closing="shouldClose"
+        @closed="close"
+    >
     <div class="h-full overflow-auto p-4 bg-grey-lighter h-full">
 
         <div v-if="loading" class="absolute pin z-200 flex items-center justify-center text-center">
@@ -20,10 +25,12 @@
             @saved="saved"
         >
             <template slot="action-buttons-right">
-                <button class="btn ml-1" v-text="__('Cancel')" @click="close" />
+                <button class="btn ml-1" v-text="__('Cancel')" @click="confirmClose" />
             </template>
         </entry-publish-form>
 
+    </div>
+    </stack>
     </div>
 
 </template>
@@ -72,13 +79,21 @@ export default {
         },
 
         close() {
+            this.$emit('closed');
+        },
+
+        confirmClose() {
+            if (this.shouldClose()) this.close();
+        },
+
+        shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
                 if (! confirm('Are you sure? Unsaved changes will be lost.')) {
-                    return;
+                    return false;
                 }
             }
 
-            this.$emit('closed');
+            return true;
         }
     }
 

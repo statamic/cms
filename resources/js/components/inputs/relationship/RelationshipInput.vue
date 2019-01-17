@@ -27,12 +27,11 @@
                             <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                             {{ __('Create & Link Entry') }}
                         </button>
-                        <stack name="inline-editor" v-if="isCreating">
-                            <inline-create-form
-                                @created="itemCreated"
-                                @closed="stopCreating"
-                            />
-                        </stack>
+                        <inline-create-form
+                            v-if="isCreating"
+                            @created="itemCreated"
+                            @closed="stopCreating"
+                        />
                     </div>
                     <button class="text-blue hover:text-grey-dark flex mb-1 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
