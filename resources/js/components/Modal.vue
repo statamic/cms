@@ -13,8 +13,11 @@ export default {
 
     props: {
         name: { type: String, required: true },
-        width: {},
+        adaptive: { type: Boolean, default: true },
+        draggable: { type: Boolean, default: false },
+        pivotY: { type: Number, default: 0.5 },
         height: {},
+        width: {}
     },
 
     data() {
@@ -28,9 +31,12 @@ export default {
         modalProps() {
             return {
                 name: this.name,
-                width: this.width,
-                height: this.height,
+                adaptive: this.adaptive,
                 clickToClose: false,
+                draggable: this.draggable,
+                height: this.height,
+                pivotY: this.pivotY,
+                width: this.width
             }
         }
 
