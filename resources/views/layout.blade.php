@@ -17,7 +17,7 @@
       @include('statamic::partials.global-header')
       @include('statamic::partials.alerts')
 
-      <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen}">
+      <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! computedNavOpen}">
             @include('statamic::partials.nav-main')
 
             <div class="content">
@@ -44,6 +44,8 @@
                   :key="`modal-${modal}-${i}`"
                   :name="`modal-${i}`"
             ></portal-target>
+
+            <stacks v-if="stacks.length"></stacks>
       </div>
 
       @include('statamic::partials.nav-mobile')

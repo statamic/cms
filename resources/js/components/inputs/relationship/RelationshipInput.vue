@@ -23,28 +23,15 @@
             <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm pl-sm -mb-1">
                     <div class="relative mb-1">
-                        <popper
-                            :force-show="isCreating"
-                            ref="popper"
-                            trigger="click"
-                            :append-to-body="true"
-                            boundaries-selector="body"
-                            :options="{ placement: 'left' }"
-                        >
-                            <div class="popover w-96 h-96 p-0">
-                                <inline-create-form
-                                    v-if="isCreating"
-                                    class="popover-inner"
-                                    @created="itemCreated"
-                                    @closed="stopCreating"
-                                />
-                            </div>
-
-                            <button slot="reference" class="text-button text-blue hover:text-grey-dark mr-3 flex items-center outline-none" @click="isCreating = true">
-                                <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                                {{ __('Create & Link Entry') }}
-                            </button>
-                        </popper>
+                        <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center outline-none" @click="isCreating = true">
+                            <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
+                            {{ __('Create & Link Entry') }}
+                        </button>
+                        <inline-create-form
+                            v-if="isCreating"
+                            @created="itemCreated"
+                            @closed="stopCreating"
+                        />
                     </div>
                     <button class="text-blue hover:text-grey-dark flex mb-1 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
@@ -53,17 +40,18 @@
                 </div>
             </div>
 
-            <item-selector
-                v-if="isSelecting"
-                :url="selectionsUrl"
-                initial-sort-column="title"
-                initial-sort-direction="asc"
-                :initial-selections="selections"
-                :initial-columns="columns"
-                :max-selections="maxItems"
-                @selected="selectionsUpdated"
-                @closed="isSelecting = false"
-            />
+            <stack name="item-selector" v-if="isSelecting">
+                <item-selector
+                    :url="selectionsUrl"
+                    initial-sort-column="title"
+                    initial-sort-direction="asc"
+                    :initial-selections="selections"
+                    :initial-columns="columns"
+                    :max-selections="maxItems"
+                    @selected="selectionsUpdated"
+                    @closed="isSelecting = false"
+                />
+            </stack>
         </div>
     </div>
 

@@ -15,6 +15,7 @@
     "autosize": "~3.0.12",
     "axios": "^0.18.0",
     "baremetrics-calendar": "file:resources/js/vendor/baremetrics-calendar",
+    "body-scroll-lock": "^2.6.1",
     "codemirror": "^5.35.0",
     "cookies-js": "^1.2.2",
     "dmuploader": "file:resources/js/vendor/dmuploader",

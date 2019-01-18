@@ -61,6 +61,9 @@ class DirtyState {
     count() {
         return vm.names.length;
     }
+    has(name) {
+        return vm.names.includes(name);
+    }
 }
 
 Object.defineProperties(Vue.prototype, {

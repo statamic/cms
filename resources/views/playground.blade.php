@@ -2,12 +2,14 @@
 
 @section('content')
 
-    <collection-wizard :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Front-End']">
-    </collection-wizard>
+    <stack-test :depth="0"></stack-test>
 
 @stop
 
 @section('nontent')
+    <collection-wizard :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Front-End']">
+    </collection-wizard>
+
     <div class="flex mb-5">
         <h1>{{ __('The Statamic Playground') }}</h1>
     </div>

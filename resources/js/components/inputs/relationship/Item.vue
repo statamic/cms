@@ -14,31 +14,14 @@
                 v-text="item.title" />
             <a v-else  @click="edit" v-text="item.title" />
 
-            <popper
+            <inline-edit-form
                 v-if="isEditing"
-                ref="popper"
-                trigger="click"
-                :force-show="isEditing"
-                :append-to-body="true"
-                boundaries-selector="body"
-                :options="{ placement: 'right' }"
-            >
-                <div class="popover w-96 h-96 p-0">
-                    <inline-edit-form
-                        class="popover-inner"
-                        :item="item"
-                        @updated="item.title = $event.title"
-                        @closed="isEditing = false"
-                    />
-                </div>
+                :item="item"
+                @updated="item.title = $event.title"
+                @closed="isEditing = false"
+            />
 
-                <!-- Popper needs a clickable element, but we don't want one.
-                We'll show it programatically.  -->
-                <div slot="reference" class="-mr-1" />
-            </popper>
         </div>
-
-        <!-- <div class="text-5xs px-1 font-bold text-grey-light antialiased uppercase" v-text="item.collection"></div> -->
 
         <dropdown-list class="pr-1">
             <ul class="dropdown-menu">
@@ -51,13 +34,11 @@
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 import InlineEditForm from './InlineEditForm.vue';
 
 export default {
 
     components: {
-        Popper,
         InlineEditForm
     },
 

@@ -1,0 +1,74 @@
+/* ==========================================================================
+   STACKS ON STACKS ON STACKS
+   ========================================================================== */
+
+.stacks-on-stacks {
+    position: fixed;
+    top: 48px;
+    left: 0; right: 0; bottom: 0;
+    // padding-top: 48px;
+    z-index: 99;
+
+    .vue-portal-target {
+        @apply absolute pin;
+    }
+
+    .stack-container {
+        @apply absolute pin;
+        transition: left .3s ease;
+    }
+
+    .stack-overlay {
+        @apply bg-black absolute pin;
+        z-index: 99;
+        opacity: 0.2;
+        pointer-events: none;
+        transition: left .3s ease;
+    }
+
+    .stack-hit-area {
+        @apply absolute pin cursor-pointer;
+        z-index: 100;
+    }
+
+    .stack-content {
+        @apply h-full relative shadow-lg;
+        z-index: 101;
+        transition: all 0.2s ease;
+    }
+
+    .hovering .stack-content {
+        transform: translateX(-16px);
+    }
+}
+
+
+/* Transitions
+  ========================================================================== */
+
+.stack-slide-enter-active {
+    transition: all .3s ease;
+}
+
+.stack-slide-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.stack-slide-enter,
+.stack-slide-leave-to {
+    transform: translateX(10px);
+    opacity: 0;
+}
+
+.stack-overlay-enter-active {
+  animation: overlay-fade-in .5s;
+}
+
+.stack-overlay-leave-active {
+  animation: overlay-fade-in .5s reverse;
+}
+
+@keyframes overlay-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 0.2; }
+}

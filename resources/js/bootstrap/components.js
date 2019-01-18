@@ -14,6 +14,8 @@ Vue.component('publish-sections', require('../components/publish/Sections.vue'))
 Vue.component('publish-validation-errors', require('../components/publish/ValidationErrors'));
 Vue.component('form-group', require('../components/publish/FormGroup.vue'));
 
+Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue'));
+
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
 Vue.component('data-list-search', require('../components/data-list/DataListSearch.vue'));
@@ -46,3 +48,6 @@ Vue.component('keyboard-shortcuts-modal', require('../components/modals/Keyboard
 // Vue.component('modal-dialog', require('../components/ModalDialog.vue'));
 
 Vue.component('pagination', require('../components/pagination/Pagination.vue'));
+
+Vue.component('stack', require('../components/stacks/Stack.vue'));
+Vue.component('stack-test', require('../components/stacks/StackTest.vue'));

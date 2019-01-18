@@ -7,7 +7,7 @@ html, body {
 }
 
 body {
-    @apply .w-full .bg-grey-lighter;
+    @apply .w-full .bg-grey-lighter relative;
 }
 
 a {
@@ -20,7 +20,7 @@ a {
 body > svg { display: none; }
 
 #main {
-    @apply flex;
+    @apply flex pb-6;
 }
 
 #main .nav-main {
@@ -34,6 +34,7 @@ body > svg { display: none; }
 }
 
 @screen md {
+    #main { padding: 74px 0 0; }
     #main .content {
         padding-left: 14rem;
         @apply pt-0;

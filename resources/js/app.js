@@ -34,6 +34,7 @@ Vue.use(Vuex);
 
 require('./components/NotificationBus');
 require('./components/ModalBus');
+require('./components/stacks/Stacks');
 require('./components/ProgressBar');
 require('./components/DirtyState');
 
@@ -56,7 +57,7 @@ var vm = new Vue({
         PageTree: require('./components/structures/PageTree.vue'),
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue'),
-        EntryPublishForm: require('./components/entries/PublishForm.vue'),
+        BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue'),
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
@@ -77,13 +78,29 @@ var vm = new Vue({
         CollectionWizard: require('./components/collections/Wizard.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
+        Stacks: require('./components/stacks/Stacks.vue'),
     },
 
     data: {
         version: Statamic.version,
         showLoginModal: false,
         navOpen: true,
-        modals: []
+        modals: [],
+        stacks: []
+    },
+
+    computed: {
+
+        computedNavOpen() {
+            if (this.stackCount > 0) return false;
+
+            return this.navOpen;
+        },
+
+        stackCount() {
+            return this.$stacks.count();
+        }
+
     },
 
     mounted() {

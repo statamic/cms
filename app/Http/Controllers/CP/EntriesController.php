@@ -80,7 +80,7 @@ class EntriesController extends CpController
             ],
             'values' => $values,
             'meta' => $fields->meta(),
-            'collection' => $entry->collection(),
+            'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry)
         ];
@@ -146,7 +146,7 @@ class EntriesController extends CpController
             ],
             'values' => $values,
             'meta' => $fields->meta(),
-            'collection' => $collection,
+            'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
         ];
 
@@ -201,5 +201,14 @@ class EntriesController extends CpController
         $entry->delete();
 
         return response('', 204);
+    }
+
+    // TODO: Change to $collection->toArray()
+    protected function collectionToArray($collection)
+    {
+        return [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.show', $collection->path())
+        ];
     }
 }
