@@ -111,6 +111,7 @@ Route::group([
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');
+        Route::resource('users', 'UsersController');
     });
 });
 
