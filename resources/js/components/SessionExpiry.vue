@@ -23,7 +23,6 @@
                         v-if="errors.password"
                         v-text="errors.password[0]" />
                     <div class="flex items-center">
-                        <input type="hidden" name="username" />
                         <input
                             type="password"
                             v-model="password"
