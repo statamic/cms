@@ -1,8 +1,8 @@
 <template>
 
-    <div>
+    <div class="session-expiry">
 
-        <button v-if="isWarning" class="px-2 py-1 text-xs text-center bg-red hover:bg-red-dark text-white cursor-pointer w-full outline-none" @click="extend">
+        <button v-if="isWarning" class="session-expiry-stripe" @click="extend">
             <span v-text="warningText" />
             <span v-if="remaining > 0">{{ __("Click to extend your session.") }}</span>
         </button>

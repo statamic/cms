@@ -2,14 +2,32 @@
    THE GLOBAL HEADER
    ========================================================================== */
 
- .global-header {
-     @apply bg-white shadow h-12 items-center justify-between hidden relative fixed w-full;
-     z-index: 9999;
- }
+.global-header {
+    @apply bg-white shadow h-12 items-center justify-between hidden relative w-full fixed;
+    z-index: 998;
+}
 
- /* Responsive Wangjangling
+/* Responsive Wangjangling
    ========================================================================== */
 
- @screen md {
-     .global-header { @apply flex; }
- }
+@screen md {
+    .global-header { @apply flex; }
+}
+
+.session-expiry-stripe {
+    @apply px-2 py-1 text-xs pin-t text-center bg-red text-white cursor-pointer w-full outline-none fixed;
+    z-index: 999;
+    height: 48px;
+
+    &:hover {
+        @apply bg-red-dark;
+    }
+
+    &:active, &:focus {
+        outline: none;
+    }
+
+    &:active {
+        height: 49px;
+    }
+}
