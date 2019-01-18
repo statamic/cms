@@ -39,7 +39,7 @@ export default {
         setFlashMessage(message, opts) {
             this.toast.showToast(message, {
                 theme:    opts.theme,
-                timeLife: opts.timeout || 5000,
+                timeLife: opts.timeout || 3500,
                 closeBtn: opts.hasOwnProperty('dismissible') ? opts.dismissible : true,
             });
         },
