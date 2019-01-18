@@ -21,8 +21,10 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
-                                <li><a :href="user.edit_url">Edit</a></li>
-                                <li class="warning" v-if="user.deleteable"><a @click.prevent="destroy(user.id, index)">Delete</a></li>
+                                <ul class="dropdown-menu">
+                                    <li><a :href="user.edit_url">Edit</a></li>
+                                    <li class="warning" v-if="user.deleteable"><a @click.prevent="destroy(user.id, index)">Delete</a></li>
+                                </ul>
                             </dropdown-list>
                         </template>
                     </data-table>
