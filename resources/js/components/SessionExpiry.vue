@@ -2,18 +2,18 @@
 
     <div>
 
-        <div v-if="isWarning" class="px-2 py-1 bg-red text-white">
+        <button v-if="isWarning" class="px-2 py-1 text-xs text-center bg-red hover:bg-red-dark text-white cursor-pointer w-full outline-none" @click="extend">
             <span v-text="warningText" />
-            <button v-if="remaining > 0" @click="extend">{{ __("Click here to extend your session.") }}</button>
-        </div>
+            <span v-if="remaining > 0">{{ __("Click to extend your session.") }}</span>
+        </button>
 
-        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px">
+        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
             <div class="flex items-center p-3 bg-grey-lightest border-b text-center">
-                {{ __('Enter your password to continue') }}
+                {{ __('Resume Your Session') }}
             </div>
             <div class="publish-fields">
                 <div class="form-group">
-                    <label v-text="__('Password')" />
+                    <label v-text="__('Enter your password to continue where you left off')" />
                     <small
                         class="help-block text-red"
                         v-if="errors.email"
@@ -22,15 +22,18 @@
                         class="help-block text-red"
                         v-if="errors.password"
                         v-text="errors.password[0]" />
-                    <input
-                        type="password"
-                        v-model="password"
-                        ref="password"
-                        class="input-text"
-                        @keydown.enter.prevent="submit" />
-                </div>
-                <div class="p-3 pt-0">
-                    <button @click="submit" class="btn btn-primary" v-text="__('Submit')" />
+                    <div class="flex items-center">
+                        <input type="hidden" name="username" />
+                        <input
+                            type="password"
+                            v-model="password"
+                            ref="password"
+                            class="input-text"
+                            tabindex="1"
+                            autofocus
+                            @keydown.enter.prevent="submit" />
+                        <button @click="submit" class="btn btn-primary ml-1" v-text="__('Login')" />
+                    </div>
                 </div>
             </div>
         </modal>
@@ -72,8 +75,8 @@ export default {
 
         warningText() {
             return (this.remaining === 0)
-                ? __('You have been logged out due to inactivity.')
-                : __('You will be logged out in :seconds seconds due to inactivity.', { seconds: this.remaining });
+                ? __("You have been logged out because you've been inactive for a while.")
+                : __('You have been inactive for a while and will be logged out in :seconds seconds.', { seconds: this.remaining });
         }
 
     },
