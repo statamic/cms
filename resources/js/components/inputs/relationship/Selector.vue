@@ -26,12 +26,11 @@
                                     @click="isCreating = true"
                                     v-text="__('Create')" />
 
-                                <stack name="inline-editor" v-if="isCreating">
-                                    <inline-create-form
-                                        @created="itemCreated"
-                                        @closed="stopCreating"
-                                    />
-                                </stack>
+                                <inline-create-form
+                                    v-if="isCreating"
+                                    @created="itemCreated"
+                                    @closed="stopCreating"
+                                />
                             </div>
                         </div>
                         <div class="flex-1 overflow-scroll">
