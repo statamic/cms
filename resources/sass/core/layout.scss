@@ -28,14 +28,14 @@ body > svg { display: none; }
     transition: all .3s;
 }
 
-#main .content {
+#main .workspace {
     transition: padding .3s;
     @apply w-full pt-2;
 }
 
 @screen md {
     #main { padding: 74px 0 0; }
-    #main .content {
+    #main .workspace {
         padding-left: 14rem;
         @apply pt-0;
     }
@@ -46,7 +46,7 @@ body > svg { display: none; }
         left: -14rem;
     }
 
-    .content {
+    .workspace {
         padding-left: 0;
     }
 }

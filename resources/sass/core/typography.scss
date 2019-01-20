@@ -18,7 +18,7 @@ h1 {
 }
 
 h2 {
-    @apply text-lg font-normal;
+    @apply text-lg font-medium;
     letter-spacing: -0.01em;
 }
 
@@ -45,6 +45,19 @@ a {
 
     &:hover {
         @apply .text-blue;
+    }
+}
+
+.content {
+    h1, h2, h3, h4, h5, h6, p {
+        @apply .mb-1;
+    }
+
+    p {
+        @apply text-grey text-sm;
+        &:last-child {
+            @apply .mb-0;
+        }
     }
 }
 

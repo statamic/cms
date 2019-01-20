@@ -20,7 +20,7 @@
       <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! computedNavOpen}">
             @include('statamic::partials.nav-main')
 
-            <div class="content">
+            <div class="workspace">
                   <div class="page-wrapper">
                         @yield('content')
                   </div>
