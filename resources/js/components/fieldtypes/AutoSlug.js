@@ -2,6 +2,7 @@ export default {
 
     data() {
         return {
+            autoSlugFromField: null,
             autoSlugOptions: {
                 isActive: true
             }
@@ -10,8 +11,9 @@ export default {
 
     computed: {
 
-        autoSlugPublishFieldsComponent() {
-            return this.$parent.$parent;
+        autoSlugFromValue() {
+            if (!this.autoSlugFromField) return;
+            return this.$store.state.publish[this.storeName].values[this.autoSlugFromField];
         }
 
     },
@@ -19,9 +21,11 @@ export default {
     methods: {
 
         autoSlug(from, to) {
+            this.autoSlugFromField = from;
+
             // The second argument indicates the name of the instance variable we should
-            // be updating. If left blank, we'll assume it's the field's data variable.
-            to = to || 'data';
+            // be updating. If left blank, we'll assume it's the field's value variable.
+            to = to || 'value';
 
             // If there is already data, we assume there's already a slug.
             // We don't want to automatically generate anything.
@@ -29,16 +33,21 @@ export default {
 
             // Whenever the "to" field is modified. ie, when the slug field is edited...
             this.$watch(to, (slug) => {
-                const fromVal = this.autoSlugPublishFieldsComponent.data[from] || '';
+                const fromVal = this.autoSlugFromValue || '';
                 // Mark it modified if the slug matches the slugified version. This allows
                 // the automatic slugification to recommence if the slug is modified to
                 this.autoSlugOptions.isActive = slug === this.$slugify(fromVal);
             });
 
             // Whenever the "from" field is modified. ie, when the watched field is edited...
-            this.autoSlugPublishFieldsComponent.$watch(`data.${from}`, (value) => {
+            this.$watch('autoSlugFromValue', (value) => {
                 if (!this.autoSlugOptions.isActive) return;
-                this[to] = this.$slugify(value);
+
+                const slugified = this.$slugify(value);
+
+                // If the target is "value", we want to emit an event rather than modifying
+                // the prop. Otherwise, we can just modify the specified instance variable.
+                (to === 'value') ? this.update(slugified) : this[to] = slugified;
             });
         }
 
