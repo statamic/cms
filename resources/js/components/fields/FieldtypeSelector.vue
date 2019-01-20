@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full bg-white">
+    <div class="h-full bg-white overflow-auto">
 
         <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
