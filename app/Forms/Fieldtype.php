@@ -7,6 +7,8 @@ use Statamic\Fields\Fieldtypes\Relationship;
 
 class Fieldtype extends Relationship
 {
+    protected $handle = 'form';
+
     public function fieldsetContents()
     {
         return [];
