@@ -16,6 +16,7 @@ var colors = {
     'green':            '#479967',
     'blue-light':       'hsla(210, 100%, 75%, 1)',
     'blue':             'hsla(200, 80%, 50%, 1)',
+    'blue-dark':        'hsla(200, 70%, 40%, 1)',
     'red-dark':         'hsla(2, 57%, 53%, 1)',
     'red':              'hsla(2, 76%, 60%, 1)',
     'red-light':        'hsla(2, 76%, 70%, 1)', // lighten-1
@@ -355,6 +356,16 @@ module.exports = {
 
     minWidth: {
         '0':    '0',
+        'xs': '10rem',
+        // 'sm': '20rem',
+        // 'md': '30rem',
+        // 'lg': '40rem',
+        // 'xl': '50rem',
+        // '2xl': '60rem',
+        // '3xl': '70rem',
+        // '4xl': '80rem',
+        // '5xl': '90rem',
+        // '5xl': '100rem',
         'full': '100%',
     },
 
