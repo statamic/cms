@@ -14,7 +14,11 @@ import Fieldtype from './Fieldtype.vue';
 
 export default {
 
-    mixins: [Fieldtype]
+    mixins: [Fieldtype, AutoSlug],
+
+    created() {
+        this.autoSlug('title');
+    }
 
 }
 </script>
