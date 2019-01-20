@@ -1,14 +1,27 @@
 <template>
 
-    <div class="flex flex-col h-full">
+    <div class="h-full overflow-auto p-4 bg-grey-lighter h-full">
 
-        <div class="flex items-center p-3 bg-grey-lightest border-b text-center" v-if="fieldtypesLoaded">
-            <svg-icon class="h-6 w-6 mr-2 inline-block opacity-50" :name="fieldtype.icon"></svg-icon>
-            <span>{{ config.display || config.handle }}</span>
-            <span class="text-xs ml-2 font-bold uppercase opacity-25 pt-sm">{{ fieldtype.title }}</span>
+        <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
+            <loading-graphic />
         </div>
 
-        <div class="flex-1 overflow-scroll" v-if="fieldtypesLoaded">
+        <div v-if="fieldtypesLoaded" class="flex items-center mb-3 -mt-1">
+            <h1 class="flex-1">
+                {{ config.display || config.handle }}
+                <small class="block text-xs text-grey-light font-medium leading-none mt-1 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-light text-current" :name="fieldtype.icon"></svg-icon>
+                    {{ fieldtype.title }}
+                </small>
+            </h1>
+            <button
+                class="btn btn-primary"
+                @click.prevent="$emit('closed')"
+                v-text="__('Done')"
+            ></button>
+        </div>
+
+        <div class="card" v-if="fieldtypesLoaded">
 
             <div class="publish-fields">
 

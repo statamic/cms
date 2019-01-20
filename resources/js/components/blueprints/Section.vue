@@ -92,6 +92,7 @@ export default {
 
         fieldAdded(field) {
             this.section.fields.push(field);
+            this.$notify.success(__('Field added.'));
             this.$nextTick(() => this.editingField = field._id);
         },
 

@@ -13,16 +13,15 @@
                     <button @click.prevent="$emit('edit')" class="opacity-50 hover:opacity-100"><span class="icon icon-cog" /></button>
                     <button @click.prevent="$emit('deleted')" class="opacity-50 hover:opacity-100"><span class="icon icon-cross" /></button>
 
-                    <portal to="modals" v-if="isEditing">
-                        <modal name="field-settings" width="90%" height="90%" @closed="$emit('editor-closed')">
-                            <field-settings
-                                ref="settings"
-                                :root="isRoot"
-                                :config="fieldConfig"
-                                @updated="configUpdated"
-                            />
-                        </modal>
-                    </portal>
+                    <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
+                        <field-settings
+                            ref="settings"
+                            :root="isRoot"
+                            :config="fieldConfig"
+                            @updated="configUpdated"
+                            @closed="editorClosed"
+                        />
+                    </stack>
                 </div>
             </div>
         </div>
@@ -54,6 +53,10 @@ export default {
             this.field[handle] = value;
 
             this.$emit('updated', this.field);
+        },
+
+        editorClosed() {
+            this.$emit('editor-closed');
         }
 
     }

@@ -1,12 +1,22 @@
 <template>
 
-    <div class="flex flex-col h-full">
+    <div class="h-full overflow-auto p-4 bg-grey-lighter h-full">
 
-        <div class="flex items-center p-3 bg-grey-lightest border-b text-center">
-            <span>Create a new field</span>
+        <div class="flex items-center mb-3 -mt-1">
+            <div class="flex-1">
+                <h1> Create a new field </h1>
+                <p class="block text-xs text-grey-light font-medium leading-none mt-1 flex items-center">
+                    You can create a field here that'll be added to a fieldset so you can reuse it later.
+                </p>
+            </div>
+            <button
+                class="btn btn-primary"
+                @click.prevent="submit"
+                v-text="__('Submit')"
+            ></button>
         </div>
 
-        <div class="flex-1 overflow-scroll">
+        <div class="card">
 
             <div class="publish-fields">
 
@@ -23,6 +33,21 @@
 
                 </div>
 
+                <div class="form-group" v-if="field">
+                    <label class="block">Fieldtype</label>
+                    <div class="input-text flex justify-between">
+                        <div class="flex items-center">
+                            <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-light text-current" :name="fieldtype.icon"></svg-icon>
+                            {{ fieldtype.title }}
+                        </div>
+                        <div class="text-xs text-grey">
+                            <button @click="field = null" class="text-blue">Choose different fieldtype</button>
+                            or
+                            <button @click="editingFieldSettings = true" class="text-blue">configure field</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <fieldtype-selector
@@ -30,14 +55,14 @@
                 @selected="fieldtypeSelected"
             />
 
-            <field-settings
-                v-if="field"
-                ref="settings"
-                :type="field.type"
-                v-model="field"
-            />
-
-            <button class="btn btn-primary" @click="submit">Submit</button>
+            <stack name="field-settings" v-if="editingFieldSettings" @closed="editingFieldSettings = false">
+                <field-settings
+                    ref="settings"
+                    :type="field.type"
+                    v-model="field"
+                    @closed="editingFieldSettings = false"
+                />
+            </stack>
 
         </div>
 
@@ -47,10 +72,13 @@
 
 <script>
 import axios from 'axios';
+import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 import FieldSettings from '../fields/Settings.vue';
 
 export default {
+
+    mixins: [ProvidesFieldtypes],
 
     components: {
         FieldtypeSelector,
@@ -61,7 +89,16 @@ export default {
         return {
             fieldset: null,
             field: null,
+            editingFieldSettings: false
         }
+    },
+
+    computed: {
+
+        fieldtype() {
+            return _.findWhere(this.fieldtypes, { handle: this.field.type });
+        }
+
     },
 
     methods: {
@@ -72,6 +109,7 @@ export default {
                 handle: 'new_field',
                 display: 'New Field'
             };
+            this.editingFieldSettings = true;
         },
 
         submit() {

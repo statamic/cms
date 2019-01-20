@@ -1,9 +1,9 @@
 <template>
 
-    <div class="flex flex-col h-full">
+    <div class="h-full bg-white">
 
-        <div class="flex items-center p-3 bg-grey-lightest border-b text-center" v-if="fieldtypesLoaded">
-            {{ __('Select Fieldtype') }}
+        <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
+            <loading-graphic />
         </div>
 
         <div class="p-3" v-if="fieldtypesLoaded">
@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div class="flex-1 overflow-scroll p-3 pt-0" v-if="fieldtypesLoaded">
+        <div class="p-3 pt-0" v-if="fieldtypesLoaded">
             <div class="fieldtype-selector">
                 <div :class="['search', { 'is-searching': isSearching }]">
                     <input type="text" v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />

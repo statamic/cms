@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <popper ref="popper" trigger="click" :append-to-body="true" :options="{ placement: 'right' }">
+        <popper ref="popper" trigger="click" :append-to-body="true" boundaries-selector="body" :options="{ placement: 'right' }">
             <div class="popover w-96">
 
                 <div>
@@ -24,17 +24,13 @@
                     </ul>
                 </div>
 
-                <portal to="modals" v-if="selectingFieldtype">
-                    <modal name="fieldtype-selector" width="90%" height="90%">
-                        <fieldtype-selector :in-modal="true" @selected="fieldtypeSelected" />
-                    </modal>
-                </portal>
+                <stack name="fieldtype-selector" v-if="selectingFieldtype" @closed="selectingFieldtype = false">
+                    <fieldtype-selector :in-modal="true" @selected="fieldtypeSelected" />
+                </stack>
 
-                <portal to="modals" v-if="creatingFieldsetField">
-                    <modal name="fieldset-field-form" width="90%" height="90%">
-                        <fieldset-field-form @created="fieldsetFieldCreated" />
-                    </modal>
-                </portal>
+                <stack name="fieldset-field-form" v-if="creatingFieldsetField" @closed="creatingFieldsetField = false">
+                    <fieldset-field-form @created="fieldsetFieldCreated" />
+                </stack>
 
             </div>
             <button
@@ -109,6 +105,7 @@ export default {
 
         addInlineField() {
             this.selectingFieldtype = true;
+            this.$refs.popper.doClose();
             this.$nextTick(() => this.$modal.show('fieldtype-selector'));
         },
 
@@ -125,6 +122,7 @@ export default {
         },
 
         addImportField() {
+            this.$refs.popper.doClose();
             this.$emit('added', {
                 _id: uniqid(),
                 type: 'import',
@@ -135,6 +133,7 @@ export default {
 
         createFieldsetField() {
             this.creatingFieldsetField = true;
+            this.$refs.popper.doClose();
             this.$nextTick(() => this.$modal.show('fieldset-field-form'));
         },
 
