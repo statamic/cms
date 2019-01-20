@@ -25,7 +25,7 @@
                 </div>
 
                 <stack name="fieldtype-selector" v-if="selectingFieldtype" @closed="selectingFieldtype = false">
-                    <fieldtype-selector :in-modal="true" @selected="fieldtypeSelected" />
+                    <fieldtype-selector @selected="fieldtypeSelected" />
                 </stack>
 
                 <stack name="fieldset-field-form" v-if="creatingFieldsetField" @closed="creatingFieldsetField = false">
