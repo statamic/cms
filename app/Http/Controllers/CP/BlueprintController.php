@@ -181,7 +181,8 @@ class BlueprintController extends CpController
             'type' => 'reference',
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
-            'config_overrides' => array_keys($config)
+            'config_overrides' => array_keys($config),
+            'fieldtype' => $fieldsetField['type'],
         ];
     }
 
@@ -194,6 +195,7 @@ class BlueprintController extends CpController
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $config,
+            'fieldtype' => $field['type'] ?? 'text',
         ];
     }
 
