@@ -11,9 +11,12 @@ use Statamic\View\Cascade;
 use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Carbon;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class CascadeTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $cascade;
 
     public function setUp()
@@ -295,17 +298,13 @@ class CascadeTest extends TestCase
     /** @test */
     function it_hydrates_page_data()
     {
-        // Add a collection to the stache
-        $collection = \Statamic\API\Collection::create('example');
-        $this->app->make(Stache::class)
-            ->store('collections')
-            ->setItem('example', $collection)
-            ->setPath('example', 'collections/example.yaml');
-
-        $page = \Statamic\API\Entry::create('test')
-            ->collection('example')
-            ->with($vars = ['foo' => 'bar', 'baz' => 'qux'])
-            ->get();
+        $vars = ['foo' => 'bar', 'baz' => 'qux'];
+        $page = \Statamic\API\Entry::make()
+            ->id('test')
+            ->collection(\Statamic\API\Collection::create('example'))
+            ->in(function ($loc) use ($vars) {
+                $loc->data($vars);
+            });
         $cascade = $this->cascade()->withContent($page);
 
         $this->assertEquals($page, $cascade->content());
@@ -346,17 +345,12 @@ class CascadeTest extends TestCase
     {
         $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.
 
-        // Add a collection to the stache
-        $collection = \Statamic\API\Collection::create('example');
-        $this->app->make(Stache::class)
-            ->store('collections')
-            ->setItem('example', $collection)
-            ->setPath('example', 'collections/example.yaml');
-
-        $page = \Statamic\API\Entry::create('test')
-            ->collection('example')
-            ->with(['foo' => 'foo defined in page'])
-            ->get();
+        $page = \Statamic\API\Entry::make()
+            ->id('test')
+            ->collection(\Statamic\API\Collection::create('example'))
+            ->in(function ($loc) {
+                $loc->data(['foo' => 'foo defined in page']);
+            });
 
         $this->createGlobal('global', ['foo' => 'foo defined in global']);
 
@@ -372,20 +366,15 @@ class CascadeTest extends TestCase
     /** @test */
     function it_merges_view_model_data()
     {
-        // Add a collection to the stache
-        $collection = \Statamic\API\Collection::create('example');
-        $this->app->make(Stache::class)
-            ->store('collections')
-            ->setItem('example', $collection)
-            ->setPath('example', 'collections/example.yaml');
-
-        $page = \Statamic\API\Entry::create('test')
-            ->collection('example')
-            ->with([
-                'foo' => 'foo defined in page',
-                'view_model' => 'Tests\View\FakeViewModel',
-            ])
-            ->get();
+        $page = \Statamic\API\Entry::make()
+            ->id('test')
+            ->collection(\Statamic\API\Collection::create('example'))
+            ->in(function ($loc) {
+                $loc->data([
+                    'foo' => 'foo defined in page',
+                    'view_model' => 'Tests\View\FakeViewModel',
+                ]);
+            });
 
         $cascade = $this->cascade()->withContent($page);
 
@@ -410,12 +399,7 @@ class CascadeTest extends TestCase
 
     private function createGlobal($handle, $data)
     {
-        $global = GlobalSet::create($handle)->with($data)->get();
-
-        $this->app->make(Stache::class)
-            ->store('globals')
-            ->setPath($handle, "globals/{$handle}.yaml")
-            ->setItem($handle, $global);
+        GlobalSet::create($handle)->with($data)->save();
     }
 }
 
