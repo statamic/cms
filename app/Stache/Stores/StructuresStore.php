@@ -110,7 +110,9 @@ class StructuresStore extends BasicStore
     {
         parent::loadMeta($data);
 
-        $this->setEntryUris($data['entryUris']);
+        $this->withoutMarkingAsUpdated(function () use ($data) {
+            $this->setEntryUris($data['entryUris']);
+        });
     }
 
     public function setEntryUris($uris)
