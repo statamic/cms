@@ -38,6 +38,7 @@ Vue.component('file-icon', require('../components/FileIcon.vue'));
 Vue.component('loading-graphic', require('../components/LoadingGraphic.vue'));
 Vue.component('dropdown-list', require('../components/DropdownList'));
 Vue.component('validation-errors', require('../components/ValidationErrors'));
+Vue.component('slugify', require('../components/Slugify.vue'));
 
 // Recursive
 Vue.component('role-permission-tree', require('../components/roles/PermissionTree.vue'));

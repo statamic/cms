@@ -19,8 +19,6 @@ export default {
         }
     },
 
-    inject: ['storeName'],
-
     methods: {
 
         update(value) {

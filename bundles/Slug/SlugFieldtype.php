@@ -7,4 +7,7 @@ use Statamic\Addons\Text\TextFieldtype;
 
 class SlugFieldtype extends TextFieldtype
 {
+    protected $configFields = [
+        'generate' => ['type' => 'toggle', 'default' => true],
+    ];
 }
