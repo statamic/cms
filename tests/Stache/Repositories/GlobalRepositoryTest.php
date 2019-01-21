@@ -62,6 +62,8 @@ class GlobalRepositoryTest extends TestCase
     /** @test */
     function it_gets_a_global_set_by_handle()
     {
+        $this->markTestIncomplete();// TODO: Revisit once globals have been refactored for multi site
+
         tap($this->repo->findByHandle('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-global', $set->id());
