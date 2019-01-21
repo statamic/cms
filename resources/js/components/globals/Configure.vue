@@ -1,48 +1,59 @@
 <template>
 
-
     <div>
-        <popper ref="popper" trigger="click" :append-to-body="true" :options="{ placement: 'left-start' }">
-            <div class="popover w-96">
-                <div class="saving flex justify-center text-center" v-if="saving">
+        <stack name="configure-global" v-if="editing" @closed="editing = false">
+            <div class="h-full overflow-auto p-3 bg-grey-lighter h-full">
+                <div v-if="saving" class="absolute pin z-200 flex items-center justify-center text-center">
                     <loading-graphic :text="__('Saving')" />
                 </div>
-                <div class="publish-fields">
+
+                <div class="flex items-center mb-3">
+                    <h1 class="flex-1">
+                        <small class="subhead block" v-text="__('Globals')" />
+                        {{ __('Edit Global Set') }}
+                    </h1>
+                    <button class="btn mr-2" @click="editing = false" v-text="__('Cancel')" />
+                    <button class="btn btn-primary" @click="save" v-text="__('Save')" />
+                </div>
+
+                <div class="card publish-fields">
                     <form-group
                         handle="title"
                         display="Title"
                         :instructions="__('global_set_title_instructions')"
-                        v-model="set.title"
+                        v-model="title"
                         :errors="errors.title"
-                        class="p-0 mb-3"
+                        width="50"
                     />
                     <form-group
                         fieldtype="slug"
                         handle="handle"
                         :display="__('Handle')"
                         :instructions="__('global_set_handle_instructions')"
-                        v-model="set.handle"
+                        :config="{ slugify_using: 'instance' }"
+                        v-model="handle"
                         :errors="errors.handle"
-                        class="p-0 mb-3"
+                        width="50"
                     />
+
                     <form-group
                         handle="blueprint"
-                        display="Blueprint"
+                        fieldtype="blueprints"
+                        :config="{ max_items: 1 }"
+                        :display="__('Blueprint')"
                         :instructions="__('global_set_blueprint_instructions')"
-                        v-model="set.blueprint"
+                        v-model="blueprint"
                         :errors="errors.blueprint"
-                        class="p-0 mb-3"
                     />
                 </div>
-                <button class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
             </div>
+        </stack>
 
-            <button
-                slot="reference"
-                class="btn"
-                v-text="__('Edit')"
-            />
-        </popper>
+        <button
+            class="btn"
+            v-text="__('Edit')"
+            @click="editing = true"
+        />
     </div>
 
 </template>
@@ -67,14 +78,13 @@ export default {
 
     data() {
         return {
+            editing: false,
             saving: false,
             error: null,
             errors: {},
-            set: {
-                title: this.initialTitle,
-                handle: this.initialHandle,
-                blueprint: this.initialBlueprint
-            }
+            title: this.initialTitle,
+            handle: this.initialHandle,
+            blueprint: this.initialBlueprint
         }
     },
 
@@ -82,6 +92,14 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
+        },
+
+        values() {
+            return {
+                title: this.title,
+                handle: this.handle,
+                blueprint: this.blueprint ? this.blueprint[0] : null
+            }
         }
 
     },
@@ -97,7 +115,7 @@ export default {
             this.clearErrors();
             this.saving = true;
 
-            axios.patch(this.saveUrl, this.set).then(response => {
+            axios.patch(this.saveUrl, this.values).then(response => {
                 window.location.reload();
             }).catch(e => {
                 if (e.response && e.response.status === 422) {

@@ -54,6 +54,7 @@ class GlobalsController extends CpController
             'set' => $set,
             'blueprint' => $blueprint,
             'values' => $values,
+            'meta' => $fields->meta(),
         ]);
     }
 
@@ -119,7 +120,7 @@ class GlobalsController extends CpController
         $data = $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'blueprint' => 'nullable'
+            'blueprint' => 'string|nullable'
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -129,8 +130,11 @@ class GlobalsController extends CpController
             ->ensureId() // TODO: Shouldn't need to do this.
             ->save();
 
-        return redirect($global->editUrl())
-            ->with('success', __('Global Set created'));
+        session()->flash('message', __('Global Set created'));
+
+        return [
+            'redirect' => $global->editUrl()
+        ];
     }
 
     public function destroy($set)
