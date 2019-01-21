@@ -119,7 +119,7 @@ class Entry implements Contract
 
     public function __call($method, $args = [])
     {
-        if (in_array($method, ['slug', 'get', 'has', 'data', 'order', 'published', 'blueprint'])) {
+        if (method_exists(LocalizedEntry::class, $method)) {
             return call_user_func_array([$this->forCurrentSite(), $method], $args);
         }
 
