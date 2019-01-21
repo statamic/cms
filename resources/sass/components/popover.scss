@@ -1,7 +1,7 @@
 $size: 16px;
 
 .popover {
-    @apply border bg-white p-2 rounded shadow-lg;
+    @apply border bg-white rounded shadow-lg;
     z-index: 5000; // arbitrary to appear on top of modals.
 }
 
@@ -12,14 +12,28 @@ $size: 16px;
 .popover .popper__arrow {
     @apply bg-white absolute border shadow-lg;
     top: -$size/2;
-    left: -$size/2;
     width: $size;
     height: $size;
     z-index: -1; // under popover-inner
     transform: rotate(45deg);
 }
 
-.popover[x-placement^="top"] { margin-bottom: $size/2; }
-.popover[x-placement^="bottom"] { margin-top: $size/2; }
-.popover[x-placement^="left"] { margin-right: $size/2; }
-.popover[x-placement^="right"] { margin-left: $size/2; }
+.popover[x-placement^="top"] {
+    margin-bottom: $size/2;
+    .popper__arrow {
+        top: auto;
+        bottom: -$size/2;
+    }
+}
+.popover[x-placement^="bottom"] {
+    margin-top: $size/2;
+    .popper__arrow { top: -$size/2; }
+}
+.popover[x-placement^="left"] {
+    margin-right: $size/2;
+    .popper__arrow { right: -$size/2; }
+}
+.popover[x-placement^="right"] {
+    margin-left: $size/2;
+    .popper__arrow { left: -$size/2; }
+}

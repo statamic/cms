@@ -3,6 +3,7 @@
     <div>
         <popper ref="popper" trigger="click" :append-to-body="true" boundaries-selector="body" :options="{ placement: 'right' }">
             <div class="popover w-96">
+                <div class="popover-inner p-2">
 
                 <div>
                     <p class="text-sm font-medium mb-1">Select a field from an existing fieldset:</p>
@@ -32,6 +33,7 @@
                     <fieldset-field-form @created="fieldsetFieldCreated" />
                 </stack>
 
+            </div>
             </div>
             <button
                 slot="reference"

@@ -2,10 +2,6 @@
    GLOBAL CONTROL PANEL LAYOUT ELEMENTS
    ========================================================================== */
 
-html, body {
-    height: 100%;
-}
-
 body {
     @apply .w-full .bg-grey-lighter relative;
 }
