@@ -64,12 +64,11 @@ class CollectionsStoreTest extends TestCase
     /** @test */
     function it_makes_collection_instances_from_files()
     {
-        $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
+        $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', "title: Example");
 
         $this->assertInstanceOf(Collection::class, $item);
-        $this->assertEquals('example', $item->path());
+        $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
     }
 
     /** @test */
