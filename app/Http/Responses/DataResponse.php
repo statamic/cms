@@ -93,24 +93,10 @@ class DataResponse implements Responsable
     protected function contents()
     {
         return (new View)
-            ->template($this->template())
-            ->layout($this->layout())
+            ->template($this->data->template())
+            ->layout($this->data->layout())
             ->cascadeContent($this->data)
             ->render();
-    }
-
-    protected function template()
-    {
-        return collect($this->data->template())->filter()->first(function ($template) {
-            return view()->exists($template);
-        });
-    }
-
-    protected function layout()
-    {
-        return collect($this->data->layout())->filter()->first(function ($layout) {
-            return view()->exists($layout);
-        });
     }
 
     protected function cascade()
