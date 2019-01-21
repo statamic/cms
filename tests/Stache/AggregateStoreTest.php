@@ -2,12 +2,13 @@
 
 namespace Tests\Stache;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\BasicStore;
-use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\ChildStore;
+use Statamic\Stache\Stores\AggregateStore;
 
 class AggregateStoreTest extends TestCase
 {
@@ -39,28 +40,41 @@ class AggregateStoreTest extends TestCase
     /** @test */
     function it_sets_paths_in_all_child_stores()
     {
-        $this->assertEquals([], $this->store->store('a')->getPaths()->all());
-        $this->assertEquals([], $this->store->store('b')->getPaths()->all());
+        $this->assertEquals([], $this->store->store('a')->getSitePaths('en')->all());
+        $this->assertEquals([], $this->store->store('a')->getSitePaths('fr')->all());
+        $this->assertEquals([], $this->store->store('b')->getSitePaths('en')->all());
+        $this->assertEquals([], $this->store->store('b')->getSitePaths('fr')->all());
 
-        $return = $this->store->setPaths($paths = [
-            'a::one' => 'one.md',
-            'b::two' => 'two.md'
+        $return = $this->store->setPaths([
+            'en' => $enPaths = [
+                'a::one' => 'one.md',
+                'b::two' => 'two.md'
+            ],
+            'fr' => $frPaths = [
+                'a::one' => 'un.md',
+                'b::two' => 'deux.md'
+            ]
         ]);
 
         $this->assertEquals($this->store, $return);
-        $this->assertEquals(['one' => 'one.md'], $this->store->store('a')->getPaths()->all());
-        $this->assertEquals(['two' => 'two.md'], $this->store->store('b')->getPaths()->all());
+        $this->assertEquals(['one' => 'one.md'], $this->store->store('a')->getSitePaths('en')->all());
+        $this->assertEquals(['one' => 'un.md'], $this->store->store('a')->getSitePaths('fr')->all());
+        $this->assertEquals(['two' => 'two.md'], $this->store->store('b')->getSitePaths('en')->all());
+        $this->assertEquals(['two' => 'deux.md'], $this->store->store('b')->getSitePaths('fr')->all());
     }
 
     /** @test */
-    function it_sets_specific_path_in_child_store()
+    function it_sets_a_path_for_a_child_stores_site()
     {
-        $this->assertNull($this->store->store('a')->getPath('one'));
+        $this->assertNull($this->store->store('a')->getSitePath('en', 'one'));
+        $this->assertNull($this->store->store('a')->getSitePath('fr', 'one'));
 
-        $return = $this->store->setPath('a::one', 'one.md');
+        $return = $this->store->setSitePath('en', 'a::one', 'one.md');
+        $this->store->setSitePath('fr', 'a::one', 'un.md');
 
         $this->assertEquals($this->store, $return);
-        $this->assertEquals('one.md', $this->store->store('a')->getPath('one'));
+        $this->assertEquals('one.md', $this->store->store('a')->getSitePath('en', 'one'));
+        $this->assertEquals('un.md', $this->store->store('a')->getSitePath('fr', 'one'));
     }
 
     /** @test */
@@ -196,33 +210,31 @@ class AggregateStoreTest extends TestCase
         $this->store->insert($objectForStoreTwo, 'two');
         $this->store->insert($objectForStoreTwo, 'two::654');
 
-        // Inserting an item with the key and path parameters will use those
-        $this->store->insert(['title' => 'Item title'], 'one::789', '/the/path');
-        $this->store->insert(['title' => 'Item title in store two'], 'two::987', '/the/path/in/store/two');
-
         $this->assertEquals($this->store, $return);
         $this->assertEquals([
             'one' => [
                 '123' => $objectForStoreOne,
                 '456' => $objectForStoreOne,
-                '789' => ['title' => 'Item title'],
             ],
             'two' => [
                 '321' => $objectForStoreTwo,
                 '654' => $objectForStoreTwo,
-                '987' => ['title' => 'Item title in store two'],
             ],
         ], $this->store->getItemsWithoutLoading()->toArray());
         $this->assertEquals([
-            '123' => '/path/to/object',
-            '456' => '/path/to/object',
-            '789' => '/the/path',
-        ], $this->store->store('one')->getPaths()->all());
+            'en' => [
+                '123' => '/path/to/object',
+                '456' => '/path/to/object',
+            ],
+            'fr' => []
+        ], $this->store->store('one')->getPaths()->toArray());
         $this->assertEquals([
-            '321' => '/path/to/object/in/store/two',
-            '654' => '/path/to/object/in/store/two',
-            '987' => '/the/path/in/store/two',
-        ], $this->store->store('two')->getPaths()->all());
+            'en' => [
+                '321' => '/path/to/object/in/store/two',
+                '654' => '/path/to/object/in/store/two',
+            ],
+            'fr' => []
+        ], $this->store->store('two')->getPaths()->toArray());
         $this->assertEquals([
             'en' => [
                 '123' => '/the/uri',
@@ -271,8 +283,14 @@ class AggregateStoreTest extends TestCase
                 '321' => $objectForStoreTwo,
             ],
         ], $this->store->getItemsWithoutLoading()->toArray());
-        $this->assertEquals([], $this->store->store('one')->getPaths()->all());
-        $this->assertEquals(['321' => '/path/to/object/in/store/two'], $this->store->store('two')->getPaths()->all());
+        $this->assertEquals([
+            'en' => [],
+            'fr' => []
+        ], $this->store->store('one')->getPaths()->toArray());
+        $this->assertEquals([
+            'en' => ['321' => '/path/to/object/in/store/two'],
+            'fr' => []
+        ], $this->store->store('two')->getPaths()->toArray());
         $this->assertEquals([
             'en' => [],
             'fr' => []
@@ -308,7 +326,7 @@ class AggregateStoreTest extends TestCase
     /** @test */
     function it_caches_items_and_meta_data()
     {
-        $this->store->setPath('one::1', '/path/to/one.txt');
+        $this->store->setSitePath('en', 'one::1', '/path/to/one.txt');
         $this->store->setSiteUri('en', 'one::1', '/one');
         $this->store->setItem('one::1', new class {
             public function toCacheableArray() {
@@ -316,12 +334,14 @@ class AggregateStoreTest extends TestCase
             }
         });
 
-        $this->store->setPath('one::2', '/path/to/two.txt');
+        $this->store->setSitePath('en', 'one::2', '/path/to/two.txt');
+        $this->store->setSitePath('fr', 'one::2', '/path/to/deux.txt');
         $this->store->setSiteUri('en', 'one::2', '/two');
         $this->store->setSiteUri('fr', 'one::2', '/deux');
         $this->store->setItem('one::2', ['item' => 'two']);
 
-        $this->store->setPath('two::3', '/path/to/three.txt');
+        $this->store->setSitePath('en', 'two::3', '/path/to/three.txt');
+        $this->store->setSitePath('fr', 'two::3', '/path/to/trois.txt');
         $this->store->setSiteUri('en', 'two::3', '/three');
         $this->store->setSiteUri('fr', 'two::3', '/trois');
         $this->store->setItem('two::3', ['item' => 'three']);
@@ -334,8 +354,13 @@ class AggregateStoreTest extends TestCase
         ]);
         Cache::shouldReceive('forever')->once()->with('stache::meta/test::one', [
             'paths' => [
-                '1' => '/path/to/one.txt',
-                '2' => '/path/to/two.txt',
+                'en' => [
+                    '1' => '/path/to/one.txt',
+                    '2' => '/path/to/two.txt',
+                ],
+                'fr' => [
+                    '2' => '/path/to/deux.txt',
+                ]
             ],
             'uris' => [
                 'en' => [
@@ -353,7 +378,12 @@ class AggregateStoreTest extends TestCase
         ]);
         Cache::shouldReceive('forever')->once()->with('stache::meta/test::two', [
             'paths' => [
-                '3' => '/path/to/three.txt',
+                'en' => [
+                    '3' => '/path/to/three.txt',
+                ],
+                'fr' => [
+                    '3' => '/path/to/trois.txt'
+                ]
             ],
             'uris' => [
                 'en' => [
@@ -374,8 +404,8 @@ class AggregateStoreTest extends TestCase
         $this->store->store('one');
         $this->store->store('two');
         Cache::shouldReceive('get')->with('stache::meta/test-keys')->once()->andReturn(['one', 'two']);
-        Cache::shouldReceive('get')->with('stache::meta/test::one')->once()->andReturn('first child stores cache');
-        Cache::shouldReceive('get')->with('stache::meta/test::two')->once()->andReturn('second child stores cache');
+        Cache::shouldReceive('get')->with('stache::meta/test::one', Mockery::any())->once()->andReturn('first child stores cache');
+        Cache::shouldReceive('get')->with('stache::meta/test::two', Mockery::any())->once()->andReturn('second child stores cache');
 
         $this->assertEquals([
             'test::one' => 'first child stores cache',
@@ -387,13 +417,20 @@ class AggregateStoreTest extends TestCase
     function it_gets_a_map_of_ids_to_the_stores()
     {
         $this->store->setPaths([
-            'one::123' => '/path/to/one.md',
-            'two::456' => '/path/to/two.md'
+            'en' => [
+                'one::123' => '/path/to/one.md',
+                'two::456' => '/path/to/two.md'
+            ],
+            'fr' => [
+                'two::456' => '/path/to/deux.md',
+                'three::789' => '/path/to/three.md'
+            ]
         ]);
 
         $this->assertEquals([
             '123' => 'test::one',
             '456' => 'test::two',
+            '789' => 'test::three',
         ], $this->store->getIdMap()->all());
     }
 
@@ -413,18 +450,40 @@ class AggregateStoreTest extends TestCase
         $this->assertEquals('456', $this->store->getIdFromUri('/two'));
         $this->assertEquals('789', $this->store->getIdFromUri('/three'));
         $this->assertEquals('101', $this->store->getIdFromUri('/four'));
+        $this->assertEquals('123', $this->store->getIdFromUri('/one', 'en'));
+        $this->assertEquals('456', $this->store->getIdFromUri('/two', 'en'));
+        $this->assertEquals('789', $this->store->getIdFromUri('/three', 'en'));
+        $this->assertEquals('101', $this->store->getIdFromUri('/four', 'en'));
+        $this->assertEquals('123', $this->store->getIdFromUri('/un', 'fr'));
+        $this->assertEquals('456', $this->store->getIdFromUri('/deux', 'fr'));
+        $this->assertEquals('789', $this->store->getIdFromUri('/tres', 'fr'));
+        $this->assertEquals('101', $this->store->getIdFromUri('/cuatro', 'fr'));
     }
 
     /** @test */
     function it_gets_an_id_from_a_path()
     {
-        $this->store->store('one')->setPaths(['123' => '/one', '456' => '/two']);
-        $this->store->store('two')->setPaths(['789' => '/three', '101' => '/four']);
+        $this->store->store('one')->setPaths([
+            'en' => $enPaths = ['123' => '/one', '456' => '/two'],
+            'fr' => $frPaths = ['123' => '/un', '456' => '/deux'],
+        ]);
+        $this->store->store('two')->setPaths([
+            'en' => $enPaths = ['789' => '/three', '101' => '/four'],
+            'fr' => $frPaths = ['789' => '/tres', '101' => '/cuatro'],
+        ]);
 
         $this->assertEquals('123', $this->store->getIdFromPath('/one'));
         $this->assertEquals('456', $this->store->getIdFromPath('/two'));
         $this->assertEquals('789', $this->store->getIdFromPath('/three'));
         $this->assertEquals('101', $this->store->getIdFromPath('/four'));
+        $this->assertEquals('123', $this->store->getIdFromPath('/one', 'en'));
+        $this->assertEquals('456', $this->store->getIdFromPath('/two', 'en'));
+        $this->assertEquals('789', $this->store->getIdFromPath('/three', 'en'));
+        $this->assertEquals('101', $this->store->getIdFromPath('/four', 'en'));
+        $this->assertEquals('123', $this->store->getIdFromPath('/un', 'fr'));
+        $this->assertEquals('456', $this->store->getIdFromPath('/deux', 'fr'));
+        $this->assertEquals('789', $this->store->getIdFromPath('/tres', 'fr'));
+        $this->assertEquals('101', $this->store->getIdFromPath('/cuatro', 'fr'));
     }
 
     /** @test */

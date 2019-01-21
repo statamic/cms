@@ -66,13 +66,8 @@ class FrontendController extends Controller
             return $route;
         }
 
-        // Get the default locale's URL for the given current URL.
-        if ($default_uri = URL::getDefaultUri(site_locale(), $uri)) {
-            $uri = $default_uri;
-        }
-
         // Attempt to get the content at this URI
-        if ($content = Content::whereUri($uri)) {
+        if ($content = Content::whereUri($uri, site_locale())) {
             // Place the content in the locale we want.
             $content = $content->in(site_locale());
 

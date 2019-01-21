@@ -41,11 +41,11 @@ class Content
      * @param string      $uri       The URI to look for.
      * @return \Statamic\Contracts\Data\Content\Content
      */
-    public function whereUri($uri)
+    public function whereUri($uri, $site = null)
     {
         // TODO: The old version of this method accepted an array of URIs.
         // Either support that in here, or make a separate method.
-        return $this->repo()->findByUri($uri);
+        return $this->repo()->findByUri($uri, $site);
     }
 
     /**

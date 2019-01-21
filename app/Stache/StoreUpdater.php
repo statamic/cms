@@ -65,15 +65,14 @@ class StoreUpdater
     {
         $this->store->load(); // TODO: TDD
 
-        foreach ($this->modifiedFiles() as $path) {
+        $this->modifiedFiles()->each(function ($path) {
             $item = $this->store->createItemFromFile($path, $this->filesystem->get($path));
             $key = $this->store->getItemKey($item, $path);
-            $this->store->insert($item, $key, $path);
-        }
+            $this->store->insert($item, $key);
+        });
 
         foreach ($this->deletedFiles() as $path) {
-            $id = $this->store->getIdFromPath($path);
-            $this->store->remove($id);
+            $this->store->removeByPath($path);
         }
 
         $this->store

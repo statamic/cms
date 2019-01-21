@@ -29,7 +29,10 @@ Route::group([
 
     // Collections
     Route::resource('collections', 'CollectionsController');
-    Route::resource('collections.entries', 'EntriesController', ['except' => 'show']);
+    Route::get('collections/{collection}/entries', 'EntriesController@index')->name('collections.entries.index');
+    Route::get('collections/{collection}/entries/create', 'EntriesController@create')->name('collections.entries.create');
+    Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
+    Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
 
     // Collections
     Route::resource('globals', 'GlobalsController');

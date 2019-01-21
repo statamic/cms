@@ -70,6 +70,11 @@ class Field implements Arrayable
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
+    public function isLocalizable()
+    {
+        return (bool) $this->get('localizable');
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [

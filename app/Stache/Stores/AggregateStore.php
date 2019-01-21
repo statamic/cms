@@ -56,26 +56,28 @@ abstract class AggregateStore extends Store
 
     public function setPaths($paths)
     {
-        collect($paths)->each(function ($path, $key) {
-            $this->setPath($key, $path);
-        });
+        foreach ($paths as $site => $sitePaths) {
+            foreach ($sitePaths as $key => $path) {
+                $this->setSitePath($site, $key, $path);
+            }
+        }
 
         return $this;
     }
 
-    public function setPath($key, $path)
+    public function setSitePath($site, $key, $path)
     {
         list($store, $id) = $this->extractKeys($key);
 
-        $this->store($store)->setPath($id, $path);
+        $this->store($store)->setSitePath($site, $id, $path);
 
         return $this;
     }
 
-    public function getIdFromPath($path)
+    public function getIdFromPath($path, $site = null)
     {
         foreach ($this->stores() as $store) {
-            if ($match = $store->getIdFromPath($path)) {
+            if ($match = $store->getIdFromPath($path, $site)) {
                 return $match;
             }
         }
@@ -173,10 +175,10 @@ abstract class AggregateStore extends Store
         return $this;
     }
 
-    public function getIdFromUri($uri)
+    public function getIdFromUri($uri, $site = null)
     {
         foreach ($this->stores() as $store) {
-            if ($match = $store->getIdFromUri($uri)) {
+            if ($match = $store->getIdFromUri($uri, $site)) {
                 return $match;
             }
         }
@@ -220,7 +222,7 @@ abstract class AggregateStore extends Store
         return 'stache::meta/' . $this->key() . '-keys';
     }
 
-    public function insert($item, $key, $path = null)
+    public function insert($item, $key)
     {
         if (str_contains($key, '::')) {
             list($store, $id) = $this->extractKeys($key);
@@ -229,7 +231,7 @@ abstract class AggregateStore extends Store
             $id = $item->id();
         }
 
-        $this->store($store)->insert($item, $id, $path);
+        $this->store($store)->insert($item, $id);
 
         return $this;
     }
@@ -239,6 +241,19 @@ abstract class AggregateStore extends Store
         list(, $store) = $this->extractKeys($this->getIdMap()->get($item));
 
         $this->store($store)->remove($item);
+
+        return $this;
+    }
+
+    // TODO: Test this.
+    // There's an equivalent test for the BasicStore.
+    public function removeByPath($path)
+    {
+        $id = $this->getIdFromPath($path);
+
+        list(, $store) = $this->extractKeys($this->getIdMap()->get($id));
+
+        $this->store($store)->removeByPath($path);
 
         return $this;
     }

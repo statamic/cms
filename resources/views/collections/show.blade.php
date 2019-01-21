@@ -7,7 +7,7 @@
             @svg('chevron-right')
             {{ $collection->title() }}
         </h1>
-        <a href="{{ cp_route('collections.entries.create', $collection->path()) }}" class="btn btn-primary">{{ __('Create Entry') }}</a>
+        <a href="{{ cp_route('collections.entries.create', $collection->handle()) }}" class="btn btn-primary">{{ __('Create Entry') }}</a>
     </div>
 
     <entry-list

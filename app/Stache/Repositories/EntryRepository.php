@@ -57,15 +57,17 @@ class EntryRepository implements RepositoryContract
         });
     }
 
-    public function findByUri(string $uri): ?Entry
+    public function findByUri(string $uri, string $site = null): ?Entry
     {
-        return app(StructureRepository::class)->findEntryByUri($uri)
-            ?? $this->find($this->store->getIdFromUri($uri));
+        return app(StructureRepository::class)->findEntryByUri($uri, $site)
+            ?? $this->find($this->store->getIdFromUri($uri, $site));
     }
 
-    public function save(Entry $entry)
+    public function save($entry)
     {
-        $this->store->store($entry->collectionName())->insert($entry);
+        $this->store
+            ->store($entry->collectionHandle())
+            ->insert($entry->entry());
 
         $this->store->save($entry);
     }
@@ -73,5 +75,10 @@ class EntryRepository implements RepositoryContract
     public function query()
     {
         return new QueryBuilder;
+    }
+
+    public function make()
+    {
+        return new \Statamic\Data\Entries\Entry;
     }
 }

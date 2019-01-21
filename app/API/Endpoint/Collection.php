@@ -52,20 +52,21 @@ class Collection
         return self::whereHandle($handle) !== null;
     }
 
-    /**
-     * Create a collection
-     *
-     * @param string $handle
-     * @return \Statamic\Contracts\Data\Entries\Collection
-     */
-    public function create($handle)
+    public function make($handle = null)
     {
-        /** @var \Statamic\Contracts\Data\Entries\Collection $collection */
-        $collection = app('Statamic\Contracts\Data\Entries\Collection');
+        $collection = app(CollectionContract::class);
 
-        $collection->path($handle);
+        if ($handle) {
+            $collection->handle($handle);
+        }
 
         return $collection;
+    }
+
+    public function create($handle)
+    {
+        // TODO: Remove.
+        return $this->make($handle);
     }
 
     public function save(CollectionContract $collection)

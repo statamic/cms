@@ -2,244 +2,170 @@
 
 namespace Statamic\Data\Entries;
 
-use Statamic\API\File;
-use Statamic\API\YAML;
-use Statamic\API\Config;
-use Statamic\API\Folder;
-use Statamic\API\Search;
-use Statamic\API\Fieldset;
-use Statamic\Data\DataFolder;
-use Statamic\API\Entry as EntryAPI;
-use Statamic\Events\Data\CollectionDeleted;
-use Statamic\API\Collection as CollectionAPI;
-use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
+use Statamic\API;
+use Statamic\API\Blueprint;
+use Statamic\Contracts\Data\Entries\Collection as Contract;
 
-class Collection extends DataFolder implements CollectionContract
+class Collection implements Contract
 {
-    /**
-     * @var \Statamic\Data\EntryCollection
-     */
-    protected $entries;
+    protected $handle;
+    protected $route;
+    protected $title;
+    protected $template;
+    protected $layout;
+    protected $sites = [];
+    protected $data = [];
+    protected $blueprints = [];
 
-    /**
-     * @var \Carbon\Carbon
-     */
-    protected $last_modified;
-
-    /**
-     * @return int
-     */
-    public function count()
+    public function get($key)
     {
-        return EntryAPI::countWhereCollection($this->path());
+        return array_get($this->data, $key);
     }
 
-    /**
-     * @return \Statamic\Data\EntryCollection
-     */
-    public function entries()
+    public function has($key)
     {
-        if ($this->entries) {
-            return $this->entries;
-        }
-
-        if (! $entries = EntryAPI::whereCollection($this->path())) {
-            $entries = collect_entries();
-        }
-
-        switch ($this->order()) {
-            case 'number':
-                $entries = $entries->multisort('order:asc');
-                break;
-            case 'date':
-                $entries = $entries->multisort('date:desc');
-                break;
-            default:
-                $entries = $entries->multisort('title:asc');
-        }
-
-        return $this->entries = $entries;
+        return $this->get($key) != null;
     }
 
-    /**
-     * @param string                         $key
-     * @param \Statamic\Contracts\Data\Entry $entry
-     */
-    public function addEntry($key, $entry)
+    public function set($key, $value)
     {
-        $this->entries->put($key, $entry);
-    }
-
-    /**
-     * @param string $key
-     */
-    public function removeEntry($key)
-    {
-        $this->entries->pull($key);
-    }
-
-    /**
-     * @return \Carbon\Carbon
-     */
-    public function lastModified()
-    {
-        $date = null;
-
-        foreach ($this->entries() as $entry) {
-            $modified = $entry->lastModified();
-
-            if ($date) {
-                if ($modified->gt($date)) {
-                    $date = $modified;
-                }
-            } else {
-                $date = $modified;
-            }
-        }
-
-        return $date;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function save()
-    {
-        CollectionAPI::save($this);
-
-        return $this; // TODO: Test
-    }
-
-    /**
-     * Get the collection order
-     *
-     * @return string
-     */
-    public function order()
-    {
-        $order = $this->get('order');
-
-        if (in_array($order, ['number', 'numeric', 'numerical', 'numbers', 'numbered'])) {
-            return 'number';
-        }
-
-        if ($order === 'date') {
-            return 'date';
-        }
-
-        return 'alphabetical';
-    }
-
-    /**
-     * Delete the folder
-     *
-     * @return mixed
-     */
-    public function delete()
-    {
-        // TODO: Re-implement correctly.
-
-        app('stache')->store('collections')->removeItem($this->path());
-        app('files')->delete(
-            app('stache')->store('collections')->directory() . $this->path() . '.yaml'
-        );
-
-        // event(new CollectionDeleted($this->path()));
-    }
-
-    /**
-     * Get the URL to edit this in the CP
-     *
-     * @return string
-     */
-    public function editUrl()
-    {
-        return cp_route('collections.edit', $this->path());
-    }
-
-    /**
-     * Get the URL to create a new Entry in this Collection inn the CP
-     *
-     * @return string
-     */
-    public function createEntryUrl()
-    {
-        return cp_route('entry.create', $this->path());
-    }
-
-    /**
-     * Get or set the route definition
-     *
-     * @return string
-     */
-    public function route($route = null)
-    {
-        if (is_null($route)) {
-            return $this->get('route');
-        }
-
-        $this->set('route', $route);
+        $this->data[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * Get or set the fieldset
-     *
-     * @param string|null|bool
-     * @return Statamic\Fields\Fieldset
-     */
-    public function fieldset($fieldset = null)
+    public function data($data = null)
     {
-        if (! is_null($fieldset)) {
-            $this->set('fieldset', $fieldset);
+        if (func_num_args() === 0) {
+            return $this->data;
         }
 
-        if ($fieldset === false) {
-            $this->set('fieldset', null);
-        }
+        $this->data = $data;
 
-        return Fieldset::get([
-            $this->get('fieldset'),
-            config('statamic.theming.fieldsets.entry'),
-            config('statamic.theming.fieldsets.default')
-        ]);
+        return $this;
     }
 
-    public function blueprints()
-    {
-        return collect($this->get('blueprints', []))->map(function ($blueprint) {
-            return \Facades\Statamic\Fields\BlueprintRepository::find($blueprint);
-        });
-    }
-
-    public function blueprint()
-    {
-        return $this->blueprints()->first();
-    }
-
-    // TODO: Deprecate path
     public function handle($handle = null)
     {
-        return $this->path($handle);
+        if (func_num_args() === 0) {
+            return $this->handle;
+        }
+
+        $this->handle = $handle;
+
+        return $this;
+    }
+
+    public function route($route = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->route;
+        }
+
+        $this->route = $route;
+
+        return $this;
+    }
+
+    public function order($order = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->order ?? 'alphabetical';
+        }
+
+        if (in_array($order, ['numeric', 'numerical', 'numbers', 'numbered'])) {
+            $order = 'number';
+        }
+
+        $this->order = $order;
+
+        return $this;
+    }
+
+    public function title($title = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->title ?? ucfirst($this->handle());
+        }
+
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function editUrl()
+    {
+        return cp_route('collections.edit', $this->handle());
     }
 
     public function queryEntries()
     {
-        return EntryAPI::query()->where('collection', $this->handle());
+        return API\Entry::query()->where('collection', $this->handle());
     }
 
-    public function searchIndex()
+    public function entryBlueprints($blueprints = null)
     {
-        if (! $index = $this->get('search_index')) {
-            return null;
+        if (func_num_args() === 0) {
+            return collect($this->blueprints)->map(function ($blueprint) {
+                return Blueprint::find($blueprint);
+            });
         }
 
-        return Search::index($index);
+        $this->blueprints = $blueprints;
+
+        return $this;
     }
 
-    public function hasSearchIndex()
+    public function entryBlueprint()
     {
-        return $this->searchIndex() !== null;
+        return $this->entryBlueprints()->first();
+    }
+
+    public function sites($sites = null)
+    {
+        if (func_num_args() === 0) {
+            return collect($this->sites);
+        }
+
+        $this->sites = $sites;
+
+        return $this;
+    }
+
+    public function template($template = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->template ?? config('statamic.theming.views.entry');
+        }
+
+        $this->template = $template;
+
+        return $this;
+    }
+
+    public function layout($layout = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->layout ?? config('statamic.theming.views.layout');
+        }
+
+        $this->layout = $layout;
+
+        return $this;
+    }
+
+    public function save()
+    {
+        API\Collection::save($this);
+
+        return $this;
+    }
+
+    public function path()
+    {
+        return vsprintf('%s/%s.yaml', [
+            rtrim(config('statamic.stache.stores.collections.directory'), '/'),
+            $this->handle
+        ]);
     }
 }

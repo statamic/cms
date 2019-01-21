@@ -4,13 +4,16 @@ namespace Tests;
 
 trait PreventSavingStacheItemsToDisk
 {
+    protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
+
     protected function preventSavingStacheItemsToDisk()
     {
         $stores = collect([
             NonSavingCollectionsStore::class,
             NonSavingEntriesStore::class,
+            NonSavingGlobalsStore::class,
         ])->map(function ($class) {
-            return app($class)->directory(__DIR__.'/__fixtures__/dev-null');
+            return app($class)->directory($this->fakeStacheDirectory);
         });
 
         $this->app['stache']->registerStores($stores->all());
@@ -24,5 +27,10 @@ class NonSavingCollectionsStore extends \Statamic\Stache\Stores\CollectionsStore
 
 class NonSavingEntriesStore extends \Statamic\Stache\Stores\EntriesStore
 {
-    public function save(\Statamic\Contracts\Data\Entries\Entry $entry) { }
+    public function save($entry) { }
+}
+
+class NonSavingGlobalsStore extends \Statamic\Stache\Stores\GlobalsStore
+{
+    public function save(\Statamic\Contracts\Data\Globals\GlobalSet $globals) { }
 }

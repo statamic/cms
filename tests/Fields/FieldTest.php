@@ -45,6 +45,14 @@ class FieldTest extends TestCase
     }
 
     /** @test */
+    function it_determines_if_localizable()
+    {
+        $this->assertFalse((new Field('test', []))->isLocalizable());
+        $this->assertFalse((new Field('test', ['localizable' => false]))->isLocalizable());
+        $this->assertTrue((new Field('test', ['localizable' => true]))->isLocalizable());
+    }
+
+    /** @test */
     function it_gets_the_fieldtype()
     {
         $fieldtype = new class extends Fieldtype { };

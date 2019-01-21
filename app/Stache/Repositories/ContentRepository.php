@@ -32,8 +32,8 @@ class ContentRepository implements RepositoryContract
         return $store->getItem($id);
     }
 
-    public function findByUri(string $uri): ?Content
+    public function findByUri(string $uri, string $site = null): ?Content
     {
-        return Entry::whereUri($uri);
+        return Entry::whereUri($uri, $site);
     }
 }

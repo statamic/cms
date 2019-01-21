@@ -2,6 +2,7 @@
 
 namespace Tests\Stache;
 
+use Mockery;
 use Tests\TestCase;
 use Statamic\Stache\Loader;
 use Statamic\Stache\Stache;
@@ -39,8 +40,7 @@ class LoaderTest extends TestCase
     {
         $this->expectException(EmptyStacheException::class);
 
-        Cache::shouldReceive('get')->with('stache::meta/one')->andReturnNull();
-        Cache::shouldReceive('get')->with('stache::meta/two')->andReturnNull();
+        Cache::shouldReceive('has')->with('stache::meta/one')->andReturnFalse();
 
         $this->loader->load();
     }
@@ -48,11 +48,13 @@ class LoaderTest extends TestCase
     /** @test */
     function it_loads_meta_in_the_stache()
     {
-        Cache::shouldReceive('get')->with('stache::meta/one')->andReturn($metaOne = [
+        Cache::shouldReceive('has')->with('stache::meta/one')->andReturnTrue();
+        Cache::shouldReceive('get')->with('stache::meta/one', Mockery::any())->andReturn($metaOne = [
             'paths' => ['one-test.md'],
             'uris' => ['en' => ['/one-test']],
         ]);
-        Cache::shouldReceive('get')->with('stache::meta/two')->andReturn($metaTwo = [
+        Cache::shouldReceive('has')->with('stache::meta/two')->andReturnTrue();
+        Cache::shouldReceive('get')->with('stache::meta/two', Mockery::any())->andReturn($metaTwo = [
             'paths' => ['two-test.md'],
             'uris' => ['en' => ['/two-test']],
         ]);
@@ -68,18 +70,24 @@ class LoaderTest extends TestCase
     /** @test */
     function it_loads_paths_into_respective_stores()
     {
-        Cache::shouldReceive('get')->with('stache::meta/one')->andReturn([
+        Cache::shouldReceive('has')->with('stache::meta/one')->andReturnTrue();
+        Cache::shouldReceive('get')->with('stache::meta/one', Mockery::any())->andReturn([
             'uris' => [],
             'paths' => [
-                12 => 'one/two.md',
-                34 => 'three/four.md',
+                'en' => [
+                    12 => 'one/two.md',
+                    34 => 'three/four.md',
+                ]
             ]
         ]);
-        Cache::shouldReceive('get')->with('stache::meta/two')->andReturn([
+        Cache::shouldReceive('has')->with('stache::meta/two')->andReturnTrue();
+        Cache::shouldReceive('get')->with('stache::meta/two', Mockery::any())->andReturn([
             'uris' => [],
             'paths' => [
-                56 => 'five/six.md',
-                78 => 'seven/eight.md',
+                'en' => [
+                    56 => 'five/six.md',
+                    78 => 'seven/eight.md',
+                ]
             ]
         ]);
 
@@ -87,19 +95,20 @@ class LoaderTest extends TestCase
 
         $this->assertEquals(
             [12 => 'one/two.md', 34 => 'three/four.md'],
-            $this->stache->store('one')->getPaths()->all()
+            $this->stache->store('one')->getSitePaths('en')->all()
         );
 
         $this->assertEquals(
             [56 => 'five/six.md', 78 => 'seven/eight.md'],
-            $this->stache->store('two')->getPaths()->all()
+            $this->stache->store('two')->getSitePaths('en')->all()
         );
     }
 
     /** @test */
     function it_loads_uris_into_respective_stores()
     {
-        Cache::shouldReceive('get')->with('stache::meta/one')->andReturn([
+        Cache::shouldReceive('has')->with('stache::meta/one')->andReturnTrue();
+        Cache::shouldReceive('get')->with('stache::meta/one', Mockery::any())->andReturn([
             'paths' => [],
             'uris' => [
                 'en' => [
@@ -112,7 +121,8 @@ class LoaderTest extends TestCase
                 ]
             ]
         ]);
-        Cache::shouldReceive('get')->with('stache::meta/two')->andReturn([
+        Cache::shouldReceive('has')->with('stache::meta/two')->andReturnTrue();
+        Cache::shouldReceive('get')->with('stache::meta/two', Mockery::any())->andReturn([
             'paths' => [],
             'uris' => [
                 'en' => [
@@ -158,6 +168,9 @@ class LoaderTest extends TestCase
             {
                 return 'one';
             }
+            public function cacheHasMeta() {
+                return true;
+            }
             public function getMetaFromCache()
             {
                 return ['one' => 'first meta data'];
@@ -167,6 +180,9 @@ class LoaderTest extends TestCase
             public function key()
             {
                 return 'two';
+            }
+            public function cacheHasMeta() {
+                return true;
             }
             public function getMetaFromCache()
             {

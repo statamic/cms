@@ -2,6 +2,6 @@
 
 namespace Statamic\Contracts\Data\Entries;
 
-interface Collection
+interface LocalizedEntry
 {
 }

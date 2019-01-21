@@ -3,6 +3,7 @@
 namespace Statamic\Data\Structures;
 
 use Statamic\API\Entry;
+use Statamic\API\Stache;
 use Statamic\API\Structure as StructureAPI;
 use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
@@ -106,5 +107,13 @@ class Structure implements StructureContract
         $this->withParent = false;
 
         return $this;
+    }
+
+    public function path()
+    {
+        return vsprintf('%s/%s.yaml', [
+            rtrim(Stache::store('structures')->directory(), '/'),
+            $this->handle
+        ]);
     }
 }

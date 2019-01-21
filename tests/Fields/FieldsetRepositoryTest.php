@@ -25,6 +25,8 @@ class FieldsetRepositoryTest extends TestCase
     public function tearDown()
     {
         (new Filesystem)->deleteDirectory($this->tempDir);
+
+        parent::tearDown();
     }
 
     /** @test */

@@ -91,7 +91,7 @@ class DataCollection extends IlluminateCollection
 
         $value = (method_exists($item, $method))
             ? call_user_func([$item, $method])
-            : $item->getWithDefaultLocale($sort);
+            : $item->get($sort);
 
         return $this->normalizeSortableValue($value);
     }

@@ -19,11 +19,11 @@ class CollectionsController extends CpController
             return request()->user()->can('view', $collection);
         })->map(function ($collection) {
             return [
-                'id' => $collection->path(),
+                'id' => $collection->handle(),
                 'title' => $collection->title(),
                 'entries' => \Statamic\API\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
-                'entries_url' => cp_route('collections.show', $collection->path())
+                'entries_url' => cp_route('collections.show', $collection->handle())
             ];
         })->values();
 

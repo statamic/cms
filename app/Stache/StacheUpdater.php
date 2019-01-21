@@ -17,8 +17,6 @@ class StacheUpdater
     public function update()
     {
         foreach ($this->stache->stores() as $store) {
-            $files = Traverser::traverse($store);
-
             app(StoreUpdater::class)->store($store)->update();
         }
     }

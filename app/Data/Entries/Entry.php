@@ -2,367 +2,143 @@
 
 namespace Statamic\Data\Entries;
 
-use Carbon\Carbon;
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Config;
-use Statamic\API\Fieldset;
-use Statamic\API\Blueprint;
-use Statamic\Data\Content\Content;
-use Statamic\API\Entry as EntryAPI;
-use Statamic\Events\Data\EntrySaved;
-use League\Flysystem\FileNotFoundException;
-use Statamic\API\Collection as CollectionAPI;
-use Statamic\Data\Content\HasLocalizedSlugsInData;
-use Statamic\Exceptions\InvalidEntryTypeException;
-use Statamic\Contracts\Data\Entries\Entry as EntryContract;
+use Closure;
+use Statamic\API\Site;
+use Statamic\Exceptions\InvalidLocalizationException;
+use Statamic\Contracts\Data\Entries\Entry as Contract;
 
-class Entry extends Content implements EntryContract
+class Entry implements Contract
 {
-    /**
-     * Allows localized slugs to be placed in front matter
-     *
-     * Used by entries and terms
-     */
-    use HasLocalizedSlugsInData;
+    protected $id;
+    protected $collection;
+    protected $localizations;
 
-    /**
-     * Get or set the path
-     *
-     * @param string|null $path
-     * @return string
-     */
-    public function path($path = null)
+    public function __construct()
     {
-        if (! is_null($path)) {
-            dd('todo: set an entrys path in entry@path'); // TODO:
+        $this->localizations = collect();
+    }
+
+    public function id($id = null)
+    {
+        if (is_null($id)) {
+            return $this->id;
         }
 
-        if (isset($this->attributes['path'])) {
-            return $this->attributes['path'];
-        }
+        $this->id = $id;
 
-        return $this->buildPath();
+        return $this;
     }
 
-    /**
-     * Get the path to a localized version
-     *
-     * @param string $locale
-     * @return string
-     */
-    public function localizedPath($locale)
-    {
-        return $this->buildPath(compact('locale'));
-    }
-
-    /**
-     * Get the path before the object was modified.
-     *
-     * @return string
-     */
-    public function originalPath()
-    {
-        $attr = $this->original['attributes'];
-
-        $attr['order'] = array_get($this->original, 'attributes.order', false);
-
-        return $this->buildPath($attr);
-    }
-
-    /**
-     * Get the path to a localized version before the object was modified.
-     *
-     * @param string $locale
-     * @return string
-     */
-    public function originalLocalizedPath($locale)
-    {
-        $attr = $this->original['attributes'];
-
-        $attr['locale'] = $locale;
-
-        $attr['order'] = array_get($this->original, 'attributes.order', false);
-
-        return $this->buildPath($attr);
-    }
-
-    /**
-     * Dynamically build the file path
-     *
-     * @param array $data Overrides for any arguments.
-     * @return string
-     */
-    private function buildPath($data = [])
-    {
-        return app('Statamic\Contracts\Data\Content\PathBuilder')
-            ->entry()
-            ->slug(array_get($data, 'slug', $this->attributes['slug']))
-            ->collection(array_get($data, 'collection', $this->collectionName()))
-            ->published(array_get($data, 'published', $this->published()))
-            ->order(array_get($data, 'order', $this->order()))
-            ->extension(array_get($data, 'data_type', $this->dataType()))
-            ->locale(array_get($data, 'locale', $this->locale()))
-            ->get();
-    }
-
-    /**
-     * Get or set the associated collection
-     *
-     * @param Collection|string|null $collection
-     * @return Collection
-     */
     public function collection($collection = null)
     {
         if (is_null($collection)) {
-            return CollectionAPI::whereHandle($this->attributes['collection']);
+            return $this->collection;
         }
 
-        // If we've been passed an actual collection, we just need the name of it.
-        if ($collection instanceof Collection) {
-            $collection = $collection->basename();
-        }
-
-        $this->attributes['collection'] = $collection;
+        $this->collection = $collection;
 
         return $this;
     }
 
-    /**
-     * Get or set the name of the associated collection
-     *
-     * @param string|null $name
-     * @return string
-     */
-    public function collectionName($name = null)
+    public function collectionHandle()
     {
-        if (is_null($name)) {
-            return $this->attributes['collection'];
-        }
-
-        $this->attributes['collection'] = $name;
+        return $this->collection->handle();
     }
 
-    /**
-     * Gets the URI
-     *
-     * This is the "identifying URL" for lack of a better description.
-     * For instance, where `/fr/blog/my-post` would be a URL, `/blog/my-post` would be the URI.
-     *
-     * @return mixed
-     * @throws \Exception
-     */
-    public function uri()
+    public function localizations()
     {
-        if ($route = $this->collection()->route()) {
-            return app('Statamic\Contracts\Data\Content\UrlBuilder')->content($this)->build($route);
-        }
+        return $this->localizations;
     }
 
-    /**
-     * The URL to edit it in the CP
-     *
-     * @return mixed
-     */
-    public function editUrl()
+    public function addLocalization(LocalizedEntry $entry)
     {
-        $slug = $this->in(default_locale())->slug();
+        $entry->entry($this);
 
-        return cp_route('collections.entries.edit', [$this->collectionName(), $slug]);
-    }
-
-    /**
-     * Get the order type (date, number, alphabetical)
-     *
-     * @return string
-     */
-    public function orderType()
-    {
-        return $this->collection()->order();
-    }
-
-    /**
-     * Get the entry's date
-     *
-     * @return \Carbon\Carbon
-     * @throws \Statamic\Exceptions\InvalidEntryTypeException
-     */
-    public function date()
-    {
-        if ($this->orderType() !== 'date') {
-            throw new InvalidEntryTypeException(
-                sprintf('Cannot get the date on an non-date based entry: [%s]', $this->path())
-            );
-        }
-
-        if (substr_count($this->order(), '-') < 1) {
-            throw new InvalidEntryTypeException(
-                sprintf('Entry date not present in a date-based entry: [%s]', $this->path())
-            );
-        }
-
-        return (strlen($this->order()) == 15)
-            ? Carbon::createFromFormat('Y-m-d-Hi', $this->order())
-            : Carbon::createFromFormat('Y-m-d', $this->order())->startOfDay();
-    }
-
-    /**
-     * Does the entry have a timestamp?
-     *
-     * @return bool
-     */
-    public function hasTime()
-    {
-        return $this->orderType() === 'date' && strlen($this->order()) === 15;
-    }
-
-    /**
-     * Get data from the cascade (folder.yaml files)
-     *
-     * @return array
-     */
-    protected function cascadingData()
-    {
-        if ($collection = $this->collection()) {
-            return $collection->data();
-        }
-
-        return [];
-    }
-
-    /**
-     * Get or set the template
-     *
-     * @param string|null $template
-     * @return mixed
-     */
-    public function template($template = null)
-    {
-        if (is_null($template)) {
-            return [
-                $this->getWithCascade('template'), // gets `template` from the entry, and falls back to what's in folder.yaml
-                config('statamic.theming.views.entry'),
-                config('statamic.theming.views.default')
-            ];
-        }
-
-        $this->set('template', $template);
-    }
-
-    /**
-     * Get or set the layout
-     *
-     * @param string|null $layout
-     * @return mixed
-     */
-    public function layout($layout = null)
-    {
-        if (is_null($layout)) {
-            // First, check the front-matter
-            if ($layout = $this->getWithCascade('layout')) {
-                return $layout;
-            }
-
-            // Lastly, return a default
-            return config('statamic.theming.views.layout');
-        }
-
-        $this->set('layout', $layout);
-    }
-
-    /**
-     * Get the folder of the file relative to content path
-     *
-     * @return string
-     */
-    public function folder()
-    {
-        $dir = Path::directory($this->path());
-
-        $dir = preg_replace('#^collections/#', '', $dir);
-
-        return (str_contains($dir, '/')) ? explode('/', $dir)[0] : $dir;
-    }
-
-    /**
-     * Get the fieldset
-     *
-     * @return string|null
-     */
-    protected function getFieldset()
-    {
-        // First check the front matter
-        if ($fieldset = $this->getWithCascade('fieldset')) {
-            return Fieldset::get($fieldset);
-        }
-
-        // Then the default content fieldset
-        $fieldset = config('statamic.theming.fieldsets.' . $this->contentType());
-        $path = settings_path('fieldsets/'.$fieldset.'.yaml');
-        if (File::exists($path)) {
-            return Fieldset::get($fieldset);
-        }
-
-        // Finally the default fieldset
-        return Fieldset::get(config('statamic.theming.fieldsets.default'));
-    }
-
-    /**
-     * Get the last modified time of the entry.
-     *
-     * @return \Carbon\Carbon
-     */
-    public function lastModified()
-    {
-        // Entries with no files have been created programmatically (eg. for a sneak peek)
-        // and haven't been saved yet. We'll use the current time in that case.
-        $timestamp = File::disk('content')->exists($path = $this->path())
-            ? File::disk('content')->lastModified($path)
-            : time();
-
-        return Carbon::createFromTimestamp($timestamp);
-    }
-
-    /**
-     * Add supplemental data to the attributes
-     *
-     * Some data on the entry is dynamic and only available through methods.
-     * When we want to use these when preparing for use in a template for
-     * example, we will need these available in the front-matter.
-     */
-    public function supplement()
-    {
-        parent::supplement();
-
-        if ($this->orderType() === 'date') {
-            $this->supplements['date'] = $this->date();
-            $this->supplements['datestring'] = $this->date()->__toString();
-            $this->supplements['datestamp'] = $this->date()->timestamp;
-            $this->supplements['timestamp'] = $this->date()->timestamp;
-            $this->supplements['has_timestamp'] = $this->hasTime();
-        }
-
-        $this->supplements['order_type'] = $this->orderType();
-        $this->supplements['collection'] = $this->collectionName();
-        $this->supplements['is_entry'] = true;
-        $this->supplements['last_modified'] = $this->lastModified()->timestamp;
-    }
-
-    public function save()
-    {
-        EntryAPI::save($this);
-
-        EntrySaved::dispatch($this, []);  // TODO: Test, and deal with second argument.
+        $this->localizations[$entry->locale()] = $entry;
 
         return $this;
     }
 
-    public function blueprint()
+    public function removeLocalization(LocalizedEntry $entry)
     {
-        if ($blueprint = $this->get('blueprint')) {
-            return Blueprint::find($blueprint);
+        $this->localizations->forget($entry->locale());
+
+        return $this;
+    }
+
+    public function existsIn($site)
+    {
+        return $this->localizations->has($site);
+    }
+
+    public function in($site, $callback = null)
+    {
+        if ($site instanceof Closure || $callback instanceof Closure) {
+            return $this->makeAndAddLocalization($site, $callback);
         }
 
-        return $this->collection()->blueprint();
+        if ($this->existsIn($site)) {
+            return $this->localizations->get($site);
+        }
+
+        throw new InvalidLocalizationException("Entry is not localized into the [$site] site");
+    }
+
+    protected function makeAndAddLocalization($site, $callback = null)
+    {
+        if (! $callback) {
+            $callback = $site;
+            $site = Site::current()->handle();
+        }
+
+        $entry = (new LocalizedEntry)->id($this->id)->locale($site);
+
+        $this->addLocalization($entry);
+
+        $callback($entry);
+
+        return $entry;
+    }
+
+    public function inOrClone($site, $from = null)
+    {
+        try {
+            return $this->in($site);
+        } catch (InvalidLocalizationException $e) {
+            return clone $this->localizations
+                ->get($from ?? $this->localizations->keys()->first())
+                ->initialPath(null)
+                ->locale($site);
+        }
+    }
+
+    protected function forCurrentSite()
+    {
+        return $this->in(Site::current()->handle());
+    }
+
+    public function __call($method, $args = [])
+    {
+        if (method_exists(LocalizedEntry::class, $method)) {
+            return call_user_func_array([$this->forCurrentSite(), $method], $args);
+        }
+
+        throw new \BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $method));
+    }
+
+    public function toCacheableArray()
+    {
+        return [
+            'collection' => $this->collectionHandle(),
+            'localizations' => $this->localizations->map(function ($entry) {
+                return [
+                    'slug' => $entry->slug(),
+                    'order' => $entry->order(),
+                    'published' => $entry->published(),
+                    'path' => $entry->initialPath() ?? $entry->path(),
+                    'data' => $entry->data()
+                ];
+            })->all()
+        ];
     }
 }

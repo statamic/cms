@@ -37,7 +37,7 @@ class StructurePagesController extends CpController
 
             return [
                 'id'          => $page->id(),
-                'title'       => (string) $page->getWithDefaultLocale('title'),
+                'title'       => (string) $page->get('title'),
                 'url'         => $page->url(),
                 'slug'        => $page->slug(),
                 'children'    => (! empty($item['children'])) ? $this->transformTree($item['children']) : []

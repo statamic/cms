@@ -28,7 +28,7 @@ class CollectionRepository implements RepositoryContract
 
     public function save(Collection $collection)
     {
-        $this->store->setItem($collection->path(), $collection);
+        $this->store->setItem($collection->handle(), $collection);
 
         $this->store->save($collection);
     }
