@@ -173,10 +173,12 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
     public function toArray()
     {
         return array_merge($this->data, [
+            'id' => $this->id(),
             'slug' => $this->slug(),
             'uri' => $this->uri(),
             'url' => $this->url(),
             'edit_url' => $this->editUrl(),
+            'published' => $this->published(),
         ], $this->supplements);
     }
 
