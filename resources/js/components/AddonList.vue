@@ -108,7 +108,7 @@
 
         methods: {
             getAddons() {
-                axios.get('/cp/api/addons', {'params': this.params}).then(response => {
+                axios.get(window.Statamic.apiRoot+'/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
                     this.rows = response.data.data;
                     this.meta = response.data.meta;

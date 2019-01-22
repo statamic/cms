@@ -435,8 +435,12 @@ function resources_root()
 
 function cp_root()
 {
-    log_todo();
-    return '/cp';
+    return str_start(config('statamic.cp.route'), '/');
+}
+
+function api_root()
+{
+    return str_start(config('statamic.api.route'), '/');
 }
 
 /**
