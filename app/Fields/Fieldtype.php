@@ -89,6 +89,11 @@ abstract class Fieldtype implements Arrayable
         return $this->defaultValue;
     }
 
+    public function augment($value)
+    {
+        return $value;
+    }
+
     public function toArray(): array
     {
         return [

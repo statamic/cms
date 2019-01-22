@@ -3,6 +3,7 @@
 namespace Statamic\View;
 
 use Statamic\Sites\Site;
+use Statamic\Fields\Value;
 use Statamic\API\GlobalSet;
 use Illuminate\Http\Request;
 
@@ -119,7 +120,14 @@ class Cascade
             return $this;
         }
 
-        $variables = $this->content->toArray();
+        $fields = $this->content->blueprint()
+            ? $this->content->blueprint()->fields()->all()
+            : collect();
+
+        $variables = collect($this->content->toArray())
+            ->map(function ($value, $handle) use ($fields) {
+                return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
+            })->all();
 
         foreach ($variables as $key => $value) {
             $this->set($key, $value);

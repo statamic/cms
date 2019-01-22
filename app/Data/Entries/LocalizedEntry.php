@@ -182,14 +182,6 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
         ], $this->supplements);
     }
 
-    public function toAugmentedArray()
-    {
-        return array_merge($d = $this->toArray(), [
-            'content' => markdown($d['content']),
-            'content_raw' => $d['content']
-        ]);
-    }
-
     public function editUrl()
     {
         return cp_route('collections.entries.edit', [

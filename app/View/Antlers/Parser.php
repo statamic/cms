@@ -6,9 +6,10 @@ use Statamic\API\Arr;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\View\Modify;
+use Statamic\Fields\Value;
+use Illuminate\Support\Collection;
 use Statamic\Exceptions\ParsingException;
 use Statamic\Exceptions\ModifierException;
-use Statamic\Contracts\Data\Taxonomies\Term;
 
 class Parser
 {
@@ -244,11 +245,6 @@ class Parser
                         foreach ($loop_data as $loop_key => $loop_value) {
                             $index++;
 
-                            // Terms should be converted to arrays automatically.
-                            if ($loop_value instanceof Term) {
-                                $loop_value = $loop_value->toArray();
-                            }
-
                             // is the value an array?
                             if (! is_array($loop_value)) {
                                 // no, make it one
@@ -302,6 +298,10 @@ class Parser
      */
     public function parseStringVariables($text, $data, $callback)
     {
+        if ($text instanceof Value) {
+            $text = $text->value();
+        }
+
         // Check for any vars flagged as noparse
         $noparse = array_get($data, '_noparse', []);
 
@@ -358,9 +358,6 @@ class Parser
                         if (($var_pipe !== false && in_array('noparse', array_slice(explode('|', $var), 1))) || in_array($var_name, $noparse)) {
                             $text = $this->createExtraction('noparse', $data_matches[0][$index], $val, $text);
                         } else {
-                            if ($val instanceof Term) {
-                                $val = $val->slug();
-                            }
                             $text = str_replace($data_matches[0][$index], $val, $text);
                         }
 
@@ -517,14 +514,13 @@ class Parser
                 if ($values = array_get_colon($data, $name)) {
 
                     // is this a tag-pair?
-                    if (is_array($values)) {
+                    if ($this->isLoopable($values)) {
                         // yes it is
                         // there might be parameters that will control how this
                         // tag-pair's data is filtered/sorted/limited/etc,
                         // look for those and apply those as needed
 
                         // exact result grabbing ----------------------------------
-
                         foreach ($parameters as $modifier => $parameters) {
                             $parameters = explode(':', $parameters);
                             $values = $this->runModifier($modifier, $values, $parameters, $data);
@@ -899,10 +895,6 @@ class Parser
         // if the resulting value of a variable is a string that contains another variable,
         // let's find that variable's value as well
         if (!is_array($value)) {
-            if ($value instanceof Term) {
-                $value = $value->slug();
-            }
-
             while (preg_match($this->variableTagRegex, $value, $matches)) {
                 $previous_value = $value;
                 $value = $this->parseVariables($value, $this->conditionalData, $callback);
@@ -1095,8 +1087,12 @@ class Parser
             }
         }
 
+        if ($data instanceof Value) {
+            $data = $data->value();
+        }
+
         // convert collections to arrays
-        if ($data instanceof \Illuminate\Support\Collection) {
+        if ($data instanceof Collection) {
             $data = $data->toArray();
         }
 
@@ -1232,15 +1228,35 @@ class Parser
      */
     protected function runModifier($modifier, $data, $parameters, $context = [])
     {
-        try {
-            return Modify::value($data)->context($context)->$modifier($parameters)->fetch();
+        $data = $data instanceof Value ? $data : new Value($data);
 
+        if ($modifier === 'raw') {
+            return $data->raw();
+        }
+
+        try {
+            return Modify::value($data->value())->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
             \Log::notice(
                 sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage())
             );
 
-            return $data;
+            return $data->value();
         }
+    }
+
+    protected function isLoopable($value)
+    {
+        if (is_array($value)) {
+            return true;
+        }
+
+        if (! $value instanceof Value) {
+            return false;
+        }
+
+        $value = $value->value();
+
+        return is_array($value) || $value instanceof Collection;
     }
 }
