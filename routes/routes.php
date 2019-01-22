@@ -1,5 +1,9 @@
 <?php
 
+Route::middleware('api')
+     ->namespace('Statamic\Http\Controllers\API')
+     ->group(__DIR__.'/api.php');
+
 Route::middleware('web')
     ->name('statamic.cp.')
     ->prefix(config('statamic.cp.route', 'cp'))
