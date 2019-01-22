@@ -438,11 +438,6 @@ function cp_root()
     return str_start(config('statamic.cp.route'), '/');
 }
 
-function api_root()
-{
-    return str_start(config('statamic.api.route'), '/');
-}
-
 /**
  * Inline SVG helper
  *

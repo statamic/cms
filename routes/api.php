@@ -1,6 +1,5 @@
 <?php
 
-Route::resource('addons', 'AddonsController');
 Route::resource('assets', 'AssetsController');
 Route::resource('collections', 'CollectionsController');
 Route::resource('collections/{collection}/entries', 'CollectionEntriesController');

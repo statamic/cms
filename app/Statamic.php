@@ -104,7 +104,6 @@ class Statamic
             'csrfToken' => csrf_token(),
             'siteRoot' => site_root(),
             'cpRoot' => cp_root(),
-            'apiRoot' => api_root(),
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => cp_resource_url('/'),
             'locales' => \Statamic\API\Config::get('statamic.system.locales'),

@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers\API;
+namespace Statamic\Http\Controllers\CP\API;
 
 use Facades\Statamic\Extend\Marketplace;
 use Illuminate\Http\Request;

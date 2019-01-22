@@ -109,6 +109,11 @@ Route::group([
         Route::get('blueprints/data', 'BlueprintsFieldtypeController@data');
     });
 
+    // Local API
+    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
+        Route::resource('addons', 'AddonsController');
+    });
+
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
 });
 
