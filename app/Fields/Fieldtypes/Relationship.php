@@ -3,6 +3,7 @@
 namespace Statamic\Fields\Fieldtypes;
 
 use Statamic\API\Entry;
+use Statamic\API\Content;
 use Illuminate\Support\Arr;
 use Statamic\Fields\Fieldtype;
 
@@ -74,5 +75,12 @@ class Relationship extends Fieldtype
             'title' => $id,
             'invalid' => true
         ];
+    }
+
+    public function augment($values)
+    {
+        return collect($values)->map(function ($value) {
+            return Content::find($value);
+        });
     }
 }
