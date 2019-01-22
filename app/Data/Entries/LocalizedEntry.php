@@ -8,6 +8,7 @@ use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
+use Illuminate\Support\Carbon;
 use Statamic\Events\Data\EntrySaved;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
@@ -179,6 +180,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
             'url' => $this->url(),
             'edit_url' => $this->editUrl(),
             'published' => $this->published(),
+            'date' => $this->date(), // TODO: Should only be here for date collections
         ], $this->supplements);
     }
 
@@ -375,5 +377,11 @@ class LocalizedEntry implements Contract, Arrayable, Responsable
     public function toResponse($request)
     {
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+    }
+
+    public function date()
+    {
+        // TODO: Should only function for date collections
+        return Carbon::parse($this->order());
     }
 }
