@@ -48,7 +48,7 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $marketplaceData = Marketplace::withoutLocalData()->findByGithubRepo($package['name']);
+        $marketplaceData = Marketplace::withoutLocalData()->findByPackageName($package['name']);
 
         $installedVariant = collect(data_get($marketplaceData, 'variants', []))->first(function ($variant) use ($package) {
             return explode('.', $package['version'])[0] == $variant['number'];

@@ -62,7 +62,7 @@ class AddonInstaller
     protected function approvedAddons()
     {
         return collect(Marketplace::get()['data'])
-            ->pluck('variants.*.githubRepo')
+            ->pluck('variants.*.package')
             ->flatten()
             ->unique()
             ->filter();

@@ -51,7 +51,7 @@ class Marketplace
     {
         return [
             'variants' => [
-                ['githubRepo' => $repo]
+                ['package' => $repo]
             ]
         ];
     }

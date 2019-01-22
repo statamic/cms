@@ -185,15 +185,15 @@ class Marketplace
     }
 
     /**
-     * Find addon by github repo (ie. 'vendor/package').
+     * Find addon by package name (ie. 'vendor/package').
      *
-     * @param string $githubRepo
+     * @param string $package
      * @return mixed
      */
-    public function findByGithubRepo($githubRepo)
+    public function findByPackageName($package)
     {
-        return collect($this->get()['data'])->first(function ($addon) use ($githubRepo) {
-            return strtolower(data_get($addon, 'variants.0.githubRepo')) === strtolower($githubRepo);
+        return collect($this->get()['data'])->first(function ($addon) use ($package) {
+            return strtolower(data_get($addon, 'variants.0.package')) === strtolower($packageName);
         });
     }
 
@@ -246,7 +246,7 @@ class Marketplace
     protected function addLocalDataToAddon($addon)
     {
         return array_merge($addon, [
-            'installed' => AddonAPI::all()->keys()->contains($addon['variants'][0]['githubRepo']),
+            'installed' => AddonAPI::all()->keys()->contains($addon['variants'][0]['package']),
         ]);
     }
 
@@ -277,7 +277,7 @@ class Marketplace
                     'number' => 1,
                     'description' => 'N/A',
                     'assets' => [],
-                    'githubRepo' => $addon->package(),
+                    'package' => $addon->package(),
                 ]
             ],
             'seller' => [

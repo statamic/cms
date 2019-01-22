@@ -35,7 +35,7 @@
             },
 
             package() {
-                return this.addon.variants[0].githubRepo;
+                return this.addon.variants[0].package;
             },
 
             composer() {

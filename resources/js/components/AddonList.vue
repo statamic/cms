@@ -124,7 +124,7 @@
             },
 
             refreshShowingAddon() {
-                this.showingAddon.installed = _.contains(this.meta.installed, this.showingAddon.variants[0].githubRepo);
+                this.showingAddon.installed = _.contains(this.meta.installed, this.showingAddon.variants[0].package);
 
                 this.$events.$emit('addon-refreshed');
             },
