@@ -126,6 +126,11 @@ class Entry implements Contract
         throw new \BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $method));
     }
 
+    public function toArray()
+    {
+        return $this->forCurrentSite()->toArray();
+    }
+
     public function toCacheableArray()
     {
         return [
