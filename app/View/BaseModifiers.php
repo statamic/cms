@@ -2110,6 +2110,10 @@ class BaseModifiers extends Modifier
      */
     private function buildAttributesFromParameters($params, $delimiter = ':')
     {
+        if (empty(array_filter($params))) {
+            return [];
+        }
+
         $attributes = [];
         foreach ($params as $param) {
             list($key, $value) = explode($delimiter, $param);
