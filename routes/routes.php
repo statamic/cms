@@ -9,7 +9,7 @@ if (config('statamic.api.enabled')) {
 }
 
 if (config('statamic.cp.enabled')) {
-    Route::middleware(config('statamic.cp.middleware'))
+    Route::middleware('web')
         ->name('statamic.cp.')
         ->prefix(config('statamic.cp.route'))
         ->namespace('Statamic\Http\Controllers\CP')
