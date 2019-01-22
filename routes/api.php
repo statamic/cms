@@ -9,4 +9,3 @@ Route::resource('users', 'UsersController');
 // Route::resource('taxonomies/{taxonomy}/terms', 'TaxonomyTermsController');
 // Route::resource('globals', 'GlobalsController');
 // Route::resource('forms', 'FormsController');
-// Route::resource('forms/{form}/submissions', 'FormSubmissionsController');
