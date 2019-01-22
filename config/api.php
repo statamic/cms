@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Middleware & Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Define the middleware / middleware group that will be applied to the
+    | API route group. If you want to externally expose this API, here
+    | you can configure a middleware based authentication layer.
+    |
+    */
+
+    'middleware' => env('API_MIDDLEWARE', 'api'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Pagination
     |--------------------------------------------------------------------------
     |

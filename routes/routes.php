@@ -1,7 +1,7 @@
 <?php
 
 if (config('statamic.api.enabled')) {
-    Route::middleware('api')
+    Route::middleware(config('statamic.api.middleware'))
         ->name('statamic.api.')
         ->prefix(config('statamic.api.route'))
         ->namespace('Statamic\Http\Controllers\API')
@@ -9,7 +9,7 @@ if (config('statamic.api.enabled')) {
 }
 
 if (config('statamic.cp.enabled')) {
-    Route::middleware('web')
+    Route::middleware(config('statamic.cp.middleware'))
         ->name('statamic.cp.')
         ->prefix(config('statamic.cp.route'))
         ->namespace('Statamic\Http\Controllers\CP')

@@ -15,6 +15,8 @@ return [
 
     'route' => env('CP_ROUTE', 'cp'),
 
+    'middleware' => env('CP_MIDDLEWARE', 'web'),
+
     /*
     |--------------------------------------------------------------------------
     | Start Page
