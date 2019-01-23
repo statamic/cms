@@ -104,8 +104,8 @@ class GlobalsController extends CpController
         ]);
 
         $set
-            ->set('title', $request->title)
-            ->set('blueprint', $request->blueprint)
+            ->title($request->title)
+            ->blueprint($request->blueprint)
             ->handle($request->handle ?? snake_case($request->title))
             ->save();
 

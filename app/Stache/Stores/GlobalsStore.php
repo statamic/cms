@@ -22,13 +22,18 @@ class GlobalsStore extends BasicStore
         $globals = collect();
 
         foreach ($cache as $id => $item) {
-            $set = $globals->get($id) ?? GlobalSet::make()->id($id);
+            $set = $globals->get($id) ?? GlobalSet::make()
+                ->id($id)
+                ->handle($item['handle'])
+                ->title($item['title'])
+                ->blueprint($item['blueprint'])
+                ->sites($item['sites'])
+                ->initialPath($item['path']);
 
             foreach ($item['localizations'] as $site => $attributes) {
                 $localized = (new LocalizedGlobalSet)
                     ->id($id)
                     ->locale($site)
-                    ->handle($attributes['handle'])
                     ->initialPath($attributes['path'])
                     ->data($attributes['data']);
 
@@ -43,32 +48,61 @@ class GlobalsStore extends BasicStore
 
     public function createItemFromFile($path, $contents)
     {
-        $site = Site::default()->handle();
-        $handle = str_after($path, $this->directory);
-
-        if (Site::hasMultiple()) {
-            list($site, $handle) = explode('/', $handle);
-        }
-
-        $handle = str_before($handle, '.yaml');
-
         $data = YAML::parse($contents);
+        $relative = str_after($path, $this->directory);
+        $handle = str_before($relative, '.yaml');
+
+        return Site::hasMultiple()
+            ? $this->createMultiSiteGlobalFromFile($handle, $path, $data)
+            : $this->createSingleSiteGlobalFromFile($handle, $path, $data);
+    }
+
+    protected function createSingleSiteGlobalFromFile($handle, $path, $data)
+    {
+        $set = $this->createBaseGlobalFromFile($handle, $path, $data);
 
         $localized = (new LocalizedGlobalSet)
-            ->id($id = array_pull($data, 'id'))
-            ->title(array_pull($data, 'title'))
-            ->locale($site)
+            ->id($set->id())
+            ->locale(Site::default()->handle())
+            ->initialPath($path)
+            ->data($data['data']);
+
+        return $set->addLocalization($localized);
+    }
+
+    protected function createMultiSiteGlobalFromFile($handle, $path, $data)
+    {
+        return substr_count($handle, '/') === 0
+            ? $this->createBaseGlobalFromFile($handle, $path, $data)
+            : $this->createLocalizedGlobalFromFile($handle, $path, $data);
+    }
+
+    protected function createBaseGlobalFromFile($handle, $path, $data)
+    {
+        return GlobalSet::make()
+            ->id($data['id'])
             ->handle($handle)
+            ->title($data['title'])
+            ->blueprint($data['blueprint'])
+            ->sites($data['sites'] ?? null)
+            ->initialPath($path);
+    }
+
+    protected function createLocalizedGlobalFromFile($handle, $path, $data)
+    {
+        list($site, $handle) = explode('/', $handle);
+
+        $set = $this->items->first(function ($global) use ($handle) {
+            return $global->handle() === $handle;
+        });
+
+        $localized = (new LocalizedGlobalSet)
+            ->id($set->id())
+            ->locale($site)
             ->initialPath($path)
             ->data($data);
 
-        if (! $set = $this->getItem($id)) {
-            $set = GlobalSet::make()->id($id);
-        }
-
-        $set->addLocalization($localized);
-
-        return $set;
+        return $set->addLocalization($localized);
     }
 
     public function getItemKey($item, $path)
@@ -90,6 +124,13 @@ class GlobalsStore extends BasicStore
 
     public function save($global)
     {
+        // When using multiple sites, the global's localized data exists
+        // in separate files. When using a single site, the data lives
+        // in the global set itself, so we'll save *that*.
+        if (!Site::hasMultiple() && $global instanceof LocalizedGlobalSet) {
+            $global = $global->localizable();
+        }
+
         File::put($path = $global->path(), $global->fileContents());
 
         // TODO:

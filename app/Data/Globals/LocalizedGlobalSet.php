@@ -11,34 +11,18 @@ use Statamic\Data\Localization;
 use Statamic\Contracts\Data\Localization as LocalizationContract;
 use Statamic\Contracts\Data\Globals\LocalizedGlobalSet as Contract;
 
-
 class LocalizedGlobalSet implements Contract, LocalizationContract
 {
     use Localization, ExistsAsFile, ContainsData;
 
-    protected $handle;
-    protected $title;
-
-    public function title($title = null)
+    public function handle()
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? ucfirst($this->handle);
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this->localizable()->handle();
     }
 
-    public function handle($handle = null)
+    public function title()
     {
-        if (is_null($handle)) {
-            return $this->handle;
-        }
-
-        $this->handle = $handle;
-
-        return $this;
+        return $this->localizable()->title();
     }
 
     public function path()
@@ -101,5 +85,10 @@ class LocalizedGlobalSet implements Contract, LocalizationContract
             'id' => $this->id(),
             'handle' => $this->handle(),
         ], $this->supplements);
+    }
+
+    protected function fileData()
+    {
+        return $this->data();
     }
 }
