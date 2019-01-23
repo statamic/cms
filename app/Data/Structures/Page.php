@@ -5,33 +5,43 @@ namespace Statamic\Data\Structures;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Content\UrlBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Data\Routable;
 
 class Page implements Entry
 {
+    use Routable;
+
+    protected $reference;
     protected $entry;
     protected $route;
     protected $parent;
     protected $children;
+    protected $isRoot = false;
 
-    public function setEntry($entry): self
+    public function setEntry($reference): self
     {
-        $this->entry = $entry;
+        if (! is_string($reference)) {
+            $this->entry = $reference;
+            $reference = $reference->id();
+        }
+
+        $this->reference = $reference;
 
         return $this;
     }
 
     public function entry(): ?Entry
     {
-        if (is_string($this->entry)) {
-            $this->entry = $this->actualEntry();
+        if (!$this->reference && !$this->entry) {
+            return null;
         }
 
-        return $this->entry;
+        return $this->entry = $this->entry ?? EntryAPI::find($this->reference);
     }
 
-    protected function actualEntry(): ?Entry
+    public function reference()
     {
-        return EntryAPI::find($this->entry);
+        return $this->reference;
     }
 
     public function parent(): ?Page
@@ -58,20 +68,32 @@ class Page implements Entry
         return $this->route;
     }
 
+    public function slug()
+    {
+        return $this->entry()->slug();
+    }
+
     public function uri()
     {
         return app(UrlBuilder::class)
             ->content($this)
             ->merge([
                 'parent_uri' => $this->parent ? $this->parent->uri() : '',
-                'slug' => $this->isParent() ? '' : $this->slug()
+                'slug' => $this->isRoot() ? '' : $this->slug()
             ])
             ->build($this->route);
     }
 
-    protected function isParent()
+    public function isRoot()
     {
-        return $this->entry()->id() === optional($this->parent)->id();
+        return $this->isRoot;
+    }
+
+    public function setRoot(bool $isRoot)
+    {
+        $this->isRoot = $isRoot;
+
+        return $this;
     }
 
     public function setChildren(array $children): self
@@ -86,7 +108,8 @@ class Page implements Entry
         return (new Pages)
             ->setTree($this->children ?? [])
             ->setParent($this)
-            ->setRoute($this->route);
+            ->setRoute($this->route)
+            ->prependParent(false);
     }
 
     public function flattenedPages()
@@ -100,7 +123,7 @@ class Page implements Entry
     {
         return array_merge($this->entry()->toArray(), [
             'url' => $this->url(),
-            'url' => $this->uri(),
+            'uri' => $this->uri(),
             'permalink' => $this->absoluteUrl(),
         ]);
     }
@@ -108,16 +131,6 @@ class Page implements Entry
     public function editUrl()
     {
         return $this->entry()->editUrl();
-    }
-
-    public function fieldset($fieldset = null)
-    {
-        return $this->entry()->fieldset($fieldset);
-    }
-
-    public function in($locale)
-    {
-        return new \Statamic\Data\LocalizedData($locale, $this);
     }
 
     public function __call($method, $args)

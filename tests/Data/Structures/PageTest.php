@@ -138,8 +138,12 @@ class PageTest extends TestCase
                 public function slug($slug = null) { return 'four'; }
             });
 
+        $entry = Mockery::mock(Page::class);
+        $entry->shouldReceive('id')->andReturn('root');
+        $entry->shouldReceive('slug')->andReturn('');
+
         $page = (new Page)
-            ->setEntry(new Entry)
+            ->setEntry($entry)
             ->setRoute('{parent_uri}/{slug}')
             ->setChildren([
                 ['entry' => 'one'],

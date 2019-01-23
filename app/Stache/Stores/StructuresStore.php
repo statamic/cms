@@ -90,9 +90,9 @@ class StructuresStore extends BasicStore
         })->all();
     }
 
-    public function getKeyFromUri(string $uri): ?string
+    public function getKeyFromUri(string $uri, string $site = null): ?string
     {
-        if ($key = collect($this->entryUris->first())->flip()->get($uri)) {
+        if ($key = $this->getEntryUris($site)->flip()->get($uri)) {
             return $key;
         }
 

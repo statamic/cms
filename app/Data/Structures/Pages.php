@@ -9,6 +9,7 @@ class Pages
     protected $tree;
     protected $route;
     protected $parent;
+    protected $prependParent = true;
 
     public function setTree(array $tree): self
     {
@@ -31,15 +32,28 @@ class Pages
         return $this;
     }
 
+    public function prependParent($prepend)
+    {
+        $this->prependParent = $prepend;
+
+        return $this;
+    }
+
     public function all()
     {
-        return collect($this->tree)->keyBy('entry')->map(function ($branch) {
+        $pages = collect($this->tree)->keyBy('entry')->map(function ($branch) {
             return (new Page)
                 ->setParent($this->parent)
                 ->setRoute($this->route)
                 ->setEntry($branch['entry'])
                 ->setChildren($branch['children'] ?? []);
         });
+
+        if ($this->prependParent && $this->parent) {
+            $pages->prepend($this->parent, $this->parent->reference());
+        }
+
+        return $pages;
     }
 
     public function uris()

@@ -33,7 +33,7 @@ class StructureRepository implements RepositoryContract
         return $this->store->getItem($handle);
     }
 
-    public function findEntryByUri(string $uri): ?Entry
+    public function findEntryByUri(string $uri, string $site = null): ?Entry
     {
         $uri = str_start($uri, '/');
 

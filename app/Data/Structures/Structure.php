@@ -48,7 +48,7 @@ class Structure implements StructureContract
 
     public function route($route = null)
     {
-        if (is_null($route)) {
+        if (func_num_args() === 0) {
             return array_get($this->data, 'route');
         }
 
@@ -60,7 +60,9 @@ class Structure implements StructureContract
     public function parent()
     {
         return (new Page)
-            ->setEntry($this->data['root']);
+            ->setEntry($this->data['root'])
+            ->setRoute($this->route())
+            ->setRoot(true);
     }
 
     public function save()
@@ -72,14 +74,11 @@ class Structure implements StructureContract
     {
         $tree = $this->data['tree'];
 
-        if ($this->withParent) {
-            array_unshift($tree, ['entry' => $this->data['root']]);
-        }
-
         return (new Pages)
             ->setTree($tree)
-            ->setParent($this->withParent ? $this->parent() : null)
-            ->setRoute($this->route());
+            ->setParent($this->parent())
+            ->setRoute($this->route())
+            ->prependParent($this->withParent);
     }
 
     public function flattenedPages()

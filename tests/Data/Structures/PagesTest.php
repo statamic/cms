@@ -59,7 +59,7 @@ class PagesTest extends TestCase
         EntryAPI::shouldReceive('find')->with('two')->andReturn($entryTwo);
 
         $parent = Mockery::mock(Page::class);
-        $parent->shouldReceive('id')->andReturn('different-from-the-entries');
+        $parent->shouldReceive('reference')->andReturn('root');
         $parent->shouldReceive('uri')->andReturn('/the-parent');
 
         $pages = (new Pages)
@@ -76,8 +76,9 @@ class PagesTest extends TestCase
             ]);
 
         $this->assertInstanceOf(Collection::class, $pages->uris());
-        $this->assertCount(2, $pages->uris());
+        $this->assertCount(3, $pages->uris());
         $this->assertEquals([
+            'root' => '/the-parent',
             'one' => '/the-parent/one',
             'two' => '/the-parent/two'
         ], $pages->uris()->all());
@@ -117,7 +118,8 @@ class PagesTest extends TestCase
             });
 
         $parent = Mockery::mock(Page::class);
-        $parent->shouldReceive('id')->andReturn('different-from-the-entries');
+        $parent->shouldReceive('reference')->andReturn('the-root');
+        $parent->shouldReceive('flattenedPages')->andReturn(collect());
         $parent->shouldReceive('uri')->andReturn('/root');
 
         $pages = (new Pages)
@@ -134,6 +136,7 @@ class PagesTest extends TestCase
             ]);
 
         $this->assertEquals([
+            'the-root' => '/root',
             'one' => '/root/one',
             'one-one' => '/root/one/one-one',
             'one-two' => '/root/one/one-two',
