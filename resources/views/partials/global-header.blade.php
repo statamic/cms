@@ -16,7 +16,7 @@
     <div class="flex items-center px-3 border-l h-full text-sm">
         <dropdown-list>
             <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" slot="trigger">
-                <i class="block h-6 w-6 mr-1">@svg('content-writing')</i><span>Shortcuts</span>
+                <i class="block h-6 w-6 mr-1">@svg('pin')</i><span>Shortcuts</span>
             </button>
             <ul class="dropdown-menu">
                 <li><a href="">New Blog Post</a></li>
