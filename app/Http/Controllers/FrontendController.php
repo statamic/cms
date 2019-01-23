@@ -68,16 +68,7 @@ class FrontendController extends Controller
 
         // Attempt to get the content at this URI
         if ($content = Content::whereUri($uri, site_locale())) {
-            // Place the content in the locale we want.
-            $content = $content->in(site_locale());
-
-            // If the requested URI exists, but also has a localized version, the
-            // default URI should not be accessible. For example, if /team has
-            // been localized to /equipe, visiting /about should throw a 404.
-            if ($requested_uri === $content->uri()) {
-                $content->supplementTaxonomies();
-                return $content;
-            }
+            return $content->in(site_locale());
         }
 
         // Still nothing?
