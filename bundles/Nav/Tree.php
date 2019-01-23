@@ -189,7 +189,7 @@ class Tree
                 'has_entries' => ($page instanceof Page) ? $page->hasEntries() : false,
                 'children'    => $children,
                 'parent'      => $parent,
-                'is_current'  => URL::getCurrent() == $page->uri(),
+                'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
                 'is_parent'   => URL::isAncestor($page->uri())
             ];
 
