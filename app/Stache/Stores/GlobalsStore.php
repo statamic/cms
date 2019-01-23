@@ -65,7 +65,7 @@ class GlobalsStore extends BasicStore
             ->id($set->id())
             ->locale(Site::default()->handle())
             ->initialPath($path)
-            ->data($data['data']);
+            ->data($data['data'] ?? []);
 
         return $set->addLocalization($localized);
     }
@@ -82,8 +82,8 @@ class GlobalsStore extends BasicStore
         return GlobalSet::make()
             ->id($data['id'])
             ->handle($handle)
-            ->title($data['title'])
-            ->blueprint($data['blueprint'])
+            ->title($data['title'] ?? null)
+            ->blueprint($data['blueprint'] ?? null)
             ->sites($data['sites'] ?? null)
             ->initialPath($path);
     }
