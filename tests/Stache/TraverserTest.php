@@ -46,7 +46,9 @@ class TraverserTest extends TestCase
     /** @test */
     function gets_files_in_a_stores_directory()
     {
+        mkdir($this->tempDir.'/nested');
         touch($this->tempDir.'/one.txt', 1234567890);
+        touch($this->tempDir.'/nested/three.txt', 4567890123);
         touch($this->tempDir.'/.hidden.txt', 2345678901);
         touch($this->tempDir.'/two.txt', 3456789012);
 
@@ -57,10 +59,13 @@ class TraverserTest extends TestCase
         $files = $this->traverser->traverse($store);
 
         $this->assertInstanceOf(Collection::class, $files);
-        $this->assertCount(2, $files);
-        $this->assertEquals([
+        $this->assertCount(3, $files);
+        // We use assertSame because we care about the order.
+        // Paths should be output by depth then alphabetical.
+        $this->assertSame([
             $this->tempDir.'/one.txt' => 1234567890,
-            $this->tempDir.'/two.txt' => 3456789012
+            $this->tempDir.'/two.txt' => 3456789012,
+            $this->tempDir.'/nested/three.txt' => 4567890123,
         ], $files->all());
     }
 

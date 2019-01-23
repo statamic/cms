@@ -27,6 +27,9 @@ class Traverser
             })
             ->mapWithKeys(function ($file) {
                 return [$file->getPathname() => $file->getMTime()];
+            })
+            ->sortBy(function ($timestamp, $path) {
+                return [substr_count($path, '/'), $path];
             });
     }
 }
