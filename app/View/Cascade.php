@@ -100,9 +100,25 @@ class Cascade
     private function hydrateGlobals()
     {
         foreach (GlobalSet::all() as $global) {
-            $global = $global->in($this->site->locale());
+            if (! $global->existsIn($this->site->handle())) {
+                continue;
+            }
 
-            $this->set($global->slug(), $global->dataWithDefaultLocale());
+            $global = $global->in($this->site->handle());
+
+            $fields = $global->blueprint()
+                ? $global->blueprint()->fields()->all()
+                : collect();
+
+            // TODO: The global should know what meta data to exclude.
+            $data = array_except($global->data(), ['blueprint']);
+
+            $variables = collect($data)
+                ->map(function ($value, $handle) use ($fields) {
+                    return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
+                })->all();
+
+            $this->set($global->handle(), $variables);
         }
 
         $mainGlobal = $this->get('global') ?? [];

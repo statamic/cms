@@ -32,5 +32,5 @@ class NonSavingEntriesStore extends \Statamic\Stache\Stores\EntriesStore
 
 class NonSavingGlobalsStore extends \Statamic\Stache\Stores\GlobalsStore
 {
-    public function save(\Statamic\Contracts\Data\Globals\GlobalSet $globals) { }
+    public function save($globals) { }
 }

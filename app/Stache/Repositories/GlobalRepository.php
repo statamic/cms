@@ -17,6 +17,11 @@ class GlobalRepository implements RepositoryContract
         $this->store = $stache->store('globals');
     }
 
+    public function make()
+    {
+        return new \Statamic\Data\Globals\GlobalSet;
+    }
+
     public function all(): GlobalCollection
     {
         return collect_globals($this->store->getItems());
@@ -32,7 +37,7 @@ class GlobalRepository implements RepositoryContract
         return $this->find($this->store->getIdByHandle($handle));
     }
 
-    public function save(GlobalSet $global)
+    public function save($global)
     {
         $this->store->setItem($global->id(), $global);
 

@@ -8,6 +8,11 @@ use Statamic\Contracts\Data\Globals\GlobalSet as GlobalContract;
 
 class GlobalSet
 {
+    public function make()
+    {
+        return $this->repo()->make();
+    }
+
     /**
      * Create a global set
      *
@@ -53,7 +58,7 @@ class GlobalSet
         });
     }
 
-    public function save(GlobalContract $global)
+    public function save($global)
     {
         $this->repo()->save($global);
     }

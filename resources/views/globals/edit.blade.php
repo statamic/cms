@@ -3,7 +3,7 @@
 @section('content')
 
     <global-publish-form
-        action="{{ cp_route('globals.update', $set->id()) }}"
+        action="{{ $set->updateUrl() }}"
         :initial-fieldset="{{ json_encode($blueprint->toPublishArray()) }}"
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
@@ -15,7 +15,7 @@
                     <small class="subhead block">
                         <a href="{{ cp_route('globals.index') }}">{{ __('Globals') }}</a>
                     </small>
-                    {{ $set->get('title') }}
+                    {{ $set->title() }}
                 </h1>
 
                 @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')

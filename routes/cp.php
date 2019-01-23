@@ -34,8 +34,11 @@ Route::group([
     Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
     Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
 
-    // Collections
-    Route::resource('globals', 'GlobalsController');
+    // Globals
+    Route::get('globals', 'GlobalsController@index')->name('globals.index');
+    Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
+    Route::get('globals/{id}/{handle}/{site}', 'GlobalsController@edit')->name('globals.edit');
+    Route::patch('globals/{id}/{handle}/{site}', 'GlobalsController@update')->name('globals.update');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
 
     // Assets

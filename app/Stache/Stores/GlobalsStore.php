@@ -2,9 +2,12 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\File;
+use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
+use Statamic\Data\Globals\LocalizedGlobalSet;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalsContract;
 
 class GlobalsStore extends BasicStore
@@ -16,40 +19,56 @@ class GlobalsStore extends BasicStore
 
     public function getItemsFromCache($cache)
     {
-        // TODO: TDD. This was just copy/pasted from v2.
-        return $cache->map(function ($item, $id) {
-            $attr = $item['attributes'];
+        $globals = collect();
 
-            // Get the data for the default locale. Remove the ID since
-            // we already have it and will be setting it separately.
-            $data = $item['data'][default_locale()];
-            unset($data['id']);
+        foreach ($cache as $id => $item) {
+            $set = $globals->get($id) ?? GlobalSet::make()->id($id);
 
-            $set = GlobalSet::create($attr['slug'])
-                ->id($id)
-                ->with($data)
-                ->get();
+            foreach ($item['localizations'] as $site => $attributes) {
+                $localized = (new LocalizedGlobalSet)
+                    ->id($id)
+                    ->locale($site)
+                    ->handle($attributes['handle'])
+                    ->initialPath($attributes['path'])
+                    ->data($attributes['data']);
 
-            // If the set has additional locale data, add them.
-            if (count($item['data']) > 1) {
-                foreach ($item['data'] as $locale => $data) {
-                    $set->dataForLocale($locale, $data);
-                }
-
-                $set->syncOriginal();
+                $set->addLocalization($localized);
             }
 
-            return $set;
-        });
+            $globals[$id] = $set;
+        }
+
+        return $globals;
     }
 
     public function createItemFromFile($path, $contents)
     {
-        $handle = pathinfo($path)['filename'];
+        $site = Site::default()->handle();
+        $handle = str_after($path, $this->directory);
 
-        return GlobalSet::create($handle)
-            ->with(YAML::parse($contents))
-            ->get();
+        if (Site::hasMultiple()) {
+            list($site, $handle) = explode('/', $handle);
+        }
+
+        $handle = str_before($handle, '.yaml');
+
+        $data = YAML::parse($contents);
+
+        $localized = (new LocalizedGlobalSet)
+            ->id($id = array_pull($data, 'id'))
+            ->title(array_pull($data, 'title'))
+            ->locale($site)
+            ->handle($handle)
+            ->initialPath($path)
+            ->data($data);
+
+        if (! $set = $this->getItem($id)) {
+            $set = GlobalSet::make()->id($id);
+        }
+
+        $set->addLocalization($localized);
+
+        return $set;
     }
 
     public function getItemKey($item, $path)
@@ -69,33 +88,13 @@ class GlobalsStore extends BasicStore
         })->flip()->get($handle);
     }
 
-    public function save(GlobalsContract $global)
+    public function save($global)
     {
-        $data = [];
+        File::put($path = $global->path(), $global->fileContents());
 
-        $data = collect($global->locales())->mapWithKeys(function ($locale) use ($global) {
-            return [$locale => $global->in($locale)->data()];
-        });
-
-        $default = $data->pull($data->keys()->first());
-
-        // Remove any localized data that's the same as what's in the default locale.
-        $data = $data->map(function ($localized) use ($default) {
-            return collect($localized)->reject(function ($value, $key) use ($default) {
-                return $value === array_get($default, $key);
-            })->all();
-        });
-
-        // We want the default locale's data to be at the top level, and all the
-        // subsequent locales to be nested under their key.
-        $data = collect($default)->merge($data);
-
-        // TODO: Change ->slug() to ->handle()
-        // TODO: Let the GlobalSet object output the path, if one is already set.
-        // It's possible that an existing file was saved in a subdirectory, for example.
-        // We'll want to maintain that.
-        $path = $this->directory . '/' . $global->slug() . '.yaml';
-
-        $this->files->put($path, YAML::dump($data->all()));
+        // TODO:
+        // if (($initial = $global->initialPath()) && $path !== $initial) {
+        //     File::delete($global->initialPath());
+        // }
     }
 }

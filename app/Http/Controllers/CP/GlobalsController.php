@@ -31,11 +31,17 @@ class GlobalsController extends CpController
         ]);
     }
 
-    public function edit($set)
+    public function edit($id, $handle, $site)
     {
-        if (! $set = GlobalSet::find($set)) {
+        if (! $set = GlobalSet::find($id)) {
             return $this->pageNotFound();
         }
+
+        if (! $set->sites()->contains($site)) {
+            return $this->pageNotFound();
+        }
+
+        $set = $set->inOrClone($site);
 
         $this->authorize('edit', $set);
 
@@ -58,11 +64,13 @@ class GlobalsController extends CpController
         ]);
     }
 
-    public function update(Request $request, $set)
+    public function update(Request $request, $id, $handle, $site)
     {
-        if (! $set = GlobalSet::find($set)) {
+        if (! $set = GlobalSet::find($id)) {
             return $this->pageNotFound();
         }
+
+        $set = $set->inOrClone($site);
 
         $this->authorize('edit', $set);
 
@@ -78,9 +86,7 @@ class GlobalsController extends CpController
 
         $set->save();
 
-        // TODD: Localization
-
-        return response('', 204);
+        return $set->toArray();
     }
 
     public function updateMeta(Request $request, $set)
