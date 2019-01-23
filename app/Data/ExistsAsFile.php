@@ -21,15 +21,20 @@ trait ExistsAsFile
         return $this;
     }
 
+    protected function fileData()
+    {
+        return array_merge($this->data(), [
+            'id' => $this->id()
+        ]);
+    }
+
     public function fileContents()
     {
         // This method should be clever about what contents to output depending on the
         // file type used. Right now it's assuming markdown. Maybe you'll want to
         // save JSON, etc. TODO: Make it smarter when the time is right.
 
-        $data = array_merge($this->data(), [
-            'id' => $this->id()
-        ]);
+        $data = $this->fileData();
 
         $content = array_pull($data, 'content');
 
