@@ -19,12 +19,13 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\API\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class Asset extends Data implements AssetContract
+class Asset extends Data implements AssetContract, Arrayable
 {
     /**
      * {@inheritdoc}
