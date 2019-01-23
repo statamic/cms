@@ -29,7 +29,7 @@ class DataSaved extends Event implements DataEvent
      * @param array $original
      * @param string|null $ooldPath
      */
-    public function __construct(Data $data, $original, $oldPath = null)
+    public function __construct($data, $original, $oldPath = null)
     {
         $this->data = $data;
         $this->original = $original;
