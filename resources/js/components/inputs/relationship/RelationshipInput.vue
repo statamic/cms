@@ -21,7 +21,7 @@
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
-                <div class="flex flex-wrap items-center text-sm pl-sm -mb-1">
+                <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
                         <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center outline-none" @click="isCreating = true">
                             <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
