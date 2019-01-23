@@ -57,6 +57,10 @@ class Helper
      **/
     public function ensureArray($value)
     {
+        if ($value === null) {
+            return [];
+        }
+
         if (! is_array($value)) {
             return array($value);
         }
