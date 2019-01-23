@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Collection;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
@@ -18,11 +19,13 @@ class CollectionsStore extends BasicStore
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
 
+        $sites = array_get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
+
         return Collection::create($handle)
             ->title(array_get($data, 'title'))
             ->route(array_get($data, 'route'))
             ->order(array_get($data, 'order'))
-            ->sites(array_get($data, 'sites'))
+            ->sites($sites)
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
             ->data(array_get($data, 'data'))
