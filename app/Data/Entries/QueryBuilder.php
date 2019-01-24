@@ -8,11 +8,17 @@ use Statamic\Data\QueryBuilder as BaseQueryBuilder;
 class QueryBuilder extends BaseQueryBuilder
 {
     protected $collections;
+    protected $site;
 
     public function where($column, $operator = null, $value = null)
     {
         if ($column === 'collection') {
             $this->collections[] = $operator;
+            return $this;
+        }
+
+        if ($column === 'site') {
+            $this->site = $operator;
             return $this;
         }
 
@@ -31,13 +37,17 @@ class QueryBuilder extends BaseQueryBuilder
 
     protected function getBaseItems()
     {
-        if ($this->collections) {
-            return collect_entries($this->collections)->flatMap(function ($collection) {
+        $entries = $this->collections
+            ? collect_entries($this->collections)->flatMap(function ($collection) {
                 return Entry::whereCollection($collection);
-            })->values();
+            })->values()
+            : Entry::all()->values();
+
+        if ($this->site) {
+            $entries = $entries->localize($this->site);
         }
 
-        return Entry::all()->values();
+        return $entries;
     }
 
     protected function collect($items = [])
