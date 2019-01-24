@@ -124,7 +124,7 @@ class StructuresStore extends BasicStore
     {
         $site = $site ?? $this->stache->sites()->first();
 
-        return $this->entryUris->get($site);
+        return collect($this->entryUris->get($site));
     }
 
     public function setItem($key, $item)
