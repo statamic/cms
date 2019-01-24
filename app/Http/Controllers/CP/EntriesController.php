@@ -225,7 +225,7 @@ class EntriesController extends CpController
     {
         return [
             'title' => $collection->title(),
-            'url' => cp_route('collections.show', $collection->path())
+            'url' => cp_route('collections.show', $collection->handle())
         ];
     }
 }
