@@ -54,6 +54,7 @@ var vm = new Vue({
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue'),
+        SiteSelector: require('./components/SiteSelector.vue'),
         PageTree: require('./components/structures/PageTree.vue'),
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue'),

@@ -13,20 +13,11 @@
         </global-search>
     </div>
 
-    <div class="flex items-center px-2 border-l h-full text-sm">
-        <dropdown-list>
-            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" slot="trigger">
-                <i class="block h-6 w-6 mr-1">@svg('sites')</i><span>English</span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="">English (active)</a></li>
-                <li><a href="" class="text-grey">Canadian</a></li>
-                <li><a href="" class="text-grey">French</a></li>
-                <li><a href="" class="text-grey">German</a></li>
-                <li><a href="" class="text-grey">Spanish</a></li>
-            </ul>
-        </dropdown-list>
-    </div>
+    @if (Statamic\API\Site::hasMultiple())
+        <site-selector>
+            <template slot="icon">@svg('sites')</template>
+        </site-selector>
+    @endif
 
     <div class="flex items-center px-2 border-l h-full text-sm">
         <dropdown-list>

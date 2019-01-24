@@ -23,6 +23,8 @@ Route::group([
     Route::get('/', 'StartPageController')->name('index');
     Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
+    Route::get('select-site/{handle}', 'SelectSiteController@select');
+
     // Structures
     Route::resource('structures', 'StructuresController');
     Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);

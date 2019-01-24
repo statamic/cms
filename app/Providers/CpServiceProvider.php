@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\Site;
 use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\Translation\Loader;
@@ -21,8 +22,20 @@ class CpServiceProvider extends ServiceProvider
 
         Statamic::provideToScript([
             'translationLocale' => $this->app['translator']->locale(),
-            'translations' => $this->app['translator']->toJson()
+            'translations' => $this->app['translator']->toJson(),
+            'sites' => $this->sites(),
+            'selectedSite' => Site::selected()->handle()
         ]);
+    }
+
+    protected function sites()
+    {
+        return Site::all()->map(function ($site) {
+            return [
+                'name' => $site->name(),
+                'handle' => $site->handle(),
+            ];
+        })->values();
     }
 
     public function register()
