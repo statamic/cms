@@ -88,13 +88,28 @@ class GlobalsStore extends BasicStore
 
     protected function createBaseGlobalFromFile($handle, $path, $data)
     {
-        return GlobalSet::make()
+        $set = GlobalSet::make()
             ->id($data['id'])
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->blueprint($data['blueprint'] ?? null)
             ->sites($data['sites'] ?? null)
             ->initialPath($path);
+
+        // If the base set file was modified, its localizations will already exist in the Stache.
+        // We should get those existing localizations and add it to this newly created set.
+        // Otherwise, the localizations would just disappear since they'd no longer be linked.
+        $existing = $this->items->first(function ($global) use ($handle) {
+            return $global->handle() === $handle;
+        });
+
+        if ($existing) {
+            $existing->localizations()->each(function ($localization) use ($set) {
+                $set->addLocalization($localization);
+            });
+        }
+
+        return $set;
     }
 
     protected function createLocalizedGlobalFromFile($handle, $path, $data)
