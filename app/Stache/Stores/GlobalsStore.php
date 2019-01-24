@@ -17,6 +17,15 @@ class GlobalsStore extends BasicStore
         return 'globals';
     }
 
+    public function setItem($key, $item)
+    {
+        if ($item instanceof LocalizedGlobalSet) {
+            $item = $item->localizable();
+        }
+
+        return parent::setItem($key, $item);
+    }
+
     public function getItemsFromCache($cache)
     {
         $globals = collect();
