@@ -112,7 +112,7 @@
                 </li>
                 <li>
                     <a href="">
-                        <i>@svg('hammer-wench')</i><span>Preferences</span>
+                        <i>@svg('hammer-wrench')</i><span>Preferences</span>
                     </a>
                 </li>
                 <li class="{{ current_class('fieldsets*') }}">

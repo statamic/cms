@@ -12,6 +12,6 @@
         <i>@svg('drawer-file')</i><span>Tools</span>
     </a>
     <a href="">
-        <i>@svg('hammer-wench')</i><span>Site</span>
+        <i>@svg('hammer-wrench')</i><span>Site</span>
     </a>
 </nav>
