@@ -3,6 +3,7 @@
 namespace Statamic\Sites;
 
 use Statamic\API\Str;
+use Statamic\Statamic;
 
 class Sites
 {
@@ -55,6 +56,15 @@ class Sites
     public function setCurrent($site)
     {
         $this->current = $this->get($site);
+    }
+
+    public function selected()
+    {
+        if (Statamic::isCpRoute()) {
+            return $this->get(cache('statamic.cp.selected-site', $this->default()->handle()));
+        }
+
+        throw new \Exception('Selected site is only available in the Control Panel.');
     }
 
     public function setConfig($key, $value = null)
