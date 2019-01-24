@@ -22,6 +22,7 @@ class EntriesController extends CpController
 
         $entries = $this
             ->indexQuery($collection)
+            ->where('site', Site::selected()->handle())
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
             ->paginate();
 
