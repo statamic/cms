@@ -2,19 +2,19 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\API\Asset;
+use Statamic\API\Form;
 use Illuminate\Http\Request;
-use Statamic\Http\Resources\AssetResource;
+use Statamic\Http\Resources\FormResource;
 use Statamic\Http\Controllers\CP\CpController;
 
-class AssetsController extends CpController
+class FormsController extends CpController
 {
     use TemporaryResourcePagination;
 
     public function index(Request $request)
     {
-        $assets = static::paginate(Asset::all());
+        $forms = static::paginate(Form::all());
 
-        return AssetResource::collection($assets);
+        return FormResource::collection($forms);
     }
 }

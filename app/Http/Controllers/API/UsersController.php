@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use Statamic\API\User;
+use Illuminate\Http\Request;
 use Statamic\Http\Resources\UserResource;
 use Statamic\Http\Controllers\CP\CpController;
 
