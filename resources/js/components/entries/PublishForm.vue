@@ -8,6 +8,20 @@
                 </small>
                 {{ initialTitle }}
             </h1>
+
+            <div class="mr-2 text-xs" v-if="localizations.length > 1">
+                <a
+                    v-for="loc in localizations"
+                    :key="loc.handle"
+                    :href="loc.url"
+                    class="mr-2 inline-flex items-center"
+                    :class="{ 'bg-grey-lightest border rounded py-1 px-2': loc.active }"
+                >
+                    <span class="little-dot mr-1" :class="[loc.published ? 'bg-green' : 'bg-grey-light']" />
+                    {{ loc.name }}
+                </a>
+            </div>
+
             <button
                 class="btn btn-primary"
                 :class="{ disabled: !canSave }"
@@ -49,6 +63,7 @@ export default {
         initialValues: Object,
         initialMeta: Object,
         initialTitle: String,
+        initialLocalizations: Array,
         collectionTitle: String,
         collectionUrl: String,
         action: String,
@@ -61,6 +76,7 @@ export default {
             fieldset: null,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
+            localizations: _.clone(this.initialLocalizations),
             error: null,
             errors: {}
         }

@@ -95,7 +95,19 @@ class EntriesController extends CpController
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $entry)
+            'readOnly' => $request->user()->cant('edit', $entry),
+            'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
+                $exists = $entry->entry()->existsIn($handle);
+                $localized = $exists ? $entry->entry()->in($handle) : optional();
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $entry->locale(),
+                    'exists' => $exists,
+                    'published' => $exists ? $localized->published() : false,
+                    'url' => $localized->editUrl(),
+                ];
+            })->all()
         ];
 
         if ($request->wantsJson()) {
