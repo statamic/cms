@@ -66,11 +66,11 @@ export default {
                     errors: {}
                 },
                 mutations: {
-                    updateField(state, payload) {
+                    setValue(state, payload) {
                         const { handle, value } = payload;
                         state.values[handle] = value;
                     },
-                    updateFields(state, values) {
+                    setValues(state, values) {
                         state.values = values;
                     },
                     setFieldset(state, fieldset) {
@@ -86,12 +86,12 @@ export default {
                     }
                 },
                 actions: {
-                    updateField(context, payload) {
-                        context.commit('updateField', payload);
+                    setValue(context, payload) {
+                        context.commit('setValue', payload);
                         vm.emitUpdatedEvent(context.state.values);
                     },
-                    updateFields(context, payload) {
-                        context.commit('updateFields', payload);
+                    setValues(context, payload) {
+                        context.commit('setValues', payload);
                         vm.emitUpdatedEvent(context.state.values);
                     }
                 }
@@ -119,7 +119,7 @@ export default {
             deep: true,
             handler(after, before) {
                 if (before === after) return;
-                this.$store.commit(`publish/${this.name}/updateFields`, after);
+                this.$store.commit(`publish/${this.name}/setValues`, after);
             }
         },
 
