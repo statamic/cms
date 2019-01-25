@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Closure;
 use Statamic\API\Site;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Exceptions\InvalidLocalizationException;
@@ -72,8 +73,10 @@ trait Localizable
         try {
             return $this->in($site);
         } catch (InvalidLocalizationException $e) {
-            return clone $this->localizations()
-                ->get($from ?? $this->localizations()->keys()->first())
+            $existing = clone $this->localizations()
+                ->get($from ?? $this->localizations()->keys()->first());
+
+            return $existing
                 ->initialPath(null)
                 ->locale($site);
         }
