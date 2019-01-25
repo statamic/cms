@@ -23,6 +23,10 @@ class Entry implements Contract
 
         $this->id = $id;
 
+        $this->localizations()->each(function ($entry) use ($id) {
+            $entry->id($id);
+        });
+
         return $this;
     }
 
