@@ -3,8 +3,9 @@
 @section('content')
     <div class="flex mb-3">
         <h1 class="flex-1">
-            <a href="{{ cp_route('collections.index')}}">{{ __('Collections') }}</a>
-            @svg('chevron-right')
+            <small class="subhead block">
+                <a href="{{ cp_route('collections.index')}}">{{ __('Collections') }}</a>
+            </small>
             {{ $collection->title() }}
         </h1>
         <create-entry-button
