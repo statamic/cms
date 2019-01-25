@@ -163,8 +163,6 @@ class BlueprintTest extends TestCase
     /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
-        $blueprint = new Blueprint;
-
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
             ->andReturn(new Field('field_one', [
@@ -182,7 +180,7 @@ class BlueprintTest extends TestCase
                 'validate' => 'min:2'
             ]));
 
-        $blueprint->setContents($contents = [
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
             'sections' => [
                 'section_one' => [
@@ -206,6 +204,7 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals([
             'title' => 'Test',
+            'handle' => 'test',
             'sections' => [
                 [
                     'display' => 'Section one',
