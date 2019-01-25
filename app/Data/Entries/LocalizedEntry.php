@@ -26,7 +26,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function entry($entry = null)
     {
-        return $this->localizable($entry);
+        return call_user_func_array([$this, 'localizable'], func_get_args());
     }
 
     public function collection()

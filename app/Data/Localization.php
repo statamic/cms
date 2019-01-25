@@ -13,7 +13,7 @@ trait Localization
 
     public function id($id = null)
     {
-        if (is_null($id)) {
+        if (func_num_args() === 0) {
             return $this->id;
         }
 
@@ -24,7 +24,7 @@ trait Localization
 
     public function locale($locale = null)
     {
-        if (is_null($locale)) {
+        if (func_num_args() === 0) {
             return $this->locale;
         }
 
@@ -42,7 +42,7 @@ trait Localization
 
     public function localizable($localizable = null)
     {
-        if (is_null($localizable)) {
+        if (func_num_args() === 0) {
             return $this->localizable;
         }
 
