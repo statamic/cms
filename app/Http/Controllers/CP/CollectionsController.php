@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Str;
+use Statamic\API\Site;
 use Statamic\API\User;
 use Statamic\API\Helper;
 use Illuminate\Http\Request;
@@ -45,7 +46,11 @@ class CollectionsController extends CpController
             ];
         });
 
-        return view('statamic::collections.show', compact('collection', 'blueprints'));
+        return view('statamic::collections.show', [
+            'collection' => $collection,
+            'blueprints' => $blueprints,
+            'site' => Site::selected()
+        ]);
     }
 
     public function create()

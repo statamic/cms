@@ -2,7 +2,7 @@
 
     <entry-publish-form
         publish-container="base"
-        :action="action"
+        :initial-action="action"
         method="post"
         :initial-title="__('Create')"
         :collection-title="collectionTitle"
@@ -10,6 +10,7 @@
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
+        :initial-localizations="localizations"
         @saved="saved"
     ></entry-publish-form>
 
@@ -25,6 +26,7 @@ export default {
         'fieldset',
         'values',
         'meta',
+        'localizations',
     ],
 
     methods: {

@@ -1,7 +1,7 @@
 @extends('statamic::layout')
 
 @section('content')
-    <div class="flex mb-3">
+    <div class="flex items-center mb-3">
         <h1 class="flex-1">
             <small class="subhead block">
                 <a href="{{ cp_route('collections.index')}}">{{ __('Collections') }}</a>
@@ -9,7 +9,7 @@
             {{ $collection->title() }}
         </h1>
         <create-entry-button
-            url="{{ cp_route('collections.entries.create', $collection->handle()) }}"
+            url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
             :blueprints="{{ $blueprints->toJson() }}"
         ></create-entry-button>
     </div>

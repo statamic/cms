@@ -89,6 +89,7 @@ class EntriesController extends CpController
         ]);
 
         $viewData = [
+            'editing' => true,
             'actions' => [
                 'update' => $entry->updateUrl()
             ],
@@ -99,7 +100,7 @@ class EntriesController extends CpController
             'readOnly' => $request->user()->cant('edit', $entry),
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
                 $exists = $entry->entry()->existsIn($handle);
-                $localized = $exists ? $entry->entry()->in($handle) : optional();
+                $localized = $entry->entry()->inOrClone($handle);
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -153,12 +154,22 @@ class EntriesController extends CpController
         return $entry->toArray();
     }
 
-    public function create(Request $request, $collection)
+    public function create(Request $request, $collection, $site)
     {
-        $collection = Collection::whereHandle($collection);
+        if (! Site::get($site)) {
+            return $this->pageNotFound();
+        }
 
-        if (! $blueprint = $collection->blueprint()) {
-            throw new \Exception('There is no blueprint defined for this collection.');
+        if (! $collection = Collection::whereHandle($collection)) {
+            return $this->pageNotFound();
+        }
+
+        $blueprint = $request->blueprint
+            ? Blueprint::find($request->blueprint)
+            : $collection->entryBlueprint();
+
+        if (! $blueprint) {
+            throw new \Exception('A valid blueprint is required.');
         }
 
         $fields = $blueprint
@@ -172,12 +183,22 @@ class EntriesController extends CpController
 
         $viewData = [
             'actions' => [
-                'store' => cp_route('collections.entries.store', $collection->handle())
+                'store' => cp_route('collections.entries.store', [$collection->handle(), $site])
             ],
             'values' => $values,
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
+            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $site,
+                    'exists' => false,
+                    'published' => false,
+                    'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
+                ];
+            })->all()
         ];
 
         if ($request->wantsJson()) {
@@ -187,13 +208,13 @@ class EntriesController extends CpController
         return view('statamic::entries.create', $viewData);
     }
 
-    public function store(Request $request, $collection)
+    public function store(Request $request, $collection, $site)
     {
         $collection = Collection::whereHandle($collection);
 
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $fields = $collection->blueprint()->fields()->addValues($request->all())->process();
+        $fields = Blueprint::find($request->blueprint)->fields()->addValues($request->all())->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
@@ -202,17 +223,22 @@ class EntriesController extends CpController
 
         $request->validate($validation->rules());
 
-        $entry = Entry::create($request->slug)
+        $values = array_except($fields->values(), ['slug']);
+
+        $entry = Entry::create()
             ->collection($collection)
-            ->with($fields->values());
+            ->in($site, function ($localized) use ($values, $request) {
+                $localized
+                    ->slug($request->slug)
+                    ->data($values);
+            });
 
-        if ($collection->order() === 'date') {
-            $entry->date($request->date ?? now());
-        }
+        // TODO: Date handling
+        // if ($collection->order() === 'date') {
+        //     $entry->date($request->date ?? now());
+        // }
 
-        // TODD: Localization
-
-        $entry = $entry->ensureId()->save();
+        $entry->save();
 
         return [
             'redirect' => $entry->editUrl(),

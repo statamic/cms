@@ -19,10 +19,16 @@
                     class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
                     :class="{ 'bg-grey-lightest': loc.active }"
                     @click="localizationSelected(loc)"
+                    v-popover:tooltip.top="localizationStatusText(loc)"
                 >
                     <div class="w-4 text-right flex items-center">
                         <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === loc.handle" />
-                        <span v-if="localizing != loc.handle" class="little-dot" :class="[loc.published ? 'bg-green' : 'bg-grey-light']" />
+                        <span v-if="localizing != loc.handle" class="little-dot"
+                            :class="{
+                                'bg-green': loc.published,
+                                'bg-grey-light': !loc.published,
+                                'bg-red': !loc.exists
+                            }" />
                     </div>
                     {{ loc.name }}
                 </button>
@@ -124,7 +130,11 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            axios[this.method](this.action, this.values).then(response => {
+            const payload = { ...this.values, ...{
+                blueprint: this.fieldset.handle
+            }};
+
+            axios[this.method](this.action, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
                 this.$notify.success('Saved');
@@ -160,7 +170,7 @@ export default {
                 this.localizations = data.localizations;
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
-                this.title = data.values.title;
+                this.title = data.editing ? data.values.title : this.title;
                 this.action = data.actions.update;
                 this.initializeFieldset(data.blueprint);
                 this.localizing = false;
@@ -174,6 +184,14 @@ export default {
                 .prependTitle()
                 .prependMeta()
                 .getFieldset();
+        },
+
+        localizationStatusText(localization) {
+            if (! localization.exists) return 'This entry does not exist for this site.';
+
+            return localization.published
+                ? 'This entry exists in this site, and is published.'
+                : 'This entry exists in this site, but is not published.';
         }
 
     }
