@@ -13,7 +13,7 @@
 
         <entry-publish-form
             v-if="blueprint"
-            :action="publishUrl"
+            :initial-action="publishUrl"
             :method="method"
             :publish-container="publishContainer"
             :collection-title="collection.title"
@@ -22,6 +22,7 @@
             :initial-fieldset="blueprint"
             :initial-values="initialValues"
             :initial-meta="initialMeta"
+            :initial-localizations="initialLocalizations"
             @saved="saved"
         >
             <template slot="action-buttons-right">
@@ -48,6 +49,7 @@ export default {
             values: null,
             initialValues: null,
             initialMeta: null,
+            initialLocalizations: null,
             collection: Object
         }
     },
@@ -72,6 +74,7 @@ export default {
                 this.blueprint = data.blueprint;
                 this.values = this.initialValues = data.values;
                 this.initialMeta = data.meta;
+                this.initialLocalizations = data.localizations;
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
                 this.loading = false;

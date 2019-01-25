@@ -6,20 +6,26 @@
                 <small class="subhead block">
                     <a :href="collectionUrl" v-text="collectionTitle" class="text-grey hover:text-blue" />
                 </small>
-                {{ initialTitle }}
+                {{ title }}
             </h1>
 
-            <div class="mr-2 text-xs" v-if="localizations.length > 1">
-                <a
+            <div
+                class="mr-3 text-xs flex items-center"
+                v-if="localizations.length > 1"
+            >
+                <button
                     v-for="loc in localizations"
                     :key="loc.handle"
-                    :href="loc.url"
-                    class="mr-2 inline-flex items-center"
-                    :class="{ 'bg-grey-lightest border rounded py-1 px-2': loc.active }"
+                    class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
+                    :class="{ 'bg-grey-lightest': loc.active }"
+                    @click="localizationSelected(loc)"
                 >
-                    <span class="little-dot mr-1" :class="[loc.published ? 'bg-green' : 'bg-grey-light']" />
+                    <div class="w-4 text-right flex items-center">
+                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === loc.handle" />
+                        <span v-if="localizing != loc.handle" class="little-dot" :class="[loc.published ? 'bg-green' : 'bg-grey-light']" />
+                    </div>
                     {{ loc.name }}
-                </a>
+                </button>
             </div>
 
             <button
@@ -37,14 +43,12 @@
             ref="container"
             :name="publishContainer"
             :fieldset="fieldset"
-            :values="initialValues"
-            :meta="initialMeta"
+            :values="values"
+            :meta="meta"
             :errors="errors"
             @updated="values = $event"
         >
-            <div slot-scope="{ }">
-                <publish-sections />
-            </div>
+            <publish-sections slot-scope="{ }" />
         </publish-container>
     </div>
 
@@ -66,14 +70,17 @@ export default {
         initialLocalizations: Array,
         collectionTitle: String,
         collectionUrl: String,
-        action: String,
+        initialAction: String,
         method: String
     },
 
     data() {
         return {
+            action: this.initialAction,
             saving: false,
+            localizing: false,
             fieldset: null,
+            title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
             localizations: _.clone(this.initialLocalizations),
@@ -95,11 +102,7 @@ export default {
     },
 
     created() {
-        this.fieldset = new Fieldset(this.initialFieldset)
-            .showSlug(true)
-            .prependTitle()
-            .prependMeta()
-            .getFieldset();
+        this.initializeFieldset(this.initialFieldset);
     },
 
     watch: {
@@ -123,6 +126,7 @@ export default {
 
             axios[this.method](this.action, this.values).then(response => {
                 this.saving = false;
+                this.title = response.data.title;
                 this.$notify.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
@@ -137,6 +141,39 @@ export default {
                     this.$notify.error('Something went wrong');
                 }
             })
+        },
+
+        localizationSelected(localization) {
+            if (localization.active) return;
+
+            if (this.$dirty.has(this.publishContainer)) {
+                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                    return;
+                }
+            }
+
+            this.localizing = localization.handle;
+            axios.get(localization.url).then(response => {
+                const data = response.data;
+                this.values = data.values;
+                this.meta = data.meta;
+                this.localizations = data.localizations;
+                this.publishUrl = data.actions[this.action];
+                this.collection = data.collection;
+                this.title = data.values.title;
+                this.action = data.actions.update;
+                this.initializeFieldset(data.blueprint);
+                this.localizing = false;
+                this.$nextTick(() => this.$refs.container.removeNavigationWarning());
+            })
+        },
+
+        initializeFieldset(fieldset) {
+            this.fieldset = new Fieldset(this.initialFieldset)
+                .showSlug(true)
+                .prependTitle()
+                .prependMeta()
+                .getFieldset();
         }
 
     }
