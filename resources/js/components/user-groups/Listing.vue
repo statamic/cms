@@ -1,7 +1,7 @@
 <template>
     <data-list :rows="rows" :columns="columns">
         <div class="card p-0" slot-scope="{ }">
-            <data-table>
+            <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: group, index }">
                     <a :href="group.edit_url">{{ group.title }}</a>
                 </template>
@@ -16,7 +16,7 @@
                         </ul>
                     </dropdown-list>
                 </template>
-            </data-table>
+            </data-list-table>
         </div>
     </data-list>
 </template>

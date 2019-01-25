@@ -1,7 +1,7 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="blueprints">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-table>
+            <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: blueprint }">
                     <a :href="blueprint.edit_url">{{ blueprint.title }}</a>
                 </template>
@@ -16,7 +16,7 @@
                         </ul>
                     </dropdown-list>
                 </template>
-            </data-table>
+            </data-list-table>
         </div>
     </data-list>
 </template>

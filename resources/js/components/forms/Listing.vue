@@ -1,7 +1,7 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="forms">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-table>
+            <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: form }">
                     <a :href="form.show_url">{{ form.title }}</a>
                 </template>
@@ -13,7 +13,7 @@
                         </ul>
                     </dropdown-list>
                 </template>
-            </data-table>
+            </data-list-table>
         </div>
     </data-list>
 </template>

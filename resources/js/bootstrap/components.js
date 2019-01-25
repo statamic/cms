@@ -18,12 +18,13 @@ Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue
 
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
-Vue.component('data-list-search', require('../components/data-list/DataListSearch.vue'));
-Vue.component('data-list-bulk-actions', require('../components/data-list/DataListBulkActions.vue'));
-Vue.component('data-list-column-picker', require('../components/data-list/DataListColumnPicker.vue'));
-Vue.component('data-list-toggle-all', require('../components/data-list/DataListToggleAll.vue'));
-Vue.component('data-list-pagination', require('../components/data-list/DataListPagination.vue'));
-Vue.component('data-table', require('../components/data-list/DataTable.vue'));
+Vue.component('data-list-search', require('../components/data-list/Search.vue'));
+Vue.component('data-list-bulk-actions', require('../components/data-list/BulkActions.vue'));
+Vue.component('data-list-column-picker', require('../components/data-list/ColumnPicker.vue'));
+Vue.component('data-list-toggle-all', require('../components/data-list/ToggleAll.vue'));
+Vue.component('data-list-pagination', require('../components/data-list/Pagination.vue'));
+Vue.component('data-list-filters', require('../components/data-list/Filters.vue'));
+Vue.component('data-list-table', require('../components/data-list/Table.vue'));
 
 // Resource Type Lists
 Vue.component('entry-list', require('../components/entries/Listing.vue'));

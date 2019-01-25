@@ -1,7 +1,7 @@
 <template>
     <data-list :visible-columns="columns" :columns="columns" :rows="fieldsets">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
-            <data-table>
+            <data-list-table>
                 <template slot="cell-title" slot-scope="{ row: fieldset }">
                     <a :href="fieldset.edit_url">{{ fieldset.title }}</a>
                 </template>
@@ -16,7 +16,7 @@
                         </ul>
                     </dropdown-list>
                 </template>
-            </data-table>
+            </data-list-table>
         </div>
     </data-list>
 </template>

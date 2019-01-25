@@ -15,7 +15,7 @@
         >
             <div slot-scope="{ filteredRows: rows }">
                 <div class="card p-0">
-                    <data-table @sorted="sorted">
+                    <data-list-table @sorted="sorted">
                         <template slot="cell-name" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url">{{ value }}</a>
                         </template>
@@ -27,7 +27,7 @@
                                 </ul>
                             </dropdown-list>
                         </template>
-                    </data-table>
+                    </data-list-table>
                 </div>
 
                 <data-list-pagination

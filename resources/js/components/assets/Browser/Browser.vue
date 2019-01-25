@@ -43,7 +43,7 @@
                     </data-list-bulk-actions>
                 </div>
 
-                <data-table :rows="rows" :allow-bulk-actions="true">
+                <data-list-table :rows="rows" :allow-bulk-actions="true">
 
                     <template slot="tbody-start">
                         <tr v-if="folder.parent_path && !restrictNavigation">
@@ -84,7 +84,7 @@
                         </dropdown-list>
                     </template>
 
-                </data-table>
+                </data-list-table>
 
                 <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
                     There are no assets.

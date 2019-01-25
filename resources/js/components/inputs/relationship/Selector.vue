@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <div class="flex-1 overflow-scroll">
-                            <data-table
+                            <data-list-table
                                 :loading="loading"
                                 :allow-bulk-actions="true"
                                 :toggle-selection-on-row-click="true"
@@ -44,7 +44,7 @@
                                 <template slot="cell-url" slot-scope="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
                                 </template>
-                            </data-table>
+                            </data-list-table>
                         </div>
 
                         <data-list-pagination

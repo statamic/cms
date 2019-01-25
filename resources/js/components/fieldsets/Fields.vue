@@ -10,7 +10,7 @@
 
             <data-list :rows="fields" :columns="['display', 'handle', 'type']" :sort="false">
                 <div class="card p-0 mb-3" slot-scope="{}">
-                    <data-table>
+                    <data-list-table>
                         <template slot="cell-display" slot-scope="{ row: field }">
                             <input
                                 type="text"
@@ -43,7 +43,7 @@
                                     v-model="field" />
                             </modal>
                         </template>
-                    </data-table>
+                    </data-list-table>
                 </div>
             </data-list>
 

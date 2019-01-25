@@ -27,9 +27,10 @@
                                 <button class="btn ml-1" @click="bulkPublish(selections)">Publish</button>
                             </div>
                         </data-list-bulk-actions>
+                        <data-list-filters />
                         <data-list-column-picker @change="updateColumns" />
                     </div>
-                    <data-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
+                    <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </template>
@@ -45,7 +46,7 @@
                                 </ul>
                             </dropdown-list>
                         </template>
-                    </data-table>
+                    </data-list-table>
                 </div>
 
                 <data-list-pagination
