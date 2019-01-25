@@ -7,7 +7,10 @@
             @svg('chevron-right')
             {{ $collection->title() }}
         </h1>
-        <a href="{{ cp_route('collections.entries.create', $collection->handle()) }}" class="btn btn-primary">{{ __('Create Entry') }}</a>
+        <create-entry-button
+            url="{{ cp_route('collections.entries.create', $collection->handle()) }}"
+            :blueprints="{{ $blueprints->toJson() }}"
+        ></create-entry-button>
     </div>
 
     <entry-list

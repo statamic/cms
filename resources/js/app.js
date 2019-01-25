@@ -59,6 +59,7 @@ var vm = new Vue({
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue'),
         BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue'),
+        CreateEntryButton: require('./components/entries/CreateEntryButton.vue'),
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),

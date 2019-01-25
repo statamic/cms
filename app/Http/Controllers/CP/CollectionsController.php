@@ -36,9 +36,16 @@ class CollectionsController extends CpController
 
     public function show($collection)
     {
-        return view('statamic::collections.show', [
-            'collection' => Collection::whereHandle($collection)
-        ]);
+        $collection = Collection::whereHandle($collection);
+
+        $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
+            return [
+                'handle' => $blueprint->handle(),
+                'title' => $blueprint->title(),
+            ];
+        });
+
+        return view('statamic::collections.show', compact('collection', 'blueprints'));
     }
 
     public function create()
