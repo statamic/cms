@@ -65,9 +65,15 @@ class EntryRepository implements RepositoryContract
 
     public function save($entry)
     {
+        $localizable = $entry->entry();
+
+        if (! $localizable->id()) {
+            $localizable->id($this->stache->generateId());
+        }
+
         $this->store
             ->store($entry->collectionHandle())
-            ->insert($entry->entry());
+            ->insert($localizable);
 
         $this->store->save($entry);
     }

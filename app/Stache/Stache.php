@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache;
 
+use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
 
 class Stache
@@ -184,6 +185,11 @@ class Stache
         $this->shouldBoot = true;
 
         return $this;
+    }
+
+    public function generateId()
+    {
+        return Helper::makeUuid(); // TODO: Get prettier, or incremental IDs.
     }
 
     public function idMap()
