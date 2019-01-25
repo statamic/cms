@@ -44,12 +44,25 @@ export default {
         registerVuexModule() {
             const vm = this;
 
+            const initial = {
+                fieldset: _.clone(this.fieldset),
+                values: _.clone(this.values),
+                meta: _.clone(this.meta),
+            };
+
+            // If the store already exists, just reinitialize the state.
+            if (this.$store.state.hasOwnProperty('publish')
+            && this.$store.state.publish.hasOwnProperty(this.name)) {
+                this.$store.commit(`publish/${this.name}/initialize`, initial);
+                return;
+            }
+
             this.$store.registerModule(['publish', this.name], {
                 namespaced: true,
                 state: {
-                    fieldset: _.clone(this.fieldset),
-                    values: _.clone(this.values),
-                    meta: _.clone(this.meta),
+                    fieldset: initial.fieldset,
+                    values: initial.values,
+                    meta: initial.meta,
                     errors: {}
                 },
                 mutations: {
@@ -60,8 +73,16 @@ export default {
                     updateFields(state, values) {
                         state.values = values;
                     },
+                    setFieldset(state, fieldset) {
+                        state.fieldset = fieldset;
+                    },
                     setErrors(state, errors) {
                         state.errors = errors;
+                    },
+                    initialize(state, payload) {
+                        state.fieldset = payload.fieldset;
+                        state.values = payload.values;
+                        state.meta = payload.meta;
                     }
                 },
                 actions: {
@@ -97,16 +118,15 @@ export default {
         values: {
             deep: true,
             handler(after, before) {
-                if (JSON.stringify(after) === JSON.stringify(before)) return;
-
-                console.error(`The "values" prop is reserved for initializing the Publish store. You should use this.$store.commit('${this.name}/setValues', values) instead.`);
+                if (before === after) return;
+                this.$store.commit(`publish/${this.name}/updateFields`, after);
             }
         },
 
         fieldset: {
             deep: true,
-            handler() {
-                console.error(`The "fieldset" prop is reserved for initializing the Publish store. You should use this.$store.commit('${this.name}/setFieldset', fieldset) instead.`);
+            handler(fieldset) {
+                this.$store.commit(`publish/${this.name}/setFieldset`, fieldset);
             }
         },
 
