@@ -26,8 +26,8 @@ Vue.component('data-list-pagination', require('../components/data-list/DataListP
 Vue.component('data-table', require('../components/data-list/DataTable.vue'));
 
 // Resource Type Lists
-Vue.component('entry-list', require('../components/EntryList.vue'));
-Vue.component('collection-list', require('../components/CollectionList.vue'));
+Vue.component('entry-list', require('../components/entries/Listing.vue'));
+Vue.component('collection-list', require('../components/collections/Listing.vue'));
 Vue.component('asset-container-list', require('../components/AssetContainerList.vue'));
 Vue.component('addon-list', require('../components/AddonList.vue'));
 Vue.component('addon-details', require('../components/AddonDetails.vue'));
