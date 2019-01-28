@@ -250,6 +250,8 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->instance('statamic.filters', collect());
 
+        $this->app['statamic.filters']['site'] = \Statamic\Filters\Site::class;
+
         $this->registerExtensionsInAppFolder('Filters');
     }
 

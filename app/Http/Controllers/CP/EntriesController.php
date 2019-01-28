@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
 use Statamic\CP\Publish\ProcessesFields;
+use Statamic\Http\Requests\FilteredRequest;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
@@ -16,13 +17,15 @@ class EntriesController extends CpController
 {
     use ProcessesFields;
 
-    public function index($collection)
+    public function index(FilteredRequest $request, $collection)
     {
         $collection = Collection::whereHandle($collection);
 
-        $entries = $this
-            ->indexQuery($collection)
-            ->where('site', Site::selected()->handle())
+        $query = $this->indexQuery($collection);
+
+        $this->filter($query, $request->filters);
+
+        $entries = $query
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
@@ -31,12 +34,26 @@ class EntriesController extends CpController
         }));
 
         return Resource::collection($entries)->additional(['meta' => [
+            'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
                 ['label' => __('Title'), 'field' => 'title'],
                 ['label' => __('Slug'), 'field' => 'slug'],
             ],
         ]]);
+    }
+
+    protected function filter($query, $filters)
+    {
+        if (! $filters->has('site')) {
+            $filters['site'] = Site::selected()->handle();
+        }
+
+        foreach ($filters as $handle => $value) {
+            $class = app('statamic.filters')->get($handle);
+            $filter = app($class);
+            $filter->apply($query, $value);
+        }
     }
 
     protected function indexQuery($collection)

@@ -3,6 +3,6 @@
    ========================================================================== */
 
 .badge {
-    @apply text-3xs roman bg-red text-white rounded-full;
+    @apply text-3xs roman bg-red text-white rounded-full leading-normal;
     padding: 2px 6px 1px;
 }

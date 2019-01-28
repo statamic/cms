@@ -18,6 +18,7 @@
         collection="{{ $collection->handle() }}"
         initial-sort-column="title"
         initial-sort-direction="asc"
+        :filters="{{ $filters->toJson() }}"
     ></entry-list>
 
 @endsection

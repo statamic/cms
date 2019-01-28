@@ -49,8 +49,24 @@ class CollectionsController extends CpController
         return view('statamic::collections.show', [
             'collection' => $collection,
             'blueprints' => $blueprints,
-            'site' => Site::selected()
+            'site' => Site::selected(),
+            'filters' => $this->filters(),
         ]);
+    }
+
+    protected function filters()
+    {
+        // TODO: Instead of getting *all* filters, there should be a way to only load
+        // filters appropriate to this listing (or this request).
+        return app('statamic.filters')->map(function ($class) {
+            $filter = app($class);
+            return [
+                'handle' => $filter->handle(),
+                'title' => $filter->title(),
+                'options' => format_input_options($filter->options()),
+                'required' => $filter->required(),
+            ];
+        })->values();
     }
 
     public function create()

@@ -28,7 +28,10 @@
                             </div>
                         </data-list-bulk-actions>
                         <data-list-filters
+                            :filters="filters"
+                            :active-filters="activeFilters"
                             :per-page="perPage"
+                            @filters-changed="activeFilters = $event"
                             @per-page-changed="perPageChanged" />
                         <data-list-column-picker @change="updateColumns" />
                     </div>
@@ -71,6 +74,7 @@ export default {
         collection: String,
         initialSortColumn: String,
         initialSortDirection: String,
+        filters: Array
     },
 
     data() {
@@ -85,6 +89,7 @@ export default {
             page: 1,
             perPage: 25, // TODO: Should come from the controller, or a config.
             searchQuery: '',
+            activeFilters: {},
         }
     },
 
@@ -99,6 +104,7 @@ export default {
                 page: this.page,
                 perPage: this.perPage,
                 search: this.searchQuery,
+                filters: btoa(JSON.stringify(this.activeFilters))
             }
         }
 
@@ -110,7 +116,8 @@ export default {
 
     watch: {
 
-        parameters() {
+        parameters(after, before) {
+            if (JSON.stringify(before) === JSON.stringify(after)) return;
             this.request();
         },
 
@@ -132,6 +139,7 @@ export default {
             axios.get(url, { params: this.parameters }).then(response => {
                 this.columns = response.data.meta.columns.map(column => column.field);
                 this.sortColumn = response.data.meta.sortColumn;
+                this.activeFilters = response.data.meta.filters;
                 this.entries = response.data.data;
                 this.meta = response.data.meta;
                 this.loading = false;
