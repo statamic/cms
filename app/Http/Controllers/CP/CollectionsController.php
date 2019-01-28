@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\Str;
 use Statamic\API\Site;
 use Statamic\API\User;
+use Statamic\API\Filter;
 use Statamic\API\Helper;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
@@ -50,23 +51,8 @@ class CollectionsController extends CpController
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => $this->filters(),
+            'filters' => Filter::for('entries'),
         ]);
-    }
-
-    protected function filters()
-    {
-        // TODO: Instead of getting *all* filters, there should be a way to only load
-        // filters appropriate to this listing (or this request).
-        return app('statamic.filters')->map(function ($class) {
-            $filter = app($class);
-            return [
-                'handle' => $filter->handle(),
-                'title' => $filter->title(),
-                'options' => format_input_options($filter->options()),
-                'required' => $filter->required(),
-            ];
-        })->values();
     }
 
     public function create()

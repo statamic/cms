@@ -23,4 +23,9 @@ class Site extends Filter
     {
         return true;
     }
+
+    public function visibleTo($key)
+    {
+        return $key === 'entries';
+    }
 }

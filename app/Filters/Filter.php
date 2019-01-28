@@ -3,8 +3,9 @@
 namespace Statamic\Filters;
 
 use Statamic\API\Str;
+use Illuminate\Contracts\Support\Arrayable;
 
-abstract class Filter
+abstract class Filter implements Arrayable
 {
     public static function title()
     {
@@ -20,5 +21,20 @@ abstract class Filter
     public function required()
     {
         return false;
+    }
+
+    public function visible($key)
+    {
+        return false;
+    }
+
+    public function toArray()
+    {
+        return [
+            'handle' => $this->handle(),
+            'title' => $this->title(),
+            'options' => format_input_options($this->options()),
+            'required' => $this->required(),
+        ];
     }
 }
