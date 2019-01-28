@@ -139,5 +139,9 @@ class AppServiceProvider extends ServiceProvider
         Nav::vendor(function () {
             Nav::content('Donut Shop')->url('/donut')->icon('fa-donut');
         });
+
+        // Removing items.
+        Nav::remove('Content', 'Donut Shop'); // Remove a single item.
+        Nav::remove('Wordpress');             // Remove a whole section.
     }
 }

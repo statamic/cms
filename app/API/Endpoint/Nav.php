@@ -28,7 +28,21 @@ class Nav
     }
 
     /**
-     * Add items to vendor array.
+     * Remove nav item.
+     *
+     * @param string $section
+     * @param string|null $name
+     */
+    public function remove($section, $name = null)
+    {
+        $this->removeItem('vendor', $section, $name);
+        $this->removeItem('extend', $section, $name);
+
+        return $this;
+    }
+
+    /**
+     * Operate on items in vendor array.
      *
      * @param Closure $callback
      */
@@ -112,6 +126,24 @@ class Nav
                 // TODO: Write more serious exception.
                 throw new Exception('Nav children cannot be iconic.');
             });
+    }
+
+    /**
+     * Remove an item from one of the item arrays.
+     *
+     * @param string $type
+     * @param string $section
+     * @param string|null $name
+     */
+    protected function removeItem($type, $section, $name = null)
+    {
+        $this->{$type} = collect($this->{$type})
+            ->reject(function ($item) use ($section, $name) {
+                return $name
+                    ? $item->section() === $section && $item->name() === $name
+                    : $item->section() === $section;
+            })
+            ->all();
     }
 
     /**
