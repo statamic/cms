@@ -29,7 +29,8 @@ class CollectionsStore extends BasicStore
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
             ->data(array_get($data, 'data'))
-            ->entryBlueprints(array_get($data, 'blueprints'));
+            ->entryBlueprints(array_get($data, 'blueprints'))
+            ->searchIndex(array_get($data, 'search_index'));
     }
 
     public function getItemKey($item, $path)
