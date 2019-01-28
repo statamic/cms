@@ -24,7 +24,7 @@ class EntriesController extends CpController
             ->indexQuery($collection)
             ->where('site', Site::selected()->handle())
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
-            ->paginate();
+            ->paginate(request('perPage'));
 
         $entries->setCollection($entries->getCollection()->supplement(function ($entry) {
             return ['deleteable' => me()->can('delete', $entry)];

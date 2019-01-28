@@ -27,7 +27,9 @@
                                 <button class="btn ml-1" @click="bulkPublish(selections)">Publish</button>
                             </div>
                         </data-list-bulk-actions>
-                        <data-list-filters />
+                        <data-list-filters
+                            :per-page="perPage"
+                            @per-page-changed="perPageChanged" />
                         <data-list-column-picker @change="updateColumns" />
                     </div>
                     <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
@@ -81,6 +83,7 @@ export default {
             sortDirection: this.initialSortDirection,
             meta: null,
             page: 1,
+            perPage: 25, // TODO: Should come from the controller, or a config.
             searchQuery: '',
         }
     },
@@ -94,6 +97,7 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 page: this.page,
+                perPage: this.perPage,
                 search: this.searchQuery,
             }
         }
@@ -152,6 +156,11 @@ export default {
 
         updateColumns() {
             //
+        },
+
+        perPageChanged(perPage) {
+            this.perPage = perPage;
+            this.page = 1;
         }
 
     }
