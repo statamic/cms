@@ -58,7 +58,7 @@ class Nav
                 return $item->section();
             })
             ->each(function ($item) use (&$sections) {
-                $sections[$item->section()] = $item;
+                $sections[$item->section()][] = $item;
             });
 
         return collect($sections);
