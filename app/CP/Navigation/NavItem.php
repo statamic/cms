@@ -2,22 +2,26 @@
 
 namespace Statamic\CP\Navigation;
 
+use Exception;
+use Statamic\API\Nav;
 use Statamic\API\Str;
 
 class NavItem
 {
-    private $name;
-    private $title;
-    private $url;
-    private $icon;
-    private $children;
-    private $badge;
+    protected $name;
+    protected $section;
+    protected $route;
+    protected $url;
+    protected $icon;
+    protected $children;
+    // private $badge; // TODO
 
-    public function __construct()
-    {
-        $this->children = new Nav;
-    }
-
+    /**
+     * Get or set name.
+     *
+     * @param string|null $name
+     * @return mixed
+     */
     public function name($name = null)
     {
         if (is_null($name)) {
@@ -29,21 +33,29 @@ class NavItem
         return $this;
     }
 
-    public function title($title = null)
+    /**
+     * Get or set section name.
+     *
+     * @param string|null $section
+     * @return mixed
+     */
+    public function section($section = null)
     {
-        if (is_null($title)) {
-            if ($this->title) {
-                return $this->title;
-            }
-
-            return $this->name ? Str::title($this->name) : null;
+        if (is_null($section)) {
+            return $this->section;
         }
 
-        $this->title = $title;
+        $this->section = $section;
 
         return $this;
     }
 
+    /**
+     * Get or set URL.
+     *
+     * @param string|null $url
+     * @return mixed
+     */
     public function url($url = null)
     {
         if (is_null($url)) {
@@ -55,13 +67,25 @@ class NavItem
         return $this;
     }
 
-    public function route($route, $arg = null)
+    /**
+     * Get or set url by route name.
+     *
+     * @param array|string $name
+     * @param mixed $parameters
+     * @param bool $absolute
+     * @return mixed
+     */
+    public function route($name, $parameters = [], $absolute = true)
     {
-        $url = ($arg) ? route($route, $arg) : route($route);
-
-        return $this->url($url);
+        return $this->url(route($name, $parameters, $absolute));
     }
 
+    /**
+     * Get or set icon.
+     *
+     * @param string|null $icon
+     * @return mixed
+     */
     public function icon($icon = null)
     {
         if (is_null($icon)) {
@@ -73,39 +97,56 @@ class NavItem
         return $this;
     }
 
-    public function badge($badge = null)
+    /**
+     * Get or set child nav items.
+     *
+     * @param array|null $items
+     * @return mixed
+     */
+    public function children($items = null)
     {
-        if (is_null($badge)) {
-            return $this->badge;
+        if (is_null($items)) {
+            return $this->children;
         }
 
-        $this->badge = $badge;
+        $this->children = collect($items)
+            ->map(function ($value, $key) {
+                return $value instanceof NavItem
+                    ? $value
+                    : Nav::item($key)->url($value);
+            });
 
         return $this;
     }
 
-    public function add($key, $item = null)
-    {
-        return $this->children->add($key, $item);
-    }
+    // public function badge($badge = null)
+    // {
+    //     if (is_null($badge)) {
+    //         return $this->badge;
+    //     }
 
-    public function has($key)
-    {
-        return $this->children->has($key);
-    }
+    //     $this->badge = $badge;
 
-    public function get($key)
-    {
-        return $this->children->get($key);
-    }
+    //     return $this;
+    // }
 
-    public function remove($key)
-    {
-        return $this->children->remove($key);
-    }
+    // public function add($key, $item = null)
+    // {
+    //     return $this->children->add($key, $item);
+    // }
 
-    public function children()
-    {
-        return $this->children->children();
-    }
+    // public function has($key)
+    // {
+    //     return $this->children->has($key);
+    // }
+
+    // public function get($key)
+    // {
+    //     return $this->children->get($key);
+    // }
+
+    // public function remove($key)
+    // {
+    //     return $this->children->remove($key);
+    // }
 }

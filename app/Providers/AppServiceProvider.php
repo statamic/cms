@@ -12,6 +12,7 @@ use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Statamic\API\Nav; // TODO: Remove!
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->messingWithNav();
+
         $this->swapSessionMiddleware();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
@@ -111,5 +114,30 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Session\Middleware\StartSession::class,
             \Statamic\Http\Middleware\CP\StartSession::class
         );
+    }
+
+    protected function messingWithNav()
+    {
+        // This nav item will go into the 'Content' section.
+        Nav::content('Floof')->url('/floof')->icon('fa-floof');
+
+        // This nav item will go into the 'Tools' section.
+        Nav::tools('Floof Utilities')
+            ->url('/floof-utilities')
+            ->icon('fa-floof')
+            ->children([
+                'Feeder' => '/feeder',                 // Since children are simpler, can define name and URL like this
+                Nav::item('Groomer')->url('/groomer'), // Or explicitly using Nav::item
+            ]);
+
+        // This nav item will go into a new custom 'Wordpress' section.
+        Nav::wordpress('Importer')->url('/wordpress-importer')->icon('fa-import');
+
+        // This will ensure vendor items get built into the nav first, no matter what order service providers load.
+        // This is similar to ::extend(), but inverse in that we can wrap our items with ::vendor(), so that
+        // user's won't have to wrap with ::extend().  A minor thing, but simplifies for end users.
+        Nav::vendor(function () {
+            Nav::content('Donut Shop')->url('/donut')->icon('fa-donut');
+        });
     }
 }

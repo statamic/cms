@@ -126,6 +126,9 @@
                     </a>
                 </li>
             </ul>
+
+            {!! dd(\Statamic\API\Nav::buildSections()) !!}
+
         </div>
     </nav>
 @stop

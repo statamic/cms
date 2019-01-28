@@ -94,7 +94,9 @@ class Str extends \Illuminate\Support\Str
     public static function modifyMultiple($string, $modifications)
     {
         foreach ($modifications as $modification) {
-            $string = self::$modification($string);
+            $string = is_callable($modification)
+                ? $modification($string)
+                : self::$modification($string);
         }
 
         return $string;
