@@ -21,7 +21,6 @@
 @import "vendors/tippy";
 
 // Core things that need to override vendor things
-@import "core/utilities";
 @import "core/layout";
 @import "core/typography";
 
@@ -90,3 +89,5 @@
 @import "components/fieldtypes/yaml";
 
 @tailwind utilities;
+
+@import "core/utilities";

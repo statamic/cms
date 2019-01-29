@@ -34,9 +34,7 @@ select {
     height: 38px;
 
     &:focus {
-        @apply border-blue-light;
-        outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
+        @apply focus-outline;
     }
 }
 

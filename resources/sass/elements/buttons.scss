@@ -8,38 +8,32 @@
     @include button(#fff, $color_gray_dark);
     @apply shadow-button;
 
-    // The larger shadow on the default button makes it look too tall compared,
-    // to form inputs and other buttons, so we adjust this to provide
-    // the illusion of equal height when elements are inline.
-    height: 37px;
-
-    .icon { color: #777; } // @TODO use standardized grey
+    &:focus {
+        @apply focus-outline;
+    }
 }
 
 .btn-primary {
     @include button($brand-primary, rgba(255,255,255,.9));
-
-    background: linear-gradient(to bottom, $brand-primary, #2096df) !important;
-
+    text-shadow: 0 1px 0 rgba(0,0,0,.15);
     box-shadow:
-        rgba($brand-primary, .05) 0 2px 5px 0,
-        rgba(0,0,0,.07) 0 1px 2px 0,
-        rgba(0,0,0,.08) 0 1px 3px 0;
-    border-bottom: 1px solid #3282b3;
+        #3282b3 0 0 0 1px,
+        rgba(#3282b3, .05) 0 2px 5px 0,
+        rgba(0,0,0,.1) 0 2px 2px 0,
+        rgba(0,0,0,.15) 0 1px 3px 0;
 
     &:hover:not(:disabled),
     &.depressed {
         box-shadow:
-            0 2px 5px 0 rgba(50,50,93,.1),
-            0 2px 4px 0 rgba(50,50,93,.08),
-            0 1px 2px 0 rgba(0,0,0,.08),
-            0 1px 3px 0 rgba(0,0,0,.08);
+            #3282b3 0 0 0 1px,
+            rgba(#3282b3, .1) 0 2px 5px 0,
+            rgba(50,50,93,.2) 0 3px 9px 0,
+            rgba(0,0,0,.15) 0 2px 3px 0,
+            rgba(0,0,0,.15) 0 1px 2px 0;
     }
 
     &:focus {
-        @apply border-blue-light;
-        outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
+        @apply focus-outline;
     }
 }
 
@@ -56,10 +50,15 @@
     &.depressed {
         color: $color_red;
         box-shadow:
-            0 2px 5px 0 rgba($color_red,.1),
-            0 2px 4px 0 rgba($color_red,.08),
-            0 1px 2px 0 rgba(0,0,0,.08),
-            0 1px 3px 0 rgba(0,0,0,.08);
+            rgba($color_red,.1) 0 0 0 1px,
+            rgba($color_red,.1) 0 2px 5px 0,
+            rgba(50,50,93,.08) 0 3px 9px 0,
+            rgba(0,0,0,.08) 0 1px 1.5px 0,
+            rgba(0,0,0,.08) 0 1px 2px 0;
+    }
+
+    &:focus {
+        @apply focus-outline;
     }
 }
 

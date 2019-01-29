@@ -16,6 +16,8 @@ $color_green: 		    #479967;
 $color_search_alt:	    #DCDCD1;
 $color_red:             #E75650;
 $color_yellow:          #fbfab0;
+$color_blue:            #3aa3e3;
+$color_blue_dark:       #3282b3;
 
 $border:                $color_border;
 $color_gray_lighter:    $color_gray_input;
@@ -26,6 +28,6 @@ $asset_bg:              #394045;
 $font_monospace: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
 $font_serif: 'Georgia', 'serif';
 
-$brand-primary: 	#3aa3e3;
+$brand-primary: 	$color_blue;
 $brand-secondary:   #48606f;
 $brand-darker:      #3C4858;
