@@ -9,7 +9,7 @@ class FilteredRequest extends FormRequest
     protected function prepareForValidation()
     {
         if ($filters = $this->filters) {
-            $this->replace([
+            $this->merge([
                 'filters' => collect(json_decode(base64_decode($filters), true))
             ]);
         }
