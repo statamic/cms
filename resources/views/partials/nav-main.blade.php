@@ -1,6 +1,7 @@
 @section('nav-main')
     <nav class="nav-main" v-cloak>
         <div class="nav-main-wrapper">
+
             <ul class="mt-sm">
                 <li class="{{ current_class('dashboard') }}">
                     <a href="{{ route('statamic.cp.dashboard') }}">
@@ -13,121 +14,7 @@
                     </a>
                 </li>
             </ul>
-            <h6>Content</h6>
-            <ul>
-                @can('index', 'Statamic\Contracts\Data\Entries\Collection')
-                <li class="{{ current_class('collections*') }}">
-                    <a href="{{ cp_route('collections.index') }}">
-                        <i class="">@svg('content-writing')</i><span>Collections</span>
-                    </a>
-                </li>
-                @endcan
-                @can('index', 'Statamic\Contracts\Data\Structures\Structure')
-                <li class="{{ current_class('structures*') }}">
-                    <a href="{{ cp_route('structures.index') }}" class="active">
-                        <i>@svg('hierarchy-files')</i><span>Structure</span>
-                    </a>
-                </li>
-                @endcan
-                <li class="{{ current_class('taxonomies*') }}">
-                    <a href="">
-                        <i>@svg('tags')</i><span>Taxonomies</span>
-                    </a>
-                </li>
-                <li class="{{ current_class('assets*') }}">
-                    <a href="{{ cp_route('assets.index') }}">
-                        <i>@svg('assets')</i><span>Assets</span>
-                    </a>
-                </li>
-                @can('index', 'Statamic\Contracts\Data\Globals\GlobalSet')
-                <li class="{{ current_class('globals*') }}">
-                    <a href="{{ cp_route('globals.index') }}">
-                        <i>@svg('earth')</i><span>Globals</span>
-                    </a>
-                </li>
-                @endcan
-            </ul>
-            <h6>Tools</h6>
-            <ul>
-                @can('index', 'Statamic\Contracts\Forms\Form')
-                <li class="{{ current_class('forms*') }}">
-                    <a href="{{ cp_route('forms.index') }}">
-                        <i>@svg('drawer-file')</i><span>Forms</span>
-                    </a>
-                </li>
-                @endcan
-                @can('view updates')
-                <li class="{{ current_class('updater*') }}">
-                    <a href="{{ route('statamic.cp.updater.index') }}">
-                        <i>@svg('loading-bar')</i><span>Updates</span>
-                        <updates-badge class="ml-1" :initial-count="{{ Facades\Statamic\Updater\UpdatesCount::get() }}"></updates-badge>
-                    </a>
-                </li>
-                @endcan
-                <li class="{{ current_class('utilities*') }}">
-                    <a href="{{ cp_route('utilities.phpinfo') }}">
-                        <i>@svg('settings-slider')</i><span>{{ __('Utilities') }}</span>
-                    </a>
-                    @if (is_current('utilities*'))
-                        <ul>
-                            <li class="{{ current_class('utilities/phpinfo') }}">
-                                <a href="{{ cp_route('utilities.phpinfo') }}">{{ __('PHP Info') }}</a>
-                            </li>
-                            <li class="{{ current_class('utilities/clear-cache') }}">
-                                <a href="{{ cp_route('utilities.clear-cache.index') }}">{{ __('Clear Cache') }}</a>
-                            </li>
-                            <li class="{{ current_class('utilities/search') }}">
-                                <a href="{{ cp_route('utilities.search') }}">{{ __('Search') }}</a>
-                            </li>
-                        </ul>
-                    @endif
-                </li>
-            </ul>
-            <h6>Users</h6>
-            <ul>
-                @can('index', 'Statamic\Contracts\Auth\User')
-                <li class="{{ current_class('users*') }}">
-                    <a href="{{ cp_route('users.index') }}">
-                        <i>@svg('users-box')</i><span>Users</span>
-                    </a>
-                </li>
-                @endcan
-                <li class="{{ current_class('user-groups*') }}">
-                    <a href="{{ cp_route('user-groups.index') }}">
-                        <i>@svg('users-multiple')</i><span>Groups</span>
-                    </a>
-                </li>
-                <li class="{{ current_class('roles*') }}">
-                    <a href="{{ cp_route('roles.index') }}">
-                        <i>@svg('shield-key')</i><span>Permissions</span>
-                    </a>
-                </li>
-            </ul>
-            <h6>Site</h6>
-            <ul>
-                <li class="{{ current_class('addons') }}">
-                    <a href="{{ route('statamic.cp.addons.index') }}">
-                        <i>@svg('addons')</i><span>Addons</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="">
-                        <i>@svg('hammer-wrench')</i><span>Preferences</span>
-                    </a>
-                </li>
-                <li class="{{ current_class('fieldsets*') }}">
-                    <a href="{{ cp_route('fieldsets.index') }}">
-                        <i>@svg('wireframe')</i><span>Fieldsets</span>
-                    </a>
-                </li>
-                <li class="{{ current_class('blueprints*') }}">
-                    <a href="{{ cp_route('blueprints.index') }}">
-                        <i>@svg('blueprints')</i><span>Blueprints</span>
-                    </a>
-                </li>
-            </ul>
 
-            {{--
             @foreach (Statamic\API\Nav::build() as $section => $items)
                 <h6>{{ __($section) }}</h6>
                 <ul>
@@ -153,7 +40,6 @@
                     @endforeach
                 </ul>
             @endforeach
-            --}}
 
         </div>
     </nav>
