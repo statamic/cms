@@ -5,12 +5,22 @@ namespace Statamic\API\Endpoint;
 use Closure;
 use Exception;
 use Statamic\CP\Navigation\NavItem;
+use Statamic\CP\Navigation\DefaultNav;
 
 class Nav
 {
-    protected $type = 'extend';
-    protected $vendor = [];
-    protected $extend = [];
+    protected $items = [];
+    protected $extensions = [];
+
+    /**
+     * Register a nav extension closure.
+     *
+     * @param Closure $callback
+     */
+    public function extend(Closure $callback)
+    {
+        $this->extensions[] = $callback;
+    }
 
     /**
      * Create nav item.
@@ -22,7 +32,7 @@ class Nav
     {
         $item = (new NavItem)->name($name);
 
-        $this->{$this->type}[] = $item;
+        $this->items[] = $item;
 
         return $item;
     }
@@ -32,70 +42,71 @@ class Nav
      *
      * @param string $section
      * @param string|null $name
+     * @return $this
      */
     public function remove($section, $name = null)
     {
-        $this->removeItem('vendor', $section, $name);
-        $this->removeItem('extend', $section, $name);
+        $this->items = collect($this->items)
+            ->reject(function ($item) use ($section, $name) {
+                return $name
+                    ? $item->section() === $section && $item->name() === $name
+                    : $item->section() === $section;
+            })
+            ->all();
 
         return $this;
     }
 
     /**
-     * Operate on items in vendor array.
-     *
-     * @param Closure $callback
-     */
-    public function vendor(Closure $callback)
-    {
-        $this->type = 'vendor';
-
-        $callback();
-
-        $this->type = 'extend';
-    }
-
-    /**
-     * Build sections for rendering.
+     * Build navigation.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function buildSections()
+    public function build()
     {
-        $this->validateNesting();
-        $this->validateIcons();
-
-        $sections = [];
-
-        collect($this->items())
-            ->filter(function ($item) {
-                return $item->section();
-            })
-            ->each(function ($item) use (&$sections) {
-                $sections[$item->section()][] = $item;
-            });
-
-        return collect($sections);
+        return $this
+            ->makeDefaultItems()
+            ->runExtensions()
+            ->validateNesting()
+            ->validateIcons()
+            ->buildSections();
     }
 
     /**
-     * Get all items.
+     * Make default nav items.
      *
-     * @return array
+     * @return $this
      */
-    protected function items()
+    protected function makeDefaultItems()
     {
-        return array_merge($this->vendor, $this->extend);
+        DefaultNav::make();
+
+        return $this;
+    }
+
+    /**
+     * Run extension closures.
+     *
+     * @return $this
+     */
+    protected function runExtensions()
+    {
+        collect($this->extensions)->each(function ($callback) {
+            $callback($this);
+        });
+
+        return $this;
     }
 
     /**
      * Validate that nav children don't exceed nesting limit.
      *
+     * @return $this
      * @throws Exception
      */
     protected function validateNesting()
     {
-        collect($this->items())
+        collect($this->items)
             ->flatMap(function ($item) {
                 return $item->children();
             })
@@ -106,16 +117,19 @@ class Nav
                 // TODO: Write more serious exception.
                 throw new Exception('Nav children cannot biologically have more nav children.');
             });
+
+        return $this;
     }
 
     /**
      * Validate that nav children don't specify icons.
      *
+     * @return $this
      * @throws Exception
      */
     protected function validateIcons()
     {
-        collect($this->items())
+        collect($this->items)
             ->flatMap(function ($item) {
                 return $item->children();
             })
@@ -126,24 +140,28 @@ class Nav
                 // TODO: Write more serious exception.
                 throw new Exception('Nav children cannot be iconic.');
             });
+
+        return $this;
     }
 
     /**
-     * Remove an item from one of the item arrays.
+     * Build sections collection.
      *
-     * @param string $type
-     * @param string $section
-     * @param string|null $name
+     * @return \Illuminate\Support\Collection
      */
-    protected function removeItem($type, $section, $name = null)
+    protected function buildSections()
     {
-        $this->{$type} = collect($this->{$type})
-            ->reject(function ($item) use ($section, $name) {
-                return $name
-                    ? $item->section() === $section && $item->name() === $name
-                    : $item->section() === $section;
+        $sections = [];
+
+        collect($this->items)
+            ->filter(function ($item) {
+                return $item->section();
             })
-            ->all();
+            ->each(function ($item) use (&$sections) {
+                $sections[$item->section()][] = $item;
+            });
+
+        return collect($sections);
     }
 
     /**

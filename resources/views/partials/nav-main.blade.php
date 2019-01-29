@@ -127,7 +127,7 @@
                 </li>
             </ul>
 
-            {!! dd(\Statamic\API\Nav::buildSections()) !!}
+            {!! dd(\Statamic\API\Nav::build()) !!}
 
         </div>
     </nav>
