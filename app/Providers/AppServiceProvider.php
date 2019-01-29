@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->messingWithNav();
+        // $this->messingWithNav();
 
         $this->swapSessionMiddleware();
 
