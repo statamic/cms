@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Nav::extend(function ($nav) {
-            $this->messingWithNav();
+            // $this->messingWithNav();
         });
 
         $this->swapSessionMiddleware();

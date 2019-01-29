@@ -139,7 +139,7 @@
                                 <a href="{{ $item->url() }}">
                                     <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
                                 </a>
-                                @if ($item->children())
+                                @if ($item->children() && is_current($item->currentClass()))
                                     <ul>
                                         @foreach ($item->children() as $child)
                                             <li class="{{ current_class($child->currentClass()) }}">
