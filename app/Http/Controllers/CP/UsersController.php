@@ -6,6 +6,7 @@ use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Email;
 use Statamic\API\Config;
+use Statamic\API\Filter;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
 use Statamic\API\Blueprint;
@@ -13,6 +14,7 @@ use Statamic\API\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
+use Statamic\Http\Requests\FilteredRequest;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Contracts\Auth\User as UserContract;
 
@@ -25,7 +27,7 @@ class UsersController extends CpController
      */
     private $user;
 
-    public function index(Request $request)
+    public function index(FilteredRequest $request)
     {
         $this->authorize('index', UserContract::class);
 
@@ -33,7 +35,9 @@ class UsersController extends CpController
             return $this->json($request);
         }
 
-        return view('statamic::users.index');
+        return view('statamic::users.index', [
+            'filters' => Filter::for('users'),
+        ]);
     }
 
     protected function json($request)
@@ -42,9 +46,11 @@ class UsersController extends CpController
             ? UserGroup::find($request->group)->queryUsers()
             : User::query();
 
+        $this->filter($query, $request->filters);
+
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
-            ->paginate();
+            ->paginate(request('perPage'));
 
         $users->setCollection($users->getCollection()->supplement(function ($user) use ($request) {
             return ['deleteable' => $request->user()->can('delete', $user)];
@@ -57,6 +63,15 @@ class UsersController extends CpController
                 ['label' => 'email', 'field' => 'email'],
             ],
         ]]);
+    }
+
+    protected function filter($query, $filters)
+    {
+        foreach ($filters as $handle => $value) {
+            $class = app('statamic.filters')->get($handle);
+            $filter = app($class);
+            $filter->apply($query, $value);
+        }
     }
 
     /**
