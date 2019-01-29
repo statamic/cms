@@ -22,7 +22,7 @@ abstract class Filter implements Arrayable
         return false;
     }
 
-    public function visible($key)
+    public function visible($key, $context)
     {
         return false;
     }

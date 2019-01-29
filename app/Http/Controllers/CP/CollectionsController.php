@@ -51,7 +51,7 @@ class CollectionsController extends CpController
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => Filter::for('entries'),
+            'filters' => Filter::for('entries', ['collection' => $collection]),
         ]);
     }
 

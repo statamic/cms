@@ -11,8 +11,8 @@ class FilterRepository
         })->values();
     }
 
-    public function for($key)
+    public function for($key, $context = [])
     {
-        return $this->all()->filter->visibleTo($key)->values();
+        return $this->all()->filter->visibleTo($key, $context)->values();
     }
 }
