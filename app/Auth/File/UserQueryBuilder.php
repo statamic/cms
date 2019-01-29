@@ -10,14 +10,23 @@ use Statamic\Auth\UserCollection;
 class UserQueryBuilder extends QueryBuilder
 {
     protected $group;
+    protected $role;
 
     protected function getBaseItems()
     {
         if ($this->group) {
-            return UserGroup::find($this->group)->queryUsers()->get();
+            $users = UserGroup::find($this->group)->queryUsers()->get();
+        } else {
+            $users = User::all()->values();
         }
 
-        return User::all()->values();
+        if ($this->role === 'super') {
+            $users = $users->filter->isSuper();
+        } elseif ($this->role) {
+            $users = $users->filter->hasRole($this->role);
+        }
+
+        return $users->values();
     }
 
     protected function collect($items = [])
@@ -29,6 +38,11 @@ class UserQueryBuilder extends QueryBuilder
     {
         if ($column === 'group') {
             $this->group = $operator;
+            return $this;
+        }
+
+        if ($column === 'role') {
+            $this->role = $operator;
             return $this;
         }
 
