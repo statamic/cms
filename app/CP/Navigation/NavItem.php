@@ -12,6 +12,7 @@ class NavItem
     protected $section;
     protected $route;
     protected $url;
+    protected $currentClass;
     protected $icon;
     protected $children;
     // private $badge; // TODO
@@ -63,6 +64,27 @@ class NavItem
         }
 
         $this->url = $url;
+
+        if (! $this->currentClass) {
+            $this->currentClass = str_replace(url('cp').'/', '', $this->url) . '*';
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get or set current class.
+     *
+     * @param string|null $pattern
+     * @return $this
+     */
+    public function currentClass($pattern = null)
+    {
+        if (is_null($pattern)) {
+            return $this->currentClass;
+        }
+
+        $this->currentClass = $pattern;
 
         return $this;
     }
