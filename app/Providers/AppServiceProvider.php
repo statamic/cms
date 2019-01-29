@@ -135,13 +135,6 @@ class AppServiceProvider extends ServiceProvider
         // This nav item will go into a new custom 'Wordpress' section.
         Nav::wordpress('Importer')->url('/wordpress-importer')->icon('fa-import');
 
-        // This will ensure vendor items get built into the nav first, no matter what order service providers load.
-        // This is similar to ::extend(), but inverse in that we can wrap our items with ::vendor(), so that
-        // user's won't have to wrap with ::extend().  A minor thing, but simplifies for end users.
-        Nav::vendor(function () {
-            Nav::content('Donut Shop')->url('/donut')->icon('fa-donut');
-        });
-
         // Removing items.
         Nav::remove('Content', 'Donut Shop'); // Remove a single item.
         Nav::remove('Wordpress');             // Remove a whole section.
