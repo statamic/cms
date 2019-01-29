@@ -253,6 +253,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         $filters = [
             Filters\Site::class,
+            Filters\UserRole::class,
             Filters\UserGroup::class,
         ];
 
