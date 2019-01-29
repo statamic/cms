@@ -12,6 +12,8 @@
         @endcan
     </div>
 
-    <user-listing></user-listing>
+    <user-listing
+        :filters="{{ $filters->toJson() }}"
+    ></user-listing>
 
 @endsection

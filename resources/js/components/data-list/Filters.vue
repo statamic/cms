@@ -1,10 +1,14 @@
 <template>
     <dropdown-list>
         <button class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative" slot="trigger">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.8 2.1A1 1 0 0 0 21 .5H2.981a1 1 0 0 0-.8 1.6l7.808 10.491V22.5a1 1 0 0 0 1.6.8l2-1.5a1 1 0 0 0 .4-.8v-8.41z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
+            <span>{{ __('Filter') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1 bg-blue" v-text="activeFilterCount" />
         </button>
         <ul class="dropdown-menu">
+            <li><h6>{{ __('Filter List') }}</h6></li>
+            <li class="divider"></li>
+
             <data-list-filter
                 v-for="filter in filters"
                 :key="filter.handle"
@@ -13,15 +17,15 @@
                 @changed="filterChanged(filter.handle, $event)"
             />
 
-            <li>
-                <h6>Per Page</h6>
-                <select class="w-full" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
+            <li class="flex items-center">
+                <select class="w-auto" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
                     <option
                         v-for="value in perPageOptions"
                         :key="value"
                         :value="value"
                         v-text="value" />
                 </select>
+                <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
             </li>
         </ul>
     </dropdown-list>

@@ -3,6 +3,7 @@
 namespace Statamic\Data\Entries;
 
 use Statamic\API;
+use Statamic\API\Search;
 use Statamic\API\Blueprint;
 use Statamic\Contracts\Data\Entries\Collection as Contract;
 
@@ -16,6 +17,7 @@ class Collection implements Contract
     protected $sites = [];
     protected $data = [];
     protected $blueprints = [];
+    protected $searchIndex;
 
     public function get($key)
     {
@@ -167,5 +169,21 @@ class Collection implements Contract
             rtrim(config('statamic.stache.stores.collections.directory'), '/'),
             $this->handle
         ]);
+    }
+
+    public function searchIndex($index = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->searchIndex ?  Search::index($this->searchIndex) : null;
+        }
+
+        $this->searchIndex = $index;
+
+        return $this;
+    }
+
+    public function hasSearchIndex()
+    {
+        return $this->searchIndex() !== null;
     }
 }

@@ -23,4 +23,13 @@ class Site extends Filter
     {
         return true;
     }
+
+    public function visibleTo($key)
+    {
+        if (! API\Site::hasMultiple()) {
+            return false;
+        }
+
+        return $key === 'entries';
+    }
 }

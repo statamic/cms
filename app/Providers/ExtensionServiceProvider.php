@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Filters;
 use Statamic\DataStore;
 use Statamic\Extend\Modifier;
 use Statamic\Fields\Fieldtypes;
@@ -250,7 +251,15 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->instance('statamic.filters', collect());
 
-        $this->app['statamic.filters']['site'] = \Statamic\Filters\Site::class;
+        $filters = [
+            Filters\Site::class,
+            Filters\UserRole::class,
+            Filters\UserGroup::class,
+        ];
+
+        foreach ($filters as $filter) {
+            $this->app['statamic.filters'][$filter::handle()] = $filter;
+        }
 
         $this->registerExtensionsInAppFolder('Filters');
     }
