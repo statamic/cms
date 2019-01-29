@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
+use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
@@ -93,9 +94,18 @@ class DefaultNav
      */
     protected function makeUsersSection()
     {
-        // Nav::users('')->route('')->icon('');
-        // Nav::users('')->route('')->icon('');
-        // Nav::users('')->route('')->icon('');
+        Nav::users('Users')
+            ->route('users.index')
+            ->icon('users-box')
+            ->can('index', User::class);
+
+        Nav::users('Groups')
+            ->route('user-groups.index')
+            ->icon('users-multiple');
+
+        Nav::users('Permissions')
+            ->route('roles.index')
+            ->icon('shield-key');
 
         return $this;
     }
@@ -107,10 +117,21 @@ class DefaultNav
      */
     protected function makeSiteSection()
     {
-        // Nav::site('')->route('')->icon('');
-        // Nav::site('')->route('')->icon('');
-        // Nav::site('')->route('')->icon('');
-        // Nav::site('')->route('')->icon('');
+        Nav::site('Addons')
+            ->route('addons.index')
+            ->icon('addons');
+
+        Nav::site('Preferences')
+            ->route('')
+            ->icon('hammer-wrench');
+
+        Nav::site('Fieldsets')
+            ->route('fieldsets.index')
+            ->icon('wireframe');
+
+        Nav::site('Blueprints')
+            ->route('blueprints.index')
+            ->icon('blueprints');
 
         return $this;
     }
