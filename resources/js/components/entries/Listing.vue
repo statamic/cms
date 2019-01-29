@@ -139,7 +139,7 @@ export default {
             axios.get(url, { params: this.parameters }).then(response => {
                 this.columns = response.data.meta.columns.map(column => column.field);
                 this.sortColumn = response.data.meta.sortColumn;
-                this.activeFilters = response.data.meta.filters;
+                this.activeFilters = {...response.data.meta.filters};
                 this.entries = response.data.data;
                 this.meta = response.data.meta;
                 this.loading = false;
