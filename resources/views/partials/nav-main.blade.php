@@ -127,6 +127,7 @@
                 </li>
             </ul>
 
+            {{--
             @foreach (Statamic\API\Nav::build() as $section => $items)
                 <h6>{{ $section }}</h6>
                 <ul>
@@ -143,6 +144,7 @@
                     @endforeach
                 </ul>
             @endforeach
+            --}}
 
         </div>
     </nav>
