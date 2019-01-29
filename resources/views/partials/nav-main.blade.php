@@ -139,6 +139,15 @@
                                 <a href="{{ $item->url() }}">
                                     <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
                                 </a>
+                                @if ($item->children())
+                                    <ul>
+                                        @foreach ($item->children() as $child)
+                                            <li class="{{ current_class($child->currentClass()) }}">
+                                                <a href="{{ $child->url() }}">{{ __($child->name()) }}</a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
                             </li>
                         @endif
                     @endforeach

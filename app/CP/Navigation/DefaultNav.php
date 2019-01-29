@@ -75,6 +75,7 @@ class DefaultNav
 
         Nav::tools('Utilities')
             ->route('utilities.phpinfo')
+            ->currentClass('utilities*')
             ->icon('settings-slider')
             ->children([
                 Nav::item('PHP Info')->route('utilities.phpinfo'),
