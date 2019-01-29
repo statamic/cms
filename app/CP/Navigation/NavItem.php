@@ -15,7 +15,7 @@ class NavItem
     protected $currentClass;
     protected $icon;
     protected $children;
-    // private $badge; // TODO
+    protected $view;
 
     /**
      * Get or set name.
@@ -140,16 +140,22 @@ class NavItem
         return $this;
     }
 
-    // public function badge($badge = null)
-    // {
-    //     if (is_null($badge)) {
-    //         return $this->badge;
-    //     }
+    /**
+     * Get or set custom view.
+     *
+     * @param string|null view
+     * @return $this
+     */
+    public function view($view = null)
+    {
+        if (is_null($view)) {
+            return $this->view;
+        }
 
-    //     $this->badge = $badge;
+        $this->view = $view;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     // public function add($key, $item = null)
     // {

@@ -131,11 +131,15 @@
                 <h6>{{ $section }}</h6>
                 <ul>
                     @foreach ($items as $item)
+                        @if ($item->view())
+                            @include($item->view())
+                        @else
                             <li class="{{ current_class($item->currentClass()) }}">
                                 <a href="{{ $item->url() }}">
                                     <i>@svg($item->icon())</i><span>{{ $item->name() }}</span>
                                 </a>
                             </li>
+                        @endif
                     @endforeach
                 </ul>
             @endforeach

@@ -42,7 +42,7 @@ class DefaultNav
     protected function makeToolsSection()
     {
         // Nav::tools('Forms')->route('forms.index')->icon('drawer-file');
-        // Nav::tools('Updates')->route('')->icon('loading-bar')->view('nav.updates');
+        Nav::tools('Updates')->route('updater.index')->icon('loading-bar')->view('statamic::nav.updates');
 
         // Nav::tools('Utilities')
         //     ->route('utilities.phpinfo')
