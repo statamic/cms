@@ -26,6 +26,10 @@ class Site extends Filter
 
     public function visibleTo($key)
     {
+        if (! API\Site::hasMultiple()) {
+            return false;
+        }
+
         return $key === 'entries';
     }
 }
