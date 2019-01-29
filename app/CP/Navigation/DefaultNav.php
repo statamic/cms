@@ -26,10 +26,10 @@ class DefaultNav
     protected function makeContentSection()
     {
         Nav::content('Collections')->route('collections.index')->icon('content-writing');
-        // Nav::content('Structure')->route('structures.index')->icon('hierarchy-files');
-        // Nav::content('Taxonomies')->route('')->icon('tags');
-        // Nav::content('')->route('assets.index')->icon('assets');
-        // Nav::content('')->route('')->icon('');
+        Nav::content('Structure')->route('structures.index')->icon('hierarchy-files');
+        Nav::content('Taxonomies')->route('')->icon('tags');
+        Nav::content('Assets')->route('assets.index')->icon('assets');
+        Nav::content('Globals')->route('globals.index')->icon('earth');
 
         return $this;
     }
