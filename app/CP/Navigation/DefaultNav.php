@@ -3,6 +3,8 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
+use Statamic\Contracts\Forms\Form;
+use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
 use Statamic\Contracts\Data\Structures\Structure;
 
@@ -37,9 +39,18 @@ class DefaultNav
             ->icon('hierarchy-files')
             ->can('index', Structure::class);
 
-        Nav::content('Taxonomies')->route('')->icon('tags');
-        Nav::content('Assets')->route('assets.index')->icon('assets');
-        Nav::content('Globals')->route('globals.index')->icon('earth');
+        Nav::content('Taxonomies')
+            ->route('')
+            ->icon('tags');
+
+        Nav::content('Assets')
+            ->route('assets.index')
+            ->icon('assets');
+
+        Nav::content('Globals')
+            ->route('globals.index')
+            ->icon('earth')
+            ->can('index', GlobalSet::class);
 
         return $this;
     }
@@ -51,15 +62,25 @@ class DefaultNav
      */
     protected function makeToolsSection()
     {
-        // Nav::tools('Forms')->route('forms.index')->icon('drawer-file');
-        Nav::tools('Updates')->route('updater.index')->icon('loading-bar')->view('statamic::nav.updates');
+        Nav::tools('Forms')
+            ->route('forms.index')
+            ->icon('drawer-file')
+            ->can('index', Form::class);
 
-        // Nav::tools('Utilities')
-        //     ->route('utilities.phpinfo')
-        //     ->icon('settings-slider')
-        //     ->children([
+        Nav::tools('Updates')
+            ->route('updater.index')
+            ->icon('loading-bar')
+            ->view('statamic::nav.updates')
+            ->can('view updates');
 
-        //     ]);
+        Nav::tools('Utilities')
+            ->route('utilities.phpinfo')
+            ->icon('settings-slider')
+            ->children([
+                Nav::item('PHP Info')->route('utilities.phpinfo'),
+                Nav::item('Clear Cache')->route('utilities.clear-cache.index'),
+                Nav::item('Search')->route('utilities.search'),
+            ]);
 
         return $this;
     }
