@@ -136,7 +136,7 @@ class AppServiceProvider extends ServiceProvider
         Nav::wordpress('Importer')->url('/wordpress-importer')->icon('fa-import');
 
         // Removing items.
-        Nav::remove('Content', 'Donut Shop'); // Remove a single item.
-        Nav::remove('Wordpress');             // Remove a whole section.
+        Nav::remove('Content', 'Collections'); // Remove a single item.
+        Nav::remove('Wordpress');              // Remove a whole section.
     }
 }
