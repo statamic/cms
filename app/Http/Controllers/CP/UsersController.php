@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Email;
+use Statamic\API\Action;
 use Statamic\API\Config;
 use Statamic\API\Filter;
 use Statamic\API\Helper;
@@ -37,6 +38,7 @@ class UsersController extends CpController
 
         return view('statamic::users.index', [
             'filters' => Filter::for('users'),
+            'actions' => Action::for('users'),
         ]);
     }
 

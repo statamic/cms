@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div>
 
         <div v-if="initializing" class="card loading">
@@ -15,24 +15,37 @@
         >
             <div slot-scope="{ }">
                 <div class="card p-0">
-                    <div class="data-list-header justify-end">
+                    <div class="data-list-header">
+                        <data-list-toggle-all ref="toggleAll" />
                         <data-list-filters
                             :filters="filters"
                             :active-filters="activeFilters"
                             :per-page="perPage"
-                            @filters-changed="activeFilters = $event"
+                            @filters-changed="filtersChanged"
                             @per-page-changed="perPageChanged" />
                     </div>
-                    <data-list-table @sorted="sorted">
+                    <data-list-bulk-actions
+                        :url="actionUrl"
+                        :actions="actions"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
+                    <data-list-table :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-name" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url">{{ value }}</a>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
-                                <ul class="dropdown-menu">
-                                    <li><a :href="user.edit_url">Edit</a></li>
-                                    <li class="warning" v-if="user.deleteable"><a @click.prevent="destroy(user.id, index)">Delete</a></li>
-                                </ul>
+                                <div class="dropdown-menu">
+                                    <div class="li"><a :href="user.edit_url">Edit</a></div>
+                                    <data-list-inline-actions
+                                        :item="user.id"
+                                        :url="actionUrl"
+                                        :actions="actions"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
+                                </div>
                             </dropdown-list>
                         </template>
                     </data-list-table>
@@ -56,7 +69,9 @@ export default {
 
     props: {
         group: String,
-        filters: Array
+        filters: Array,
+        actions: Array,
+        actionUrl: String
     },
 
     data() {
@@ -135,6 +150,19 @@ export default {
         perPageChanged(perPage) {
             this.perPage = perPage;
             this.page = 1;
+        },
+
+        filtersChanged(filters) {
+            this.activeFilters = filters;
+            this.$refs.toggleAll.uncheckAllItems();
+        },
+
+        actionStarted() {
+            this.loading = true;
+        },
+
+        actionCompleted() {
+            this.request();
         }
 
     }

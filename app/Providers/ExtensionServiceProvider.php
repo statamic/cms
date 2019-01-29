@@ -279,6 +279,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Delete::class,
             Actions\Publish::class,
             Actions\Unpublish::class,
+            Actions\SendActivationEmail::class,
         ];
 
         foreach ($filters as $filter) {

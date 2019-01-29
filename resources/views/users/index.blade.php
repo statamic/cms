@@ -14,6 +14,8 @@
 
     <user-listing
         :filters="{{ $filters->toJson() }}"
+        :actions="{{ $actions->toJson() }}"
+        action-url="{{ cp_route('users.action') }}"
     ></user-listing>
 
 @endsection

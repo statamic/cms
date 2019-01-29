@@ -86,6 +86,7 @@ Route::group([
     Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
 
     // Users
+    Route::post('users/action', 'UserActionController')->name('users.action');
     Route::resource('users', 'UsersController');
     Route::patch('users/{user}/password', 'UserPasswordController@update')->name('users.password.update');
     Route::get('account', 'AccountController')->name('account');
