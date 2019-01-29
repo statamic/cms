@@ -59,10 +59,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic-translations');
 
         Blade::directive('svg', function ($expression) {
-            $file = trim($expression, "'");
-            return StaticStringy::collapseWhitespace(
-                File::get(statamic_path("resources/dist/svg/{$file}.svg"))
-            );
+            return "<?php echo Statamic::svg({$expression}) ?>";
         });
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {

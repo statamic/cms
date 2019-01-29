@@ -3,6 +3,8 @@
 namespace Statamic;
 
 use Closure;
+use Statamic\API\File;
+use Stringy\StaticStringy;
 use Illuminate\Http\Request;
 
 class Statamic
@@ -126,5 +128,12 @@ class Statamic
         static::$jsonVariables = array_merge(static::$jsonVariables, $variables);
 
         return new static;
+    }
+
+    public static function svg($name)
+    {
+        return StaticStringy::collapseWhitespace(
+            File::get(statamic_path("resources/dist/svg/{$name}.svg"))
+        );
     }
 }

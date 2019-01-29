@@ -469,19 +469,6 @@ function t($var, $params = [])
 {
     return translate('cp.'.$var, $params);
 }
-/**
- * SVG helper
- *
- * Outputs a tag to reference a symbol in the sprite.
- *
- * @param string $name Name of svg
- * @return string
- */
-function svg($name)
-{
-    return '<svg><use xlink:href="#'.$name.'" /></svg>';
-}
-
 
 /**
  * Return a gravatar image
