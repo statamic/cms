@@ -68,16 +68,15 @@ class NavItem
     }
 
     /**
-     * Get or set url by route name.
+     * Get or set url by cp route name.
      *
      * @param array|string $name
-     * @param mixed $parameters
-     * @param bool $absolute
+     * @param mixed $params
      * @return mixed
      */
-    public function route($name, $parameters = [], $absolute = true)
+    public function route($name, $params = [])
     {
-        return $this->url(route($name, $parameters, $absolute));
+        return $this->url(cp_route($name, $params));
     }
 
     /**
