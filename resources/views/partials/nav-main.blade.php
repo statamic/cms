@@ -129,7 +129,7 @@
 
             {{--
             @foreach (Statamic\API\Nav::build() as $section => $items)
-                <h6>{{ $section }}</h6>
+                <h6>{{ __($section) }}</h6>
                 <ul>
                     @foreach ($items as $item)
                         @if ($item->view())
@@ -137,7 +137,7 @@
                         @else
                             <li class="{{ current_class($item->currentClass()) }}">
                                 <a href="{{ $item->url() }}">
-                                    <i>@svg($item->icon())</i><span>{{ $item->name() }}</span>
+                                    <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
                                 </a>
                             </li>
                         @endif
