@@ -9,15 +9,15 @@ use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
 use Statamic\CP\Publish\ProcessesFields;
-use Statamic\Http\Requests\FilteredRequest;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {
     use ProcessesFields;
 
-    public function index(FilteredRequest $request, $collection)
+    public function index(FilteredSiteRequest $request, $collection)
     {
         $collection = Collection::whereHandle($collection);
 
@@ -45,10 +45,6 @@ class EntriesController extends CpController
 
     protected function filter($query, $filters)
     {
-        if (! $filters->has('site')) {
-            $filters['site'] = Site::selected()->handle();
-        }
-
         foreach ($filters as $handle => $value) {
             $class = app('statamic.filters')->get($handle);
             $filter = app($class);
