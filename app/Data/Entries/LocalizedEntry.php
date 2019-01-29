@@ -169,4 +169,12 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
     {
         return $this->collection()->sites();
     }
+
+    protected function fileData()
+    {
+        return array_merge($this->data(), [
+            'id' => $this->id(),
+            'published' => $this->published
+        ]);
+    }
 }
