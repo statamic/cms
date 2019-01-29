@@ -127,7 +127,18 @@
                 </li>
             </ul>
 
-            {!! dd(\Statamic\API\Nav::build()) !!}
+            @foreach (Statamic\API\Nav::build() as $section => $items)
+                <h6>{{ $section }}</h6>
+                <ul>
+                    @foreach ($items as $item)
+                            <li class="{{ current_class($item->currentClass()) }}">
+                                <a href="{{ $item->url() }}">
+                                    <i>@svg($item->icon())</i><span>{{ $item->name() }}</span>
+                                </a>
+                            </li>
+                    @endforeach
+                </ul>
+            @endforeach
 
         </div>
     </nav>
