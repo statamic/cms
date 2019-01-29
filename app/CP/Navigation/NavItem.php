@@ -138,6 +138,10 @@ class NavItem
                     : Nav::item($key)->url($value);
             });
 
+        if ($this->children->isEmpty()) {
+            $this->children = null;
+        }
+
         return $this;
     }
 
