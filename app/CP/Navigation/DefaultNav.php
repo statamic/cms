@@ -3,6 +3,8 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
+use Statamic\Contracts\Data\Entries\Collection;
+use Statamic\Contracts\Data\Structures\Structure;
 
 class DefaultNav
 {
@@ -25,8 +27,16 @@ class DefaultNav
      */
     protected function makeContentSection()
     {
-        Nav::content('Collections')->route('collections.index')->icon('content-writing');
-        Nav::content('Structure')->route('structures.index')->icon('hierarchy-files');
+        Nav::content('Collections')
+            ->route('collections.index')
+            ->icon('content-writing')
+            ->can('index', Collection::class);
+
+        Nav::content('Structure')
+            ->route('structures.index')
+            ->icon('hierarchy-files')
+            ->can('index', Structure::class);
+
         Nav::content('Taxonomies')->route('')->icon('tags');
         Nav::content('Assets')->route('assets.index')->icon('assets');
         Nav::content('Globals')->route('globals.index')->icon('earth');

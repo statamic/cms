@@ -16,6 +16,7 @@ class NavItem
     protected $icon;
     protected $children;
     protected $view;
+    protected $authorization;
 
     /**
      * Get or set name.
@@ -76,7 +77,7 @@ class NavItem
      * Get or set current class.
      *
      * @param string|null $pattern
-     * @return $this
+     * @return mixed
      */
     public function currentClass($pattern = null)
     {
@@ -143,8 +144,8 @@ class NavItem
     /**
      * Get or set custom view.
      *
-     * @param string|null view
-     * @return $this
+     * @param string|null $view
+     * @return mixed
      */
     public function view($view = null)
     {
@@ -155,6 +156,39 @@ class NavItem
         $this->view = $view;
 
         return $this;
+    }
+
+    /**
+     * Get or set authorization.
+     *
+     * @param string|null $ability
+     * @param array $arguments
+     * @return mixed
+     */
+    public function authorization($ability = null, $arguments = [])
+    {
+        if (is_null($ability)) {
+            return $this->authorization;
+        }
+
+        $this->authorization = (object) [
+            'ability' => $ability,
+            'arguments' => $arguments,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Get or set authorization (an alias for consistency with Laravel's can() method).
+     *
+     * @param string|null $ability
+     * @param array $arguments
+     * @return mixed
+     */
+    public function can($ability = null, $arguments = [])
+    {
+        return $this->authorization($ability, $arguments);
     }
 
     // public function add($key, $item = null)

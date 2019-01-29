@@ -69,6 +69,7 @@ class Nav
             ->runExtensions()
             ->validateNesting()
             ->validateIcons()
+            ->filterAuthorized()
             ->buildSections();
     }
 
@@ -139,6 +140,24 @@ class Nav
             ->each(function ($item) {
                 // TODO: Write more serious exception.
                 throw new Exception('Nav children cannot be iconic.');
+            });
+
+        return $this;
+    }
+
+    /**
+     * Filter authorized nav items.
+     *
+     * @return $this
+     */
+    protected function filterAuthorized()
+    {
+        $this->items = collect($this->items)
+            ->filter(function ($item) {
+                return $item->authorization()
+                    // TODO: Ensure this actually works.
+                    ? auth()->user()->can($item->can()->ability, $item->can()->arguments)
+                    : true;
             });
 
         return $this;
