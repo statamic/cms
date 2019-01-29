@@ -20,13 +20,6 @@
                     <div class="data-list-header">
                         <data-list-toggle-all />
                         <data-list-search v-model="searchQuery" />
-                        <data-list-bulk-actions>
-                            <div slot-scope="{ selections, hasSelections }" class="flex items-center" v-if="hasSelections">
-                                <button class="btn ml-1" @click="bulkDelete(selections)">Delete</button>
-                                <button class="btn ml-1" @click="bulkUnpublish(selections)">Unpublish</button>
-                                <button class="btn ml-1" @click="bulkPublish(selections)">Publish</button>
-                            </div>
-                        </data-list-bulk-actions>
                         <data-list-filters
                             :filters="filters"
                             :active-filters="activeFilters"
@@ -35,6 +28,24 @@
                             @per-page-changed="perPageChanged" />
                         <data-list-column-picker @change="updateColumns" />
                     </div>
+                    <data-list-bulk-actions>
+                        <div slot-scope="{ selections, hasSelections }" class="flex items-center bg-grey-lighter text-sm border-b px-2 py-1" v-if="hasSelections">
+                            <div class="text-grey mr-2">({{ selections.length }}) Selected</div>
+                            <div class="flex-1 text-right">
+                                <!-- If has permissions -->
+                                <button class="text-blue hover:text-grey-dark">Duplicate</button>
+
+                                <!-- If any are published -->
+                                <button class="ml-2 text-blue hover:text-grey-dark">Unpublish</button>
+
+                                <!-- If any are unpublished -->
+                                <button class="ml-2 text-blue hover:text-grey-dark">Publish</button>
+
+                                <!-- If has permissions -->
+                                <button class="ml-2 text-red hover:text-grey-dark">Delete</button>
+                            </div>
+                        </div>
+                    </data-list-bulk-actions>
                     <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <a :href="entry.edit_url">{{ entry.title }}</a>
