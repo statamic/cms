@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Actions;
 use Statamic\Filters;
 use Statamic\DataStore;
 use Statamic\Extend\Modifier;
@@ -136,6 +137,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerModifiers();
         $this->registerFieldtypes();
         $this->registerFilters();
+        $this->registerActions();
         $this->registerWidgets();
     }
 
@@ -262,6 +264,28 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         $this->registerExtensionsInAppFolder('Filters');
+    }
+
+    /**
+     * Register actions.
+     *
+     * @return void
+     */
+    protected function registerActions()
+    {
+        $this->app->instance('statamic.actions', collect());
+
+        $filters = [
+            Actions\Delete::class,
+            Actions\Publish::class,
+            Actions\Unpublish::class,
+        ];
+
+        foreach ($filters as $filter) {
+            $this->app['statamic.actions'][$filter::handle()] = $filter;
+        }
+
+        $this->registerExtensionsInAppFolder('Actions');
     }
 
     /**

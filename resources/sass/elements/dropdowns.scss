@@ -45,7 +45,8 @@
     will-change: transform, opacity;
     background-clip: padding-box;
 
-    li > a {
+    li > a,
+    .li > a {
         @apply block rounded text-xs font-normal px-1 py-sm text-blue;
         white-space: nowrap;
 
@@ -68,8 +69,10 @@
         }
     }
 
-    li.warning a { color: $color_red; }
-    li.warning a:hover {
+    li.warning a,
+    .li.warning a { color: $color_red; }
+    li.warning a:hover,
+    .li.warning a:hover {
         background: $color_red;
         color: #fff;
     }

@@ -18,48 +18,46 @@
             <div slot-scope="{ }">
                 <div class="card p-0">
                     <div class="data-list-header">
-                        <data-list-toggle-all />
+                        <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
                         <data-list-filters
                             :filters="filters"
                             :active-filters="activeFilters"
                             :per-page="perPage"
-                            @filters-changed="activeFilters = $event"
+                            @filters-changed="filtersChanged"
                             @per-page-changed="perPageChanged" />
                         <data-list-column-picker @change="updateColumns" />
                     </div>
-                    <data-list-bulk-actions>
-                        <div slot-scope="{ selections, hasSelections }" class="flex items-center bg-grey-lighter text-sm border-b px-2 py-1" v-if="hasSelections">
-                            <div class="text-grey mr-2">({{ selections.length }}) Selected</div>
-                            <div class="flex-1 text-right">
-                                <!-- If has permissions -->
-                                <button class="text-blue hover:text-grey-dark">Duplicate</button>
-
-                                <!-- If any are published -->
-                                <button class="ml-2 text-blue hover:text-grey-dark">Unpublish</button>
-
-                                <!-- If any are unpublished -->
-                                <button class="ml-2 text-blue hover:text-grey-dark">Publish</button>
-
-                                <!-- If has permissions -->
-                                <button class="ml-2 text-red hover:text-grey-dark">Delete</button>
-                            </div>
-                        </div>
-                    </data-list-bulk-actions>
+                    <data-list-bulk-actions
+                        :url="actionUrl"
+                        :actions="actions"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
                     <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
-                            <a :href="entry.edit_url">{{ entry.title }}</a>
+                            <div class="flex items-center">
+                                <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-yellow-dark']" />
+                                <a :href="entry.edit_url">{{ entry.title }}</a>
+                            </div>
                         </template>
                         <template slot="cell-slug" slot-scope="{ row: entry }">
                             <span class="font-mono text-2xs">{{ entry.slug }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
-                                <ul class="dropdown-menu">
-                                    <li><a :href="entry.permalink">View</a></li>
-                                    <li><a :href="entry.edit_url">Edit</a></li>
-                                    <li class="warning" v-if="entry.deleteable"><a @click.prevent="destroy(entry.id, index)">Delete</a></li>
-                                </ul>
+                                <div class="dropdown-menu">
+                                    <div class="li"><a :href="entry.permalink">View</a></div>
+                                    <div class="li"><a :href="entry.edit_url">Edit</a></div>
+                                    <div class="li divider" />
+                                    <data-list-inline-actions
+                                        :item="entry.id"
+                                        :url="actionUrl"
+                                        :actions="actions"
+                                        @started="actionStarted"
+                                        @completed="actionCompleted"
+                                    />
+                                </div>
                             </dropdown-list>
                         </template>
                     </data-list-table>
@@ -85,7 +83,9 @@ export default {
         collection: String,
         initialSortColumn: String,
         initialSortDirection: String,
-        filters: Array
+        filters: Array,
+        actions: Array,
+        actionUrl: String
     },
 
     data() {
@@ -163,16 +163,6 @@ export default {
             this.sortDirection = direction;
         },
 
-        destroy(id, index) {
-            const url = cp_url(`collections/${this.collection}/entries/${id}`);
-            axios.delete(url).then(response => {
-                this.entries.splice(index, 1);
-                this.$notify.success(__('Entry deleted'));
-            }).catch(error => {
-                this.$notify.error(error.response.data.message);
-            })
-        },
-
         updateColumns() {
             //
         },
@@ -180,6 +170,19 @@ export default {
         perPageChanged(perPage) {
             this.perPage = perPage;
             this.page = 1;
+        },
+
+        filtersChanged(filters) {
+            this.activeFilters = filters;
+            this.$refs.toggleAll.uncheckAllItems();
+        },
+
+        actionStarted() {
+            this.loading = true;
+        },
+
+        actionCompleted() {
+            this.request();
         }
 
     }

@@ -20,6 +20,7 @@ Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
 Vue.component('data-list-search', require('../components/data-list/Search.vue'));
 Vue.component('data-list-bulk-actions', require('../components/data-list/BulkActions.vue'));
+Vue.component('data-list-inline-actions', require('../components/data-list/InlineActions.vue'));
 Vue.component('data-list-column-picker', require('../components/data-list/ColumnPicker.vue'));
 Vue.component('data-list-toggle-all', require('../components/data-list/ToggleAll.vue'));
 Vue.component('data-list-pagination', require('../components/data-list/Pagination.vue'));
