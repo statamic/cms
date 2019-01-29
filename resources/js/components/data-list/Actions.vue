@@ -36,6 +36,8 @@ export default {
 
             axios.post(this.url, payload).then(response => {
                 this.$emit('completed');
+            }).catch(error => {
+                this.$notify.error(error.response.data.message);
             });
         }
 
