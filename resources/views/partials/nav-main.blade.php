@@ -19,9 +19,7 @@
                 <h6>{{ __($section) }}</h6>
                 <ul>
                     @foreach ($items as $item)
-                        @if ($item->view())
-                            @include($item->view())
-                        @else
+                        @unless ($item->view())
                             <li class="{{ current_class($item->currentClass()) }}">
                                 <a href="{{ $item->url() }}">
                                     <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
@@ -36,7 +34,9 @@
                                     </ul>
                                 @endif
                             </li>
-                        @endif
+                        @else
+                            @include($item->view())
+                        @endunless
                     @endforeach
                 </ul>
             @endforeach
