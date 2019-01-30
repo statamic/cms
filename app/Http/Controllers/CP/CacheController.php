@@ -2,40 +2,100 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\API\Str;
+use League\Glide\Server;
 use Statamic\API\Stache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
+use Statamic\StaticCaching\Cacher as StaticCacher;
 
 class CacheController extends CpController
 {
     public function index()
     {
-        // dd(Stache::load());
-        return view('statamic::utilities.cache');
+        return view('statamic::utilities.cache', [
+            'stache' => $this->getStacheStats(),
+            'cache' => $this->getApplicationCacheStats(),
+            'static' => $this->getStaticCacheStats(),
+            'images' => $this->getImageCacheStats()
+        ]);
     }
 
-    public function clear(Request $request)
+    protected function getStacheStats()
     {
-        $caches = collect($request->validate([
-            'caches' => 'required',
-        ])['caches']);
+        $time = Stache::buildTime();
+        $built = Stache::buildDate();
 
-        if ($caches->contains('cache')) {
-            Artisan::call('cache:clear');
-        }
+        return [
+            'records' => Stache::fileCount(),
+            'size' => Str::fileSizeForHumans(Stache::fileSize()),
+            'time' => $time ? Str::timeForHumans($time) : 'Refresh',
+            'rebuilt' => $built ? $built->diffForHumans() : 'Refresh',
+        ];
+    }
 
-        if ($caches->contains('stache')) {
-            Artisan::call('statamic:stache:clear');
-        }
+    protected function getApplicationCacheStats()
+    {
+        $driver = config('cache.default');
+        $driver = ($driver === 'statamic') ? 'file (statamic)' : $driver;
+        return compact('driver');
+    }
 
-        if ($caches->contains('static')) {
-            Artisan::call('statamic:static:clear');
-        }
+    protected function getImageCacheStats()
+    {
+        $files = collect(app(Server::class)->getCache()->listContents('', true))
+            ->filter(function ($file) {
+                return $file['type'] === 'file';
+            });
 
-        if ($caches->contains('glide')) {
-            Artisan::call('statamic:glide:clear');
-        }
+        return [
+            'count' => $files->count(),
+            'size' => Str::fileSizeForHumans($files->reduce(function ($size, $file) {
+                return $size + $file['size'];
+            }, 0)),
+        ];
+    }
 
-        return back()->withSuccess('Cache successfully cleared.');
+    protected function getStaticCacheStats()
+    {
+        return [
+            'count' => app(StaticCacher::class)->getUrls()->count(),
+        ];
+    }
+
+    public function clear(Request $request, $cache)
+    {
+        $method = 'clear' . ucfirst($cache) . 'Cache';
+
+        return $this->$method();
+    }
+
+    protected function clearStacheCache()
+    {
+        Stache::refresh();
+
+        return back()->withSuccess('Stache cleared.');
+    }
+
+    protected function clearStaticCache()
+    {
+        app(StaticCacher::class)->flush();
+
+        return back()->withSuccess('Static page cache cleared.');
+    }
+
+    protected function clearApplicationCache()
+    {
+        Artisan::call('cache:clear');
+
+        return back()->withSuccess('Application cache cleared.');
+    }
+
+    protected function clearImageCache()
+    {
+        Artisan::call('statamic:glide:clear');
+
+        return back()->withSuccess('Image cache cleared.');
     }
 }
