@@ -15,7 +15,6 @@ class Stache
     protected $booted = false;
     protected $temperature;
     protected $sites;
-    protected $meta;
     protected $keys;
     protected $config;
     protected $stores;
@@ -60,17 +59,6 @@ class Stache
     public function defaultSite()
     {
         return $this->sites->first();
-    }
-
-    public function meta($meta = null)
-    {
-        if (! $meta) {
-            return $this->meta;
-        }
-
-        $this->meta = collect($meta);
-
-        return $this;
     }
 
     public function keys($keys = null)

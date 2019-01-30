@@ -46,28 +46,6 @@ class LoaderTest extends TestCase
     }
 
     /** @test */
-    function it_loads_meta_in_the_stache()
-    {
-        Cache::shouldReceive('has')->with('stache::meta/one')->andReturnTrue();
-        Cache::shouldReceive('get')->with('stache::meta/one', Mockery::any())->andReturn($metaOne = [
-            'paths' => ['one-test.md'],
-            'uris' => ['en' => ['/one-test']],
-        ]);
-        Cache::shouldReceive('has')->with('stache::meta/two')->andReturnTrue();
-        Cache::shouldReceive('get')->with('stache::meta/two', Mockery::any())->andReturn($metaTwo = [
-            'paths' => ['two-test.md'],
-            'uris' => ['en' => ['/two-test']],
-        ]);
-
-        $this->loader->load();
-
-        $this->assertEquals([
-            'one' => $metaOne,
-            'two' => $metaTwo
-        ], $this->stache->meta()->all());
-    }
-
-    /** @test */
     function it_loads_paths_into_respective_stores()
     {
         Cache::shouldReceive('has')->with('stache::meta/one')->andReturnTrue();

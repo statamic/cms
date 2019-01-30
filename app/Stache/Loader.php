@@ -20,8 +20,6 @@ class Loader
         $meta->each(function ($data, $key) {
             $this->stache->store($key)->loadMeta($data);
         });
-
-        $this->stache->meta($meta);
     }
 
     public function getMetaFromCache()
