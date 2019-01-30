@@ -84,6 +84,16 @@ class Nav
     }
 
     /**
+     * Get currently registered nav items as a raw array, before creating build structure.
+     *
+     * @return array
+     */
+    public function items()
+    {
+        return $this->items;
+    }
+
+    /**
      * Build navigation.
      *
      * @return \Illuminate\Support\Collection
