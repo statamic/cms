@@ -2,10 +2,12 @@
 
 namespace Statamic\Stache;
 
+use Carbon\Carbon;
 use Statamic\API\File;
 use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
 use Statamic\Extensions\FileStore;
+use Illuminate\Support\Facades\Cache;
 
 class Stache
 {
@@ -20,6 +22,7 @@ class Stache
     protected $keys;
     protected $config;
     protected $stores;
+    protected $startTime;
 
     public function __construct()
     {
@@ -210,7 +213,7 @@ class Stache
 
     public function refresh()
     {
-        $this->clear()->update()->persist();
+        $this->clear()->startTimer()->update()->persist();
     }
 
     public function instance()
@@ -234,6 +237,41 @@ class Stache
         return collect($files)->reduce(function ($size, $path) {
             return $size + File::size($path);
         }, 0);
+    }
+
+    public function startTimer()
+    {
+        $this->startTime = microtime(true);
+
+        return $this;
+    }
+
+    public function stopTimer()
+    {
+        if (! $this->startTime) {
+            return $this;
+        }
+
+        Cache::forever('stache::timing', [
+            'time' => floor((microtime(true) - $this->startTime) * 1000),
+            'date' => Carbon::now()->timestamp
+        ]);
+
+        return $this;
+    }
+
+    public function buildTime()
+    {
+        return Cache::get('stache::timing')['time'] ?? null;
+    }
+
+    public function buildDate()
+    {
+        if (! $cache = Cache::get('stache::timing')) {
+            return null;
+        };
+
+        return Carbon::createFromTimestamp($cache['date']);
     }
 
     public function paths()
