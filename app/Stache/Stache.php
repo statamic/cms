@@ -215,4 +215,44 @@ class Stache
     {
         return $this;
     }
+
+    public function paths()
+    {
+        $paths = $this->sites()->mapWithKeys(function ($site) {
+            return [$site => collect()];
+        });
+
+        foreach ($this->stores() as $store) {
+            $storePaths = $store instanceof Stores\AggregateStore
+                ? $this->getAggregateStorePaths($store)
+                : $store->getPaths();
+
+            $storeKey = $store->key();
+
+            foreach ($storePaths as $site => $sitePaths) {
+                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($storeKey) {
+                    return ["{$storeKey}::{$key}" => $path];
+                }));
+            }
+        }
+
+        return $paths;
+    }
+
+    private function getAggregateStorePaths($store)
+    {
+        $paths = $this->sites()->mapWithKeys(function ($site) {
+            return [$site => collect()];
+        });
+
+        foreach ($store->stores() as $store) {
+            foreach ($store->getPaths() as $site => $sitePaths) {
+                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($store) {
+                    return ["{$store->childKey()}::{$key}" => $path];
+                }));
+            }
+        }
+
+        return $paths;
+    }
 }
