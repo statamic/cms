@@ -17,6 +17,7 @@
                 <div class="card p-0">
                     <div class="data-list-header">
                         <data-list-toggle-all ref="toggleAll" />
+                        <div class="flex-1" />
                         <data-list-filters
                             :filters="filters"
                             :active-filters="activeFilters"
