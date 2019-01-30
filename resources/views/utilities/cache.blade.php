@@ -37,13 +37,18 @@
                     <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
                     <p class="text-grey text-sm my-1">Static pages bypass Statamic completely and are rendered directly from your server for maximum performance.</p>
                 </div>
-                <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}">
-                    @csrf
-                    <button class="btn">{{ __('Clear') }}</button>
-                </form>
+                @if ($static['enabled'])
+                    <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}">
+                        @csrf
+                        <button class="btn">{{ __('Clear') }}</button>
+                    </form>
+                @endunless
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Pages:</span> {{ $static['count'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Strategy:</span> {{ $static['strategy'] }}</div>
+                @if ($static['enabled'])
+                    <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Pages:</span> {{ $static['count'] }}</div>
+                @endif
             </div>
         </div>
 

@@ -59,7 +59,11 @@ class CacheController extends CpController
 
     protected function getStaticCacheStats()
     {
+        $strategy = config('statamic.static_caching.strategy');
+
         return [
+            'enabled' => (bool) $strategy,
+            'strategy' => $strategy ?? 'Disabled',
             'count' => app(StaticCacher::class)->getUrls()->count(),
         ];
     }
