@@ -38,6 +38,22 @@ class Nav
     }
 
     /**
+     * Find or create nav item.
+     *
+     * @param string $section
+     * @param string $name
+     */
+    public function findOrCreate($section, $name)
+    {
+        $item = collect($this->items)->first(function ($item) use ($section, $name) {
+            return $item->section() === $section
+                && $item->name() === $name;
+        });
+
+        return $item ?: $this->item($name)->section($section);
+    }
+
+    /**
      * Remove nav item.
      *
      * @param string $section
@@ -184,7 +200,7 @@ class Nav
     }
 
     /**
-     * Magically create nav items in sections by method name.
+     * Magically find or create nav items, specifying the section name in sections by method name.
      *
      * @param string $name
      * @param array $arguments
@@ -197,6 +213,6 @@ class Nav
             return str_replace('_', ' ', $string);
         }]);
 
-        return $this->item($arguments[0])->section($section);
+        return $this->findOrCreate($section, $arguments[0]);
     }
 }
