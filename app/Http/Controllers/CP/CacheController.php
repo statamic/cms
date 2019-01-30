@@ -2,14 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\API\Stache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
-class ClearCacheController extends CpController
+class CacheController extends CpController
 {
     public function index()
     {
-        return view('statamic::utilities.clear-cache');
+        // dd(Stache::load());
+        return view('statamic::utilities.cache');
     }
 
     public function clear(Request $request)
