@@ -85,6 +85,7 @@ class Nav
             ->runExtensions()
             ->validateNesting()
             ->validateIcons()
+            ->validateViews()
             ->filterAuthorized()
             ->buildSections();
     }
@@ -156,6 +157,29 @@ class Nav
             ->each(function ($item) {
                 // TODO: Write more serious exception.
                 throw new Exception('Nav children cannot be iconic.');
+            });
+
+        return $this;
+    }
+
+    /**
+     * Validate that nav children don't specify views.
+     *
+     * @return $this
+     * @throws Exception
+     */
+    protected function validateViews()
+    {
+        collect($this->items)
+            ->flatMap(function ($item) {
+                return $item->children();
+            })
+            ->reject(function ($item) {
+                return is_null($item->view());
+            })
+            ->each(function ($item) {
+                // TODO: Write more serious exception.
+                throw new Exception('Nav children cannot be viewtiful.');
             });
 
         return $this;
