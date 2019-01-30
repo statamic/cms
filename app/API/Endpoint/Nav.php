@@ -28,13 +28,23 @@ class Nav
      * @param string $name
      * @return NavItem
      */
-    public function item($name)
+    public function create($name)
     {
         $item = (new NavItem)->name($name);
 
         $this->items[] = $item;
 
         return $item;
+    }
+
+    /**
+     * Create nav item (an alias that reads a little nicer when creating children).
+     *
+     * @param mixed $name
+     */
+    public function item($name)
+    {
+        return $this->create($name);
     }
 
     /**
@@ -50,7 +60,7 @@ class Nav
                 && $item->name() === $name;
         });
 
-        return $item ?: $this->item($name)->section($section);
+        return $item ?: $this->create($name)->section($section);
     }
 
     /**
@@ -220,7 +230,9 @@ class Nav
                 $sections[$item->section()][] = $item;
             });
 
-        return collect($sections);
+        return collect($sections)->map(function ($items) {
+            return collect($items);
+        });
     }
 
     /**

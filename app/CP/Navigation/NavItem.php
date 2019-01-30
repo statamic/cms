@@ -194,24 +194,4 @@ class NavItem
     {
         return $this->authorization($ability, $arguments);
     }
-
-    // public function add($key, $item = null)
-    // {
-    //     return $this->children->add($key, $item);
-    // }
-
-    // public function has($key)
-    // {
-    //     return $this->children->has($key);
-    // }
-
-    // public function get($key)
-    // {
-    //     return $this->children->get($key);
-    // }
-
-    // public function remove($key)
-    // {
-    //     return $this->children->remove($key);
-    // }
 }
