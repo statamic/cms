@@ -216,6 +216,11 @@ class Stache
         return $this;
     }
 
+    public function fileCount()
+    {
+        return $this->paths()->flatten()->count();
+    }
+
     public function paths()
     {
         $paths = $this->sites()->mapWithKeys(function ($site) {
