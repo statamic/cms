@@ -1,9 +1,10 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\CP\Navigation;
 
 use Closure;
 use Exception;
+use Statamic\API\Str;
 use Statamic\CP\Navigation\NavItem;
 use Statamic\CP\Navigation\DefaultNav;
 
