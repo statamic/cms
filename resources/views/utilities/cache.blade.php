@@ -5,7 +5,11 @@
 
     <div class="flex items-center justify-between">
         <h1>{{ __('Cache Manager') }}</h1>
-        <button class="btn-primary">{{ __('Clear All') }}</button>
+
+        <form method="POST" action="{{ cp_route('utilities.cache.clear', 'all') }}">
+            @csrf
+            <button class="btn-primary">{{ __('Clear All') }}</button>
+        </form>
     </div>
 
     <div class="mt-3 card p-0">

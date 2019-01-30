@@ -75,6 +75,16 @@ class CacheController extends CpController
         return $this->$method();
     }
 
+    protected function clearAllCache()
+    {
+        $this->clearStacheCache();
+        $this->clearStaticCache();
+        $this->clearApplicationCache();
+        $this->clearImageCache();
+
+        return back()->withSuccess('All caches cleared.');
+    }
+
     protected function clearStacheCache()
     {
         Stache::refresh();
