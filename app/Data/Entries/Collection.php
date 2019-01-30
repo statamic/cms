@@ -95,6 +95,11 @@ class Collection implements Contract
         return $this;
     }
 
+    public function showUrl()
+    {
+        return cp_route('collections.show', $this->handle());
+    }
+
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());

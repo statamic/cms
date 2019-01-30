@@ -5,6 +5,7 @@ namespace Statamic\CP\Navigation;
 use Statamic\API\Nav;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
+use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
 use Statamic\Contracts\Data\Structures\Structure;
@@ -33,7 +34,12 @@ class DefaultNav
         Nav::content('Collections')
             ->route('collections.index')
             ->icon('content-writing')
-            ->can('index', Collection::class);
+            ->can('index', Collection::class)
+            ->children(CollectionAPI::all()->map(function ($collection) {
+                return Nav::item($collection->title())
+                          ->url($collection->showUrl())
+                          ->can('view', $collection);
+            }));
 
         Nav::content('Structure')
             ->route('structures.index')
