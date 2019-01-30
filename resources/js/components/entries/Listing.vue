@@ -7,7 +7,7 @@
 
         <data-list
             v-if="!initializing"
-            :rows="entries"
+            :rows="items"
             :columns="columns"
             :search="false"
             :search-query="searchQuery"
@@ -75,116 +75,21 @@
 </template>
 
 <script>
-import axios from 'axios';
+import Listing from '../Listing.vue';
 
 export default {
 
+    mixins: [Listing],
+
     props: {
         collection: String,
-        initialSortColumn: String,
-        initialSortDirection: String,
-        filters: Array,
-        actions: Array,
-        actionUrl: String
     },
 
     data() {
         return {
-            initializing: true,
-            loading: true,
-            entries: [],
-            columns: [],
-            sortColumn: this.initialSortColumn,
-            sortDirection: this.initialSortDirection,
-            meta: null,
-            page: 1,
-            perPage: 25, // TODO: Should come from the controller, or a config.
-            searchQuery: '',
-            activeFilters: {},
+            listingKey: 'entries',
+            requestUrl: cp_url(`collections/${this.collection}/entries`),
         }
-    },
-
-
-    computed: {
-
-        parameters() {
-            return {
-                group: this.group,
-                sort: this.sortColumn,
-                order: this.sortDirection,
-                page: this.page,
-                perPage: this.perPage,
-                search: this.searchQuery,
-                filters: btoa(JSON.stringify(this.activeFilters))
-            }
-        }
-
-    },
-
-    created() {
-        this.request();
-    },
-
-    watch: {
-
-        parameters(after, before) {
-            if (JSON.stringify(before) === JSON.stringify(after)) return;
-            this.request();
-        },
-
-        loading: {
-            immediate: true,
-            handler(loading) {
-                this.$progress.loading('entries', loading);
-            }
-        }
-
-    },
-
-    methods: {
-
-        request() {
-            this.loading = true;
-            const url = cp_url(`collections/${this.collection}/entries`);
-
-            axios.get(url, { params: this.parameters }).then(response => {
-                this.columns = response.data.meta.columns.map(column => column.field);
-                this.sortColumn = response.data.meta.sortColumn;
-                this.activeFilters = {...response.data.meta.filters};
-                this.entries = response.data.data;
-                this.meta = response.data.meta;
-                this.loading = false;
-                this.initializing = false;
-            });
-        },
-
-        sorted(column, direction) {
-            this.sortColumn = column;
-            this.sortDirection = direction;
-        },
-
-        updateColumns() {
-            //
-        },
-
-        perPageChanged(perPage) {
-            this.perPage = perPage;
-            this.page = 1;
-        },
-
-        filtersChanged(filters) {
-            this.activeFilters = filters;
-            this.$refs.toggleAll.uncheckAllItems();
-        },
-
-        actionStarted() {
-            this.loading = true;
-        },
-
-        actionCompleted() {
-            this.request();
-        }
-
     }
 
 }
