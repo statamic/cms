@@ -136,7 +136,8 @@ class NavItem
                 return $value instanceof NavItem
                     ? $value
                     : Nav::item($key)->url($value);
-            });
+            })
+            ->values();
 
         if ($this->children->isEmpty()) {
             $this->children = null;
