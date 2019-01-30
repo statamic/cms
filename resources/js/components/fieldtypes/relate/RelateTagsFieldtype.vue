@@ -3,7 +3,7 @@
 <div>
     <select ref="tags" multiple tabindex="0" ></select>
 
-    <input type="hidden" :name="name" :value="JSON.stringify(data)" class="form-control" />
+    <input type="hidden" :name="name" :value="JSON.stringify(data)" class="input-text" />
 </div>
 
 </template>
