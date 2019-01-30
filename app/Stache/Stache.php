@@ -2,8 +2,10 @@
 
 namespace Statamic\Stache;
 
+use Statamic\API\File;
 use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
+use Statamic\Extensions\FileStore;
 
 class Stache
 {
@@ -219,6 +221,19 @@ class Stache
     public function fileCount()
     {
         return $this->paths()->flatten()->count();
+    }
+
+    public function fileSize()
+    {
+        if (! ($cache = app('cache')->store()->getStore()) instanceof FileStore) {
+            return null;
+        }
+
+        $files = File::getFiles($cache->getDirectory() . '/stache', true);
+
+        return collect($files)->reduce(function ($size, $path) {
+            return $size + File::size($path);
+        }, 0);
     }
 
     public function paths()
