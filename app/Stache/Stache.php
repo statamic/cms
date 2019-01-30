@@ -210,4 +210,9 @@ class Stache
     {
         $this->clear()->update()->persist();
     }
+
+    public function instance()
+    {
+        return $this;
+    }
 }
