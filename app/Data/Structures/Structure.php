@@ -46,6 +46,16 @@ class Structure implements StructureContract
         return $this;
     }
 
+    public function showUrl()
+    {
+        return cp_route('structures.show', $this->handle());
+    }
+
+    public function editUrl()
+    {
+        return cp_route('structures.edit', $this->handle());
+    }
+
     public function route($route = null)
     {
         if (func_num_args() === 0) {

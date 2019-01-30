@@ -5,6 +5,7 @@ namespace Statamic\CP\Navigation;
 use Statamic\API\Nav;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
+use Statamic\API\Structure as StructureAPI;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
@@ -44,7 +45,12 @@ class DefaultNav
         Nav::content('Structure')
             ->route('structures.index')
             ->icon('hierarchy-files')
-            ->can('index', Structure::class);
+            ->can('index', Structure::class)
+            ->children(StructureAPI::all()->map(function ($structure) {
+                return Nav::item($structure->title())
+                          ->url($structure->showUrl())
+                          ->can('view', $structure);
+            }));
 
         Nav::content('Taxonomies')
             ->route('')
