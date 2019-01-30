@@ -1,25 +1,25 @@
-Vue.component('dummy_name-fieldtype', {
+<template>
+
+    <div>
+        <text-input :value="value" @input="update($event)" />
+    </div>
+
+</template>
+
+<script>
+/**
+ * Register this component with:
+ * Vue.component('dummy_name-fieldtype', require('./path/to/DummyName.vue'))
+ */
+export default {
 
     mixins: [Fieldtype],
 
-    template: '<div>DummyName</div>',
-
-    data: function() {
+    data() {
         return {
             //
         };
-    },
-
-    computed: {
-        //
-    },
-
-    methods: {
-        //
-    },
-
-    ready: function() {
-        //
     }
 
-});
+};
+</script>
