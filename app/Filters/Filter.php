@@ -3,19 +3,12 @@
 namespace Statamic\Filters;
 
 use Statamic\API\Str;
+use Statamic\Extend\HasTitleAndHandle;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Filter implements Arrayable
 {
-    public static function title()
-    {
-        return static::$title ?? Str::humanize(static::handle());
-    }
-
-    public static function handle()
-    {
-        return static::$handle ?? snake_case(str_replace((new \ReflectionClass(static::class))->getNamespaceName().'\\', '', static::class));
-    }
+    use HasTitleAndHandle;
 
     public function required()
     {
