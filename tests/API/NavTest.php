@@ -147,7 +147,7 @@ class NavTest extends TestCase
             ->children([
                 Nav::item('B1')->url('/b1'),
                 Nav::item('B2')->url('/b2'),
-                Nav::item('HK-47')->url('/hk-47'),
+                'HK-47' => '/hk-47', // If only specifying name and URL, can pass key/value pair as well.
             ]);
 
         $item = Nav::build()->get('Droids')->first();
