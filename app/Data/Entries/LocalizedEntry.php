@@ -49,6 +49,8 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
             'edit_url' => $this->editUrl(),
             'published' => $this->published(),
             'date' => $this->date(), // TODO: Should only be here for date collections
+            'is_entry' => true,
+            'collection' => $this->collectionHandle(),
         ], $this->supplements);
     }
 
