@@ -3,40 +3,9 @@
    ========================================================================== */
 
 .card {
-    @apply .shadow .bg-white .rounded-md .p-2;
+    @apply .shadow .bg-white .rounded-md .p-1;
 }
 
-@media (max-width: 375px) {
-    .card {
-        @apply .p-1;
-    }
-}
-
-.card .card-head,
-.card .card-actions {
-    @apply select-none;
-}
-
-// @TODO: Remove/replace
-.card.flush {
-    padding: 0;
-
-    .head {
-        background: #fafafa;
-        border-bottom: 1px solid #eee;
-        border-radius: 4px 4px 0 0;
-        padding: 16px;
-    }
-
-    table {
-        margin-top: 0;
-    }
-
-    tr td:first-child {
-        padding-left: 24px;
-    }
-
-    tr td:last-child {
-        padding-right: 24px;
-    }
+@screen md {
+    .card { @apply .p-2; }
 }
