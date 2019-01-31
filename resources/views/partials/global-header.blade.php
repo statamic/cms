@@ -1,17 +1,15 @@
 <div class="global-header">
-    <div class="flex items-center flex-1">
-        <div class="w-54 pl-3 flex items-center">
-            <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
-            <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
-                <div v-popover:tooltip.bottom="version">
-                    @svg('statamic-wordmark')
-                </div>
-            </a>
-        </div>
-
-        <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
-        </global-search>
+    <div class="w-54 pl-3 flex items-center">
+        <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
+        <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
+            <div v-popover:tooltip.bottom="version">
+                @svg('statamic-wordmark')
+            </div>
+        </a>
     </div>
+
+    <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
+    </global-search>
 
     @if (Statamic\API\Site::hasMultiple())
         <site-selector>
@@ -19,7 +17,7 @@
         </site-selector>
     @endif
 
-    <div class="flex items-center px-2 border-l h-full text-sm">
+    {{-- <div class="flex items-center px-2 border-l h-full text-sm">
         <dropdown-list>
             <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" slot="trigger">
                 <i class="block h-6 w-6 mr-1">@svg('pin')</i><span>Shortcuts</span>
@@ -34,11 +32,14 @@
                 <li><a href="" class="text-grey hover:text-white">Customize Shortcuts</a></li>
             </ul>
         </dropdown-list>
-    </div>
+    </div> --}}
 
-    <div class="head-link border-l h-full px-3 flex items-center">
+    <div class="head-link h-full px-3 flex items-center">
+        <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark">
+            @svg('pin')
+        </a>
         <dropdown-list>
-            <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark" slot="trigger">
+            <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-dark" slot="trigger">
                 @svg('book-open')
             </a>
             <ul class="dropdown-menu">
