@@ -17,6 +17,7 @@ class NavTest extends TestCase
         parent::setUp();
 
         Route::any('wordpress-importer', ['as' => 'statamic.cp.wordpress-importer.index']);
+        Route::any('security-droids', ['as' => 'statamic.cp.security-droids.index']);
     }
 
     /** @test */
@@ -156,6 +157,36 @@ class NavTest extends TestCase
         $this->assertEquals('B1', $item->children()->get(0)->name());
         $this->assertEquals('B2', $item->children()->get(1)->name());
         $this->assertEquals('HK-47', $item->children()->get(2)->name());
+    }
+
+    /** @test */
+    function it_can_create_a_nav_item_with_deferred_children()
+    {
+        $this->markTestSkipped('Getting a NotFoundHttpException, even though I\'m registering route?');
+
+        $this
+            ->actingAs(User::make()->makeSuper())
+            ->get(cp_route('security-droids.index'))
+            ->assertStatus(200);
+
+        $item = Nav::droids('Security Droids')
+            ->url('/security-droids')
+            ->children(function () {
+                return [
+                    'IG-86' => '/ig-86',
+                    'K-2SO' => '/k-2so',
+                ];
+            });
+
+        $this->assertEquals('Security Droids', $item->name());
+        $this->assertTrue(is_callable($item->children()));
+
+        $item = Nav::build()->get('Droids')->first();
+
+        $this->assertEquals('Security Droids', $item->name());
+        $this->assertFalse(is_callable($item->children()));
+        $this->assertEquals('IG-86', $item->children()->get(0)->name());
+        $this->assertEquals('K-2SO', $item->children()->get(1)->name());
     }
 
     /** @test */
