@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
+use Statamic\API\Form as FormAPI;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
 use Statamic\API\GlobalSet as GlobalSetAPI;
@@ -84,7 +85,12 @@ class DefaultNav
         Nav::tools('Forms')
             ->route('forms.index')
             ->icon('drawer-file')
-            ->can('index', Form::class);
+            ->can('index', Form::class)
+            ->children(FormAPI::all()->map(function ($form) {
+                return Nav::item($form->title())
+                          ->url($form->editUrl())
+                          ->can('view', $form);
+            }));
 
         Nav::tools('Updates')
             ->route('updater.index')
