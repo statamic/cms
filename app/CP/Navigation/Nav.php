@@ -175,8 +175,7 @@ class Nav
                 return is_null($item->icon());
             })
             ->each(function ($item) {
-                // TODO: Write more serious exception.
-                throw new Exception('Nav children cannot be iconic.');
+                throw new Exception('These nav children cannot have icons.');
             });
 
         return $this;
@@ -198,8 +197,7 @@ class Nav
                 return is_null($item->view());
             })
             ->each(function ($item) {
-                // TODO: Write more serious exception.
-                throw new Exception('Nav children cannot be viewtiful.');
+                throw new Exception('Nav children cannot specify views.');
             });
 
         return $this;
