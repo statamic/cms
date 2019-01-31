@@ -63,10 +63,13 @@ class DefaultNav
         Nav::content('Taxonomies')
             ->route('')
             ->icon('tags');
+            // ->can() // TODO: Permission to manage taxonomies?
 
         Nav::content('Assets')
             ->route('assets.index')
             ->icon('assets');
+            // ->can() // TODO: Permission to manage assets?
+            // ->children() // TODO: Show asset containers as children?
 
         Nav::content('Globals')
             ->route('globals.index')
@@ -112,6 +115,7 @@ class DefaultNav
             ->route('utilities.phpinfo')
             ->currentClass('utilities*')
             ->icon('settings-slider')
+            // ->can() // TODO: Permission to use utilities?
             ->children([
                 Nav::item('Cache')->route('utilities.cache.index'),
                 Nav::item('PHP Info')->route('utilities.phpinfo'),
