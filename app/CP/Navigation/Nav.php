@@ -154,7 +154,7 @@ class Nav
             })
             ->each(function ($item) {
                 // TODO: Write more serious exception.
-                throw new Exception('Nav children cannot biologically have more nav children.');
+                throw new Exception('Nav children have exceeded their nesting limit.');
             });
 
         return $this;
