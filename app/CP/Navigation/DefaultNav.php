@@ -8,6 +8,7 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
 use Statamic\API\GlobalSet as GlobalSetAPI;
 use Statamic\API\Structure as StructureAPI;
+use Statamic\API\UserGroup as UserGroupAPI;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
@@ -125,7 +126,12 @@ class DefaultNav
 
         Nav::users('Groups')
             ->route('user-groups.index')
-            ->icon('users-multiple');
+            ->icon('users-multiple')
+            // ->can() // TODO: Permission to manage groups?
+            ->children(UserGroupAPI::all()->map(function ($userGroup) {
+                return Nav::item($userGroup->title())
+                          ->url($userGroup->editUrl());
+            }));
 
         Nav::users('Permissions')
             ->route('roles.index')

@@ -191,4 +191,9 @@ class UserGroup implements UserGroupContract
 
         return $this;
     }
+
+    public function editUrl()
+    {
+        return cp_route('user-groups.edit', $this->handle());
+    }
 }
