@@ -48,7 +48,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
             'url' => $this->url(),
             'edit_url' => $this->editUrl(),
             'published' => $this->published(),
-            'date' => $this->date(), // TODO: Should only be here for date collections
+            'date' => $this->date(),
             'is_entry' => true,
             'collection' => $this->collectionHandle(),
         ], $this->supplements);
@@ -163,8 +163,11 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function date()
     {
-        // TODO: Should only function for date collections
-        return Carbon::parse($this->order());
+        if ($this->collection()->order === 'date') {
+            return Carbon::parse($this->order());
+        }
+
+        return null;
     }
 
     public function sites()
