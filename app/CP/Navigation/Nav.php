@@ -103,7 +103,8 @@ class Nav
     {
         return $this
             ->makeDefaultItems()
-            ->runExtensions()
+            ->buildExtensions()
+            ->buildChildren()
             ->validateNesting()
             ->validateIcons()
             ->validateViews()
@@ -124,15 +125,33 @@ class Nav
     }
 
     /**
-     * Run extension closures.
+     * Build extension closures.
      *
      * @return $this
      */
-    protected function runExtensions()
+    protected function buildExtensions()
     {
         collect($this->extensions)->each(function ($callback) {
             $callback($this);
         });
+
+        return $this;
+    }
+
+    /**
+     * Build children closures.
+     *
+     * @return $this
+     */
+    public function buildChildren()
+    {
+        collect($this->items)
+            ->filter(function ($item) {
+                return is_callable($item->children()) && is_current($item->currentClass());
+            })
+            ->each(function ($item) {
+                $item->children($item->children()());
+            });
 
         return $this;
     }

@@ -131,6 +131,11 @@ class NavItem
             return $this->children;
         }
 
+        if (is_callable($items)) {
+            $this->children = $items;
+            return $this;
+        }
+
         $this->children = collect($items)
             ->map(function ($value, $key) {
                 return $value instanceof NavItem
