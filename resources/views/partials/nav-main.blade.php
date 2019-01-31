@@ -1,22 +1,10 @@
 @section('nav-main')
     <nav class="nav-main" v-cloak>
         <div class="nav-main-wrapper">
-
-            <ul class="mt-sm">
-                <li class="{{ current_class('dashboard') }}">
-                    <a href="{{ route('statamic.cp.dashboard') }}">
-                        <i>@svg('charts')</i><span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="{{ current_class('playground') }}">
-                    <a href="{{ route('statamic.cp.playground') }}">
-                        <i>@svg('playground')</i><span>Playground</span>
-                    </a>
-                </li>
-            </ul>
-
             @foreach (Statamic\API\Nav::build() as $section => $items)
-                <h6>{{ __($section) }}</h6>
+                @if ($section !== 'Top Level')
+                    <h6>{{ __($section) }}</h6>
+                @endif
                 <ul>
                     @foreach ($items as $item)
                         @unless ($item->view())
@@ -40,7 +28,6 @@
                     @endforeach
                 </ul>
             @endforeach
-
         </div>
     </nav>
 @stop

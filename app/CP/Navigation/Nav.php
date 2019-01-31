@@ -253,6 +253,10 @@ class Nav
             ->filter(function ($item) {
                 return $item->section();
             })
+            ->reject(function ($item) {
+                return $item->section() === 'Top Level'
+                    && ! in_array($item->name(), DefaultNav::ALLOWED_TOP_LEVEL);
+            })
             ->each(function ($item) use (&$sections) {
                 $sections[$item->section()][] = $item;
             });

@@ -17,16 +17,40 @@ use Statamic\Contracts\Data\Structures\Structure;
 
 class DefaultNav
 {
+    const ALLOWED_TOP_LEVEL = [
+        'Dashboard',
+        'Playground',
+    ];
+
     /**
      * Make default nav items.
      */
     public static function make()
     {
         (new static)
+            ->makeTopLevel()
             ->makeContentSection()
             ->makeToolsSection()
             ->makeUsersSection()
             ->makeSiteSection();
+    }
+
+    /**
+     * Make top level items.
+     *
+     * @return $this
+     */
+    protected function makeTopLevel()
+    {
+        Nav::topLevel('Dashboard')
+            ->route('dashboard')
+            ->icon('charts');
+
+        Nav::topLevel('Playground')
+            ->route('playground')
+            ->icon('playground');
+
+        return $this;
     }
 
     /**
