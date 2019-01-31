@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
 use Statamic\API\Form as FormAPI;
+use Statamic\API\Role as RoleAPI;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
 use Statamic\API\GlobalSet as GlobalSetAPI;
@@ -135,7 +136,12 @@ class DefaultNav
 
         Nav::users('Permissions')
             ->route('roles.index')
-            ->icon('shield-key');
+            ->icon('shield-key')
+            // ->can() // TODO: Permission to manage permissions?
+            ->children(RoleAPI::all()->map(function ($role) {
+                return Nav::item($role->title())
+                          ->url($role->editUrl());
+            }));
 
         return $this;
     }
