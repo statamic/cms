@@ -153,7 +153,6 @@ class Nav
                 return empty($item->children());
             })
             ->each(function ($item) {
-                // TODO: Write more serious exception.
                 throw new Exception('Nav children have exceeded their nesting limit.');
             });
 
