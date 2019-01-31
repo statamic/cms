@@ -40,21 +40,25 @@ class DefaultNav
             ->route('collections.index')
             ->icon('content-writing')
             ->can('index', Collection::class)
-            ->children(CollectionAPI::all()->map(function ($collection) {
-                return Nav::item($collection->title())
-                          ->url($collection->showUrl())
-                          ->can('view', $collection);
-            }));
+            ->children(function () {
+                return CollectionAPI::all()->map(function ($collection) {
+                    return Nav::item($collection->title())
+                              ->url($collection->showUrl())
+                              ->can('view', $collection);
+                });
+            });
 
         Nav::content('Structure')
             ->route('structures.index')
             ->icon('hierarchy-files')
             ->can('index', Structure::class)
-            ->children(StructureAPI::all()->map(function ($structure) {
-                return Nav::item($structure->title())
-                          ->url($structure->showUrl())
-                          ->can('view', $structure);
-            }));
+            ->children(function () {
+                return StructureAPI::all()->map(function ($structure) {
+                    return Nav::item($structure->title())
+                              ->url($structure->showUrl())
+                              ->can('view', $structure);
+                });
+            });
 
         Nav::content('Taxonomies')
             ->route('')
@@ -68,11 +72,13 @@ class DefaultNav
             ->route('globals.index')
             ->icon('earth')
             ->can('index', GlobalSet::class)
-            ->children(GlobalSetAPI::all()->map(function ($globalSet) {
-                return Nav::item($globalSet->title())
-                          ->url($globalSet->editUrl())
-                          ->can('view', $globalSet);
-            }));
+            ->children(function () {
+                return GlobalSetAPI::all()->map(function ($globalSet) {
+                    return Nav::item($globalSet->title())
+                              ->url($globalSet->editUrl())
+                              ->can('view', $globalSet);
+                });
+            });
 
         return $this;
     }
@@ -88,11 +94,13 @@ class DefaultNav
             ->route('forms.index')
             ->icon('drawer-file')
             ->can('index', Form::class)
-            ->children(FormAPI::all()->map(function ($form) {
-                return Nav::item($form->title())
-                          ->url($form->editUrl())
-                          ->can('view', $form);
-            }));
+            ->children(function () {
+                return FormAPI::all()->map(function ($form) {
+                    return Nav::item($form->title())
+                        ->url($form->editUrl())
+                        ->can('view', $form);
+                });
+            });
 
         Nav::tools('Updates')
             ->route('updater.index')
@@ -129,19 +137,23 @@ class DefaultNav
             ->route('user-groups.index')
             ->icon('users-multiple')
             // ->can() // TODO: Permission to manage groups?
-            ->children(UserGroupAPI::all()->map(function ($userGroup) {
-                return Nav::item($userGroup->title())
-                          ->url($userGroup->editUrl());
-            }));
+            ->children(function () {
+                return UserGroupAPI::all()->map(function ($userGroup) {
+                    return Nav::item($userGroup->title())
+                              ->url($userGroup->editUrl());
+                });
+            });
 
         Nav::users('Permissions')
             ->route('roles.index')
             ->icon('shield-key')
             // ->can() // TODO: Permission to manage permissions?
-            ->children(RoleAPI::all()->map(function ($role) {
-                return Nav::item($role->title())
-                          ->url($role->editUrl());
-            }));
+            ->children(function () {
+                return RoleAPI::all()->map(function ($role) {
+                    return Nav::item($role->title())
+                        ->url($role->editUrl());
+                });
+            });
 
         return $this;
     }
