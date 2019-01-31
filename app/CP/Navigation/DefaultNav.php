@@ -105,8 +105,8 @@ class DefaultNav
             ->currentClass('utilities*')
             ->icon('settings-slider')
             ->children([
+                Nav::item('Cache')->route('utilities.cache.index'),
                 Nav::item('PHP Info')->route('utilities.phpinfo'),
-                Nav::item('Clear Cache')->route('utilities.clear-cache.index'),
                 Nav::item('Search')->route('utilities.search'),
             ]);
 

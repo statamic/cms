@@ -41,6 +41,7 @@ class Bootstrapper
         try {
             $stache->load();
         } catch (EmptyStacheException $e) {
+            $stache->startTimer();
             $update = true;
         }
 

@@ -5,7 +5,7 @@ namespace Statamic\Stache\Stores;
 class ChildStore extends BasicStore
 {
     protected $parent;
-    protected $key;
+    protected $childKey;
 
     public function setParent(AggregateStore $parent)
     {
@@ -19,16 +19,21 @@ class ChildStore extends BasicStore
         return $this->parent;
     }
 
-    public function setKey($key)
+    public function setChildKey($key)
     {
-        $this->key = $key;
+        $this->childKey = $key;
 
         return $this;
     }
 
+    public function childKey()
+    {
+        return $this->childKey;
+    }
+
     public function key()
     {
-        return $this->parent->key() . '::' . $this->key;
+        return $this->parent->key() . '::' . $this->childKey;
     }
 
     public function getItemsFromCache($cache)

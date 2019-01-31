@@ -57,6 +57,15 @@ class Str extends \Illuminate\Support\Str
         return $bytes;
     }
 
+    public function timeForHumans($ms)
+    {
+        if ($ms < 1000) {
+            return $ms . 'ms';
+        }
+
+        return $ms * 60 . 'sec';
+    }
+
     /**
      * Locale based string comparison.
      *

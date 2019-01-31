@@ -31,5 +31,10 @@ class NullCacher implements Cacher
     {
         //
     }
+
+    public function getUrls($domain = null)
+    {
+        return collect();
+    }
 }
 
