@@ -5,6 +5,7 @@ namespace Statamic\CP\Navigation;
 use Statamic\API\Nav;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
+use Statamic\API\GlobalSet as GlobalSetAPI;
 use Statamic\API\Structure as StructureAPI;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
@@ -63,7 +64,12 @@ class DefaultNav
         Nav::content('Globals')
             ->route('globals.index')
             ->icon('earth')
-            ->can('index', GlobalSet::class);
+            ->can('index', GlobalSet::class)
+            ->children(GlobalSetAPI::all()->map(function ($globalSet) {
+                return Nav::item($globalSet->title())
+                          ->url($globalSet->editUrl())
+                          ->can('view', $globalSet);
+            }));
 
         return $this;
     }
