@@ -10,13 +10,12 @@ class NavItem
 {
     protected $name;
     protected $section;
-    protected $route;
     protected $url;
-    protected $currentClass;
     protected $icon;
     protected $children;
-    protected $view;
     protected $authorization;
+    protected $active;
+    protected $view;
 
     /**
      * Get or set name.
@@ -53,6 +52,18 @@ class NavItem
     }
 
     /**
+     * Get or set url by cp route name.
+     *
+     * @param array|string $name
+     * @param mixed $params
+     * @return mixed
+     */
+    public function route($name, $params = [])
+    {
+        return $this->url(cp_route($name, $params));
+    }
+
+    /**
      * Get or set URL.
      *
      * @param string|null $url
@@ -66,40 +77,11 @@ class NavItem
 
         $this->url = $url;
 
-        if (! $this->currentClass) {
-            $this->currentClass = str_replace(url('cp').'/', '', $this->url) . '*';
+        if (! $this->active) {
+            $this->active = str_replace(url('cp').'/', '', $this->url) . '*';
         }
 
         return $this;
-    }
-
-    /**
-     * Get or set current class.
-     *
-     * @param string|null $pattern
-     * @return mixed
-     */
-    public function currentClass($pattern = null)
-    {
-        if (is_null($pattern)) {
-            return $this->currentClass;
-        }
-
-        $this->currentClass = $pattern;
-
-        return $this;
-    }
-
-    /**
-     * Get or set url by cp route name.
-     *
-     * @param array|string $name
-     * @param mixed $params
-     * @return mixed
-     */
-    public function route($name, $params = [])
-    {
-        return $this->url(cp_route($name, $params));
     }
 
     /**
@@ -152,23 +134,6 @@ class NavItem
     }
 
     /**
-     * Get or set custom view.
-     *
-     * @param string|null $view
-     * @return mixed
-     */
-    public function view($view = null)
-    {
-        if (is_null($view)) {
-            return $this->view;
-        }
-
-        $this->view = $view;
-
-        return $this;
-    }
-
-    /**
      * Get or set authorization.
      *
      * @param string|null $ability
@@ -199,5 +164,39 @@ class NavItem
     public function can($ability = null, $arguments = [])
     {
         return $this->authorization($ability, $arguments);
+    }
+
+    /**
+     * Get or set pattern for active state styling.
+     *
+     * @param string|null $pattern
+     * @return mixed
+     */
+    public function active($pattern = null)
+    {
+        if (is_null($pattern)) {
+            return $this->active;
+        }
+
+        $this->active = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Get or set custom view.
+     *
+     * @param string|null $view
+     * @return mixed
+     */
+    public function view($view = null)
+    {
+        if (is_null($view)) {
+            return $this->view;
+        }
+
+        $this->view = $view;
+
+        return $this;
     }
 }

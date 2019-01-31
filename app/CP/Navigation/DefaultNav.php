@@ -137,7 +137,7 @@ class DefaultNav
 
         Nav::tools('Utilities')
             ->route('utilities.phpinfo')
-            ->currentClass('utilities*')
+            ->active('utilities*')
             ->icon('settings-slider')
             // ->can() // TODO: Permission to use utilities?
             ->children([

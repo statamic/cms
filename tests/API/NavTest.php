@@ -24,6 +24,7 @@ class NavTest extends TestCase
     function it_can_build_a_default_nav()
     {
         $expected = collect([
+            'Top Level' => ['Dashboard', 'Playground'],
             'Content' => ['Collections', 'Structure', 'Taxonomies', 'Assets', 'Globals'],
             'Tools' => ['Forms', 'Updates', 'Utilities'],
             'Users' => ['Users', 'Groups', 'Permissions'],
@@ -56,7 +57,7 @@ class NavTest extends TestCase
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
         $this->assertEquals(config('app.url').'wordpress-importer', $item->url());
-        $this->assertEquals(config('app.url').'wordpress-importer*', $item->currentClass());
+        $this->assertEquals(config('app.url').'wordpress-importer*', $item->active());
         $this->assertEquals('up-arrow', $item->icon());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
@@ -84,7 +85,7 @@ class NavTest extends TestCase
         $this->actingAs(User::make()->makeSuper());
 
         Nav::droids('C-3PO')
-            ->currentClass('threepio*')
+            ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
             ->can('index', 'DroidsClass');
@@ -95,7 +96,7 @@ class NavTest extends TestCase
         $this->assertEquals('C-3PO', $item->name());
         $this->assertEquals('/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
-        $this->assertEquals('threepio*', $item->currentClass());
+        $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals('DroidsClass', $item->authorization()->arguments);
     }
