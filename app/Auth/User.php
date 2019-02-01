@@ -3,7 +3,6 @@
 namespace Statamic\Auth;
 
 use Statamic\API;
-use Statamic\Data\Data;
 use Statamic\API\Blueprint;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -11,21 +10,21 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Statamic\Contracts\Auth\User as UserContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
-abstract class User extends Data implements UserContract, Authenticatable, CanResetPasswordContract
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract
 {
     use Authorizable, Notifiable, CanResetPassword;
 
-    public function username($username = null)
-    {
-        return $this->email($username);
-    }
-
     public function initials()
     {
-        // TODO: Attempt to get initials from the name before using email.
-        return strtoupper(substr($this->email(), 0, 1));
+        if ($name = $this->get('name')) {
+            list($first, $last) = explode(' ', $name);
+        } else {
+            $first = $this->email();
+            $last = '';
+        }
+
+        return strtoupper(substr($first, 0, 1) . substr($last, 0, 1));
     }
 
     public function avatar($size = 64)
@@ -51,9 +50,7 @@ abstract class User extends Data implements UserContract, Authenticatable, CanRe
     public function supplement()
     {
         $this->supplements['last_modified'] = $this->lastModified()->timestamp;
-        $this->supplements['username'] = $this->username();
         $this->supplements['email'] = $this->email();
-        $this->supplements['status'] = $this->status();
         $this->supplements['edit_url'] = $this->editUrl();
 
         if ($first_name = $this->get('first_name')) {
@@ -77,6 +74,22 @@ abstract class User extends Data implements UserContract, Authenticatable, CanRe
         if ($this->supplement_taxonomies) {
             $this->addTaxonomySupplements();
         }
+    }
+
+    public function toArray()
+    {
+        $roles = $this->roles()->mapWithKeys(function ($role) {
+            return ["is_{$role->handle()}" => true];
+        })->all();
+
+        $groups = $this->groups()->mapWithKeys(function ($group) {
+            return ["in_{$group->handle()}" => true];
+        })->all();
+
+        return array_merge($this->data(), [
+            'id' => $this->id(),
+            'email' => $this->email(),
+        ], $roles, $groups);
     }
 
     public function getAuthIdentifierName()
@@ -111,13 +124,7 @@ abstract class User extends Data implements UserContract, Authenticatable, CanRe
 
     public function save()
     {
-        $this
-            ->ensureId()
-            ->ensureSecured();
-
         API\User::save($this);
-
-        $this->syncOriginal();
 
         // TODO: dispatch event
 

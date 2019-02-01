@@ -30,7 +30,7 @@ class UserGeneratorTest extends TestCase
 
         $user = User::all()->first();
 
-        $this->assertNotEmpty($user->get('id'));
+        $this->assertNotEmpty($user->id());
         $this->assertEquals('jason@tellmewhatyouchasin.com', $user->email());
     }
 
@@ -48,11 +48,11 @@ class UserGeneratorTest extends TestCase
 
         $user = User::all()->first();
 
-        $this->assertNotEmpty($user->get('id'));
+        $this->assertNotEmpty($user->id());
         $this->assertEquals('jason@ifyoucantescapeit.org', $user->email());
         $this->assertEquals('Jason', $user->get('name'));
-        $this->assertNotEmpty($user->get('password_hash'));
-        $this->assertTrue($user->get('super'));
+        $this->assertNotNull($user->password());
+        $this->assertTrue($user->isSuper());
     }
 
     /** @test */

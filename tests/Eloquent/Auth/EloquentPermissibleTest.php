@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests\Permissions;
+namespace Tests\Eloquent\Auth;
 
 use Tests\TestCase;
 use Faker\Generator as Faker;
-use Statamic\Auth\Eloquent\User;
-use Statamic\Auth\Eloquent\Model;
+use Statamic\Eloquent\Auth\User;
+use Statamic\Eloquent\Auth\Model;
 use Illuminate\Database\Eloquent\Factory;
+use Tests\Permissions\PermissibleContractTests;
 
 class EloquentPermissibleTest extends TestCase
 {
@@ -18,7 +19,7 @@ class EloquentPermissibleTest extends TestCase
 
         // TODO: The migration has been added into the test, but the implementation could be broken if the real
         // migration is different from what's in here. We should find a way to reference the actual migrations.
-        $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/__migrations__');
 
         app(Factory::class)->define(Model::class, function (Faker $faker) {
             return [

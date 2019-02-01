@@ -24,6 +24,13 @@ trait ContainsData
         return $this;
     }
 
+    public function remove($key)
+    {
+        unset($this->data[$key]);
+
+        return $this;
+    }
+
     public function data($data = null)
     {
         if (is_null($data)) {

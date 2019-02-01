@@ -72,7 +72,7 @@ class UsersStoreTest extends TestCase
         $this->assertEquals('123', $item->id());
         $this->assertEquals('john@example.com', $item->email());
         $this->assertEquals('John Doe', $item->get('name'));
-        $this->assertEquals(['id' => '123', 'name' => 'John Doe', 'email' => 'john@example.com'], $item->data());
+        $this->assertEquals(['name' => 'John Doe', 'email' => 'john@example.com'], $item->data());
     }
 
     /** @test */
