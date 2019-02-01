@@ -5,7 +5,11 @@
 .markdown-fieldtype {
 
     .markdown-fieldtype-wrapper {
-        @apply .border .rounded .overflow-hidden
+        @apply .border .rounded .overflow-hidden;
+
+        &:focus-within {
+            @apply focus-outline;
+        }
     }
 
     .markdown-toolbar {

@@ -81,12 +81,15 @@
             @upload-complete="uploadComplete">
         </uploader> -->
 
-        <!-- TODO: Bring this back.
-        <modal :show.sync="showCheatsheet" class="markdown-modal">
-            <template slot="header">{{ __('cp.markdown_cheatsheet') }}</template>
-            <template slot="body" v-html="__('markdown.cheatsheet')"></template>
-        </modal>
-        -->
+        <!-- TODO: Style this better. -->
+        <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
+            <div class="h-full overflow-auto p-3 bg-white">
+                <div class="max-w-md mx-auto my-4 content">
+                    <h2 v-text="__('Markdown Cheatsheet')"></h2>
+                    <div v-html="__('markdown.cheatsheet')"></div>
+                </div>
+            </div>
+        </stack>
 
     </div>
 </template>

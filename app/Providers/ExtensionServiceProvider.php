@@ -118,6 +118,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Date::class,
         \Statamic\Forms\Fieldtype::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Radio::class,
