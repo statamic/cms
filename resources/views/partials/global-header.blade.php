@@ -35,7 +35,7 @@
     </div> --}}
 
     <div class="head-link h-full px-3 flex items-center">
-        <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark">
+        <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark"  v-popover:tooltip.bottom="'{{ __('Pin to Favorites') }}'">
             @svg('pin')
         </a>
         <dropdown-list>
