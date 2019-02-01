@@ -107,7 +107,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledWidgets = [
-        'collection', 'template', 'updater',
+        'getting-started', 'collection', 'template', 'updater', 'form'
     ];
 
     protected $fieldtypes = [
@@ -303,23 +303,19 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->instance('statamic.widgets', collect());
 
-        $this->registerBundledWidgets();
-        $this->registerExtensionsInAppFolder('Widgets');
-    }
+        $widgets = [
+            \Statamic\Widgets\GettingStarted::class,
+            \Statamic\Widgets\Collection::class,
+            \Statamic\Widgets\Template::class,
+            \Statamic\Widgets\Updater::class,
+            \Statamic\Forms\Widget::class,
+        ];
 
-    /**
-     * Register bundled widgets.
-     *
-     * @return void
-     */
-    protected function registerBundledWidgets()
-    {
-        foreach ($this->bundledWidgets as $widget) {
-            $studly = studly_case($widget);
-            $this->app['statamic.widgets'][$widget] = "Statamic\\Addons\\{$studly}\\{$studly}Widget";
+        foreach ($widgets as $widget) {
+            $this->app['statamic.widgets'][$widget::handle()] = $widget;
         }
 
-        $this->app['statamic.widgets']['form'] = \Statamic\Forms\Widget::class;
+        $this->registerExtensionsInAppFolder('Widgets');
     }
 
     /**
