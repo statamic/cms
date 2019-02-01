@@ -10,6 +10,8 @@ use Statamic\Extend\Widget as BaseWidget;
 
 class Widget extends BaseWidget
 {
+    protected static $handle = 'form';
+
     public function html()
     {
         $form = $this->get('form');
