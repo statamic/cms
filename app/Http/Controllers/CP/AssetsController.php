@@ -26,10 +26,13 @@ class AssetsController extends CpController
 
         $fields = $asset->blueprint()->fields()
             ->addValues($asset->data())
-            ->preProcess()
-            ->values();
+            ->preProcess();
 
-        return ['asset' => $asset->toArray(), 'fields' => $fields];
+        return [
+            'asset' => $asset->toArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+        ];
     }
 
     private function supplementAssetForEditing($asset)

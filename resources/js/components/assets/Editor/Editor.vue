@@ -123,6 +123,7 @@
                     name="asset"
                     :fieldset="fieldset"
                     :values="initialValues"
+                    :meta="initialMeta"
                     :errors="errors"
                     @updated="values = $event"
                 >
@@ -277,7 +278,8 @@ export default {
 
             axios.get(url).then(response => {
                 this.asset = response.data.asset;
-                this.initialValues = response.data.fields;
+                this.initialValues = response.data.values;
+                this.initialMeta = response.data.meta;
                 this.values = this.initialValues;
                 this.getFieldset();
             });
