@@ -14,7 +14,6 @@
                 :initial-container="container"
                 :selected-path="path"
                 :selected-assets="selectedAssets"
-                :max-files="2"
                 @navigated="navigate"
                 @selections-updated="updateSelections"
                 @asset-doubleclicked="editAsset"
