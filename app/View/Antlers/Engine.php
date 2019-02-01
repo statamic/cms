@@ -54,15 +54,12 @@ class Engine implements EngineInterface
 
         list($frontMatter, $contents) = $this->extractFrontMatter($contents);
 
-        $contents = Parse::template(
+        return app('antlers.view.parser')->parse(
             $contents,
             array_merge($data, $frontMatter),
-            [],
+            ['Statamic\View\Antlers\Engine', 'renderTag'],
             Str::endsWith($path, '.php')
         );
-
-        // Anything that was avoided with {{ noparse }} tags, put them back in now that we're done
-        return Parser::injectNoparse($contents);
     }
 
     protected function getContents($path)

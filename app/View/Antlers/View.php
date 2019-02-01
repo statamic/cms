@@ -65,6 +65,8 @@ class View
             ]))->render();
         }
 
+        $contents = app('antlers.view.parser')->injectNoparse($contents);
+
         ViewRendered::dispatch($this);
 
         return $contents;

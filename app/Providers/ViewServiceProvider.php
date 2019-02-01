@@ -80,8 +80,10 @@ class ViewServiceProvider extends LaravelViewServiceProvider
             return new AntlersEngine($this->app['files']);
         });
 
-        $this->app->singleton('Statamic\View\Antlers\Parser', function () {
-            return new Parser;
+        $this->app->singleton('antlers.view.parser', function ($app) {
+            $parser = new Parser;
+            $parser->cumulativeNoparse(true);
+            return $parser;
         });
     }
 

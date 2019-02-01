@@ -41,7 +41,7 @@ class Parser
     protected $variableTagRegex;
 
     // Extractions
-    protected static $extractions = [
+    protected $extractions = [
         'noparse' => [],
     ];
 
@@ -853,10 +853,10 @@ class Parser
      * @param  string $text Text to inject into
      * @return string
      */
-    public static function injectNoparse($text)
+    public function injectNoparse($text)
     {
-        if (isset(self::$extractions['noparse'])) {
-            foreach (self::$extractions['noparse'] as $hash => $replacement) {
+        if (isset($this->extractions['noparse'])) {
+            foreach ($this->extractions['noparse'] as $hash => $replacement) {
                 if (strpos($text, "noparse_{$hash}") !== false) {
                     $text = str_replace("noparse_{$hash}", $replacement, $text);
                 }
@@ -1016,7 +1016,7 @@ class Parser
     protected function createExtraction($type, $extraction, $replacement, $text)
     {
         $hash = md5($replacement);
-        self::$extractions[$type][$hash] = $replacement;
+        $this->extractions[$type][$hash] = $replacement;
 
         return str_replace($extraction, "{$type}_{$hash}", $text);
     }
@@ -1031,23 +1031,23 @@ class Parser
     protected function injectExtractions($text, $type = null)
     {
         if (is_null($type)) {
-            foreach (self::$extractions as $type => $extractions) {
+            foreach ($this->extractions as $type => $extractions) {
                 foreach ($extractions as $hash => $replacement) {
                     if (strpos($text, "{$type}_{$hash}") !== false) {
                         $text = str_replace("{$type}_{$hash}", $replacement, $text);
-                        unset(self::$extractions[$type][$hash]);
+                        unset($this->extractions[$type][$hash]);
                     }
                 }
             }
         } else {
-            if (! isset(self::$extractions[$type])) {
+            if (! isset($this->extractions[$type])) {
                 return $text;
             }
 
-            foreach (self::$extractions[$type] as $hash => $replacement) {
+            foreach ($this->extractions[$type] as $hash => $replacement) {
                 if (strpos($text, "{$type}_{$hash}") !== false) {
                     $text = str_replace("{$type}_{$hash}", $replacement, $text);
-                    unset(self::$extractions[$type][$hash]);
+                    unset($this->extractions[$type][$hash]);
                 }
             }
         }
