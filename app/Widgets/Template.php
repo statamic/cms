@@ -1,4 +1,4 @@
-<?php namespace Statamic\Addons\Template;
+<?php namespace Statamic\Widgets;
 
 use Statamic\API\File;
 use Statamic\API\Path;
@@ -6,13 +6,13 @@ use Statamic\API\Parse;
 use Statamic\API\Config;
 use Statamic\Extend\Widget;
 
-class TemplateWidget extends Widget
+class Template extends Widget
 {
     public function html()
     {
         // This approach would be nicer at some point.
-        // return app('Statamic\Http\View')->render($this->config, $this->get('template'));        
-        
+        // return app('Statamic\Http\View')->render($this->config, $this->get('template'));
+
         $template = $this->loadTemplate($this->get('template'));
 
         return Parse::template($template, $this->parameters);
