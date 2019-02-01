@@ -6,7 +6,7 @@ use Statamic\Addons\BundleFieldtype as Fieldtype;
 
 class ArrFieldtype extends Fieldtype
 {
-    protected $handle = 'array';
+    protected static $handle = 'array';
 
     public function blank()
     {
