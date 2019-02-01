@@ -20,10 +20,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Nav::extend(function ($nav) {
-            // $this->messingWithNav();
-        });
-
         $this->swapSessionMiddleware();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
@@ -113,27 +109,5 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Session\Middleware\StartSession::class,
             \Statamic\Http\Middleware\CP\StartSession::class
         );
-    }
-
-    protected function messingWithNav()
-    {
-        // This nav item will go into the 'Content' section.
-        Nav::content('Floof')->url('/floof')->icon('fa-floof');
-
-        // This nav item will go into the 'Tools' section.
-        Nav::tools('Floof Utilities')
-            ->url('/floof-utilities')
-            ->icon('fa-floof')
-            ->children([
-                'Feeder' => '/feeder',                 // Since children are simpler, can define name and URL like this
-                Nav::item('Groomer')->url('/groomer'), // Or explicitly using Nav::item
-            ]);
-
-        // This nav item will go into a new custom 'Wordpress' section.
-        Nav::wordpress('Importer')->url('/wordpress-importer')->icon('fa-import');
-
-        // Removing items.
-        Nav::remove('Content', 'Collections'); // Remove a single item.
-        Nav::remove('Wordpress');              // Remove a whole section.
     }
 }
