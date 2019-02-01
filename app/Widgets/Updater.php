@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic\Addons\Updater;
+namespace Statamic\Widgets;
 
 use GuzzleHttp\Client;
 use Statamic\API\Content;
 use Statamic\Extend\Widget;
 use Statamic\Statamic;
 
-class UpdaterWidget extends Widget
+class Updater extends Widget
 {
     public function html()
     {
