@@ -93,4 +93,19 @@ class Arr extends IlluminateArr
 
         return $output;
     }
+
+    /**
+     * Get rid of null values. (Empty arrays, literal null values, and empty strings)
+     *
+     * @param array $array
+     * @return array
+     */
+    public function removeNullValues($data)
+    {
+        return array_filter($data, function ($item) {
+            return is_array($item)
+                ? !empty($item)
+                : !in_array($item, [null, ''], true);
+        });
+    }
 }
