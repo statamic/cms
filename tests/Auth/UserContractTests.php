@@ -64,6 +64,12 @@ trait UserContractTests
     }
 
     /** @test */
+    function it_gets_initials_from_name_with_no_surname()
+    {
+        $this->assertEquals('J', $this->user()->set('name', 'John')->initials());
+    }
+
+    /** @test */
     function it_gets_initials_from_email_if_name_doesnt_exist()
     {
         $user = $this->user()->remove('name');

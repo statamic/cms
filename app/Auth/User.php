@@ -17,14 +17,16 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function initials()
     {
+        $surname = '';
         if ($name = $this->get('name')) {
-            list($first, $last) = explode(' ', $name);
+            if (str_contains($name, ' ')) {
+                list($name, $surname) = explode(' ', $name);
+            }
         } else {
-            $first = $this->email();
-            $last = '';
+            $name = $this->email();
         }
 
-        return strtoupper(substr($first, 0, 1) . substr($last, 0, 1));
+        return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
     }
 
     public function avatar($size = 64)
