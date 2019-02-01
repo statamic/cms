@@ -19,7 +19,7 @@ class WidgetLoader
     private function init($class, $config)
     {
         return tap(app($class), function ($widget) use ($config) {
-            $widget->setParameters($config);
+            $widget->setConfig($config);
         });
     }
 }
