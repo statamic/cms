@@ -179,7 +179,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
     {
         return array_merge($this->data(), [
             'id' => $this->id(),
-            'published' => $this->published
+            'published' => $this->published === false ? false : null
         ]);
     }
 }
