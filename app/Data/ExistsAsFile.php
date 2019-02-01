@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\API\Arr;
 use Statamic\API\YAML;
 
 trait ExistsAsFile
@@ -34,7 +35,7 @@ trait ExistsAsFile
         // file type used. Right now it's assuming markdown. Maybe you'll want to
         // save JSON, etc. TODO: Make it smarter when the time is right.
 
-        $data = $this->fileData();
+        $data = Arr::removeNullValues($this->fileData());
 
         $content = array_pull($data, 'content');
 
