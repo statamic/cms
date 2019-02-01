@@ -1,11 +1,6 @@
 <template>
 
-    <modal
-        name="asset-editor"
-        width="90%"
-        height="90%"
-        @closed="$emit('closed')"
-    >
+    <stack name="asset-editor" @closed="$emit('closed')">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
 
@@ -184,7 +179,7 @@
         </mover>
     </div>
 
-    </modal>
+    </stack>
 
 </template>
 
