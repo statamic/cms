@@ -49,7 +49,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'arr', 'asset_container', 'asset_folder', 'bard', 'checkboxes', 'code', 'collection',
+        'arr', 'asset_container', 'asset_folder', 'bard', 'checkboxes', 'collection',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
@@ -113,6 +113,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $fieldtypes = [
         Fieldtypes\Assets::class,
         Fieldtypes\Blueprints::class,
+        Fieldtypes\Code::class,
         Fieldtypes\Collections::class,
         \Statamic\Forms\Fieldtype::class,
         Fieldtypes\Grid::class,
