@@ -1,12 +1,22 @@
 <?php
 
-namespace Statamic\Addons\Date;
+namespace Statamic\Fields\Fieldtypes;
 
 use Carbon\Carbon;
-use Statamic\Addons\BundleFieldtype as Fieldtype;
+use Statamic\Fields\Fieldtype;
 
-class DateFieldtype extends Fieldtype
+class Date extends Fieldtype
 {
+    protected $configFields = [
+        'allow_blank'   => ['type' => 'toggle'],
+        'allow_time'    => ['type' => 'toggle'],
+        'format'        => ['type' => 'text'],
+        'earliest_date' => [
+            'type'      => 'text',
+            'default'   => 'January 1, 1900'
+        ],
+    ];
+
     public function preProcess($data)
     {
         if (! $data) {

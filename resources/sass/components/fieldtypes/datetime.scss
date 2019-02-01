@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DATE/TIME FIELDTYPE
+   DATE & TIME FIELDTYPES
    ========================================================================== */
 
 .daterange {
@@ -31,33 +31,6 @@
     min-width: 60px;
 }
 
-.time-fieldtype {
-	input {
-		max-width: 40px !important;
-        padding-left: 3px;
-        padding-right: 3px;
-        text-align: center;
-		-moz-appearance: textfield;
-	}
-
-	input::-webkit-inner-spin-button,
-	input::-webkit-outer-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
-
-	.icon-remove {
-		position: relative;
-		top: 0;
-		right: -8px;
-		outline: none;
-	}
-
-	.icon-remove:focus {
-
-	}
-}
-
 .date-time-container {
 	display: flex;
 
@@ -66,6 +39,41 @@
 	}
 	.col-time {
 		padding-left: 10px;
+	}
+}
+
+
+/* Time Field
+  ========================================================================== */
+
+.time-fieldtype {
+	.time-fieldtype-container {
+		@apply flex items-center w-auto;
+
+	}
+
+	.input-text:focus-within {
+		@apply focus-outline;
+	}
+
+	.input-time {
+		@apply inline-block text-center bg-transparent;
+		-moz-appearance: textfield;
+
+		&:active, &:focus {
+			outline: none;
+		}
+	}
+
+	.colon {
+		@apply select-none;
+		margin: 0 -4px;
+	}
+
+	input::-webkit-inner-spin-button,
+	input::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
 	}
 }
 

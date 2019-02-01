@@ -115,11 +115,13 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Blueprints::class,
         Fieldtypes\Code::class,
         Fieldtypes\Collections::class,
+        Fieldtypes\Date::class,
         \Statamic\Forms\Fieldtype::class,
         Fieldtypes\Grid::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Time::class,
     ];
 
     /**
