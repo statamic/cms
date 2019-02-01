@@ -111,13 +111,13 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $fieldtypes = [
-        'assets' => Fieldtypes\Assets::class,
-        'blueprints' => Fieldtypes\Blueprints::class,
-        'collections' => Fieldtypes\Collections::class,
-        'form' => \Statamic\Forms\Fieldtype::class,
-        'grid' => Fieldtypes\Grid::class,
-        'fields' => Fieldtypes\NestedFields::class,
-        'relationship' => Fieldtypes\Relationship::class,
+        Fieldtypes\Assets::class,
+        Fieldtypes\Blueprints::class,
+        Fieldtypes\Collections::class,
+        \Statamic\Forms\Fieldtype::class,
+        Fieldtypes\Grid::class,
+        Fieldtypes\NestedFields::class,
+        Fieldtypes\Relationship::class,
     ];
 
     /**
@@ -240,7 +240,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->fieldtypes as $handle => $class) {
-            $this->app['statamic.fieldtypes'][$handle] = $class;
+            $this->app['statamic.fieldtypes'][$class::handle()] = $class;
         }
     }
 
