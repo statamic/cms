@@ -1,5 +1,0 @@
-fieldtype_fields:
-  options:
-    type: array
-  inline:
-    type: toggle
