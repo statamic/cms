@@ -57,7 +57,7 @@ class View
     {
         $cascade = array_merge($this->data, $this->cascade());
 
-        $contents = view($this->template, $cascade);
+        $contents = view($this->template, $cascade)->render();
 
         if ($this->layout) {
             $contents = view($this->layout, array_merge($cascade, [
