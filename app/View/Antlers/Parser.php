@@ -10,6 +10,7 @@ use Statamic\Fields\Value;
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\ParsingException;
 use Statamic\Exceptions\ModifierException;
+use Illuminate\Contracts\Support\Arrayable;
 
 class Parser
 {
@@ -106,6 +107,8 @@ class Parser
      */
     public function parse($text, $data = [])
     {
+        $data = $this->normalizeData($data);
+
         // Let's store the current callback data with the the local data
         // so we can use it straight after a callback is called.
         $this->callbackData = $data;
@@ -143,6 +146,22 @@ class Parser
         }
 
         return $text;
+    }
+
+    protected function normalizeData($data)
+    {
+        if (is_array($data)) {
+            return $data;
+        }
+
+        if ($data instanceof Arrayable) {
+            return $data->toArray();
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'Expecting array or object implementing Arrayable. Encountered [%s]',
+            ($type = gettype($data)) === 'object' ? get_class($data) : $type
+        ));
     }
 
     /**

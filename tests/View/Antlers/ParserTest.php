@@ -390,4 +390,54 @@ class ParserTest extends TestCase
 
         $this->assertEquals('{{ string }} Hello wilderness', $parser->injectNoparse($parsed));
     }
+
+    /** @test */
+    function it_accepts_an_arrayable_object()
+    {
+        $this->assertEquals(
+            'Hello World',
+            Antlers::parse('{{ string }}', new ArrayableObject(['string' => 'Hello World']))
+        );
+    }
+
+    /** @test */
+    function it_throws_exception_for_non_arrayable_data_object()
+    {
+        try {
+            Antlers::parse('{{ string }}', new NonArrayableObject(['string' => 'Hello World']));
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Expecting array or object implementing Arrayable. Encountered [Tests\View\Antlers\NonArrayableObject]', $e->getMessage());
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    function it_throws_exception_for_unsupported_data_value()
+    {
+        try {
+            Antlers::parse('{{ string }}', 'string');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Expecting array or object implementing Arrayable. Encountered [string]', $e->getMessage());
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+}
+
+class NonArrayableObject
+{
+    function __construct($data)
+    {
+        $this->data = $data;
+    }
+}
+
+class ArrayableObject extends NonArrayableObject implements \Illuminate\Contracts\Support\Arrayable
+{
+    function toArray() {
+        return $this->data;
+    }
 }

@@ -12,13 +12,7 @@ class Antlers
 
     public function parse($str, $variables = [])
     {
-        $parser = $this->parser();
-
-        if (! is_array($variables)) {
-            $variables = $variables->toArray();
-        }
-
-        return $parser->parse($str, $variables);
+        return $this->parser()->parse($str, $variables);
     }
 
     /**
