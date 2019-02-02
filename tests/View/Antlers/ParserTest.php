@@ -269,8 +269,6 @@ class ParserTest extends TestCase
 
     public function testRecursiveChildrenWithScope()
     {
-        $this->markTestIncomplete();
-
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
 
@@ -347,8 +345,6 @@ class ParserTest extends TestCase
 
     public function testNestedArraySyntax()
     {
-        $this->markTestIncomplete();
-
         $variables = [
             'hello' => [
                 'world' => [
