@@ -155,11 +155,11 @@ class ThemeTags extends Tags
         $src = $this->get('src');
 
         // Output nothing if the file doesn't exist.
-        if (! File::disk('theme')->exists($src)) {
+        if (! File::disk('resources')->exists($src)) {
             return '';
         }
 
-        $contents = File::disk('theme')->get($src);
+        $contents = File::disk('resources')->get($src);
 
         // If its a tag pair, the contents should be inserted into a variable.
         // {{ output_contents }} by default, but can be changed using `as`.

@@ -11,7 +11,7 @@ class TemplatesController extends CpController
 {
     public function index()
     {
-        return collect(Folder::disk('theme')->getFilesRecursively('views'))
+        return collect(Folder::disk('resources')->getFilesRecursively('views'))
             ->map(function ($view) {
                 return str_replace_first('views/', '',  str_before($view, '.')
             );

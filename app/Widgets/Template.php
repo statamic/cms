@@ -27,8 +27,8 @@ class Template extends Widget
     {
         $template_path = "templates/{$template}.html";
 
-        if (File::disk('theme')->exists($template_path)) {
-            return File::disk('theme')->get($template_path);
+        if (File::disk('resources')->exists($template_path)) {
+            return File::disk('resources')->get($template_path);
         }
     }
 }

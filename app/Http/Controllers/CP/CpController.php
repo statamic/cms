@@ -40,7 +40,7 @@ class CpController extends Controller
     {
         $templates = [];
 
-        foreach (Folder::disk('theme')->getFilesByTypeRecursively('templates', 'html') as $path) {
+        foreach (Folder::disk('resources')->getFilesByTypeRecursively('templates', 'html') as $path) {
             $parts = explode('/', $path);
             array_shift($parts);
             $templates[] = Str::removeRight(join('/', $parts), '.html');
