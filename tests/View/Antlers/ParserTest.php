@@ -375,12 +375,12 @@ class ParserTest extends TestCase
     {
         $this->assertEquals(
             'Hello wilderness!',
-            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [], true)
+            Antlers::parser()->allowPhp()->parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
         );
 
         $this->assertEquals(
             'Hello wilderness&lt;?php echo "!"; ?>',
-            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [], false)
+            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
         );
     }
 }

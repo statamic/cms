@@ -83,19 +83,23 @@ class Parser
         ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
     }
 
+    public function allowPhp()
+    {
+        $this->allowPhp = true;
+
+        return $this;
+    }
+
     /**
      * Kick off the Antlers parse process
      *
      * @param  string        $text      Text to parse
      * @param  array|object  $data      Array or object to use
      * @param  mixed         $callback  Callback to use for Callback Tags
-     * @param  boolean       $allowPhp  Should we allow PHP?
      * @return string
      */
-    public function parse($text, $data = [], $callback = false, $allowPhp = false)
+    public function parse($text, $data = [], $callback = false)
     {
-        $this->allowPhp = $allowPhp;
-
         // Let's store the current callback data with the the local data
         // so we can use it straight after a callback is called.
         $this->callbackData = $data;
@@ -105,7 +109,7 @@ class Parser
         $this->original_text = $text;
 
         // Prevent the parsing of PHP by b0rking the PHP open tag
-        if (! $allowPhp) {
+        if (! $this->allowPhp) {
             $text = str_replace(['<?php'], ['&lt;?php'], $text);
         }
 
