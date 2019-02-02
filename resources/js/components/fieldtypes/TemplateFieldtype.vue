@@ -1,45 +1,38 @@
 <template>
     <div>
-        <div v-if="loading" class="loading loading-basic">
-            <span class="icon icon-circular-graph animation-spin"></span> {{ __('Loading') }}
-        </div>
-
-        <select-fieldtype v-if="!loading" :name="name" :data.sync="data" :config="selectConfig"></select-fieldtype>
+        <loading-graphic :inline="true" v-if="loading" />
+        <select-input v-if="!loading" :name="name" :value="value" @input="update" :options="options" />
     </div>
 </template>
 
 <script>
 export default {
 
-    props: ['data', 'config', 'name'],
+    mixins: [Fieldtype],
 
     data: function() {
         return {
             loading: true,
-            options: {}
-        }
-    },
-
-    computed: {
-        selectConfig: function() {
-            return {
-                options: this.options
-            };
+            options: []
         }
     },
 
     mounted() {
-        this.$http.get(cp_url('system/templates/get'), function(data) {
-            var options = [{ value: null, text: '' }];
-            _.each(data, function(template) {
+
+        this.axios.get(cp_url('api/templates')).then(response => {
+            var options = [];
+
+            _.each(response.data, function(template) {
                 options.push({
                     value: template,
                     text: template
                 });
             });
+
             this.options = options;
             this.loading = false;
         });
+
     }
 
 };

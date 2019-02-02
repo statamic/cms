@@ -122,6 +122,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\NestedFields::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Template::class,
         Fieldtypes\Time::class,
     ];
 

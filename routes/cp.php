@@ -103,7 +103,10 @@ Route::group([
     Route::get('utilities/search', 'UpdateSearchController@index')->name('utilities.search');
     Route::post('utilities/search', 'UpdateSearchController@update');
 
+    // Suggestions
     Route::get('suggestions/{type}', 'SuggestionController@show');
+
+    // Templates
 
     // Fieldtypes
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
@@ -120,6 +123,7 @@ Route::group([
     // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');
+        Route::resource('templates', 'TemplatesController');
     });
 
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
