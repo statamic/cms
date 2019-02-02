@@ -370,7 +370,6 @@ class ParserTest extends TestCase
         );
     }
 
-    /** @test */
     function testParsesPhpWhenEnabled()
     {
         $this->assertEquals(
@@ -382,5 +381,17 @@ class ParserTest extends TestCase
             'Hello wilderness&lt;?php echo "!"; ?>',
             Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
         );
+    }
+
+    /** @test */
+    function it_doesnt_parse_noparse_tags_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $parsed = $parser->parse('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
+
+        $this->assertEquals('noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness', $parsed);
+
+        $this->assertEquals('{{ string }} Hello wilderness', $parser->injectNoparse($parsed));
     }
 }
