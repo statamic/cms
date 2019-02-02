@@ -839,15 +839,7 @@ class Parser
      */
     public function injectNoparse($text)
     {
-        if (isset($this->extractions['noparse'])) {
-            foreach ($this->extractions['noparse'] as $hash => $replacement) {
-                if (strpos($text, "noparse_{$hash}") !== false) {
-                    $text = str_replace("noparse_{$hash}", $replacement, $text);
-                }
-            }
-        }
-
-        return $text;
+        return $this->injectExtractions($text, 'noparse');
     }
 
     /**
