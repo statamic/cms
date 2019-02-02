@@ -15,7 +15,6 @@ class Parser
 {
     // Instance state
     protected $allowPhp = false;
-    protected $cumulativeNoparse = false;
     protected $inCondition = false;
     protected $data = null;
     protected $original_text = null;
@@ -136,14 +135,6 @@ class Parser
 
         if ($this->callback) {
             $text = $this->parseCallbackTags($text, $data);
-        }
-
-        // Ensure that {{ noparse }} is never parsed, even during consecutive
-        // parse calls. First, set $cumulativeNoparse to true and then use
-        // self::injectNoparse($text) immediately before the final output is
-        // sent to the browser
-        if (! $this->cumulativeNoparse) {
-            $text = $this->injectExtractions($text);
         }
 
         // Parse parameters inside tag pairs
@@ -837,19 +828,6 @@ class Parser
     }
 
     /**
-     * Set the noparse style. Immediate or cumulative.
-     *
-     * @param  bool $mode
-     * @return void
-     */
-    public function cumulativeNoparse($mode)
-    {
-        $this->cumulativeNoparse = $mode;
-
-        return $this;
-    }
-
-    /**
      * Injects noparse extractions.
      *
      * This is so that multiple parses can store noparse
@@ -1026,28 +1004,15 @@ class Parser
     }
 
     /**
-     * Injects all of the extractions.
+     * Injects all of the extractions for a given type
      *
      * @param string $text Text to inject into
      * @param string $type Type of extraction to inject
      * @return string
      */
-    protected function injectExtractions($text, $type = null)
+    protected function injectExtractions($text, $type)
     {
-        if (is_null($type)) {
-            foreach ($this->extractions as $type => $extractions) {
-                foreach ($extractions as $hash => $replacement) {
-                    if (strpos($text, "{$type}_{$hash}") !== false) {
-                        $text = str_replace("{$type}_{$hash}", $replacement, $text);
-                        unset($this->extractions[$type][$hash]);
-                    }
-                }
-            }
-        } else {
-            if (! isset($this->extractions[$type])) {
-                return $text;
-            }
-
+        if (isset($this->extractions[$type])) {
             foreach ($this->extractions[$type] as $hash => $replacement) {
                 if (strpos($text, "{$type}_{$hash}") !== false) {
                     $text = str_replace("{$type}_{$hash}", $replacement, $text);
