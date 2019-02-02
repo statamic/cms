@@ -841,6 +841,8 @@ class Parser
     public function cumulativeNoparse($mode)
     {
         $this->cumulativeNoparse = $mode;
+
+        return $this;
     }
 
     /**

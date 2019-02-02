@@ -11,9 +11,7 @@ class Antlers
 
     public function parse($str, $variables = [], $context = [], $php = false)
     {
-        $parser = $this->parser();
-
-        $parser->cumulativeNoparse(true);
+        $parser = $this->parser()->cumulativeNoparse(true);
 
         if (! is_array($variables)) {
             $variables = $variables->toArray();
