@@ -369,4 +369,18 @@ class ParserTest extends TestCase
             Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
     }
+
+    /** @test */
+    function testParsesPhpWhenEnabled()
+    {
+        $this->assertEquals(
+            'Hello wilderness!',
+            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [], true)
+        );
+
+        $this->assertEquals(
+            'Hello wilderness&lt;?php echo "!"; ?>',
+            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [], false)
+        );
+    }
 }
