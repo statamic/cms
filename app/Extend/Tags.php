@@ -5,6 +5,7 @@ namespace Statamic\Extend;
 use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Parse;
+use Statamic\API\Antlers;
 use Statamic\Data\DataCollection;
 
 /**
@@ -127,7 +128,7 @@ abstract class Tags
 
         $context = array_merge($context, $this->context);
 
-        return Parse::template($this->content, $this->addScope($data), $context);
+        return Antlers::parse($this->content, $this->addScope($data), $context);
     }
 
     /**
@@ -146,7 +147,7 @@ abstract class Tags
 
         $context = array_merge($context, $this->context);
 
-        return Parse::templateLoop($this->content, $this->addScope($data), $supplement, $context);
+        return Antlers::parseLoop($this->content, $this->addScope($data), $supplement, $context);
     }
 
     /**

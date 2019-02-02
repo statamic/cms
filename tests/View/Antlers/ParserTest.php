@@ -1,10 +1,13 @@
-<?php namespace Tests;
+<?php
 
+namespace Tests\View\Antlers;
+
+use Tests\TestCase;
 use Statamic\API\Term;
+use Statamic\API\Antlers;
 use Statamic\API\Taxonomy;
-use Statamic\View\Antlers\Template as Antlers;
 
-class AntlersParserTest extends TestCase
+class ParserTest extends TestCase
 {
     private $variables;
 
