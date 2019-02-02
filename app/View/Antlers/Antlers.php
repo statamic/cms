@@ -10,7 +10,7 @@ class Antlers
             ->callback(['Statamic\View\Antlers\Engine', 'renderTag']);
     }
 
-    public function parse($str, $variables = [], $context = [], $php = false)
+    public function parse($str, $variables = [])
     {
         $parser = $this->parser();
 
@@ -18,9 +18,7 @@ class Antlers
             $variables = $variables->toArray();
         }
 
-        $data = array_merge($context, $variables);
-
-        return $parser->parse($str, $data, ['Statamic\View\Antlers\Engine', 'renderTag'], $php);
+        return $parser->parse($str, $variables);
     }
 
     /**
@@ -32,7 +30,7 @@ class Antlers
      * @param array   $context
      * @return string
      */
-    public function parseLoop($content, $data, $supplement, $context, $php = false)
+    public function parseLoop($content, $data, $supplement, $context)
     {
         $output = '';
         $i      = 1;
@@ -48,7 +46,7 @@ class Antlers
                 $item['total_results'] = $total;
             }
 
-            $output .= $this->parse($content, $item, $context, $php);
+            $output .= $this->parse($content, array_merge($context, $item));
             $i++;
         }
 

@@ -117,18 +117,17 @@ abstract class Tags
      * Parse the tag pair contents with scoped variables
      *
      * @param array $data     Data to be parsed into template
-     * @param array $context  Contextual variables to also use
      * @return string
      */
-    protected function parse($data = [], $context = [])
+    protected function parse($data = [])
     {
         if ($this->trim) {
             $this->content = trim($this->content);
         }
 
-        $context = array_merge($context, $this->context);
+        $variables = array_merge($this->context, $this->addScope($data));
 
-        return Antlers::parse($this->content, $this->addScope($data), $context);
+        return Antlers::parse($this->content, $variables);
     }
 
     /**
@@ -136,18 +135,15 @@ abstract class Tags
      *
      * @param array|\Statamic\Data\DataCollection $data        Data to iterate over
      * @param bool                                $supplement  Whether to supplement with contextual values
-     * @param array                               $context     Contextual variables to also use
      * @return string
      */
-    protected function parseLoop($data, $supplement = true, $context = [])
+    protected function parseLoop($data, $supplement = true)
     {
         if ($this->trim) {
             $this->content = trim($this->content);
         }
 
-        $context = array_merge($context, $this->context);
-
-        return Antlers::parseLoop($this->content, $this->addScope($data), $supplement, $context);
+        return Antlers::parseLoop($this->content, $this->addScope($data), $supplement, $this->context);
     }
 
     /**

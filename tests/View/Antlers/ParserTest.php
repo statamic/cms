@@ -283,7 +283,7 @@ class ParserTest extends TestCase
 
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
     {
-        $context = [
+        $variables = [
             'loop' => [
                 [
                     'one' => '[1.1]',
@@ -297,7 +297,7 @@ class ParserTest extends TestCase
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ two }}{{ /loop }}', [], $context)
+            Antlers::parse('{{ loop }}{{ one }}{{ two }}{{ /loop }}', $variables)
         );
     }
 
@@ -306,7 +306,7 @@ class ParserTest extends TestCase
         // the variables are inside Test@some_parsing
         $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
 
-        $context = [
+        $variables = [
             'loop' => [
                 [
                     'one' => '[1.1]',
@@ -320,7 +320,7 @@ class ParserTest extends TestCase
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', [], $context)
+            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
         );
     }
 
