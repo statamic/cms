@@ -19,6 +19,7 @@ class Parser
     protected $inCondition = false;
     protected $data = null;
     protected $original_text = null;
+    protected $callback = null;
     protected $callbackData = [];
     protected $conditionalData = [];
 
@@ -90,16 +91,24 @@ class Parser
         return $this;
     }
 
+    public function callback($callback)
+    {
+        $this->callback = $callback;
+
+        return $this;
+    }
+
     /**
      * Kick off the Antlers parse process
      *
      * @param  string        $text      Text to parse
      * @param  array|object  $data      Array or object to use
-     * @param  mixed         $callback  Callback to use for Callback Tags
      * @return string
      */
-    public function parse($text, $data = [], $callback = false)
+    public function parse($text, $data = [])
     {
+        $callback = $this->callback;
+
         // Let's store the current callback data with the the local data
         // so we can use it straight after a callback is called.
         $this->callbackData = $data;
