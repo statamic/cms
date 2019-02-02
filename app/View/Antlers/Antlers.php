@@ -4,9 +4,14 @@ namespace Statamic\View\Antlers;
 
 class Antlers
 {
+    public function parser()
+    {
+        return new Parser;
+    }
+
     public function parse($str, $variables = [], $context = [], $php = false)
     {
-        $parser = new Parser;
+        $parser = $this->parser();
 
         $parser->cumulativeNoparse(true);
 
