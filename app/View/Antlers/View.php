@@ -67,7 +67,7 @@ class View
 
         ViewRendered::dispatch($this);
 
-        return $contents;
+        return $contents->render();
     }
 
     protected function cascade()
