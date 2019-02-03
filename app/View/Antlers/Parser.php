@@ -84,9 +84,9 @@ class Parser
         ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
     }
 
-    public function allowPhp()
+    public function allowPhp($allow = true)
     {
-        $this->allowPhp = true;
+        $this->allowPhp = $allow;
 
         return $this;
     }
