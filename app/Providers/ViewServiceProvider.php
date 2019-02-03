@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\View\Store;
+use Illuminate\View\View;
 use Statamic\View\Modify;
 use Statamic\View\Cascade;
 use Statamic\View\Antlers\Parser;
@@ -33,6 +34,14 @@ class ViewServiceProvider extends LaravelViewServiceProvider
 
         $this->app->bind(Parser::class, function ($app) {
             return (new Parser)->callback([AntlersEngine::class, 'renderTag']);
+        });
+    }
+
+    public function boot()
+    {
+        View::macro('withoutExtractions', function () {
+            $this->engine->withoutExtractions();
+            return $this;
         });
     }
 
@@ -81,13 +90,7 @@ class ViewServiceProvider extends LaravelViewServiceProvider
     public function registerAntlersEngine($resolver)
     {
         $resolver->register('antlers', function () {
-            return new AntlersEngine($this->app['files']);
-        });
-
-        $this->app->singleton('antlers.view.parser', function ($app) {
-            $parser = new Parser;
-            $parser->cumulativeNoparse(true);
-            return $parser;
+            return new AntlersEngine($this->app['files'], $this->app[Parser::class]);
         });
     }
 
