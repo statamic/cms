@@ -30,6 +30,10 @@ class ViewServiceProvider extends LaravelViewServiceProvider
         $this->app->singleton(Cascade::class, function ($app) {
             return new Cascade($app['request'], \Statamic\API\Site::current());
         });
+
+        $this->app->bind(Parser::class, function ($app) {
+            return (new Parser)->callback([AntlersEngine::class, 'renderTag']);
+        });
     }
 
     /**

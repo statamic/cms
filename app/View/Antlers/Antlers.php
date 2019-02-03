@@ -6,8 +6,7 @@ class Antlers
 {
     public function parser()
     {
-        return (new Parser)
-            ->callback(['Statamic\View\Antlers\Engine', 'renderTag']);
+        return app(Parser::class);
     }
 
     public function parse($str, $variables = [])
