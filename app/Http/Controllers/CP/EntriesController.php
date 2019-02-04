@@ -167,11 +167,9 @@ class EntriesController extends CpController
         return $entry->toArray();
     }
 
-    public function create(Request $request, $collection, $site = null)
+    public function create(Request $request, $collection, $site)
     {
-        if (is_null($site)) {
-            $site = Site::default()->handle();
-        } elseif (! Site::get($site)) {
+        if (! Site::get($site)) {
             return $this->pageNotFound();
         }
 
