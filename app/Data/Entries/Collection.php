@@ -107,7 +107,7 @@ class Collection implements Contract
 
     public function createEntryUrl()
     {
-        return cp_route('collections.entries.create', [$this->handle(), API\Site::default()->handle()]);
+        return cp_route('collections.entries.create', [$this->handle(), $this->sites()->first()]);
     }
 
     public function queryEntries()
