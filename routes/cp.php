@@ -33,7 +33,7 @@ Route::group([
     Route::resource('collections', 'CollectionsController');
     Route::get('collections/{collection}/entries', 'EntriesController@index')->name('collections.entries.index');
     Route::post('collections/{collection}/entries/action', 'EntryActionController')->name('collections.entries.action');
-    Route::get('collections/{collection}/entries/create/{site}', 'EntriesController@create')->name('collections.entries.create');
+    Route::get('collections/{collection}/entries/create/{site?}', 'EntriesController@create')->name('collections.entries.create');
     Route::post('collections/{collection}/entries/{site}', 'EntriesController@store')->name('collections.entries.store');
     Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
     Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');

@@ -105,6 +105,11 @@ class Collection implements Contract
         return cp_route('collections.edit', $this->handle());
     }
 
+    public function createEntryUrl()
+    {
+        return cp_route('collections.entries.create', [$this->handle()]);
+    }
+
     public function queryEntries()
     {
         return API\Entry::query()->where('collection', $this->handle());
