@@ -1,10 +1,13 @@
-<?php namespace Tests;
+<?php
 
+namespace Tests\View\Antlers;
+
+use Tests\TestCase;
 use Statamic\API\Term;
+use Statamic\API\Antlers;
 use Statamic\API\Taxonomy;
-use Statamic\View\Antlers\Template as Antlers;
 
-class AntlersParserTest extends TestCase
+class ParserTest extends TestCase
 {
     private $variables;
 
@@ -266,8 +269,6 @@ class AntlersParserTest extends TestCase
 
     public function testRecursiveChildrenWithScope()
     {
-        $this->markTestIncomplete();
-
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
 
@@ -280,7 +281,7 @@ class AntlersParserTest extends TestCase
 
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
     {
-        $context = [
+        $variables = [
             'loop' => [
                 [
                     'one' => '[1.1]',
@@ -294,7 +295,7 @@ class AntlersParserTest extends TestCase
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ two }}{{ /loop }}', [], $context)
+            Antlers::parse('{{ loop }}{{ one }}{{ two }}{{ /loop }}', $variables)
         );
     }
 
@@ -303,7 +304,7 @@ class AntlersParserTest extends TestCase
         // the variables are inside Test@some_parsing
         $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
 
-        $context = [
+        $variables = [
             'loop' => [
                 [
                     'one' => '[1.1]',
@@ -317,7 +318,7 @@ class AntlersParserTest extends TestCase
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', [], $context)
+            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
         );
     }
 
@@ -344,8 +345,6 @@ class AntlersParserTest extends TestCase
 
     public function testNestedArraySyntax()
     {
-        $this->markTestIncomplete();
-
         $variables = [
             'hello' => [
                 'world' => [
@@ -365,5 +364,80 @@ class AntlersParserTest extends TestCase
             '[one][two]',
             Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
+    }
+
+    function testParsesPhpWhenEnabled()
+    {
+        $this->assertEquals(
+            'Hello wilderness!',
+            Antlers::parser()->allowPhp()->parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
+        );
+
+        $this->assertEquals(
+            'Hello wilderness&lt;?php echo "!"; ?>',
+            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
+        );
+    }
+
+    /** @test */
+    function it_doesnt_parse_noparse_tags_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $parsed = $parser->parse('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
+
+        $this->assertEquals('noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness', $parsed);
+
+        $this->assertEquals('{{ string }} Hello wilderness', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_accepts_an_arrayable_object()
+    {
+        $this->assertEquals(
+            'Hello World',
+            Antlers::parse('{{ string }}', new ArrayableObject(['string' => 'Hello World']))
+        );
+    }
+
+    /** @test */
+    function it_throws_exception_for_non_arrayable_data_object()
+    {
+        try {
+            Antlers::parse('{{ string }}', new NonArrayableObject(['string' => 'Hello World']));
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Expecting array or object implementing Arrayable. Encountered [Tests\View\Antlers\NonArrayableObject]', $e->getMessage());
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    function it_throws_exception_for_unsupported_data_value()
+    {
+        try {
+            Antlers::parse('{{ string }}', 'string');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Expecting array or object implementing Arrayable. Encountered [string]', $e->getMessage());
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+}
+
+class NonArrayableObject
+{
+    function __construct($data)
+    {
+        $this->data = $data;
+    }
+}
+
+class ArrayableObject extends NonArrayableObject implements \Illuminate\Contracts\Support\Arrayable
+{
+    function toArray() {
+        return $this->data;
     }
 }

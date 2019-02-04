@@ -10,15 +10,16 @@ use Statamic\Fields\Value;
 use Illuminate\Support\Collection;
 use Statamic\Exceptions\ParsingException;
 use Statamic\Exceptions\ModifierException;
+use Illuminate\Contracts\Support\Arrayable;
 
 class Parser
 {
     // Instance state
     protected $allowPhp = false;
-    protected $cumulativeNoparse = false;
     protected $inCondition = false;
     protected $data = null;
     protected $original_text = null;
+    protected $callback = null;
     protected $callbackData = [];
     protected $conditionalData = [];
 
@@ -83,18 +84,30 @@ class Parser
         ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
     }
 
+    public function allowPhp($allow = true)
+    {
+        $this->allowPhp = $allow;
+
+        return $this;
+    }
+
+    public function callback($callback)
+    {
+        $this->callback = $callback;
+
+        return $this;
+    }
+
     /**
      * Kick off the Antlers parse process
      *
      * @param  string        $text      Text to parse
      * @param  array|object  $data      Array or object to use
-     * @param  mixed         $callback  Callback to use for Callback Tags
-     * @param  boolean       $allowPhp  Should we allow PHP?
      * @return string
      */
-    public function parse($text, $data = [], $callback = false, $allowPhp = false)
+    public function parse($text, $data = [])
     {
-        $this->allowPhp = $allowPhp;
+        $data = $this->normalizeData($data);
 
         // Let's store the current callback data with the the local data
         // so we can use it straight after a callback is called.
@@ -105,7 +118,7 @@ class Parser
         $this->original_text = $text;
 
         // Prevent the parsing of PHP by b0rking the PHP open tag
-        if (! $allowPhp) {
+        if (! $this->allowPhp) {
             $text = str_replace(['<?php'], ['&lt;?php'], $text);
         }
 
@@ -115,24 +128,16 @@ class Parser
         $text = $this->extractNoparse($text);
         $text = $this->stripComments($text);
 
-        $text = $this->extractLoopedTags($text, $data, $callback);
+        $text = $this->extractLoopedTags($text, $data);
 
         // Parse conditionals first to avoid parsing and execution.
-        $text = $this->parseConditionals($text, $data, $callback);
+        $text = $this->parseConditionals($text, $data);
         $text = $this->injectExtractions($text, 'looped_tags');
-        $text = $this->parseVariables($text, $data, $callback);
+        $text = $this->parseVariables($text, $data);
         $text = $this->injectExtractions($text, 'callback_blocks');
 
-        if ($callback) {
-            $text = $this->parseCallbackTags($text, $data, $callback);
-        }
-
-        // Ensure that {{ noparse }} is never parsed, even during consecutive
-        // parse calls. First, set $cumulativeNoparse to true and then use
-        // self::injectNoparse($text) immediately before the final output is
-        // sent to the browser
-        if (! $this->cumulativeNoparse) {
-            $text = $this->injectExtractions($text);
+        if ($this->callback) {
+            $text = $this->parseCallbackTags($text, $data);
         }
 
         // Parse parameters inside tag pairs
@@ -141,6 +146,22 @@ class Parser
         }
 
         return $text;
+    }
+
+    protected function normalizeData($data)
+    {
+        if (is_array($data)) {
+            return $data;
+        }
+
+        if ($data instanceof Arrayable) {
+            return $data->toArray();
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'Expecting array or object implementing Arrayable. Encountered [%s]',
+            ($type = gettype($data)) === 'object' ? get_class($data) : $type
+        ));
     }
 
     /**
@@ -159,14 +180,13 @@ class Parser
      *
      * @param  string       $html      The HTML markup
      * @param  array|object $data      the data
-     * @param  callable     $callback  optional callback
      * @return string
      */
-    public function parseVariables($html, $data, $callback = null)
+    public function parseVariables($html, $data)
     {
-        $html = $this->parseLoopVariables($html, $data, $callback);
-        $html = $this->parseStringVariables($html, $data, $callback);
-        $html = $this->parseVariablesWithParameterStyleModifiers($html, $data, $callback);
+        $html = $this->parseLoopVariables($html, $data);
+        $html = $this->parseStringVariables($html, $data);
+        $html = $this->parseVariablesWithParameterStyleModifiers($html, $data);
 
         return $html;
     }
@@ -176,10 +196,9 @@ class Parser
      *
      * @param  string       $html      The HTML markup
      * @param  array|object $data      the data
-     * @param  callable     $callback  optional callback
      * @return string
      */
-    public function parseLoopVariables($text, $data, $callback)
+    public function parseLoopVariables($text, $data)
     {
         // Check for any vars flagged as noparse
         $noparse = array_get($data, '_noparse', []);
@@ -226,14 +245,14 @@ class Parser
                         $loop_value = $loop_data + $data + $this->callbackData;
 
                         // perform standard actions
-                        $str = $this->extractLoopedTags($match[2][0], $loop_value, $callback);
-                        $str = $this->parseConditionals($str, $loop_value, $callback);
+                        $str = $this->extractLoopedTags($match[2][0], $loop_value);
+                        $str = $this->parseConditionals($str, $loop_value);
                         $str = $this->injectExtractions($str, 'looped_tags');
-                        $str = $this->parseVariables($str, $loop_value, $callback);
+                        $str = $this->parseVariables($str, $loop_value);
 
-                        if (!is_null($callback)) {
+                        if (!is_null($this->callback)) {
                             $str = $this->injectExtractions($str, 'callback_blocks');
-                            $str = $this->parseCallbackTags($str, $loop_value, $callback);
+                            $str = $this->parseCallbackTags($str, $loop_value);
                         }
 
                         $looped_text .= $str;
@@ -266,14 +285,14 @@ class Parser
                             $loop_value = $loop_value + $data + $this->callbackData;
 
                             // perform standard actions
-                            $str = $this->extractLoopedTags($match[2][0], $loop_value, $callback);
-                            $str = $this->parseConditionals($str, $loop_value, $callback);
+                            $str = $this->extractLoopedTags($match[2][0], $loop_value);
+                            $str = $this->parseConditionals($str, $loop_value);
                             $str = $this->injectExtractions($str, 'looped_tags');
-                            $str = $this->parseVariables($str, $loop_value, $callback);
+                            $str = $this->parseVariables($str, $loop_value);
 
-                            if (!is_null($callback)) {
+                            if (!is_null($this->callback)) {
                                 $str = $this->injectExtractions($str, 'callback_blocks');
-                                $str = $this->parseCallbackTags($str, $loop_value, $callback);
+                                $str = $this->parseCallbackTags($str, $loop_value);
                             }
 
                             $looped_text .= $str;
@@ -293,10 +312,9 @@ class Parser
      *
      * @param  string       $html      The HTML markup
      * @param  array|object $data      the data
-     * @param  callable     $callback  optional callback
      * @return string
      */
-    public function parseStringVariables($text, $data, $callback)
+    public function parseStringVariables($text, $data)
     {
         if ($text instanceof Value) {
             $text = $text->value();
@@ -376,10 +394,9 @@ class Parser
      *
      * @param  string       $html      The HTML markup
      * @param  array|object $data      the data
-     * @param  callable     $callback  optional callback
      * @return string
      */
-    public function parseVariablesWithParameterStyleModifiers($text, $data, $callback)
+    public function parseVariablesWithParameterStyleModifiers($text, $data)
     {
         $regex = '/{{\s*(' . $this->looseVariableRegex . ')(\s+.*?)?\s*}}/ms';
 
@@ -409,7 +426,7 @@ class Parser
                             $raw_params = $this->injectExtractions($match[2][0], '__cond_str');
 
                             // parse them into an array
-                            $parameters = $this->parseParameters($raw_params, $cb_data, $callback);
+                            $parameters = $this->parseParameters($raw_params, $cb_data);
                         } elseif (is_string($data)) {
                             $text = str_replace($tag, $data, $text);
                         }
@@ -432,14 +449,13 @@ class Parser
     }
 
     /**
-     * Parses all Callback tags, and sends them through the given $callback.
+     * Parses all Callback tags, by sending them through the defined callback.
      *
      * @param  string $text     Text to parse
      * @param  array  $data     An array of data to use
-     * @param  mixed  $callback Callback to apply to each tag
      * @return string
      */
-    public function parseCallbackTags($text, $data, $callback)
+    public function parseCallbackTags($text, $data)
     {
         $inCondition = $this->inCondition;
 
@@ -483,8 +499,8 @@ class Parser
 
             if (isset($match[2])) {
                 $raw_params = $this->injectExtractions($match[2][0], '__cond_str');
-                $parameters = $this->parseParameters($raw_params, $cb_data, $callback);
-                $parameters = $this->parseVariablesInsideParameters($parameters, $data, $callback);
+                $parameters = $this->parseParameters($raw_params, $cb_data);
+                $parameters = $this->parseVariablesInsideParameters($parameters, $data);
             }
 
             if (preg_match('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', $text_subselection, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
@@ -502,9 +518,9 @@ class Parser
             $replacement = null; // oh look, another temporary variable.
 
             // now, check to see if a callback should happen
-            if ($callback) {
-                $replacement = call_user_func_array($callback, [$name, $parameters, $content, $data]);
-                $replacement = $this->parseRecursives($replacement, $content, $callback);
+            if ($this->callback) {
+                $replacement = call_user_func_array($this->callback, [$name, $parameters, $content, $data]);
+                $replacement = $this->parseRecursives($replacement, $content);
             }
 
             // look for tag pairs and (plugin) callbacks
@@ -556,18 +572,18 @@ class Parser
                         // parse the tag found with the value(s) related to it
                         $tmpname = md5($name);
                         $vars = [$tmpname => $values];
-                        $replacement = $this->parseVariables("{{ $tmpname }}$content{{ /$tmpname }}", [$tmpname => $values], $callback);
+                        $replacement = $this->parseVariables("{{ $tmpname }}$content{{ /$tmpname }}", [$tmpname => $values]);
                     }
                 } else {
                     // nope, this must be a callback
-                    if (is_null($callback)) {
+                    if (is_null($this->callback)) {
                         // TODO: what does this do?
                         $text = $this->createExtraction('__variables_not_callbacks', $text, $text, $text);
                     } elseif (! empty($cb_data[$name])) {
                         // value not found in the data block, so we check the
                         // cumulative callback data block for a value and use that
-                        $text = $this->extractLoopedTags($text, $cb_data, $callback);
-                        $text = $this->parseVariables($text, $cb_data, $callback);
+                        $text = $this->extractLoopedTags($text, $cb_data);
+                        $text = $this->parseVariables($text, $cb_data);
                         $text = $this->injectExtractions($text, 'callback_blocks');
                     }
                 }
@@ -584,10 +600,10 @@ class Parser
         }
 
         // parse for recursives, as they may not have been parsed yet
-        $text = $this->parseRecursives($text, $this->original_text, $callback);
+        $text = $this->parseRecursives($text, $this->original_text);
 
         // re-inject any extractions
-        if (is_null($callback)) {
+        if (is_null($this->callback)) {
             $text = $this->injectExtractions($text, '__variables_not_callbacks');
         }
 
@@ -598,15 +614,15 @@ class Parser
      * Parses {variables} with single braces inside parameters
      * making sure the parameter's parameters are an array in order to resolve duplicates.
      */
-    public function parseVariablesInsideParameters($parameters, $data, $callback)
+    public function parseVariablesInsideParameters($parameters, $data)
     {
-        return collect($parameters)->map(function ($value) use ($data, $callback) {
+        return collect($parameters)->map(function ($value) use ($data) {
             preg_match_all('/(\{\s*' . $this->variableRegex . '\s*\})/', $value, $matches);
 
             $value = str_replace(['{', '}'], ['{{', '}}'], $value);
             $value = $this->parseVariables($value, $data);
 
-            return $this->parseCallbackTags($value, $data, $callback);
+            return $this->parseCallbackTags($value, $data);
         })->all();
     }
 
@@ -615,10 +631,9 @@ class Parser
      *
      * @param  string $text     Text to parse
      * @param  mixed  $data     Data to use when executing conditionals
-     * @param  mixed  $callback The callback to be used for tags
      * @return string
      */
-    public function parseConditionals($text, $data, $callback)
+    public function parseConditionals($text, $data)
     {
         preg_match_all($this->conditionalRegex, $text, $matches, PREG_SET_ORDER);
 
@@ -639,7 +654,7 @@ class Parser
             }
 
             // check for and extract callbacks
-            if ($callback) {
+            if ($this->callback) {
                 if (preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
                     foreach ($cb_matches[0] as $m) {
                         $condition = $this->createExtraction('__cond_callbacks', $m, "{$m}", $condition);
@@ -670,14 +685,14 @@ class Parser
             // also pass in the current callback (for later processing callback tags); also setting
             // $ref so that we can use it within the anonymous function
             $ref = $this;
-            $condition = preg_replace_callback('/\b(' . $this->variableRegex . ')\b/', function ($match) use ($callback, $ref) {
-                return $ref->processConditionVar($match, $callback);
+            $condition = preg_replace_callback('/\b(' . $this->variableRegex . ')\b/', function ($match) use ($ref) {
+                return $ref->processConditionVar($match);
             }, $condition);
 
             // inject and parse any callbacks
-            if ($callback) {
+            if ($this->callback) {
                 $condition = $this->injectExtractions($condition, '__cond_callbacks');
-                $condition = $this->parseCallbackTags($condition, $data, $callback, true);
+                $condition = $this->parseCallbackTags($condition, $data);
             }
 
             // Re-extract the strings that have may have been added.
@@ -761,10 +776,9 @@ class Parser
      *
      * @param  string $text       The replaced text after a callback.
      * @param  string $orig_text  The original text, before a callback is called.
-     * @param  mixed  $callback
      * @return string $text
      */
-    public function parseRecursives($text, $orig_text, $callback)
+    public function parseRecursives($text, $orig_text)
     {
         // Is there a {{ *recursive [array_key]* }} tag here, let's loop through it.
         if (preg_match($this->recursiveRegex, $text, $match)) {
@@ -809,7 +823,7 @@ class Parser
                     $has_children      = false;
                 }
 
-                $replacement = $this->parse($orig_text, $child, $callback, $this->allowPhp);
+                $replacement = $this->parse($orig_text, $child);
 
                 // If this is the first loop we'll use $tag as reference, if not
                 // we'll use the previous tag ($next_tag)
@@ -822,7 +836,7 @@ class Parser
                 $text = str_replace($current_tag, $replacement . $next_tag, $text);
 
                 if ($has_children) {
-                    $text = $this->parseRecursives($text, $orig_text, $callback);
+                    $text = $this->parseRecursives($text, $orig_text);
                 }
 
                 $count++;
@@ -830,17 +844,6 @@ class Parser
         }
 
         return $text;
-    }
-
-    /**
-     * Set the noparse style. Immediate or cumulative.
-     *
-     * @param  bool $mode
-     * @return void
-     */
-    public function cumulativeNoparse($mode)
-    {
-        $this->cumulativeNoparse = $mode;
     }
 
     /**
@@ -855,15 +858,7 @@ class Parser
      */
     public function injectNoparse($text)
     {
-        if (isset($this->extractions['noparse'])) {
-            foreach ($this->extractions['noparse'] as $hash => $replacement) {
-                if (strpos($text, "noparse_{$hash}") !== false) {
-                    $text = str_replace("noparse_{$hash}", $replacement, $text);
-                }
-            }
-        }
-
-        return $text;
+        return $this->injectExtractions($text, 'noparse');
     }
 
     /**
@@ -871,10 +866,9 @@ class Parser
      * and returns the value of it, properly formatted.
      *
      * @param  array    $match    A match from preg_replace_callback
-     * @param  callable $callback A callback to use to process further callback tags
      * @return string
      */
-    public function processConditionVar($match, $callback = null)
+    public function processConditionVar($match)
     {
         $var = is_array($match) ? $match[0] : $match;
 
@@ -897,7 +891,7 @@ class Parser
         if (!is_array($value)) {
             while (preg_match($this->variableTagRegex, $value, $matches)) {
                 $previous_value = $value;
-                $value = $this->parseVariables($value, $this->conditionalData, $callback);
+                $value = $this->parseVariables($value, $this->conditionalData);
 
                 // nothing changed, break out, prevents any sort of infinite looping
                 if ($previous_value === $value) {
@@ -975,10 +969,9 @@ class Parser
      *
      * @param string   $text     The text to extract from
      * @param array    $data     Data array to use
-     * @param callable $callback Callback to call when complete
      * @return string
      */
-    protected function extractLoopedTags($text, $data = array(), $callback = null)
+    protected function extractLoopedTags($text, $data = array())
     {
         /**
          * $matches[][0] is the raw match
@@ -989,7 +982,7 @@ class Parser
                 // Allow {{ /if }} to close if statements
                 if ($match[1] === 'if' || $match[1] === 'unless') {
                     // move on
-                } elseif ($this->parseParameters($match[2], $data, $callback)) {
+                } elseif ($this->parseParameters($match[2], $data)) {
                     // This callback block contains parameters
                     // Let's extract it so it doesn't conflict with local variables when
                     // parseVariables() is called.
@@ -1022,28 +1015,15 @@ class Parser
     }
 
     /**
-     * Injects all of the extractions.
+     * Injects all of the extractions for a given type
      *
      * @param string $text Text to inject into
      * @param string $type Type of extraction to inject
      * @return string
      */
-    protected function injectExtractions($text, $type = null)
+    protected function injectExtractions($text, $type)
     {
-        if (is_null($type)) {
-            foreach ($this->extractions as $type => $extractions) {
-                foreach ($extractions as $hash => $replacement) {
-                    if (strpos($text, "{$type}_{$hash}") !== false) {
-                        $text = str_replace("{$type}_{$hash}", $replacement, $text);
-                        unset($this->extractions[$type][$hash]);
-                    }
-                }
-            }
-        } else {
-            if (! isset($this->extractions[$type])) {
-                return $text;
-            }
-
+        if (isset($this->extractions[$type])) {
             foreach ($this->extractions[$type] as $hash => $replacement) {
                 if (strpos($text, "{$type}_{$hash}") !== false) {
                     $text = str_replace("{$type}_{$hash}", $replacement, $text);
@@ -1148,10 +1128,9 @@ class Parser
      *
      * @param string   $parameters The string of parameters
      * @param array    $data       Array of data
-     * @param callable $callback   Callback function to call
      * @return array
      */
-    protected function parseParameters($parameters, $data, $callback)
+    protected function parseParameters($parameters, $data)
     {
         $this->conditionalData = $data;
         $this->inCondition = true;
@@ -1169,9 +1148,9 @@ class Parser
             $parameters
         );
 
-        if ($callback) {
+        if ($this->callback) {
             $parameters = preg_replace('/(.*?\s*=\s*(?!\{\s*)(?!__))('.$this->callbackNameRegex.')(?!\s*\})\b/', '$1{$2}', $parameters);
-            $parameters = $this->parseCallbackTags($parameters, $data, $callback);
+            $parameters = $this->parseCallbackTags($parameters, $data);
         }
 
         // Re-inject extracted strings

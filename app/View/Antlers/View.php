@@ -57,19 +57,17 @@ class View
     {
         $cascade = array_merge($this->data, $this->cascade());
 
-        $contents = view($this->template, $cascade)->render();
+        $contents = view($this->template, $cascade);
 
         if ($this->layout) {
             $contents = view($this->layout, array_merge($cascade, [
-                'template_content' => $contents
-            ]))->render();
+                'template_content' => $contents->withoutExtractions()->render()
+            ]));
         }
-
-        $contents = app('antlers.view.parser')->injectNoparse($contents);
 
         ViewRendered::dispatch($this);
 
-        return $contents;
+        return $contents->render();
     }
 
     protected function cascade()

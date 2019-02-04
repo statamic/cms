@@ -33,6 +33,68 @@ class ViewTest extends TestCase
     }
 
     /** @test */
+    function template_is_rendered_alone_if_no_layout_is_provided()
+    {
+        $finder = Mockery::mock(FileViewFinder::class);
+        $finder->shouldReceive('find')->with('template')->andReturn(__DIR__.'/fixtures/template.antlers.html');
+        $this->app->make('view')->setFinder($finder);
+
+        $view = (new View)
+            ->template('template')
+            ->data(['foo' => 'bar']);
+
+        $this->assertEquals('Template: bar', $view->render());
+    }
+
+    /** @test */
+    function template_with_noparse_is_left_unparsed()
+    {
+        $finder = Mockery::mock(FileViewFinder::class);
+        $finder->shouldReceive('find')->with('template')->andReturn(__DIR__.'/fixtures/template-with-noparse.antlers.html');
+        $finder->shouldReceive('find')->with('layout')->andReturn(__DIR__.'/fixtures/layout.antlers.html');
+        $this->app->make('view')->setFinder($finder);
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout')
+            ->data(['foo' => 'bar']);
+
+        $this->assertEquals('Layout: bar | Template: {{ foo }}', $view->render());
+    }
+
+    /** @test */
+    function layout_with_noparse_is_left_unparsed()
+    {
+        $finder = Mockery::mock(FileViewFinder::class);
+        $finder->shouldReceive('find')->with('template')->andReturn(__DIR__.'/fixtures/template.antlers.html');
+        $finder->shouldReceive('find')->with('layout')->andReturn(__DIR__.'/fixtures/layout-with-noparse.antlers.html');
+        $this->app->make('view')->setFinder($finder);
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout')
+            ->data(['foo' => 'bar']);
+
+        $this->assertEquals('Layout: {{ foo }} | Template: bar', $view->render());
+    }
+
+    /** @test */
+    function layout_and_template_with_noparse_is_left_unparsed()
+    {
+        $finder = Mockery::mock(FileViewFinder::class);
+        $finder->shouldReceive('find')->with('template')->andReturn(__DIR__.'/fixtures/template-with-noparse.antlers.html');
+        $finder->shouldReceive('find')->with('layout')->andReturn(__DIR__.'/fixtures/layout-with-noparse.antlers.html');
+        $this->app->make('view')->setFinder($finder);
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout')
+            ->data(['foo' => 'bar']);
+
+        $this->assertEquals('Layout: {{ foo }} | Template: {{ foo }}', $view->render());
+    }
+
+    /** @test */
     function gets_data()
     {
         $view = (new View)->data(['foo' => 'bar']);

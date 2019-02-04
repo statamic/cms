@@ -25,7 +25,7 @@ class CacheTags extends Tags
         $path = 'troves:' . $hash;
 
         if (! $this->cache->exists($path)) {
-            $html = $this->parse([], $this->context);
+            $html = $this->parse();
 
             $this->cache->put($path, $html);
         }
