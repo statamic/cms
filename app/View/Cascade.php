@@ -136,7 +136,7 @@ class Cascade
             return $this;
         }
 
-        $fields = $this->content->blueprint()
+        $fields = (method_exists($this->content, 'blueprint') ? $this->content->blueprint() : false)
             ? $this->content->blueprint()->fields()->all()
             : collect();
 
