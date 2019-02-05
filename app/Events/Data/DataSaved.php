@@ -12,17 +12,17 @@ class DataSaved extends Event implements DataSavedEvent
     /**
      * @var Data
      */
-    public $data;
+    protected $data;
 
     /**
      * @var array
      */
-    public $original;
+    protected $original;
 
     /**
      * @var string
      */
-    public $oldPath;
+    protected $oldPath;
 
     /**
      * @param Data $data
