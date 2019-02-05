@@ -65,13 +65,13 @@ class AssetBrowserController extends CpController
         foreach ($assets as &$asset) {
             // Add thumbnails to all image assets.
             if ($asset->isImage()) {
-                $asset->set('thumbnail', $this->thumbnail($asset, 'small'));
-                $asset->set('toenail', $this->thumbnail($asset, 'large'));
+                $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
+                $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
             }
 
             // Set some values for better listing formatting.
-            $asset->set('size_formatted', Str::fileSizeForHumans($asset->size(), 0));
-            $asset->set('last_modified_formatted', $asset->lastModified()->format(config('statamic.cp.date_format')));
+            $asset->setSupplement('size_formatted', Str::fileSizeForHumans($asset->size(), 0));
+            $asset->setSupplement('last_modified_formatted', $asset->lastModified()->format(config('statamic.cp.date_format')));
         }
 
         return $assets;

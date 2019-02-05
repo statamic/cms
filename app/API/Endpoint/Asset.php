@@ -8,6 +8,7 @@ use Statamic\API\Site;
 use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Assets\AssetFactory;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 
 class Asset
 {
@@ -144,6 +145,11 @@ class Asset
     public function create($path = null)
     {
         return app(AssetFactory::class)->create($path);
+    }
+
+    public function make()
+    {
+        return new \Statamic\Assets\Asset;
     }
 
     /**

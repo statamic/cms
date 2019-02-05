@@ -2,9 +2,7 @@
 
 namespace Statamic\Contracts\Assets;
 
-use Statamic\Contracts\CP\Editable;
-
-interface AssetContainer extends Editable
+interface AssetContainer
 {
     /**
      * Get or set the ID
@@ -29,28 +27,6 @@ interface AssetContainer extends Editable
      * @return string
      */
     public function title($title = null);
-
-    /**
-     * Get or set the data
-     *
-     * @param null|array $data
-     * @return array|null
-     */
-    public function data($data = null);
-
-    /**
-     * Get the path
-     *
-     * @return string
-     */
-    public function path();
-
-    /**
-     * Get the full resolved path
-     *
-     * @return string
-     */
-    public function resolvedPath();
 
     /**
      * Get the URL to this location
@@ -120,4 +96,12 @@ interface AssetContainer extends Editable
      * @return bool
      */
     public function accessible();
+
+    /**
+     * Get or set whether the container's assets are private (non-web-accessible)
+     *
+     * @param bool|null $private  When setting, this is whether it should private or not.
+     * @return bool
+     */
+    public function private($private = null);
 }

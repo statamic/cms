@@ -2,11 +2,10 @@
 
 namespace Statamic\Contracts\Assets;
 
-use Statamic\Filesystem\FileAccessor;
-use Statamic\Filesystem\FolderAccessor;
-use Statamic\Contracts\Data\DataFolder;
+use Statamic\Assets\AssetCollection;
+use Statamic\Filesystem\FlysystemAdapter;
 
-interface AssetFolder extends DataFolder
+interface AssetFolder
 {
     /**
      * Get the container where this folder is located
@@ -18,23 +17,22 @@ interface AssetFolder extends DataFolder
     /**
      * Get the container's filesystem disk instance
      *
-     * @param string $type  The type of disk instance to get
-     * @return FileAccessor|FolderAccessor;
+     * @return FlysystemAdapter
      */
-    public function disk($type = 'folder');
+    public function disk();
 
     /**
      * Get the assets in the folder
      *
      * @param bool $recursive Whether to look for assets recursively
-     * @return \Statamic\Assets\AssetCollection
+     * @return AssetCollection
      */
     public function assets($recursive = false);
 
     /**
      * Get the parent folder
      *
-     * @return null|\Statamic\Contracts\Assets\AssetFolder
+     * @return null|AssetFolder
      */
     public function parent();
 
@@ -47,9 +45,6 @@ interface AssetFolder extends DataFolder
 
     /**
      * Get the resolved path to the folder
-     *
-     * This is the "actual" path to the folder.
-     * It combines the container path with the folder path.
      *
      * @return string
      */

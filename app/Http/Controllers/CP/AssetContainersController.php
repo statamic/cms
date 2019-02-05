@@ -2,8 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\AssetContainer;
+use Statamic\API\Arr;
 use Illuminate\Http\Request;
+use Statamic\API\AssetContainer;
 
 class AssetContainersController extends CpController
 {
@@ -44,16 +45,22 @@ class AssetContainersController extends CpController
         ]);
     }
 
-    public function update($container)
+    public function update(Request $request, $container)
     {
         $container = AssetContainer::find($container);
 
         // TODO: auth
-        // TODO: validation
 
-        $data = request()->only(['title', 'disk', 'path', 'fieldset']);
-        $container->data($data);
-        $container->save();
+        $request->validate([
+            'title' => 'required',
+            'disk' => 'required',
+        ]);
+
+        $container
+            ->title($request->title)
+            ->disk($request->disk)
+            ->blueprint(Arr::first(json_decode($request->blueprint, true)))
+            ->save();
 
         return back()->with('success', 'Container saved');
     }
@@ -67,16 +74,24 @@ class AssetContainersController extends CpController
         ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
         // TODO: auth
-        // TODO: validation
 
-        $data = request()->only(['title', 'disk', 'path', 'fieldset']);
-        $container = AssetContainer::create();
-        $container->handle(request('handle'));
-        $container->data($data);
-        $container->save();
+        $request->validate([
+            'title' => 'required',
+            'handle' => 'nullable|alpha_dash',
+            'disk' => 'required',
+        ]);
+
+        $title = $request->title;
+        $handle = $request->handle ?? snake_case($title);
+
+        $container = AssetContainer::make($handle)
+            ->title($title)
+            ->disk($request->disk)
+            ->blueprint(Arr::first(json_decode($request->blueprint, true)))
+            ->save();
 
         return redirect($container->editUrl())->with('success', 'Container saved');
     }
