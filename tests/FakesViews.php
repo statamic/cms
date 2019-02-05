@@ -54,6 +54,11 @@ class FakeViewFactory extends Factory
     {
         return new View($this, app('FakeViewEngine'), $view, $view, $data);
     }
+
+    public function exists($view)
+    {
+        return app('FakeViewEngine')->exists($view);
+    }
 }
 
 class FakeViewEngine extends \Statamic\View\Antlers\Engine
@@ -77,6 +82,11 @@ class FakeViewEngine extends \Statamic\View\Antlers\Engine
         }
 
         return parent::getContents($path);
+    }
+
+    public function exists($path)
+    {
+        return isset($this->rawContents[$path]);
     }
 }
 
