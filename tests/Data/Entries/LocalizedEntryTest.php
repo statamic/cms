@@ -366,6 +366,7 @@ array:
   - 'first one'
   - 'second one'
 id: '123'
+published: false
 ---
 The content
 EOT;
