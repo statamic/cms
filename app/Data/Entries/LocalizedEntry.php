@@ -86,7 +86,9 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function save()
     {
-        EntrySaving::dispatch($this);
+        if (EntrySaving::dispatch($this) === false) {
+            return false;
+        }
 
         API\Entry::save($this);
 
@@ -98,6 +100,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
+        // TODO: return true;
         return $this;
     }
 
