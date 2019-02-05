@@ -96,8 +96,8 @@ class FeatureTest extends TestCase
     /** @test */
     function it_gets_an_asset_container()
     {
-        $this->assertEquals('Main Assets', AssetContainer::find('main')->data()['title']);
-        $this->assertEquals('Another Asset Container', AssetContainer::find('another')->data()['title']);
+        $this->assertEquals('Main Assets', AssetContainer::find('main')->title());
+        $this->assertEquals('Another Asset Container', AssetContainer::find('another')->title());
     }
 
     /** @test */
@@ -194,6 +194,19 @@ class FeatureTest extends TestCase
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
             "title: 'New Collection'\norder: date\nfoo: bar\n"
+        );
+        @unlink($path);
+    }
+
+
+    /** @test */
+    function saving_an_asset_container_writes_it_to_file()
+    {
+        AssetContainer::make('new')->title('New Container')->save();
+
+        $this->assertStringEqualsFile(
+            $path = __DIR__.'/__fixtures__/content/assets/new.yaml',
+            "title: 'New Container'\n"
         );
         @unlink($path);
     }

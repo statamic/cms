@@ -2,6 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
+use Statamic\API;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Contracts\Assets\AssetContainer;
@@ -16,7 +17,9 @@ class AssetContainerRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
-        $stache->registerStore((new AssetContainersStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/assets'));
+        $this->app->instance(Stache::class, $stache);
+        $this->directory = __DIR__.'/../__fixtures__/content/assets';
+        $stache->registerStore((new AssetContainersStore($stache, app('files')))->directory($this->directory));
 
         $this->repo = new AssetContainerRepository($stache);
     }
@@ -54,5 +57,19 @@ class AssetContainerRepositoryTest extends TestCase
         });
 
         $this->assertNull($this->repo->findByHandle('unknown'));
+    }
+
+    /** @test */
+    function it_saves_a_container_to_the_stache_and_to_a_file()
+    {
+        $container = API\AssetContainer::make('new');
+        $this->assertNull($this->repo->findByHandle('new'));
+
+        $this->repo->save($container);
+
+        $this->assertNotNull($item = $this->repo->findByHandle('new'));
+        $this->assertEquals($container, $item);
+        $this->assertTrue(file_exists($this->directory.'/new.yaml'));
+        @unlink($this->directory.'/new.yaml');
     }
 }

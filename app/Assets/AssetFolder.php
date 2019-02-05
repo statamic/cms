@@ -8,77 +8,77 @@ use Statamic\Data\DataFolder;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
 use Statamic\API\AssetContainer as AssetContainerAPI;
-use Statamic\Contracts\Assets\AssetFolder as AssetFolderContract;
+use Statamic\Contracts\Assets\AssetFolder as Contract;
 
-class AssetFolder extends DataFolder implements AssetFolderContract, Arrayable
+class AssetFolder implements Contract, Arrayable
 {
-    /**
-     * @var string
-     */
     protected $container;
+    protected $path;
 
-    /**
-     * Create a new asset folder instance
-     *
-     * @param string     $path
-     * @param array|null $data
-     */
-    public function __construct($container_id, $path, $data = [])
+    public function container($container = null)
     {
-        $this->container = $container_id;
-        $this->path   = $path;
-        $this->data   = $data;
+        if (func_num_args() === 0) {
+            return $this->container;
+        }
+
+        $this->container = $container;
+
+        return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function disk($type = 'folder')
+    public function path($path = null)
     {
-        return $this->container()->disk($type);
+        if (func_num_args() === 0) {
+            return $this->path;
+        }
+
+        $this->path = $path;
+
+        return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
+    public function title($title = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->title ?? $this->computedTitle();
+        }
+
+        $this->title = $title;
+
+        return $this;
+    }
+
+    protected function computedTitle()
+    {
+        return pathinfo($this->path(), PATHINFO_FILENAME);
+    }
+
+    public function disk()
+    {
+        return $this->container()->disk();
+    }
+
     public function resolvedPath()
     {
-        return Path::tidy($this->container()->resolvedPath() . '/' . $this->path());
+        return Path::tidy($this->container()->diskPath() . '/' . $this->path());
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function computedTitle()
-    {
-        return pathinfo($this->path())['filename'];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function count()
     {
         return $this->assets()->count();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function assets($recursive = false)
     {
         return $this->container()->assets($this->path(), $recursive);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function lastModified()
     {
         $date = null;
 
         foreach ($this->assets() as $asset) {
-            $modified = $asset->getLastModified();
+            $modified = $asset->lastModified();
 
             if ($date) {
                 if ($modified->gt($date)) {
@@ -92,43 +92,21 @@ class AssetFolder extends DataFolder implements AssetFolderContract, Arrayable
         return $date;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function save()
     {
-        $data = $this->data();
-
-        // If there's a title set, and it's the same as what the default would be
-        // (ie. the folder name) then we'll just remove it. It's not needed.
-        if ($title = array_get($data, 'title')) {
-            if ($title === $this->computedTitle()) {
-                unset($data['title']);
-            }
-        }
-
-        // Make sure there's a folder
-        $this->disk('folder')->make($this->path());
-
         $path = $this->path() . '/folder.yaml';
 
-        // If there's no data to be saved, and there's already an existing folder.yaml,
-        // we'll delete the file now. There's no reason for it to be hanging around.
-        if (empty($data) && $this->disk('file')->exists($path)) {
-            $this->disk('file')->delete($path);
+        if ($this->title === $this->computedTitle()) {
+            $this->disk()->delete($path);
+            return $this;
         }
 
-        // Only bother saving a file if there's data to save.
-        if (! empty($data)) {
-            $this->disk('file')->put($path, YAML::dump($data));
-        }
+        $this->disk()->makeDirectory($this->path());
+        $this->disk()->put($path, YAML::dump(['title' => $this->title]));
 
-        event('assetfolder.saved', $this);
+        return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function delete()
     {
         $paths = [];
@@ -143,17 +121,11 @@ class AssetFolder extends DataFolder implements AssetFolderContract, Arrayable
         }
 
         // Delete the actual folder that'll be leftover. It'll include any empty subfolders.
-        $this->disk('folder')->delete($this->path());
+        $this->disk()->delete($this->path());
 
         event(new AssetFolderDeleted($this->container(), $this->path(), $paths));
-    }
 
-    /**
-     * @inheritdoc
-     */
-    public function container()
-    {
-        return AssetContainerAPI::find($this->container);
+        return $this;
     }
 
     /**
@@ -181,15 +153,7 @@ class AssetFolder extends DataFolder implements AssetFolderContract, Arrayable
         return [
             'title' => $this->title(),
             'path' => $this->path(),
-            'parent_path' => ($this->parent()) ? $this->parent()->path() : null
+            'parent_path' => optional($this->parent())->path(),
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function editUrl()
-    {
-        // A folder is currently only editable within a AJAX based modal.
     }
 }

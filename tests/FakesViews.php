@@ -80,7 +80,7 @@ class FakeViewEngine extends \Statamic\View\Antlers\Engine
     }
 }
 
-class FakeViewFinder extends \Statamic\Extensions\View\FileViewFinder
+class FakeViewFinder extends \Illuminate\View\FileViewFinder
 {
     public $views = [];
 

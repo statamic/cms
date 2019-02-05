@@ -216,7 +216,7 @@ export default {
             loading: true,
             saving: false,
             asset: null,
-            values: null,
+            values: {},
             initialValues: null,
             fields: null,
             fieldset: null,

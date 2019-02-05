@@ -1,6 +1,7 @@
 <template>
 
     <relationship-input
+        :name="name"
         v-model="selections"
         :initial-data="initialData"
         :max-items="maxItems"

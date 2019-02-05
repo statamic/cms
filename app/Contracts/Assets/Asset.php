@@ -2,10 +2,9 @@
 
 namespace Statamic\Contracts\Assets;
 
-use Statamic\Contracts\Data\Data;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-interface Asset extends Data
+interface Asset
 {
     /**
      * Get the filename
@@ -24,25 +23,10 @@ interface Asset extends Data
     /**
      * Get or set the container
      *
-     * @param null|string $id  ID of the container, if setting.
-     * @return \Statamic\Contracts\Assets\AssetContainer
+     * @param AssetContainer|string $container  An asset container instance, or the handle of one.
+     * @return AssetContainer
      */
-    public function container($id = null);
-
-    /**
-     * Get or set the container by ID
-     *
-     * @param null|string $id  ID of the container, if setting.
-     * @return string
-     */
-    public function containerId($id = null);
-
-    /**
-     * Get the URI
-     *
-     * @return string
-     */
-    public function uri();
+    public function container($container = null);
 
     /**
      * Get the URL
@@ -50,14 +34,6 @@ interface Asset extends Data
      * @return string
      */
     public function url();
-
-    /**
-     * Get the asset's absolute URL
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function absoluteUrl();
 
     /**
      * Get either a image URL builder instance, or a URL if passed params.

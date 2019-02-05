@@ -43,7 +43,7 @@ class AssetsController extends CpController
 
             // Public asset containers can use their regular URLs.
             // Private ones don't have URLs so we'll generate an actual-size "thumbnail".
-            $asset->setSupplement('preview', $asset->container()->url() ? $asset->absoluteUrl() : $this->thumbnail($asset));
+            $asset->setSupplement('preview', $asset->container()->accessible() ? $asset->url() : $this->thumbnail($asset));
         }
 
         $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
@@ -69,8 +69,8 @@ class AssetsController extends CpController
         $asset->save();
 
         if ($asset->isImage()) {
-            $asset->set('thumbnail', $this->thumbnail($asset, 'small'));
-            $asset->set('toenail', $this->thumbnail($asset, 'large'));
+            $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
+            $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
         }
 
         return ['success' => true, 'message' => 'Asset updated', 'asset' => $asset->toArray()];

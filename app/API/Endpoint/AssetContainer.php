@@ -3,6 +3,7 @@
 namespace Statamic\API\Endpoint;
 
 use Statamic\Contracts\Data\Repositories\AssetContainerRepository;
+use Statamic\Contracts\Assets\AssetContainer as ContainerContract;
 
 class AssetContainer
 {
@@ -49,6 +50,24 @@ class AssetContainer
     public function create($driver = null)
     {
         return $this->repo()->create($driver);
+    }
+
+    public function make($handle = null)
+    {
+        $collection = app(ContainerContract::class);
+
+        if ($handle) {
+            $collection->handle($handle);
+        }
+
+        return $collection;
+    }
+
+    public function save(ContainerContract $container)
+    {
+        $this->repo()->save($container);
+
+        // AssetContainerSaved::dispatch($container); // TODO
     }
 
     protected function repo()

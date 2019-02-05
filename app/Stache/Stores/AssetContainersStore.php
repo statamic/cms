@@ -2,9 +2,12 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\File;
 use Statamic\API\YAML;
+use Statamic\Assets\Asset;
 use Statamic\API\Collection;
 use Statamic\API\AssetContainer;
+use Statamic\Contracts\Assets\AssetContainer as ContainerContract;
 
 class AssetContainersStore extends BasicStore
 {
@@ -13,16 +16,32 @@ class AssetContainersStore extends BasicStore
         return 'asset-containers';
     }
 
+    public function getItemsFromCache($cache)
+    {
+        return $cache->map(function ($item, $handle) {
+            return $this->containerFromArray($handle, $item);
+        });
+    }
+
     public function createItemFromFile($path, $contents)
     {
-        $id = pathinfo($path, PATHINFO_FILENAME);
+        $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
         $driver = array_get($data, 'driver', 'local');
 
-        $container = AssetContainer::create();
-        $container->id($id);
-        $container->data(YAML::parse($contents));
-        // $container->url($this->getUrl($id, $driver, $data)); // TODO: TDD
+        return $this->containerFromArray($handle, $data);
+    }
+
+    protected function containerFromArray($handle, $data)
+    {
+        $container = AssetContainer::make($handle)
+            ->disk(array_get($data, 'disk'))
+            ->title(array_get($data, 'title'))
+            ->blueprint(array_get($data, 'blueprint'));
+
+        foreach (array_get($data, 'assets', []) as $path => $data) {
+            $container->addAsset((new Asset)->path($path)->data($data));
+        }
 
         return $container;
     }
@@ -35,5 +54,10 @@ class AssetContainersStore extends BasicStore
     public function filter($file)
     {
         return $file->getExtension() === 'yaml';
+    }
+
+    public function save($container)
+    {
+        File::put($container->path(), $container->fileContents());
     }
 }

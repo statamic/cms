@@ -42,7 +42,7 @@ trait ContainsData
 
     public function data($data = null)
     {
-        if (is_null($data)) {
+        if (func_num_args() === 0) {
             return $this->data;
         }
 

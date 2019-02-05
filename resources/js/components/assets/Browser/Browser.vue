@@ -61,7 +61,7 @@
                             <td @click="selectFolder(folder.path)">
                                 <a class="flex items-center cursor-pointer">
                                     <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                    {{ folder.path }}
+                                    {{ folder.title || folder.path }}
                                 </a>
                             </td>
                             <td :colspan="columns.length" />

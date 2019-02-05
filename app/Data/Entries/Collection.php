@@ -5,47 +5,21 @@ namespace Statamic\Data\Entries;
 use Statamic\API;
 use Statamic\API\Search;
 use Statamic\API\Blueprint;
+use Statamic\Data\ContainsData;
 use Statamic\Contracts\Data\Entries\Collection as Contract;
 
 class Collection implements Contract
 {
+    use ContainsData;
+
     protected $handle;
     protected $route;
     protected $title;
     protected $template;
     protected $layout;
     protected $sites = [];
-    protected $data = [];
     protected $blueprints = [];
     protected $searchIndex;
-
-    public function get($key)
-    {
-        return array_get($this->data, $key);
-    }
-
-    public function has($key)
-    {
-        return $this->get($key) != null;
-    }
-
-    public function set($key, $value)
-    {
-        $this->data[$key] = $value;
-
-        return $this;
-    }
-
-    public function data($data = null)
-    {
-        if (func_num_args() === 0) {
-            return $this->data;
-        }
-
-        $this->data = $data;
-
-        return $this;
-    }
 
     public function handle($handle = null)
     {
