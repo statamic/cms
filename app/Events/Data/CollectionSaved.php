@@ -3,11 +3,11 @@
 namespace Statamic\Events\Data;
 
 use Statamic\API\Path;
-use Statamic\Contracts\Data\DataEvent;
-use Statamic\Data\Entries\Collection;
 use Statamic\Events\Event;
+use Statamic\Data\Entries\Collection;
+use Statamic\Contracts\Data\DataSavedEvent;
 
-class CollectionSaved extends Event implements DataEvent
+class CollectionSaved extends Event implements DataSavedEvent
 {
     /**
      * @var Collection

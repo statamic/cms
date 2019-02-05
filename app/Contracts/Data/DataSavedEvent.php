@@ -2,7 +2,7 @@
 
 namespace Statamic\Contracts\Data;
 
-interface DataEvent
+interface DataSavedEvent
 {
     /**
      * Get contextual data related to event.
