@@ -14,9 +14,6 @@ class GettingStarted extends Widget
      */
     public function html()
     {
-        // Why won't this work on a blade view?
-        // return View::make('statamic::widgets.getting-started');
-
         return view('statamic::widgets.getting-started');
     }
 }
