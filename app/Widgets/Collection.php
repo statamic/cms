@@ -2,11 +2,8 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\API\Collection as CollectionAPI;
-use Statamic\API\Config;
-use Statamic\API\Content;
-use Statamic\API\User;
 use Statamic\Extend\Widget;
+use Statamic\API\Collection as CollectionAPI;
 
 class Collection extends Widget
 {
@@ -14,31 +11,26 @@ class Collection extends Widget
     {
         $collection = $this->config('collection');
 
-        if (! Collection::handleExists($collection)) {
+        if (! CollectionAPI::handleExists($collection)) {
             return "Error: Collection [$collection] doesn't exist.";
         }
 
-        // Ensure the collection can be viewed
-        if ( ! User::getCurrent()->can("collections:{$collection}:view")) {
+        $collection = CollectionAPI::whereHandle($collection);
+
+        if (! auth()->user()->can('view', $collection)) {
             return;
         }
 
-        $collection = Collection::whereHandle($collection);
+        $entries = $collection
+            ->queryEntries()
+            // ->removeUnpublished() // TODO: Reimplement
+            ->limit($this->config('limit', 5))
+            ->get();
 
-        $entries = $collection->entries()
-            ->removeUnpublished()
-            ->limit($this->getInt('limit', 5));
+        $title = $this->config('title', $collection->title());
+        $format = $this->config('date_format', config('statamic.cp.date_format'));
+        $button = __('New :thing', ['thing' => $collection->entryBlueprint()->title()]);
 
-        $title = $this->get('title', $collection->title());
-
-        $format = $this->get('date_format', Config::get('statamic.cp.date_format'));
-
-        $button = array_get(
-                $collection->fieldset()->contents(),
-                'create_title',
-                __('New :thing', ['thing' => $collection->fieldset()->title()])
-        );
-
-        return $this->view('widget', compact('collection', 'entries', 'title', 'format', 'button'));
+        return view('statamic::widgets.collection', compact('collection', 'entries', 'title', 'format', 'button'));
     }
 }
