@@ -7,7 +7,6 @@ use Statamic\Fields\Fieldtype;
 class Markdown extends Fieldtype
 {
     protected $configFields = [
-        'cheatsheet' => ['type' => 'toggle'],
         'container' => ['type' => 'asset_container'],
         'folder' => ['type' => 'asset_folder'],
         'restrict' => ['type' => 'toggle']

@@ -40,13 +40,13 @@
 
                 <div class="editor" ref="codemirror"></div>
 
-                <div class="helpers" v-if="cheatsheet || assetsEnabled">
+                <div class="helpers">
                     <!-- TODO: Fix modal -->
-                    <div class="markdown-cheatsheet-helper" v-if="cheatsheet">
-                        <a href="" @click.prevent="showCheatsheet = true">
+                    <div class="markdown-cheatsheet-helper">
+                        <button @click="showCheatsheet = true">
                             <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" mask="url(#a)"/></svg>
                             {{ __('Markdown Cheatsheet') }}
-                        </a>
+                        </button>
                     </div>
                     <div class="markdown-asset-helper" v-if="assetsEnabled">
                         <a href="" @click.prevent="addAsset"><span class="icon icon-image"></span> {{ __('Add Asset') }}</a> (or drag &amp; drop)
@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview"></div>
+            <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview clean-content"></div>
         </div>
 
         <selector v-if="showAssetSelector"
@@ -81,10 +81,9 @@
             @upload-complete="uploadComplete">
         </uploader> -->
 
-        <!-- TODO: Style this better. -->
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-3 bg-white">
-                <div class="max-w-md mx-auto my-4 content">
+                <div class="max-w-md mx-auto my-4 clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
                 </div>
@@ -469,10 +468,6 @@ export default {
 
         folder: function() {
             return this.config.folder || '/';
-        },
-
-        cheatsheet: function() {
-            return this.config && this.config.cheatsheet;
         },
 
         uploadElement() {
