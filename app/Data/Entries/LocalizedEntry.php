@@ -13,6 +13,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\Localization;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\Data\EntrySaved;
+use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Entries\LocalizedEntry as Contract;
@@ -85,6 +86,8 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function save()
     {
+        EntrySaving::dispatch($this);
+
         API\Entry::save($this);
 
         $this->entry()->addLocalization($this);
