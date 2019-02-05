@@ -23,7 +23,6 @@ class Collection extends Widget
 
         $entries = $collection
             ->queryEntries()
-            // ->removeUnpublished() // TODO: Reimplement
             ->limit($this->config('limit', 5))
             ->get();
 
