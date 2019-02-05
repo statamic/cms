@@ -52,6 +52,8 @@
                     @closed="isSelecting = false"
                 />
             </stack>
+
+            <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
         </div>
     </div>
 
@@ -68,6 +70,7 @@ import InlineCreateForm from './InlineCreateForm.vue';
 export default {
 
     props: {
+        name: String,
         value: { required: true },
         initialData: Array,
         maxItems: Number,
