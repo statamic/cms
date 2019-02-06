@@ -16,7 +16,7 @@
             <div class="flex-1 mr-3">
                 <h3 class="mb-0">Statamic Core Update</h3>
             </div>
-            <a href="{{ cp_route('updater.product.index', 'statamic') }}" class="btn btn-primary min-w-xs block">
+            <a href="{{ cp_route('updater.products.index', 'statamic') }}" class="btn btn-primary min-w-xs block">
                 Update
             </a>
         </div>
@@ -30,7 +30,7 @@
             <div class="flex-1 mr-3">
                 <h3 class="mb-0">{{ $name }}</h3>
             </div>
-            <a href="{{ cp_route('updater.product.index', $slug) }}" class="btn btn-primary min-w-xs block">
+            <a href="{{ cp_route('updater.products.index', $slug) }}" class="btn btn-primary min-w-xs block">
                 Update
             </a>
         </div>

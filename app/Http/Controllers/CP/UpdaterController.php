@@ -18,13 +18,13 @@ class UpdaterController extends CpController
         $updatableAddons = $this->getUpdatableAddons();
 
         if ($updatableAddons->isEmpty()) {
-            return redirect()->route('statamic.cp.updater.product.index', ['statamic']);
+            return redirect()->route('statamic.cp.updater.products.index', ['statamic']);
         }
 
         // TODO: Proper view instead of this inline html.
-        echo '<a href="' . route('statamic.cp.updater.product.index', 'statamic') . '">statamic core</a><br><br>';
+        echo '<a href="' . route('statamic.cp.updater.products.index', 'statamic') . '">statamic core</a><br><br>';
         $updatableAddons->each(function ($addon) {
-            echo '<a href="' . route('statamic.cp.updater.product.index', $addon) . '">' . $addon . '</a><br>';
+            echo '<a href="' . route('statamic.cp.updater.products.index', $addon) . '">' . $addon . '</a><br>';
         });
     }
 
