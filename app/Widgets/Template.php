@@ -8,27 +8,15 @@ use Statamic\Extend\Widget;
 
 class Template extends Widget
 {
+    /**
+     * The HTML that should be shown in the widget
+     *
+     * @return \Illuminate\View\View
+     */
     public function html()
     {
-        // This approach would be nicer at some point.
-        // return app('Statamic\Http\View')->render($this->config, $this->get('template'));
+        $data = $this->config()->except('type', 'template')->all();
 
-        $template = $this->loadTemplate($this->get('template'));
-
-        return Parse::template($template, $this->parameters);
-    }
-
-    /**
-     * Gets the raw contents of the template
-     *
-     * @return string
-     */
-    private function loadTemplate($template)
-    {
-        $template_path = "templates/{$template}.html";
-
-        if (File::disk('resources')->exists($template_path)) {
-            return File::disk('resources')->get($template_path);
-        }
+        return view($this->config('template'), $data);
     }
 }
