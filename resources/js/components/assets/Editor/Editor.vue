@@ -203,7 +203,6 @@ export default {
 
     props: {
         id: String,
-        hasChild: false,
         allowDeleting: {
             type: Boolean,
             default() {
@@ -313,7 +312,6 @@ export default {
          */
         openFocalPointEditor() {
             this.showFocalPointEditor = true;
-            this.hasChild = true;
         },
 
         /**
@@ -321,7 +319,6 @@ export default {
          */
         closeFocalPointEditor() {
             this.showFocalPointEditor = false;
-            this.hasChild = false;
         },
 
         /**
@@ -390,12 +387,10 @@ export default {
 
         openRenamer() {
             this.showRenamer = true;
-            this.hasChild = true;
         },
 
         closeRenamer() {
             this.showRenamer = false;
-            this.hasChild = false;
         },
 
         assetRenamed(asset) {
@@ -405,12 +400,10 @@ export default {
 
         openMover() {
             this.showMover = true;
-            this.hasChild = true;
         },
 
         closeMover() {
             this.showMover = false;
-            this.hasChild = false;
         },
 
         /**
