@@ -16,10 +16,16 @@ abstract class Widget
     /**
      * Get config for use within widget.
      *
-     * @param mixed $key
+     * @param string|null $key
+     * @param mixed $default
+     * @return string|\Illuminate\Support\Collection
      */
-    public function config($key, $default = null)
+    public function config($key = null, $default = null)
     {
+        if (is_null($key)) {
+            return collect($this->config);
+        }
+
         return $this->config[$key] ?? $default;
     }
 
