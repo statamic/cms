@@ -17,7 +17,7 @@ class Date extends Fieldtype
             'default' => false
         ],
         'earliest_date' => [
-            'type' => 'date',
+            'type' => 'text',
             'default' => 'January 1, 1900'
         ],
         'format' => ['type' => 'text']
