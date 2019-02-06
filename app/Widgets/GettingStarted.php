@@ -3,14 +3,13 @@
 namespace Statamic\Widgets;
 
 use Statamic\Extend\Widget;
-use Statamic\View\Antlers\View;
 
 class GettingStarted extends Widget
 {
     /**
      * The HTML that should be shown in the widget
      *
-     * @return string
+     * @return \Illuminate\View\View
      */
     public function html()
     {

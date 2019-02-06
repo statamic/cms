@@ -12,7 +12,6 @@ use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Statamic\API\Nav; // TODO: Remove!
 
 class AppServiceProvider extends ServiceProvider
 {

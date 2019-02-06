@@ -1,9 +1,7 @@
-<?php namespace Statamic\Widgets;
+<?php
 
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Parse;
-use Statamic\API\Config;
+namespace Statamic\Widgets;
+
 use Statamic\Extend\Widget;
 
 class Template extends Widget
