@@ -5,6 +5,7 @@
         <div class="flex mb-3">
             <h1 class="flex-1">{{ container.title }}</h1>
 
+            <a :href="createContainerUrl" class="btn mr-1" v-if="canCreateContainers">Create Container</a>
             <a :href="container.edit_url" class="btn">Edit Container</a>
         </div>
 
@@ -55,6 +56,8 @@ export default {
         initialPath: String,
         actions: Array,
         actionUrl: String,
+        canCreateContainers: Boolean,
+        createContainerUrl: String,
     },
 
 
