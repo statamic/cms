@@ -5,6 +5,7 @@ namespace Tests;
 use Statamic\API\User;
 use Statamic\API\Site;
 use Statamic\API\Entry;
+use Statamic\API\Blueprint;
 use Statamic\API\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
@@ -153,39 +154,33 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
-    function only_content_gets_automatically_parsed_as_markdown()
+    function fields_gets_augmented()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('default', '{{ content }}{{ subtitle }}');
+        $this->viewShouldReturnRaw('default', '{{ augment_me }}{{ dont_augment_me }}');
+        Blueprint::shouldReceive('find')
+            ->with('test')
+            ->andReturn((new \Statamic\Fields\Blueprint)
+                ->setHandle('test')
+                ->setContents(['fields' => [
+                    [
+                        'handle' => 'augment_me',
+                        'field' => ['type' => 'markdown']
+                    ]
+                ]]));
 
         $this->createPage('about', [
             'path' => 'about.md',
             'with' => [
-                'content' => '# Foo *Bar*',
-                'subtitle' => '# Foo *Bar*',
+                'blueprint' => 'test',
+                'augment_me' => '# Foo *Bar*',
+                'dont_augment_me' => '# Foo *Bar*',
             ]
         ]);
 
         $response = $this->get('about');
 
         $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
-    }
-
-    /** @test */
-    function content_gets_automatically_parsed_as_textile()
-    {
-        $this->viewShouldReturnRaw('default', '{{ content }}{{ subtitle }}');
-
-        $this->createPage('test', [
-            'with' => [
-                'content' => 'h1. Foo *Bar*',
-                'subtitle' => 'h1. Foo *Bar*',
-            ]
-        ])->dataType('textile');
-
-        $response = $this->get('test');
-
-        $this->assertEquals("<h1>Foo <strong>Bar</strong></h1>h1. Foo *Bar*", trim($response->content()));
     }
 
     /** @test */
