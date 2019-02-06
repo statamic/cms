@@ -10,12 +10,12 @@
             />
         </div>
 
-        <div v-if="loading" class="asset-browser-loading loading">
+        <div v-if="initializing || loadingContainers" class="asset-browser-loading loading">
             <loading-graphic />
         </div>
 
         <data-list
-            v-if="!loading"
+            v-if="!loadingContainers && !initializing"
             :rows="assets"
             :columns="columns"
             :visible-columns="visibleColumns"
@@ -27,23 +27,18 @@
             <div slot-scope="{ filteredRows: rows }">
 
                 <div class="data-list-header">
-                    <data-list-toggle-all />
+                    <data-list-toggle-all ref="toggleAll" />
                     <data-list-search v-model="searchQuery" />
-                    <data-list-bulk-actions>
-                        <div slot-scope="{ selections, hasSelections }">
-                            <div class="flex items-center" v-if="hasSelections">
-                                <div class="text-xs text-grey-light mr-2">{{ selections.length }} selected</div>
-                                <slot name="actions" :selections="selections" />
-                            </div>
-                            <div v-show="!hasSelections">
-                                <button class="btn">New Folder</button>
-                                <button class="btn ml-1">Upload</button>
-                            </div>
-                        </div>
-                    </data-list-bulk-actions>
                 </div>
 
-                <data-list-table :rows="rows" :allow-bulk-actions="true">
+                <data-list-bulk-actions
+                    :url="actionUrl"
+                    :actions="actions"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                />
+
+                <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
 
                     <template slot="tbody-start">
                         <tr v-if="folder.parent_path && !restrictNavigation">
@@ -77,10 +72,17 @@
 
                     <template slot="actions" slot-scope="{ row: asset }">
                         <dropdown-list>
-                            <ul class="dropdown-menu">
+                            <div class="dropdown-menu">
                                 <li><a @click="edit(asset.id)">Edit</a></li>
-                                <li class="warning"><a @click="destroy(asset.id)">Delete</a></li>
-                            </ul>
+                                <div class="li divider" />
+                                <data-list-inline-actions
+                                    :item="asset.id"
+                                    :url="actionUrl"
+                                    :actions="actions"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                />
+                            </div>
                         </dropdown-list>
                     </template>
 
@@ -109,25 +111,28 @@
 import axios from 'axios';
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
+import HasActions from '../../data-list/HasActions';
 
 export default {
+
+    mixins: [
+        HasActions,
+    ],
 
     components: {
         AssetThumbnail,
         AssetEditor,
     },
 
-    props: [
+    props: {
         // The container to display, determined by a parent component.
         // Either the ID, or the whole container object.
-        'initialContainer',
-
-        'selectedPath',        // The path to display, determined by a parent component.
-
-        'restrictNavigation',  // Whether to restrict to a single folder and prevent navigation.
-        'selectedAssets',
-        'maxFiles'
-    ],
+        initialContainer: Object,
+        selectedPath: String,        // The path to display, determined by a parent component.
+        restrictNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
+        selectedAssets: Array,
+        maxFiles: Number,
+    },
 
     data() {
         return {
@@ -136,6 +141,7 @@ export default {
             loadingContainers: true,
             containers: [],
             container: {},
+            initializing: true,
             loadingAssets: true,
             assets: [],
             path: this.selectedPath,
@@ -192,6 +198,14 @@ export default {
 
     methods: {
 
+        actionStarted() {
+            this.loadingAssets = true;
+        },
+
+        actionCompleted() {
+            this.loadAssets();
+        },
+
         loadContainers() {
             this.loadingContainers = true;
 
@@ -212,11 +226,13 @@ export default {
                 this.folders = folders;
                 this.folder = folder;
                 this.loadingAssets = false;
+                this.initializing = false;
             }).catch(e => {
                 this.$notify.error(e.response.data.message, { dismissible: false });
                 this.assets = [];
                 this.folders = [];
                 this.loadingAssets = false;
+                this.initializing = false;
             });
         },
 

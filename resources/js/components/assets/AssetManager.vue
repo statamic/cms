@@ -14,6 +14,8 @@
                 :initial-container="container"
                 :selected-path="path"
                 :selected-assets="selectedAssets"
+                :actions="actions"
+                :action-url="actionUrl"
                 @navigated="navigate"
                 @selections-updated="updateSelections"
                 @asset-doubleclicked="editAsset"
@@ -48,10 +50,12 @@ export default {
     },
 
 
-    props: [
-        'initialContainer',
-        'initialPath'
-    ],
+    props: {
+        initialContainer: Object,
+        initialPath: String,
+        actions: Array,
+        actionUrl: String,
+    },
 
 
     data() {

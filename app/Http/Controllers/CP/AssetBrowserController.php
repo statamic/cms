@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Str;
+use Statamic\API\Action;
 use Illuminate\Http\Request;
 use Statamic\API\AssetContainer;
 
@@ -28,7 +29,8 @@ class AssetBrowserController extends CpController
 
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),
-            'folder' => $path
+            'folder' => $path,
+            'actions' => Action::for('asset-browser', ['container' => $container]),
         ]);
     }
 

@@ -47,6 +47,7 @@ Route::group([
 
     // Assets
     Route::resource('asset-containers', 'AssetContainersController');
+    Route::post('assets/action', 'AssetActionController')->name('assets.action');
     Route::get('assets/browse', 'AssetBrowserController@index')->name('assets.browse.index');
     Route::get('assets/browse/folders/{container}/{path?}', 'AssetBrowserController@folder')->where('path', '.*');
     Route::get('assets/browse/{container}/{path?}', 'AssetBrowserController@show')->where('path', '.*')->name('assets.browse.show');
