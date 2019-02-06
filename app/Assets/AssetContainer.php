@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\YAML;
@@ -371,8 +372,10 @@ class AssetContainer implements AssetContainerContract
             'title' => $this->title(),
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
-            'assets' => $this->assets->map->data()->reject(function ($data) {
-                return empty(array_filter($data));
+            'assets' => $this->assets->map->data()->map(function ($data) {
+                return Arr::removeNullValues($data);
+            })->reject(function ($data) {
+                return empty($data);
             })->all(),
         ];
     }
