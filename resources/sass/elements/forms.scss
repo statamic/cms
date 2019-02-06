@@ -33,7 +33,7 @@ select {
 
     height: 38px;
 
-    &:focus {
+    &:focus, &:focus-within {
         @apply focus-outline;
     }
 }
