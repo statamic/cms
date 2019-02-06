@@ -100,8 +100,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
-        // TODO: return true;
-        return $this;
+        return true;
     }
 
     public function path()

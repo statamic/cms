@@ -10,6 +10,7 @@ use Statamic\Data\Entries\Entry;
 use Statamic\Events\Data\EntrySaved;
 use Illuminate\Support\Facades\Event;
 use Statamic\Data\Entries\Collection;
+use Statamic\Events\Data\EntrySaving;
 use Statamic\Data\Entries\LocalizedEntry;
 use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\BlueprintRepository;
@@ -333,16 +334,43 @@ class LocalizedEntryTest extends TestCase
     function it_saves_through_the_api()
     {
         Event::fake();
-        API\Entry::spy();
-
-        $entry = (new LocalizedEntry)
-            ->entry((new Entry)->collection(new Collection));
+        $entry = (new LocalizedEntry)->entry((new Entry)->collection(new Collection));
+        API\Entry::shouldReceive('save')->with($entry);
 
         $return = $entry->save();
 
-        $this->assertEquals($entry, $return);
-        API\Entry::shouldHaveReceived('save')->with($entry);
-        Event::assertDispatched(EntrySaved::class); // TODO: Assert about payload.
+        $this->assertTrue($return);
+        Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
+            return $event->data === $entry;
+        });
+        Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
+            return $event->data === $entry;
+        });
+    }
+
+    /** @test */
+    function if_saving_event_returns_false_the_entry_doesnt_save()
+    {
+        API\Entry::spy();
+
+        // TODO: Swap these two lines if/when PR for bug fix is merged.
+        // and remove test class at the bottom of this file.
+        // https://github.com/laravel/framework/pull/27430
+        //
+        // Event::fake([EntrySaved::class]);
+        Event::swap(new FixedEventFake(app('events'), [EntrySaved::class]));
+
+        Event::listen(EntrySaving::class, function () {
+            return false;
+        });
+
+        $entry = (new LocalizedEntry)->entry((new Entry)->collection(new Collection));
+
+        $return = $entry->save();
+
+        $this->assertFalse($return);
+        API\Entry::shouldNotHaveReceived('save');
+        Event::assertNotDispatched(EntrySaved::class);
     }
 
     /** @test */
@@ -492,5 +520,19 @@ EOT;
         $return = $entry->layout('bar');
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->layout());
+    }
+}
+
+class FixedEventFake extends \Illuminate\Support\Testing\Fakes\EventFake
+{
+    public function dispatch($event, $payload = [], $halt = false)
+    {
+        $name = is_object($event) ? get_class($event) : (string) $event;
+
+        if ($this->shouldFakeEvent($name, $payload)) {
+            $this->events[$name][] = func_get_args();
+        } else {
+            return $this->dispatcher->dispatch($event, $payload, $halt);
+        }
     }
 }
