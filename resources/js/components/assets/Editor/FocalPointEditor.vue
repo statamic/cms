@@ -2,18 +2,18 @@
 
     <div class="focal-point">
         <div class="focal-point-toolbox card">
-            <div class="form-group">
+            <div class="form-group p-0">
                 <label>{{ __('Focal Point') }}</label>
-                <small class="help-block">{{ __('cp.focal_point_instructions') }}</small>
+                <small class="help-block">{{ __('focal_point_instructions') }}</small>
                 <div class="focal-point-image inline-block">
                     <img :src="image" @click="define" />
                     <div class="focal-point-reticle" :style="{ top: y+'%', left: x+'%' }"></div>
                 </div>
             </div>
             <div class="flex items-center justify-between">
-                <div class="btn-group">
+                <div>
                     <button type="button" class="btn btn-default" @click.prevent="close">{{ __('Cancel') }}</button>
-                    <button type="button" class="btn btn-default" @click.prevent="reset">{{ __('Reset') }}</button>
+                    <button type="button" class="btn btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
                     <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
                 </div>
                 <div class="focal-point-coordinates">
@@ -28,8 +28,8 @@
                 </div>
             </div>
         </div>
-        <div v-for="n in 9"
-             class="`frame frame-${n+1}`"
+        <div v-for="n in 9" :key="n"
+             :class="`frame frame-${n}`"
              :style="{ backgroundImage: 'url('+bgImage+')', backgroundPosition: bgPosition }">
         </div>
     </div>
