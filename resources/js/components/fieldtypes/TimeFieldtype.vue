@@ -22,9 +22,9 @@
             />
         </div>
         <button class="text-blue text-xs ml-1" tabindex="0"
-              v-if="!isRequired && hasTime"
+              v-if="! required"
               @click="clear" @keyup.enter.space="clear">
-              clear
+              {{ __('clear') }}
         </button>
     </div>
 </template>
@@ -97,10 +97,6 @@ export default {
         hasTime: function() {
             return this.required || this.data !== null;
         },
-
-        isRequired() {
-            return this.required;
-        }
     },
 
     methods: {

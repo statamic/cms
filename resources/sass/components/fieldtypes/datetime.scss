@@ -4,6 +4,7 @@
 
 .daterange {
 	outline: none;
+	width: 100%;
 	.icon-remove { right: 32px; }
 
     .dr-calendar { max-width: 250px; }
@@ -30,18 +31,6 @@
 .daterange--single .dr-input .dr-dates {
     min-width: 60px;
 }
-
-.date-time-container {
-	display: flex;
-
-	.col-date {
-		flex: 1;
-	}
-	.col-time {
-		padding-left: 10px;
-	}
-}
-
 
 /* Time Field
   ========================================================================== */
@@ -90,17 +79,9 @@
 
     .dr-input { border: 0 !important; }
 
-    .col-time {
-        padding: 0 10px;
-        input.form-control {
-            background: #f8f8f8;
-            width: auto;
-            text-align: center;
-        }
-        .colon {
-            background: #fff;
-            margin: 0;
-            padding: 8px 5px;
-        }
+    .colon {
+        background: #fff;
+        margin: 0;
+        padding: 8px 5px;
     }
 }

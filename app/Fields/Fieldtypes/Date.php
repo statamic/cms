@@ -8,13 +8,19 @@ use Statamic\Fields\Fieldtype;
 class Date extends Fieldtype
 {
     protected $configFields = [
-        'allow_blank'   => ['type' => 'toggle'],
-        'allow_time'    => ['type' => 'toggle'],
-        'format'        => ['type' => 'text'],
+        'time_enabled'  => [
+            'type' => 'toggle',
+            'default' => false
+        ],
+        'time_required'  => [
+            'type' => 'toggle',
+            'default' => false
+        ],
         'earliest_date' => [
-            'type'      => 'text',
+            'type'      => 'text', // TODO: use "date"
             'default'   => 'January 1, 1900'
         ],
+        'format'        => ['type' => 'text']
     ];
 
     public function preProcess($data)
