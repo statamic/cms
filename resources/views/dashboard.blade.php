@@ -8,7 +8,7 @@
 
     <div class="widgets">
         @foreach($widgets as $widget)
-            <div class="widget {{ array_get($widget, 'width', 'half')}}">
+            <div class="widget {{ array_get($widget, 'width', 'half')}} mb-3">
                 {!! $widget['html'] !!}
             </div>
         @endforeach

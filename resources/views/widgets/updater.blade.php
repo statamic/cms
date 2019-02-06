@@ -1,4 +1,4 @@
-<div class="card p-0  content">
+<div class="card p-0 content">
     <div class="p-3">
         <h1>Updates Overview</h1>
         @if ($count)
