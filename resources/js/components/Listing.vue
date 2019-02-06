@@ -1,14 +1,18 @@
 <script>
 import axios from 'axios';
+import HasActions from './data-list/HasActions';
+import HasFilters from './data-list/HasFilters';
 
 export default {
+
+    mixins: [
+        HasActions,
+        HasFilters,
+    ],
 
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        filters: Array,
-        actions: Array,
-        actionUrl: String
     },
 
     data() {
@@ -23,7 +27,6 @@ export default {
             perPage: 25, // TODO: Should come from the controller, or a config.
             meta: null,
             searchQuery: '',
-            activeFilters: {},
         }
     },
 
@@ -94,19 +97,6 @@ export default {
         perPageChanged(perPage) {
             this.perPage = perPage;
             this.page = 1;
-        },
-
-        filtersChanged(filters) {
-            this.activeFilters = filters;
-            this.$refs.toggleAll.uncheckAllItems();
-        },
-
-        actionStarted() {
-            this.loading = true;
-        },
-
-        actionCompleted() {
-            this.request();
         }
 
     }
