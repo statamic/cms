@@ -30,7 +30,7 @@ class AssetsController extends CpController
 
         return [
             'asset' => $asset->toArray(),
-            'values' => $fields->values(),
+            'values' => array_merge($asset->data(), $fields->values()),
             'meta' => $fields->meta(),
         ];
     }
@@ -62,7 +62,11 @@ class AssetsController extends CpController
 
         $request->validate((new Validation)->fields($fields)->rules());
 
-        foreach ($fields->values() as $key => $value) {
+        $values = array_merge($fields->values(), [
+            'focus' => $request->focus
+        ]);
+
+        foreach ($values as $key => $value) {
             $asset->set($key, $value);
         }
 
