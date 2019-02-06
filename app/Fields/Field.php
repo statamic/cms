@@ -54,6 +54,7 @@ class Field implements Arrayable
     public function rules()
     {
         $rules = [$this->handle => array_merge(
+            $this->get('required') ? ['required'] : [],
             Validation::explodeRules(array_get($this->config, 'validate')),
             Validation::explodeRules($this->fieldtype()->rules())
         )];
