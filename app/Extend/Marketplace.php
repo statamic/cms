@@ -193,7 +193,7 @@ class Marketplace
     public function findByPackageName($package)
     {
         return collect($this->get()['data'])->first(function ($addon) use ($package) {
-            return strtolower(data_get($addon, 'variants.0.package')) === strtolower($packageName);
+            return strtolower(data_get($addon, 'variants.0.package')) === strtolower($package);
         });
     }
 
