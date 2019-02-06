@@ -12,15 +12,15 @@ class Date extends Fieldtype
             'type' => 'toggle',
             'default' => false
         ],
-        'time_required'  => [
+        'time_required' => [
             'type' => 'toggle',
             'default' => false
         ],
         'earliest_date' => [
-            'type'      => 'text', // TODO: use "date"
-            'default'   => 'January 1, 1900'
+            'type' => 'date',
+            'default' => 'January 1, 1900'
         ],
-        'format'        => ['type' => 'text']
+        'format' => ['type' => 'text']
     ];
 
     public function preProcess($data)
