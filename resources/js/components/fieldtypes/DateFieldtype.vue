@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import moment from 'moment';
 import Calendar from 'baremetrics-calendar';
 
 export default {
@@ -162,6 +161,7 @@ export default {
     },
 
     mounted() {
+
         const timeFormat = 'HH:mm';
         const dateFormat = 'YYYY-MM-DD';
 
