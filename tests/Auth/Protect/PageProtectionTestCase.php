@@ -22,22 +22,22 @@ class PageProtectionTestCase extends TestCase
 
     protected function requestPageProtectedBy($scheme, $headers = [])
     {
-        $this->createPage('test', ['with' => ['protect' => $scheme]]);
+        $this->createPage('test', ['data' => ['protect' => $scheme]]);
 
         return $this->get('test', $headers);
     }
 
     protected function createPage($slug, $attributes = [])
     {
-        $collection = Collection::create('pages');
-        $collection->data(['route' => '{slug}']);
-        $collection->save();
+        $collection = Collection::create('pages')
+            ->route('{slug}')
+            ->template('default');
 
-        return Entry::create($slug)
+        Entry::create()
             ->id($slug)
-            ->collection('pages')
-            ->path(array_get($attributes, 'path', $slug.'.html'))
-            ->with(array_get($attributes, 'with', []))
-            ->save();
+            ->collection($collection)
+            ->in(function ($loc) use ($slug, $attributes) {
+                $loc->slug($slug)->data($attributes['data']);
+            })->save();
     }
 }

@@ -77,6 +77,8 @@ class PasswordProtectionTest extends PageProtectionTestCase
     /** @test */
     function custom_password_form_url_is_unprotected()
     {
+        $this->viewShouldReturnRendered('password-entry', 'Password form template');
+
         config(['statamic.routes.routes' => [
             '/password-entry' => 'password-entry'
         ]]);
@@ -92,6 +94,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
 
         $this
             ->get('/password-entry')
-            ->assertOk();
+            ->assertOk()
+            ->assertSee('Password form template');
     }
 }
