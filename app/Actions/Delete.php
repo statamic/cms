@@ -15,8 +15,6 @@ class Delete extends Action
 
     public function run($items)
     {
-        $items->each(function ($entry) {
-            $entry->set('title', $entry->get('title') . ' (Deleted)')->save();
-        });
+        $items->each->delete();
     }
 }
