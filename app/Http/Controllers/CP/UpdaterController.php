@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\Addon;
 use Illuminate\Http\Request;
-use Facades\Statamic\Updater\UpdatesCount;
+use Facades\Statamic\Updater\UpdatesOverview;
 
 class UpdaterController extends CpController
 {
@@ -37,7 +37,7 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        return UpdatesCount::get($request->input('clearCache', false));
+        return UpdatesOverview::count($request->input('clearCache', false));
     }
 
     /**

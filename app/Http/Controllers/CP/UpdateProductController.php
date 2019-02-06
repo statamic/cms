@@ -7,7 +7,6 @@ use Statamic\API\Addon;
 use Illuminate\Http\Request;
 use Statamic\Updater\Updater;
 use Statamic\Updater\Changelog;
-use Facades\Statamic\Updater\UpdatesCount;
 use Facades\Statamic\Console\Processes\Composer;
 
 class UpdateProductController extends CpController
