@@ -63,7 +63,8 @@ textarea.input-text {
     }
 }
 
-.radio-fieldtype .inline-mode {
+.radio-fieldtype .inline-mode,
+.checkboxes-fieldtype .inline-mode {
     @apply flex items-center;
 
     .option {

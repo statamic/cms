@@ -1,5 +1,5 @@
 <template>
-    <div class="checkbox-fieldtype-wrapper">
+    <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
         <div class="option" v-for="(option, $index) in config.options" :key="$index">
             <input type="checkbox"
                    :name="name + '[]'"

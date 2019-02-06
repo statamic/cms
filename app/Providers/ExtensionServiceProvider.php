@@ -113,6 +113,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $fieldtypes = [
         Fieldtypes\Assets::class,
         Fieldtypes\Blueprints::class,
+        Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Date::class,
