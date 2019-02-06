@@ -14,6 +14,10 @@ class Updater extends Widget
      */
     public function html()
     {
+        if (! auth()->user()->can('view updates')) {
+            return;
+        }
+
         $count = UpdatesOverview::count();
         $hasStatamicUpdate = UpdatesOverview::hasStatamicUpdate();
         $updatableAddons = UpdatesOverview::updatableAddons();
