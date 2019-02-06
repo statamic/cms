@@ -122,8 +122,8 @@
                     v-if="fields"
                     name="asset"
                     :fieldset="fieldset"
-                    :values="initialValues"
-                    :meta="initialMeta"
+                    :values="values"
+                    :meta="meta"
                     :errors="errors"
                     @updated="values = $event"
                 >
@@ -218,7 +218,7 @@ export default {
             saving: false,
             asset: null,
             values: {},
-            initialValues: null,
+            meta: {},
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
@@ -279,9 +279,8 @@ export default {
 
             axios.get(url).then(response => {
                 this.asset = response.data.asset;
-                this.initialValues = response.data.values;
-                this.initialMeta = response.data.meta;
-                this.values = this.initialValues;
+                this.values = response.data.values;
+                this.meta = response.data.meta;
                 this.getFieldset();
             });
         },
