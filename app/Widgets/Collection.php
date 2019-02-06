@@ -7,6 +7,11 @@ use Statamic\API\Collection as CollectionAPI;
 
 class Collection extends Widget
 {
+    /**
+     * The HTML that should be shown in the widget
+     *
+     * @return \Illuminate\View\View
+     */
     public function html()
     {
         $collection = $this->config('collection');

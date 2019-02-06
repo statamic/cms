@@ -9,6 +9,11 @@ use Statamic\Statamic;
 
 class Updater extends Widget
 {
+    /**
+     * The HTML that should be shown in the widget
+     *
+     * @return \Illuminate\View\View
+     */
     public function html()
     {
         $success = true;
