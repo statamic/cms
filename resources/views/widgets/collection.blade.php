@@ -13,12 +13,11 @@
                         </a>
                     </td>
 
-                    {{-- TODO: Entry order type? --}}
-                    {{-- @if ($entry->orderType() === 'date') --}}
-                    <td class="minor text-right">
-                        {{ ($entry->date()->diffInDays() <= 14) ? $entry->date()->diffForHumans() : $entry->date()->format($format) }}
-                    </td>
-                    {{-- @endif --}}
+                    @if ($entry->date())
+                        <td class="minor text-right">
+                            {{ ($entry->date()->diffInDays() <= 14) ? $entry->date()->diffForHumans() : $entry->date()->format($format) }}
+                        </td>
+                    @endif
                 </tr>
             @endforeach
         </table>
