@@ -327,17 +327,17 @@ class FrontendTest extends TestCase
         // the 'response_code' key var is 404
     }
 
-    private function createPage($slug, $factoryAttributes = [])
+    private function createPage($slug, $attributes = [])
     {
-        $collection = Collection::create('pages');
-        $collection->data(['route' => '{slug}']);
-        $collection->save();
+        $collection = Collection::create('pages')
+            ->route('{slug}')
+            ->template('default');
 
-        return Entry::create($slug)
+        return Entry::create()
             ->id($slug)
-            ->collection('pages')
-            ->path(array_get($factoryAttributes, 'path', $slug.'.html'))
-            ->with(array_get($factoryAttributes, 'with', []))
-            ->save();
+            ->collection($collection)
+            ->in(function ($loc) use ($slug, $attributes) {
+                $loc->slug($slug)->data($attributes['with'] ?? []);
+            })->save();
     }
 }
