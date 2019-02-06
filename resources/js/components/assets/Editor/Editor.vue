@@ -155,13 +155,15 @@
 
         </template>
 
-        <focal-point-editor
-            v-if="showFocalPointEditor"
-            :data="values.focus"
-            :image="asset.preview"
-            @selected="selectFocalPoint"
-            @closed="closeFocalPointEditor">
-        </focal-point-editor>
+        <portal to="outside">
+            <focal-point-editor
+                v-if="showFocalPointEditor"
+                :data="values.focus"
+                :image="asset.preview"
+                @selected="selectFocalPoint"
+                @closed="closeFocalPointEditor">
+            </focal-point-editor>
+        </portal>
 
         <renamer
             v-if="showRenamer"
