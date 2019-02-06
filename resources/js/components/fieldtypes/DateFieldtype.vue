@@ -141,7 +141,7 @@ export default {
             this.calendar = new Calendar({
                 element: $(self.$refs.date),
                 current_date: moment(date),
-                earliest_date: self.config.earliest_date || "January 1, 1900",
+                earliest_date: self.config.earliest_date || "1900-01-01",
                 format: {
                     input: self.config.format,
                     jump_month: 'MMMM',
