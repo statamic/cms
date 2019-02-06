@@ -2,6 +2,7 @@
 
 namespace Statamic\Updater;
 
+use Carbon\Carbon;
 use Statamic\Statamic;
 use Statamic\API\Addon;
 use Illuminate\Support\Facades\Cache;
@@ -73,7 +74,7 @@ class UpdatesCount
      */
     protected function cacheCount()
     {
-        Cache::put('updates-count', $this->count, 60);
+        Cache::put('updates-count', $this->count, Carbon::now()->addMinutes(1));
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Carbon\Carbon;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -44,9 +45,9 @@ class CacheServiceProvider extends ServiceProvider
         Cache::macro('rememberWithExpiration', function ($cacheKey, $callback) {
             $keyValuePair = $callback();
             $value = reset($keyValuePair);
-            $expirationInMinutes = key($keyValuePair);
+            $expiration = Carbon::now()->addMinutes(key($keyValuePair));
 
-            return Cache::remember($cacheKey, $expirationInMinutes, function () use ($value) {
+            return Cache::remember($cacheKey, $expiration, function () use ($value) {
                 return $value;
             });
         });
