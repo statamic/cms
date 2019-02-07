@@ -232,28 +232,70 @@ class Parser
                 // Must be a callback block. Extract it so it doesn't
                 // conflict with local scope variables in the next step.
                 $text = $this->createExtraction('callback_blocks', $match[0][0], $match[0][0], $text);
+                continue;
+            }
+
+            $looped_text = '';
+            $index = 0;
+
+            if ($loop_data instanceof Arrayable) {
+                $loop_data = $loop_data->toArray();
+            }
+
+            // If it's not an array, the user is trying to loop over something unloopable.
+            if (!is_array($loop_data)) {
+                $loop_data = [];
+                Log::debug("Cannot loop over non-loopable variable: {{ $var }}");
+            }
+
+            // is this a list, or simply a set of named variables?
+            if ((bool) count(array_filter(array_keys($loop_data), 'is_string'))) {
+                // this is a set of named variables, don't actually loop over and over,
+                // instead, parse the inner contents with this set's local variables that
+                // have been merged into the bigger scope
+
+                // merge this local data with callback data before performing actions
+                $loop_value = $loop_data + $data + $this->callbackData;
+
+                // perform standard actions
+                $str = $this->extractLoopedTags($match[2][0], $loop_value);
+                $str = $this->parseConditionals($str, $loop_value);
+                $str = $this->injectExtractions($str, 'looped_tags');
+                $str = $this->parseVariables($str, $loop_value);
+
+                if (!is_null($this->callback)) {
+                    $str = $this->injectExtractions($str, 'callback_blocks');
+                    $str = $this->parseCallbackTags($str, $loop_value);
+                }
+
+                $looped_text .= $str;
+                $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($looped_text, '\\$'), $text, 1);
             } else {
-                $looped_text = '';
-                $index = 0;
+                // this is a list, let's loop
+                $total_results = count($loop_data);
 
-                if ($loop_data instanceof Arrayable) {
-                    $loop_data = $loop_data->toArray();
-                }
+                foreach ($loop_data as $loop_key => $loop_value) {
+                    $index++;
 
-                // If it's not an array, the user is trying to loop over something unloopable.
-                if (!is_array($loop_data)) {
-                    $loop_data = [];
-                    Log::debug("Cannot loop over non-loopable variable: {{ $var }}");
-                }
+                    // is the value an array?
+                    if (! is_array($loop_value)) {
+                        // no, make it one
+                        $loop_value = [
+                            'value' => $loop_value,
+                            'name'  => $loop_value // alias for backwards compatibility
+                        ];
+                    }
 
-                // is this a list, or simply a set of named variables?
-                if ((bool) count(array_filter(array_keys($loop_data), 'is_string'))) {
-                    // this is a set of named variables, don't actually loop over and over,
-                    // instead, parse the inner contents with this set's local variables that
-                    // have been merged into the bigger scope
+                    // set contextual loop vars
+                    $loop_value['key']           = $loop_key;
+                    $loop_value['index']         = $index;
+                    $loop_value['zero_index']    = $index - 1;
+                    $loop_value['total_results'] = $total_results;
+                    $loop_value['first']         = ($index === 1) ? true : false;
+                    $loop_value['last']          = ($index === $loop_value['total_results']) ? true : false;
 
                     // merge this local data with callback data before performing actions
-                    $loop_value = $loop_data + $data + $this->callbackData;
+                    $loop_value = $loop_value + $data + $this->callbackData;
 
                     // perform standard actions
                     $str = $this->extractLoopedTags($match[2][0], $loop_value);
@@ -267,50 +309,9 @@ class Parser
                     }
 
                     $looped_text .= $str;
-                    $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($looped_text, '\\$'), $text, 1);
-                } else {
-                    // this is a list, let's loop
-                    $total_results = count($loop_data);
-
-                    foreach ($loop_data as $loop_key => $loop_value) {
-                        $index++;
-
-                        // is the value an array?
-                        if (! is_array($loop_value)) {
-                            // no, make it one
-                            $loop_value = [
-                                'value' => $loop_value,
-                                'name'  => $loop_value // alias for backwards compatibility
-                            ];
-                        }
-
-                        // set contextual loop vars
-                        $loop_value['key']           = $loop_key;
-                        $loop_value['index']         = $index;
-                        $loop_value['zero_index']    = $index - 1;
-                        $loop_value['total_results'] = $total_results;
-                        $loop_value['first']         = ($index === 1) ? true : false;
-                        $loop_value['last']          = ($index === $loop_value['total_results']) ? true : false;
-
-                        // merge this local data with callback data before performing actions
-                        $loop_value = $loop_value + $data + $this->callbackData;
-
-                        // perform standard actions
-                        $str = $this->extractLoopedTags($match[2][0], $loop_value);
-                        $str = $this->parseConditionals($str, $loop_value);
-                        $str = $this->injectExtractions($str, 'looped_tags');
-                        $str = $this->parseVariables($str, $loop_value);
-
-                        if (!is_null($this->callback)) {
-                            $str = $this->injectExtractions($str, 'callback_blocks');
-                            $str = $this->parseCallbackTags($str, $loop_value);
-                        }
-
-                        $looped_text .= $str;
-                    }
-
-                    $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($looped_text, '\\$'), $text, 1);
                 }
+
+                $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($looped_text, '\\$'), $text, 1);
             }
         }
 
