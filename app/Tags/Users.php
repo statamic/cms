@@ -6,9 +6,8 @@ use Statamic\API\Role;
 use Statamic\API\Term;
 use Statamic\API\User;
 use Statamic\API\UserGroup;
-use Statamic\Addons\Collection\CollectionTags;
 
-class Users extends CollectionTags
+class Users extends Collection
 {
     public function index()
     {

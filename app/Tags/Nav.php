@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
 use Statamic\API\Str;
-use Statamic\API\Content;
+use Statamic\API\URL;
 use Statamic\Tags\Tags;
+use Statamic\API\Content;
 
 class Nav extends Tags
 {

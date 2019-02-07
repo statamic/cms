@@ -3,9 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\API\Str;
+use Statamic\Tags\Tags;
 use Statamic\API\Config;
 use Statamic\API\Content;
-use Statamic\Tags\Tags;
 use Illuminate\Support\Collection;
 
 class Locales extends Tags

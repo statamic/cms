@@ -4,13 +4,15 @@ namespace Statamic\Auth;
 
 use Statamic\API\URL;
 use Statamic\API\User;
+use Statamic\Tags\Tags;
 use Statamic\API\Request;
-use Statamic\Extend\Tags;
 use Statamic\Exceptions\RedirectException;
 use Statamic\Contracts\Auth\User as UserContract;
 
 class UserTags extends Tags
 {
+    protected static $handle = 'user';
+
     /**
      * Dynamically fetch a user's data by variable_name
      *

@@ -2,19 +2,19 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Collection;
-use Statamic\API\Entry;
-use Statamic\API\Term;
-use Statamic\API\URL;
 use Statamic\API\Str;
+use Statamic\API\URL;
+use Statamic\API\Term;
+use Statamic\API\Entry;
+use Statamic\Tags\Tags;
 use Statamic\API\Helper;
 use Statamic\API\Request;
-use Statamic\Tags\Tags;
-use Statamic\Extend\Management\FilterLoader;
 use Statamic\Data\Content\ContentCollection;
+use Statamic\Extend\Management\FilterLoader;
 use Statamic\Presenters\PaginationPresenter;
-use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\API\Collection as CollectionAPI;
 use Statamic\SiteHelpers\Filters as SiteHelperFilters;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 class Collection extends Tags
 {
@@ -134,7 +134,7 @@ class Collection extends Tags
         $collections = Helper::ensureArray($collection);
 
         foreach ($collections as $collection) {
-            if (! Collection::handleExists($collection)) {
+            if (! CollectionAPI::handleExists($collection)) {
                 throw new \Exception("Collection [$collection] doesn't exist.");
             }
         }
@@ -176,7 +176,7 @@ class Collection extends Tags
             array_get($this->context, 'page.default_slug'),
             array_get($this->context, 'page.taxonomy')
         );
-        
+
         return ($data) ? $data->collection() : $data;
     }
 

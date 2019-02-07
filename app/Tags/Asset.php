@@ -2,11 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Asset;
 use Statamic\API\Helper;
-use Statamic\Addons\Assets\AssetsTags;
+use Statamic\API\Asset as AssetAPI;
 
-class Asset extends AssetsTags
+class Asset extends Assets
 {
     /**
      * Gets a single Asset's data from a value
@@ -40,7 +39,7 @@ class Asset extends AssetsTags
      */
     public function index()
     {
-        $asset = Asset::find($this->get('url'));
+        $asset = AssetAPI::find($this->get('url'));
 
         return $asset ? $asset->toArray() : $asset;
     }

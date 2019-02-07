@@ -2,18 +2,17 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Data;
 use Statamic\API\Str;
+use Statamic\API\Data;
 use Statamic\API\User;
 use Statamic\API\Helper;
 use Statamic\API\Content;
 use Statamic\API\Pattern;
 use Statamic\API\Term as TermAPI;
-use Statamic\Contracts\Data\Taxonomies\Term;
 use Statamic\Data\ContentCollection;
-use Statamic\Addons\Collection\CollectionTags;
+use Statamic\Contracts\Data\Taxonomies\Term;
 
-class Relate extends CollectionTags
+class Relate extends Collection
 {
     public function __call($method, $args)
     {

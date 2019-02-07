@@ -3,8 +3,8 @@
 namespace Statamic\Tags;
 
 use Statamic\API\URL;
-use Statamic\API\Config;
 use Statamic\Tags\Tags;
+use Statamic\API\Config;
 
 class Routes extends Tags
 {

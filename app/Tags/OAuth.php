@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\OAuth;
 use Statamic\Tags\Tags;
+use Statamic\API\OAuth as OAuthAPI;
 
 class OAuth extends Tags
 {
@@ -41,7 +41,7 @@ class OAuth extends Tags
      */
     protected function generateLoginUrl($provider)
     {
-        $url = OAuth::route($provider);
+        $url = OAuthAPI::route($provider);
 
         if ($redirect = $this->get('redirect')) {
             $url .= "?redirect=$redirect";

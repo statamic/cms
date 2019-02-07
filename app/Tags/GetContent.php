@@ -5,9 +5,8 @@ namespace Statamic\Tags;
 use Statamic\API\URL;
 use Statamic\API\Helper;
 use Statamic\API\Content;
-use Statamic\Addons\Collection\CollectionTags;
 
-class GetContent extends CollectionTags
+class GetContent extends Collection
 {
     /**
      * The {{ get_content:[foo] }} tag

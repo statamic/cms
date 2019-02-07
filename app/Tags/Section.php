@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\View\Store;
 use Statamic\Tags\Tags;
+use Statamic\View\Store;
 
 class Section extends Tags
 {

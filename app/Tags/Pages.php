@@ -2,13 +2,12 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Page;
-use Statamic\API\URL;
 use Statamic\API\Str;
+use Statamic\API\URL;
+use Statamic\API\Page;
 use Statamic\API\Content;
-use Statamic\Addons\Collection\CollectionTags;
 
-class Pages extends CollectionTags
+class Pages extends Collection
 {
     /**
      * Maps to `{{ pages }}`

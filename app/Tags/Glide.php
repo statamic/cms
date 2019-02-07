@@ -6,9 +6,9 @@ use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\API\Asset;
 use Statamic\API\Image;
-use Statamic\API\Config;
-use League\Glide\Server;
 use Statamic\Tags\Tags;
+use League\Glide\Server;
+use Statamic\API\Config;
 use Statamic\Imaging\ImageGenerator;
 
 class Glide extends Tags

@@ -2,11 +2,13 @@
 
 namespace Statamic\Auth\Protect;
 
+use Statamic\Tags\Tags as BaseTags;
 use Illuminate\Support\ViewErrorBag;
-use Statamic\Extend\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
+    protected static $handle = 'protect';
+
     public function passwordForm()
     {
         if (! $token = request('token')) {

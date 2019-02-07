@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Addons\User\UserTags;
+use Statamic\Auth\UserTags;
 
 class Member extends UserTags
 {
-
+    protected static $handle = 'member';
 }

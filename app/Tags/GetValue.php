@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Content;
 use Statamic\Tags\Tags;
+use Statamic\API\Content;
 
 class GetValue extends Tags
 {

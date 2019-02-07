@@ -3,10 +3,12 @@
 namespace Statamic\Search;
 
 use Statamic\API\Search;
-use Statamic\Extend\Tags as BaseTags;
+use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
+    protected static $handle = 'search';
+
     public function results()
     {
         $results = Search::index($this->get('index'))

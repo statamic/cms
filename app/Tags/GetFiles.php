@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Tags\Tags;
 use Statamic\API\Folder;
 use Statamic\API\Helper;
-use Statamic\Tags\Tags;
 use Statamic\FileCollection;
 
 class GetFiles extends Tags

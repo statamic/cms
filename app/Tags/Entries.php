@@ -2,12 +2,11 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
 use Statamic\API\Str;
+use Statamic\API\URL;
 use Statamic\API\Page;
-use Statamic\Addons\Collection\CollectionTags;
 
-class Entries extends CollectionTags
+class Entries extends Collection
 {
     /**
      * Catch-all for any child tags

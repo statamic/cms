@@ -2,12 +2,12 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Helper;
-use Statamic\API\Page;
 use Statamic\API\Str;
-use Statamic\API\Content;
+use Statamic\API\Page;
 use Statamic\API\Term;
 use Statamic\Tags\Tags;
+use Statamic\API\Helper;
+use Statamic\API\Content;
 use Statamic\Extend\Management\FilterLoader;
 use Statamic\SiteHelpers\Filters as SiteHelperFilters;
 
