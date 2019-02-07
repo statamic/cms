@@ -24,6 +24,10 @@ class ParserTest extends TestCase
                 ['string' => 'the first string'],
                 ['string' => 'the second string']
             ],
+            'associative' => [
+                'one' => 'hello',
+                'two' => 'wilderness',
+            ],
             'date' => 'June 19 2012',
             'content' => "Paragraph"
         ];
@@ -45,9 +49,85 @@ class ParserTest extends TestCase
 
     public function testListVariable()
     {
-        $template = "{{ simple }}{{ value }}{{ /simple }}";
+        $template = <<<EOT
+{{ simple }}
+    {{ value }}, {{ key or "0" }}, {{ index or "0" }}, {{ zero_index or "0" }}, {{ total_results }}
+    {{ if first }}first{{ elseif last }}last{{ else }}neither{{ /if }}
 
-        $this->assertEquals('onetwothree', Antlers::parse($template, $this->variables));
+
+{{ /simple }}
+EOT;
+
+$expected = <<<EOT
+    one, 0, 1, 0, 3
+    first
+
+    two, 1, 2, 1, 3
+    neither
+
+    three, 2, 3, 2, 3
+    last
+
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    public function testComplexArrayVariable()
+    {
+        $template = <<<EOT
+{{ complex }}
+    {{ string }}, {{ key or "0" }}, {{ index or "0" }}, {{ zero_index or "0" }}, {{ total_results }}
+    {{ if first }}first{{ elseif last }}last{{ else }}neither{{ /if }}
+
+
+{{ /complex }}
+EOT;
+
+$expected = <<<EOT
+    the first string, 0, 1, 0, 2
+    first
+
+    the second string, 1, 2, 1, 2
+    last
+
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    public function testAssociativeArrayVariable()
+    {
+        $template = <<<EOT
+{{ associative }}
+    {{ one }}
+    {{ two }}
+    {{ value or "no value" }}
+    {{ key or "no key" }}
+    {{ index or "no index" }}
+    {{ zero_index or "no zero_index" }}
+    {{ total_results or "no total_results" }}
+    {{ first or "no first" }}
+    {{ last or "no last" }}
+{{ /associative }}
+EOT;
+
+$expected = <<<EOT
+    hello
+    wilderness
+    no value
+    no key
+    no index
+    no zero_index
+    no total_results
+    no first
+    no last
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
     }
 
     public function testNonExistantVariablesShouldBeNull()
