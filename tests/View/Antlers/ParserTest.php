@@ -3,9 +3,7 @@
 namespace Tests\View\Antlers;
 
 use Tests\TestCase;
-use Statamic\API\Term;
 use Statamic\API\Antlers;
-use Statamic\API\Taxonomy;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
 
@@ -321,27 +319,6 @@ class ParserTest extends TestCase
         $this->assertEquals(
             '[1.1][1.2][2.1]',
             Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
-        );
-    }
-
-    public function testTermsAreConvertedToArrays()
-    {
-        $this->markTestSkipped(); // Until taxonomies are reimplemented.
-
-        Taxonomy::shouldReceive('whereHandle')->with('tags')->andReturn(
-            new \Statamic\Data\Taxonomies\Taxonomy
-        );
-
-        $variables = [
-            'tags' => [
-                Term::create('foo')->taxonomy('tags')->get(),
-                Term::create('bar')->taxonomy('tags')->get(),
-            ]
-        ];
-
-        $this->assertEquals(
-            '[foo][bar]',
-            Antlers::parse('{{ tags }}[{{ slug }}]{{ /tags }}', $variables)
         );
     }
 
