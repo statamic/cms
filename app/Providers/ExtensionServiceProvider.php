@@ -162,8 +162,6 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->app['statamic.tags'][$tag::handle()] = $tag;
         }
 
-        dd($this->app['statamic.tags']);
-
         $this->registerExtensionsInAppFolder('Tags');
     }
 
