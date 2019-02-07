@@ -372,7 +372,7 @@ class Parser
                         // prevent arrays trying to be printed as a string
                         if (is_array($val)) {
                             $val = null;
-                            \Log::error("Cannot render an array variable as a string: {{ $var }}");
+                            \Log::debug("Cannot render an array variable as a string: {{ $var }}");
                         }
 
                         // If an object can be cast to a string, great. If not, prevent it.
@@ -381,7 +381,7 @@ class Parser
                                 $val = (string) $val;
                             } else {
                                 $val = null;
-                                \Log::error("Cannot render an object variable as a string: {{ $var }}");
+                                \Log::debug("Cannot render an object variable as a string: {{ $var }}");
                             }
                         }
 

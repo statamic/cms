@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Statamic\API\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Support\Arrayable;
 
 class ParserTest extends TestCase
@@ -59,11 +60,12 @@ class ParserTest extends TestCase
     /** @test */
     function non_arrays_cannot_be_looped()
     {
+        Log::shouldReceive('debug')->once()
+            ->with('Cannot loop over non-loopable variable: {{ string }}');
+
         $template = "{{ string }} {{ /string }}";
 
         $this->assertEquals('', Antlers::parse($template, $this->variables));
-
-        // TODO: Assert about log message
     }
 
     public function testStaticStringsWithDoubleQuotesShouldBeLeftAlone()
@@ -110,11 +112,12 @@ class ParserTest extends TestCase
 
     public function testUnclosedArrayVariablePairsShouldBeNull()
     {
+        Log::shouldReceive('debug')->once()
+            ->with('Cannot render an array variable as a string: {{ simple }}');
+
         $template = "{{ simple }}";
 
         $this->assertEquals(null, Antlers::parse($template, $this->variables));
-
-        // TODO: Assert about log message
     }
 
     public function testSingleCondition()
@@ -539,11 +542,12 @@ class ParserTest extends TestCase
     /** @test */
     function it_doesnt_output_anything_if_object_cannot_be_cast_to_a_string()
     {
+        Log::shouldReceive('debug')->once()
+            ->with('Cannot render an object variable as a string: {{ object }}');
+
         $object = new class {};
 
         $this->assertEquals('', Antlers::parse('{{ object }}', compact('object')));
-
-        // TODO: Assert about log message
     }
 
     /** @test */
@@ -565,6 +569,12 @@ class ParserTest extends TestCase
                 'object' => $arrayableObject
             ])
         );
+    }
+
+    function it_cannot_cast_non_arrayable_objects_to_arrays_when_using_tag_pairs()
+    {
+        Log::shouldReceive('debug')->once()
+            ->with('Cannot loop over non-loopable variable: {{ object }}');
 
         $this->assertEquals(
             '',
@@ -572,7 +582,6 @@ class ParserTest extends TestCase
                 'object' => $nonArrayableObject
             ])
         );
-        // TODO: Assert about log message
     }
 }
 
