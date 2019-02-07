@@ -8,6 +8,7 @@ use Statamic\API\Helper;
 use Statamic\View\Modify;
 use Statamic\Fields\Value;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Statamic\Exceptions\ParsingException;
 use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
@@ -239,7 +240,7 @@ class Parser
                     // If it's not an array, the user is trying to loop over something unloopable.
                     if (!is_array($loop_data)) {
                         $loop_data = [];
-                        \Log::debug("Cannot loop over non-loopable variable: {{ $var }}");
+                        Log::debug("Cannot loop over non-loopable variable: {{ $var }}");
                     }
 
                     // is this a list, or simply a set of named variables?
@@ -372,7 +373,7 @@ class Parser
                         // prevent arrays trying to be printed as a string
                         if (is_array($val)) {
                             $val = null;
-                            \Log::debug("Cannot render an array variable as a string: {{ $var }}");
+                            Log::debug("Cannot render an array variable as a string: {{ $var }}");
                         }
 
                         // If an object can be cast to a string, great. If not, prevent it.
@@ -381,7 +382,7 @@ class Parser
                                 $val = (string) $val;
                             } else {
                                 $val = null;
-                                \Log::debug("Cannot render an object variable as a string: {{ $var }}");
+                                Log::debug("Cannot render an object variable as a string: {{ $var }}");
                             }
                         }
 
@@ -1263,7 +1264,7 @@ class Parser
         try {
             return Modify::value($data->value())->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
-            \Log::notice(
+            Log::notice(
                 sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage())
             );
 
