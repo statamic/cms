@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class TransChoice extends Tag
+class TransChoice extends Tags
 {
     /**
      * The {{ trans_choice }} tag.

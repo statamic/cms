@@ -5,9 +5,9 @@ namespace Statamic\Tags;
 use Statamic\API\URL;
 use Statamic\API\Str;
 use Statamic\API\Content;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Nav extends Tag
+class Nav extends Tags
 {
     /**
      * @var  \Statamic\Addons\Nav\TreeFactory

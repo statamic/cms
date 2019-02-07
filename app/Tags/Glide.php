@@ -8,10 +8,10 @@ use Statamic\API\Asset;
 use Statamic\API\Image;
 use Statamic\API\Config;
 use League\Glide\Server;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\Imaging\ImageGenerator;
 
-class Glide extends Tag
+class Glide extends Tags
 {
     /**
      * Maps to {{ glide:[field] }}

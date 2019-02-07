@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Dump extends Tag
+class Dump extends Tags
 {
     public function index()
     {

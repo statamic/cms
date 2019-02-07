@@ -2,14 +2,14 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
 use Statamic\API\URL;
 use Statamic\API\Parse;
 use Statamic\API\Content;
 use Stringy\StaticStringy as Stringy;
 
-class Parent extends Tag
+class Parent extends Tags
 {
     /**
      * The {{ parent:[field] }} tag

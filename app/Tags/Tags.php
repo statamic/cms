@@ -10,7 +10,7 @@ use Statamic\Extend\HasHandle;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 
-abstract class Tag
+abstract class Tags
 {
     use HasHandle, HasParameters;
 

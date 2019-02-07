@@ -9,14 +9,14 @@ use Statamic\API\URL;
 use Statamic\API\Str;
 use Statamic\API\Helper;
 use Statamic\API\Request;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\Extend\Management\FilterLoader;
 use Statamic\Data\Content\ContentCollection;
 use Statamic\Presenters\PaginationPresenter;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\SiteHelpers\Filters as SiteHelperFilters;
 
-class Collection extends Tag
+class Collection extends Tags
 {
     /**
      * @var \Statamic\Data\Content\ContentCollection

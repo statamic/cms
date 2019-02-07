@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Is extends Tag
+class Is extends Tags
 {
     /**
      * Maps to {{ is:[role] }}

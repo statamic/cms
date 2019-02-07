@@ -5,10 +5,10 @@ namespace Statamic\Tags;
 use Statamic\API\Str;
 use Statamic\API\Config;
 use Statamic\API\Content;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Illuminate\Support\Collection;
 
-class Locales extends Tag
+class Locales extends Tags
 {
     /**
      * @var \Statamic\Contracts\Data\Content\Content

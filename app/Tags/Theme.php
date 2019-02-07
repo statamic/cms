@@ -8,9 +8,9 @@ use Statamic\API\Path;
 use Statamic\API\Parse;
 use Statamic\API\Config;
 use Statamic\API\Str;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Theme extends Tag
+class Theme extends Tags
 {
     /**
      * Catch-all for dynamic theme tags.

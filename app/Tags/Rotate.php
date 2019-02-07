@@ -3,9 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\API\Helper;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Rotate extends Tag
+class Rotate extends Tags
 {
     /**
      * The {{ rotate }} tag

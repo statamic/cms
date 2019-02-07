@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\Exceptions\UrlNotFoundException;
 
-class NotFound extends Tag
+class NotFound extends Tags
 {
     public function index()
     {

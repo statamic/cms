@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Env extends Tag
+class Env extends Tags
 {
     public function __call($method, $arguments)
     {

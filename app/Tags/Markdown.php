@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Markdown extends Tag
+class Markdown extends Tags
 {
     public function index()
     {

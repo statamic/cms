@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class In extends Tag
+class In extends Tags
 {
     /**
      * Maps to {{ in:[group] }}

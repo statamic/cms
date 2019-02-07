@@ -5,9 +5,9 @@ namespace Statamic\Tags;
 use Statamic\API\URL;
 use Statamic\API\Path;
 use Statamic\API\Config;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Path extends Tag
+class Path extends Tags
 {
     /**
      * Maps to the {{ path }} tag

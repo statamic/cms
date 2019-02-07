@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\Exceptions\RedirectException;
 
-class Redirect extends Tag
+class Redirect extends Tags
 {
     public function index()
     {

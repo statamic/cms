@@ -3,9 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\API\Content;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class GetValue extends Tag
+class GetValue extends Tags
 {
     /**
      * Maps to {{ get_value:[field] }}

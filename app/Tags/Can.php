@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Can extends Tag
+class Can extends Tags
 {
     /**
      * Maps to {{ can:[permission] }}

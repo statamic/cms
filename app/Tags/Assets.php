@@ -5,10 +5,10 @@ namespace Statamic\Tags;
 use Statamic\API\Asset;
 use Statamic\API\AssetContainer;
 use Statamic\API\Helper;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\Assets\AssetCollection;
 
-class Assets extends Tag
+class Assets extends Tags
 {
     /**
      * @var AssetCollection

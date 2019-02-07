@@ -4,10 +4,10 @@ namespace Statamic\Tags;
 
 use Statamic\API\Folder;
 use Statamic\API\Helper;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\FileCollection;
 
-class GetFiles extends Tag
+class GetFiles extends Tags
 {
     /**
      * @var \Statamic\FileCollection

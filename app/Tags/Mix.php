@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Mix extends Tag
+class Mix extends Tags
 {
     public function index()
     {

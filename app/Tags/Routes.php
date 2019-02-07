@@ -4,9 +4,9 @@ namespace Statamic\Tags;
 
 use Statamic\API\URL;
 use Statamic\API\Config;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Routes extends Tag
+class Routes extends Tags
 {
     /**
      * The {{ routes }} tag

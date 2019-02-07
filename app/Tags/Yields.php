@@ -3,9 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\View\Store;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Yields extends Tag
+class Yields extends Tags
 {
     public function __call($method, $args)
     {

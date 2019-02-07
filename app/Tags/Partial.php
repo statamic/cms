@@ -6,9 +6,9 @@ use Statamic\API\Path;
 use Statamic\API\File;
 use Statamic\API\Parse;
 use Statamic\API\Config;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Partial extends Tag
+class Partial extends Tags
 {
     public function __call($method, $arguments)
     {

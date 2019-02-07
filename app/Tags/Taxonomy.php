@@ -7,11 +7,11 @@ use Statamic\API\Page;
 use Statamic\API\Str;
 use Statamic\API\Content;
 use Statamic\API\Term;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 use Statamic\Extend\Management\FilterLoader;
 use Statamic\SiteHelpers\Filters as SiteHelperFilters;
 
-class Taxonomy extends Tag
+class Taxonomy extends Tags
 {
     /**
      * @var \Statamic\Data\Taxonomies\TermCollection

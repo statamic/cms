@@ -3,9 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\API\URL;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Cache extends Tag
+class Cache extends Tags
 {
     /**
      * The {{ cache }} tag

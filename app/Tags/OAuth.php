@@ -3,9 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\API\OAuth;
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class OAuth extends Tag
+class OAuth extends Tags
 {
     /**
      * Shorthand for generating an OAuth login URL

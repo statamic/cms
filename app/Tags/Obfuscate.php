@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tag;
+use Statamic\Tags\Tags;
 
-class Obfuscate extends Tag
+class Obfuscate extends Tags
 {
     public function index()
     {
