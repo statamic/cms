@@ -6,17 +6,13 @@ use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Parse;
 use Statamic\API\Antlers;
+use Statamic\Extend\HasHandle;
 use Statamic\Data\DataCollection;
+use Statamic\Extend\HasParameters;
 
-/**
- * Template tags
- */
 abstract class Tag
 {
-    /**
-     * Provides access to methods for retrieving parameters
-     */
-    use HasParameters;
+    use HasHandle, HasParameters;
 
     /**
      * The content written between the tags (when a tag pair)
