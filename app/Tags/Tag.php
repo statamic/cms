@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Tags;
 
 use Statamic\API\Arr;
 use Statamic\API\Str;
@@ -11,7 +11,7 @@ use Statamic\Data\DataCollection;
 /**
  * Template tags
  */
-abstract class Tags
+abstract class Tag
 {
     /**
      * Provides access to methods for retrieving parameters
