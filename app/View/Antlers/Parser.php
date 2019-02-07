@@ -222,7 +222,7 @@ class Parser
                     continue;
                 }
 
-                $loop_data = $this->getVariable(trim($match[1][0]), $data);
+                $loop_data = $this->getVariable($var = trim($match[1][0]), $data);
 
                 if (! $loop_data) {
                     // Must be a callback block. Extract it so it doesn't
@@ -232,8 +232,15 @@ class Parser
                     $looped_text = '';
                     $index = 0;
 
-                    // If we're not in a loop, we're done here.
-                    if (!is_array($loop_data)) return $loop_data;
+                    if ($loop_data instanceof Arrayable) {
+                        $loop_data = $loop_data->toArray();
+                    }
+
+                    // If it's not an array, the user is trying to loop over something unloopable.
+                    if (!is_array($loop_data)) {
+                        $loop_data = [];
+                        \Log::debug("Cannot loop over non-loopable variable: {{ $var }}");
+                    }
 
                     // is this a list, or simply a set of named variables?
                     if ((bool) count(array_filter(array_keys($loop_data), 'is_string'))) {
@@ -316,10 +323,6 @@ class Parser
      */
     public function parseStringVariables($text, $data)
     {
-        if ($text instanceof Value) {
-            $text = $text->value();
-        }
-
         // Check for any vars flagged as noparse
         $noparse = array_get($data, '_noparse', []);
 
@@ -370,6 +373,16 @@ class Parser
                         if (is_array($val)) {
                             $val = null;
                             \Log::error("Cannot render an array variable as a string: {{ $var }}");
+                        }
+
+                        // If an object can be cast to a string, great. If not, prevent it.
+                        if (is_object($val)) {
+                            if (method_exists($val, '__toString')) {
+                                $val = (string) $val;
+                            } else {
+                                $val = null;
+                                \Log::error("Cannot render an object variable as a string: {{ $var }}");
+                            }
                         }
 
                         // if variable is in the noparse list, extract it.
@@ -1069,11 +1082,6 @@ class Parser
 
         if ($data instanceof Value) {
             $data = $data->value();
-        }
-
-        // convert collections to arrays
-        if ($data instanceof Collection) {
-            $data = $data->toArray();
         }
 
         return $data;

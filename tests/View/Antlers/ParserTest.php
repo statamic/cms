@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Statamic\API\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
+use Illuminate\Contracts\Support\Arrayable;
 
 class ParserTest extends TestCase
 {
@@ -55,6 +56,16 @@ class ParserTest extends TestCase
         $this->assertEquals(null, Antlers::parse($template, $this->variables));
     }
 
+    /** @test */
+    function non_arrays_cannot_be_looped()
+    {
+        $template = "{{ string }} {{ /string }}";
+
+        $this->assertEquals('', Antlers::parse($template, $this->variables));
+
+        // TODO: Assert about log message
+    }
+
     public function testStaticStringsWithDoubleQuotesShouldBeLeftAlone()
     {
         $template = '{{ "Thundercats are Go!" }}';
@@ -102,6 +113,8 @@ class ParserTest extends TestCase
         $template = "{{ simple }}";
 
         $this->assertEquals(null, Antlers::parse($template, $this->variables));
+
+        // TODO: Assert about log message
     }
 
     public function testSingleCondition()
@@ -507,6 +520,60 @@ class ParserTest extends TestCase
 
         $this->assertEquals('bar', $parsed);
     }
+
+    /** @test */
+    function it_casts_objects_to_string_when_using_single_tags()
+    {
+        $object = new class {
+            function __toString() {
+                return 'string';
+            }
+        };
+
+        $this->assertEquals(
+            'string',
+            Antlers::parse('{{ object }}', compact('object'))
+        );
+    }
+
+    /** @test */
+    function it_doesnt_output_anything_if_object_cannot_be_cast_to_a_string()
+    {
+        $object = new class {};
+
+        $this->assertEquals('', Antlers::parse('{{ object }}', compact('object')));
+
+        // TODO: Assert about log message
+    }
+
+    /** @test */
+    function it_casts_arrayable_objects_to_arrays_when_using_tag_pairs()
+    {
+        $arrayableObject = new ArrayableObject([
+            'one' => 'foo',
+            'two' => 'bar',
+        ]);
+
+        $nonArrayableObject = new NonArrayableObject([
+            'one' => 'foo',
+            'two' => 'bar',
+        ]);
+
+        $this->assertEquals(
+            'foo bar',
+            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+                'object' => $arrayableObject
+            ])
+        );
+
+        $this->assertEquals(
+            '',
+            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+                'object' => $nonArrayableObject
+            ])
+        );
+        // TODO: Assert about log message
+    }
 }
 
 class NonArrayableObject
@@ -517,7 +584,7 @@ class NonArrayableObject
     }
 }
 
-class ArrayableObject extends NonArrayableObject implements \Illuminate\Contracts\Support\Arrayable
+class ArrayableObject extends NonArrayableObject implements Arrayable
 {
     function toArray() {
         return $this->data;
