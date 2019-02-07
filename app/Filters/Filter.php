@@ -3,12 +3,13 @@
 namespace Statamic\Filters;
 
 use Statamic\API\Str;
-use Statamic\Extend\HasTitleAndHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\HasHandle;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Filter implements Arrayable
 {
-    use HasTitleAndHandle;
+    use HasTitle, HasHandle;
 
     public function required()
     {

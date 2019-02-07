@@ -3,11 +3,12 @@
 namespace Statamic\Extend;
 
 use Statamic\API\Str;
-use Statamic\Extend\HasTitleAndHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\HasHandle;
 
 abstract class Widget
 {
-    use HasTitleAndHandle {
+    use HasTitle, HasHandle {
         handle as protected traitHandle;
     }
 

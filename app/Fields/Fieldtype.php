@@ -3,12 +3,13 @@
 namespace Statamic\Fields;
 
 use Statamic\API\Str;
-use Statamic\Extend\HasTitleAndHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\HasHandle;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Fieldtype implements Arrayable
 {
-    use HasTitleAndHandle {
+    use HasTitle, HasHandle {
         handle as protected traitHandle;
     }
 
