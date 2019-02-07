@@ -1052,11 +1052,11 @@ class Parser
         if ($this->isLiteralString($key)) {
             $data = trim($key, '"\'');
         } else {
-            if (! array_has_colon($context, $key)) {
+            list($exists, $data) = $this->getVariableExistenceAndValue($key, $context);
+
+            if (! $exists) {
                 return $default;
             }
-
-            $data = array_get_colon($context, $key); // @TODO: add data_get_colon() method
         }
 
         // execute the modifier chain
@@ -1077,6 +1077,45 @@ class Parser
         }
 
         return $data;
+    }
+
+    /**
+     * Find out whether a given variable exists within a given context.
+     *
+     * @param string $key
+     * @param array $context
+     * @return array  Array of [boolean whether it exists, value of the key]
+     */
+    protected function getVariableExistenceAndValue($key, $context)
+    {
+        // If the key exists in the context, great, we're done.
+        if (array_has_colon($context, $key)) {
+            return [true, array_get_colon($context, $key)];
+        }
+
+        // If there was no colon, there's nothing more we can check.
+        if (! str_contains($key, ':')) {
+            return [false, null];
+        }
+
+        // If it didn't exist and the key contained a colon, we'll try again, but this
+        // time using the first part of the key as the new context. For example, if
+        // we had been given "foo:bar:baz" as the key, we'll try to get the "foo"
+        // from the context and get the "bar:baz" from within within its value.
+        list($first, $rest) = explode(':', $key, 2);
+
+        if (! array_has_colon($context, $first)) {
+            return [false, null];
+        }
+
+        $context = array_get_colon($context, $first);
+
+        if ($context instanceof Value) {
+            $context = $context->value();
+        }
+
+        // It will do this recursively until it's out of colon delimiters or values.
+        return $this->getVariableExistenceAndValue($rest, $context);
     }
 
     /**

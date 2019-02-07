@@ -6,6 +6,8 @@ use Tests\TestCase;
 use Statamic\API\Term;
 use Statamic\API\Antlers;
 use Statamic\API\Taxonomy;
+use Statamic\Fields\Value;
+use Statamic\Fields\Fieldtype;
 
 class ParserTest extends TestCase
 {
@@ -424,6 +426,109 @@ class ParserTest extends TestCase
         }
 
         $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    function it_gets_augmented_value()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return 'augmented ' . $value;
+            }
+        };
+
+        $value = new Value('expected', 'test', $fieldtype);
+
+        $parsed = Antlers::parse('{{ test }}', ['test' => $value]);
+
+        $this->assertEquals('augmented expected', $parsed);
+    }
+
+    /** @test */
+    function it_expands_augmented_value_when_used_as_an_array()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($values)
+            {
+                return collect($values)->map(function ($value) {
+                    return strtoupper($value);
+                })->all();
+            }
+        };
+
+        $value = new Value([
+            'one' => 'hello',
+            'two' => 'world',
+        ], 'test', $fieldtype);
+
+        $parsed = Antlers::parse('{{ test }}{{ one }} {{ two }}{{ /test }}', ['test' => $value]);
+
+        $this->assertEquals('HELLO WORLD', $parsed);
+    }
+
+    /** @test */
+    function it_loops_over_value_object()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($values)
+            {
+                return collect($values)->map(function ($value) {
+                    return collect($value)->map(function ($v) {
+                        return strtoupper($v);
+                    });
+                })->toArray();
+            }
+        };
+
+        $value = new Value([
+            ['one' => 'uno', 'two' => 'dos'],
+            ['one' => 'une', 'two' => 'deux'],
+        ], 'test', $fieldtype);
+
+        $parsed = Antlers::parse('{{ test }}{{ one }} {{ two }} {{ /test }}', ['test' => $value]);
+
+        $this->assertEquals('UNO DOS UNE DEUX ', $parsed);
+    }
+
+    /** @test */
+    function it_gets_nested_values_from_value_objects()
+    {
+        $value = new Value(['foo' => 'bar'], 'test');
+
+        $parsed = Antlers::parse('{{ test:foo }}', ['test' => $value]);
+
+        $this->assertEquals('bar', $parsed);
+    }
+
+    /** @test */
+    function it_gets_nested_values_from_nested_value_objects()
+    {
+        $value = new Value(['foo' => 'bar'], 'test');
+
+        $parsed = Antlers::parse('{{ nested:test:foo }}', [
+            'nested' => [
+                'test' => $value
+            ]
+        ]);
+
+        $this->assertEquals('bar', $parsed);
+    }
+
+    /** @test */
+    function it_gets_nested_values_from_within_nested_value_objects()
+    {
+        $value = new Value([
+            'foo' => ['nested' => 'bar']
+        ], 'test');
+
+        $parsed = Antlers::parse('{{ nested:test:foo:nested }}', [
+            'nested' => [
+                'test' => $value
+            ]
+        ]);
+
+        $this->assertEquals('bar', $parsed);
     }
 }
 
