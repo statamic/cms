@@ -2,7 +2,7 @@
 
 namespace Foo\Bar\Tags;
 
-class RecursiveChildren extends \Statamic\Extend\Tags
+class RecursiveChildren extends \Statamic\Tags\Tags
 {
     public function index()
     {
