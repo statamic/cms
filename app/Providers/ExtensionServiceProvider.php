@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Tags;
 use Statamic\Actions;
 use Statamic\Filters;
 use Statamic\DataStore;
@@ -9,8 +10,8 @@ use Statamic\Extend\Modifier;
 use Statamic\Fields\Fieldtypes;
 use Statamic\View\BaseModifiers;
 use Statamic\Extensions\FileStore;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extend\Management\Manifest;
 use Illuminate\Console\DetectsApplicationNamespace;
@@ -18,19 +19,6 @@ use Illuminate\Console\DetectsApplicationNamespace;
 class ExtensionServiceProvider extends ServiceProvider
 {
     use DetectsApplicationNamespace;
-
-    /**
-     * Tags bundled with Statamic.
-     *
-     * @var array
-     */
-    protected $bundledTags = [
-        'asset', 'assets', 'cache', 'can', 'collection', 'dump', 'entries', 'env',
-        'get_content', 'get_files', 'get_value', 'glide', 'in', 'is', 'link', 'locales',
-        'markdown', 'member', 'mix', 'nav', 'not_found', 'oauth', 'obfuscate', 'pages', 'parent',
-        'partial', 'path', 'redirect', 'relate', 'rotate', 'routes',
-        'section', 'taxonomy', 'theme', 'trans', 'trans_choice', 'users', 'widont', 'yields',
-    ];
 
     /**
      * Aliases for tags bundled with Statamic.
@@ -157,34 +145,30 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->instance('statamic.tags', collect());
 
-        $this->registerBundledTags();
+        $tags = [
+            Tags\Asset::class, Tags\Assets::class, Tags\Cache::class, Tags\Can::class, Tags\Collection::class,
+            Tags\Dump::class, Tags\Entries::class, Tags\Env::class, Tags\GetContent::class, Tags\GetFiles::class,
+            Tags\GetValue::class, Tags\Glide::class, Tags\In::class, Tags\Is::class, Tags\Link::class,
+            Tags\Locales::class, Tags\Markdown::class, Tags\Member::class, Tags\Mix::class, Tags\Nav::class,
+            Tags\NotFound::class, Tags\OAuth::class, Tags\Obfuscate::class, Tags\Pages::class, Tags\ParentTags::class,
+            Tags\Partial::class, Tags\Path::class, Tags\Redirect::class, Tags\Relate::class, Tags\Rotate::class,
+            Tags\Routes::class, Tags\Section::class, Tags\Taxonomy::class, Tags\Theme::class, Tags\Trans::class,
+            Tags\TransChoice::class, Tags\Users::class, Tags\Widont::class, Tags\Yields::class,
+            \Statamic\Forms\Tags::class, \Statamic\Auth\UserTags::class, \Statamic\Auth\Protect\Tags::class,
+            \Statamic\Search\Tags::class
+        ];
+
+        foreach ($tags as $tag) {
+            $this->app['statamic.tags'][$tag::handle()] = $tag;
+        }
+
+        dd($this->app['statamic.tags']);
+
         $this->registerExtensionsInAppFolder('Tags');
     }
 
     /**
-     * Register bundled tags.
-     *
-     * @return void
-     */
-    protected function registerBundledTags()
-    {
-        foreach ($this->bundledTags as $tag) {
-            $studly = studly_case($tag);
-            $this->app['statamic.tags'][$tag] = "Statamic\\Addons\\{$studly}\\{$studly}Tags";
-        }
-
-        foreach ($this->bundledTagAliases as $alias => $actual) {
-            $this->app['statamic.tags'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Tags";
-        }
-
-        $this->app['statamic.tags']['form'] = \Statamic\Forms\Tags::class;
-        $this->app['statamic.tags']['user'] = \Statamic\Auth\UserTags::class;
-        $this->app['statamic.tags']['protect'] = \Statamic\Auth\Protect\Tags::class;
-        $this->app['statamic.tags']['search'] = \Statamic\Search\Tags::class;
-    }
-
-    /**
-     * Register tags.
+     * Register modifiers.
      *
      * @return void
      */
@@ -197,7 +181,7 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register bundled tags.
+     * Register bundled modifiers.
      *
      * @return void
      */
@@ -231,7 +215,7 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register bundled tags.
+     * Register bundled fieldtypes.
      *
      * @return void
      */
