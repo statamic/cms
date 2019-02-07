@@ -3,17 +3,10 @@
 namespace Statamic\Extend;
 
 use ReflectionClass;
-use Statamic\API\Str;
 
-trait HasTitleAndHandle
+trait HasHandle
 {
-    protected static $title;
     protected static $handle;
-
-    public static function title()
-    {
-        return static::$title ?? Str::humanize(static::handle());
-    }
 
     public static function handle()
     {
