@@ -217,6 +217,7 @@ class Parser
         }
 
         foreach ($data_matches as $match) {
+            $contents = $match[2][0];
 
             // Don't parse any variables in the noparse list.
             $var_name = (strpos($match[1][0], '|') !== false) ? substr($match[1][0], 0, strpos($match[1][0], '|')) : $match[1][0];
@@ -226,96 +227,86 @@ class Parser
                 continue;
             }
 
-            $loop_data = $this->getVariable($var = trim($match[1][0]), $data);
+            $value = $this->getVariable($var = trim($match[1][0]), $data);
 
-            if (! $loop_data) {
+            if (! $value) {
                 // Must be a callback block. Extract it so it doesn't
                 // conflict with local scope variables in the next step.
                 $text = $this->createExtraction('callback_blocks', $match[0][0], $match[0][0], $text);
                 continue;
             }
 
-            $looped_text = '';
-            $index = 0;
-
-            if ($loop_data instanceof Arrayable) {
-                $loop_data = $loop_data->toArray();
+            if ($value instanceof Arrayable) {
+                $value = $value->toArray();
             }
 
             // If it's not an array, the user is trying to loop over something unloopable.
-            if (!is_array($loop_data)) {
-                $loop_data = [];
+            if (!is_array($value)) {
+                $value = [];
                 Log::debug("Cannot loop over non-loopable variable: {{ $var }}");
             }
 
-            // is this a list, or simply a set of named variables?
-            if ((bool) count(array_filter(array_keys($loop_data), 'is_string'))) {
-                // this is a set of named variables, don't actually loop over and over,
-                // instead, parse the inner contents with this set's local variables that
-                // have been merged into the bigger scope
+            // Associative arrays (key value pairs like ['foo' => 'bar', 'baz' => 'qux']) shouldn't be looped over,
+            // instead, they should be parsed one time, as a whole. We'll turn it into a multidimensional array
+            // so it can be parsed over like the other cases, and then we'll pick out the first one after.
+            $value = ($associative = Arr::assoc($value)) ? [$value] : $this->addLoopIterationVariables($value);
 
-                // merge this local data with callback data before performing actions
-                $loop_value = $loop_data + $data + $this->callbackData;
+            $parses = collect($value)->map(function ($iteration) use ($contents, $data) {
+                $data = $iteration + $data + $this->callbackData;
+                return $this->parseLoopInstance($contents, $data);
+            });
 
-                // perform standard actions
-                $str = $this->extractLoopedTags($match[2][0], $loop_value);
-                $str = $this->parseConditionals($str, $loop_value);
-                $str = $this->injectExtractions($str, 'looped_tags');
-                $str = $this->parseVariables($str, $loop_value);
+            // Again, associative arrays just need the single iteration, so we'll grab
+            // the first. For the others, we'll concatenate them all into one string.
+            $text = $associative ? $parses->first() : $parses->implode('');
 
-                if (!is_null($this->callback)) {
-                    $str = $this->injectExtractions($str, 'callback_blocks');
-                    $str = $this->parseCallbackTags($str, $loop_value);
-                }
-
-                $looped_text .= $str;
-                $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($looped_text, '\\$'), $text, 1);
-            } else {
-                // this is a list, let's loop
-                $total_results = count($loop_data);
-
-                foreach ($loop_data as $loop_key => $loop_value) {
-                    $index++;
-
-                    // is the value an array?
-                    if (! is_array($loop_value)) {
-                        // no, make it one
-                        $loop_value = [
-                            'value' => $loop_value,
-                            'name'  => $loop_value // alias for backwards compatibility
-                        ];
-                    }
-
-                    // set contextual loop vars
-                    $loop_value['key']           = $loop_key;
-                    $loop_value['index']         = $index;
-                    $loop_value['zero_index']    = $index - 1;
-                    $loop_value['total_results'] = $total_results;
-                    $loop_value['first']         = ($index === 1) ? true : false;
-                    $loop_value['last']          = ($index === $loop_value['total_results']) ? true : false;
-
-                    // merge this local data with callback data before performing actions
-                    $loop_value = $loop_value + $data + $this->callbackData;
-
-                    // perform standard actions
-                    $str = $this->extractLoopedTags($match[2][0], $loop_value);
-                    $str = $this->parseConditionals($str, $loop_value);
-                    $str = $this->injectExtractions($str, 'looped_tags');
-                    $str = $this->parseVariables($str, $loop_value);
-
-                    if (!is_null($this->callback)) {
-                        $str = $this->injectExtractions($str, 'callback_blocks');
-                        $str = $this->parseCallbackTags($str, $loop_value);
-                    }
-
-                    $looped_text .= $str;
-                }
-
-                $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($looped_text, '\\$'), $text, 1);
-            }
+            $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($text, '\\$'), $text, 1);
         }
 
         return $text;
+    }
+
+    protected function addLoopIterationVariables($loop)
+    {
+        $index = 0;
+        $total = count($loop);
+
+        foreach ($loop as $key => &$value) {
+            $index++;
+
+            // If the value of the current iteration is *not* already an array (ie. we're
+            // dealing with a super basic list like [one, two, three] then convert it
+            // to one, where the value is stored in a key named "value".
+            if (! is_array($value)) {
+                $value = ['value' => $value, 'name'  => $value];
+            }
+
+            $value = array_merge($value, [
+                'key'           => $key,
+                'index'         => $index,
+                'zero_index'    => $index - 1,
+                'total_results' => $total,
+                'first'         => ($index === 1) ? true : false,
+                'last'          => ($index === $total) ? true : false,
+            ]);
+        }
+
+        return $loop;
+    }
+
+    protected function parseLoopInstance($str, $data)
+    {
+        $str = $this->extractLoopedTags($str, $data);
+        $str = $this->parseConditionals($str, $data);
+        $str = $this->injectExtractions($str, 'looped_tags');
+        $str = $this->parseVariables($str, $data);
+
+        if (!is_null($this->callback)) {
+            $str = $this->injectExtractions($str, 'callback_blocks');
+            $str = $this->parseCallbackTags($str, $data);
+        }
+
+        return $str;
     }
 
     /**
