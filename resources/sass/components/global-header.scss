@@ -30,8 +30,6 @@
 		}
     }
 
-    // &:hover, &:focus-within { @apply .shadow-lg; }
-
     .global-search-results {
         @apply shadow-lg absolute p-0 w-full bg-white rounded border w-96;
         top: 36px;
@@ -69,6 +67,18 @@
         background: #ddd;
         border-radius: 2px;
         padding: 2px 4px;
+    }
+
+    .icon {
+        @apply text-grey;
+        font-size: 18px;
+        cursor: pointer;
+        position: relative;
+        top: 1px;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        overflow: hidden;
     }
 
     .reset {
