@@ -6,7 +6,12 @@
         @csrf
 
         <div class="flex items-center mb-3">
-            <h1 class="flex-1">{{ __('Create Asset Container') }}</h1>
+            <h1 class="flex-1">
+                <small class="subhead block">
+                    <a href="{{ cp_route('assets.browse.index') }}">{{ __('Assets') }}</a>
+                </small>
+                {{ __('Create Asset Container') }}
+            </h1>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 

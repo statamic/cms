@@ -6,7 +6,12 @@
         @method('patch') @csrf
 
         <div class="flex items-center mb-3">
-            <h1 class="flex-1">{{ $container->title() }}</h1>
+            <h1 class="flex-1">
+                <small class="subhead block">
+                    <a href="{{ cp_route('assets.browse.index') }}">{{ __('Assets') }}</a>
+                </small>
+                {{ $container->title() }}
+            </h1>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 
