@@ -2,7 +2,6 @@
 
 namespace Statamic\Extend\Management;
 
-use Statamic\API\Str;
 use Statamic\Exceptions\ResourceNotFoundException;
 
 class WidgetLoader

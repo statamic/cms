@@ -18,7 +18,7 @@ class ModifierLoader
             throw new ResourceNotFoundException("Could not find files to load the `{$name}` modifier.");
         }
 
-        if (str_contains($class = $modifiers->get($name), 'BaseModifiers@')) {
+        if (Str::contains($class = $modifiers->get($name), 'BaseModifiers@')) {
             list($class, $method) = explode('@', $class);
         }
 
