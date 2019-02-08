@@ -43,8 +43,13 @@ textarea.input-text {
     min-height: 80px;
 }
 
-.form-group.tight {
-    margin-bottom: 8px;
+// Used inside tables, grids, and so on
+.input-text-minimal {
+    @apply appearance-none shadow-none bg-white w-full p-1;
+
+    &:focus {
+        @apply outline-none bg-grey-lightest;
+    }
 }
 
 
