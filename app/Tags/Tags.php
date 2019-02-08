@@ -7,12 +7,13 @@ use Statamic\API\Str;
 use Statamic\API\Parse;
 use Statamic\API\Antlers;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasAliases;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 
 abstract class Tags
 {
-    use HasHandle, HasParameters;
+    use HasHandle, HasAliases, HasParameters;
 
     /**
      * The content written between the tags (when a tag pair)
