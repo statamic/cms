@@ -127,18 +127,6 @@ class Asset implements AssetContract, Arrayable
         return URL::assemble($this->container()->url(), $this->path());
     }
 
-    public function value()
-    {
-        $url = $this->url();
-        $siteUrl = Site::current()->absoluteUrl();
-
-        if (starts_with($url, $siteUrl)) {
-            return '/'.str_after($url, $siteUrl);
-        }
-
-        return $url;
-    }
-
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
@@ -387,7 +375,7 @@ class Asset implements AssetContract, Arrayable
             'edit_url'       => $this->editUrl(),
             'container'      => $this->container()->id(),
             'folder'         => $this->folder(),
-            // 'value'          => $this->value(), // TODO: test this
+            'url'            => $this->url(),
         ];
 
         if ($this->disk() && $this->disk()->exists($this->path())) {

@@ -21,7 +21,7 @@
 
         <template v-if="!loading">
 
-            <div class="manage-assets" v-if="!maxFilesReached" :class="{'bard-drag-handle': isInBardField}">
+            <div class="manage-assets flex items-center" v-if="!maxFilesReached" :class="{'bard-drag-handle': isInBardField}">
 
                 <div v-if="!containerSpecified">
                     <i class="icon icon-warning"></i>
@@ -31,7 +31,7 @@
                 <template v-else>
                     <button
                         type="button"
-                        class="btn btn-with-icon mr-8"
+                        class="btn btn-with-icon mr-1"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
@@ -115,17 +115,22 @@
             </div>
         </template>
 
-        <selector
+        <stack
             v-if="showSelector"
-            :container="container"
-            :folder="folder"
-            :restrict-navigation="restrictNavigation"
-            :selected="selectedAssets"
-            :view-mode="selectorViewMode"
-            :max-files="maxFiles"
-            @selected="assetsSelected"
-            @closed="closeSelector">
-        </selector>
+            name="asset-selector"
+            @closed="closeSelector"
+        >
+            <selector
+                :container="container"
+                :folder="folder"
+                :restrict-navigation="restrictNavigation"
+                :selected="selectedAssets"
+                :view-mode="selectorViewMode"
+                :max-files="maxFiles"
+                @selected="assetsSelected"
+                @closed="closeSelector">
+            </selector>
+        </stack>
     </div>
 </template>
 
@@ -256,11 +261,7 @@ export default {
          * The asset browser expects an array of asset IDs to be passed in as a prop.
          */
         selectedAssets() {
-            // If the value has an :: it's already an ID and we can return as-is.
-            // Otherwise, we need to find the ID from the corresponding asset.
-            return _(this.value).map((value) => {
-                return (value.includes('::')) ? value : _(this.assets).findWhere({ value }).id;
-            });
+            return this.value;
         },
 
         /**
@@ -434,13 +435,13 @@ export default {
     watch: {
 
         /**
-         * The components deal with passing around asset objects, however our fieldtype is
-         * only concerned with their respective values, which will either be a URLs or ID.
+         * The components deal with passing around asset objects, however
+         * our fieldtype is only concerned with their respective IDs.
          */
         assets() {
             if (this.initializing) return;
 
-            this.update(_.pluck(this.assets, 'value'));
+            this.update(_.pluck(this.assets, 'id'));
         },
 
         loading: {

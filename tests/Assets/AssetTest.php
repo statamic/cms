@@ -417,12 +417,11 @@ class AssetTest extends TestCase
             'is_asset' => true,
             'folder' => 'path/to',
             'container' => 'test_container',
-            // 'value' => '?',
             'blueprint' => 'test_blueprint',
             'foo' => 'bar',
         ], $array);
 
-        $keys = ['is_audio', 'is_previewable', 'is_image', 'is_video', 'edit_url'];
+        $keys = ['is_audio', 'is_previewable', 'is_image', 'is_video', 'edit_url', 'url'];
         foreach ($keys as $key) {
             $this->assertArrayHasKey($key, $array);
         }

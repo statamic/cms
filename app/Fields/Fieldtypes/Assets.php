@@ -5,6 +5,7 @@ namespace Statamic\Fields\Fieldtypes;
 use Statamic\API\Asset;
 use Statamic\API\Helper;
 use Statamic\Fields\Fieldtype;
+use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
 
 class Assets extends Fieldtype
@@ -35,30 +36,35 @@ class Assets extends Fieldtype
         return [];
     }
 
-    public function preProcess($data)
+    public function preProcess($values)
     {
-        $max_files = (int) $this->config('max_files');
-
-        if ($max_files === 1 && empty($data)) {
-            return $data;
-        }
-
-        if (is_null($data)) {
+        if (is_null($values)) {
             return [];
         }
 
-        return Helper::ensureArray($data);
+        return collect($values)->map(function ($value) {
+            return $this->valueToId($value);
+        })->filter()->values()->all();
+    }
+
+    protected function valueToId($value)
+    {
+        if (str_contains($value, '::')) {
+            return $value;
+        }
+
+        return optional($this->container()->asset($value))->id();
     }
 
     public function process($data)
     {
         $max_files = (int) $this->config('max_files');
 
-        if ($max_files === 1) {
-            return array_get($data, 0);
-        }
+        $values = collect($data)->map(function ($id) {
+            return Asset::find($id)->path();
+        });
 
-        return $data;
+        return $this->config('max_files') === 1 ? $values->first() : $values->all();
     }
 
     public function preload()
@@ -94,5 +100,19 @@ class Assets extends Fieldtype
             'asset' => base64_encode($asset->id()),
             'size' => $preset
         ]);
+    }
+
+    public function augment($value)
+    {
+        $assets = collect($value)->map(function ($path) {
+            return $this->container()->asset($path);
+        })->filter()->values();
+
+        return $this->config('max_files') === 1 ? $assets->first() : $assets;
+    }
+
+    protected function container()
+    {
+        return AssetContainer::find($this->config('container'));
     }
 }

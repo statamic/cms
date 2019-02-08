@@ -1,8 +1,19 @@
 export default {
 
     props: {
-        actions: Array,
+        actions: {
+            type: Array,
+            default: () => []
+        },
         actionUrl: String,
+    },
+
+    computed: {
+
+        hasActions() {
+            return this.actions.length > 0;
+        }
+
     },
 
     methods: {

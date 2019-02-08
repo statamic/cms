@@ -32,6 +32,7 @@
                 </div>
 
                 <data-list-bulk-actions
+                    v-if="hasActions"
                     :url="actionUrl"
                     :actions="actions"
                     @started="actionStarted"
@@ -127,7 +128,7 @@ export default {
     props: {
         // The container to display, determined by a parent component.
         // Either the ID, or the whole container object.
-        initialContainer: Object,
+        initialContainer: {},
         selectedPath: String,        // The path to display, determined by a parent component.
         restrictNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
