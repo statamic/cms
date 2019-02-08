@@ -132,7 +132,7 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerTags()
     {
-        $this->app->instance('statamic.tags', collect());
+        $parent = 'statamic.tags';
 
         $tags = [
             Tags\Asset::class, Tags\Assets::class, Tags\Cache::class, Tags\Can::class, Tags\Collection::class,
@@ -147,11 +147,14 @@ class ExtensionServiceProvider extends ServiceProvider
             \Statamic\Search\Tags::class
         ];
 
+        $this->registerParent($parent);
+
         foreach ($tags as $tag) {
-            $this->app['statamic.tags'][$tag::handle()] = $tag;
+            $this->registerExtension($tag, $parent);
+            $this->registerAliases($tag, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Tags');
+        $this->registerExtensionsInAppFolder('Tags', $parent);
     }
 
     /**
@@ -161,18 +164,20 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerModifiers()
     {
-        $this->app->instance('statamic.modifiers', collect());
+        $parent = 'statamic.modifiers';
 
-        $this->registerBundledModifiers();
-        $this->registerExtensionsInAppFolder('Modifiers');
+        $this->registerParent($parent);
+        $this->registerBundledModifiers($parent);
+        $this->registerExtensionsInAppFolder('Modifiers', $parent);
     }
 
     /**
      * Register bundled modifiers.
      *
+     * @param string $parent
      * @return void
      */
-    protected function registerBundledModifiers()
+    protected function registerBundledModifiers($parent)
     {
         $methods = array_diff(
             get_class_methods(BaseModifiers::class),
@@ -180,11 +185,11 @@ class ExtensionServiceProvider extends ServiceProvider
         );
 
         foreach ($methods as $method) {
-            $this->app['statamic.modifiers'][$method] = "Statamic\\View\\BaseModifiers@{$method}";
+            $this->app[$parent][$method] = "Statamic\\View\\BaseModifiers@{$method}";
         }
 
         foreach ($this->bundledModifierAliases as $alias => $actual) {
-            $this->app['statamic.modifiers'][$alias] = "Statamic\\View\\BaseModifiers@{$actual}";
+            $this->app[$parent][$alias] = "Statamic\\View\\BaseModifiers@{$actual}";
         }
     }
 
@@ -195,30 +200,32 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerFieldtypes()
     {
-        $this->app->instance('statamic.fieldtypes', collect());
+        $parent = 'statamic.fieldtypes';
 
-        $this->registerBundledFieldtypes();
-        $this->registerExtensionsInAppFolder('Fieldtypes');
+        $this->registerParent($parent);
+        $this->registerBundledFieldtypes($parent);
+        $this->registerExtensionsInAppFolder('Fieldtypes', $parent);
     }
 
     /**
      * Register bundled fieldtypes.
      *
+     * @param string $parent
      * @return void
      */
-    protected function registerBundledFieldtypes()
+    protected function registerBundledFieldtypes($parent)
     {
         foreach ($this->bundledFieldtypes as $tag) {
             $studly = studly_case($tag);
-            $this->app['statamic.fieldtypes'][$tag] = "Statamic\\Addons\\{$studly}\\{$studly}Fieldtype";
+            $this->app[$parent][$tag] = "Statamic\\Addons\\{$studly}\\{$studly}Fieldtype";
         }
 
         foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
-            $this->app['statamic.fieldtypes'][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
+            $this->app[$parent][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
 
         foreach ($this->fieldtypes as $handle => $class) {
-            $this->app['statamic.fieldtypes'][$class::handle()] = $class;
+            $this->app[$parent][$class::handle()] = $class;
         }
     }
 
@@ -229,7 +236,7 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerFilters()
     {
-        $this->app->instance('statamic.filters', collect());
+        $parent = 'statamic.filters';
 
         $filters = [
             Filters\Site::class,
@@ -237,11 +244,13 @@ class ExtensionServiceProvider extends ServiceProvider
             Filters\UserGroup::class,
         ];
 
+        $this->registerParent($parent);
+
         foreach ($filters as $filter) {
-            $this->app['statamic.filters'][$filter::handle()] = $filter;
+            $this->registerExtension($filter, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Filters');
+        $this->registerExtensionsInAppFolder('Filters', $parent);
     }
 
     /**
@@ -251,9 +260,9 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerActions()
     {
-        $this->app->instance('statamic.actions', collect());
+        $parent = 'statamic.actions';
 
-        $filters = [
+        $actions = [
             Actions\Delete::class,
             Actions\Publish::class,
             Actions\Unpublish::class,
@@ -261,11 +270,13 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\MoveAsset::class,
         ];
 
-        foreach ($filters as $filter) {
-            $this->app['statamic.actions'][$filter::handle()] = $filter;
+        $this->registerParent($parent);
+
+        foreach ($actions as $action) {
+            $this->registerExtension($action, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Actions');
+        $this->registerExtensionsInAppFolder('Actions', $parent);
     }
 
     /**
@@ -275,7 +286,7 @@ class ExtensionServiceProvider extends ServiceProvider
      */
     protected function registerWidgets()
     {
-        $this->app->instance('statamic.widgets', collect());
+        $parent = 'statamic.widgets';
 
         $widgets = [
             \Statamic\Widgets\GettingStarted::class,
@@ -285,11 +296,50 @@ class ExtensionServiceProvider extends ServiceProvider
             \Statamic\Forms\Widget::class,
         ];
 
+        $this->registerParent($parent);
+
         foreach ($widgets as $widget) {
-            $this->app['statamic.widgets'][$widget::handle()] = $widget;
+            $this->registerExtension($widget, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Widgets');
+        $this->registerExtensionsInAppFolder('Widgets', $parent);
+    }
+
+    /**
+     * Register parent.
+     *
+     * @param string $parent
+     * @return void
+     */
+    protected function registerParent($parent)
+    {
+        $this->app->instance($parent, collect());
+    }
+
+    /**
+     * Register extension.
+     *
+     * @param string $extension
+     * @param string $parent
+     * @return void
+     */
+    protected function registerExtension($extension, $parent)
+    {
+        $this->app[$parent][$extension::handle()] = $extension;
+    }
+
+    /**
+     * Register aliases.
+     *
+     * @param string $extension
+     * @param string $parent
+     * @return void
+     */
+    protected function registerAliases($extension, $parent)
+    {
+        foreach ($extension::aliases() as $alias) {
+            $this->app[$parent][$alias] = $extension;
+        }
     }
 
     /**
@@ -298,9 +348,10 @@ class ExtensionServiceProvider extends ServiceProvider
      * This prevents requiring users to manually bind their extensions.
      *
      * @param string $folder
+     * @param string $parent
      * @return void
      */
-    protected function registerExtensionsInAppFolder($folder)
+    protected function registerExtensionsInAppFolder($folder, $parent)
     {
         if (! $this->app['files']->exists($path = app_path($folder))) {
             return;
@@ -310,8 +361,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $class = $file->getBasename('.php');
             $fqcn = $this->getAppNamespace() . "{$folder}\\{$class}";
             $handle = $fqcn::handle();
-            $extensionType = strtolower($folder);
-            $this->app["statamic.{$extensionType}"][$handle] = $fqcn;
+            $this->app[$parent][$handle] = $fqcn;
         }
     }
 }
