@@ -15,6 +15,8 @@ Vue.prototype.axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
 Vue.prototype.$events = new Vue();
 
+Vue.moment = require('moment');
+
 Vue.config.productionTip = false
 
 Vue.use(Popover, { tooltip: true })

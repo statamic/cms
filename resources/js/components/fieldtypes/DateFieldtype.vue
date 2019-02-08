@@ -77,7 +77,7 @@ export default {
             if (this.data && this.data.length >= 10) {
                 return this.data.substr(0, 10)
             } else {
-                return moment().format('YYYY-MM-DD')
+                return Vue.moment().format('YYYY-MM-DD')
             }
         },
 
@@ -108,7 +108,7 @@ export default {
         },
 
         addTime() {
-            this.time = moment().format('HH:mm');
+            this.time = Vue.moment().format('HH:mm');
 
             this.$nextTick(function() {
                 $(this.$refs.time.$refs.hour).focus().select();
@@ -120,7 +120,7 @@ export default {
         },
 
         addDate() {
-            this.data = moment().format('YYYY-MM-DD');
+            this.data = Vue.moment().format('YYYY-MM-DD');
             this.$nextTick(function() {
                 this.bindCalendar();
             });
@@ -135,12 +135,12 @@ export default {
 
             // Use the date if there is one, otherwise use today's date.
             var date = (this.data)
-                ? moment(self.dateString())
-                : moment().format('YYYY-MM-DD');
+                ? Vue.moment(self.dateString())
+                : Vue.moment().format('YYYY-MM-DD');
 
             this.calendar = new Calendar({
                 element: $(self.$refs.date),
-                current_date: moment(date),
+                current_date: Vue.moment(date),
                 earliest_date: self.config.earliest_date || "1900-01-01",
                 format: {
                     input: self.config.format,
@@ -148,7 +148,7 @@ export default {
                     jump_year: 'YYYY'
                 },
                 callback() {
-                    var newDate = moment(this.current_date).format('YYYY-MM-DD');
+                    var newDate = Vue.moment(this.current_date).format('YYYY-MM-DD');
                     self.updateDateString(newDate);
                 }
             });
@@ -170,11 +170,11 @@ export default {
                 ? dateFormat + ' ' + timeFormat
                 : dateFormat;
 
-            this.data = moment().format(format);
+            this.data = Vue.moment().format(format);
         }
 
         else if (this.data && this.config.time_required && !this.hasTime) {
-            this.data += ' ' + moment().format(timeFormat);
+            this.data += ' ' + Vue.moment().format(timeFormat);
         }
 
         if (this.data) {
