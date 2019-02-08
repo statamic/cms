@@ -7,10 +7,10 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Statamic\Fields\Blueprint;
-use Illuminate\Http\UploadedFile;
 use Statamic\Assets\AssetContainer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
+use Facades\Statamic\Assets\Dimensions;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class AssetTest extends TestCase
@@ -368,15 +368,10 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_dimensions()
     {
-        Storage::disk('test')->putFileAs(
-            'images',
-            UploadedFile::fake()->image('test.jpg', 30, 60),
-            'test.jpg'
-        );
+        $asset = new Asset;
 
-        $asset = (new Asset)
-            ->container($this->container)
-            ->path('images/test.jpg');
+        Dimensions::shouldReceive('asset')->with($asset)->andReturnSelf();
+        Dimensions::shouldReceive('get')->andReturn([30, 60]);
 
         $this->assertEquals([30, 60], $asset->dimensions());
         $this->assertEquals(30, $asset->width());

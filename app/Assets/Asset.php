@@ -16,6 +16,7 @@ use Statamic\API\Blueprint;
 use Statamic\Data\ContainsData;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use Facades\Statamic\Assets\Dimensions;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
 use Illuminate\Contracts\Support\Arrayable;
@@ -330,7 +331,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function dimensions()
     {
-        return (new DimensionBuilder($this))->dimensions();
+        return Dimensions::asset($this)->get();
     }
 
     /**
@@ -340,7 +341,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function width()
     {
-        return (new DimensionBuilder($this))->width();
+        return $this->dimensions()[0];
     }
 
     /**
@@ -350,7 +351,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function height()
     {
-        return (new DimensionBuilder($this))->height();
+        return $this->dimensions()[1];
     }
 
     /**
