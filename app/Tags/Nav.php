@@ -6,6 +6,7 @@ use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\Tags\Tags;
 use Statamic\API\Content;
+use Statamic\Addons\Nav\TreeFactory;
 
 class Nav extends Tags
 {
