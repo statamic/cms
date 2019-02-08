@@ -1,6 +1,6 @@
 <template>
     <div class="code-fieldtype-container relative">
-        <div v-text="mode" class="code-mode select-none z-10 opacity-25 absolute pin-r pin-r p-1 text-white text-2xs uppercase"></div>
+        <div v-text="mode" class="code-mode"></div>
         <div ref="codemirror"></div>
     </div>
 </template>
@@ -71,20 +71,3 @@ export default {
 
 };
 </script>
-
-<style>
-.CodeMirror {
-    min-height: 80px;
-    line-height: 1.75;
-    font-size: 13px !important;
-}
-
-.CodeMirror-wrap {
-    padding: 0.5rem;
-    border-radius: 4px;
-}
-
-.CodeMirror-scroll {
-    height: auto;
-}
-</style>
