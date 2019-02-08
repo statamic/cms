@@ -50,15 +50,18 @@ class ParserTest extends TestCase
     public function testListVariable()
     {
         $template = <<<EOT
+before
 {{ simple }}
     {{ value }}, {{ key or "0" }}, {{ index or "0" }}, {{ zero_index or "0" }}, {{ total_results }}
     {{ if first }}first{{ elseif last }}last{{ else }}neither{{ /if }}
 
 
 {{ /simple }}
+after
 EOT;
 
 $expected = <<<EOT
+before
     one, 0, 1, 0, 3
     first
 
@@ -69,6 +72,7 @@ $expected = <<<EOT
     last
 
 
+after
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template, $this->variables));
@@ -77,15 +81,18 @@ EOT;
     public function testComplexArrayVariable()
     {
         $template = <<<EOT
+before
 {{ complex }}
     {{ string }}, {{ key or "0" }}, {{ index or "0" }}, {{ zero_index or "0" }}, {{ total_results }}
     {{ if first }}first{{ elseif last }}last{{ else }}neither{{ /if }}
 
 
 {{ /complex }}
+after
 EOT;
 
 $expected = <<<EOT
+before
     the first string, 0, 1, 0, 2
     first
 
@@ -93,6 +100,7 @@ $expected = <<<EOT
     last
 
 
+after
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template, $this->variables));
@@ -101,6 +109,7 @@ EOT;
     public function testAssociativeArrayVariable()
     {
         $template = <<<EOT
+before
 {{ associative }}
     {{ one }}
     {{ two }}
@@ -112,9 +121,11 @@ EOT;
     {{ first or "no first" }}
     {{ last or "no last" }}
 {{ /associative }}
+after
 EOT;
 
 $expected = <<<EOT
+before
     hello
     wilderness
     no value
@@ -125,6 +136,7 @@ $expected = <<<EOT
     no first
     no last
 
+after
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template, $this->variables));

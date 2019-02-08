@@ -258,9 +258,10 @@ class Parser
 
             // Again, associative arrays just need the single iteration, so we'll grab
             // the first. For the others, we'll concatenate them all into one string.
-            $text = $associative ? $parses->first() : $parses->implode('');
+            $loopedText = $associative ? $parses->first() : $parses->implode('');
 
-            $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($text, '\\$'), $text, 1);
+            // Replace the contents of the tag pair in the original text with the parsed versions of all the loops.
+            $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($loopedText, '\\$'), $text, 1);
         }
 
         return $text;
