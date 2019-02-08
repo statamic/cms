@@ -7,6 +7,8 @@ use Statamic\View\Store;
 
 class Yields extends Tags
 {
+    protected static $aliases = ['yield'];
+
     public function __call($method, $args)
     {
         $name = explode(':', $this->tag)[1];

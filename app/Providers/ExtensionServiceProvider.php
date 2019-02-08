@@ -21,17 +21,6 @@ class ExtensionServiceProvider extends ServiceProvider
     use DetectsApplicationNamespace;
 
     /**
-     * Aliases for tags bundled with Statamic.
-     *
-     * @var array
-     */
-    protected $bundledTagAliases = [
-        'switch' => 'Rotate',
-        '404' => 'NotFound',
-        'yield' => 'Yields',
-    ];
-
-    /**
      * Fieldtypes bundled with Statamic.
      *
      * @var array

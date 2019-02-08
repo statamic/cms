@@ -7,6 +7,8 @@ use Statamic\API\Helper;
 
 class Rotate extends Tags
 {
+    protected static $aliases = ['switch'];
+
     /**
      * The {{ rotate }} tag
      *
