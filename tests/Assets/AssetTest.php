@@ -20,13 +20,18 @@ class AssetTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->tempDir = __DIR__.'/tmp';
-    }
 
-    public function tearDown()
-    {
-        parent::tearDown();
-        (new Filesystem)->deleteDirectory($this->tempDir);
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/tmp',
+        ]]);
+
+        $this->container = (new AssetContainer)
+            ->handle('test_container')
+            ->blueprint('test_blueprint')
+            ->disk('test');
+
+        Storage::fake('test');
     }
 
     /** @test */
@@ -235,15 +240,18 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_last_modified_time()
     {
-        $container = $this->tempContainer();
-        $now = Carbon::now();
-        touch($this->tempDir . '/test.txt', $now->timestamp);
+        Carbon::setTestNow('2017-01-02 14:35:00');
+        Storage::disk('test')->put('test.txt', '');
+        touch(
+            Storage::disk('test')->getAdapter()->getPathPrefix() . 'test.txt',
+            Carbon::now()->timestamp
+        );
 
-        $asset = (new Asset)->container($container)->path('test.txt');
+        $asset = (new Asset)->container($this->container)->path('test.txt');
 
         $lastModified = $asset->lastModified();
         $this->assertInstanceOf(Carbon::class, $lastModified);
-        $this->assertEquals($now->timestamp, $lastModified->timestamp);
+        $this->assertEquals(Carbon::parse('2017-01-02 14:35:00')->timestamp, $lastModified->timestamp);
     }
 
     /** @test */
@@ -360,15 +368,14 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_dimensions()
     {
-        Storage::fake('local');
-        Storage::disk('local')->putFileAs(
+        Storage::disk('test')->putFileAs(
             'images',
             UploadedFile::fake()->image('test.jpg', 30, 60),
             'test.jpg'
         );
 
         $asset = (new Asset)
-            ->container((new AssetContainer)->disk('local'))
+            ->container($this->container)
             ->path('images/test.jpg');
 
         $this->assertEquals([30, 60], $asset->dimensions());
@@ -379,12 +386,12 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_file_size_in_bytes()
     {
-        $container = $this->tempContainer();
+        $container = $this->container;
         $size = filesize($fixture = __DIR__.'/__fixtures__/container/a.txt');
-        copy($fixture, $this->tempDir.'/test.txt');
+        copy($fixture, Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt');
 
         $asset = (new Asset)
-            ->container($container)
+            ->container($this->container)
             ->path('test.txt');
 
         $this->assertEquals($size, $asset->size());
@@ -394,15 +401,11 @@ class AssetTest extends TestCase
     function it_converts_to_array()
     {
         API\Blueprint::shouldReceive('find')->once()
-            ->with('custom')
-            ->andReturn((new Blueprint)->setHandle('custom'));
-
-        $container = (new AssetContainer)
-            ->handle('test_container')
-            ->blueprint('custom');
+            ->with('test_blueprint')
+            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
 
         $asset = (new Asset)
-            ->container($container)
+            ->container($this->container)
             ->set('title', 'test')
             ->setSupplement('foo', 'bar')
             ->path('path/to/asset.jpg');
@@ -420,7 +423,7 @@ class AssetTest extends TestCase
             'folder' => 'path/to',
             'container' => 'test_container',
             // 'value' => '?',
-            'blueprint' => 'custom',
+            'blueprint' => 'test_blueprint',
             'foo' => 'bar',
         ], $array);
 
@@ -438,7 +441,7 @@ class AssetTest extends TestCase
     function data_keys_get_added_to_array()
     {
         $array = (new Asset)
-            ->container((new AssetContainer)->handle('test'))
+            ->container($this->container)
             ->set('title', 'test')
             ->path('path/to/asset.jpg')
             ->set('foo', 'bar')
@@ -452,9 +455,8 @@ class AssetTest extends TestCase
     /** @test */
     function extra_keys_get_added_to_array_when_file_exists()
     {
-        $container = $this->tempContainer();
-        $size = filesize($fixture = __DIR__.'/__fixtures__/container/a.txt');
-        copy($fixture, $this->tempDir.'/test.txt');
+        $container = $this->container;
+        Storage::disk('test')->put('test.txt', '');
 
         $asset = (new Asset)->container($container)->path('test.txt');
 
@@ -505,17 +507,5 @@ class AssetTest extends TestCase
             'last_modified', 'last_modified_timestamp', 'last_modified_instance',
             'focus_css',
         ];
-    }
-
-    private function tempContainer()
-    {
-        config(['filesystems.disks.temp' => [
-            'driver' => 'local',
-            'root' => $this->tempDir,
-        ]]);
-
-        @mkdir($this->tempDir);
-
-        return (new AssetContainer)->disk('temp');
     }
 }
