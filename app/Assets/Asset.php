@@ -536,4 +536,9 @@ class Asset implements AssetContract, Arrayable
     {
         return (in_array(strtolower($this->extension()), $filetypes));
     }
+
+    public function __toString()
+    {
+        return $this->url() ?? $this->id();
+    }
 }

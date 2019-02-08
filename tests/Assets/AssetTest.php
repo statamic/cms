@@ -482,16 +482,19 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
         $this->assertEquals('http://example.com/path/to/test.txt', $asset->url());
+        $this->assertEquals('http://example.com/path/to/test.txt', (string) $asset);
     }
 
     /** @test */
     function there_is_no_url_for_a_private_asset()
     {
         $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('id')->andReturn('container-id');
         $container->shouldReceive('private')->andReturnTrue();
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
         $this->assertNull($asset->url());
+        $this->assertEquals('container-id::path/to/test.txt', (string) $asset);
     }
 
     private function toArrayKeysWhenFileExists()
