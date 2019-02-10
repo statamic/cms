@@ -4,9 +4,9 @@ namespace Statamic\Forms;
 
 use Statamic\API\URL;
 use Statamic\API\Form;
-use Statamic\API\Crypt;
 use Statamic\Tags\Collection;
 use DebugBar\DebugBarException;
+use Illuminate\Support\Facades\Crypt;
 use DebugBar\DataCollector\ConfigCollector;
 
 class Tags extends Collection

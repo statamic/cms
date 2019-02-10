@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers;
 
 use Carbon\Carbon;
 use Statamic\API\Form;
-use Statamic\API\Crypt;
 use Statamic\API\Email;
 use Statamic\API\Parse;
 use Statamic\API\Config;
