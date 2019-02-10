@@ -30,6 +30,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Data\Structures\Structure::class => Policies\StructurePolicy::class,
         \Statamic\Contracts\Data\Entries\Collection::class => Policies\CollectionPolicy::class,
         \Statamic\Contracts\Data\Entries\Entry::class => Policies\EntryPolicy::class,
+        \Statamic\Contracts\Data\Entries\LocalizedEntry::class => Policies\EntryPolicy::class,
         \Statamic\Contracts\Data\Globals\GlobalSet::class => Policies\GlobalSetPolicy::class,
         \Statamic\Contracts\Auth\User::class => Policies\UserPolicy::class,
         \Statamic\Contracts\Forms\Form::class => Policies\FormPolicy::class,
