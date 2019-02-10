@@ -8,15 +8,12 @@ use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
-use Statamic\CP\Publish\ProcessesFields;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {
-    use ProcessesFields;
-
     public function index(FilteredSiteRequest $request, $collection)
     {
         $collection = Collection::whereHandle($collection);
