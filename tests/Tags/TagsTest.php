@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Extend;
+namespace Tests\Tags;
 
 use Tests\TestCase;
-use Statamic\Extend\Tags;
+use Statamic\Tags\Tags;
 use Tests\TestDependency;
 
 class TagsTest extends TestCase
