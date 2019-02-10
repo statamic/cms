@@ -4,7 +4,6 @@
     "keywords": ["statamic", "cms", "flat file", "laravel"],
     "require": {
         "composer/composer": "^1.7",
-        "danielstjules/stringy": "dev-master",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*|5.7.*|5.8.*",
         "laravelcollective/html": "5.6.*|5.7.*",
