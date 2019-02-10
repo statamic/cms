@@ -32,7 +32,7 @@ class EditBlueprintTest extends TestCase
             ->actingAs($user)
             ->get($blueprint->editUrl())
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */

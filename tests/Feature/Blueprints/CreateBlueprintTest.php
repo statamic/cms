@@ -30,6 +30,6 @@ class CreateBlueprintTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('blueprints.create'))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 }
