@@ -12,6 +12,8 @@ class NavTest extends TestCase
 {
     use FakesRoles;
 
+    protected $shouldPreventNavBeingBuilt = false;
+
     public function setUp()
     {
         parent::setUp();
