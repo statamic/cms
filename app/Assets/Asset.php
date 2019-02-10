@@ -9,7 +9,6 @@ use Statamic\API\URL;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
-use Statamic\API\Event;
 use Statamic\API\Image;
 use Statamic\Data\Data;
 use Statamic\API\Blueprint;
