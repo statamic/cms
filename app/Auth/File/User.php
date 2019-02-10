@@ -5,13 +5,13 @@ namespace Statamic\Auth\File;
 use Statamic\API;
 use Carbon\Carbon;
 use Statamic\API\File;
-use Statamic\API\Hash;
 use Statamic\API\YAML;
 use Statamic\Data\Data;
 use Statamic\API\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Auth\User as BaseUser;
+use Illuminate\Support\Facades\Hash;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
