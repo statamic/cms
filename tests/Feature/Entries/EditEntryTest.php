@@ -9,6 +9,7 @@ use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
+use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
 
 class EditEntryTest extends TestCase
@@ -21,9 +22,7 @@ class EditEntryTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
-        $collection = Collection::create('blog')->save();
-
-        $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->save();
+        $entry = EntryFactory::slug('test')->collection('blog')->create();
 
         $this
             ->from('/original')
@@ -39,15 +38,17 @@ class EditEntryTest extends TestCase
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
-        $collection = Collection::create('blog')->save();
 
-        $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with(['blueprint' => 'test'])->save();
+        $entry = EntryFactory::slug('test')
+            ->collection('blog')
+            ->data(['blueprint' => 'test'])
+            ->create();
 
         $this
             ->actingAs($user)
             ->get($entry->editUrl())
             ->assertSuccessful()
-            ->assertViewHas('entry', $entry)
+            ->assertViewHas('entry', $entry->in('en'))
             ->assertViewHas('readOnly', false);
     }
 
@@ -57,8 +58,11 @@ class EditEntryTest extends TestCase
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
         $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
         $user = User::make()->assignRole('test');
-        $collection = Collection::create('blog')->save();
-        $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with(['blueprint' => 'test'])->save();
+
+        $entry = EntryFactory::slug('test')
+            ->collection('blog')
+            ->data(['blueprint' => 'test'])
+            ->create();
 
         $this
             ->actingAs($user)

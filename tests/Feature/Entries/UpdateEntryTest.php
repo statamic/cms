@@ -11,6 +11,7 @@ use Statamic\Fields\Fields;
 use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
+use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
 
 class UpdateEntryTest extends TestCase
@@ -23,8 +24,12 @@ class UpdateEntryTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
-        $collection = Collection::create('blog')->save();
-        $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->id('1')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->data(['blueprint' => 'test'])
+            ->create();
 
         $this
             ->from('/original')
@@ -40,13 +45,15 @@ class UpdateEntryTest extends TestCase
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
-        $collection = Collection::create('blog')->save();
-        $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with([
-            'id' => 1,
-            'blueprint' => 'test',
-            'title' => 'Original title',
-            'foo' => 'bar',
-        ])->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
 
         $this
             ->actingAs($user)
@@ -55,11 +62,10 @@ class UpdateEntryTest extends TestCase
                 'foo' => 'updated foo',
                 'slug' => 'updated-slug'
             ])
-            ->assertStatus(204);
+            ->assertOk();
 
         $this->assertEquals('updated-slug', $entry->slug());
         $this->assertEquals([
-            'id' => 1,
             'blueprint' => 'test',
             'title' => 'Updated title',
             'foo' => 'updated foo',
@@ -72,13 +78,15 @@ class UpdateEntryTest extends TestCase
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text', 'validate' => 'required']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
-        $collection = Collection::create('blog')->save();
-        $entry = Entry::create('test')->collection('blog')->date('2017-07-04')->with([
-            'id' => 1,
-            'blueprint' => 'test',
-            'title' => 'Original title',
-            'foo' => 'bar',
-        ])->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
 
         $this
             ->from('/original')
@@ -93,7 +101,6 @@ class UpdateEntryTest extends TestCase
 
         $this->assertEquals('test', $entry->slug());
         $this->assertEquals([
-            'id' => 1,
             'blueprint' => 'test',
             'title' => 'Original title',
             'foo' => 'bar',
@@ -103,7 +110,7 @@ class UpdateEntryTest extends TestCase
     private function submit($entry, $payload)
     {
         return $this->patch(
-            cp_route('collections.entries.update', [$entry->collectionName(), $entry->slug()]),
+            cp_route('collections.entries.update', [$entry->collectionHandle(), $entry->id(), $entry->slug(), 'en']),
             $payload
         );
     }
