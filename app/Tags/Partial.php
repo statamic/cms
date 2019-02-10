@@ -7,6 +7,7 @@ use Statamic\API\Path;
 use Statamic\API\Parse;
 use Statamic\Tags\Tags;
 use Statamic\API\Config;
+use Statamic\API\Antlers;
 
 class Partial extends Tags
 {
@@ -35,6 +36,6 @@ class Partial extends Tags
         // Since 2.5, parameters need to be prefixed with a colon in order to read from the field.
         $variables = array_merge($this->context, $variables, $this->parameters);
 
-        return Parse::template($template, $variables, [], $php ?? false);
+        return Antlers::parser()->allowPhp($php ?? false)->parse($template, $variables);
     }
 }
