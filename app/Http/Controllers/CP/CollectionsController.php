@@ -92,8 +92,7 @@ class CollectionsController extends CpController
             ->data(array_except($data, 'handle'))
             ->save();
 
-        return redirect()
-            ->route('statamic.cp.collections.edit', $collection->path())
+        return redirect($collection->editUrl())
             ->with('success', 'Collection created.');
     }
 
@@ -114,8 +113,7 @@ class CollectionsController extends CpController
             ->data(array_merge($collection->data(), $data))
             ->save();
 
-        return redirect()
-            ->route('statamic.cp.collections.edit', $collection->path())
+        return redirect($collection->editUrl())
             ->with('success', 'Collection updated');
     }
 
