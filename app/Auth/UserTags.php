@@ -5,7 +5,6 @@ namespace Statamic\Auth;
 use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\Tags\Tags;
-use Statamic\API\Request;
 use Statamic\Exceptions\RedirectException;
 use Statamic\Contracts\Auth\User as UserContract;
 
@@ -376,7 +375,7 @@ class UserTags extends Tags
         $return = $this->get('redirect');
 
         if ($this->getBool('allow_request_redirect')) {
-            $return = Request::input('redirect', $return);
+            $return = request()->input('redirect', $return);
         }
 
         return $return;

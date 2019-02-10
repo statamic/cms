@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers;
 
 use Statamic\API\Auth;
 use Statamic\API\User;
-use Statamic\API\Request;
 use Statamic\Auth\PasswordReset;
 use Statamic\Auth\UserRegistrar;
 use Illuminate\Support\MessageBag;
@@ -16,7 +15,7 @@ class UserController extends Controller
 
     public function login()
     {
-        $validator = \Validator::make(Request::all(), [
+        $validator = \Validator::make(request()->all(), [
             'username' => 'required',
             'password' => 'required'
         ], [], [
@@ -29,16 +28,16 @@ class UserController extends Controller
         }
 
         $logged_in = Auth::login(
-            Request::input('username'),
-            Request::input('password'),
-            Request::has('remember')
+            request()->input('username'),
+            request()->input('password'),
+            request()->has('remember')
         );
 
         if (! $logged_in) {
             return back()->withInput()->withErrors('Invalid credentials.');
         }
 
-        $redirect = Request::input('redirect', '/');
+        $redirect = request()->input('redirect', '/');
 
         return redirect($redirect);
     }
@@ -47,7 +46,7 @@ class UserController extends Controller
     {
         \Auth::logout();
 
-        return redirect(Request::get('redirect', '/'));
+        return redirect(request()->get('redirect', '/'));
     }
 
     public function register()
@@ -76,7 +75,7 @@ class UserController extends Controller
 
         Auth::login($user);
 
-        $redirect = Request::input('redirect', '/');
+        $redirect = request()->input('redirect', '/');
 
         return redirect($redirect);
     }

@@ -8,7 +8,6 @@ use Statamic\API\Term;
 use Statamic\API\Entry;
 use Statamic\Tags\Tags;
 use Statamic\API\Helper;
-use Statamic\API\Request;
 use Statamic\Data\Content\ContentCollection;
 use Statamic\Extend\Management\FilterLoader;
 use Statamic\Presenters\PaginationPresenter;
@@ -486,7 +485,7 @@ class Collection extends Tags
         // Keep track of how many items were in the collection before pagination chunks it up.
         $this->total_results = $this->collection->count();
 
-        $page = (int) Request::get('page', 1);
+        $page = (int) request()->get('page', 1);
 
         $this->offset = (($page - 1) * $this->limit) + $this->getInt('offset', 0);
 
@@ -509,7 +508,7 @@ class Collection extends Tags
         $paginator = new LengthAwarePaginator($items, $count, $this->limit, $page);
 
         $paginator->setPath(request()->url());
-        $paginator->appends(Request::all());
+        $paginator->appends(request()->all());
 
         $this->pagination_data = [
             'total_items'    => $count,

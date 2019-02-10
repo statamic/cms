@@ -7,7 +7,6 @@ use Statamic\API\Form;
 use Statamic\API\Email;
 use Statamic\API\Parse;
 use Statamic\API\Config;
-use Statamic\API\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\RedirectResponse;
@@ -25,9 +24,9 @@ class FormController extends Controller
      */
     public function store()
     {
-        $fields = Request::all();
+        $fields = request()->all();
 
-        if (! $params = Request::input('_params')) {
+        if (! $params = request()->input('_params')) {
             return response('Invalid request.', 400);
         }
 
