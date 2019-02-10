@@ -254,8 +254,8 @@ EOT;
             'second::5' => '/baz/qux',
         ];
 
-        $this->assertEquals($expected, $this->store->getEntryUris());
-        $this->assertEquals($expected, $this->store->getEntryUris('en'));
+        $this->assertEquals($expected, $this->store->getEntryUris()->all());
+        $this->assertEquals($expected, $this->store->getEntryUris('en')->all());
     }
 
     /** @test */
