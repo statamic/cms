@@ -18,6 +18,7 @@ class GlobalRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
+        $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals';
         $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
 
@@ -35,7 +36,7 @@ class GlobalRepositoryTest extends TestCase
 
         $ordered = $sets->sortBy->path()->values();
         $this->assertEquals(['globals-contact', 'globals-global'], $ordered->map->id()->all());
-        $this->assertEquals(['contact', 'global'], $ordered->map->slug()->all()); // TODO: Change to handle()
+        $this->assertEquals(['contact', 'global'], $ordered->map->handle()->all());
         $this->assertEquals(['Contact Details', 'General'], $ordered->map->title()->all());
     }
 
@@ -45,14 +46,14 @@ class GlobalRepositoryTest extends TestCase
         tap($this->repo->find('globals-global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-global', $set->id());
-            $this->assertEquals('global', $set->slug()); // TODO: Change to handle()
+            $this->assertEquals('global', $set->handle());
             $this->assertEquals('General', $set->title());
         });
 
         tap($this->repo->find('globals-contact'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-contact', $set->id());
-            $this->assertEquals('contact', $set->slug()); // TODO: Change to handle()
+            $this->assertEquals('contact', $set->handle());
             $this->assertEquals('Contact Details', $set->title());
         });
 
@@ -62,19 +63,17 @@ class GlobalRepositoryTest extends TestCase
     /** @test */
     function it_gets_a_global_set_by_handle()
     {
-        $this->markTestIncomplete();// TODO: Revisit once globals have been refactored for multi site
-
         tap($this->repo->findByHandle('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-global', $set->id());
-            $this->assertEquals('global', $set->slug()); // TODO: Change to handle()
+            $this->assertEquals('global', $set->handle());
             $this->assertEquals('General', $set->title());
         });
 
         tap($this->repo->findByHandle('contact'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
             $this->assertEquals('globals-contact', $set->id());
-            $this->assertEquals('contact', $set->slug()); // TODO: Change to handle()
+            $this->assertEquals('contact', $set->handle());
             $this->assertEquals('Contact Details', $set->title());
         });
 
@@ -84,16 +83,21 @@ class GlobalRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_global_to_the_stache_and_to_a_file()
     {
-        $global = GlobalSetAPI::create('new')
-            ->with(['id' => 'id-new', 'foo' => 'bar', 'baz' => 'qux'])
-            ->get();
-        $global->in('fr')->set('foo', 'le bar');
+        $global = GlobalSetAPI::make()
+            ->id('id-new')
+            ->handle('new');
+        $global->in(function ($loc) {
+            $loc->data(['foo' => 'bar', 'baz' => 'qux']);
+        });
+        $global->in('fr', function ($loc) {
+            $loc->set('foo', 'le bar');
+        });
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($global);
 
         $this->assertNotNull($item = $this->repo->find('id-new'));
-        $this->assertEquals(['id' => 'id-new', 'foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data());
         $this->assertEquals(['foo' => 'le bar'], $item->in('fr')->data());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');

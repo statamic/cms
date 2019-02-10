@@ -1,4 +1,5 @@
 ---
 id: globals-global
 title: General
-foo: Bar
+data:
+  foo: Bar

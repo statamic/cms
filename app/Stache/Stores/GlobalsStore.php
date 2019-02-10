@@ -141,20 +141,33 @@ class GlobalsStore extends BasicStore
 
     public function getIdByHandle($handle)
     {
-        return $this->paths->map(function ($path) {
-            return pathinfo($path, PATHINFO_FILENAME);
-        })->flip()->get($handle);
+        return $this->paths->flatMap(function ($paths, $site) {
+            return $paths->mapWithKeys(function ($path, $id) {
+                $handle = pathinfo($path, PATHINFO_FILENAME);
+                return [$handle => $id];
+            });
+        })->get($handle);
     }
 
     public function save($global)
     {
-        // When using multiple sites, the global's localized data exists
-        // in separate files. When using a single site, the data lives
-        // in the global set itself, so we'll save *that*.
-        if (!Site::hasMultiple() && $global instanceof LocalizedGlobalSet) {
+        if ($global instanceof LocalizedGlobalSet) {
             $global = $global->localizable();
         }
 
+        $this->write($global);
+
+        // When using multiple sites, the global's localized data exists
+        // in separate files, so we'll write each one of those, too.
+        if (Site::hasMultiple()) {
+            $global->localizations()->each(function ($localization) {
+                $this->write($localization);
+            });
+        }
+    }
+
+    protected function write($global)
+    {
         File::put($path = $global->path(), $global->fileContents());
 
         // TODO:
