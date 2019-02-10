@@ -328,11 +328,15 @@ class FrontendTest extends TestCase
             ->route('{slug}')
             ->template('default');
 
-        return Entry::create()
+        $entry = Entry::create()
             ->id($slug)
             ->collection($collection)
             ->in(function ($loc) use ($slug, $attributes) {
                 $loc->slug($slug)->data($attributes['with'] ?? []);
-            })->save();
+            });
+
+        $entry->save();
+
+        return $entry;
     }
 }
