@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Statamic\API\Entries;
 use Statamic\API\Entry;
 use Statamic\Stache\Stache;
 
