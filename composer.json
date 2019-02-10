@@ -12,10 +12,10 @@
         "league/glide": "^1.1",
         "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
+        "statamic/stringy": "^3.1",
         "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*",
-        "wilderborn/partyline": "^1.0",
-        "statamic/stringy": "^3.1"
+        "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "codedungeon/phpunit-result-printer": "0.22",
