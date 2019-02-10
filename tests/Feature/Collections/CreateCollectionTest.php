@@ -36,6 +36,6 @@ class CreateCollectionTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.create'))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 }

@@ -31,7 +31,7 @@ class UpdateEntryTest extends TestCase
             ->actingAs($user)
             ->submit($entry, [])
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */

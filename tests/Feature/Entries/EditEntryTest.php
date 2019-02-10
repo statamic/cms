@@ -30,7 +30,7 @@ class EditEntryTest extends TestCase
             ->actingAs($user)
             ->get($entry->editUrl())
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */

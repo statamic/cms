@@ -37,7 +37,7 @@ class StoreFieldsetTest extends TestCase
                 'fields' => []
             ])
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
 
         $this->assertNull(API\Fieldset::find('test'));
     }

@@ -27,7 +27,7 @@ class DeleteCollectionTest extends TestCase
             ->actingAs($user)
             ->delete(cp_route('collections.destroy', $collection->path()))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
 
         $this->assertCount(1, Collection::all());
     }

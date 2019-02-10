@@ -25,7 +25,7 @@ class UpdateCollectionTest extends TestCase
             ->actingAs($this->userWithoutPermission())
             ->patch(cp_route('collections.update', $collection->path()))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */

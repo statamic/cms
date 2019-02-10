@@ -41,6 +41,6 @@ class EditCollectionTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('collections.edit', $collection->path()))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 }

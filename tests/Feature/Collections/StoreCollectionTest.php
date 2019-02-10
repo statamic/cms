@@ -21,7 +21,7 @@ class StoreCollectionTest extends TestCase
             ->actingAs($this->userWithoutPermission())
             ->post(cp_route('collections.store'))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */

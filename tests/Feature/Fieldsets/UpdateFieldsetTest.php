@@ -34,7 +34,7 @@ class UpdateFieldsetTest extends TestCase
             ->actingAs($user)
             ->submit($fieldset)
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
 
         $fieldset = API\Fieldset::find('test');
         $this->assertEquals('Test', $fieldset->title());
