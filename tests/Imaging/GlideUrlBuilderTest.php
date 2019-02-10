@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
 use Statamic\Imaging\GlideUrlBuilder;
 
 class GlideUrlBuilderTest extends TestCase
@@ -49,7 +50,7 @@ class GlideUrlBuilderTest extends TestCase
     public function testAsset()
     {
         $asset = new Asset;
-        $asset->container('main');
+        $asset->container((new AssetContainer)->handle('main'));
         $asset->path('img/foo.jpg');
 
         $encoded = base64_encode('main/img/foo.jpg');
