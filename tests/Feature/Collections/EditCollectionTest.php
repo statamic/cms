@@ -23,7 +23,7 @@ class EditCollectionTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get(cp_route('collections.edit', $collection->path()))
+            ->get(cp_route('collections.edit', $collection->handle()))
             ->assertSuccessful()
             ->assertViewHas('collection', $collection);
     }
@@ -39,7 +39,7 @@ class EditCollectionTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->get(cp_route('collections.edit', $collection->path()))
+            ->get(cp_route('collections.edit', $collection->handle()))
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
