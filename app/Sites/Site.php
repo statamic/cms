@@ -54,7 +54,9 @@ class Site
     {
         $path = Str::removeLeft($url, $this->absoluteUrl());
 
-        return Str::removeRight(Str::ensureLeft($path, '/'), '/');
+        $path = Str::removeRight(Str::ensureLeft($path, '/'), '/');
+
+        return $path === '' ? '/' : $path;
     }
 
     private function removePath($url)
