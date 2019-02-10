@@ -2,8 +2,6 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\Extend\Widget;
-
 class Template extends Widget
 {
     /**

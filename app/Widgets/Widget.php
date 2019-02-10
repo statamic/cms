@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Widgets;
 
 use Statamic\API\Str;
 use Statamic\Extend\HasTitle;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Extend;
+namespace Tests\Widgets;
 
 use Tests\TestCase;
 use Tests\TestDependency;
-use Statamic\Extend\Widget;
+use Statamic\Widgets\Widget;
 
 class WidgetTest extends TestCase
 {
@@ -13,9 +13,9 @@ class WidgetTest extends TestCase
     {
         $class = app(TestWidget::class);
 
-        $class->setParameters(['foo' => 'bar']);
+        $class->setConfig(['foo' => 'bar']);
 
-        $this->assertEquals('bar', $class->getParam('foo'));
+        $this->assertEquals('bar', $class->config('foo'));
         $this->assertInstanceOf(TestDependency::class, $class->dependency);
     }
 }
