@@ -20,31 +20,23 @@
 
             <span v-if="! (isDirty || searching)" class="rounded px-sm text-2xs border text-grey-light">/</span>
 
+            <div v-show="focused" class="global-search-results">
 
-
-            <div v-show="focused || hasResults" class="global-search-results">
                 <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
                     <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
                     <div class="flex-1 ml-1 title" v-html="result.title"></div>
                     <span class="rounded px-sm py-px text-2xs uppercase bg-grey-lightest text-grey" v-html="result.collection"></span>
                 </div>
 
-                <div v-if="! hasResults">
-                    <div class="px-1.5 py-1 text-grey uppercase text-3xs">Your Favorites</div>
-                    <div class="global-search-result-item flex items-center">
+                <div v-if="! hasResults && hasFavorites">
+                    <div class="px-1.5 py-1 text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
+
+                    <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
                         <svg-icon name="pin" class="icon"></svg-icon>
-                        <div class="flex-1 ml-1 title">New Blog Post</div>
-                    </div>
-                    <div class="global-search-result-item flex items-center">
-                        <svg-icon name="pin" class="icon"></svg-icon>
-                        <div class="flex-1 ml-1 title">New Event</div>
-                    </div>
-                    <div class="global-search-result-item flex items-center">
-                        <svg-icon name="pin" class="icon"></svg-icon>
-                        <div class="flex-1 ml-1 title">New Gallery</div>
+                        <div class="flex-1 ml-1 title" v-html="favorite.title"></div>
                     </div>
 
-                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide text-3xs">PRO TIP:</b> You can open global search using the <span class="rounded px-sm text-2xs border text-grey-light">/</span> key</div>
+                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm text-2xs border text-grey-light">/</span> key</div>
                 </div>
             </div>
         </div>
@@ -67,6 +59,11 @@ export default {
     data() {
         return {
             results: [],
+            favorites: [
+                // @TODO replace with Preference API
+                {title: 'New Blog Post', url: '/blog/new'},
+                {title: 'New Gallery Post', url: '/gallery/new'}
+            ],
             query: '',
             current: -1,
             searching: false,
@@ -77,6 +74,10 @@ export default {
     computed: {
         hasResults() {
             return this.results.length > 0;
+        },
+
+        hasFavorites() {
+            return this.favorites.length > 0;
         },
 
         isEmpty() {
@@ -126,6 +127,8 @@ export default {
         hit() {
             if (this.hasResults) {
                 window.location.href = this.results[this.current].edit_url;
+            } else {
+                window.location.href = this.favorites[this.current].url;
             }
         },
 
@@ -134,7 +137,11 @@ export default {
         },
 
         moveDown() {
-            if (this.current < this.results.length-1) this.current++;
+            if (this.hasResults) {
+                if (this.current < this.results.length-1) this.current++;
+            } else {
+                if (this.current < this.favorites.length-1) this.current++;
+            }
         },
 
         getResultIcon(result) {
