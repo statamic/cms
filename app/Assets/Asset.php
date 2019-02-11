@@ -2,7 +2,6 @@
 
 namespace Statamic\Assets;
 
-use Carbon\Carbon;
 use Stringy\Stringy;
 use Statamic\API\Str;
 use Statamic\API\URL;
@@ -12,6 +11,7 @@ use Statamic\API\Site;
 use Statamic\API\Image;
 use Statamic\Data\Data;
 use Statamic\API\Blueprint;
+use Illuminate\Support\Carbon;
 use Statamic\Data\ContainsData;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
@@ -421,18 +421,15 @@ class Asset implements AssetContract, Arrayable
 
         // If the file exists, we'll append a timestamp to prevent overwriting.
         if ($this->disk()->exists($path)) {
-            $basename = $filename . '-' . time() . '.' . $ext;
+            $basename = $filename . '-' . Carbon::now()->timestamp . '.' . $ext;
             $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
         }
 
-        $this->performUpload($file, $path);
+        $this->disk()->put($path, $file);
 
         $this->path($path);
 
         event(new AssetUploaded($this));
-
-        // Legacy/Deprecated. TODO: Remove in 2.3
-        event('asset.uploaded', $path);
     }
 
     private function getSafeFilename($string)
@@ -449,36 +446,6 @@ class Asset implements AssetContract, Arrayable
         }
 
         return (string) $str;
-    }
-
-    /**
-     * Actually perform the file upload.
-     *
-     * Saves the file to a temporary location on the local filesystem, then moves it to the
-     * right place. This is a workaround for needing to know the file extension or mime
-     * type when uploading to Amazon S3. Temporary files don't have file extensions
-     * so sending directly to S3 causes it to appear with the wrong mime type.
-     *
-     * @param UploadedFile $file
-     * @param string $path
-     * @return void
-     */
-    private function performUpload(UploadedFile $file, $path)
-    {
-        // Build up a path where the file will be temporarily stored
-        $temp = 'uploads/'.md5($file->getRealPath().microtime(true)).'.'.$file->getClientOriginalExtension();
-
-        // Upload to a temporary location
-        $temp_disk = new Filesystem(new Local(temp_path()));
-        $stream = fopen($file->getRealPath(), 'r+');
-        $temp_disk->putStream($temp, $stream);
-        fclose($stream);
-
-        // Move from the temporary location to the real container location
-        $this->disk()->put($path, $temp_disk->readStream($temp));
-
-        // Delete the temporary file
-        $temp_disk->delete($temp);
     }
 
     /**

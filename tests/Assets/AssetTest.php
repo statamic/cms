@@ -7,10 +7,13 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Statamic\Fields\Blueprint;
+use Illuminate\Http\UploadedFile;
 use Statamic\Assets\AssetContainer;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Event;
 use Facades\Statamic\Assets\Dimensions;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Events\Data\AssetUploaded;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class AssetTest extends TestCase
@@ -463,7 +466,35 @@ class AssetTest extends TestCase
     /** @test */
     function it_can_upload_a_file()
     {
-        $this->markTestIncomplete();
+        Event::fake();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
+    function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
+    {
+        Event::fake();
+        Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
+        Storage::disk('test')->put('path/to/asset.jpg', '');
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+
+        $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/asset-1549914700.jpg');
+        $this->assertEquals('path/to/asset-1549914700.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
     }
 
     /** @test */
