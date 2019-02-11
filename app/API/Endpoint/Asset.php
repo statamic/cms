@@ -7,7 +7,6 @@ use Statamic\API\URL;
 use Statamic\API\Site;
 use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
-use Statamic\Contracts\Assets\AssetFactory;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 
 class Asset
@@ -136,15 +135,6 @@ class Asset
         return self::all()->filter(function ($asset) use ($path) {
             return $asset->resolvedPath() === $path;
         })->first();
-    }
-
-    /**
-     * @param string|null $path
-     * @return \Statamic\Contracts\Assets\AssetFactory
-     */
-    public function create($path = null)
-    {
-        return app(AssetFactory::class)->create($path);
     }
 
     public function make()

@@ -2,7 +2,6 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Contracts\Data\Globals\GlobalFactory;
 use Statamic\Contracts\Data\Repositories\GlobalRepository;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalContract;
 
@@ -11,17 +10,6 @@ class GlobalSet
     public function make()
     {
         return $this->repo()->make();
-    }
-
-    /**
-     * Create a global set
-     *
-     * @param string $slug
-     * @return GlobalFactory
-     */
-    public function create($slug)
-    {
-        return app(GlobalFactory::class)->create($slug);
     }
 
     /**

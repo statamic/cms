@@ -40,18 +40,8 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Entries\EntryFactory::class,
-            \Statamic\Data\Entries\EntryFactory::class
-        );
-
-        $this->app->bind(
             \Statamic\Contracts\Data\Entries\Collection::class,
             \Statamic\Data\Entries\Collection::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Data\Taxonomies\TermFactory::class,
-            \Statamic\Data\Taxonomies\TermFactory::class
         );
 
         $this->app->bind(
@@ -60,23 +50,8 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Globals\GlobalFactory::class,
-            \Statamic\Data\Globals\GlobalFactory::class
-        );
-
-        $this->app->bind(
             \Statamic\Contracts\Assets\AssetContainer::class,
             \Statamic\Assets\AssetContainer::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Assets\AssetFactory::class,
-            \Statamic\Assets\AssetFactory::class
-        );
-
-        $this->app->bind(
-            \Statamic\Contracts\Assets\AssetContainerFactory::class,
-            \Statamic\Assets\AssetContainerFactory::class
         );
 
         $this->app->singleton(
