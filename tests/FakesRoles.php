@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Statamic\API\Role;
+use Statamic\Auth\File\Role as FileRole;
 use Illuminate\Support\Collection;
 use Statamic\Auth\RoleRepository;
 use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
@@ -11,11 +12,12 @@ trait FakesRoles
 {
     private function setTestRoles($roles)
     {
-        $roles = collect($roles)->map(function ($permissions, $handle) {
-            return Role::make()
-                ->handle($handle)
-                ->addPermission($permissions);
-        });
+        $roles = collect($roles)
+            ->map(function ($permissions, $handle) {
+                return $permissions instanceof FileRole
+                    ? $permissions->handle($handle)
+                    : Role::make()->handle($handle)->addPermission($permissions);
+            });
 
         $fake = new class($roles) extends RoleRepository {
             protected $roles;
