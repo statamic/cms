@@ -2,7 +2,6 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Filesystem\FileAccessor;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Filesystem\FlysystemAdapter;
 use Statamic\Filesystem\FilesystemAdapter;

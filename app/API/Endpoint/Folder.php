@@ -2,8 +2,6 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\Filesystem\FolderAccessor;
-
 /**
  * Manipulating folders on the local filesystem
  *
