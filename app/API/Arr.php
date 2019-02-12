@@ -13,7 +13,7 @@ class Arr extends IlluminateArr
      * @param $array
      * @return bool
      */
-    public function assoc($array)
+    public static function assoc($array)
     {
         return (bool) count(array_filter(array_keys($array), 'is_string'));
     }
@@ -25,7 +25,7 @@ class Arr extends IlluminateArr
      * @param array $array2
      * @return array
      */
-    public function &combineRecursive(array &$array1, &$array2)
+    public static function &combineRecursive(array &$array1, &$array2)
     {
         $merged = $array1;
 
@@ -50,7 +50,7 @@ class Arr extends IlluminateArr
      * @param  array  $order An array of keys in the order to sort the first array
      * @return array
      */
-    public function sortByArray(array $array, array $order)
+    public static function sortByArray(array $array, array $order)
     {
         $ordered = [];
 
@@ -64,7 +64,7 @@ class Arr extends IlluminateArr
         return $ordered + $array;
     }
 
-    public function addScope($data, $scope)
+    public static function addScope($data, $scope)
     {
         if ($data instanceof DataCollection) {
             $data = $data->toArray();
@@ -100,7 +100,7 @@ class Arr extends IlluminateArr
      * @param array $array
      * @return array
      */
-    public function removeNullValues($data)
+    public static function removeNullValues($data)
     {
         return array_filter($data, function ($item) {
             return is_array($item)
