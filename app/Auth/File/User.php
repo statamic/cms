@@ -12,6 +12,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
+use Statamic\Preferences\HasPreferences;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
@@ -20,8 +21,7 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile;
-    use ContainsData {
+    use ExistsAsFile, HasPreferences, ContainsData {
         data as traitData;
     }
 
