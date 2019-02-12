@@ -9,26 +9,24 @@
             <a :href="container.edit_url" class="btn">Edit Container</a>
         </div>
 
-        <div class="card p-0">
-            <asset-browser
-                ref="browser"
-                :initial-container="container"
-                :selected-path="path"
-                :selected-assets="selectedAssets"
-                :actions="actions"
-                :action-url="actionUrl"
-                @navigated="navigate"
-                @selections-updated="updateSelections"
-                @asset-doubleclicked="editAsset"
-            >
+        <asset-browser
+            ref="browser"
+            :initial-container="container"
+            :selected-path="path"
+            :selected-assets="selectedAssets"
+            :actions="actions"
+            :action-url="actionUrl"
+            @navigated="navigate"
+            @selections-updated="updateSelections"
+            @asset-doubleclicked="editAsset"
+        >
 
-                <template slot="actions" slot-scope="{ ids }">
-                    <button class="btn ml-1" @click="openAssetMover">{{ __('Move') }}</button>
-                    <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">Delete</button>
-                </template>
+            <template slot="actions" slot-scope="{ ids }">
+                <button class="btn ml-1" @click="openAssetMover">{{ __('Move') }}</button>
+                <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">Delete</button>
+            </template>
 
-            </asset-browser>
-        </div>
+        </asset-browser>
 
         <mover
             v-if="showAssetMover"

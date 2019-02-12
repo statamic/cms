@@ -6,6 +6,8 @@ use Statamic\API\Str;
 use Statamic\API\Action;
 use Illuminate\Http\Request;
 use Statamic\API\AssetContainer;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AssetBrowserController extends CpController
 {
@@ -54,12 +56,22 @@ class AssetBrowserController extends CpController
             ];
         }
 
-        return [
+        // Set up the paginator, since we don't want to display all the assets.
+        // TODO: Instead of manually creating a paginator, get one from the Asset QueryBuilder once it exists.
+        $totalAssetCount = $assets->count();
+        $perPage = request('perPage');
+        $currentPage = (int) $this->request->page ?: 1;
+        $offset = ($currentPage - 1) * $perPage;
+        $assets = new LengthAwarePaginator(
+            $assets->values()->slice($offset, $perPage),
+            $totalAssetCount, $perPage, $currentPage
+        );
+
+        return Resource::collection($assets)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
-            'assets' => $assets->toArray(),
             'folders' => $folders,
             'folder' => $container->assetFolder($path)->toArray()
-        ];
+        ]]);
     }
 
     private function supplementAssetsForDisplay($assets)

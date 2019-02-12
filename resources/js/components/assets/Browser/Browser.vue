@@ -38,83 +38,92 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }">
+                        <div class="card p-0">
 
-                        <div class="data-list-header">
-                            <data-list-toggle-all ref="toggleAll" />
-                            <data-list-search v-model="searchQuery" />
+                            <div class="data-list-header">
+                                <data-list-toggle-all ref="toggleAll" />
+                                <data-list-search v-model="searchQuery" />
 
-                            <button
-                                class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
-                                @click="openFileBrowser"
-                            >
-                                <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
-                                <span>{{ __('Upload') }}</span>
-                            </button>
+                                <button
+                                    class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
+                                    @click="openFileBrowser"
+                                >
+                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
+                                    <span>{{ __('Upload') }}</span>
+                                </button>
+                            </div>
+
+                            <data-list-bulk-actions
+                                v-if="hasActions"
+                                :url="actionUrl"
+                                :actions="actions"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
+
+                            <uploads
+                                v-if="uploads.length"
+                                :uploads="uploads"
+                                class="-mt-px"
+                            />
+
+                            <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
+
+                                <template slot="tbody-start">
+                                    <tr v-if="folder.parent_path && !restrictNavigation">
+                                        <td />
+                                        <td @click="selectFolder(folder.parent_path)">
+                                            <a class="flex items-center cursor-pointer">
+                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                ..
+                                            </a>
+                                        </td>
+                                        <td :colspan="columns.length" />
+                                    </tr>
+                                    <tr v-for="folder in folders" :key="folder.path" v-if="!restrictNavigation">
+                                        <td />
+                                        <td @click="selectFolder(folder.path)">
+                                            <a class="flex items-center cursor-pointer">
+                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                {{ folder.title || folder.path }}
+                                            </a>
+                                        </td>
+                                        <td :colspan="columns.length" />
+                                    </tr>
+                                </template>
+
+                                <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
+                                    <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
+                                        <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
+                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
+                                    </div>
+                                </template>
+
+                                <template slot="actions" slot-scope="{ row: asset }">
+                                    <dropdown-list>
+                                        <div class="dropdown-menu">
+                                            <li><a @click="edit(asset.id)">Edit</a></li>
+                                            <div class="li divider" />
+                                            <data-list-inline-actions
+                                                :item="asset.id"
+                                                :url="actionUrl"
+                                                :actions="actions"
+                                                @started="actionStarted"
+                                                @completed="actionCompleted"
+                                            />
+                                        </div>
+                                    </dropdown-list>
+                                </template>
+
+                            </data-list-table>
+
                         </div>
 
-                        <data-list-bulk-actions
-                            v-if="hasActions"
-                            :url="actionUrl"
-                            :actions="actions"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
+                        <data-list-pagination
+                            class="mt-3"
+                            :resource-meta="meta"
+                            @page-selected="page = $event"
                         />
-
-                        <uploads
-                            v-if="uploads.length"
-                            :uploads="uploads"
-                            class="-mt-px"
-                        />
-
-                        <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
-
-                            <template slot="tbody-start">
-                                <tr v-if="folder.parent_path && !restrictNavigation">
-                                    <td />
-                                    <td @click="selectFolder(folder.parent_path)">
-                                        <a class="flex items-center cursor-pointer">
-                                            <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                            ..
-                                        </a>
-                                    </td>
-                                    <td :colspan="columns.length" />
-                                </tr>
-                                <tr v-for="folder in folders" :key="folder.path" v-if="!restrictNavigation">
-                                    <td />
-                                    <td @click="selectFolder(folder.path)">
-                                        <a class="flex items-center cursor-pointer">
-                                            <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                            {{ folder.title || folder.path }}
-                                        </a>
-                                    </td>
-                                    <td :colspan="columns.length" />
-                                </tr>
-                            </template>
-
-                            <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
-                                <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                    <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
-                                    <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
-                                </div>
-                            </template>
-
-                            <template slot="actions" slot-scope="{ row: asset }">
-                                <dropdown-list>
-                                    <div class="dropdown-menu">
-                                        <li><a @click="edit(asset.id)">Edit</a></li>
-                                        <div class="li divider" />
-                                        <data-list-inline-actions
-                                            :item="asset.id"
-                                            :url="actionUrl"
-                                            :actions="actions"
-                                            @started="actionStarted"
-                                            @completed="actionCompleted"
-                                        />
-                                    </div>
-                                </dropdown-list>
-                            </template>
-
-                        </data-list-table>
 
                         <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
                             There are no assets.
@@ -184,6 +193,9 @@ export default {
             searchQuery: '',
             editedAssetId: null,
             uploads: [],
+            page: 1,
+            perPage: 25, // TODO: Should come from the controller, or a config.
+            meta: {},
         }
     },
 
@@ -207,6 +219,13 @@ export default {
             return true;
             // TODO
             // return this.can('assets:'+ this.container.id +':edit')
+        },
+
+        parameters() {
+            return {
+                page: this.page,
+                perPage: this.perPage
+            }
         }
 
     },
@@ -227,7 +246,12 @@ export default {
 
         path() {
             this.loadAssets();
-        }
+        },
+
+        parameters(after, before) {
+            if (JSON.stringify(before) === JSON.stringify(after)) return;
+            this.loadAssets();
+        },
 
     },
 
@@ -255,11 +279,11 @@ export default {
             this.loadingAssets = true;
             const url = cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
 
-            axios.get(url).then(response => {
-                const { assets, folders, folder } = response.data;
-                this.assets = assets;
-                this.folders = folders;
-                this.folder = folder;
+            axios.get(url, { params: this.parameters }).then(response => {
+                this.assets = response.data.data;
+                this.folders = response.data.meta.folders;
+                this.folder = response.data.meta.folder;
+                this.meta = response.data.meta;
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {
@@ -325,7 +349,6 @@ export default {
         },
 
         uploadError(upload, uploads) {
-            console.log('error');
             this.uploads = uploads;
             this.$notify.error(upload.errorMessage);
         },
