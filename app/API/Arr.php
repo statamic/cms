@@ -2,12 +2,6 @@
 
 namespace Statamic\API;
 
-use Illuminate\Support\Facades\Facade;
-
-class Arr extends Facade
+class Arr extends Endpoint\Arr
 {
-    protected static function getFacadeAccessor()
-    {
-        return Endpoint\Arr::class;
-    }
 }
