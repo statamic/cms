@@ -425,11 +425,15 @@ class Asset implements AssetContract, Arrayable
             $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
         }
 
-        $this->disk()->put($path, $file);
+        $stream = fopen($file->getRealPath(), 'r');
+        $this->disk()->put($path, $stream);
+        fclose($stream);
 
         $this->path($path);
 
         event(new AssetUploaded($this));
+
+        return $this;
     }
 
     private function getSafeFilename($string)

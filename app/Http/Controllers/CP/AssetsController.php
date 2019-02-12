@@ -5,12 +5,12 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\Asset;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
+use Statamic\API\AssetContainer;
 use Statamic\CP\Publish\ProcessesFields;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 
 class AssetsController extends CpController
 {
-    use ProcessesFields;
-
     public function index()
     {
         return redirect()->cpRoute('assets.browse.index');
@@ -78,6 +78,24 @@ class AssetsController extends CpController
         }
 
         return ['success' => true, 'message' => 'Asset updated', 'asset' => $asset->toArray()];
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'container' => 'required',
+            'folder' => 'required',
+        ]);
+
+        $this->authorize('store', [
+            AssetContract::class,
+            $container = AssetContainer::find($request->container)
+        ]);
+
+        $file = $request->file('file');
+        $path = $request->folder . '/' . $file->getClientOriginalName();
+
+        return $container->makeAsset($path)->upload($file);
     }
 
     public function download($asset)

@@ -1,37 +1,39 @@
 <template>
 
-    <tr>
+    <div class="flex items-center my-2"
+        :class="{
+            'text-red': status == 'error',
+            'text-green': status === 'pending'
+        }"
+    >
 
-        <td class="column-status" :class="status">
+        <div class="mx-1">
             <span class="icon icon-warning error" v-if="status === 'error'"></span>
-            <span class="icon icon-circular-graph animation-spin" v-else></span>
-        </td>
+            <loading-graphic v-else :inline="true" text="" />
+        </div>
 
-        <td class="column-thumbnail">
-            <div class="img">
-                <file-icon :extension="extension"></file-icon>
-            </div>
-        </td>
+        <div class="w-6 mr-1">
+            <file-icon :extension="extension"></file-icon>
+        </div>
 
-        <td class="column-filename">
-            <span class="filename">{{ basename }}</span>
-        </td>
+        <div class="filename">{{ basename }}</div>
 
-        <td class="column-progress" v-if="status !== 'error'">
-            <div class="progress">
-                <div class="progress-bar" :style="{ width: percent+'%' }"></div>
-            </div>
-        </td>
+        <div
+            v-if="status !== 'error'"
+            class="bg-white flex-1 h-4 mx-1 rounded"
+        >
+            <div class="bg-blue h-full rounded"
+                :style="{ width: percent+'%' }" />
+        </div>
 
-        <td class="column-error" v-else>{{ error }}</td>
-
-        <td style="width: 30px">
-            <a href="#" v-if="status == 'error'" @click.prevent="clear">
+        <div class="ml-1" v-if="status === 'error'">
+            {{ error }}
+            <button v-if="status == 'error'" @click.prevent="clear">
                 <i class="icon icon-circle-with-cross"></i>
-            </a>
-        </td>
+            </button>
+        </div>
 
-    </tr>
+    </div>
 
 </template>
 

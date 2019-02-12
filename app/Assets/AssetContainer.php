@@ -277,14 +277,14 @@ class AssetContainer implements AssetContainerContract
     }
 
     /**
-     * Create an asset
+     * Make an asset
      *
      * @param string $path
      * @return \Statamic\Assets\Asset
      */
-    public function createAsset($path)
+    public function makeAsset($path)
     {
-        return AssetAPI::create($path)->container($this->id)->get();
+        return AssetAPI::make()->path($path)->container($this);
     }
 
     /**

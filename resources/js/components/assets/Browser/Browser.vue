@@ -1,100 +1,124 @@
 <template>
 
     <div>
-
-        <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictNavigation && Object.keys(containers).length > 1">
-            <a v-for="item in containers" :key="item.id"
-                v-text="item.title"
-                :class="{ active: item.id === container.id }"
-                @click="selectContainer(item.id)"
-            />
-        </div>
-
-        <div v-if="initializing || loadingContainers" class="asset-browser-loading loading">
-            <loading-graphic />
-        </div>
-
-        <data-list
-            v-if="!loadingContainers && !initializing"
-            :rows="assets"
-            :columns="columns"
-            :visible-columns="visibleColumns"
-            :search-query="searchQuery"
-            :selections="selectedAssets"
-            :max-selections="maxFiles"
-            @selections-updated="(ids) => $emit('selections-updated', ids)"
+        <uploader
+            ref="uploader"
+            :container="container.id"
+            :path="path"
+            @updated="uploadsUpdated"
+            @upload-complete="uploadCompleted"
+            @error="uploadError"
         >
-            <div slot-scope="{ filteredRows: rows }">
-
-                <div class="data-list-header">
-                    <data-list-toggle-all ref="toggleAll" />
-                    <data-list-search v-model="searchQuery" />
+            <div slot-scope="{}">
+                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictNavigation && Object.keys(containers).length > 1">
+                    <a v-for="item in containers" :key="item.id"
+                        v-text="item.title"
+                        :class="{ active: item.id === container.id }"
+                        @click="selectContainer(item.id)"
+                    />
                 </div>
 
-                <data-list-bulk-actions
-                    v-if="hasActions"
-                    :url="actionUrl"
-                    :actions="actions"
-                    @started="actionStarted"
-                    @completed="actionCompleted"
-                />
+                <div v-if="initializing || loadingContainers" class="asset-browser-loading loading">
+                    <loading-graphic />
+                </div>
 
-                <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
+                <data-list
+                    v-if="!loadingContainers && !initializing"
+                    :rows="assets"
+                    :columns="columns"
+                    :visible-columns="visibleColumns"
+                    :search-query="searchQuery"
+                    :selections="selectedAssets"
+                    :max-selections="maxFiles"
+                    @selections-updated="(ids) => $emit('selections-updated', ids)"
+                >
+                    <div slot-scope="{ filteredRows: rows }">
 
-                    <template slot="tbody-start">
-                        <tr v-if="folder.parent_path && !restrictNavigation">
-                            <td />
-                            <td @click="selectFolder(folder.parent_path)">
-                                <a class="flex items-center cursor-pointer">
-                                    <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                    ..
-                                </a>
-                            </td>
-                            <td :colspan="columns.length" />
-                        </tr>
-                        <tr v-for="folder in folders" :key="folder.path" v-if="!restrictNavigation">
-                            <td />
-                            <td @click="selectFolder(folder.path)">
-                                <a class="flex items-center cursor-pointer">
-                                    <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                    {{ folder.title || folder.path }}
-                                </a>
-                            </td>
-                            <td :colspan="columns.length" />
-                        </tr>
-                    </template>
+                        <div class="data-list-header">
+                            <data-list-toggle-all ref="toggleAll" />
+                            <data-list-search v-model="searchQuery" />
 
-                    <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
-                        <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                            <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
-                            <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
+                            <button
+                                class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
+                                @click="openFileBrowser"
+                            >
+                                <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
+                                <span>{{ __('Upload') }}</span>
+                            </button>
                         </div>
-                    </template>
 
-                    <template slot="actions" slot-scope="{ row: asset }">
-                        <dropdown-list>
-                            <div class="dropdown-menu">
-                                <li><a @click="edit(asset.id)">Edit</a></li>
-                                <div class="li divider" />
-                                <data-list-inline-actions
-                                    :item="asset.id"
-                                    :url="actionUrl"
-                                    :actions="actions"
-                                    @started="actionStarted"
-                                    @completed="actionCompleted"
-                                />
-                            </div>
-                        </dropdown-list>
-                    </template>
+                        <data-list-bulk-actions
+                            v-if="hasActions"
+                            :url="actionUrl"
+                            :actions="actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
 
-                </data-list-table>
+                        <uploads
+                            v-if="uploads.length"
+                            :uploads="uploads"
+                            class="-mt-px"
+                        />
 
-                <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
-                    There are no assets.
-                </div>
+                        <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
 
+                            <template slot="tbody-start">
+                                <tr v-if="folder.parent_path && !restrictNavigation">
+                                    <td />
+                                    <td @click="selectFolder(folder.parent_path)">
+                                        <a class="flex items-center cursor-pointer">
+                                            <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                            ..
+                                        </a>
+                                    </td>
+                                    <td :colspan="columns.length" />
+                                </tr>
+                                <tr v-for="folder in folders" :key="folder.path" v-if="!restrictNavigation">
+                                    <td />
+                                    <td @click="selectFolder(folder.path)">
+                                        <a class="flex items-center cursor-pointer">
+                                            <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                            {{ folder.title || folder.path }}
+                                        </a>
+                                    </td>
+                                    <td :colspan="columns.length" />
+                                </tr>
+                            </template>
+
+                            <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
+                                <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
+                                    <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
+                                    <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
+                                </div>
+                            </template>
+
+                            <template slot="actions" slot-scope="{ row: asset }">
+                                <dropdown-list>
+                                    <div class="dropdown-menu">
+                                        <li><a @click="edit(asset.id)">Edit</a></li>
+                                        <div class="li divider" />
+                                        <data-list-inline-actions
+                                            :item="asset.id"
+                                            :url="actionUrl"
+                                            :actions="actions"
+                                            @started="actionStarted"
+                                            @completed="actionCompleted"
+                                        />
+                                    </div>
+                                </dropdown-list>
+                            </template>
+
+                        </data-list-table>
+
+                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
+                            There are no assets.
+                        </div>
+
+                    </div>
+                </data-list>
             </div>
-        </data-list>
+        </uploader>
 
         <asset-editor
             v-if="showAssetEditor"
@@ -113,6 +137,8 @@ import axios from 'axios';
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import HasActions from '../../data-list/HasActions';
+import Uploader from '../Uploader.vue';
+import Uploads from '../Uploads.vue';
 
 export default {
 
@@ -123,6 +149,8 @@ export default {
     components: {
         AssetThumbnail,
         AssetEditor,
+        Uploader,
+        Uploads,
     },
 
     props: {
@@ -150,6 +178,7 @@ export default {
             folder: {},
             searchQuery: '',
             editedAssetId: null,
+            uploads: [],
         }
     },
 
@@ -279,7 +308,26 @@ export default {
         destroyMultiple(ids) {
             // TODO
             console.log('deleting multiple assets', ids);
-        }
+        },
+
+        uploadsUpdated(uploads) {
+            this.uploads = uploads;
+        },
+
+        uploadCompleted(asset) {
+            this.loadAssets();
+            this.$notify.success(__(':file uploaded', { file: asset.basename }), { timeout: 3000 });
+        },
+
+        uploadError(upload, uploads) {
+            console.log('error');
+            this.uploads = uploads;
+            this.$notify.error(upload.errorMessage);
+        },
+
+        openFileBrowser() {
+            this.$refs.uploader.browse();
+        },
     }
 
 }

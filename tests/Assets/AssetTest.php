@@ -470,8 +470,9 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+        $return = $asset->upload(UploadedFile::fake()->create('asset.jpg'));
 
+        $this->assertEquals($asset, $return);
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {

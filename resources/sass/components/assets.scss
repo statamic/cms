@@ -198,86 +198,6 @@
 
 }
 
-/**
- * Asset upload listing
- *
- * Used in the browser and fieldtype to show files being uploaded.
- */
-
-.asset-upload-listing {
-    background: $asset_bg;
-    color: #fff;
-    padding: 0px 5px;
-
-    .asset-upload-listing-header {
-        @extend .little-heading;
-        padding: 10px;
-    }
-
-    table {
-        margin: 0;
-        -webkit-font-smoothing: antialiased;
-
-        tr { border-top: 1px solid rgba(white, .1); }
-        tr:first-child { border: none; }
-        td { vertical-align: middle;}
-    }
-
-    .column-status {
-        width: 1px;
-        padding-left: 10px;
-
-        &.error {
-            color: $color_red;
-        }
-
-        &.pending {
-            color: $color_green;
-        }
-    }
-
-    .column-icon {
-        width: 1px;
-
-        img {
-            width: 25px;
-            height: 25px;
-        }
-    }
-
-    .column-thumbnail {
-        .img {
-            width: 25px;
-            height: 25px;
-            border-radius: 2px;
-        }
-
-        .svg-icon, svg {
-            width: 100%;
-            height: 100%;
-        }
-    }
-
-    .column-filename {
-        .filename {
-            display: inline-block;
-            vertical-align: middle;
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: 300px;
-            text-overflow: ellipsis;
-        }
-    }
-
-    .column-progress {
-        width: 60%;
-    }
-
-    .progress {
-        margin-bottom: 0;
-    }
-}
-
 
 /**
  * Table listing
@@ -611,26 +531,6 @@
 
     .asset-filesize {
         display: none;
-    }
-}
-
-.assets-fieldtype .asset-upload-listing {
-    margin: 0;
-    border: 1px dashed #ccc;
-    border-top: 0;
-
-    table {
-        margin: 0;
-    }
-
-    tr:first-child {
-        border-top: 0;
-    }
-
-    .img {
-        width: 25px;
-        height: 25px;
-        border-radius: 2px;
     }
 }
 
