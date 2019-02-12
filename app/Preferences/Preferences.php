@@ -6,6 +6,10 @@ use Illuminate\Support\Arr;
 
 class Preferences
 {
+    protected $user;
+    protected $dotted = [];
+    protected $preferences = [];
+
     /**
      * Instantiate preferences helpers.
      */
@@ -21,8 +25,15 @@ class Preferences
      */
     public function all()
     {
-        // TODO: Merging with roles
-        return $this->user->preferences();
+        if ($this->preferences) {
+            return $this->preferences;
+        }
+
+        return $this
+            ->resetState()
+            ->mergeDottedUserPreferences()
+            ->mergeDottedRolePreferences()
+            ->getMultiDimensionalPreferences();
     }
 
     /**
@@ -35,5 +46,58 @@ class Preferences
     public function get($key, $fallback = null)
     {
         return Arr::get($this->all(), $key, $fallback);
+    }
+
+    /**
+     * Reset state.
+     *
+     * @return $this
+     */
+    protected function resetState()
+    {
+        $this->dotted = [];
+        $this->preferences = [];
+
+        return $this;
+    }
+
+    /**
+     * Merged dotted user preferences.
+     *
+     * @return $this
+     */
+    protected function mergeDottedUserPreferences()
+    {
+        $this->dotted += Arr::dot($this->user->preferences());
+
+        return $this;
+    }
+
+    /**
+     * Merged dotted role preferences.
+     *
+     * @return $this
+     */
+    protected function mergeDottedRolePreferences()
+    {
+        foreach ($this->user->roles() as $role) {
+            $this->dotted += Arr::dot($role->preferences());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get multi-dimensional array of preferences from dotted preferences.
+     *
+     * @return array
+     */
+    protected function getMultiDimensionalPreferences()
+    {
+        foreach ($this->dotted as $key => $value) {
+            Arr::set($this->preferences, $key, $value);
+        }
+
+        return $this->preferences;
     }
 }
