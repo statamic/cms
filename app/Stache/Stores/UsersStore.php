@@ -24,6 +24,7 @@ class UsersStore extends BasicStore
                 ->id($id)
                 ->email($item['email'])
                 ->initialPath($item['path'])
+                ->preferences($item['preferences'])
                 ->data($item['data'])
                 ->passwordHash($item['password']);
 
@@ -41,6 +42,7 @@ class UsersStore extends BasicStore
             ->id(array_pull($data, 'id'))
             ->initialPath($path)
             ->email(pathinfo($path, PATHINFO_FILENAME))
+            ->preferences(array_pull($data, 'preferences', []))
             ->data($data);
 
         if (array_get($data, 'password')) {

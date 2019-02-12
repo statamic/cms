@@ -306,6 +306,7 @@ class User extends BaseUser
             'email' => $this->email,
             'password' => $this->password,
             'data' => $this->data(),
+            'preferences' => $this->preferences(),
         ];
     }
 
@@ -314,6 +315,7 @@ class User extends BaseUser
         return array_merge($this->data(), [
             'id' => (string) $this->id(),
             'password_hash' => $this->password(),
+            'preferences' => $this->preferences(),
         ]);
     }
 }
