@@ -8,9 +8,15 @@ export default {
             ref: 'nativeFileField'
         });
 
-        return h('div', {}, [
-            fileField,
-            ...this.$scopedSlots.default({})
+        return h('div', { on: {
+            'dragenter': this.dragenter,
+            'dragleave': this.dragleave,
+            'drop': this.drop,
+        }}, [
+            h('div', { class: { 'pointer-events-none': this.dragging }}, [
+                fileField,
+                ...this.$scopedSlots.default({ dragging: this.dragging })
+            ])
         ]);
     },
 
@@ -20,6 +26,7 @@ export default {
 
     data() {
         return {
+            dragging: false,
             uploads: []
         }
     },
@@ -117,10 +124,23 @@ export default {
                     this.$emit('error', upload, this.uploads);
                 }
             });
+        },
+
+        dragenter(e) {
+            this.dragging = true;
+        },
+
+        dragleave(e) {
+            // When dragging over a child, the parent will trigger a dragleave.
+            if (e.target !== e.currentTarget) return;
+
+            this.dragging = false;
+        },
+
+        drop(e) {
+            this.dragging = false;
         }
-
     }
-
 
 }
 </script>

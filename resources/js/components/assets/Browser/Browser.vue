@@ -9,7 +9,12 @@
             @upload-complete="uploadCompleted"
             @error="uploadError"
         >
-            <div slot-scope="{}">
+            <div slot-scope="{ dragging }" class="relative">
+                <div class="drag-notification" v-show="dragging">
+                    <i class="icon icon-download" />
+                    Drop to upload.
+                </div>
+
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictNavigation && Object.keys(containers).length > 1">
                     <a v-for="item in containers" :key="item.id"
                         v-text="item.title"
