@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\API;
+namespace Tests\Preferences;
 
 use Tests\TestCase;
 use Tests\FakesRoles;
@@ -8,7 +8,7 @@ use Statamic\API\Role;
 use Statamic\API\User;
 use Statamic\API\Preference;
 
-class PreferenceTest extends TestCase
+class PrecedenceTest extends TestCase
 {
     use FakesRoles;
 

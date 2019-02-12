@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\API;
+namespace Tests\Preferences;
 
 use Tests\TestCase;
 use Statamic\Preferences\HasPreferences;
 
-class PreferenceTest extends TestCase
+class HasPreferencesTest extends TestCase
 {
     public function setUp()
     {
