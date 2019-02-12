@@ -26,7 +26,8 @@ abstract class RoleRepository implements RepositoryContract
             return API\Role::make()
                 ->handle($handle)
                 ->title(array_get($role, 'title'))
-                ->addPermission(array_get($role, 'permissions', []));
+                ->addPermission(array_get($role, 'permissions', []))
+                ->preferences(array_get($role, 'preferences', []));
         });
     }
 
@@ -46,7 +47,8 @@ abstract class RoleRepository implements RepositoryContract
 
         $roles->put($role->handle(), [
             'title' => $role->title(),
-            'permissions' => $role->permissions()->all()
+            'permissions' => $role->permissions()->all(),
+            'preferences' => $role->preferences()
         ]);
 
         if ($role->handle() !== $role->originalHandle()) {
