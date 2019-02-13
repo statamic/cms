@@ -31,7 +31,6 @@
                     v-if="!loadingContainers && !initializing"
                     :rows="assets"
                     :columns="columns"
-                    :visible-columns="visibleColumns"
                     :search-query="searchQuery"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
@@ -179,8 +178,11 @@ export default {
 
     data() {
         return {
-            columns: ['basename', 'size_b', 'last_modified_timestamp'],
-            visibleColumns: ['basename', 'size_b', 'last_modified_timestamp'],
+            columns: [
+                { label: __('File'), field: 'basename', visible: true },
+                { label: __('Size'), field: 'size_b', visible: true },
+                { label: __('Last Modified'), field: 'last_modified_timestamp', visible: true },
+            ],
             loadingContainers: true,
             containers: [],
             container: {},
