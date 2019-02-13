@@ -19,7 +19,7 @@ class MoveAsset extends Action
         $items->each->move($values['folder']);
     }
 
-    public function fieldItems()
+    protected function fieldItems()
     {
         $options = AssetContainer::find($this->context['container'])
             ->assetFolders()

@@ -36,7 +36,7 @@ abstract class Action implements Arrayable
         return new Fields($fields);
     }
 
-    public function fieldItems()
+    protected function fieldItems()
     {
         return $this->fields;
     }
