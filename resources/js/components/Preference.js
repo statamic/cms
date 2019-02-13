@@ -15,7 +15,7 @@ class Preference {
 }
 
 Object.defineProperties(Vue.prototype, {
-    $preference: {
+    $preferences: {
         get() {
             return new Preference(this);
         }
