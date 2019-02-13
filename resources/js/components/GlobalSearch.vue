@@ -33,7 +33,7 @@
 
                     <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
                         <svg-icon name="pin" class="icon"></svg-icon>
-                        <div class="flex-1 ml-1 title" v-html="favorite.title"></div>
+                        <div class="flex-1 ml-1 title" v-html="favorite.name"></div>
                     </div>
 
                     <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm text-2xs border text-grey-light">/</span> key</div>
@@ -59,12 +59,7 @@ export default {
     data() {
         return {
             results: [],
-            favorites: [
-                // @TODO replace with Preference API
-                {title: 'Create Blog Entry', url: '/gallery/new'},
-                {title: 'Create Gallery Entry', url: '/gallery/new'},
-                {title: 'Manage Blueprints', url: '/blog/new'}
-            ],
+            favorites: [],
             query: '',
             current: -1,
             searching: false,
@@ -164,6 +159,10 @@ export default {
         this.$mousetrap.bind(['/', 'ctrl+f', 'alt+f', 'shift+f'], e => {
             e.preventDefault();
             this.focus();
+        });
+
+        this.axios.get(cp_url('favorites/index')).then(response => {
+            this.favorites = response.data.favorites
         });
     }
 };

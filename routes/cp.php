@@ -99,6 +99,7 @@ Route::group([
         Route::resource('roles', 'RolesController');
     });
 
+    Route::get('favorites/index', 'FavoritesController@index')->name('favorites.index');
     Route::post('favorites/create', 'FavoritesController@create')->name('favorites.create');
 
     Route::get('search', 'SearchController')->name('search');
