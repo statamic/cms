@@ -255,6 +255,10 @@ export default {
             this.loadAssets();
         },
 
+        loading(loading) {
+            this.$progress.loading('asset-browser', loading);
+        }
+
     },
 
     methods: {
