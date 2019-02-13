@@ -7,6 +7,7 @@ import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
+import Preferences from './preferences';
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.csrfToken;
@@ -14,6 +15,7 @@ axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.csrfToken;
 Vue.prototype.axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
 Vue.prototype.$events = new Vue();
+Vue.prototype.$preferences = new Vue(Preferences);
 
 Vue.moment = require('moment');
 
