@@ -75,7 +75,7 @@ export default {
             this.loading = true;
 
             axios.get(this.requestUrl, { params: this.parameters }).then(response => {
-                this.columns = response.data.meta.columns.map(column => column.field);
+                this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.activeFilters = {...response.data.meta.filters};
                 this.items = response.data.data;
@@ -88,10 +88,6 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
-        },
-
-        updateColumns() {
-            //
         },
 
         perPageChanged(perPage) {

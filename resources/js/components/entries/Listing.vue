@@ -26,7 +26,7 @@
                             :per-page="perPage"
                             @filters-changed="filtersChanged"
                             @per-page-changed="perPageChanged" />
-                        <data-list-column-picker @change="updateColumns" />
+                        <data-list-column-picker :save-url="saveColumnsUrl" />
                     </div>
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -89,6 +89,7 @@ export default {
         return {
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
+            saveColumnsUrl: cp_url(`collections/${this.collection}/entries/columns`),
         }
     }
 

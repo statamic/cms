@@ -7,6 +7,7 @@ use Statamic\API\Entry;
 use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
+use Statamic\API\Preference;
 use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
@@ -34,11 +35,22 @@ class EntriesController extends CpController
         return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sort,
-            'columns' => [
+            'columns' => $this->columns($collection->handle(), ['title', 'slug'], [
                 ['label' => __('Title'), 'field' => 'title'],
                 ['label' => __('Slug'), 'field' => 'slug'],
-            ],
+            ]),
         ]]);
+    }
+
+    protected function columns($collection, $default, $columns)
+    {
+        $visible = Preference::get("collections.{$collection}.columns") ?? $default;
+
+        return collect($columns)->map(function ($column) use ($visible) {
+            return array_merge($column, [
+                'visible' => in_array($column['field'], $visible)
+            ]);
+        });
     }
 
     protected function filter($query, $filters)
