@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="p-3 bg-grey-lightest border-t flex items-center text-sm">
-                    <button class="btn btn-primary" @click="confirm">Run Action</button>
+                    <button class="btn" :class="[ action.dangerous ? 'btn-danger' : 'btn-primary' ]" @click="confirm">Run Action</button>
                     <button @click="cancel" class="ml-3 text-grey">Cancel</button>
                 </div>
             </div>
