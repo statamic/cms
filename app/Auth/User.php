@@ -91,6 +91,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return array_merge($this->data(), [
             'id' => $this->id(),
             'email' => $this->email(),
+            'preferences' => $this->preferences(),
         ], $roles, $groups);
     }
 
