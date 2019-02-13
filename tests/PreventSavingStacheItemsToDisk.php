@@ -44,5 +44,5 @@ class NonSavingAssetContainersStore extends \Statamic\Stache\Stores\AssetContain
 
 class NonSavingUsersStore extends \Statamic\Stache\Stores\UsersStore
 {
-    public function save($container) { }
+    public function save($user) { }
 }
