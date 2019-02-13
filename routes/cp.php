@@ -3,16 +3,16 @@
 use Statamic\Http\Middleware\CP\Authenticate;
 use Statamic\Http\Middleware\CP\Configurable;
 
-Route::group(['prefix' => 'auth'], function () {
-    Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
-    Route::post('login', 'Auth\LoginController@login');
-    Route::get('logout', 'Auth\LoginController@logout')->name('logout');
+Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
+    Route::get('login', 'LoginController@showLoginForm')->name('login');
+    Route::post('login', 'LoginController@login');
+    Route::get('logout', 'LoginController@logout')->name('logout');
 
-    Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-    Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.request');
+    Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 
-    Route::get('token', 'Auth\CsrfTokenController')->name('token');
-    Route::get('extend', 'Auth\ExtendSessionController')->name('extend');
+    Route::get('token', 'CsrfTokenController')->name('token');
+    Route::get('extend', 'ExtendSessionController')->name('extend');
 });
 
 Route::group([
@@ -25,91 +25,91 @@ Route::group([
 
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
-    // Structures
-    Route::resource('structures', 'StructuresController');
-    Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
+    Route::group(['namespace' => 'Structures'], function () {
+        Route::resource('structures', 'StructuresController');
+        Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
+    });
 
-    // Collections
-    Route::resource('collections', 'CollectionsController');
-    Route::get('collections/{collection}/entries', 'EntriesController@index')->name('collections.entries.index');
-    Route::post('collections/{collection}/entries/action', 'EntryActionController')->name('collections.entries.action');
-    Route::get('collections/{collection}/entries/create/{site}', 'EntriesController@create')->name('collections.entries.create');
-    Route::post('collections/{collection}/entries/{site}', 'EntriesController@store')->name('collections.entries.store');
-    Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
-    Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
+    Route::group(['namespace' => 'Collections'], function () {
+        Route::resource('collections', 'CollectionsController');
+        Route::get('collections/{collection}/entries', 'EntriesController@index')->name('collections.entries.index');
+        Route::post('collections/{collection}/entries/action', 'EntryActionController')->name('collections.entries.action');
+        Route::get('collections/{collection}/entries/create/{site}', 'EntriesController@create')->name('collections.entries.create');
+        Route::post('collections/{collection}/entries/{site}', 'EntriesController@store')->name('collections.entries.store');
+        Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
+        Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
+    });
 
-    // Globals
     Route::get('globals', 'GlobalsController@index')->name('globals.index');
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
     Route::get('globals/{id}/{handle}/{site}', 'GlobalsController@edit')->name('globals.edit');
     Route::patch('globals/{id}/{handle}/{site}', 'GlobalsController@update')->name('globals.update');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
 
-    // Assets
-    Route::resource('asset-containers', 'AssetContainersController');
-    Route::post('assets/action', 'AssetActionController')->name('assets.action');
-    Route::get('assets/browse', 'AssetBrowserController@index')->name('assets.browse.index');
-    Route::get('assets/browse/folders/{container}/{path?}', 'AssetBrowserController@folder')->where('path', '.*');
-    Route::get('assets/browse/{container}/{path?}', 'AssetBrowserController@show')->where('path', '.*')->name('assets.browse.show');
-    Route::get('assets-fieldtype', 'AssetsFieldtypeController@index');
-    Route::resource('assets', 'AssetsController');
-    Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
-    Route::get('thumbnails/{asset}/{size?}', 'AssetThumbnailController@show')->name('assets.thumbnails.show');
+    Route::group(['namespace' => 'Assets'], function () {
+        Route::resource('asset-containers', 'AssetContainersController');
+        Route::post('assets/action', 'ActionController')->name('assets.action');
+        Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
+        Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');
+        Route::get('assets/browse/{container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
+        Route::get('assets-fieldtype', 'FieldtypeController@index');
+        Route::resource('assets', 'AssetsController');
+        Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
+        Route::get('thumbnails/{asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+    });
 
-    // Fields
-    Route::resource('fieldsets', 'FieldsetController');
-    Route::post('fieldsets/quick', 'FieldsetController@quickStore');
-    Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
-    Route::resource('blueprints', 'BlueprintController');
-    Route::get('fieldtypes', 'FieldtypesController@index');
-    Route::get('publish-blueprints/{blueprint}', 'PublishBlueprintController@show');
+    Route::group(['namespace' => 'Fields'], function () {
+        Route::resource('fieldsets', 'FieldsetController');
+        Route::post('fieldsets/quick', 'FieldsetController@quickStore');
+        Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
+        Route::resource('blueprints', 'BlueprintController');
+        Route::get('fieldtypes', 'FieldtypesController@index');
+        Route::get('publish-blueprints/{blueprint}', 'PublishBlueprintController@show');
+    });
 
-    // Composer
     Route::get('composer/check', 'ComposerOutputController@check');
 
-    // Updater
-    Route::get('updater', 'UpdaterController@index')->name('updater.index');
-    Route::get('updater/count', 'UpdaterController@count');
-    Route::get('updater/{product}', 'UpdateProductController@index')->name('updater.products.index');
-    Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
-    Route::post('updater/{product}/update', 'UpdateProductController@update');
-    Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');
-    Route::post('updater/{product}/install-explicit-version', 'UpdateProductController@installExplicitVersion');
+    Route::group(['namespace' => 'Updater'], function () {
+        Route::get('updater', 'UpdaterController@index')->name('updater.index');
+        Route::get('updater/count', 'UpdaterController@count');
+        Route::get('updater/{product}', 'UpdateProductController@index')->name('updater.products.index');
+        Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
+        Route::post('updater/{product}/update', 'UpdateProductController@update');
+        Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');
+        Route::post('updater/{product}/install-explicit-version', 'UpdateProductController@installExplicitVersion');
+    });
 
-    // Addons
     Route::get('addons', 'AddonsController@index')->name('addons.index');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
 
-    // Forms
-    Route::resource('forms', 'FormsController');
-    Route::resource('forms.submissions', 'FormSubmissionsController');
-    Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
+    Route::group(['namespace' => 'Forms'], function () {
+        Route::resource('forms', 'FormsController');
+        Route::resource('forms.submissions', 'FormSubmissionsController');
+        Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
+    });
 
-    // Users
-    Route::post('users/action', 'UserActionController')->name('users.action');
-    Route::resource('users', 'UsersController');
-    Route::patch('users/{user}/password', 'UserPasswordController@update')->name('users.password.update');
-    Route::get('account', 'AccountController')->name('account');
-    Route::resource('user-groups', 'UserGroupsController');
-    Route::resource('roles', 'RolesController');
+    Route::group(['namespace' => 'Users'], function () {
+        Route::post('users/action', 'UserActionController')->name('users.action');
+        Route::resource('users', 'UsersController');
+        Route::patch('users/{user}/password', 'UserPasswordController@update')->name('users.password.update');
+        Route::get('account', 'AccountController')->name('account');
+        Route::resource('user-groups', 'UserGroupsController');
+        Route::resource('roles', 'RolesController');
+    });
 
-    // Search
     Route::get('search', 'SearchController')->name('search');
 
-    // Utilities
-    Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
-    Route::get('utilities/cache', 'CacheController@index')->name('utilities.cache.index');
-    Route::post('utilities/cache/{cache}', 'CacheController@clear')->name('utilities.cache.clear');
-    Route::get('utilities/search', 'UpdateSearchController@index')->name('utilities.search');
-    Route::post('utilities/search', 'UpdateSearchController@update');
+    Route::group(['namespace' => 'Utilities'], function () {
+        Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
+        Route::get('utilities/cache', 'CacheController@index')->name('utilities.cache.index');
+        Route::post('utilities/cache/{cache}', 'CacheController@clear')->name('utilities.cache.clear');
+        Route::get('utilities/search', 'UpdateSearchController@index')->name('utilities.search');
+        Route::post('utilities/search', 'UpdateSearchController@update');
+    });
 
-    // Suggestions
     Route::get('suggestions/{type}', 'SuggestionController@show');
 
-    // Templates
-
-    // Fieldtypes
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data');
@@ -121,7 +121,6 @@ Route::group([
         Route::get('blueprints/data', 'BlueprintsFieldtypeController@data');
     });
 
-    // Local API
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');

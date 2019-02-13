@@ -1,0 +1,16 @@
+<?php
+
+namespace Statamic\Http\Controllers\CP\Users;
+
+use Statamic\API\User;
+use Statamic\Http\Controllers\CP\ActionController;
+
+class UserActionController extends ActionController
+{
+    protected function getSelectedItems($items)
+    {
+        return $items->map(function ($item) {
+            return User::find($item);
+        });
+    }
+}
