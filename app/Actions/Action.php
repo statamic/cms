@@ -4,24 +4,18 @@ namespace Statamic\Actions;
 
 use Statamic\API\Str;
 use Statamic\Fields\Fields;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\HasHandle;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Action implements Arrayable
 {
+    use HasHandle, HasTitle;
+
     protected $confirm = true;
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
-
-    public static function title()
-    {
-        return static::$title ?? Str::humanize(static::handle());
-    }
-
-    public static function handle()
-    {
-        return static::$handle ?? snake_case(str_replace((new \ReflectionClass(static::class))->getNamespaceName().'\\', '', static::class));
-    }
 
     public function context($context)
     {
