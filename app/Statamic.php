@@ -114,6 +114,7 @@ class Statamic
             'MediumEditorExtensions' => [],
             'flash' => [],
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
+            'user' => auth()->user()->toArray(),
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);
