@@ -22,10 +22,4 @@ class FavoritesController extends CpController
             'url' => request()->url,
         ])->save();
     }
-
-    public function index()
-    {
-        return Preference::all();
-    }
-
 }

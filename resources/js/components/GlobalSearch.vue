@@ -59,7 +59,6 @@ export default {
     data() {
         return {
             results: [],
-            favorites: [],
             query: '',
             current: -1,
             searching: false,
@@ -70,6 +69,10 @@ export default {
     computed: {
         hasResults() {
             return this.results.length > 0;
+        },
+
+        favorites() {
+            return this.$preferences.get('favorites', []);
         },
 
         hasFavorites() {
@@ -159,10 +162,6 @@ export default {
         this.$mousetrap.bind(['/', 'ctrl+f', 'alt+f', 'shift+f'], e => {
             e.preventDefault();
             this.focus();
-        });
-
-        this.axios.get(cp_url('favorites/index')).then(response => {
-            this.favorites = response.data.favorites
         });
     }
 };
