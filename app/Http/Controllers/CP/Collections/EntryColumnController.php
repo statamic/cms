@@ -15,7 +15,7 @@ class EntryColumnController extends CpController
             'columns' => 'required|array|min:1',
         ]);
 
-        $request->user()->addPreference(
+        $request->user()->setPreference(
             "collections.{$collection}.columns",
             $request->columns
         )->save();

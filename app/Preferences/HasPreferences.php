@@ -21,18 +21,18 @@ trait HasPreferences
             return $this->preferences;
         }
 
-        $this->preferences = $preferences;
+        $this->setPreferences($preferences);
 
         return $this;
     }
 
     /**
-     * Add/merge array of preferences.
+     * Set/merge array of preferences.
      *
      * @param array $preferences
      * @return $this
      */
-    public function addPreferences($preferences)
+    public function setPreferences($preferences)
     {
         $this->preferences = array_merge($this->preferences, Arr::wrap($preferences));
 
@@ -40,13 +40,13 @@ trait HasPreferences
     }
 
     /**
-     * Add preference (dot notation in key supported).
+     * Set preference (dot notation in key supported).
      *
      * @param string $key
      * @param mixed $value
      * @return $this
      */
-    public function addPreference($key, $value)
+    public function setPreference($key, $value)
     {
         Arr::set($this->preferences, $key, $value);
 

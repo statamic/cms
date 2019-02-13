@@ -27,14 +27,14 @@ class HasPreferencesTest extends TestCase
     }
 
     /** @test */
-    function it_can_add_array_of_preferences()
+    function it_can_set_array_of_preferences()
     {
         $this->person->preferences([
             'language' => 'english',
             'color' => 'red'
         ]);
 
-        $this->person->addPreferences([
+        $this->person->setPreferences([
             'language' => 'french',
             'music' => 'metal'
         ]);
@@ -49,9 +49,9 @@ class HasPreferencesTest extends TestCase
     }
 
     /** @test */
-    function it_can_add_a_single_preference()
+    function it_can_set_a_single_preference()
     {
-        $this->person->addPreference('collection.columns', ['date', 'title']);
+        $this->person->setPreference('collection.columns', ['date', 'title']);
 
         $expected = [
             'collection' => [
@@ -128,7 +128,7 @@ class HasPreferencesTest extends TestCase
     /** @test */
     function it_can_modify_a_preference()
     {
-        $this->person->addPreference('favorite', 'pizza');
+        $this->person->setPreference('favorite', 'pizza');
 
         $this->person->modifyPreference('favorite', function ($value) {
             return strtoupper($value);
