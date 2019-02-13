@@ -1,8 +1,9 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP;
+namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Statamic\Http\Controllers\CP\CpController;
 
 class FieldtypesController extends CpController
 {

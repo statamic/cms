@@ -93,7 +93,7 @@ Route::group([
     Route::group(['namespace' => 'Users'], function () {
         Route::post('users/action', 'UserActionController')->name('users.action');
         Route::resource('users', 'UsersController');
-        Route::patch('users/{user}/password', 'UserPasswordController@update')->name('users.password.update');
+        Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
         Route::resource('roles', 'RolesController');

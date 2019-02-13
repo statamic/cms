@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Statamic\API\Role;
 use Illuminate\Http\Request;
 use Statamic\API\Permission;
+use Statamic\Http\Controllers\CP\CpController;
 
 class RolesController extends CpController
 {
