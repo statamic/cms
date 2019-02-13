@@ -86,4 +86,37 @@ trait HasPreferences
     {
         return (bool) $this->getPreference($key);
     }
+
+    /**
+     * Append array of preferences onto an array of preferences.
+     *
+     * @param string $key
+     * @param array $array
+     * @return $this
+     */
+    public function appendPreferences($key, $array)
+    {
+        foreach ($array as $value) {
+            $this->appendPreference($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Append a value onto an array of preferences (will convert to array if necessary).
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function appendPreference($key, $value)
+    {
+        $values = (array) Arr::get($this->preferences, $key);
+        $values[] = $value;
+
+        Arr::set($this->preferences, $key, $values);
+
+        return $this;
+    }
 }
