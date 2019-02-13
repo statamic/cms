@@ -33,7 +33,12 @@ export default {
     data() {
         return {
             rows: this.initialRows,
-            columns: ['title', 'handle', 'users', 'roles']
+            columns: [
+                { label: __('Title'), field: 'title' },
+                { label: __('Handle'), field: 'handle' },
+                { label: __('Users'), field: 'users' },
+                { label: __('Roles'), field: 'roles' },
+            ]
         }
     },
 

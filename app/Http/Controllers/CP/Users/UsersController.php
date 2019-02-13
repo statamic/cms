@@ -60,8 +60,8 @@ class UsersController extends CpController
         return Resource::collection($users)->additional(['meta' => [
             'sortColumn' => $sort,
             'columns' => [
-                ['label' => 'name', 'field' => 'name'],
-                ['label' => 'email', 'field' => 'email'],
+                ['label' => __('Name'), 'field' => 'name'],
+                ['label' => __('Email'), 'field' => 'email'],
             ],
         ]]);
     }

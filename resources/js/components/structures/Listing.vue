@@ -28,7 +28,10 @@ export default {
     data() {
         return {
             rows: this.initialRows,
-            columns: ['title', 'pages']
+            columns: [
+                { label: __('Title'), field: 'title', visible: true },
+                { label: __('Pages'), field: 'pages', visible: true },
+            ]
         }
     }
 
