@@ -108,8 +108,6 @@ Route::group([
         Route::post('utilities/search', 'UpdateSearchController@update');
     });
 
-    Route::get('suggestions/{type}', 'SuggestionController@show');
-
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data');
