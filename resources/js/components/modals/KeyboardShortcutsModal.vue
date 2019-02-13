@@ -1,5 +1,5 @@
 <template>
-    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" @closed="open = false">
+    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" :pivotY=".1" @closed="open = false" v-on-clickaway="close">
         <h1 class="p-2 bg-grey-lightest border-b text-center">
             {{ __('Keyboard Shortcuts') }}
         </h1>
@@ -44,7 +44,10 @@
 </template>
 
 <script>
+import { mixin as clickaway } from 'vue-clickaway';
+
 export default {
+    mixins: [ clickaway ],
 
     data() {
         return {
@@ -60,12 +63,21 @@ export default {
             } else {
                 this.$mousetrap.unbind('esc');
             }
-        }
+        },
+    },
 
+    methods: {
+        close() {
+            this.open = false;
+        }
     },
 
     created() {
         this.$mousetrap.bind('?', () => this.open = !this.open);
+
+        this.$events.$on('keyboard-shortcuts.open', () => {
+           this.open = true;
+       });
     },
 }
 </script>
