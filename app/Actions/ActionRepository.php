@@ -20,6 +20,9 @@ class ActionRepository
 
     public function for($key, $context = [])
     {
-        return $this->all()->filter->visibleTo($key, $context)->values();
+        return $this->all()
+            ->filter->visibleTo($key, $context)
+            ->each->context($context)
+            ->values();
     }
 }

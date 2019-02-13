@@ -40,9 +40,9 @@ class CollectionsController extends CpController
         ]);
     }
 
-    public function show($collection)
+    public function show($collectionHandle)
     {
-        $collection = Collection::whereHandle($collection);
+        $collection = Collection::whereHandle($collectionHandle);
 
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
@@ -55,7 +55,7 @@ class CollectionsController extends CpController
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => Filter::for('entries', $context = ['collection' => $collection]),
+            'filters' => Filter::for('entries', $context = ['collection' => $collectionHandle]),
             'actions' => Action::for('entries', $context),
         ]);
     }

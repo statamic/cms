@@ -299,14 +299,14 @@ class Asset implements AssetContract, Arrayable
 
         $oldPath = $this->path();
 
-        $newPath = $folder . '/' . $filename . '.' . pathinfo($oldPath, PATHINFO_EXTENSION);
+        $newPath = Str::removeLeft(Path::tidy($folder . '/' . $filename . '.' . pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
 
-        // Actually rename the file.
-        $this->disk()->rename($oldPath, $newPath);
+        if ($oldPath !== $newPath) {
+            // Actually rename the file.
+            $this->disk()->rename($oldPath, $newPath);
 
-        $this
-            ->path($newPath)
-            ->save();
+            $this->path($newPath)->save();
+        }
 
         return $this;
     }

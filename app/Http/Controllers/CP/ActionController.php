@@ -5,18 +5,27 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\API\Entry;
 use Statamic\API\Action;
 use Illuminate\Http\Request;
+use Statamic\Fields\Validation;
 
 abstract class ActionController extends CpController
 {
     public function __invoke(Request $request)
     {
-        $request->validate([
+        $posted = $request->validate([
             'action' => 'required',
-            'selections' => 'required|array'
+            'context' => 'required',
+            'selections' => 'required|array',
         ]);
 
-        Action::get($request->action)->run(
-            $this->getSelectedItems(collect($request->selections))
+        $action = Action::get($request->action)->context($request->context);
+
+        $validation = (new Validation)->fields($action->fields());
+
+        $request->replace($request->values)->validate($validation->rules());
+
+        $action->run(
+            $this->getSelectedItems(collect($posted['selections'])),
+            $request->all()
         );
     }
 

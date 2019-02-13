@@ -26,12 +26,14 @@ export default {
 
     methods: {
 
-        run(action) {
+        run(action, values) {
             this.$emit('started');
 
             const payload = {
                 action: action.handle,
-                selections: this.selections
+                context: action.context,
+                selections: this.selections,
+                values
             };
 
             axios.post(this.url, payload).then(response => {

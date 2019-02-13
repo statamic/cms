@@ -5,7 +5,7 @@
             v-for="action in sortedActions"
             :key="action.handle"
             :action="action"
-            @selected="run(action)"
+            @selected="run"
         >
             <div
                 slot-scope="{ action, select }"

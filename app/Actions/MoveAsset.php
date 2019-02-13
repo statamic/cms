@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\API;
+use Statamic\API\AssetContainer;
 
 class MoveAsset extends Action
 {
@@ -13,8 +14,27 @@ class MoveAsset extends Action
         return $key === 'asset-browser';
     }
 
-    public function run($items)
+    public function run($items, $values)
     {
-        // TODO
+        $items->each->move($values['folder']);
+    }
+
+    public function fieldItems()
+    {
+        $options = AssetContainer::find($this->context['container'])
+            ->assetFolders()
+            ->mapWithKeys(function ($folder) {
+                return [$folder->path() => $folder->title()];
+            })
+            ->prepend('/', '/')
+            ->all();
+
+        return [
+            'folder' => [
+                'type' => 'select',
+                'options' => $options,
+                'validate' => 'required',
+            ]
+        ];
     }
 }

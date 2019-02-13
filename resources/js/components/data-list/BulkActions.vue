@@ -12,7 +12,7 @@
                 v-for="action in sortedActions"
                 :key="action.handle"
                 :action="action"
-                @selected="run(action)"
+                @selected="run"
             >
                 <button
                     slot-scope="{ action, select }"

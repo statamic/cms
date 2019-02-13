@@ -23,17 +23,17 @@ class BrowserController extends CpController
             ->cpRoute('assets.browse.show', $containers->first()->handle());
     }
 
-    public function show($container, $path = '/')
+    public function show($containerHandle, $path = '/')
     {
         // TODO: Handle invalid $container in url
         // TODO: Auth
 
-        $container = AssetContainer::find($container);
+        $container = AssetContainer::find($containerHandle);
 
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),
             'folder' => $path,
-            'actions' => Action::for('asset-browser', ['container' => $container]),
+            'actions' => Action::for('asset-browser', ['container' => $containerHandle]),
         ]);
     }
 

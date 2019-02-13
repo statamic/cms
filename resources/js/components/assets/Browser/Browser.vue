@@ -57,7 +57,7 @@
                                 :url="actionUrl"
                                 :actions="actions"
                                 @started="actionStarted"
-                                @completed="actionCompleted"
+                                @completed="bulkActionsCompleted"
                             />
 
                             <uploads
@@ -269,6 +269,11 @@ export default {
 
         actionCompleted() {
             this.loadAssets();
+        },
+
+        bulkActionsCompleted() {
+            this.$refs.toggleAll.uncheckAllItems();
+            this.actionCompleted();
         },
 
         loadContainers() {
