@@ -28,7 +28,6 @@
         <collection-list
             :initial-rows="{{ json_encode($collections) }}"
             :columns="{{ json_encode($columns) }}"
-            :visible-columns="{{ json_encode($visibleColumns) }}"
             :endpoints="{}">
         </collection-list>
     @endif

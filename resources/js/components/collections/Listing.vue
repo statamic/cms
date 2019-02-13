@@ -1,5 +1,5 @@
 <template>
-    <data-list :visible-columns="visibleColumns" :columns="columns" :rows="initialRows">
+    <data-list :columns="columns" :rows="initialRows">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: collection }">
@@ -23,7 +23,6 @@ export default {
     props: [
         'initial-rows',
         'columns',
-        'visible-columns'
     ],
     data() {
         return {
@@ -31,9 +30,6 @@ export default {
         }
     },
     methods: {
-        updateColumns(columns) {
-            //TODO: Add axios call and store the updated visible columns
-        },
         bulkDelete(ids) {
             //TODO: Axios call & update rows
         },

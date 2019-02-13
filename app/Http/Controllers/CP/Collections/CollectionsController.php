@@ -33,8 +33,10 @@ class CollectionsController extends CpController
 
         return view('statamic::collections.index', [
             'collections' => $collections,
-            'columns' => ['title', 'entries'],
-            'visibleColumns' => ['title', 'entries'],
+            'columns' => [
+                ['label' => __('Title'), 'field' => 'title', 'visible' => true],
+                ['label' => __('Entries'), 'field' => 'entries', 'visible' => true],
+            ],
         ]);
     }
 
