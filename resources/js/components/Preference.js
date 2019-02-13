@@ -3,6 +3,7 @@ import Vue from 'vue';
 class Preference {
     constructor(instance) {
         this.instance = instance;
+        this.storeUrl = '/cp/preferences';
     }
 
     all() {
@@ -11,6 +12,18 @@ class Preference {
 
     get(key, fallback) {
         return this.all()[key] || fallback;
+    }
+
+    set(key, value) {
+        return this.instance.axios.post(this.storeUrl, {'key': key, 'value': value});
+    }
+
+    append(key, value) {
+        return this.instance.axios.post(this.storeUrl, {'key': key, 'value': value, append: true});
+    }
+
+    remove(key) {
+        return this.instance.axios.delete(`${this.storeUrl}/${key}`);
     }
 }
 

@@ -97,9 +97,8 @@ Route::group([
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
         Route::resource('roles', 'RolesController');
+        Route::resource('preferences', 'PreferenceController');
     });
-
-    Route::post('favorites/create', 'FavoritesController@create')->name('favorites.create');
 
     Route::get('search', 'SearchController')->name('search');
 
