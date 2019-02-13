@@ -22,6 +22,7 @@
                 <table v-if="hasConditions" class="table">
                     <tr is="condition"
                         v-for="(i, condition) in conditions"
+                        :key="condition.handle"
                         :index="i"
                         :handle.sync="condition.handle"
                         :operator.sync="condition.operator"
