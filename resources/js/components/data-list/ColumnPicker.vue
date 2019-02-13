@@ -6,11 +6,25 @@
         </button>
         <div class="dropdown-menu">
             <h6>{{ __('Customize Columns') }}</h6>
-            <div class="li divider"></div>
-            <div class="li text-sm" v-for="column in sharedState.columns" :key="column.field">
-                <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
-            </div>
-            <div class="li mt-1">
+            <div class="li divider mb-2"></div>
+
+            <sortable-list
+                v-model="columns"
+                :vertical="true"
+                item-class="item"
+                handle-class="item-move"
+            >
+                <div>
+                    <div class="item mb-1 text-sm column" v-for="column in sharedState.columns" :key="column.field">
+                        <div class="item-move">&nbsp;</div>
+                        <div class="item-inner">
+                            <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
+                        </div>
+                    </div>
+                </div>
+            </sortable-list>
+
+            <div class="mt-2">
                 <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                 <button v-else class="btn btn-primary btn-sm" @click="save">Save</button>
             </div>
@@ -20,8 +34,13 @@
 
 <script>
 import axios from 'axios';
+import { SortableList } from '../sortable/Sortable';
 
 export default {
+
+    components: {
+        SortableList
+    },
 
     props: {
         saveUrl: String,
@@ -34,6 +53,15 @@ export default {
     },
 
     computed: {
+
+        columns: {
+            get() {
+                return this.sharedState.columns;
+            },
+            set(columns) {
+                this.sharedState.columns = columns;
+            }
+        },
 
         selectedColumns() {
             return this.sharedState.columns
