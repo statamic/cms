@@ -1,5 +1,5 @@
 <script>
-import { Sortable } from '@shopify/draggable'
+import { Sortable, Plugins } from '@shopify/draggable'
 
 function move(items, oldIndex, newIndex) {
     const itemRemovedArray = [
@@ -41,6 +41,8 @@ export default {
                 draggable: `.${this.itemClass}`,
                 handle: `.${this.handleClass}`,
                 delay: 200,
+                swapAnimation: { vertical: this.vertical },
+                plugins: [Plugins.SwapAnimation],
                 mirror: {
                     constrainDimensions: true,
                 },
