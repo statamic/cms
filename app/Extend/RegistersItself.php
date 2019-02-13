@@ -2,8 +2,6 @@
 
 namespace Statamic\Extend;
 
-use Statamic\API\Str;
-
 trait RegistersItself
 {
     public static function register()
