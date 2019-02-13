@@ -11,7 +11,7 @@ class Preference {
     }
 
     get(key, fallback) {
-        return this.all()[key] || fallback;
+        return this.dotNotationGet(key, this.all()) || fallback;
     }
 
     set(key, value) {
@@ -38,6 +38,13 @@ class Preference {
         });
 
         return promise;
+    }
+
+    // Because we don't have access to lodash, and underscore doesn't have a direct solution.
+    // Source: https://stackoverflow.com/a/22129960
+    dotNotationGet(path, obj) {
+        var properties = Array.isArray(path) ? path : path.split('.');
+        return properties.reduce((prev, curr) => prev && prev[curr], obj);
     }
 }
 
