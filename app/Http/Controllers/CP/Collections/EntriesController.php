@@ -44,7 +44,7 @@ class EntriesController extends CpController
 
     protected function columns($collection, $default, $columns)
     {
-        $visible = Preference::get("collections.{$collection}.columns") ?? $default;
+        $visible = Preference::get("collections.{$collection}.columns", $default);
 
         return collect($columns)->map(function ($column) use ($visible) {
             return array_merge($column, [
