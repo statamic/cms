@@ -99,6 +99,8 @@ Route::group([
         Route::resource('roles', 'RolesController');
     });
 
+    Route::post('favorites/create', 'FavoritesController@create')->name('favorites.create');
+
     Route::get('search', 'SearchController')->name('search');
 
     Route::group(['namespace' => 'Utilities'], function () {

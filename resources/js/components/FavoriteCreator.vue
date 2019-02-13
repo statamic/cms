@@ -26,9 +26,23 @@ export default {
         Popper
     },
 
+    props: {
+        currentUrl: String,
+        saveUrl: String
+    },
+
     data() {
         return {
             name: document.title
+        }
+    },
+
+    computed: {
+        favorite() {
+            return {
+                name: this.name,
+                url: this.currentUrl
+            }
         }
     },
 
@@ -36,10 +50,21 @@ export default {
         highlight() {
             this.$refs.fave.select();
         },
-        save() {
-            console.log('This is the part of our tale where the data is saved, like a princess in a tall tower guarded by a misunderstood dragon.');
 
-            this.$refs.popper.doClose()
+        save() {
+            this.saving = true;
+            this.axios.post(this.saveUrl, this.favorite).then(response => {
+                this.saving = false;
+                this.$notify.success(__('Favorite saved'), { timeout: 3000 });
+                this.$refs.popper.doClose();
+            }).catch(e => {
+                this.saving = false;
+                if (e.response) {
+                    this.$notify.error(e.response.data.message);
+                } else {
+                    this.$notify.error(__('Something went wrong'));
+                }
+            });
         }
     }
 }

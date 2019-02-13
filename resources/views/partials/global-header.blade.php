@@ -17,27 +17,13 @@
         </site-selector>
     @endif
 
-    {{-- <div class="flex items-center px-2 border-l h-full text-sm">
-        <dropdown-list>
-            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" slot="trigger">
-                <i class="block h-6 w-6 mr-1">@svg('pin')</i><span>Shortcuts</span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="">New Blog Post</a></li>
-                <li><a href="">New Event</a></li>
-                <li><a href="">New FAQ Question</a></li>
-                <li><a href="">Edit Footer Links</a></li>
-                <li><a href="">Manage Photo Galleries</a></li>
-                <li class="divider"></li>
-                <li><a href="" class="text-grey hover:text-white">Customize Shortcuts</a></li>
-            </ul>
-        </dropdown-list>
-    </div> --}}
-
     <div class="head-link h-full px-3 flex items-center">
-        <a class="h-6 w-6 block p-sm text-grey hover:text-grey-dark"  v-popover:tooltip.bottom="'{{ __('Pin to Favorites') }}'">
-            @svg('pin')
-        </a>
+
+        <favorite-creator
+            current-url="{{ request()->fullUrl() }}"
+            save-url="{{ cp_route('favorites.create') }}"
+        ></favorite-creator>
+
         <dropdown-list>
             <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-dark" slot="trigger">
                 @svg('book-open')
@@ -45,19 +31,19 @@
             <ul class="dropdown-menu">
                 <li>
                     <a href="https://docs.statamic.com" class="flex items-center">
-                        <span>Documentation</span>
+                        <span>{{__('Documentation')}}</span>
                         <i class="w-3 block ml-1">@svg('expand')</i>
                     </a>
                 </li>
                 <li>
                     <a href="https://statamic.com/forum" class="flex items-center">
-                        <span>Support</span>
+                        <span>{{ __('Support') }}</span>
                         <i class="w-3 block ml-1">@svg('expand')</i>
                     </a>
                 </li>
                 <li>
-                    <a @click="$modal.show('keyboard-shortcuts')" class="flex items-center">
-                        <span>Keyboard Shortcuts</span>
+                    <a @click="$events.$emit('keyboard-shortcuts.open')" class="flex items-center">
+                        <span>{{ __('Keyboard Shortcuts') }}</span>
                     </a>
                 </li>
             </ul>

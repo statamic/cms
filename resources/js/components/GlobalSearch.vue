@@ -61,8 +61,9 @@ export default {
             results: [],
             favorites: [
                 // @TODO replace with Preference API
-                {title: 'New Blog Post', url: '/blog/new'},
-                {title: 'New Gallery Post', url: '/gallery/new'}
+                {title: 'Create Blog Entry', url: '/gallery/new'},
+                {title: 'Create Gallery Entry', url: '/gallery/new'},
+                {title: 'Manage Blueprints', url: '/blog/new'}
             ],
             query: '',
             current: -1,
