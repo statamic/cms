@@ -124,6 +124,21 @@ class HasPreferencesTest extends TestCase
         $this->assertTrue($this->person->hasPreference('collection.filters'));
         $this->assertFalse($this->person->hasPreference('language'));
     }
+
+    /** @test */
+    function it_can_append_to_a_preference_array()
+    {
+        $this->person->appendPreferences('favorite', ['pizza', 'lasagna']);
+        $this->person->appendPreference('favorite', 'rigatoni');
+
+        $expected = [
+            'pizza',
+            'lasagna',
+            'rigatoni'
+        ];
+
+        $this->assertEquals($expected, $this->person->getPreference('favorite'));
+    }
 }
 
 class Person
