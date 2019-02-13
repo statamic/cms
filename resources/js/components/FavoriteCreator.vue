@@ -28,7 +28,6 @@ export default {
 
     props: {
         currentUrl: String,
-        saveUrl: String
     },
 
     data() {
@@ -53,7 +52,7 @@ export default {
 
         save() {
             this.saving = true;
-            this.axios.post(this.saveUrl, this.favorite).then(response => {
+            this.$preferences.append('favorites', this.favorite).then(response => {
                 this.saving = false;
                 this.$notify.success(__('Favorite saved'), { timeout: 3000 });
                 this.$refs.popper.doClose();

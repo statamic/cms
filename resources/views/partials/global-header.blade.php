@@ -21,7 +21,6 @@
 
         <favorite-creator
             current-url="{{ request()->fullUrl() }}"
-            save-url="{{ cp_route('favorites.create') }}"
         ></favorite-creator>
 
         <dropdown-list>
