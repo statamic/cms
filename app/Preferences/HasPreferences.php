@@ -2,6 +2,7 @@
 
 namespace Statamic\Preferences;
 
+use Closure;
 use Illuminate\Support\Arr;
 
 trait HasPreferences
@@ -88,6 +89,22 @@ trait HasPreferences
     }
 
     /**
+     * Modify a preference using a callback.
+     *
+     * @param string $key
+     * @param Closure $callback
+     * @return $this
+     */
+    public function modifyPreference($key, Closure $callback)
+    {
+        $value = $this->getPreference($key);
+
+        Arr::set($this->preferences, $key, $callback($value));
+
+        return $this;
+    }
+
+    /**
      * Append array of preferences onto an array of preferences.
      *
      * @param string $key
@@ -112,11 +129,11 @@ trait HasPreferences
      */
     public function appendPreference($key, $value)
     {
-        $values = (array) Arr::get($this->preferences, $key);
-        $values[] = $value;
+        return $this->modifyPreference($key, function ($original) use ($value) {
+            $array = (array) $original;
+            $array[] = $value;
 
-        Arr::set($this->preferences, $key, $values);
-
-        return $this;
+            return $array;
+        });
     }
 }

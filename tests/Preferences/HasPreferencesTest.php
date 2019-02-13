@@ -126,7 +126,19 @@ class HasPreferencesTest extends TestCase
     }
 
     /** @test */
-    function it_can_append_to_a_preference_array()
+    function it_can_modify_a_preference()
+    {
+        $this->person->addPreference('favorite', 'pizza');
+
+        $this->person->modifyPreference('favorite', function ($value) {
+            return strtoupper($value);
+        });
+
+        $this->assertEquals('PIZZA', $this->person->getPreference('favorite'));
+    }
+
+    /** @test */
+    function it_can_append_to_a_preference()
     {
         $this->person->appendPreferences('favorite', ['pizza', 'lasagna']);
         $this->person->appendPreference('favorite', 'rigatoni');
