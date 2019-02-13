@@ -5,18 +5,11 @@ namespace Tests\Preferences;
 use Tests\TestCase;
 use Statamic\API\User;
 use Statamic\API\Preference;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class EndpointsTest extends TestCase
 {
-    public function tearDown()
-    {
-        // TODO: Re-implement delete() on user.
-        User::all()->each(function ($user) {
-            \File::delete($user->path());
-        });
-
-        parent::tearDown();
-    }
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     function it_can_set_a_preference()

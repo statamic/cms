@@ -13,6 +13,7 @@ trait PreventSavingStacheItemsToDisk
             NonSavingEntriesStore::class,
             NonSavingGlobalsStore::class,
             NonSavingAssetContainersStore::class,
+            NonSavingUsersStore::class,
         ])->map(function ($class) {
             return app($class)->directory($this->fakeStacheDirectory);
         });
@@ -37,6 +38,11 @@ class NonSavingGlobalsStore extends \Statamic\Stache\Stores\GlobalsStore
 }
 
 class NonSavingAssetContainersStore extends \Statamic\Stache\Stores\AssetContainersStore
+{
+    public function save($container) { }
+}
+
+class NonSavingUsersStore extends \Statamic\Stache\Stores\UsersStore
 {
     public function save($container) { }
 }
