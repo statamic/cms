@@ -23,6 +23,10 @@ export default {
             state.composer = composer;
         },
 
+        preferences(state, preferences) {
+            state.preferences = preferences;
+        },
+
     }
 
 };

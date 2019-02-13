@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Statamic\API\Preference;
 use Statamic\Http\Controllers\CP\CpController;
 
 class PreferenceController extends CpController
@@ -24,6 +25,8 @@ class PreferenceController extends CpController
         $method = $request->has('append') ? 'appendPreference' : 'setPreference';
 
         auth()->user()->{$method}($request->key, $request->value)->save();
+
+        return Preference::all();
     }
 
     /**
@@ -36,5 +39,7 @@ class PreferenceController extends CpController
         $this->authorize('access cp');
 
         auth()->user()->removePreference($key)->save();
+
+        return Preference::all();
     }
 }

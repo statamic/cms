@@ -15,15 +15,29 @@ class Preference {
     }
 
     set(key, value) {
-        return this.instance.axios.post(this.storeUrl, {'key': key, 'value': value});
+        return this.commitOnSuccessAndReturnPromise(
+            this.instance.axios.post(this.storeUrl, {'key': key, 'value': value})
+        );
     }
 
     append(key, value) {
-        return this.instance.axios.post(this.storeUrl, {'key': key, 'value': value, append: true});
+        return this.commitOnSuccessAndReturnPromise(
+            this.instance.axios.post(this.storeUrl, {'key': key, 'value': value, append: true})
+        );
     }
 
     remove(key) {
-        return this.instance.axios.delete(`${this.storeUrl}/${key}`);
+        return this.commitOnSuccessAndReturnPromise(
+            this.instance.axios.delete(`${this.storeUrl}/${key}`)
+        );
+    }
+
+    commitOnSuccessAndReturnPromise(promise) {
+        promise.then(response => {
+            this.instance.$store.commit('statamic/preferences', response.data);
+        });
+
+        return promise;
     }
 }
 
