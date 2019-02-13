@@ -5,13 +5,16 @@ namespace Statamic\Fields;
 use Statamic\API\Str;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Fieldtype implements Arrayable
 {
-    use HasTitle, HasHandle {
+    use RegistersItself, HasTitle, HasHandle {
         handle as protected traitHandle;
     }
+
+    protected static $binding = 'fieldtypes';
 
     protected $field;
     protected $localizable = true;

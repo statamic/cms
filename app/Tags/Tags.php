@@ -10,10 +10,13 @@ use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
+use Statamic\Extend\RegistersItself;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters;
+    use HasHandle, HasAliases, HasParameters, RegistersItself;
+
+    protected static $binding = 'tags';
 
     /**
      * The content written between the tags (when a tag pair)

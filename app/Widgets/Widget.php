@@ -5,12 +5,15 @@ namespace Statamic\Widgets;
 use Statamic\API\Str;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\RegistersItself;
 
 abstract class Widget
 {
-    use HasTitle, HasHandle {
+    use RegistersItself, HasTitle, HasHandle {
         handle as protected traitHandle;
     }
+
+    protected static $binding = 'widgets';
 
     protected $config;
 

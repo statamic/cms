@@ -361,8 +361,7 @@ class ExtensionServiceProvider extends ServiceProvider
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
             $fqcn = $this->getAppNamespace() . "{$folder}\\{$class}";
-            $handle = $fqcn::handle();
-            $this->app[$parent][$handle] = $fqcn;
+            $fqcn::register();
         }
     }
 }

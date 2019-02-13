@@ -6,11 +6,14 @@ use Statamic\API\Str;
 use Statamic\Fields\Fields;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Action implements Arrayable
 {
-    use HasHandle, HasTitle;
+    use HasHandle, HasTitle, RegistersItself;
+
+    protected static $binding = 'actions';
 
     protected $confirm = true;
     protected $dangerous = false;

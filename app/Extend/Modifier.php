@@ -7,4 +7,7 @@ namespace Statamic\Extend;
  */
 class Modifier
 {
+    use RegistersItself, HasHandle;
+
+    protected static $binding = 'modifiers';
 }

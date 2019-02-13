@@ -6,10 +6,13 @@ use Statamic\API\Str;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Extend\RegistersItself;
 
 abstract class Filter implements Arrayable
 {
-    use HasTitle, HasHandle;
+    use HasTitle, HasHandle, RegistersItself;
+
+    protected static $binding = 'filters';
 
     public function required()
     {
