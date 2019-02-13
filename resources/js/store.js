@@ -6,7 +6,7 @@ export default {
         windowWidth: null,
         fieldtypes: null,
         composer: {},
-        preferences: Statamic.user.preferences,
+        preferences: Statamic.preferences,
     },
 
     mutations: {
