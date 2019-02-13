@@ -81,7 +81,8 @@ export default {
     },
 
     created() {
-        let firstVisibleColumn = this.sharedState.columns.filter(col => col.visible)[0].field;
+        let firstVisibleColumn = this.sharedState.columns.filter(col => col.visible)[0];
+        firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : this.sharedState.columns[0].field;
         this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
     },
 

@@ -85,7 +85,9 @@ export default {
         },
 
         visibleColumns() {
-            return this.sharedState.columns.filter(column => column.visible);
+            const columns = this.sharedState.columns.filter(column => column.visible);
+
+            return columns.length ? columns : this.sharedState.columns;
         }
 
     },
