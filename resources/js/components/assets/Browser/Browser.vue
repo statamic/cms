@@ -40,7 +40,7 @@
                         <div class="card p-0">
 
                             <div class="data-list-header">
-                                <data-list-toggle-all ref="toggleAll" />
+                                <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
                                 <button
@@ -228,6 +228,10 @@ export default {
                 page: this.page,
                 perPage: this.perPage
             }
+        },
+
+        hasMaxFiles() {
+            return this.maxFiles !== undefined && this.maxFiles !== Infinity;
         }
 
     },
