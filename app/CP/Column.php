@@ -38,7 +38,7 @@ class Column
     {
         return $this->fluentlyGetOrSet('field', $field, function () {
             if (is_null($this->label)) {
-                $this->label = Str::slugToTitle($this->field);
+                $this->label(Str::slugToTitle($this->field), true);
             }
         });
     }
@@ -47,10 +47,15 @@ class Column
      * Get or set label.
      *
      * @param null|string $label
+     * @param bool $localize
      * @return mixed
      */
-    public function label($label = null)
+    public function label($label = null, $localize = false)
     {
+        if ($label && $localize) {
+            $label = __($label);
+        }
+
         return $this->fluentlyGetOrSet('label', $label);
     }
 
@@ -63,5 +68,15 @@ class Column
     public function visible($visible = null)
     {
         return $this->fluentlyGetOrSet('visible', $visible);
+    }
+
+    /**
+     * Cast column to array.
+     *
+     * return array
+     */
+    public function toArray()
+    {
+        return (array) $this;
     }
 }

@@ -31,4 +31,10 @@ class ColumnTest extends TestCase
         $this->assertEquals('Ripped', $json->label);
         $this->assertFalse($json->visible);
     }
+
+    /** @test */
+    function it_can_localize_label()
+    {
+        $this->markTestSkipped();
+    }
 }
