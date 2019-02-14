@@ -52,7 +52,7 @@ class RolesController extends CpController
             'permissions' => 'array',
         ]);
 
-        $role = Role::create()
+        $role = Role::make()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
             ->permissions($request->super ? ['super'] : $request->permissions)
