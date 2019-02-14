@@ -1,7 +1,12 @@
 <template>
 
     <div>
+        <div v-if="initializing" class="loading">
+            <loading-graphic  />
+        </div>
+
         <uploader
+            v-if="!initializing"
             ref="uploader"
             :container="container.id"
             :path="path"
@@ -9,26 +14,25 @@
             @upload-complete="uploadCompleted"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="relative">
+            <div slot-scope="{ dragging }" class="relative" :class="{ 'shadow': showContainerTabs }">
                 <div class="drag-notification" v-show="dragging">
                     <i class="icon icon-download" />
                     Drop to upload.
                 </div>
 
-                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictContainerNavigation && Object.keys(containers).length > 1">
+                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
                     <a v-for="item in containers" :key="item.id"
                         v-text="item.title"
-                        :class="{ active: item.id === container.id }"
+                        :class="{
+                            active: item.id === container.id,
+                            'border-b border-grey-lighter': item.id !== container.id
+                        }"
                         @click="selectContainer(item.id)"
                     />
                 </div>
 
-                <div v-if="initializing || loadingContainers" class="asset-browser-loading loading">
-                    <loading-graphic />
-                </div>
-
                 <data-list
-                    v-if="!loadingContainers && !initializing"
+                    v-if="!initializing"
                     :rows="assets"
                     :columns="columns"
                     :search-query="searchQuery"
@@ -37,7 +41,7 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }">
-                        <div class="card p-0">
+                        <div class="card p-0" :class="{ 'rounded-t-none shadow-none': showContainerTabs }">
 
                             <div class="data-list-header">
                                 <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
@@ -184,7 +188,6 @@ export default {
                 { label: __('Size'), field: 'size_formatted', visible: true },
                 { label: __('Last Modified'), field: 'last_modified_relative', visible: true },
             ],
-            loadingContainers: true,
             containers: [],
             container: {},
             initializing: true,
@@ -210,8 +213,12 @@ export default {
                 : this.initialContainer;
         },
 
+        showContainerTabs() {
+            return !this.restrictContainerNavigation && Object.keys(this.containers).length > 1
+        },
+
         loading() {
-            return this.loadingAssets || this.loadingContainers;
+            return this.loadingAssets;
         },
 
         showAssetEditor() {
@@ -282,12 +289,9 @@ export default {
         },
 
         loadContainers() {
-            this.loadingContainers = true;
-
             axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
-                this.loadingContainers = false;
             });
         },
 
