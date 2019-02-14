@@ -5,9 +5,12 @@ namespace Statamic\CP\Navigation;
 use Exception;
 use Statamic\API\Nav;
 use Statamic\API\Str;
+use Statamic\FluentlyGetsAndSets;
 
 class NavItem
 {
+    use FluentlyGetsAndSets;
+
     protected $name;
     protected $section;
     protected $url;
@@ -25,13 +28,7 @@ class NavItem
      */
     public function name($name = null)
     {
-        if (is_null($name)) {
-            return $this->name;
-        }
-
-        $this->name = $name;
-
-        return $this;
+        return $this->fluentlyGetOrSet('name', $name);
     }
 
     /**
@@ -42,13 +39,7 @@ class NavItem
      */
     public function section($section = null)
     {
-        if (is_null($section)) {
-            return $this->section;
-        }
-
-        $this->section = $section;
-
-        return $this;
+        return $this->fluentlyGetOrSet('section', $section);
     }
 
     /**
@@ -71,17 +62,11 @@ class NavItem
      */
     public function url($url = null)
     {
-        if (is_null($url)) {
-            return $this->url;
-        }
-
-        $this->url = $url;
-
-        if (! $this->active) {
-            $this->active = str_replace(url('cp').'/', '', $this->url) . '*';
-        }
-
-        return $this;
+        return $this->fluentlyGetOrSet('url', $url, function () {
+            if (! $this->active) {
+                $this->active = str_replace(url('cp').'/', '', $this->url) . '*';
+            }
+        });
     }
 
     /**
@@ -92,13 +77,7 @@ class NavItem
      */
     public function icon($icon = null)
     {
-        if (is_null($icon)) {
-            return $this->icon;
-        }
-
-        $this->icon = $icon;
-
-        return $this;
+        return $this->fluentlyGetOrSet('icon', $icon);
     }
 
     /**
@@ -174,13 +153,7 @@ class NavItem
      */
     public function active($pattern = null)
     {
-        if (is_null($pattern)) {
-            return $this->active;
-        }
-
-        $this->active = $pattern;
-
-        return $this;
+        return $this->fluentlyGetOrSet('active', $pattern);
     }
 
     /**
@@ -191,12 +164,6 @@ class NavItem
      */
     public function view($view = null)
     {
-        if (is_null($view)) {
-            return $this->view;
-        }
-
-        $this->view = $view;
-
-        return $this;
+        return $this->fluentlyGetOrSet('view', $view);
     }
 }
