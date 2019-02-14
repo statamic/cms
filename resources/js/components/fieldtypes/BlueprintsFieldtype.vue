@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import RelationshipFieldtype from './RelationshipFieldtype.vue';
+import RelationshipFieldtype from './relationship/RelationshipFieldtype.vue';
 
 export default {
 
