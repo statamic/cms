@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Statamic\API\Str;
 use Statamic\API\Site;
 use Statamic\API\User;
+use Statamic\CP\Column;
 use Statamic\API\Action;
 use Statamic\API\Filter;
 use Statamic\API\Helper;
@@ -34,8 +35,8 @@ class CollectionsController extends CpController
         return view('statamic::collections.index', [
             'collections' => $collections,
             'columns' => [
-                ['label' => __('Title'), 'field' => 'title', 'visible' => true],
-                ['label' => __('Entries'), 'field' => 'entries', 'visible' => true],
+                Column::make('title'),
+                Column::make('entries'),
             ],
         ]);
     }

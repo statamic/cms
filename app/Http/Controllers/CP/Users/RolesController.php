@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Statamic\API\Role;
+use Statamic\CP\Column;
 use Illuminate\Http\Request;
 use Statamic\API\Permission;
 use Statamic\Http\Controllers\CP\CpController;
@@ -30,9 +31,9 @@ class RolesController extends CpController
         return view('statamic::roles.index', [
             'roles' => $roles,
             'columns' => [
-                ['label' => __('Title'), 'field' => 'title', 'visible' => true],
-                ['label' => __('Handle'), 'field' => 'handle', 'visible' => true],
-                ['label' => __('Permissions'), 'field' => 'permissions', 'visible' => true],
+                Column::make('title'),
+                Column::make('handle'),
+                Column::make('permissions'),
             ],
         ]);
     }
