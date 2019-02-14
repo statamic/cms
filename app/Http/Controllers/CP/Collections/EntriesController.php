@@ -16,9 +16,9 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $collection)
+    public function index(FilteredSiteRequest $request, $handle)
     {
-        $collection = Collection::whereHandle($collection);
+        $collection = Collection::whereHandle($handle);
 
         $query = $this->indexQuery($collection);
 
@@ -32,25 +32,13 @@ class EntriesController extends CpController
             return ['deleteable' => me()->can('delete', $entry)];
         }));
 
+        $preferredColumns = Preference::get("collections.{$handle}.columns");
+
         return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sort,
-            'columns' => $this->columns($collection->handle(), ['title', 'slug'], [
-                ['label' => __('Title'), 'field' => 'title'],
-                ['label' => __('Slug'), 'field' => 'slug'],
-            ]),
+            'columns' => $collection->entryBlueprint()->makeListableColumns($preferredColumns),
         ]]);
-    }
-
-    protected function columns($collection, $default, $columns)
-    {
-        $visible = Preference::get("collections.{$collection}.columns", $default);
-
-        return collect($columns)->map(function ($column) use ($visible) {
-            return array_merge($column, [
-                'visible' => in_array($column['field'], $visible)
-            ]);
-        });
     }
 
     protected function filter($query, $filters)
