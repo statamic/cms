@@ -3,11 +3,13 @@
 namespace Statamic\Providers;
 
 use Statamic\API\File;
+use Statamic\Statamic;
 use Statamic\DataStore;
 use Statamic\Sites\Sites;
-use Statamic\Statamic;
 use Stringy\StaticStringy;
+use Statamic\API\Preference;
 use Statamic\Routing\Router;
+use Illuminate\Support\Carbon;
 use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
@@ -59,6 +61,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
+        });
+
+        Carbon::macro('inPreferredFormat', function () {
+            return $this->format(
+                Preference::get('date_format', config('statamic.cp.date_format'))
+            );
         });
     }
 
