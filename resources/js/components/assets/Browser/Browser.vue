@@ -15,7 +15,7 @@
                     Drop to upload.
                 </div>
 
-                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictNavigation && Object.keys(containers).length > 1">
+                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px" v-if="!restrictContainerNavigation && Object.keys(containers).length > 1">
                     <a v-for="item in containers" :key="item.id"
                         v-text="item.title"
                         :class="{ active: item.id === container.id }"
@@ -69,7 +69,7 @@
                             <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
 
                                 <template slot="tbody-start">
-                                    <tr v-if="folder.parent_path && !restrictNavigation">
+                                    <tr v-if="folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer">
@@ -79,7 +79,7 @@
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="folder in folders" :key="folder.path" v-if="!restrictNavigation">
+                                    <tr v-for="folder in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
@@ -171,7 +171,8 @@ export default {
         // Either the ID, or the whole container object.
         initialContainer: {},
         selectedPath: String,        // The path to display, determined by a parent component.
-        restrictNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
+        restrictContainerNavigation: Boolean,  // Whether to restrict to a single container and prevent navigation.
+        restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
     },

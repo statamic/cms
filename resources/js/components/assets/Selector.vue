@@ -7,7 +7,8 @@
                     :initial-container="container"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
-                    :restrict-navigation="restrictNavigation"
+                    :restrict-container-navigation="restrictContainerNavigation"
+                    :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
                     @selections-updated="selectionsUpdated"
                     @asset-doubleclicked="select">
@@ -54,7 +55,13 @@ export default {
         folder: String,
         selected: Array,
         maxFiles: Number,
-        restrictNavigation: {
+        restrictContainerNavigation: {
+            type: Boolean,
+            default() {
+                return false;
+            }
+        },
+        restrictFolderNavigation: {
             type: Boolean,
             default() {
                 return false;

@@ -144,7 +144,8 @@
             <selector
                 :container="container"
                 :folder="folder"
-                :restrict-navigation="restrictNavigation"
+                :restrict-container-navigation="true"
+                :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
                 :view-mode="selectorViewMode"
                 :max-files="maxFiles"
