@@ -13,6 +13,7 @@ class ColumnTest extends TestCase
         $column = Column::make('description');
 
         $this->assertEquals('description', $column->handle());
+        $this->assertEquals('Description', $column->Label());
         $this->assertTrue($column->visible());
     }
 
@@ -29,15 +30,5 @@ class ColumnTest extends TestCase
         $this->assertEquals('bars', $json->handle);
         $this->assertEquals('Ripped', $json->label);
         $this->assertFalse($json->visible);
-    }
-
-    /** @test */
-    function it_automatically_infers_default_label_when_serializing_to_json()
-    {
-        $column = Column::make('description');
-
-        $json = json_decode(json_encode($column));
-
-        $this->assertEquals('Description', $json->label);
     }
 }

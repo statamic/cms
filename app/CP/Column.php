@@ -3,10 +3,12 @@
 namespace Statamic\CP;
 
 use Illuminate\Support\Str;
-use JsonSerializable;
+use Statamic\FluentlyGetsAndSets;
 
-class Column implements JsonSerializable
+class Column
 {
+    use FluentlyGetsAndSets;
+
     public $handle;
     public $label;
     public $visible = true;
@@ -34,13 +36,11 @@ class Column implements JsonSerializable
      */
     public function handle($handle = null)
     {
-        if (is_null($handle)) {
-            return $this->handle;
-        }
-
-        $this->handle = $handle;
-
-        return $this;
+        return $this->fluentlyGetOrSet('handle', $handle, function () {
+            if (is_null($this->label)) {
+                $this->label(Str::title($this->handle));
+            }
+        });
     }
 
     /**
@@ -51,13 +51,7 @@ class Column implements JsonSerializable
      */
     public function label($label = null)
     {
-        if (is_null($label)) {
-            return $this->label;
-        }
-
-        $this->label = __($label);
-
-        return $this;
+        return $this->fluentlyGetOrSet('label', $label);
     }
 
     /**
@@ -68,26 +62,6 @@ class Column implements JsonSerializable
      */
     public function visible($visible = null)
     {
-        if (is_null($visible)) {
-            return $this->visible;
-        }
-
-        $this->visible = $visible;
-
-        return $this;
-    }
-
-    /**
-     * If empty, set default label when serializing.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        if (is_null($this->label)) {
-            $this->label(Str::title($this->handle));
-        }
-
-        return (array) $this;
+        return $this->fluentlyGetOrSet('visible', $visible);
     }
 }
