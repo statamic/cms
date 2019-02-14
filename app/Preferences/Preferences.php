@@ -25,6 +25,10 @@ class Preferences
      */
     public function all()
     {
+        if (auth()->guest()) {
+            return [];
+        }
+
         if ($this->preferences) {
             return $this->preferences;
         }
