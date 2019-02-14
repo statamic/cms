@@ -95,7 +95,6 @@ export default {
          * Close this selector
          */
         close() {
-            this.$modal.hide('asset-selector');
             this.$emit('closed');
         },
 
