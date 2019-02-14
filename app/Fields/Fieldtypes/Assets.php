@@ -115,4 +115,15 @@ class Assets extends Fieldtype
     {
         return AssetContainer::find($this->config('container'));
     }
+
+    public function rules(): array
+    {
+        $rules = ['array'];
+
+        if ($max = $this->config('max_files')) {
+            $rules[] = 'max:' . $max;
+        }
+
+        return $rules;
+    }
 }
