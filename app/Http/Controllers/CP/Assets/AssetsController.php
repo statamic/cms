@@ -96,7 +96,14 @@ class AssetsController extends CpController
         $file = $request->file('file');
         $path = ltrim($request->folder . '/' . $file->getClientOriginalName(), '/');
 
-        return $container->makeAsset($path)->upload($file);
+        $asset = $container->makeAsset($path)->upload($file);
+
+        if ($asset->isImage()) {
+            $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
+            $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
+        }
+
+        return $asset;
     }
 
     public function download($asset)
