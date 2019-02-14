@@ -60,17 +60,16 @@ class Blueprint
 
     public function makeListableColumns($listable = null)
     {
-        return $this->fields()
-            ->all()
-            ->map(function ($field) use ($listable) {
-                return Column::make()
-                    ->field($field->handle())
-                    ->fieldtype($field->fieldtype()->handle())
-                    ->label(__($field->display()))
-                    ->visible(is_array($listable) ? in_array($field->handle(), $listable) : $field->isListable())
-                    ->toArray();
-            })
-            ->values();
+        $fields = $this->fields()->all();
+
+        return $this->sortListableFieldsFirst($listable, $fields)->map(function ($field) use ($listable) {
+            return Column::make()
+                ->field($field->handle())
+                ->fieldtype($field->fieldtype()->handle())
+                ->label(__($field->display()))
+                ->visible(is_array($listable) ? in_array($field->handle(), $listable) : $field->isListable())
+                ->toArray();
+        });
     }
 
     public function isEmpty(): bool
@@ -102,5 +101,17 @@ class Blueprint
         BlueprintRepository::save($this);
 
         return $this;
+    }
+
+    protected function sortListableFieldsFirst($listable, $fields)
+    {
+        return $fields
+            ->values()
+            ->keyBy(function ($field, $key) use ($listable) {
+                $listableKey = array_search($field->handle(), $listable ?? []);
+                return $listableKey !== false ? '_' . $listableKey : $key + 1;
+            })
+            ->sortKeys()
+            ->values();
     }
 }
