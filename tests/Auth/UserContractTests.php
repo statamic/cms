@@ -149,6 +149,7 @@ trait UserContractTests
             'is_role_two' => true,
             'in_group_one' => true,
             'in_group_two' => true,
+            'preferences' => [],
         ], $this->user()->toArray());
     }
 
