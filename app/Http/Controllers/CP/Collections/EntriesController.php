@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Statamic\API\Site;
 use Statamic\API\Entry;
+use Statamic\CP\Column;
 use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
@@ -26,18 +27,28 @@ class EntriesController extends CpController
 
         $entries = $query
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
-            ->paginate(request('perPage'));
+            ->paginate(request('perPage'))
+            ->supplement(function ($entry) {
+                return [
+                    'deleteable' => me()->can('delete', $entry)
+                ];
+            });
 
-        $entries->setCollection($entries->getCollection()->supplement(function ($entry) {
-            return ['deleteable' => me()->can('delete', $entry)];
-        }));
+        $columns = $collection->entryBlueprint()
+            ->columns(Preference::get("collections.{$handle}.columns"))
+            ->ensurePrepended(Column::make('title'));
 
-        $preferredColumns = Preference::get("collections.{$handle}.columns");
+        if ($collection->order() === 'date') {
+            $columns->ensureHas(Column::make('date'));
+            $entries->supplement('date', function ($entry) {
+                return $entry->date()->inPreferredFormat();
+            });
+        }
 
         return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sort,
-            'columns' => $collection->entryBlueprint()->makeListableColumns($preferredColumns),
+            'columns' => $columns->values(),
         ]]);
     }
 

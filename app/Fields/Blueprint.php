@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Statamic\API\Str;
 use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\BlueprintRepository;
 
@@ -63,18 +64,17 @@ class Blueprint
         return $this->fields()->has($field);
     }
 
-    public function makeListableColumns($listable = null)
+    public function columns($listable = null)
     {
         $fields = $this->fields()->all();
 
-        return $this->sortListableFieldsFirst($listable, $fields)->map(function ($field) use ($listable) {
+        return new Columns($this->sortListableFieldsFirst($listable, $fields)->map(function ($field) use ($listable) {
             return Column::make()
                 ->field($field->handle())
                 ->fieldtype($field->fieldtype()->handle())
                 ->label(__($field->display()))
-                ->visible(is_array($listable) ? in_array($field->handle(), $listable) : $field->isListable())
-                ->toArray();
-        });
+                ->visible(is_array($listable) ? in_array($field->handle(), $listable) : $field->isListable());
+        }));
     }
 
     public function isEmpty(): bool
@@ -117,6 +117,6 @@ class Blueprint
                 return $listableKey !== false ? '_' . $listableKey : $key + 1;
             })
             ->sortKeys()
-            ->values();
+            ->keyBy->handle();
     }
 }
