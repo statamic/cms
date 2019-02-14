@@ -5,6 +5,7 @@ namespace Tests\Data\Entries;
 use Statamic\API;
 use Tests\TestCase;
 use Statamic\Sites\Site;
+use Illuminate\Support\Carbon;
 use Statamic\Fields\Blueprint;
 use Statamic\Data\Entries\Entry;
 use Statamic\Events\Data\EntrySaved;
@@ -271,6 +272,29 @@ class LocalizedEntryTest extends TestCase
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('123', $entry->order());
+    }
+
+    /** @test */
+    function it_gets_and_sets_the_date_for_date_collections()
+    {
+        $dateEntry = with('', function() {
+            $collection = (new Collection)->order('date');
+            $parent = (new Entry)->collection($collection);
+            return (new LocalizedEntry)->entry($parent);
+        });
+        $numberEntry = with('', function() {
+            $collection = (new Collection)->order('number');
+            $parent = (new Entry)->collection($collection);
+            return (new LocalizedEntry)->entry($parent);
+        });
+        $this->assertNull($dateEntry->order());
+        $this->assertNull($numberEntry->order());
+
+        $dateEntry->order('2017-01-02');
+        $numberEntry->order('2017-01-02');
+
+        $this->assertEquals(Carbon::parse('2017-01-02'), $dateEntry->date());
+        $this->assertNull($numberEntry->date());
     }
 
     /** @test */

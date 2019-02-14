@@ -168,7 +168,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function date()
     {
-        if ($this->collection()->order === 'date') {
+        if ($this->collection()->order() === 'date') {
             return Carbon::parse($this->order());
         }
 
