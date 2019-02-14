@@ -94,7 +94,7 @@ class AssetsController extends CpController
         ]);
 
         $file = $request->file('file');
-        $path = $request->folder . '/' . $file->getClientOriginalName();
+        $path = ltrim($request->folder . '/' . $file->getClientOriginalName(), '/');
 
         return $container->makeAsset($path)->upload($file);
     }
