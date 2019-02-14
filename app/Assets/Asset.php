@@ -91,7 +91,7 @@ class Asset implements AssetContract, Arrayable
     public function path($path = null)
     {
         if (func_num_args() === 0) {
-            return $this->path;
+            return $this->path ? Str::removeLeft($this->path, '/') : null;
         }
 
         $this->path = $path;

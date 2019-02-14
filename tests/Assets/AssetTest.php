@@ -119,6 +119,12 @@ class AssetTest extends TestCase
 
         $this->assertEquals($asset, $return);
         $this->assertEquals('path/to/asset.jpg', $asset->path());
+
+        $asset->path('/asset.jpg');
+        $this->assertEquals('asset.jpg', $asset->path());
+
+        $asset->path('asset.jpg');
+        $this->assertEquals('asset.jpg', $asset->path());
     }
 
     /** @test */
