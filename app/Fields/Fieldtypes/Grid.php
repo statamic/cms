@@ -69,7 +69,7 @@ class Grid extends Fieldtype
         }
 
         if ($max = $this->config('max_rows')) {
-            $rules[] = 'max:' . $min;
+            $rules[] = 'max:' . $max;
         }
 
         return $rules;
