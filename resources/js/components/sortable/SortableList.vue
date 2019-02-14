@@ -41,7 +41,7 @@ export default {
                 draggable: `.${this.itemClass}`,
                 handle: `.${this.handleClass}`,
                 delay: 200,
-                swapAnimation: { vertical: this.vertical },
+                swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],
                 mirror: {
                     constrainDimensions: true,

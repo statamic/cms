@@ -436,86 +436,11 @@
 /* Fieldtype
   ========================================================================== */
 
- .assets-fieldtype {
-     position: relative;
+.assets-fieldtype .asset-grid-listing .asset-tile {
 
-     &.empty .drag-notification {
-         flex-direction: row;
-         .icon {
-             font-size: 21px;
-             padding: 5px;
-             border: none;
-             margin: 0;
-         }
-         h3 { font-size: 18px; margin: 0; padding: 5px;}
-     }
- }
-
-.assets-fieldtype .manage-assets {
-    background: $color_gray_lighter;
-    padding: 16px;
-    position: relative;
-    border: 1px solid $border;
-    border-radius: 3px;
-
-    .icon {
-        color: #babfc2;
+    &.draggable-source--is-dragging {
+        visibility: hidden;
     }
-
-    p {
-        margin: 0 0 0 10px;
-        font-size: 14px;
-        display: inline-block;
-
-        a {
-            border-bottom: 1px solid;
-        }
-    }
-}
-
-.assets-fieldtype > .asset-grid-listing {
-    border: 1px solid $border;
-
-    .ui-sortable-placeholder {
-        .faux-thumbnail {
-            background: #fcfcfc;
-            padding-top: 100%;
-            border: 1px dashed #ccc;
-            width: 150px;
-            border-radius: 3px;
-        }
-    }
-}
-
-.assets-fieldtype > .asset-table-listing {
-    border: 1px solid $border;
-    border-radius: 0 0 3px 3px;
-    padding: 5px 0;
-
-    tr { border-top: 1px solid $border; }
-    td { padding: 5px; }
-
-    .remove-asset {
-        background: #fff url('../img/delete.png') no-repeat 0 0;
-        width: 12px;
-        height: 12px;
-        display: inline-block;
-        vertical-align: middle;
-        margin: 2px 0 0 5px;
-        cursor: pointer;
-    }
-}
-
-.assets-fieldtype .manage-assets ~ .asset-grid-listing {
-    margin-top: -3px;
-    border-radius: 0 0 3px 3px;
-}
-
-.assets-fieldtype .manage-assets ~ .asset-table-listing {
-    border-top: 0;
-}
-
-.assets-fieldtype > .asset-grid-listing > .asset-tile {
 
     .asset-thumb-container {
         position: relative;

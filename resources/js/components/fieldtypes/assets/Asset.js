@@ -67,7 +67,7 @@ export default {
         },
 
         assetSaved(asset) {
-            this.asset = asset;
+            this.$emit('updated', asset);
             this.closeEditor();
         }
 
