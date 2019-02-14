@@ -43,7 +43,7 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', Str::humanize($this->handle));
+        return array_get($this->config, 'display', Str::slugToTitle($this->handle));
     }
 
     public function instructions()

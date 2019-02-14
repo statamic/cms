@@ -28,7 +28,7 @@ class FieldTest extends TestCase
         );
 
         $this->assertEquals(
-            'Test multi word handle and no explicit display',
+            'Test Multi Word Handle And No Explicit Display',
             (new Field('test_multi_word_handle_and_no_explicit_display', []))->display()
         );
     }

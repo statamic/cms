@@ -37,7 +37,9 @@ class Column
     public function field($field = null)
     {
         return $this->fluentlyGetOrSet('field', $field, function () {
-            $this->setDefaultLabel();
+            if (is_null($this->label)) {
+                $this->label = Str::slugToTitle($this->field);
+            }
         });
     }
 
@@ -61,21 +63,5 @@ class Column
     public function visible($visible = null)
     {
         return $this->fluentlyGetOrSet('visible', $visible);
-    }
-
-    /**
-     * If unset, set default label.
-     *
-     * @return void
-     */
-    private function setDefaultLabel()
-    {
-        if ($this->label) {
-            return;
-        }
-
-        $this->label = Str::modifyMultiple($this->field, ['snake', 'title', function ($string) {
-            return str_replace('_', ' ', $string);
-        }]);
     }
 }

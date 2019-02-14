@@ -275,11 +275,6 @@ class Nav
      */
     public function __call($name, $arguments)
     {
-        // Convert camel case name method name to title case section name.
-        $section = Str::modifyMultiple($name, ['snake', 'title', function ($string) {
-            return str_replace('_', ' ', $string);
-        }]);
-
-        return $this->findOrCreate($section, $arguments[0]);
+        return $this->findOrCreate(Str::studlyToTitle($name), $arguments[0]);
     }
 }
