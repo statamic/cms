@@ -10,10 +10,10 @@ class ColumnTest extends TestCase
     /** @test */
     function it_can_make_a_basic_column()
     {
-        $column = Column::make('description');
+        $column = Column::make('first_name');
 
-        $this->assertEquals('description', $column->field());
-        $this->assertEquals('Description', $column->Label());
+        $this->assertEquals('first_name', $column->field());
+        $this->assertEquals('First Name', $column->Label());
         $this->assertTrue($column->visible());
     }
 
