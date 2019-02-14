@@ -28,7 +28,12 @@ class RolesController extends CpController
         }
 
         return view('statamic::roles.index', [
-            'roles' => $roles
+            'roles' => $roles,
+            'columns' => [
+                ['label' => __('Title'), 'field' => 'title', 'visible' => true],
+                ['label' => __('Handle'), 'field' => 'handle', 'visible' => true],
+                ['label' => __('Permissions'), 'field' => 'permissions', 'visible' => true],
+            ],
         ]);
     }
 
