@@ -84,8 +84,8 @@ class Assets extends Fieldtype
             }
 
             if ($asset->isImage()) {
-                $asset->set('thumbnail', $this->thumbnail($asset, 'small'));
-                $asset->set('toenail', $this->thumbnail($asset, 'large'));
+                $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
+                $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
             }
 
             $assets->put($url, $asset);
