@@ -76,6 +76,15 @@ class Field implements Arrayable
         return (bool) $this->get('localizable');
     }
 
+    public function isListable()
+    {
+        if (is_null($this->get('listable'))) {
+            return true;
+        }
+
+        return (bool) $this->get('listable');
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [
