@@ -12,7 +12,7 @@ class ColumnTest extends TestCase
     {
         $column = Column::make('description');
 
-        $this->assertEquals('description', $column->handle());
+        $this->assertEquals('description', $column->field());
         $this->assertEquals('Description', $column->Label());
         $this->assertTrue($column->visible());
     }
@@ -21,13 +21,13 @@ class ColumnTest extends TestCase
     function it_can_explicitly_set_data_and_serialize_to_json()
     {
         $column = Column::make()
-            ->handle('bars')
+            ->field('bars')
             ->label('Ripped')
             ->visible(false);
 
         $json = json_decode(json_encode($column));
 
-        $this->assertEquals('bars', $json->handle);
+        $this->assertEquals('bars', $json->field);
         $this->assertEquals('Ripped', $json->label);
         $this->assertFalse($json->visible);
     }

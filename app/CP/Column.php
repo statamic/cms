@@ -9,36 +9,36 @@ class Column
 {
     use FluentlyGetsAndSets;
 
-    public $handle;
+    public $field;
     public $label;
     public $visible = true;
 
     /**
      * Make new column instance.
      *
-     * @param null|string $handle
+     * @param null|string $field
      * @return static
      */
-    public static function make($handle = null)
+    public static function make($field = null)
     {
         $column = new static;
 
-        return $handle
-            ? $column->handle($handle)
+        return $field
+            ? $column->field($field)
             : $column;
     }
 
     /**
-     * Get or set handle.
+     * Get or set field.
      *
-     * @param null|string $handle
+     * @param null|string $field
      * @return mixed
      */
-    public function handle($handle = null)
+    public function field($field = null)
     {
-        return $this->fluentlyGetOrSet('handle', $handle, function () {
+        return $this->fluentlyGetOrSet('field', $field, function () {
             if (is_null($this->label)) {
-                $this->label(Str::title($this->handle));
+                $this->label(Str::title($this->field));
             }
         });
     }
