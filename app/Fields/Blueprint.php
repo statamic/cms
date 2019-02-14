@@ -65,7 +65,7 @@ class Blueprint
             ->map(function ($field) use ($listable) {
                 return Column::make()
                     ->field($field->handle())
-                    ->label($field->display(), true)
+                    ->label(__($field->display()))
                     ->visible(is_array($listable) ? in_array($field->handle(), $listable) : $field->isListable())
                     ->toArray();
             })

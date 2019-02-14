@@ -47,15 +47,10 @@ class Column
      * Get or set label.
      *
      * @param null|string $label
-     * @param bool $localize
      * @return mixed
      */
-    public function label($label = null, $localize = false)
+    public function label($label = null)
     {
-        if ($label && $localize) {
-            $label = __($label);
-        }
-
         return $this->fluentlyGetOrSet('label', $label);
     }
 
