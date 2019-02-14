@@ -37,8 +37,9 @@
                         :row="row"
                         :index="actualIndex(row)"
                         :display-index="index"
-                        :checkbox-id="`checkbox-${row.id}`">
-                        {{ row[column.field] }}
+                        :checkbox-id="`checkbox-${row.id}`"
+                    >
+                        <table-field :value="row[column.field]" :fieldtype="column.fieldtype" />
                     </slot>
                 </td>
                 <td class="text-right">
@@ -55,7 +56,13 @@
 </template>
 
 <script>
+import TableField from './TableField.vue';
+
 export default {
+
+    components: {
+        TableField
+    },
 
     props: {
         loading: {
