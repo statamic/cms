@@ -10,6 +10,7 @@ class Column
     use FluentlyGetsAndSets;
 
     public $field;
+    public $fieldtype;
     public $label;
     public $visible = true;
 
@@ -41,6 +42,17 @@ class Column
                 $this->label(Str::slugToTitle($this->field), true);
             }
         });
+    }
+
+    /**
+     * Get or set fieldtype.
+     *
+     * @param null|string $fieldtype
+     * @return mixed
+     */
+    public function fieldtype($fieldtype = null)
+    {
+        return $this->fluentlyGetOrSet('fieldtype', $fieldtype);
     }
 
     /**
