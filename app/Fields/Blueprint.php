@@ -58,6 +58,11 @@ class Blueprint
         }, new Fields);
     }
 
+    public function hasField($field)
+    {
+        return $this->fields()->has($field);
+    }
+
     public function makeListableColumns($listable = null)
     {
         $fields = $this->fields()->all();

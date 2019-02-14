@@ -149,6 +149,10 @@ class BlueprintTest extends TestCase
             ]
         ]);
 
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertFalse($blueprint->hasField('three'));
+
         tap($blueprint->fields(), function ($fields) {
             $this->assertInstanceOf(Fields::class, $fields);
             tap($fields->all(), function ($items) {
