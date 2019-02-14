@@ -83,9 +83,7 @@ class EntriesController extends CpController
 
         $this->authorize('view', $entry);
 
-        if (! $blueprint = $entry->blueprint()) {
-            throw new \Exception('There is no blueprint defined for this collection.');
-        }
+        $blueprint = $entry->blueprint();
 
         // event(new PublishBlueprintFound($blueprint, 'entry', $entry)); // TODO
 

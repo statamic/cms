@@ -105,7 +105,8 @@ class Collection implements Contract
 
     public function entryBlueprint()
     {
-        return $this->entryBlueprints()->first();
+        return $this->entryBlueprints()->first()
+            ?? Blueprint::find(config('statamic.theming.blueprints.default'));
     }
 
     public function sites($sites = null)
