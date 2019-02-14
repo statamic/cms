@@ -68,6 +68,10 @@ class BrowserController extends CpController
             $totalAssetCount, $perPage, $currentPage
         );
 
+        $assets->each(function($asset) {
+            $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
+        });
+
         return Resource::collection($assets)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
             'folders' => $folders,

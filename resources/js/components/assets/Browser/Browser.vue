@@ -181,8 +181,8 @@ export default {
         return {
             columns: [
                 { label: __('File'), field: 'basename', visible: true },
-                { label: __('Size'), field: 'size_b', visible: true },
-                { label: __('Last Modified'), field: 'last_modified_timestamp', visible: true },
+                { label: __('Size'), field: 'size_formatted', visible: true },
+                { label: __('Last Modified'), field: 'last_modified_relative', visible: true },
             ],
             loadingContainers: true,
             containers: [],
