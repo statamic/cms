@@ -7,6 +7,12 @@ use Illuminate\Support\Collection;
 
 class Columns extends Collection
 {
+    /**
+     * Ensure has column.
+     *
+     * @param \Statamic\CP\Column $column
+     * @return $this
+     */
     public function ensureHas($column)
     {
         if ($this->keyBy->field()->has($column->field())) {
@@ -16,6 +22,12 @@ class Columns extends Collection
         return $this->put($column->field(), $column);
     }
 
+    /**
+     * Ensure has column, and if not prepend.
+     *
+     * @param \Statamic\CP\Column $column
+     * @return $this
+     */
     public function ensurePrepended($column)
     {
         if ($this->keyBy->field()->has($column->field())) {

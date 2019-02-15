@@ -100,5 +100,4 @@ class ColumnsTest extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
-
 }
