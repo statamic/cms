@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\CP;
 
 use Tests\TestCase;
 use Statamic\CP\Column;

@@ -7,18 +7,30 @@ use Illuminate\Support\Collection;
 
 class Columns extends Collection
 {
+    /**
+     * Ensure has column.
+     *
+     * @param \Statamic\CP\Column $column
+     * @return $this
+     */
     public function ensureHas($column)
     {
-        if ($this->has($column->field())) {
+        if ($this->keyBy->field()->has($column->field())) {
             return $this;
         }
 
         return $this->put($column->field(), $column);
     }
 
+    /**
+     * Ensure has column, and if not prepend.
+     *
+     * @param \Statamic\CP\Column $column
+     * @return $this
+     */
     public function ensurePrepended($column)
     {
-        if ($this->has($column->field())) {
+        if ($this->keyBy->field()->has($column->field())) {
             return $this;
         }
 
