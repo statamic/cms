@@ -34,11 +34,11 @@ class PreferenceController extends CpController
      *
      * @param string $key
      */
-    public function destroy($key)
+    public function destroy($key, Request $request)
     {
         $this->authorize('access cp');
 
-        auth()->user()->removePreference($key)->save();
+        auth()->user()->removePreference($key, $request->value)->save();
 
         return Preference::all();
     }
