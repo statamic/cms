@@ -1,6 +1,6 @@
 <template>
     <div>
-        <popper ref="popper" @show="highlight" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
+        <popper v-if="isNotYetFavorited" ref="popper" @show="highlight" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
 
             <div class="card p-0 shadow-lg z-top">
                 <h6 class="text-center p-1 border-b">{{ __('Pin to Favorites') }}</h6>
@@ -14,6 +14,11 @@
                 <svg-icon name="pin"></svg-icon>
             </button>
         </popper>
+        <div v-else>
+            <button @click="remove" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-dark" v-popover:tooltip.bottom="__('Unpin from Favorites')">
+                <svg-icon name="pin"></svg-icon>
+            </button>
+        </div>
     </div>
 </template>
 
@@ -42,6 +47,16 @@ export default {
                 name: this.name,
                 url: this.currentUrl
             }
+        },
+
+        persistedFavorite() {
+            return _.find(this.$preferences.get('favorites'), favorite => {
+                return favorite.url == this.currentUrl;
+            });
+        },
+
+        isNotYetFavorited() {
+            return this.persistedFavorite === undefined;
         }
     },
 
@@ -63,6 +78,12 @@ export default {
                 } else {
                     this.$notify.error(__('Something went wrong'));
                 }
+            });
+        },
+
+        remove() {
+            this.$preferences.remove('favorites', this.persistedFavorite).then(response => {
+                this.$notify.success(__('Favorite removed'), { timeout: 3000 });
             });
         }
     }
