@@ -290,8 +290,9 @@ class ExtensionServiceProvider extends ServiceProvider
         $parent = 'statamic.widgets';
 
         $widgets = [
-            \Statamic\Widgets\GettingStarted::class,
             \Statamic\Widgets\Collection::class,
+            \Statamic\Widgets\GettingStarted::class,
+            \Statamic\Widgets\Header::class,
             \Statamic\Widgets\Template::class,
             \Statamic\Widgets\Updater::class,
             \Statamic\Forms\Widget::class,
