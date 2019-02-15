@@ -64,16 +64,14 @@ class Blueprint
         return $this->fields()->has($field);
     }
 
-    public function columns($listable = null)
+    public function columns()
     {
-        $fields = $this->fields()->all();
-
-        return new Columns($this->sortListableFieldsFirst($listable, $fields)->map(function ($field) use ($listable) {
+        return new Columns($this->fields()->all()->map(function ($field) {
             return Column::make()
                 ->field($field->handle())
                 ->fieldtype($field->fieldtype()->handle())
                 ->label(__($field->display()))
-                ->visible(is_array($listable) ? in_array($field->handle(), $listable) : $field->isListable());
+                ->visible($field->isListable());
         }));
     }
 
@@ -106,17 +104,5 @@ class Blueprint
         BlueprintRepository::save($this);
 
         return $this;
-    }
-
-    protected function sortListableFieldsFirst($listable, $fields)
-    {
-        return $fields
-            ->values()
-            ->keyBy(function ($field, $key) use ($listable) {
-                $listableKey = array_search($field->handle(), $listable ?? []);
-                return $listableKey !== false ? '_' . $listableKey : $key + 1;
-            })
-            ->sortKeys()
-            ->keyBy->handle();
     }
 }
