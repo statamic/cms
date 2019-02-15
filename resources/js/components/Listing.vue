@@ -13,6 +13,10 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
+        perPage: {
+            type: Number,
+            default: 25
+        }
     },
 
     data() {
@@ -24,7 +28,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
-            perPage: 25, // TODO: Should come from the controller, or a config.
             meta: null,
             searchQuery: '',
         }
