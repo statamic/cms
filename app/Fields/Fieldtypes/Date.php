@@ -41,7 +41,7 @@ class Date extends Fieldtype
 
     private function dateFormat($date)
     {
-        return $this->getFieldConfig(
+        return $this->config(
             'format',
             strlen($date) > 10 ? 'Y-m-d H:i' : 'Y-m-d'
         );
