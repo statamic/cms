@@ -3,13 +3,9 @@
 
 @section('content')
 
-    <div class="flex items-center mb-3">
-        <h1 class="flex-1">{{ __('Dashboard') }}</h1>
-    </div>
-
-    <div class="widgets">
+    <div class="widgets flex flex-wrap -mx-2 py-1">
         @foreach($widgets as $widget)
-            <div class="widget {{ array_get($widget, 'width', 'half')}} mb-3">
+            <div class="widget {{ $widget['classes'] }} mb-2 px-2">
                 {!! $widget['html'] !!}
             </div>
         @endforeach

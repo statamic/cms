@@ -34,6 +34,9 @@ Vue.component('asset-container-list', require('../components/AssetContainerList.
 Vue.component('addon-list', require('../components/AddonList.vue'));
 Vue.component('addon-details', require('../components/AddonDetails.vue'));
 
+// Widgets
+Vue.component('collection-widget', require('../components/entries/Widget.vue'));
+
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
 Vue.component('file-icon', require('../components/FileIcon.vue'));

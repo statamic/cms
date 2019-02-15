@@ -25,15 +25,10 @@ class Collection extends Widget
             return;
         }
 
-        $entries = $collection
-            ->queryEntries()
-            ->limit($this->config('limit', 5))
-            ->get();
-
         $title = $this->config('title', $collection->title());
-        $format = $this->config('date_format', config('statamic.cp.date_format'));
         $button = __('New :thing', ['thing' => $collection->entryBlueprint()->title()]);
+        $limit = $this->config('limit', 5);
 
-        return view('statamic::widgets.collection', compact('collection', 'entries', 'title', 'format', 'button'));
+        return view('statamic::widgets.collection', compact('collection', 'title', 'button', 'limit'));
     }
 }
