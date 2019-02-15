@@ -57,11 +57,34 @@ trait HasPreferences
      * Remove preference (dot notation in key supported).
      *
      * @param string $key
+     * @param null|mixed $value
      * @return $this
      */
-    public function removePreference($key)
+    public function removePreference($key, $value = null)
     {
-        Arr::pull($this->preferences, $key);
+        if (is_null($value)) {
+            Arr::pull($this->preferences, $key);
+        } else {
+            $this->removePreferenceValue($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove an array value from a preference.
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    public function removePreferenceValue($key, $value)
+    {
+        $preference = collect($this->getPreference($key))
+            ->diff([$value])
+            ->values()
+            ->all();
+
+        $this->setPreference($key, $preference);
 
         return $this;
     }
