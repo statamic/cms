@@ -1,4 +1,4 @@
-<div class="card p-0 content">
+<div class="card shadow-hover-lg p-0 content">
     <div class="p-3">
         <h1>Getting started with Statamic</h1>
         <p>To begin building your new Statamic site, we recommend starting with these steps.</p>

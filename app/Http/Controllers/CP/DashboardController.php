@@ -42,7 +42,7 @@ class DashboardController extends CpController
             ->map(function ($config) use ($loader) {
                 return [
                     'widget' => $widget = $loader->load(array_get($config, 'type'), $config),
-                    'width' => $widget->config('width', 'half'),
+                    'classes' => $widget->config('classes', 'w-full'),
                     'html' => (string) $widget->html()
                 ];
             })
