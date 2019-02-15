@@ -287,6 +287,12 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
+    function no_pre_processing_happens_by_default_for_the_index()
+    {
+        $this->assertEquals('test', (new TestFieldtype)->preProcessIndex('test'));
+    }
+
+    /** @test */
     function it_gets_a_config_value()
     {
         $field = new Field('test', [

@@ -64,6 +64,11 @@ class Blueprint
         return $this->fields()->has($field);
     }
 
+    public function field($field)
+    {
+        return $this->fields()->get($field);
+    }
+
     public function columns()
     {
         return new Columns($this->fields()->all()->map(function ($field) {

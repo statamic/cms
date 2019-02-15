@@ -323,6 +323,22 @@ class FieldTest extends TestCase
     }
 
     /** @test */
+    function it_preprocesses_the_value_through_its_fieldtype_for_the_index()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcessIndex($data) {
+                    return $data . ' preprocessed for index';
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
+
+        $this->assertEquals('foo preprocessed for index', $field->preProcessIndex()->value());
+    }
+
+    /** @test */
     function preprocessing_a_field_with_no_value_will_take_the_default_from_the_field()
     {
         FieldtypeRepository::shouldReceive('find')

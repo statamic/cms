@@ -140,6 +140,13 @@ class Field implements Arrayable
         return $this;
     }
 
+    public function preProcessIndex()
+    {
+        $this->value = $this->fieldtype()->preProcessIndex($this->value);
+
+        return $this;
+    }
+
     public function toArray()
     {
         return array_merge($this->config, [

@@ -150,8 +150,11 @@ class BlueprintTest extends TestCase
         ]);
 
         $this->assertTrue($blueprint->hasField('one'));
+        $this->assertInstanceOf(Field::class, $blueprint->field('one'));
         $this->assertTrue($blueprint->hasField('two'));
+        $this->assertInstanceOf(Field::class, $blueprint->field('two'));
         $this->assertFalse($blueprint->hasField('three'));
+        $this->assertNull($blueprint->field('three'));
 
         tap($blueprint->fields(), function ($fields) {
             $this->assertInstanceOf(Fields::class, $fields);

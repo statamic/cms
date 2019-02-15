@@ -134,6 +134,11 @@ abstract class Fieldtype implements Arrayable
         return $data;
     }
 
+    public function preProcessIndex($data)
+    {
+        return $data;
+    }
+
     public function config(string $key = null, $fallback = null)
     {
         return $key
