@@ -84,7 +84,8 @@
             </div>
         </uploader>
 
-        <selector v-if="showAssetSelector"
+        <stack v-if="showAssetSelector" name="markdown-asset-selector" @closed="closeAssetSelector">
+            <selector
                   :container="container"
                   :folder="folder"
                   :selected="selectedAssets"
@@ -92,7 +93,8 @@
                   :restrict-folder-navigation="restrictAssetNavigation"
                   @selected="assetsSelected"
                   @closed="closeAssetSelector"
-        ></selector>
+            />
+        </stack>
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-3 bg-white">
@@ -107,6 +109,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 var CodeMirror = require('codemirror');
 var marked = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
@@ -416,8 +419,8 @@ export default {
             // We don't want to maintain the asset selections
             this.selectedAssets = [];
 
-            this.$http.post(cp_url('assets/get'), { assets }, (response) => {
-                _(response).each((asset) => {
+            axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
+                _(response.data).each((asset) => {
                     var alt = asset.alt || '';
                     var url = encodeURI(asset.url);
                     if (asset.is_image) {
