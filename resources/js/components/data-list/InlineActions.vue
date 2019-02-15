@@ -5,6 +5,7 @@
             v-for="action in sortedActions"
             :key="action.handle"
             :action="action"
+            :selections="1"
             @selected="run"
         >
             <div

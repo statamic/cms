@@ -12,6 +12,7 @@
                 v-for="action in sortedActions"
                 :key="action.handle"
                 :action="action"
+                :selections="selections.length"
                 @selected="run"
             >
                 <button

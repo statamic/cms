@@ -21,11 +21,11 @@
                         <publish-fields :fields="action.fields" />
                     </publish-container>
 
-                    <div v-else class="p-3" v-text="__('Are you sure you want to run this action?')" />
+                    <div v-else class="p-3" v-text="confirmationText" />
                 </div>
 
                 <div class="p-3 bg-grey-lightest border-t flex items-center text-sm">
-                    <button class="btn" :class="[ action.dangerous ? 'btn-danger' : 'btn-primary' ]" @click="confirm">Run Action</button>
+                    <button class="btn" :class="[ action.dangerous ? 'btn-danger' : 'btn-primary' ]" @click="confirm" v-text="runButtonText" />
                     <button @click="cancel" class="ml-3 text-grey">Cancel</button>
                 </div>
             </div>
@@ -46,7 +46,14 @@ export default {
     },
 
     props: {
-        action: Object
+        action: {
+            type: Object,
+            required: true,
+        },
+        selections: {
+            type: Number,
+            required: true,
+        }
     },
 
     data() {
@@ -56,6 +63,22 @@ export default {
             values: {},
             errors: {},
         }
+    },
+
+    computed: {
+
+        confirmationText() {
+            return this.selections === 1
+                ? __('Are you sure you want to run this action?')
+                : __n('Are you sure you want to run this action on :count items?', this.selections);
+        },
+
+        runButtonText() {
+            return this.selections === 1
+                ? __('Run action')
+                : __n('Run action on :count items', this.selections);
+        }
+
     },
 
     methods: {
