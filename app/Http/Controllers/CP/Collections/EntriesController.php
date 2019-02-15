@@ -46,12 +46,10 @@ class EntriesController extends CpController
             });
         }
 
-        $columns->setPreferred("collections.{$handle}.columns");
-
         return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sort,
-            'columns' => $columns->values(),
+            'columns' => $columns->setPreferred("collections.{$handle}.columns")->values(),
         ]]);
     }
 
