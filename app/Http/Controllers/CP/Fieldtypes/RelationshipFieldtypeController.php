@@ -14,7 +14,6 @@ class RelationshipFieldtypeController extends CpController
     {
         return Resource::collection($this->getIndexItems())->additional(['meta' => [
             'sortColumn' => $this->getSortColumn(),
-            'columns' => $this->getIndexColumns(),
         ]]);
     }
 
@@ -48,13 +47,6 @@ class RelationshipFieldtypeController extends CpController
         }
 
         return $query;
-    }
-
-    protected function getIndexColumns()
-    {
-        return collect(request('columns'))->map(function ($column) {
-            return ['label' => $column, 'field' => $column];
-        })->all();
     }
 
     public function data(Request $request)

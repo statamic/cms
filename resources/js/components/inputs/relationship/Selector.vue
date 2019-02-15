@@ -125,7 +125,6 @@ export default {
                 order: this.sortDirection,
                 page: this.page,
                 search: this.searchQuery,
-                columns: this.columns,
             }
         },
 
@@ -164,8 +163,7 @@ export default {
             this.loading = true;
 
             return axios.get(this.url, { params: this.parameters }).then(response => {
-                // this.columns = response.data.meta.columns.map(column => column.field);
-                // this.sortColumn = response.data.meta.sortColumn;
+                this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
                 this.loading = false;

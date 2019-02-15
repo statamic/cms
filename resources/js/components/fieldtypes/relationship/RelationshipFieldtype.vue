@@ -9,7 +9,7 @@
         :selections-url="selectionsUrl"
         :status-icons="true"
         :editable-items="true"
-        :columns="['title', 'url']"
+        :columns="[{ field: 'title', label: 'Title', visible: true }, { field: 'url', label: 'URL', visible: true }]"
     />
 
 </template>
