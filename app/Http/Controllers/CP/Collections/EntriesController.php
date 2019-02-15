@@ -34,8 +34,9 @@ class EntriesController extends CpController
                 ];
             });
 
-        $columns = $collection->entryBlueprint()
-            ->columns(Preference::get("collections.{$handle}.columns"))
+        $columns = $collection
+            ->entryBlueprint()
+            ->columns()
             ->ensurePrepended(Column::make('title'));
 
         if ($collection->order() === 'date') {
@@ -44,6 +45,8 @@ class EntriesController extends CpController
                 return $entry->date()->inPreferredFormat();
             });
         }
+
+        $columns->setPreferred("collections.{$handle}.columns");
 
         return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
