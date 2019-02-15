@@ -32,7 +32,7 @@ class EntriesController extends CpController
                 return [
                     'deleteable' => me()->can('delete', $entry)
                 ];
-            });
+            })->preProcessForIndex();
 
         $columns = $collection
             ->entryBlueprint()
