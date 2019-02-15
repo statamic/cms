@@ -94,6 +94,33 @@ class HasPreferencesTest extends TestCase
     }
 
     /** @test */
+    function it_can_remove_a_single_preference_array_value()
+    {
+        $this->person->preferences([
+            'collection' => [
+                'columns' => [
+                    'date',
+                    'title',
+                    'slug'
+                ]
+            ]
+        ]);
+
+        $this->person->removePreference('collection.columns', 'date');
+        $this->person->removePreferenceValue('collection.columns', 'slug');
+
+        $expected = [
+            'collection' => [
+                'columns' => [
+                    'title'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $this->person->preferences());
+    }
+
+    /** @test */
     function it_can_get_a_single_preference()
     {
         $this->person->preferences([
