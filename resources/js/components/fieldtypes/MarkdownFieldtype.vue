@@ -111,6 +111,7 @@ require('codemirror/mode/css/css');
 require('codemirror/mode/clike/clike');
 require('codemirror/mode/php/php');
 require('codemirror/mode/yaml/yaml');
+require('codemirror/addon/edit/continuelist');
 
 export default {
 
@@ -494,7 +495,8 @@ export default {
             lineWrapping: true,
             viewportMargin: Infinity,
             tabindex: 0,
-            autoRefresh: true
+            autoRefresh: true,
+            extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
         });
 
         self.codemirror.on('change', function (cm) {
