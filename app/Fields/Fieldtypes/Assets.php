@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\API\Arr;
 use Statamic\API\Asset;
 use Statamic\API\Helper;
 use Statamic\Fields\Fieldtype;
@@ -125,5 +126,27 @@ class Assets extends Fieldtype
         }
 
         return $rules;
+    }
+
+    public function preProcessIndex($data)
+    {
+        $data = Arr::wrap($this->augment($data));
+
+        return collect($data)->map(function ($asset) {
+            $arr = [
+                'id' => $asset->id(),
+                'is_image' => $isImage = $asset->isImage(),
+                'url' => $asset->url(),
+            ];
+
+            if ($isImage) {
+                $arr['thumbnail'] = cp_route('assets.thumbnails.show', [
+                    'asset' => base64_encode($asset->id()),
+                    'size' => 'thumbnail',
+                ]);
+            }
+
+            return $arr;
+        });
     }
 }

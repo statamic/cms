@@ -21,6 +21,18 @@ class Relationship extends Fieldtype
         return Arr::wrap($data);
     }
 
+    public function preProcessIndex($data)
+    {
+        return $this->augment($data)->map(function ($item) {
+            return [
+                'id' => $item->id(),
+                'title' => $item->get('title'),
+                'edit_url' => $item->editUrl(),
+                'published' => $item->published(),
+            ];
+        });
+    }
+
     public function process($data)
     {
         if ($data === null || $data === []) {
