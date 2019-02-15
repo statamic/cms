@@ -102,17 +102,37 @@ class HasPreferencesTest extends TestCase
                     'date',
                     'title',
                     'slug'
+                ],
+            ],
+            'favorites' => [
+                [
+                    'name' => 'Updates',
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                ],
+                [
+                    'name' => 'Blog',
+                    'url' => 'https://worldwideweb.com/cp/collections/blog'
                 ]
             ]
         ]);
 
         $this->person->removePreference('collection.columns', 'date');
         $this->person->removePreferenceValue('collection.columns', 'slug');
+        $this->person->removePreferenceValue('favorites', [
+            'name' => 'Updates',
+            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+        ]);
 
         $expected = [
             'collection' => [
                 'columns' => [
                     'title'
+                ],
+            ],
+            'favorites' => [
+                [
+                    'name' => 'Blog',
+                    'url' => 'https://worldwideweb.com/cp/collections/blog'
                 ]
             ]
         ];

@@ -79,12 +79,13 @@ trait HasPreferences
      */
     public function removePreferenceValue($key, $value)
     {
-        $preference = collect($this->getPreference($key))
-            ->diff([$value])
-            ->values()
-            ->all();
+        $values = collect($this->getPreference($key));
 
-        $this->setPreference($key, $preference);
+        $removableKey = $values->search($value);
+
+        if ($removableKey !== false) {
+            $this->setPreference($key, $values->forget($removableKey)->values()->all());
+        }
 
         return $this;
     }
