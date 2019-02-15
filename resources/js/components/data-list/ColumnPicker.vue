@@ -5,28 +5,25 @@
             <span>{{ __('Columns') }}</span>
         </button>
         <div class="dropdown-menu">
-            <h6>{{ __('Customize Columns') }}</h6>
-            <div class="li divider mb-2"></div>
+            <h6 class="text-center">{{ __('Customize Columns') }}</h6>
+            <div class="li divider"></div>
 
             <sortable-list
                 v-model="columns"
                 :vertical="true"
-                item-class="item"
-                handle-class="item-move"
+                item-class="column-picker-item"
+                handle-class="column-picker-item"
             >
                 <div>
-                    <div class="item mb-1 text-sm column" v-for="column in sharedState.columns" :key="column.field">
-                        <div class="item-move">&nbsp;</div>
-                        <div class="item-inner">
-                            <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
-                        </div>
+                    <div class="column-picker-item column" v-for="column in sharedState.columns" :key="column.field">
+                        <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
                     </div>
                 </div>
             </sortable-list>
-
-            <div class="mt-2">
+            <div class="li divider"></div>
+            <div class="">
                 <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                <button v-else class="btn btn-primary btn-sm" @click="save">Save</button>
+                <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
             </div>
         </div>
     </dropdown-list>
