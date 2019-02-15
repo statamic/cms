@@ -15,13 +15,20 @@ export default {
         }}, [
             h('div', { class: { 'pointer-events-none': this.dragging }}, [
                 fileField,
-                ...this.$scopedSlots.default({ dragging: this.dragging })
+                ...this.$scopedSlots.default({ dragging: this.enabled ? this.dragging : false })
             ])
         ]);
     },
 
 
-    props: ['container', 'path'],
+    props: {
+        enabled: {
+            type: Boolean,
+            default: () => true
+        },
+        container: String,
+        path: String
+    },
 
 
     data() {
@@ -46,7 +53,9 @@ export default {
 
 
     mounted() {
-        this.bindUploader();
+        if (this.enabled) {
+            this.bindUploader();
+        }
     },
 
 
