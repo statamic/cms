@@ -9,7 +9,7 @@ class Columns extends Collection
 {
     public function ensureHas($column)
     {
-        if ($this->has($column->field())) {
+        if ($this->keyBy->field()->has($column->field())) {
             return $this;
         }
 
@@ -18,7 +18,7 @@ class Columns extends Collection
 
     public function ensurePrepended($column)
     {
-        if ($this->has($column->field())) {
+        if ($this->keyBy->field()->has($column->field())) {
             return $this;
         }
 
