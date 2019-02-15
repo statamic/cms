@@ -1,66 +1,88 @@
 <template>
-    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode}">
+    <div class="markdown-fieldtype-wrapper relative" :class="{'markdown-fullscreen': fullScreenMode}">
 
-        <div class="markdown-toolbar">
-            <ul class="markdown-modes">
-                <li :class="{ 'active': mode == 'write' }">
-                    <a href="" @click.prevent="mode = 'write'" tabindex="-1">{{ __('Write') }}</a>
-                </li>
-                <li :class="{ 'active': mode == 'preview' }">
-                    <a href="" @click.prevent="mode = 'preview'" tabindex="-1">{{ __('Preview') }}</a>
-                </li>
-            </ul>
+        <uploader
+            ref="uploader"
+            :enabled="assetsEnabled"
+            :container="container"
+            :path="folder"
+            @updated="uploadsUpdated"
+            @upload-complete="uploadComplete"
+        >
+            <div slot-scope="{ dragging }">
+                <div class="markdown-toolbar">
+                    <ul class="markdown-modes">
+                        <li :class="{ 'active': mode == 'write' }">
+                            <a href="" @click.prevent="mode = 'write'" tabindex="-1">{{ __('Write') }}</a>
+                        </li>
+                        <li :class="{ 'active': mode == 'preview' }">
+                            <a href="" @click.prevent="mode = 'preview'" tabindex="-1">{{ __('Preview') }}</a>
+                        </li>
+                    </ul>
 
-            <ul class="markdown-buttons">
-                <li><a @click="bold" tabindex="-1"><b>B</b></a></li>
-                <li><a @click="italic" tabindex="-1"><i>i</i></a></li>
-                <li><a @click="insertLink('')" tabindex="-1">
-                    <span class="icon icon-link"></span>
-                </a></li>
-                <li><a @click="insertImage('')" tabindex="-1">
-                    <span class="icon icon-image"></span>
-                </a></li>
-                <li><a @click="toggleFullScreen" tabindex="-1">
-                    <span class="icon" :class="{
-                        'icon-resize-full-screen' : ! fullScreenMode,
-                        'icon-resize-100' : fullScreenMode
-                        }"></span>
-                </a></li>
-            </ul>
-        </div>
-
-        <div :class="`mode-wrap mode-${mode}`">
-            <div class="markdown-writer"
-                 ref="writer"
-                 v-show="mode == 'write'"
-                 @dragover="draggingFile = true"
-                 @dragleave="draggingFile = false"
-                 @drop="draggingFile = false"
-                 @keydown="shortcut">
-
-                <div class="editor" ref="codemirror"></div>
-
-                <div class="helpers">
-                    <!-- TODO: Fix modal -->
-                    <div class="markdown-cheatsheet-helper">
-                        <button @click="showCheatsheet = true">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" mask="url(#a)"/></svg>
-                            {{ __('Markdown Cheatsheet') }}
-                        </button>
-                    </div>
-                    <div class="markdown-asset-helper" v-if="assetsEnabled">
-                        <a href="" @click.prevent="addAsset"><span class="icon icon-image"></span> {{ __('Add Asset') }}</a> (or drag &amp; drop)
-                    </div>
+                    <ul class="markdown-buttons">
+                        <li><a @click="bold" tabindex="-1"><b>B</b></a></li>
+                        <li><a @click="italic" tabindex="-1"><i>i</i></a></li>
+                        <li><a @click="insertLink('')" tabindex="-1">
+                            <span class="icon icon-link"></span>
+                        </a></li>
+                        <li><a @click="insertImage('')" tabindex="-1">
+                            <span class="icon icon-image"></span>
+                        </a></li>
+                        <li><a @click="toggleFullScreen" tabindex="-1">
+                            <span class="icon" :class="{
+                                'icon-resize-full-screen' : ! fullScreenMode,
+                                'icon-resize-100' : fullScreenMode
+                                }"></span>
+                        </a></li>
+                    </ul>
                 </div>
 
-                <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                    <i class="icon icon-download"></i>
-                    <h3>{{ __('Drop to Upload') }}</h3>
+                <div class="drag-notification" v-show="dragging">
+                    <i class="icon icon-download" />
+                    Drop to upload.
+                </div>
+
+                <uploads
+                    v-if="uploads.length"
+                    :uploads="uploads"
+                    class="-mt-px"
+                />
+
+                <div :class="`mode-wrap mode-${mode}`">
+                    <div class="markdown-writer"
+                        ref="writer"
+                        v-show="mode == 'write'"
+                        @dragover="draggingFile = true"
+                        @dragleave="draggingFile = false"
+                        @drop="draggingFile = false"
+                        @keydown="shortcut">
+
+                        <div class="editor" ref="codemirror"></div>
+
+                        <div class="helpers">
+                            <!-- TODO: Fix modal -->
+                            <div class="markdown-cheatsheet-helper">
+                                <button @click="showCheatsheet = true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" mask="url(#a)"/></svg>
+                                    {{ __('Markdown Cheatsheet') }}
+                                </button>
+                            </div>
+                            <div class="markdown-asset-helper" v-if="assetsEnabled">
+                                <a href="" @click.prevent="addAsset"><span class="icon icon-image"></span> {{ __('Add Asset') }}</a> (or drag &amp; drop)
+                            </div>
+                        </div>
+
+                        <div class="drag-notification" v-if="assetsEnabled && draggingFile">
+                            <i class="icon icon-download"></i>
+                            <h3>{{ __('Drop to Upload') }}</h3>
+                        </div>
+                    </div>
+
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview clean-content"></div>
                 </div>
             </div>
-
-            <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview clean-content"></div>
-        </div>
+        </uploader>
 
         <selector v-if="showAssetSelector"
                   :container="container"
@@ -71,16 +93,6 @@
                   @selected="assetsSelected"
                   @closed="closeAssetSelector"
         ></selector>
-
-        <!-- TODO: Bring this back.
-        <uploader
-            v-ref=uploader
-            v-if="! showAssetSelector"
-            :dom-element="uploadElement"
-            :container="container"
-            :path="folder"
-            @upload-complete="uploadComplete">
-        </uploader> -->
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-3 bg-white">
@@ -119,7 +131,8 @@ export default {
 
     components: {
         selector: require('../assets/Selector.vue'),
-        Uploader: require('../assets/Uploader.vue')
+        Uploader: require('../assets/Uploader.vue'),
+        Uploads: require('../assets/Uploads.vue'),
     },
 
     data: function() {
@@ -133,7 +146,8 @@ export default {
             draggingFile: false,
             showCheatsheet: false,
             fullScreenMode: false,
-            codemirror: null       // The CodeMirror instance
+            codemirror: null,       // The CodeMirror instance
+            uploads: [],
         };
     },
 
@@ -419,6 +433,10 @@ export default {
             this.showAssetSelector = false;
         },
 
+        uploadsUpdated(uploads) {
+            this.uploads = uploads;
+        },
+
         uploadComplete(upload, uploads) {
             if (upload.is_image) {
                 this.insertImage(upload.url);
@@ -461,7 +479,7 @@ export default {
 
     computed: {
         assetsEnabled: function() {
-            return this.config && this.config.container;
+            return Boolean(this.config && this.config.container);
         },
 
         container: function() {
@@ -470,10 +488,6 @@ export default {
 
         folder: function() {
             return this.config.folder || '/';
-        },
-
-        uploadElement() {
-            return this.$el;
         },
 
         restrictAssetNavigation() {
