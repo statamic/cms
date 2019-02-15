@@ -26,10 +26,14 @@ class Preference {
         );
     }
 
-    remove(key) {
+    remove(key, value=null) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.delete(`${this.storeUrl}/${key}`)
+            this.instance.axios.delete(`${this.storeUrl}/${key}`, {data: {'value': value}})
         );
+    }
+
+    removeValue(key, value) {
+        return this.remove(key, value);
     }
 
     commitOnSuccessAndReturnPromise(promise) {
