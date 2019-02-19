@@ -4,7 +4,6 @@ namespace Statamic\Fields\Fieldtypes;
 
 use Statamic\API\Helper;
 use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
@@ -75,14 +74,12 @@ class Grid extends Fieldtype
         return $rules;
     }
 
-    // public function extraRules(): array
-    // {
-    //     // TODO
-    //     $fieldset = (new Fieldset)->contents(['fields' => $this->config('fields')]);
-    //     $rules = (new Validation)->fieldset($fieldset)->rules();
+    public function extraRules(): array
+    {
+        $rules = (new Validation)->fields($this->fields())->rules();
 
-    //     return collect($rules)->mapWithKeys(function ($rules, $handle) {
-    //         return ["{$this->getName()}.*.{$handle}" => $rules];
-    //     })->all();
-    // }
+        return collect($rules)->mapWithKeys(function ($rules, $handle) {
+            return ["{$this->field->handle()}.*.{$handle}" => $rules];
+        })->all();
+    }
 }
