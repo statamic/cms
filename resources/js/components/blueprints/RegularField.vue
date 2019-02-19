@@ -18,7 +18,7 @@
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
-                            :type="field.fieldtype"
+                            :type="field.config.type"
                             :root="isRoot"
                             :config="fieldConfig"
                             @updated="configUpdated"
