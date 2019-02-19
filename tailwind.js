@@ -172,7 +172,7 @@ module.exports = {
         'none':   1,
         'tight':  1.25,
         'normal': 1.5,
-        'loose':  2,
+        'loose':  1.75,
     },
 
 
@@ -475,6 +475,7 @@ module.exports = {
         'sm': '1px 2px 4px 0 rgba(0,0,0,.03)',
         default: '0 0 0 0.5px rgba(49,49,93,.03), 0 2px 5px 0 rgba(49,49,93,.1), 0 1px 2px 0 rgba(0,0,0,.08)',
         'lg': '0 7px 14px 0 rgba(50,50,93,.1), 0 2px 8px 0 rgba(0,0,0,.075)',
+        'xl': '0 12px 24px 0 rgba(50, 50, 93, .1), 0 10px 20px 0 rgba(0, 0, 0, .075)',
         'button': 'rgba(50,50,93,.1) 0 0 0 1px, rgba(50,50,93,.08) 0 2px 5px, rgba(0,0,0,.07) 0 1px 1.5px,rgba(0,0,0,.08) 0 1px 2px 0, transparent 0 0 0 0',
         'inner': 'inset 0px 1px 1px 0px rgba(0,0,0,.05)',
         'none':  'none',
@@ -499,6 +500,7 @@ module.exports = {
         '40':   40,
         '50':   50,
         '200':  200,
+        'top':  1001,
         'auto': 'auto',
     },
 

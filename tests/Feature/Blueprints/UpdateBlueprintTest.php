@@ -34,7 +34,7 @@ class UpdateBlueprintTest extends TestCase
             ->actingAs($user)
             ->submit($blueprint)
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
 
         $blueprint = API\Blueprint::find('test');
         $this->assertEquals('Test', $blueprint->title());

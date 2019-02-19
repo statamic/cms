@@ -31,7 +31,10 @@ export default {
     data() {
         return {
             rows: this.globals,
-            columns: ['title', 'handle']
+            columns: [
+                { label: __('Title'), field: 'title' },
+                { label: __('Handle'), field: 'handle' },
+            ]
         }
     },
 

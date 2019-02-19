@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Statamic\Extend\Fieldtype;
+use Statamic\Fields\Fieldtype;
 
 class DummyClass extends Fieldtype
 {

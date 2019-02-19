@@ -38,7 +38,7 @@ abstract class AggregateStore extends Store
             : app(ChildStore::class);
 
         return $store
-            ->setKey($key)
+            ->setChildKey($key)
             ->setParent($this);
     }
 

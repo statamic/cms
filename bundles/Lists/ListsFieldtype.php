@@ -7,7 +7,7 @@ use Statamic\Fields\Fieldtype;
 
 class ListsFieldtype extends Fieldtype
 {
-    protected $handle = 'list';
+    protected static $handle = 'list';
 
     public function preProcess($data)
     {

@@ -25,7 +25,6 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StacheRefresh::class,
         Commands\StaticClear::class,
         // Commands\MakeUserMigration::class,
-        // Commands\SiteClear::class,
     ];
 
     public function boot()

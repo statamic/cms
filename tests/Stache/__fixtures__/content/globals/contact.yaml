@@ -1,4 +1,5 @@
 ---
 id: globals-contact
 title: Contact Details
-phone: '555-1234'
+data:
+  phone: '555-1234'

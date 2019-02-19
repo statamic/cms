@@ -1,0 +1,24 @@
+.column-picker-item {
+    @apply text-sm outline-none flex items-center rounded select-none;
+    cursor: grab;
+    transition: all .08s ease-in-out;
+    padding: 4px 8px;
+
+    &:hover  {
+        @apply bg-grey-lightest;
+    }
+
+    label {
+        cursor: grab;
+    }
+
+    input {
+        @apply mr-1;
+    }
+
+    // Drag interaction
+    &.draggable-mirror,
+    &.draggable-source--is-dragging {
+        @apply shadow;
+    }
+}

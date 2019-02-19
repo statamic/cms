@@ -5,47 +5,22 @@ namespace Statamic\Data\Entries;
 use Statamic\API;
 use Statamic\API\Search;
 use Statamic\API\Blueprint;
+use Statamic\Data\ContainsData;
 use Statamic\Contracts\Data\Entries\Collection as Contract;
 
 class Collection implements Contract
 {
+    use ContainsData;
+
     protected $handle;
     protected $route;
+    protected $order;
     protected $title;
     protected $template;
     protected $layout;
     protected $sites = [];
-    protected $data = [];
     protected $blueprints = [];
     protected $searchIndex;
-
-    public function get($key)
-    {
-        return array_get($this->data, $key);
-    }
-
-    public function has($key)
-    {
-        return $this->get($key) != null;
-    }
-
-    public function set($key, $value)
-    {
-        $this->data[$key] = $value;
-
-        return $this;
-    }
-
-    public function data($data = null)
-    {
-        if (func_num_args() === 0) {
-            return $this->data;
-        }
-
-        $this->data = $data;
-
-        return $this;
-    }
 
     public function handle($handle = null)
     {
@@ -95,9 +70,19 @@ class Collection implements Contract
         return $this;
     }
 
+    public function showUrl()
+    {
+        return cp_route('collections.show', $this->handle());
+    }
+
     public function editUrl()
     {
         return cp_route('collections.edit', $this->handle());
+    }
+
+    public function createEntryUrl()
+    {
+        return cp_route('collections.entries.create', [$this->handle(), $this->sites()->first()]);
     }
 
     public function queryEntries()
@@ -120,7 +105,8 @@ class Collection implements Contract
 
     public function entryBlueprint()
     {
-        return $this->entryBlueprints()->first();
+        return $this->entryBlueprints()->first()
+            ?? Blueprint::find(config('statamic.theming.blueprints.default'));
     }
 
     public function sites($sites = null)

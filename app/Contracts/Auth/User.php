@@ -20,20 +20,6 @@ interface User
      */
     public function password($password = null);
 
-    /**
-     * Has this user's password been secured?
-     *
-     * @return mixed
-     */
-    public function isSecured();
-
-    /**
-     * Get the user's status
-     *
-     * @return string
-     */
-    public function status();
-
     public function roles();
     public function assignRole($role);
     public function removeRole($role);

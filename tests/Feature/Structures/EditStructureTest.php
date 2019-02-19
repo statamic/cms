@@ -45,7 +45,7 @@ class EditStructureTest extends TestCase
             ->actingAs($user)
             ->get(route('statamic.cp.structures.edit', $structure->handle()))
             ->assertRedirect('/cp/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     private function createStructure($handle)

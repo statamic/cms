@@ -2,8 +2,12 @@
 
 namespace Statamic\Stache;
 
+use Carbon\Carbon;
+use Statamic\API\File;
 use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
+use Statamic\Extensions\FileStore;
+use Illuminate\Support\Facades\Cache;
 
 class Stache
 {
@@ -15,10 +19,10 @@ class Stache
     protected $booted = false;
     protected $temperature;
     protected $sites;
-    protected $meta;
     protected $keys;
     protected $config;
     protected $stores;
+    protected $startTime;
 
     public function __construct()
     {
@@ -60,17 +64,6 @@ class Stache
     public function defaultSite()
     {
         return $this->sites->first();
-    }
-
-    public function meta($meta = null)
-    {
-        if (! $meta) {
-            return $this->meta;
-        }
-
-        $this->meta = collect($meta);
-
-        return $this;
     }
 
     public function keys($keys = null)
@@ -220,6 +213,104 @@ class Stache
 
     public function refresh()
     {
-        $this->clear()->update()->persist();
+        $this->clear()->startTimer()->update()->persist();
+    }
+
+    public function instance()
+    {
+        return $this;
+    }
+
+    public function fileCount()
+    {
+        return $this->paths()->flatten()->count();
+    }
+
+    public function fileSize()
+    {
+        if (! ($cache = app('cache')->store()->getStore()) instanceof FileStore) {
+            return null;
+        }
+
+        $files = File::getFiles($cache->getDirectory() . '/stache', true);
+
+        return collect($files)->reduce(function ($size, $path) {
+            return $size + File::size($path);
+        }, 0);
+    }
+
+    public function startTimer()
+    {
+        $this->startTime = microtime(true);
+
+        return $this;
+    }
+
+    public function stopTimer()
+    {
+        if (! $this->startTime) {
+            return $this;
+        }
+
+        Cache::forever('stache::timing', [
+            'time' => floor((microtime(true) - $this->startTime) * 1000),
+            'date' => Carbon::now()->timestamp
+        ]);
+
+        return $this;
+    }
+
+    public function buildTime()
+    {
+        return Cache::get('stache::timing')['time'] ?? null;
+    }
+
+    public function buildDate()
+    {
+        if (! $cache = Cache::get('stache::timing')) {
+            return null;
+        };
+
+        return Carbon::createFromTimestamp($cache['date']);
+    }
+
+    public function paths()
+    {
+        $paths = $this->sites()->mapWithKeys(function ($site) {
+            return [$site => collect()];
+        });
+
+        foreach ($this->stores() as $store) {
+            $storePaths = $store instanceof Stores\AggregateStore
+                ? $this->getAggregateStorePaths($store)
+                : $store->getPaths();
+
+            $storeKey = $store->key();
+
+            foreach ($storePaths as $site => $sitePaths) {
+                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($storeKey) {
+                    return ["{$storeKey}::{$key}" => $path];
+                }));
+            }
+        }
+
+        return $paths;
+    }
+
+    private function getAggregateStorePaths($store)
+    {
+        $paths = $this->sites()->mapWithKeys(function ($site) {
+            return [$site => collect()];
+        });
+
+        foreach ($store->stores() as $store) {
+            foreach ($store->getPaths() as $site => $sitePaths) {
+                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($store) {
+                    return ["{$store->childKey()}::{$key}" => $path];
+                }));
+            }
+        }
+
+        return $paths;
     }
 }

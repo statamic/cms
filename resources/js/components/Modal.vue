@@ -16,7 +16,7 @@ export default {
         adaptive: { type: Boolean, default: true },
         draggable: { type: Boolean, default: false },
         pivotY: { type: Number, default: 0.5 },
-        height: {},
+        height: { default: 'auto' },
         width: {}
     },
 

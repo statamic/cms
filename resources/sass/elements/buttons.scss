@@ -37,6 +37,15 @@
     }
 }
 
+.btn-flat {
+    @include button(white, black);
+    @apply shadow-none text-grey-dark bg-grey-lightest;
+    &:hover {
+        @apply bg-grey-lighter;
+        box-shadow: none !important;
+    }
+}
+
 .btn-danger {
     @include button(transparent, $color_red);
     border: 1px solid $color_red;

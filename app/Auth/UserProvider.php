@@ -3,8 +3,8 @@
 namespace Statamic\Auth;
 
 use Statamic\API\Str;
-use Statamic\API\Hash;
 use Statamic\API\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider as UserProviderContract;
 

@@ -6,11 +6,14 @@ use Statamic\API;
 use Statamic\API\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Auth\Role as BaseRole;
+use Statamic\Preferences\HasPreferences;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\Role as RoleContract;
 
 class Role extends BaseRole
 {
+    use HasPreferences;
+
     protected $title;
     protected $handle;
     protected $originalHandle;

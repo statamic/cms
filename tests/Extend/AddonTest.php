@@ -21,16 +21,7 @@ class AddonTest extends TestCase
     {
         $this->assertEquals(
             'TestAddon',
-            Addon::create('Test Addon')->id()
-        );
-    }
-
-    /** @test */
-    public function it_initializes_the_id_as_studly_case()
-    {
-        $this->assertEquals(
-            'TestAddon',
-            Addon::create('test addon')->id()
+            Addon::create('TestAddon')->id()
         );
     }
 

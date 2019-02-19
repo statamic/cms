@@ -7,6 +7,7 @@ use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
+use Statamic\API\YAML;
 use Statamic\API\Asset;
 use Statamic\API\Parse;
 use Statamic\API\Theme;
@@ -1043,9 +1044,11 @@ class BaseModifiers extends Modifier
      */
     public function macro($value, $params, $context)
     {
-        $macro = array_get_colon($params, 0);
+        $path = base_path('resources/macros.yaml');
+        $macros = array_reindex(YAML::parse(File::get($path)));
+        $macro = array_get_colon($macros, array_get_colon($params, 0));
 
-        return collect(Theme::getMacro($macro))->map(function ($params, $name) {
+        return collect($macro)->map(function ($params, $name) {
             return compact('name', 'params');
         })->reduce(function ($value, $modifier) use ($context) {
             return Modify::value($value)->context($context)->modify($modifier['name'], $modifier['params']);
@@ -1279,7 +1282,7 @@ class BaseModifiers extends Modifier
 
         $partial = 'partials/' . $name . '.html';
 
-        return Parse::template(File::disk('theme')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value);
     }
 
     /**

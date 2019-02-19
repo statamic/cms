@@ -1,21 +1,39 @@
-<template>
-
-    <div class="asset-uploader">
-        <input type="file" multiple="multiple" class="hide" ref="native-file-field">
-    </div>
-
-</template>
-
-
 <script>
 export default {
 
+    render(h) {
+        const fileField = h('input', {
+            class: { hidden: true },
+            attrs: { type: 'file', multiple: true },
+            ref: 'nativeFileField'
+        });
 
-    props: ['domElement', 'container', 'path'],
+        return h('div', { on: {
+            'dragenter': this.dragenter,
+            'dragleave': this.dragleave,
+            'drop': this.drop,
+        }}, [
+            h('div', { class: { 'pointer-events-none': this.dragging }}, [
+                fileField,
+                ...this.$scopedSlots.default({ dragging: this.enabled ? this.dragging : false })
+            ])
+        ]);
+    },
+
+
+    props: {
+        enabled: {
+            type: Boolean,
+            default: () => true
+        },
+        container: String,
+        path: String
+    },
 
 
     data() {
         return {
+            dragging: false,
             uploads: []
         }
     },
@@ -27,7 +45,7 @@ export default {
             return {
                 container: this.container,
                 folder: this.path,
-                _token: document.querySelector('#csrf-token').getAttribute('value')
+                _token: Statamic.csrfToken
             };
         }
 
@@ -35,7 +53,9 @@ export default {
 
 
     mounted() {
-        this.bindUploader();
+        if (this.enabled) {
+            this.bindUploader();
+        }
     },
 
 
@@ -43,7 +63,7 @@ export default {
     // get called at all sometimes when using `npm run production`. Works fine when
     // using `npm run dev`. beforeDestroy works fine in both cases. ¯\_(ツ)_/¯
     beforeDestroy() {
-        $(this.domElement).unbind().removeData();
+        $(this.$el).unbind().removeData();
     },
 
 
@@ -53,13 +73,9 @@ export default {
             this.$emit('updated', uploads);
         },
 
-        container() {
-            this.updateExtraData();
+        extraData(data) {
+            $(this.$el).data('dmUploader').settings.extraData = data;
         },
-
-        path() {
-            this.updateExtraData();
-        }
 
     },
 
@@ -77,7 +93,7 @@ export default {
          * Bind the uploader plugin to the DOM
          */
         bindUploader() {
-            $(this.domElement).dmUploader({
+            $(this.$el).dmUploader({
                 url: cp_url('assets'),
 
                 extraData: this.extraData,
@@ -99,23 +115,17 @@ export default {
                 },
 
                 onUploadSuccess: (id, response) => {
-                    this.$emit('upload-complete', response.asset, this.uploads);
+                    this.$emit('upload-complete', response, this.uploads);
 
                     let index = _(this.uploads).findIndex({ id });
                     this.uploads.splice(index, 1);
                 },
 
-                onComplete: () => {
-                    this.$emit('uploads-complete', this.uploads);
-                },
-
                 onUploadError: (id, errMsg, response) => {
                     let upload = _(this.uploads).findWhere({ id });
 
-                    if (response.status == 400) {
-                        errMsg = response.responseJSON;
-                    } else if (response.status == 413) {
-                        errMsg = "This file exceeds your server's max upload filesize limit.";
+                    if (response.responseJSON) {
+                        errMsg = response.responseJSON.message;
                     }
 
                     upload.errorMessage = errMsg;
@@ -125,15 +135,21 @@ export default {
             });
         },
 
-        /**
-         * Update the "extraData" object the plugin will use when uploading.
-         */
-        updateExtraData() {
-            $(this.domElement).data('dmUploader').settings.extraData = this.extraData;
+        dragenter(e) {
+            this.dragging = true;
+        },
+
+        dragleave(e) {
+            // When dragging over a child, the parent will trigger a dragleave.
+            if (e.target !== e.currentTarget) return;
+
+            this.dragging = false;
+        },
+
+        drop(e) {
+            this.dragging = false;
         }
-
     }
-
 
 }
 </script>

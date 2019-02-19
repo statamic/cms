@@ -1,9 +1,10 @@
 /* ==========================================================================
-   DATE/TIME FIELDTYPE
+   DATE & TIME FIELDTYPES
    ========================================================================== */
 
 .daterange {
 	outline: none;
+	width: 100%;
 	.icon-remove { right: 32px; }
 
     .dr-calendar { max-width: 250px; }
@@ -31,41 +32,37 @@
     min-width: 60px;
 }
 
+/* Time Field
+  ========================================================================== */
+
 .time-fieldtype {
-	input {
-		max-width: 40px !important;
-        padding-left: 3px;
-        padding-right: 3px;
-        text-align: center;
+	.time-fieldtype-container {
+		@apply flex items-center w-auto;
+
+	}
+
+	.input-text:focus-within {
+		@apply focus-outline;
+	}
+
+	.input-time {
+		@apply inline-block text-center bg-transparent;
 		-moz-appearance: textfield;
+
+		&:active, &:focus {
+			outline: none;
+		}
+	}
+
+	.colon {
+		@apply select-none;
+		margin: 0 -4px;
 	}
 
 	input::-webkit-inner-spin-button,
 	input::-webkit-outer-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
-	}
-
-	.icon-remove {
-		position: relative;
-		top: 0;
-		right: -8px;
-		outline: none;
-	}
-
-	.icon-remove:focus {
-
-	}
-}
-
-.date-time-container {
-	display: flex;
-
-	.col-date {
-		flex: 1;
-	}
-	.col-time {
-		padding-left: 10px;
 	}
 }
 
@@ -82,17 +79,9 @@
 
     .dr-input { border: 0 !important; }
 
-    .col-time {
-        padding: 0 10px;
-        input.form-control {
-            background: #f8f8f8;
-            width: auto;
-            text-align: center;
-        }
-        .colon {
-            background: #fff;
-            margin: 0;
-            padding: 8px 5px;
-        }
+    .colon {
+        background: #fff;
+        margin: 0;
+        padding: 8px 5px;
     }
 }

@@ -46,6 +46,8 @@
             ></portal-target>
 
             <stacks v-if="stacks.length"></stacks>
+
+            <portal-target name="outside"></portal-target>
       </div>
 
       @include('statamic::partials.nav-mobile')

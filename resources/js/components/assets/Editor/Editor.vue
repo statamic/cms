@@ -1,11 +1,6 @@
 <template>
 
-    <modal
-        name="asset-editor"
-        width="90%"
-        height="90%"
-        @closed="$emit('closed')"
-    >
+    <stack name="asset-editor" @closed="$emit('closed')">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
 
@@ -127,7 +122,8 @@
                     v-if="fields"
                     name="asset"
                     :fieldset="fieldset"
-                    :values="initialValues"
+                    :values="values"
+                    :meta="meta"
                     :errors="errors"
                     @updated="values = $event"
                 >
@@ -159,13 +155,15 @@
 
         </template>
 
-        <focal-point-editor
-            v-if="showFocalPointEditor"
-            :data="values.focus"
-            :image="asset.preview"
-            @selected="selectFocalPoint"
-            @closed="closeFocalPointEditor">
-        </focal-point-editor>
+        <portal to="outside">
+            <focal-point-editor
+                v-if="showFocalPointEditor"
+                :data="values.focus"
+                :image="asset.preview"
+                @selected="selectFocalPoint"
+                @closed="closeFocalPointEditor">
+            </focal-point-editor>
+        </portal>
 
         <renamer
             v-if="showRenamer"
@@ -184,7 +182,7 @@
         </mover>
     </div>
 
-    </modal>
+    </stack>
 
 </template>
 
@@ -205,7 +203,6 @@ export default {
 
     props: {
         id: String,
-        hasChild: false,
         allowDeleting: {
             type: Boolean,
             default() {
@@ -220,8 +217,8 @@ export default {
             loading: true,
             saving: false,
             asset: null,
-            values: null,
-            initialValues: null,
+            values: {},
+            meta: {},
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
@@ -282,8 +279,8 @@ export default {
 
             axios.get(url).then(response => {
                 this.asset = response.data.asset;
-                this.initialValues = response.data.fields;
-                this.values = this.initialValues;
+                this.values = response.data.values;
+                this.meta = response.data.meta;
                 this.getFieldset();
             });
         },
@@ -314,7 +311,6 @@ export default {
          */
         openFocalPointEditor() {
             this.showFocalPointEditor = true;
-            this.hasChild = true;
         },
 
         /**
@@ -322,7 +318,6 @@ export default {
          */
         closeFocalPointEditor() {
             this.showFocalPointEditor = false;
-            this.hasChild = false;
         },
 
         /**
@@ -391,12 +386,10 @@ export default {
 
         openRenamer() {
             this.showRenamer = true;
-            this.hasChild = true;
         },
 
         closeRenamer() {
             this.showRenamer = false;
-            this.hasChild = false;
         },
 
         assetRenamed(asset) {
@@ -406,12 +399,10 @@ export default {
 
         openMover() {
             this.showMover = true;
-            this.hasChild = true;
         },
 
         closeMover() {
             this.showMover = false;
-            this.hasChild = false;
         },
 
         /**

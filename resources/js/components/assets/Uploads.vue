@@ -1,21 +1,15 @@
 <template>
 
-    <div class="asset-upload-listing">
-        <div class="asset-upload-listing-header">
-            <h6>{{ __n('Upload|Uploads', uploads) }}</h6>
-        </div>
-        <table>
-            <tbody>
-                <tr is="upload"
-                    v-for="(upload, i) in uploads"
-                    :basename="upload.basename"
-                    :extension="upload.extension"
-                    :percent="upload.percent"
-                    :error="upload.errorMessage"
-                    @clear="clearUpload(i)">
-                </tr>
-            </tbody>
-        </table>
+    <div class="bg-grey-light text-xs p-1">
+        <upload
+            v-for="(upload, i) in uploads"
+            :key="upload.id"
+            :basename="upload.basename"
+            :extension="upload.extension"
+            :percent="upload.percent"
+            :error="upload.errorMessage"
+            @clear="clearUpload(i)"
+        />
     </div>
 
 </template>

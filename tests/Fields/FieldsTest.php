@@ -253,6 +253,35 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    function it_checks_if_a_given_field_exists()
+    {
+        $fields = new Fields([
+            [
+                'handle' => 'one',
+                'field' => []
+            ]
+        ]);
+
+        $this->assertTrue($fields->has('one'));
+        $this->assertFalse($fields->has('two'));
+    }
+
+    /** @test */
+    function it_gets_a_given_field()
+    {
+        $fields = new Fields([
+            [
+                'handle' => 'one',
+                'field' => ['display' => 'First']
+            ]
+        ]);
+
+        $this->assertInstanceOf(Field::class, $field = $fields->get('one'));
+        $this->assertEquals('First', $field->display());
+        $this->assertNull($fields->get('two'));
+    }
+
+    /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')

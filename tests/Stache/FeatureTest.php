@@ -96,8 +96,8 @@ class FeatureTest extends TestCase
     /** @test */
     function it_gets_an_asset_container()
     {
-        $this->assertEquals('Main Assets', AssetContainer::find('main')->data()['title']);
-        $this->assertEquals('Another Asset Container', AssetContainer::find('another')->data()['title']);
+        $this->assertEquals('Main Assets', AssetContainer::find('main')->title());
+        $this->assertEquals('Another Asset Container', AssetContainer::find('another')->title());
     }
 
     /** @test */
@@ -198,6 +198,19 @@ class FeatureTest extends TestCase
         @unlink($path);
     }
 
+
+    /** @test */
+    function saving_an_asset_container_writes_it_to_file()
+    {
+        AssetContainer::make('new')->title('New Container')->save();
+
+        $this->assertStringEqualsFile(
+            $path = __DIR__.'/__fixtures__/content/assets/new.yaml',
+            "title: 'New Container'\n"
+        );
+        @unlink($path);
+    }
+
     /** @test */
     function saving_a_taxonomy_writes_it_to_file()
     {
@@ -218,13 +231,18 @@ class FeatureTest extends TestCase
     /** @test */
     function saving_a_global_set_writes_it_to_file()
     {
-        $global = GlobalSet::create('new')
-            ->with(['foo' => 'bar'])
+        $global = GlobalSet::make()
+            ->id('123')
+            ->handle('new')
+            ->title('New Global Set')
+            ->in('en', function ($loc) {
+                $loc->data(['foo' => 'bar']);
+            })
             ->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/globals/new.yaml',
-            "foo: bar\n"
+            "id: '123'\ntitle: 'New Global Set'\ndata:\n  foo: bar\n"
         );
         @unlink($path);
     }

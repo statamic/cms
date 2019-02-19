@@ -4,7 +4,6 @@
     "keywords": ["statamic", "cms", "flat file", "laravel"],
     "require": {
         "composer/composer": "^1.7",
-        "danielstjules/stringy": "dev-master",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*|5.7.*|5.8.*",
         "laravelcollective/html": "5.6.*|5.7.*",
@@ -12,10 +11,10 @@
         "league/glide": "^1.1",
         "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
+        "statamic/stringy": "^3.1",
         "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*",
-        "wilderborn/partyline": "^1.0",
-        "statamic/stringy": "^3.1"
+        "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "codedungeon/phpunit-result-printer": "0.22",

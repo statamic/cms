@@ -4,7 +4,7 @@ namespace Statamic\API\Endpoint;
 
 use Statamic\API\Str;
 use Statamic\API\YAML;
-use Statamic\View\Antlers\Template as Antlers;
+use Statamic\API\Antlers;
 
 /**
  * Parsing things. Templates, Markdown, YAML, etc.

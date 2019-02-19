@@ -11,10 +11,6 @@ a {
     cursor: pointer;
 }
 
-// svg sprite
-// @TODO Confirm we can rmove this
-body > svg { display: none; }
-
 #main {
     @apply flex pb-6;
 }

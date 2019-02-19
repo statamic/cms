@@ -2,21 +2,20 @@
 
 namespace Statamic\Assets;
 
-use Carbon\Carbon;
 use Stringy\Stringy;
 use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
-use Statamic\API\Cache;
-use Statamic\API\Event;
 use Statamic\API\Image;
 use Statamic\Data\Data;
-use Statamic\API\Config;
 use Statamic\API\Blueprint;
+use Illuminate\Support\Carbon;
+use Statamic\Data\ContainsData;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use Facades\Statamic\Assets\Dimensions;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
 use Illuminate\Contracts\Support\Arrayable;
@@ -25,35 +24,26 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class Asset extends Data implements AssetContract, Arrayable
+class Asset implements AssetContract, Arrayable
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function id($id = null)
-    {
-        return $this->containerId() . '::' . $this->path();
-    }
+    use ContainsData;
 
-    /**
-     * Get the driver this asset's container uses
-     *
-     * @return string
-     */
-    public function driver()
+    protected $container;
+    protected $path;
+
+    public function id()
     {
-        return $this->container()->driver();
+        return $this->container->id() . '::' . $this->path();
     }
 
     /**
      * Get the container's filesystem disk instance
      *
-     * @param string $type  The type of disk instance to get
-     * @return \Statamic\Filesystem\FileAccessor|\Statamic\Filesystem\FolderAccessor;
+     * @return \Statamic\Filesystem\FlysystemAdapter
      */
-    public function disk($type = 'file')
+    public function disk()
     {
-        return $this->container()->disk($type);
+        return $this->container()->disk();
     }
 
     /**
@@ -100,23 +90,13 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function path($path = null)
     {
-        if (is_null($path)) {
-            return $this->attributes['path'];
+        if (func_num_args() === 0) {
+            return $this->path ? ltrim($this->path, '/') : null;
         }
 
-        $this->attributes['path'] = $path;
-    }
+        $this->path = $path;
 
-    /**
-     * Get the path to a localized version
-     *
-     * @param string $locale
-     * @return string
-     */
-    public function localizedPath($locale)
-    {
-        // TODO:
-        dd('todo asset@localizedpath');
+        return $this;
     }
 
     /**
@@ -129,58 +109,21 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function resolvedPath()
     {
-        return Path::tidy($this->container()->resolvedPath() . '/' . $this->path());
+        return Path::tidy($this->container()->diskPath() . '/' . $this->path());
     }
 
     /**
      * Get the asset's URL
-     *
-     * @return string
-     */
-    public function uri()
-    {
-        // Assets located in a location that cannot be accessed on the web
-        // cannot have URI/URLs so we'll just return an identifing string.
-        if (! $this->container()->accessible()) {
-            return $this->id();
-        }
-
-        return URL::assemble($this->container()->url(), $this->path());
-    }
-
-    /**
-     * Get the asset's URL
-     *
-     * Intentionally left un-encoded
      *
      * @return string
      */
     public function url()
     {
-        return $this->uri();
-    }
-
-    /**
-     * Get the asset's absolute URL
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function absoluteUrl()
-    {
-        return URL::makeAbsolute($this->url());
-    }
-
-    public function value()
-    {
-        $url = $this->url();
-        $siteUrl = Site::current()->absoluteUrl();
-
-        if (starts_with($url, $siteUrl)) {
-            return '/'.str_after($url, $siteUrl);
+        if ($this->container()->private()) {
+            return null;
         }
 
-        return $url;
+        return URL::assemble($this->container()->url(), $this->path());
     }
 
     /**
@@ -274,11 +217,11 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function save()
     {
-        $this->container()->addAsset($this);
-
-        $this->container()->save();
+        $this->container()->addAsset($this)->save();
 
         event('asset.saved', $this);
+
+        return $this;
     }
 
     /**
@@ -289,11 +232,12 @@ class Asset extends Data implements AssetContract, Arrayable
     public function delete()
     {
         // Delete the data from the container, if any is in there.
-        $this->container()->removeAsset($this);
-        $this->container()->save();
+        $this->container()->removeAsset($this)->save();
 
         // Also, delete the actual file
         $this->disk()->delete($this->path());
+
+        return $this;
     }
 
     /**
@@ -304,30 +248,27 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function container($container = null)
     {
-        if (is_null($container)) {
-            return AssetContainerAPI::find($this->attributes['container']);
+        if (func_num_args() === 0) {
+            return $this->container;
         }
 
-        if ($container instanceof AssetContainerContract) {
-            $container = $container->id();
+        if (is_string($container)) {
+            $container = AssetContainerAPI::find($container);
         }
 
-        $this->attributes['container'] = $container;
+        $this->container = $container;
+
+        return $this;
     }
 
     /**
-     * Get or set the container by ID
+     * Get the container's ID
      *
-     * @param null|string $id  ID of the container, if setting.
      * @return string
      */
-    public function containerId($id = null)
+    public function containerId()
     {
-        if (is_null($id)) {
-            return $this->attributes['container'];
-        }
-
-        $this->container($id);
+        return $this->container->id();
     }
 
     /**
@@ -338,7 +279,7 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function rename($filename)
     {
-        $this->move($this->folder(), $filename);
+        return $this->move($this->folder(), $filename);
     }
 
     /**
@@ -358,19 +299,16 @@ class Asset extends Data implements AssetContract, Arrayable
 
         $oldPath = $this->path();
 
-        $pi = pathinfo($oldPath);
+        $newPath = Str::removeLeft(Path::tidy($folder . '/' . $filename . '.' . pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
 
-        $newPath = $folder . '/' . $filename . '.' . $pi['extension'];
+        if ($oldPath !== $newPath) {
+            // Actually rename the file.
+            $this->disk()->rename($oldPath, $newPath);
 
-        // Actually rename the file.
-        $this->disk()->rename($oldPath, $newPath);
+            $this->path($newPath)->save();
+        }
 
-        // Update the reference the path.
-        $this->path($newPath);
-
-        // Re-add the asset definition to the container.
-        $this->container()->addAsset($this);
-        $this->container()->save();
+        return $this;
     }
 
     /**
@@ -380,7 +318,7 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function dimensions()
     {
-        return (new DimensionBuilder($this))->dimensions();
+        return Dimensions::asset($this)->get();
     }
 
     /**
@@ -390,7 +328,7 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function width()
     {
-        return (new DimensionBuilder($this))->width();
+        return $this->dimensions()[0];
     }
 
     /**
@@ -400,7 +338,7 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function height()
     {
-        return (new DimensionBuilder($this))->height();
+        return $this->dimensions()[1];
     }
 
     /**
@@ -420,15 +358,9 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function toArray()
     {
-        $array = parent::toArray();
-
-        unset($array['content'], $array['content_raw']);
-
-        $extra = [
+        $attributes = [
             'id'             => $this->id(),
             'title'          => $this->get('title'),
-            'url'            => $this->url(),
-            'permalink'      => $this->absoluteUrl(),
             'path'           => $this->path(),
             'filename'       => $this->filename(),
             'basename'       => $this->basename(),
@@ -442,16 +374,16 @@ class Asset extends Data implements AssetContract, Arrayable
             'edit_url'       => $this->editUrl(),
             'container'      => $this->container()->id(),
             'folder'         => $this->folder(),
-            'value'          => $this->value(),
+            'url'            => $this->url(),
         ];
 
-        if ($exists = $this->disk()->exists($this->path())) {
+        if ($this->disk() && $this->disk()->exists($this->path())) {
             $size = $this->size();
             $kb = number_format($size / 1024, 2);
             $mb = number_format($size / 1048576, 2);
             $gb = number_format($size / 1073741824, 2);
 
-            $extra = array_merge($extra, [
+            $attributes = array_merge($attributes, [
                 'size'           => $this->disk()->sizeHuman($this->path()),
                 'size_bytes'     => $size,
                 'size_kilobytes' => $kb,
@@ -468,18 +400,7 @@ class Asset extends Data implements AssetContract, Arrayable
             ]);
         }
 
-        return array_merge($array, $extra);
-    }
-
-    /**
-     * Add supplemental data to the attributes
-     *
-     * @return void
-     */
-    public function supplement()
-    {
-        // The Asset object implements its own toArray method,
-        // which negates the need for a supplement method.
+        return array_merge($this->data(), $attributes, $this->supplements);
     }
 
     /**
@@ -500,18 +421,19 @@ class Asset extends Data implements AssetContract, Arrayable
 
         // If the file exists, we'll append a timestamp to prevent overwriting.
         if ($this->disk()->exists($path)) {
-            $basename = $filename . '-' . time() . '.' . $ext;
+            $basename = $filename . '-' . Carbon::now()->timestamp . '.' . $ext;
             $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
         }
 
-        $this->performUpload($file, $path);
+        $stream = fopen($file->getRealPath(), 'r');
+        $this->disk()->put($path, $stream);
+        fclose($stream);
 
         $this->path($path);
 
         event(new AssetUploaded($this));
 
-        // Legacy/Deprecated. TODO: Remove in 2.3
-        event('asset.uploaded', $path);
+        return $this;
     }
 
     private function getSafeFilename($string)
@@ -528,36 +450,6 @@ class Asset extends Data implements AssetContract, Arrayable
         }
 
         return (string) $str;
-    }
-
-    /**
-     * Actually perform the file upload.
-     *
-     * Saves the file to a temporary location on the local filesystem, then moves it to the
-     * right place. This is a workaround for needing to know the file extension or mime
-     * type when uploading to Amazon S3. Temporary files don't have file extensions
-     * so sending directly to S3 causes it to appear with the wrong mime type.
-     *
-     * @param UploadedFile $file
-     * @param string $path
-     * @return void
-     */
-    private function performUpload(UploadedFile $file, $path)
-    {
-        // Build up a path where the file will be temporarily stored
-        $temp = 'uploads/'.md5($file->getRealPath().microtime(true)).'.'.$file->getClientOriginalExtension();
-
-        // Upload to a temporary location
-        $temp_disk = new Filesystem(new Local(temp_path()));
-        $stream = fopen($file->getRealPath(), 'r+');
-        $temp_disk->putStream($temp, $stream);
-        fclose($stream);
-
-        // Move from the temporary location to the real container location
-        $this->disk()->put($path, $temp_disk->readStream($temp));
-
-        // Delete the temporary file
-        $temp_disk->delete($temp);
     }
 
     /**
@@ -580,36 +472,7 @@ class Asset extends Data implements AssetContract, Arrayable
      */
     public function blueprint()
     {
-        // Check the container
-        if ($blueprint = $this->container()->blueprint()) {
-            return $blueprint;
-        }
-
-        // Then the default asset blueprint
-        return Blueprint::find(config('statamic.theming.blueprints.asset')) ?? Blueprint::find('asset');
-    }
-
-    /**
-     * Get the path before the object was modified.
-     *
-     * @return string
-     */
-    public function originalPath()
-    {
-        // TODO:
-        dd('todo: extend data@originalPath');
-    }
-
-    /**
-     * Get the path to a localized version before the object was modified.
-     *
-     * @param string $locale
-     * @return string
-     */
-    public function originalLocalizedPath($locale)
-    {
-        // TODO:
-        dd('todo: extend data@localizedPath');
+        return $this->container()->blueprint();
     }
 
     /**
@@ -632,13 +495,8 @@ class Asset extends Data implements AssetContract, Arrayable
         return (in_array(strtolower($this->extension()), $filetypes));
     }
 
-    /**
-     * Whether the data can be taxonomized
-     *
-     * @return bool
-     */
-    public function isTaxonomizable()
+    public function __toString()
     {
-        return false;
+        return $this->url() ?? $this->id();
     }
 }

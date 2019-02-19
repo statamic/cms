@@ -5,18 +5,20 @@ namespace Statamic\CP\Navigation;
 use Exception;
 use Statamic\API\Nav;
 use Statamic\API\Str;
+use Statamic\FluentlyGetsAndSets;
 
 class NavItem
 {
+    use FluentlyGetsAndSets;
+
     protected $name;
     protected $section;
-    protected $route;
     protected $url;
-    protected $currentClass;
     protected $icon;
     protected $children;
-    protected $view;
     protected $authorization;
+    protected $active;
+    protected $view;
 
     /**
      * Get or set name.
@@ -26,13 +28,7 @@ class NavItem
      */
     public function name($name = null)
     {
-        if (is_null($name)) {
-            return $this->name;
-        }
-
-        $this->name = $name;
-
-        return $this;
+        return $this->fluentlyGetOrSet('name', $name);
     }
 
     /**
@@ -43,51 +39,7 @@ class NavItem
      */
     public function section($section = null)
     {
-        if (is_null($section)) {
-            return $this->section;
-        }
-
-        $this->section = $section;
-
-        return $this;
-    }
-
-    /**
-     * Get or set URL.
-     *
-     * @param string|null $url
-     * @return mixed
-     */
-    public function url($url = null)
-    {
-        if (is_null($url)) {
-            return $this->url;
-        }
-
-        $this->url = $url;
-
-        if (! $this->currentClass) {
-            $this->currentClass = str_replace(url('cp').'/', '', $this->url) . '*';
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get or set current class.
-     *
-     * @param string|null $pattern
-     * @return mixed
-     */
-    public function currentClass($pattern = null)
-    {
-        if (is_null($pattern)) {
-            return $this->currentClass;
-        }
-
-        $this->currentClass = $pattern;
-
-        return $this;
+        return $this->fluentlyGetOrSet('section', $section);
     }
 
     /**
@@ -103,6 +55,21 @@ class NavItem
     }
 
     /**
+     * Get or set URL.
+     *
+     * @param string|null $url
+     * @return mixed
+     */
+    public function url($url = null)
+    {
+        return $this->fluentlyGetOrSet('url', $url, function () {
+            if (! $this->active) {
+                $this->active = str_replace(url('cp').'/', '', $this->url) . '*';
+            }
+        });
+    }
+
+    /**
      * Get or set icon.
      *
      * @param string|null $icon
@@ -110,13 +77,7 @@ class NavItem
      */
     public function icon($icon = null)
     {
-        if (is_null($icon)) {
-            return $this->icon;
-        }
-
-        $this->icon = $icon;
-
-        return $this;
+        return $this->fluentlyGetOrSet('icon', $icon);
     }
 
     /**
@@ -131,29 +92,22 @@ class NavItem
             return $this->children;
         }
 
+        if (is_callable($items)) {
+            $this->children = $items;
+            return $this;
+        }
+
         $this->children = collect($items)
             ->map(function ($value, $key) {
                 return $value instanceof NavItem
                     ? $value
                     : Nav::item($key)->url($value);
-            });
+            })
+            ->values();
 
-        return $this;
-    }
-
-    /**
-     * Get or set custom view.
-     *
-     * @param string|null $view
-     * @return mixed
-     */
-    public function view($view = null)
-    {
-        if (is_null($view)) {
-            return $this->view;
+        if ($this->children->isEmpty()) {
+            $this->children = null;
         }
-
-        $this->view = $view;
 
         return $this;
     }
@@ -191,23 +145,25 @@ class NavItem
         return $this->authorization($ability, $arguments);
     }
 
-    // public function add($key, $item = null)
-    // {
-    //     return $this->children->add($key, $item);
-    // }
+    /**
+     * Get or set pattern for active state styling.
+     *
+     * @param string|null $pattern
+     * @return mixed
+     */
+    public function active($pattern = null)
+    {
+        return $this->fluentlyGetOrSet('active', $pattern);
+    }
 
-    // public function has($key)
-    // {
-    //     return $this->children->has($key);
-    // }
-
-    // public function get($key)
-    // {
-    //     return $this->children->get($key);
-    // }
-
-    // public function remove($key)
-    // {
-    //     return $this->children->remove($key);
-    // }
+    /**
+     * Get or set custom view.
+     *
+     * @param string|null $view
+     * @return mixed
+     */
+    public function view($view = null)
+    {
+        return $this->fluentlyGetOrSet('view', $view);
+    }
 }

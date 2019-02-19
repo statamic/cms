@@ -10,7 +10,6 @@ Vue.component('textarea-fieldtype', require('../components/fieldtypes/TextareaFi
 Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.vue'));
 
 // Fieldtypes
-import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue'
 import AssetsFolderFieldtype from '../components/fieldtypes/AssetsFolderFieldtype.vue'
 import AssetContainerFieldtype from '../components/fieldtypes/AssetContainerFieldtype.vue'
 import CollectionFieldtype from '../components/fieldtypes/CollectionFieldtype.vue'
@@ -33,7 +32,8 @@ import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
 import UsersFieldtype from '../components/fieldtypes/UsersFieldtype.vue'
 
 Vue.component('array-fieldtype', require('../components/fieldtypes/ArrayFieldtype.vue'));
-Vue.component('assets-fieldtype', AssetsFieldtype);
+Vue.component('assets-fieldtype', require('../components/fieldtypes/assets/AssetsFieldtype.vue'));
+Vue.component('assets-fieldtype-index', require('../components/fieldtypes/assets/AssetsIndexFieldtype.vue'));
 Vue.component('asset_container-fieldtype', AssetContainerFieldtype);
 Vue.component('asset_folder-fieldtype', AssetsFolderFieldtype);
 Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardFieldtype.vue'));
@@ -56,7 +56,8 @@ Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtyp
 Vue.component('redactor-fieldtype', require('../components/fieldtypes/redactor/RedactorFieldtype.vue'));
 Vue.component('redactor_settings-fieldtype', RedactorSettingsFieldtype);
 Vue.component('relate-fieldtype', RelateFieldtype);
-Vue.component('relationship-fieldtype', require('../components/fieldtypes/RelationshipFieldtype.vue'));
+Vue.component('relationship-fieldtype', require('../components/fieldtypes/relationship/RelationshipFieldtype.vue'));
+Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue'));
 Vue.component('replicator-fieldtype', require('../components/fieldtypes/replicator/Replicator.vue'));
 Vue.component('revealer-fieldtype', RevealerFieldtype);
 Vue.component('routes-fieldtype', RoutesFieldtype);

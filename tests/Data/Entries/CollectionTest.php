@@ -119,11 +119,13 @@ class CollectionTest extends TestCase
     /** @test */
     function it_gets_and_sets_entry_blueprints()
     {
+        BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('one')->andReturn($blueprintOne = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('two')->andReturn($blueprintTwo = new Blueprint);
 
         $collection = new Collection;
         $this->assertCount(0, $collection->entryBlueprints());
+        $this->assertEquals($default, $collection->entryBlueprint());
 
         $return = $collection->entryBlueprints(['one', 'two']);
 

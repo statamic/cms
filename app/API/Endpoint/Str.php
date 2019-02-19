@@ -21,6 +21,16 @@ class Str extends \Illuminate\Support\Str
         return Str::slug(Str::snake($string));
     }
 
+    public static function studlyToTitle($string)
+    {
+        return Str::modifyMultiple($string, ['snake', 'slugToTitle']);
+    }
+
+    public static function slugToTitle($string)
+    {
+        return Str::modifyMultiple($string, ['deslugify', 'title']);
+    }
+
     public static function isUrl($string)
     {
         return self::startsWith($string, ['http://', 'https://', '/']);
@@ -55,6 +65,15 @@ class Str extends \Illuminate\Support\Str
         }
 
         return $bytes;
+    }
+
+    public function timeForHumans($ms)
+    {
+        if ($ms < 1000) {
+            return $ms . 'ms';
+        }
+
+        return $ms * 60 . 'sec';
     }
 
     /**

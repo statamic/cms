@@ -1,20 +1,14 @@
 <template>
 
-<div>
-    <modal
-        name="asset-selector"
-        width="90%"
-        height="90%"
-        :resizable="true"
-    >
-        <div class="flex flex-col justify-end h-full">
+        <div class="flex flex-col justify-end h-full bg-white">
 
             <div class="flex-1 overflow-scroll">
                 <asset-browser
                     :initial-container="container"
                     :selected-path="folder"
                     :selected-assets="browserSelections"
-                    :restrict-navigation="restrictNavigation"
+                    :restrict-container-navigation="restrictContainerNavigation"
+                    :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
                     @selections-updated="selectionsUpdated"
                     @asset-doubleclicked="select">
@@ -50,7 +44,6 @@
             </div>
 
         </div>
-    </modal>
 </div>
 
 </template>
@@ -62,7 +55,13 @@ export default {
         folder: String,
         selected: Array,
         maxFiles: Number,
-        restrictNavigation: {
+        restrictContainerNavigation: {
+            type: Boolean,
+            default() {
+                return false;
+            }
+        },
+        restrictFolderNavigation: {
             type: Boolean,
             default() {
                 return false;
@@ -103,7 +102,6 @@ export default {
          * Close this selector
          */
         close() {
-            this.$modal.hide('asset-selector');
             this.$emit('closed');
         },
 
@@ -114,10 +112,6 @@ export default {
             this.browserSelections = selections;
         }
 
-    },
-
-    mounted() {
-        this.$modal.show('asset-selector');
     }
 
 };

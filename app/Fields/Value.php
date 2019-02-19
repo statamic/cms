@@ -2,7 +2,10 @@
 
 namespace Statamic\Fields;
 
-class Value
+use ArrayIterator;
+use IteratorAggregate;
+
+class Value implements IteratorAggregate
 {
     protected $raw;
     protected $handle;
@@ -32,5 +35,10 @@ class Value
     public function __toString()
     {
         return (string) $this->value();
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->value());
     }
 }

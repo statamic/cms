@@ -25,6 +25,8 @@ class Persister
         $this->updatedStores()->each(function ($store) {
             $store->load()->cache();
         });
+
+        $this->stache->stopTimer();
     }
 
     protected function updatedStores()

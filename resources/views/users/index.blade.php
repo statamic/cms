@@ -13,7 +13,10 @@
     </div>
 
     <user-listing
+        listing-key="users"
         :filters="{{ $filters->toJson() }}"
+        :actions="{{ $actions->toJson() }}"
+        action-url="{{ cp_route('users.action') }}"
     ></user-listing>
 
 @endsection

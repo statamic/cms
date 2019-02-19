@@ -1,29 +1,31 @@
 <template>
-    <div class="time-template-wrapper">
-        <input class="form-control"
-            type="number" min="00" max="23" v-model="hour" ref="hour"
-            @keydown.up.prevent="incrementHour(1)"
-            @keydown.down.prevent="incrementHour(-1)"
-            @keydown.esc="clear"
-            @keydown.186.prevent="focusMinute"
-            @keydown.190.prevent="focusMinute"
-            tabindex="0"
-        />
-        <span class="colon">:</span>
-        <input class="form-control"
-            type="number" min="00" max="59" v-model="minute" ref="minute"
-            @keydown.up.prevent="incrementMinute(1)"
-            @keydown.down.prevent="incrementMinute(-1)"
-            @keydown.esc="clear"
-            tabindex="0"
-        />
-        <div>
-            <span class="icon icon-remove" tabindex="0"
-                  v-if="!isRequired && hasTime"
-                  @click="clear" @keyup.enter.space="clear">
-                  &times;
-            </span>
+    <div class="time-fieldtype-container">
+        <div class="input-text block-inline px-sm w-auto">
+            <input class="input-time input-hour"
+                type="number" min="00" max="23" v-model="hour" ref="hour"
+                placeholder="00"
+                @keydown.up.prevent="incrementHour(1)"
+                @keydown.down.prevent="incrementHour(-1)"
+                @keydown.esc="clear"
+                @keydown.186.prevent="focusMinute"
+                @keydown.190.prevent="focusMinute"
+                tabindex="0"
+            />
+            <span class="colon">:</span>
+            <input class="input-time input-minute"
+                type="number" min="00" max="59" v-model="minute" ref="minute"
+                placeholder="00"
+                @keydown.up.prevent="incrementMinute(1)"
+                @keydown.down.prevent="incrementMinute(-1)"
+                @keydown.esc="clear"
+                tabindex="0"
+            />
         </div>
+        <button class="text-blue text-xs ml-1" tabindex="0"
+              v-if="! required"
+              @click="clear" @keyup.enter.space="clear">
+              {{ __('clear') }}
+        </button>
     </div>
 </template>
 
@@ -95,10 +97,6 @@ export default {
         hasTime: function() {
             return this.required || this.data !== null;
         },
-
-        isRequired() {
-            return this.required;
-        }
     },
 
     methods: {

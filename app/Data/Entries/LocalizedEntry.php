@@ -13,6 +13,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\Localization;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\Data\EntrySaved;
+use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Entries\LocalizedEntry as Contract;
@@ -48,7 +49,9 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
             'url' => $this->url(),
             'edit_url' => $this->editUrl(),
             'published' => $this->published(),
-            'date' => $this->date(), // TODO: Should only be here for date collections
+            'date' => $this->date(),
+            'is_entry' => true,
+            'collection' => $this->collectionHandle(),
         ], $this->supplements);
     }
 
@@ -83,6 +86,10 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function save()
     {
+        if (EntrySaving::dispatch($this) === false) {
+            return false;
+        }
+
         API\Entry::save($this);
 
         $this->entry()->addLocalization($this);
@@ -93,7 +100,7 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
-        return $this;
+        return true;
     }
 
     public function path()
@@ -161,12 +168,23 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
 
     public function date()
     {
-        // TODO: Should only function for date collections
-        return Carbon::parse($this->order());
+        if ($this->collection()->order() === 'date') {
+            return Carbon::parse($this->order());
+        }
+
+        return null;
     }
 
     public function sites()
     {
         return $this->collection()->sites();
+    }
+
+    protected function fileData()
+    {
+        return array_merge($this->data(), [
+            'id' => $this->id(),
+            'published' => $this->published === false ? false : null
+        ]);
     }
 }

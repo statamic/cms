@@ -6,40 +6,45 @@
         @method('patch') @csrf
 
         <div class="flex items-center mb-3">
-            <h1 class="flex-1">{{ $container->title() }}</h1>
+            <h1 class="flex-1">
+                <small class="subhead block">
+                    <a href="{{ cp_route('assets.browse.index') }}">{{ __('Assets') }}</a>
+                </small>
+                {{ $container->title() }}
+            </h1>
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
         </div>
 
-        <div class="publish-form p-0 card">
+        <div class="p-0 card publish-fields">
 
-            <div class="form-group">
-                <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('The proper name of your container.') }}</small>
-                <input type="text" name="title" class="form-control" value="{{ old('title', $container->title()) }}" autofocus="autofocus">
-            </div>
+            <form-group
+                handle="title"
+                display="{{ __('Title') }}"
+                instructions="{{ __('The proper name of your container.') }}"
+                value="{{ old('title', $container->title()) }}"
+                error="{{ $errors->first('title') }}"
+                autofocus
+            ></form-group>
 
-            <div class="form-group">
-                <label class="block">{{ __('Disk') }}</label>
-                <small class="help-block">{{ __('The filesystem disk this container will use.') }}</small>
-                <select-input
-                    name="disk"
-                    value="{{ old('disk', array_get($container->data(), 'disk')) }}"
-                    :options="{{ json_encode($disks) }}"
-                ></select-input>
-            </div>
+            <form-group
+                fieldtype="select"
+                handle="disk"
+                display="{{ __('Disk') }}"
+                instructions="{{ __('The filesystem disk this container will use.') }}"
+                value="{{ old('disk', $container->diskHandle()) }}"
+                error="{{ $errors->first('disk') }}"
+                :config="{{ json_encode(['options' => $disks]) }}"
+            ></form-group>
 
-            <div class="form-group">
-                <label class="block">{{ __('Path') }}</label>
-                <small class="help-block">{{ __('The path to the root directory within the selected filesystem disk. Leave blank to use the root directory.') }}</small>
-                <input type="text" name="path" class="form-control" value="{{ old('path', $container->path()) }}">
-            </div>
-
-            <div class="form-group">
-                <label class="block">{{ __('Fieldset') }}</label>
-                <small class="help-block">{{ __('The default fieldset, unless otherwise specified.') }}</small>
-                {{-- TODO: Bring back fieldset fieldtype. --}}
-                <input type="text" name="fieldset" class="form-control" value="{{ old('fieldset', array_get($container->data(), 'fieldset')) }}">
-            </div>
+            <form-group
+                fieldtype="blueprints"
+                handle="blueprint"
+                display="{{ __('Blueprint') }}"
+                instructions="{{ __('The blueprint that assets in this container will use.') }}"
+                value="{{ old('blueprint', $container->blueprint()->handle()) }}"
+                error="{{ $errors->first('blueprint') }}"
+                :config="{ max_items: 1 }"
+            ></form-group>
 
         </div>
     </form>

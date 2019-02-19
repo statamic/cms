@@ -31,4 +31,11 @@ class AssetContainerRepository implements RepositoryContract
     {
         return app(AssetContainer::class);
     }
+
+    public function save(AssetContainer $container)
+    {
+        $this->store->setItem($container->handle(), $container);
+
+        $this->store->save($container);
+    }
 }

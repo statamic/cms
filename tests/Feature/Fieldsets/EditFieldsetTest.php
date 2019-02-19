@@ -32,7 +32,7 @@ class EditFieldsetTest extends TestCase
             ->actingAs($user)
             ->get($fieldset->editUrl())
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */

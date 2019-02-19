@@ -21,7 +21,7 @@ class StoreCollectionTest extends TestCase
             ->actingAs($this->userWithoutPermission())
             ->post(cp_route('collections.store'))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */
@@ -37,7 +37,7 @@ class StoreCollectionTest extends TestCase
 
         $this->assertCount(1, Collection::all());
         $collection = Collection::all()->first();
-        $this->assertEquals('test', $collection->path());
+        $this->assertEquals('test', $collection->handle());
         $this->assertEquals([
             'title' => 'Test Collection',
             'template' => 'test-template',
@@ -96,7 +96,7 @@ class StoreCollectionTest extends TestCase
 
         $this->assertCount(1, Collection::all());
         $collection = Collection::all()->first();
-        $this->assertEquals('an_example_collection', $collection->path());
+        $this->assertEquals('an_example_collection', $collection->handle());
     }
 
     private function validParams($overrides = [])

@@ -6,11 +6,6 @@ export default {
         columns: {
             required: true,
         },
-        visibleColumns: {
-            default() {
-                return this.columns;
-            }
-        },
         rows: {
             type: Array,
             required: true,
@@ -50,7 +45,6 @@ export default {
             sharedState: {
                 searchQuery: this.searchQuery,
                 columns: this.columns,
-                visibleColumns: this.visibleColumns,
                 sortColumn: null,
                 sortDirection: this.sortDirection,
                 rows: [],
@@ -87,7 +81,9 @@ export default {
     },
 
     created() {
-        this.sharedState.sortColumn = this.sortColumn || (this.sort ? this.visibleColumns[0] : null);
+        let firstVisibleColumn = this.sharedState.columns.filter(col => col.visible)[0];
+        firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : this.sharedState.columns[0].field;
+        this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
     },
 
     methods: {

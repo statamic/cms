@@ -64,6 +64,18 @@
     }
 }
 
+.cursor-text {
+    cursor: text;
+}
+
+.shadow-hover-lg {
+    @apply shadow-lg;
+    transition: box-shadow .08s ease-in-out;
+    &:hover {
+        @apply shadow-xl;
+    }
+}
+
 [v-cloak] { display: none }
 
 .loading-blocker {

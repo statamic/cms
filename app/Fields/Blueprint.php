@@ -3,6 +3,8 @@
 namespace Statamic\Fields;
 
 use Statamic\API\Str;
+use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\BlueprintRepository;
 
@@ -55,6 +57,27 @@ class Blueprint
         return $this->sections()->map->fields()->reduce(function ($carry, $fields) {
             return $carry->merge($fields);
         }, new Fields);
+    }
+
+    public function hasField($field)
+    {
+        return $this->fields()->has($field);
+    }
+
+    public function field($field)
+    {
+        return $this->fields()->get($field);
+    }
+
+    public function columns()
+    {
+        return new Columns($this->fields()->all()->map(function ($field) {
+            return Column::make()
+                ->field($field->handle())
+                ->fieldtype($field->fieldtype()->handle())
+                ->label(__($field->display()))
+                ->visible($field->isListable());
+        }));
     }
 
     public function isEmpty(): bool

@@ -6,10 +6,12 @@ use Statamic\API\Str;
 use Statamic\API\Form;
 use Statamic\API\File;
 use Statamic\API\Metrics;
-use Statamic\Extend\Widget as BaseWidget;
+use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget
 {
+    protected static $handle = 'form';
+
     public function html()
     {
         $form = $this->get('form');

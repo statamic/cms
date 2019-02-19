@@ -16,8 +16,3 @@
     ></entry-publish-form>
 
 @endsection
-
-
-
-
-

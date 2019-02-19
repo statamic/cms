@@ -1,5 +1,8 @@
 <template>
-    <div ref="codemirror"></div>
+    <div class="code-fieldtype-container relative">
+        <div v-text="mode" class="code-mode"></div>
+        <div ref="codemirror"></div>
+    </div>
 </template>
 
 <style src="codemirror/theme/material.css" />
@@ -33,7 +36,6 @@ export default {
 
     data() {
         return {
-            data: this.value,
             codemirror: null
         }
     },
@@ -44,15 +46,9 @@ export default {
         }
     },
 
-    watch: {
-        data(value) {
-            this.update(value);
-        }
-    },
-
     mounted() {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: this.data || this.config.default || '',
+            value: this.value || this.config.default || '',
             mode: this.mode,
             tabSize: 4,
             indentUnit: 4,
@@ -63,7 +59,7 @@ export default {
         });
 
         this.codemirror.on('change', (cm) => {
-            this.data = cm.doc.getValue();
+            this.$emit('updated', cm.doc.getValue());
         });
     },
 
@@ -75,20 +71,3 @@ export default {
 
 };
 </script>
-
-<style>
-.CodeMirror {
-    min-height: 80px;
-    line-height: 1.75;
-    font-size: 13px !important;
-}
-
-.CodeMirror-wrap {
-    padding: 0.5rem;
-    border-radius: 4px;
-}
-
-.CodeMirror-scroll {
-    height: auto;
-}
-</style>

@@ -1,16 +1,16 @@
 <template>
     <table class="data-table" :class="{ 'opacity-50': loading }">
-        <thead v-if="sharedState.visibleColumns.length > 1">
+        <thead v-if="visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions"></th>
                 <th
-                    v-for="column in sharedState.visibleColumns"
-                    :key="column"
+                    v-for="column in visibleColumns"
+                    :key="column.field"
                     class="sortable-column"
-                    :class="{'current-column': sharedState.sortColumn === column}"
-                    @click.prevent="changeSortColumn(column)"
+                    :class="{'current-column': sharedState.sortColumn === column.field}"
+                    @click.prevent="changeSortColumn(column.field)"
                 >
-                    <span>{{ column }}</span>
+                    <span v-text="column.label" />
                     <svg :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5" style="enable-background:new 0 0 10 6.5;">
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z"/>
                     </svg>
@@ -30,15 +30,16 @@
                         :id="`checkbox-${row.id}`"
                     />
                 </td>
-                <td v-for="column in sharedState.visibleColumns" :key="column">
+                <td v-for="column in visibleColumns" :key="column.field">
                     <slot
-                        :name="`cell-${column}`"
-                        :value="row[column]"
+                        :name="`cell-${column.field}`"
+                        :value="row[column.field]"
                         :row="row"
                         :index="actualIndex(row)"
                         :display-index="index"
-                        :checkbox-id="`checkbox-${row.id}`">
-                        {{ row[column] }}
+                        :checkbox-id="`checkbox-${row.id}`"
+                    >
+                        <table-field :value="row[column.field]" :fieldtype="column.fieldtype" />
                     </slot>
                 </td>
                 <td class="text-right">
@@ -55,7 +56,13 @@
 </template>
 
 <script>
+import TableField from './TableField.vue';
+
 export default {
+
+    components: {
+        TableField
+    },
 
     props: {
         loading: {
@@ -82,6 +89,12 @@ export default {
 
         reachedSelectionLimit() {
             return this.sharedState.selections.length === this.sharedState.maxSelections;
+        },
+
+        visibleColumns() {
+            const columns = this.sharedState.columns.filter(column => column.visible);
+
+            return columns.length ? columns : this.sharedState.columns;
         }
 
     },

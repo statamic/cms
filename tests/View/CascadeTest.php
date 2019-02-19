@@ -399,7 +399,9 @@ class CascadeTest extends TestCase
 
     private function createGlobal($handle, $data)
     {
-        GlobalSet::create($handle)->with($data)->save();
+        GlobalSet::make()->handle($handle)->in(function ($loc) use ($data) {
+            $loc->data($data);
+        })->save();
     }
 }
 

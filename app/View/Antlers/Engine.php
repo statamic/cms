@@ -20,6 +20,13 @@ class Engine implements EngineInterface
     private $data;
 
     /**
+     * The Antlers Parser
+     *
+     * @return Parser
+     */
+    private $parser;
+
+    /**
      * Full path to the view
      *
      * @var string
@@ -32,13 +39,34 @@ class Engine implements EngineInterface
     private $filesystem;
 
     /**
+     * Whether noparse extractions should be injected
+     *
+     * @var bool
+     */
+    private $injectExtractions = true;
+
+    /**
      * Create a new AntlersEngine instance
      *
      * @param Filesystem $filesystem
+     * @param Parser $parser
      */
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $filesystem, Parser $parser)
     {
         $this->filesystem = $filesystem;
+        $this->parser = $parser;
+    }
+
+    /**
+     * Prevent injecting extractions the next time a view is evaluated.
+     *
+     * @return self
+     */
+    public function withoutExtractions()
+    {
+        $this->injectExtractions = false;
+
+        return $this;
     }
 
     /**
@@ -54,15 +82,17 @@ class Engine implements EngineInterface
 
         list($frontMatter, $contents) = $this->extractFrontMatter($contents);
 
-        $contents = Parse::template(
-            $contents,
-            array_merge($data, $frontMatter),
-            [],
-            Str::endsWith($path, '.php')
-        );
+        $parser = $this->parser->allowPhp(Str::endsWith($path, '.php'));
 
-        // Anything that was avoided with {{ noparse }} tags, put them back in now that we're done
-        return Parser::injectNoparse($contents);
+        $contents = $parser->parse($contents, array_merge($data, $frontMatter));
+
+        if ($this->injectExtractions) {
+            $contents = $parser->injectNoparse($contents);
+        }
+
+        $this->injectExtractions = true;
+
+        return $contents;
     }
 
     protected function getContents($path)

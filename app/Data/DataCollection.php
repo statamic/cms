@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Closure;
 use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\API\Helper;
@@ -150,23 +151,19 @@ class DataCollection extends IlluminateCollection
      * Add a new key to each item of the collection
      *
      * @param string|callable $key       New key to add, or a function to return an array of new values
-     * @param callable        $callable  Function to return the new value when specifying a key
+     * @param Closure         $callable  Function to return the new value when specifying a key
      * @return \Statamic\Data\DataCollection
      */
-    public function supplement($key, callable $callable = null)
+    public function supplement($key, Closure $callable = null)
     {
         // If a callable is specified as the first parameter, we'll expect that it'll
         // return an associative array of values to be merged into the supplements.
-        if (is_callable($key)) {
+        if ($key instanceof Closure) {
             return $this->supplementMany($key);
         }
 
-        if (! is_callable($callable, false)) {
-            return $this;
-        }
-
         foreach ($this->items as $i => $item) {
-            $this->items[$i]->setSupplement($key, call_user_func($callable, $item));
+            $this->items[$i]->setSupplement($key, $callable($item));
         }
 
         return $this;
@@ -228,5 +225,17 @@ class DataCollection extends IlluminateCollection
         }
 
         return array_values($array);
+    }
+
+    public function preProcessForIndex()
+    {
+        return $this->each(function ($item) {
+            foreach ($item->data() as $key => $value) {
+                if ($field = $item->blueprint()->field($key)) {
+                    $processed = $field->setValue($value)->preProcessIndex()->value();
+                    $item->setSupplement($key, $processed);
+                }
+            }
+        });
     }
 }

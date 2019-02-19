@@ -44,4 +44,12 @@ interface Cacher
      * @return void
      */
     public function invalidateUrls($urls);
+
+    /**
+     * Get all the URLs that have been cached
+     *
+     * @param string|null $domain
+     * @return \Illuminate\Support\Collection
+     */
+    public function getUrls($domain = null);
 }

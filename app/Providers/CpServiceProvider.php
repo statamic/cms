@@ -44,8 +44,6 @@ class CpServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->registerPublishers();
-
         $this->app->extend('translation.loader', function ($loader, $app) {
             return new Loader($loader, $app['path.lang']);
         });
@@ -53,34 +51,6 @@ class CpServiceProvider extends ServiceProvider
         $this->app->extend('translator', function ($translator, $app) {
             return new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
         });
-    }
-
-    /**
-     * Register the Publisher's dependencies.
-     *
-     * @return void
-     */
-    private function registerPublishers()
-    {
-        $this->app->when(\Statamic\Http\Controllers\CP\PublishPageController::class)
-                  ->needs(\Statamic\CP\Publish\Publisher::class)
-                  ->give(\Statamic\CP\Publish\PagePublisher::class);
-
-        $this->app->when(\Statamic\Http\Controllers\CP\PublishEntryController::class)
-                  ->needs(\Statamic\CP\Publish\Publisher::class)
-                  ->give(\Statamic\CP\Publish\EntryPublisher::class);
-
-        $this->app->when(\Statamic\Http\Controllers\CP\PublishGlobalController::class)
-                  ->needs(\Statamic\CP\Publish\Publisher::class)
-                  ->give(\Statamic\CP\Publish\GlobalsPublisher::class);
-
-        $this->app->when(\Statamic\Http\Controllers\CP\PublishTaxonomyController::class)
-                  ->needs(\Statamic\CP\Publish\Publisher::class)
-                  ->give(\Statamic\CP\Publish\TaxonomyPublisher::class);
-
-        $this->app->when(\Statamic\Http\Controllers\CP\PublishUserController::class)
-                  ->needs(\Statamic\CP\Publish\Publisher::class)
-                  ->give(\Statamic\CP\Publish\UserPublisher::class);
     }
 
     private function preventRegistration()

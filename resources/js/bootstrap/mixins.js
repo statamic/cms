@@ -1,8 +1,10 @@
 // Mixins
 import Vue from 'vue'
 import Fieldtype from '../components/fieldtypes/Fieldtype.vue'
+import IndexFieldtype from '../components/fieldtypes/IndexFieldtype.vue'
 
 window.Fieldtype = Fieldtype;
+window.IndexFieldtype = IndexFieldtype;
 
 
 Vue.mixin({

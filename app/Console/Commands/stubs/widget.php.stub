@@ -3,17 +3,16 @@
 namespace DummyNamespace;
 
 use Statamic\Extend\Widget;
-use Statamic\View\Antlers\View;
 
 class DummyClass extends Widget
 {
     /**
      * The HTML that should be shown in the widget
      *
-     * @return string
+     * @return string|\Illuminate\View\View
      */
     public function html()
     {
-        // return View::make('widgets.widget_view');
+        // return view('widgets.widget_view');
     }
 }

@@ -31,7 +31,7 @@ class StoreBlueprintTest extends TestCase
             ->actingAs($user)
             ->submit()
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
 
         $this->assertCount(0, API\Blueprint::all());
     }

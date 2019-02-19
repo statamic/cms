@@ -43,7 +43,7 @@ class FieldtypeTest extends TestCase
     function handle_can_be_defined_as_a_property()
     {
         $fieldtype = new class extends Fieldtype {
-            protected $handle = 'example';
+            protected static $handle = 'example';
         };
 
         $this->assertEquals('example', $fieldtype->handle());
@@ -67,7 +67,7 @@ class FieldtypeTest extends TestCase
     function title_can_be_defined_as_a_property()
     {
         $fieldtype = new class extends Fieldtype {
-            protected $title = 'Super Cool Example';
+            protected static $title = 'Super Cool Example';
         };
 
         $this->assertEquals('Super Cool Example', $fieldtype->title());
@@ -262,7 +262,7 @@ class FieldtypeTest extends TestCase
         $this->assertEquals('test', (new TestFieldtype)->icon());
 
         $customHandle = new class extends Fieldtype {
-            protected $handle = 'custom_handle';
+            protected static $handle = 'custom_handle';
         };
 
         $this->assertEquals('custom_handle', $customHandle->icon());
@@ -284,6 +284,12 @@ class FieldtypeTest extends TestCase
     function no_pre_processing_happens_by_default()
     {
         $this->assertEquals('test', (new TestFieldtype)->preProcess('test'));
+    }
+
+    /** @test */
+    function no_pre_processing_happens_by_default_for_the_index()
+    {
+        $this->assertEquals('test', (new TestFieldtype)->preProcessIndex('test'));
     }
 
     /** @test */

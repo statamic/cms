@@ -4,10 +4,10 @@ namespace Statamic;
 
 use Log;
 use GuzzleHttp\Client;
-use Statamic\API\Cache;
 use Statamic\API\Addon;
 use Statamic\API\Config;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
 
 class Outpost

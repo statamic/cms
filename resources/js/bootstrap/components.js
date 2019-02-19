@@ -20,6 +20,7 @@ Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue
 Vue.component('data-list', require('../components/data-list/DataList.vue'));
 Vue.component('data-list-search', require('../components/data-list/Search.vue'));
 Vue.component('data-list-bulk-actions', require('../components/data-list/BulkActions.vue'));
+Vue.component('data-list-inline-actions', require('../components/data-list/InlineActions.vue'));
 Vue.component('data-list-column-picker', require('../components/data-list/ColumnPicker.vue'));
 Vue.component('data-list-toggle-all', require('../components/data-list/ToggleAll.vue'));
 Vue.component('data-list-pagination', require('../components/data-list/Pagination.vue'));
@@ -32,6 +33,9 @@ Vue.component('collection-list', require('../components/collections/Listing.vue'
 Vue.component('asset-container-list', require('../components/AssetContainerList.vue'));
 Vue.component('addon-list', require('../components/AddonList.vue'));
 Vue.component('addon-details', require('../components/AddonDetails.vue'));
+
+// Widgets
+Vue.component('collection-widget', require('../components/entries/Widget.vue'));
 
 // Reusable
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
@@ -46,10 +50,9 @@ Vue.component('role-permission-tree', require('../components/roles/PermissionTre
 
 // Modals
 Vue.component('modal', require('../components/Modal.vue'));
+Vue.component('favorite-creator', require('../components/FavoriteCreator.vue'));
 Vue.component('keyboard-shortcuts-modal', require('../components/modals/KeyboardShortcutsModal.vue'));
 // Vue.component('modal-dialog', require('../components/ModalDialog.vue'));
-
-Vue.component('pagination', require('../components/pagination/Pagination.vue'));
 
 Vue.component('stack', require('../components/stacks/Stack.vue'));
 Vue.component('stack-test', require('../components/stacks/StackTest.vue'));

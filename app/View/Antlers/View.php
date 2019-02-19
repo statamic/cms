@@ -61,13 +61,13 @@ class View
 
         if ($this->layout) {
             $contents = view($this->layout, array_merge($cascade, [
-                'template_content' => $contents
-            ]))->render();
+                'template_content' => $contents->withoutExtractions()->render()
+            ]));
         }
 
         ViewRendered::dispatch($this);
 
-        return $contents;
+        return $contents->render();
     }
 
     protected function cascade()

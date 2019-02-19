@@ -6,6 +6,7 @@ use Closure;
 use Statamic\API\File;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
+use Statamic\API\Preference;
 
 class Statamic
 {
@@ -114,6 +115,7 @@ class Statamic
             'MediumEditorExtensions' => [],
             'flash' => [],
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
+            'preferences' => Preference::all(),
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);

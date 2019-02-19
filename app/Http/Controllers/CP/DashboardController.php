@@ -3,12 +3,8 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\User;
-use Statamic\API\Config;
 use Statamic\Extend\Management\WidgetLoader;
 
-/**
- * Controller for the CP home/dashboard
- */
 class DashboardController extends CpController
 {
     /**
@@ -20,39 +16,38 @@ class DashboardController extends CpController
     public function index(WidgetLoader $loader)
     {
         return view('statamic::dashboard', [
-            'widgets' => $this->getWidgets($loader)
+            'widgets' => $this->getDisplayableWidgets($loader)
         ]);
     }
 
-    private function getWidgets($loader)
+    /**
+     * Get displayable widgets.
+     *
+     * @param WidgetLoader $loader
+     * @return \Illuminate\Support\Collection
+     */
+    private function getDisplayableWidgets($loader)
     {
-        return collect(Config::get('statamic.cp.widgets', []))->map(function ($config) use ($loader) {
-            $config = is_string($config) ? ['type' => $config] : $config;
-            $widget = $loader->load(array_get($config, 'type'), $config);
-
-            return [
-                'widget' => $widget,
-                'width' => $widget->get('width', 'half'),
-                'html' => (string) $widget->html()
-            ];
-        })->filter(function ($item) {
-            if (! $permissions = $item['widget']->get('permissions')) {
-                return true;
-            }
-
-            $user = User::getCurrent();
-
-            foreach ($permissions as $permission) {
-                if ($user->can($permission)) {
-                    return true;
-                }
-            }
-
-            return false;
-
-        // Ditch any empty widgets
-        })->reject(function ($widget) {
-            return empty($widget['html']);
-        });
+        return collect(config('statamic.cp.widgets', []))
+            ->map(function ($config) {
+                return is_string($config) ? ['type' => $config] : $config;
+            })
+            ->filter(function ($config) {
+                return collect($config['can'] ?? $config['permissions'] ?? ['access cp'])
+                    ->filter(function ($ability) {
+                        return auth()->user()->can($ability);
+                    })
+                    ->isNotEmpty();
+            })
+            ->map(function ($config) use ($loader) {
+                return [
+                    'widget' => $widget = $loader->load(array_get($config, 'type'), $config),
+                    'classes' => $widget->config('classes', 'w-full'),
+                    'html' => (string) $widget->html()
+                ];
+            })
+            ->reject(function ($widget) {
+                return empty($widget['html']);
+            });
     }
 }

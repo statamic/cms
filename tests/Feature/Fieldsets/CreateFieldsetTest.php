@@ -21,6 +21,6 @@ class CreateFieldsetTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('fieldsets.create'))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 }

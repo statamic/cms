@@ -23,4 +23,6 @@ return [
     'permission_view_{form}_form_submissions' => 'View :form submissions',
     'permission_delete_{form}_form_submissions' => 'Delete :form submissions',
 
+    'focal_point_instructions' => 'The focal point is used when cropping so the most important part of the image is not removed.',
+
 ];

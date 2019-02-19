@@ -5,7 +5,8 @@
                   :container="container"
                   :folder="folder"
                   :selected="selectedAssets"
-                  :restrict-navigation="restrictAssetNavigation"
+                  :restrict-container-navigation="restrictAssetNavigation"
+                  :restrict-folder-navigation="restrictAssetNavigation"
                   @selected="assetsSelected"
                   @closed="closeAssetSelector"
         ></selector>

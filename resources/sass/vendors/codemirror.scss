@@ -2,7 +2,12 @@
 
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
-  @apply .text-grey-darker .font-mono .text-sm;
+  @apply .text-grey-darker .font-mono .text-sm .leading-loose;
+  min-height: 80px;
+}
+
+.code-mode {
+    @apply select-none z-10 opacity-25 absolute pin-r pin-r p-1 text-white text-2xs uppercase;
 }
 
 /* PADDING */
@@ -155,7 +160,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   /* See overflow: hidden in .CodeMirror */
   margin-bottom: -30px; margin-right: -30px;
   padding-bottom: 30px;
-  height: 100%;
+  height: auto;
   outline: none; /* Prevent dragging from highlighting the element */
   position: relative;
 }
@@ -245,6 +250,11 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   overflow: visible;
   -webkit-tap-highlight-color: transparent;
 }
+
+.CodeMirror-wrap {
+    @apply .p-1 .rounded;
+}
+
 .CodeMirror-wrap pre {
   word-wrap: break-word;
   white-space: pre-wrap;

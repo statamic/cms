@@ -40,8 +40,12 @@ class User extends BaseUser
      */
     public function data($data = null)
     {
-        if (is_null($data)) {
-            return $this->model()->attributesToArray();
+        if (func_num_args() === 0) {
+            $data = array_merge($this->model()->attributesToArray(), [
+                'roles' => $this->roles()->map->handle()->values()->all(),
+                'groups' => $this->groups()->map->handle()->values()->all(),
+            ]);
+            return array_except($data, ['id', 'email']);
         }
 
         foreach ($data as $key => $value) {
@@ -53,7 +57,11 @@ class User extends BaseUser
 
     public function id($id = null)
     {
-        return $this->model()->getKey();
+        if (func_num_args() === 0) {
+            return $this->model()->getKey();
+        }
+
+        return $this->set('id', $id);
     }
 
     public function email($email = null)
@@ -63,10 +71,6 @@ class User extends BaseUser
 
     public function password($password = null)
     {
-        if (is_string($password)) {
-            $password = Hash::make($password);
-        }
-
         return $this->getOrSet('password', $password);
     }
 
@@ -282,11 +286,18 @@ class User extends BaseUser
 
     public function set($key, $value)
     {
-        $columns = \Schema::getColumnListing($this->model()->getTable());
-
-        if (array_has(array_flip($columns), $key)) {
-            $this->model()->$key = $value;
+        if ($key === 'password') {
+            $value = Hash::make($value);
         }
+
+        $this->model()->$key = $value;
+
+        return $this;
+    }
+
+    public function remove($key)
+    {
+        $this->model()->$key = null;
 
         return $this;
     }

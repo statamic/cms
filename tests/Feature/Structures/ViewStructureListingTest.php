@@ -24,10 +24,9 @@ class ViewStructureListingTest extends TestCase
             ->actingAs($user)
             ->get(route('statamic.cp.structures.index'))
             ->assertSuccessful()
-            ->assertViewHas('structures', collect([
-                'foo' => $structureA,
-                'bar' => $structureB
-            ]))
+            ->assertViewHas('structures', function ($structures) {
+                return $structures->map->id->all() === ['foo', 'bar'];
+            })
             ->assertDontSee('no-results');
     }
 
@@ -59,9 +58,9 @@ class ViewStructureListingTest extends TestCase
             ->actingAs($user)
             ->get(route('statamic.cp.structures.index'))
             ->assertSuccessful()
-            ->assertViewHas('structures', collect([
-                'bar' => $structureB
-            ]))
+            ->assertViewHas('structures', function ($structures) {
+                return $structures->map->id->all() === ['bar'];
+            })
             ->assertDontSee('no-results');
     }
 
@@ -79,10 +78,9 @@ class ViewStructureListingTest extends TestCase
             ->actingAs($user)
             ->get(route('statamic.cp.structures.index'))
             ->assertSuccessful()
-            ->assertViewHas('structures', collect([
-                'foo' => $structureA,
-                'bar' => $structureB
-            ]))
+            ->assertViewHas('structures', function ($structures) {
+                return $structures->map->id->all() === ['foo', 'bar'];
+            })
             ->assertDontSee('no-results');
     }
 

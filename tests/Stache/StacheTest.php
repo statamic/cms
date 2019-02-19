@@ -56,18 +56,6 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function meta_data_can_be_defined_and_retrieved()
-    {
-        $this->assertNull($this->stache->meta());
-
-        $return = $this->stache->meta(['foo', 'bar']);
-
-        $this->assertEquals($this->stache, $return);
-        $this->assertInstanceOf(Collection::class, $this->stache->meta());
-        $this->assertEquals(['foo', 'bar'], $this->stache->meta()->all());
-    }
-
-    /** @test */
     function cached_keys_can_be_defined_and_retrieved()
     {
         $this->assertNull($this->stache->keys());

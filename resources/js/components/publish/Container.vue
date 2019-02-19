@@ -30,6 +30,7 @@ export default {
     },
 
     destroyed() {
+        this.removeVuexModule();
         this.removeNavigationWarning();
     },
 
@@ -96,6 +97,10 @@ export default {
                     }
                 }
             });
+        },
+
+        removeVuexModule() {
+            this.$store.unregisterModule(['publish', this.name]);
         },
 
         emitUpdatedEvent(values) {

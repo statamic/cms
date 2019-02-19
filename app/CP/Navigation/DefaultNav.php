@@ -3,24 +3,54 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
+use Statamic\API\Form as FormAPI;
+use Statamic\API\Role as RoleAPI;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
+use Statamic\API\GlobalSet as GlobalSetAPI;
+use Statamic\API\Structure as StructureAPI;
+use Statamic\API\UserGroup as UserGroupAPI;
+use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
 use Statamic\Contracts\Data\Structures\Structure;
 
 class DefaultNav
 {
+    const ALLOWED_TOP_LEVEL = [
+        'Dashboard',
+        'Playground',
+    ];
+
     /**
      * Make default nav items.
      */
     public static function make()
     {
         (new static)
+            ->makeTopLevel()
             ->makeContentSection()
             ->makeToolsSection()
             ->makeUsersSection()
             ->makeSiteSection();
+    }
+
+    /**
+     * Make top level items.
+     *
+     * @return $this
+     */
+    protected function makeTopLevel()
+    {
+        Nav::topLevel('Dashboard')
+            ->route('dashboard')
+            ->icon('charts');
+
+        Nav::topLevel('Playground')
+            ->route('playground')
+            ->icon('playground');
+
+        return $this;
     }
 
     /**
@@ -33,25 +63,49 @@ class DefaultNav
         Nav::content('Collections')
             ->route('collections.index')
             ->icon('content-writing')
-            ->can('index', Collection::class);
+            ->can('index', Collection::class)
+            ->children(function () {
+                return CollectionAPI::all()->map(function ($collection) {
+                    return Nav::item($collection->title())
+                              ->url($collection->showUrl())
+                              ->can('view', $collection);
+                });
+            });
 
         Nav::content('Structure')
             ->route('structures.index')
             ->icon('hierarchy-files')
-            ->can('index', Structure::class);
+            ->can('index', Structure::class)
+            ->children(function () {
+                return StructureAPI::all()->map(function ($structure) {
+                    return Nav::item($structure->title())
+                              ->url($structure->showUrl())
+                              ->can('view', $structure);
+                });
+            });
 
         Nav::content('Taxonomies')
             ->route('')
             ->icon('tags');
+            // ->can() // TODO: Permission to manage taxonomies?
 
         Nav::content('Assets')
             ->route('assets.index')
             ->icon('assets');
+            // ->can() // TODO: Permission to manage assets?
+            // ->children() // TODO: Show asset containers as children?
 
         Nav::content('Globals')
             ->route('globals.index')
             ->icon('earth')
-            ->can('index', GlobalSet::class);
+            ->can('index', GlobalSet::class)
+            ->children(function () {
+                return GlobalSetAPI::all()->map(function ($globalSet) {
+                    return Nav::item($globalSet->title())
+                              ->url($globalSet->editUrl())
+                              ->can('view', $globalSet);
+                });
+            });
 
         return $this;
     }
@@ -66,7 +120,14 @@ class DefaultNav
         Nav::tools('Forms')
             ->route('forms.index')
             ->icon('drawer-file')
-            ->can('index', Form::class);
+            ->can('index', Form::class)
+            ->children(function () {
+                return FormAPI::all()->map(function ($form) {
+                    return Nav::item($form->title())
+                        ->url($form->editUrl())
+                        ->can('view', $form);
+                });
+            });
 
         Nav::tools('Updates')
             ->route('updater.index')
@@ -76,11 +137,12 @@ class DefaultNav
 
         Nav::tools('Utilities')
             ->route('utilities.phpinfo')
-            ->currentClass('utilities*')
+            ->active('utilities*')
             ->icon('settings-slider')
+            // ->can() // TODO: Permission to use utilities?
             ->children([
+                Nav::item('Cache')->route('utilities.cache.index'),
                 Nav::item('PHP Info')->route('utilities.phpinfo'),
-                Nav::item('Clear Cache')->route('utilities.clear-cache.index'),
                 Nav::item('Search')->route('utilities.search'),
             ]);
 
@@ -101,11 +163,25 @@ class DefaultNav
 
         Nav::users('Groups')
             ->route('user-groups.index')
-            ->icon('users-multiple');
+            ->icon('users-multiple')
+            // ->can() // TODO: Permission to manage groups?
+            ->children(function () {
+                return UserGroupAPI::all()->map(function ($userGroup) {
+                    return Nav::item($userGroup->title())
+                              ->url($userGroup->editUrl());
+                });
+            });
 
         Nav::users('Permissions')
             ->route('roles.index')
-            ->icon('shield-key');
+            ->icon('shield-key')
+            // ->can() // TODO: Permission to manage permissions?
+            ->children(function () {
+                return RoleAPI::all()->map(function ($role) {
+                    return Nav::item($role->title())
+                        ->url($role->editUrl());
+                });
+            });
 
         return $this;
     }

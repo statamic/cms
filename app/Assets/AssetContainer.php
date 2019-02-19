@@ -2,12 +2,16 @@
 
 namespace Statamic\Assets;
 
-use Statamic\API\Folder;
+use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Parse;
+use Statamic\API\Folder;
+use Statamic\API\Stache;
 use Statamic\API\Blueprint;
+use Statamic\Data\ExistsAsFile;
 use Statamic\API\Asset as AssetAPI;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
@@ -15,114 +19,59 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class AssetContainer implements AssetContainerContract
 {
-    /**
-     * @var array
-     */
-    protected $data;
+    use ExistsAsFile;
 
-    /**
-     * @var string
-     */
-    protected $id;
+    protected $title;
+    protected $handle;
+    protected $disk;
+    protected $private;
+    protected $blueprint;
+    protected $assets;
 
-    /**
-     * @var string
-     */
-    protected $path;
+    public function __construct()
+    {
+        $this->assets = collect();
+    }
 
-    /**
-     * @var string
-     */
-    protected $url;
-
-    /**
-     * @var array
-     */
-    protected $folders = [];
-
-    /**
-     * @var string
-     */
-    protected $fieldset;
-
-    /**
-     * Get or set the ID
-     *
-     * @param null|string $id
-     * @return string
-     */
     public function id($id = null)
     {
-        if (is_null($id)) {
-            return $this->id;
-        }
-
-        return $this->id = $id;
+        // For files, the handle is the ID.
+        return $this->handle(...func_get_args());
     }
 
-    /**
-     * Get or set the ID, with backwards compatibility
-     *
-     * @param null|string $uuid
-     * @return string
-     * @deprecated
-     */
-    public function uuid($uuid = null)
+    public function handle($handle = null)
     {
-        return $this->id($uuid);
-    }
-
-    public function data($data = null)
-    {
-        if (! is_null($data)) {
-            $this->data = $data;
-            return;
+        if (func_num_args() === 0) {
+            return $this->handle;
         }
 
-        if ($this->data) {
-            return $this->data;
-        }
+        $this->handle = $handle;
 
-        $path = "assets/{$this->id}.yaml";
-
-        $this->data = YAML::parse(File::disk('content')->get($path));
-
-        return $this->data;
+        return $this;
     }
 
-    /**
-     * Get or set the title
-     *
-     * @param null|string $title
-     * @return string
-     */
     public function title($title = null)
     {
-        if ($title) {
-            $this->data['title'] = $title;
+        if (func_num_args() === 0) {
+            return $this->title ?? ucfirst($this->handle());
         }
 
-        return array_get($this->data, 'title', Str::title($this->id));
+        $this->title = $title;
+
+        return $this;
     }
 
-    /**
-     * Get the path
-     *
-     * @return string
-     */
-    public function path()
+    public function diskPath()
     {
         return rtrim($this->disk()->path('/'), '/');
     }
 
-    /**
-     * Get the full resolved path
-     *
-     * @return string
-     */
-    public function resolvedPath()
+    public function path()
     {
-        return Parse::env($this->path());
+        return vsprintf('%s/%s.yaml', [
+            rtrim(Stache::store('asset-containers')->directory(), '/'),
+            $this->handle()
+        ]);
     }
 
     /**
@@ -145,7 +94,7 @@ class AssetContainer implements AssetContainerContract
         $data = $this->data();
 
         $data['id'] = $this->id();
-        $data['driver'] = $this->driver();
+        $data['disk'] = array_get($this->data(), 'disk');
 
         return $data;
     }
@@ -173,31 +122,14 @@ class AssetContainer implements AssetContainerContract
      */
     public function blueprint($blueprint = null)
     {
-        if (is_null($blueprint)) {
-            if (! $blueprint = array_get($this->data, 'blueprint')) {
-                return null;
-            }
-
-            return Blueprint::find($blueprint);
+        if (func_num_args() === 0) {
+            return Blueprint::find($this->blueprint ?? config('statamic.theming.blueprints.asset'))
+                ?? Blueprint::find('asset');
         }
 
-        if ($blueprint === false) {
-            $blueprint = null;
-        }
+        $this->blueprint = $blueprint;
 
-        $this->data['blueprint'] = $blueprint;
-    }
-
-    /**
-     * Get or set the handle
-     *
-     * @param null|string $handle
-     * @return string
-     */
-    public function handle($handle = null)
-    {
-        // For files, the id is also the handle.
-        return $this->id($handle);
+        return $this;
     }
 
     /**
@@ -207,6 +139,9 @@ class AssetContainer implements AssetContainerContract
      */
     public function save()
     {
+        API\AssetContainer::save($this);
+
+        return $this;
         $path = "assets/{$this->id}.yaml";
 
         $data = array_filter($this->toArray());
@@ -244,20 +179,25 @@ class AssetContainer implements AssetContainerContract
         event(new AssetContainerDeleted($this->id(), $path));
     }
 
-    public function disk()
+    public function disk($disk = null)
     {
-        if (! $disk = array_get($this->data(), 'disk')) {
-            throw new \Exception("Asset container [{$this->id()}] does not have a disk specified.");
+        if (func_num_args() === 0) {
+            return $this->disk ? File::disk($this->disk) : null;
         }
 
-        return File::disk($disk);
+        $this->disk = $disk;
+
+        return $this;
+    }
+
+    public function diskHandle()
+    {
+        return $this->disk;
     }
 
     public function diskConfig()
     {
-        $disk = array_get($this->data(), 'disk');
-
-        return config("filesystems.disks.$disk");
+        return config("filesystems.disks.{$this->disk}");
     }
 
     /**
@@ -337,14 +277,14 @@ class AssetContainer implements AssetContainerContract
     }
 
     /**
-     * Create an asset
+     * Make an asset
      *
      * @param string $path
      * @return \Statamic\Assets\Asset
      */
-    public function createAsset($path)
+    public function makeAsset($path)
     {
-        return AssetAPI::create($path)->container($this->id)->get();
+        return AssetAPI::make()->path($path)->container($this);
     }
 
     /**
@@ -359,11 +299,13 @@ class AssetContainer implements AssetContainerContract
             return;
         }
 
-        $assets = array_get($this->data, 'assets', []);
+        if (! $asset = $this->assets->get($path)) {
+            $asset = API\Asset::make();
+            $asset->container($this);
+            $asset->path($path);
+        }
 
-        $data = array_get($assets, $path, []);
-
-        return AssetAPI::create($path)->container($this->id)->with($data)->get();
+        return $asset;
     }
 
     /**
@@ -374,35 +316,33 @@ class AssetContainer implements AssetContainerContract
      */
     public function assetFolder($path)
     {
-        $contents = $this->disk('file')->get("{$path}/folder.yaml", '');
+        $data = YAML::parse($this->disk()->get("{$path}/folder.yaml", ''));
 
-        $data = YAML::parse($contents);
-
-        return new AssetFolder($this->id, $path, $data);
+        return (new AssetFolder)
+            ->container($this)
+            ->path($path)
+            ->title(array_get($data, 'title'));
     }
 
     public function addAsset(\Statamic\Assets\Asset $asset)
     {
-        $data = $asset->data();
+        $asset->container($this);
 
-        $assets = array_get($this->data, 'assets', []);
+        $this->assets[$asset->path()] = $asset;
 
-        $assets[$asset->path()] = $data;
-
-        if (empty($data)) {
-            unset($assets[$asset->path()]);
-        }
-
-        $this->data['assets'] = $assets;
+        return $this;
     }
 
     public function removeAsset(\Statamic\Assets\Asset $asset)
     {
-        $assets = array_get($this->data, 'assets', []);
+        $this->assets->forget($asset->path());
 
-        unset($assets[$asset->path()]);
+        return $this;
+    }
 
-        $this->data['assets'] = $assets;
+    public function pendingAssets()
+    {
+        return $this->assets;
     }
 
     /**
@@ -415,8 +355,33 @@ class AssetContainer implements AssetContainerContract
         return ! $this->private();
     }
 
-    public function private()
+    public function private($private = null)
     {
-        return array_get($this->data, 'private', false);
+        if (func_num_args() === 0) {
+            return (bool) $this->private;
+        }
+
+        $this->private = $private;
+
+        return $this;
+    }
+
+    protected function fileData()
+    {
+        return [
+            'title' => $this->title(),
+            'disk' => $this->disk,
+            'blueprint' => $this->blueprint,
+            'assets' => $this->assets->map->data()->map(function ($data) {
+                return Arr::removeNullValues($data);
+            })->reject(function ($data) {
+                return empty($data);
+            })->all(),
+        ];
+    }
+
+    public function toCacheableArray()
+    {
+        return $this->fileData();
     }
 }

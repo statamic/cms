@@ -1,18 +1,17 @@
 <template>
     <div class="array-fieldtype-container">
 
-        <div class='grid-field array-keyed' v-if="componentType === 'keyed'">
-            <table class="grid-table grid-mode-table headless">
-                <tbody>
-                    <tr v-if="data" v-for="(key, i) in config.keys" :key="i">
-                        <th>{{ key.text }}</th>
-                        <td>
-                            <input type="text" class="form-control" v-model="data[key.value]" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <table class="array-table" v-if="componentType === 'keyed'">
+            <tbody>
+                <tr v-if="data" v-for="(key, index) in config.keys" :key="index">
+                    <th>{{ key.text }}</th>
+                    <td>
+                        <input type="text" class="input-text-minimal" v-model="data[key.value]" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
 
         <template v-if="componentType === 'dynamic'">
             <div class="grid-field array-dynamic">

@@ -3,13 +3,20 @@
 namespace Statamic\Fields;
 
 use Statamic\API\Str;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\HasHandle;
+use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Fieldtype implements Arrayable
 {
+    use RegistersItself, HasTitle, HasHandle {
+        handle as protected traitHandle;
+    }
+
+    protected static $binding = 'fieldtypes';
+
     protected $field;
-    protected $handle;
-    protected $title;
     protected $localizable = true;
     protected $validatable = true;
     protected $defaultable = true;
@@ -33,20 +40,9 @@ abstract class Fieldtype implements Arrayable
         return $this->field;
     }
 
-    public function handle(): string
+    public static function handle()
     {
-        if ($this->handle) {
-            return $this->handle;
-        }
-
-        $class = (new \ReflectionClass(static::class))->getShortName();
-
-        return Str::removeRight(snake_case($class), '_fieldtype');
-    }
-
-    public function title(): string
-    {
-        return $this->title ?? Str::humanize($this->handle());
+        return Str::removeRight(static::traitHandle(), '_fieldtype');
     }
 
     public function localizable(): bool
@@ -134,6 +130,11 @@ abstract class Fieldtype implements Arrayable
     }
 
     public function preProcess($data)
+    {
+        return $data;
+    }
+
+    public function preProcessIndex($data)
     {
         return $data;
     }

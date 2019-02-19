@@ -16,7 +16,7 @@ class FilesystemServiceProvider extends ServiceProvider
         $paths = [
             'standard' => base_path(),
             'content' => base_path('content'),
-            'theme' => base_path('resources'),
+            'resources' => base_path('resources'),
             'users' => base_path('users'),
             'storage' => storage_path('statamic'),
         ];

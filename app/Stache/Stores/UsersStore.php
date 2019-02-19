@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\File;
 use Statamic\API\User;
 use Statamic\API\YAML;
 use Statamic\API\UserGroup;
@@ -18,11 +19,14 @@ class UsersStore extends BasicStore
     public function getItemsFromCache($cache)
     {
         // TODO: TDD
-        return $cache->map(function ($item) {
+        return $cache->map(function ($item, $id) {
             $user = User::make()
-                ->email($item['attributes']['email'])
-                ->data($item['data'][default_locale()])
-                ->syncOriginal();
+                ->id($id)
+                ->email($item['email'])
+                ->initialPath($item['path'])
+                ->preferences($item['preferences'])
+                ->data($item['data'])
+                ->passwordHash($item['password']);
 
             $this->queueGroups($user);
 
@@ -35,15 +39,15 @@ class UsersStore extends BasicStore
         $data = YAML::parse($contents);
 
         $user = User::make()
+            ->id(array_pull($data, 'id'))
+            ->initialPath($path)
             ->email(pathinfo($path, PATHINFO_FILENAME))
+            ->preferences(array_pull($data, 'preferences', []))
             ->data($data);
 
-        // TODO: TDD
-        if ($rawPassword = array_get($data, 'password')) {
-            $user->securePassword(true, true);
+        if (array_get($data, 'password')) {
+            $user->save();
         }
-
-        $user->syncOriginal();
 
         $this->queueGroups($user);
 
@@ -82,16 +86,11 @@ class UsersStore extends BasicStore
 
     public function save($user)
     {
-        $data = $user->data();
-        $content = array_pull($data, 'content');
-        $data = $this->removeNullValues($data);
-        $contents = YAML::dump($data, $content);
+        File::put($path = $user->path(), $user->fileContents());
 
-        $path = sprintf('%s/%s.yaml', $this->directory, $user->email());
-
-        $this->files->put($path, $contents);
-
-        // TODO: Logic for deleting the old file if the email had changed.
+        if (($initial = $user->initialPath()) && $path !== $initial) {
+            File::delete($user->initialPath()); // TODO: Test
+        }
     }
 
     /**

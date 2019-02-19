@@ -24,9 +24,25 @@ trait ContainsData
         return $this;
     }
 
+    public function remove($key)
+    {
+        unset($this->data[$key]);
+
+        return $this;
+    }
+
+    public function modify($key, $callback)
+    {
+        $value = $this->get($key);
+
+        $this->set($key, $callback($value));
+
+        return $this;
+    }
+
     public function data($data = null)
     {
-        if (is_null($data)) {
+        if (func_num_args() === 0) {
             return $this->data;
         }
 

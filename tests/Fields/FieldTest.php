@@ -28,7 +28,7 @@ class FieldTest extends TestCase
         );
 
         $this->assertEquals(
-            'Test multi word handle and no explicit display',
+            'Test Multi Word Handle And No Explicit Display',
             (new Field('test_multi_word_handle_and_no_explicit_display', []))->display()
         );
     }
@@ -197,6 +197,39 @@ class FieldTest extends TestCase
     }
 
     /** @test */
+    function it_checks_if_a_field_is_required_when_defined_as_its_own_field_property()
+    {
+        $fieldtype = new class extends Fieldtype {
+            protected $rules = null;
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype_with_no_rules')
+            ->andReturn($fieldtype);
+
+        $requiredField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'min:2',
+            'required' => true,
+        ]);
+
+        $optionalField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'min:2',
+        ]);
+
+        $explicitlyOptionalField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'min:2',
+            'required' => false,
+        ]);
+
+        $this->assertTrue($requiredField->isRequired());
+        $this->assertFalse($optionalField->isRequired());
+        $this->assertFalse($explicitlyOptionalField->isRequired());
+    }
+
+    /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldtypeRepository::shouldReceive('find')
@@ -287,6 +320,22 @@ class FieldTest extends TestCase
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
         $this->assertEquals('foo preprocessed', $field->preProcess()->value());
+    }
+
+    /** @test */
+    function it_preprocesses_the_value_through_its_fieldtype_for_the_index()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function preProcessIndex($data) {
+                    return $data . ' preprocessed for index';
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
+
+        $this->assertEquals('foo preprocessed for index', $field->preProcessIndex()->value());
     }
 
     /** @test */

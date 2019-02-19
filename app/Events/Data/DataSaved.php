@@ -3,11 +3,11 @@
 namespace Statamic\Events\Data;
 
 use Statamic\API\File;
-use Statamic\Contracts\Data\DataEvent;
 use Statamic\Data\Data;
 use Statamic\Events\Event;
+use Statamic\Contracts\Data\DataSavedEvent;
 
-class DataSaved extends Event implements DataEvent
+class DataSaved extends Event implements DataSavedEvent
 {
     /**
      * @var Data

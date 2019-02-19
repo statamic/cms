@@ -62,6 +62,16 @@ class Fields
         return new static($items);
     }
 
+    public function has($field)
+    {
+        return $this->fields->has($field);
+    }
+
+    public function get($field)
+    {
+        return $this->fields->get($field);
+    }
+
     public function toPublishArray()
     {
         return $this->fields->values()->map->toPublishArray()->all();

@@ -112,9 +112,11 @@ class ProtectionTest extends TestCase
 
     private function createEntryWithScheme($scheme)
     {
-        return Entry::create('test')
+        return Entry::make()
+            ->id('test')
             ->collection('test')
-            ->with(['protect' => $scheme])
-            ->get();
+            ->in(function ($loc) use ($scheme) {
+                $loc->set('protect', $scheme);
+            });
     }
 }

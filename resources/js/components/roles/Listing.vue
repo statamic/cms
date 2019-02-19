@@ -26,14 +26,14 @@ import axios from 'axios';
 
 export default {
 
-    props: {
-        initialRows: Array,
-    },
+    props: [
+        'initialRows',
+        'columns',
+    ],
 
     data() {
         return {
             rows: this.initialRows,
-            columns: ['title', 'handle', 'permissions']
         }
     },
 

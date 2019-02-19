@@ -102,17 +102,6 @@ class Term
     }
 
     /**
-     * Create a term
-     *
-     * @param string $slug
-     * @return \Statamic\Contracts\Data\Taxonomies\TermFactory
-     */
-    public function create($slug)
-    {
-        return app('Statamic\Contracts\Data\Taxonomies\TermFactory')->create($slug);
-    }
-
-    /**
      * Get a normalized slug
      *
      * A term's slug may potentially contain spaces, localized characters,

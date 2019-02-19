@@ -23,9 +23,9 @@ class UpdateCollectionTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($this->userWithoutPermission())
-            ->patch(cp_route('collections.update', $collection->path()))
+            ->patch(cp_route('collections.update', $collection->handle()))
             ->assertRedirect('/original')
-            ->assertSessionHasErrors();
+            ->assertSessionHas('error');
     }
 
     /** @test */
@@ -37,8 +37,8 @@ class UpdateCollectionTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->patch(cp_route('collections.update', $collection->path()), $this->validParams())
-            ->assertRedirect(cp_route('collections.edit', $collection->path()))
+            ->patch(cp_route('collections.update', $collection->handle()), $this->validParams())
+            ->assertRedirect(cp_route('collections.edit', $collection->handle()))
             ->assertSessionHas('success');
 
         $this->assertCount(1, Collection::all());
@@ -64,7 +64,7 @@ class UpdateCollectionTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($this->userWithPermission())
-            ->patch(cp_route('collections.update', $collection->path()), $this->validParams([
+            ->patch(cp_route('collections.update', $collection->handle()), $this->validParams([
                 'title' => ''
             ]))
             ->assertRedirect('/original')

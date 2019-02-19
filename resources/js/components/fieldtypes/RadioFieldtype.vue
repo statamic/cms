@@ -1,13 +1,18 @@
 <template>
     <div class="radio-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
-            <div
-                v-for="(option, $index) in config.options"
-                :key="$index"
-                class="option"
-            >
-                <input type="radio" :name="name" @input="update($event.target.value)" :value="option.value" :id="name + $index" />
-                <label :for="name + $index">{{ option.text }}</label>
-            </div>
+        <div
+            v-for="(option, $index) in config.options"
+            :key="$index"
+            class="option"
+        >
+            <input type="radio"
+                :name="name"
+                @input="update($event.target.value)"
+                :value="option.value"
+                :id="name + $index"
+            />
+            <label :for="name + $index">{{ option.text }}</label>
+        </div>
     </div>
 </template>
 

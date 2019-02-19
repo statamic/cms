@@ -5,7 +5,11 @@
 .markdown-fieldtype {
 
     .markdown-fieldtype-wrapper {
-        @apply .border .rounded .overflow-hidden
+        @apply .border .rounded .overflow-hidden;
+
+        &:focus-within {
+            @apply focus-outline;
+        }
     }
 
     .markdown-toolbar {
@@ -58,6 +62,7 @@
 
     .CodeMirror-lines {
         max-width: 860px;
+        margin: 0 auto;
     }
 
     .helpers {
@@ -121,96 +126,8 @@
 /* Markdown Preview typography
   ========================================================================== */
 
-.markdown-fieldtype .markdown-preview {
-
-    @apply .text-grey-dark .text-base .bg-white .p-2;
-    max-width: 860px;
-
-    blockquote {
-        margin: 0 1.5em 1.5em 0;
-    }
-
-    a {
-        text-decoration: underline;
-        color: #1E5BA2;
-    }
-
-    p {
-        margin: 0 0 1.5em 0;
-    }
-
-    li ul,
-    li ol {
-        margin: 0 1.5em;
-    }
-
-    ul,
-    ol {
-        margin: 0 1.5em 1.5em 0;
-    }
-
-    ul {
-        list-style-type: disc;
-    }
-
-    ol {
-        list-style-type: decimal;
-    }
-
-    ol ol {
-        list-style: upper-alpha;
-    }
-
-    ol ol ol {
-        list-style: lower-roman;
-    }
-
-    ol ol ol ol {
-        list-style: lower-alpha;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    strong {
-        font-weight: bold;
-    }
-
-    h1 {
-        font-size: xx-large;
-    }
-    h2 {
-        font-size: x-large;
-    }
-    h3 {
-        font-size: large;
-    }
-    h4,
-    h5,
-    h6 {
-        font-size: medium;
-    }
-
-    li {
-        @apply text-grey-dark;
-        line-height: 1;
-        margin-bottom: .25em;
-    }
-
-    blockquote p:last-child {
-        margin-bottom: 0;
-    }
-
-    hr {
-        margin: 1em 0 1.5em !important;
-    }
-
-    img {
-        max-width: 100%;
-    }
+.markdown-preview {
+    @apply px-2 py-4 mx-auto max-w-md;
 }
 
 // TODO: Needs serious love.

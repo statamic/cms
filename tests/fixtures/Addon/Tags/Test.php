@@ -2,7 +2,7 @@
 
 namespace Foo\Bar\Tags;
 
-use Statamic\Extend\Tags;
+use Statamic\Tags\Tags;
 
 class Test extends Tags
 {

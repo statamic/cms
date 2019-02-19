@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', __('Collections'))
 
 @section('content')
 
@@ -28,7 +29,6 @@
         <collection-list
             :initial-rows="{{ json_encode($collections) }}"
             :columns="{{ json_encode($columns) }}"
-            :visible-columns="{{ json_encode($visibleColumns) }}"
             :endpoints="{}">
         </collection-list>
     @endif

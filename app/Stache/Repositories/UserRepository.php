@@ -14,6 +14,7 @@ use Statamic\Auth\UserRepository as BaseRepository;
 
 class UserRepository extends BaseRepository
 {
+    protected $stache;
     protected $store;
     protected $config;
     protected $roleRepository = RoleRepository::class;
@@ -21,6 +22,7 @@ class UserRepository extends BaseRepository
 
     public function __construct(Stache $stache, array $config = [])
     {
+        $this->stache = $stache;
         $this->store = $stache->store('users');
         $this->config = $config;
     }
@@ -55,6 +57,10 @@ class UserRepository extends BaseRepository
 
     public function save(User $user)
     {
+        if (! $user->id()) {
+            $user->id($this->stache->generateId());
+        }
+
         $this->store->insert($user);
 
         $this->store->save($user);

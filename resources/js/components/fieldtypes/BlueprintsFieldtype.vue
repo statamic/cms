@@ -1,6 +1,7 @@
 <template>
 
     <relationship-input
+        :name="name"
         v-model="selections"
         :initial-data="initialData"
         :max-items="maxItems"
@@ -12,7 +13,7 @@
 </template>
 
 <script>
-import RelationshipFieldtype from './RelationshipFieldtype.vue';
+import RelationshipFieldtype from './relationship/RelationshipFieldtype.vue';
 
 export default {
 

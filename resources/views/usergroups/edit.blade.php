@@ -19,6 +19,12 @@
 
     </user-group-publish-form>
 
-    <user-listing group="{{ $group->id() }}"></user-listing>
+    <user-listing
+        listing-key="usergroup-users"
+        group="{{ $group->id() }}"
+        :filters="{{ $filters->toJson() }}"
+        :actions="{{ $actions->toJson() }}"
+        action-url="{{ cp_route('users.action') }}"
+    ></user-listing>
 
 @endsection

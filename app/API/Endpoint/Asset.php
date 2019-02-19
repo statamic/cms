@@ -7,7 +7,7 @@ use Statamic\API\URL;
 use Statamic\API\Site;
 use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
-use Statamic\Contracts\Assets\AssetFactory;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 
 class Asset
 {
@@ -137,13 +137,9 @@ class Asset
         })->first();
     }
 
-    /**
-     * @param string|null $path
-     * @return \Statamic\Contracts\Assets\AssetFactory
-     */
-    public function create($path = null)
+    public function make()
     {
-        return app(AssetFactory::class)->create($path);
+        return new \Statamic\Assets\Asset;
     }
 
     /**

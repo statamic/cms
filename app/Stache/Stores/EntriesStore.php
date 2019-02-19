@@ -75,8 +75,13 @@ class EntriesStore extends AggregateStore
         $data = YAML::parse($contents);
         $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
+        if (! $id = array_pull($data, 'id')) {
+            $idGenerated = true;
+            $id = $this->stache->generateId();
+        }
+
         $localized = (new LocalizedEntry)
-            ->id($id = array_pull($data, 'id'))
+            ->id($id)
             ->locale($site)
             ->slug($slug)
             ->initialPath($path)
@@ -91,6 +96,10 @@ class EntriesStore extends AggregateStore
         }
 
         $entry->addLocalization($localized);
+
+        if (isset($idGenerated)) {
+            $localized->save();
+        }
 
         return $entry;
     }

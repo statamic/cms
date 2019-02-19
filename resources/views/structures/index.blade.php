@@ -3,7 +3,7 @@
 @section('content')
 
     @if (! count($structures))
-        <div class="text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
+        <div class="no-results text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
             @svg('empty/structure')
             <h1 class="my-3">{{ __('Create your first Structure now') }}</h1>
             <p class="text-grey mb-3">

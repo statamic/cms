@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\API\Entries;
+use Statamic\API\Entry;
 use Illuminate\Http\Request;
 use Statamic\Http\Resources\EntryResource;
 use Statamic\Http\Controllers\CP\CpController;
@@ -13,7 +13,7 @@ class CollectionEntriesController extends CpController
 
     public function index($collection, Request $request)
     {
-        $entries = static::paginate(Entries::getFromCollection($collection));
+        $entries = static::paginate(Entry::whereCollection($collection));
 
         return EntryResource::collection($entries);
     }

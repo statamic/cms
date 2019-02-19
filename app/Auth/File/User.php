@@ -4,31 +4,60 @@ namespace Statamic\Auth\File;
 
 use Statamic\API;
 use Carbon\Carbon;
-use Statamic\API\Str;
 use Statamic\API\File;
-use Statamic\API\Hash;
 use Statamic\API\YAML;
 use Statamic\Data\Data;
-use Statamic\API\Config;
-use Statamic\API\Blueprint;
+use Statamic\API\Stache;
+use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Auth\User as BaseUser;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Statamic\Contracts\Auth\User as UserContract;
+use Illuminate\Support\Facades\Hash;
+use Statamic\Preferences\HasPreferences;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
-use Statamic\Contracts\Auth\Permissible as PermissibleContract;
 
 /**
  * A user
  */
 class User extends BaseUser
 {
-    /**
-     * Array of OAuth IDs stored in the YAML file
-     *
-     * @var array
-     */
-    private static $oauth_ids;
+    use ExistsAsFile, HasPreferences, ContainsData {
+        data as traitData;
+    }
+
+    protected $id;
+    protected $email;
+    protected $password;
+
+    public function data($data = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->traitData();
+        }
+
+        $this->traitData($data);
+
+        if (array_has($data, 'password')) {
+            $this->remove('password')->password($data['password']);
+        }
+
+        if (array_has($data, 'password_hash')) {
+            $this->remove('password_hash')->passwordHash($data['password_hash']);
+        }
+
+        return $this;
+    }
+
+    public function id($id = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->id;
+        }
+
+        $this->id = $id;
+
+        return $this;
+    }
 
     /**
      * Get or set a user's email
@@ -38,11 +67,11 @@ class User extends BaseUser
      */
     public function email($email = null)
     {
-        if (is_null($email)) {
-            return $this->attributes['email'];
+        if (func_num_args() === 0) {
+            return $this->email;
         }
 
-        $this->attributes['email'] = $email;
+        $this->email = $email;
 
         return $this;
     }
@@ -55,126 +84,32 @@ class User extends BaseUser
      */
     public function password($password = null)
     {
-        if (is_null($password)) {
-            $this->ensureSecured();
-
-            return $this->get('password_hash');
+        if (func_num_args() === 0) {
+            return $this->password;
         }
 
-        $this->set('password', $password);
-        $this->remove('password_hash');
-
-        $this->securePassword(false);
+        $this->password = Hash::make($password);
 
         return $this;
     }
 
-    /**
-     * Get or set the path to the file
-     *
-     * @param string|null $path
-     * @return string
-     * @throws \Exception
-     */
-    public function path($path = null)
+    public function passwordHash($hash = null)
     {
-        if ($path) {
-            throw new \Exception('You cant set the path of a file.');
+        if (func_num_args() === 0) {
+            return $this->password;
         }
 
-        if (! $path = $this->email()) {
-            throw new \Exception('Cannot get the path of a user without an email.');
-        }
+        $this->password = $hash;
 
-        return $path . '.yaml';
+        return $this;
     }
 
-    /**
-     * Get the path to a localized version
-     *
-     * @param string $locale
-     * @return string
-     */
-    public function localizedPath($locale)
+    public function path()
     {
-        // TODO:
-        dd('todo user@localizedpath');
-    }
-
-    /**
-     * Whether a file should be written to disk when saving.
-     *
-     * @return bool
-     */
-    protected function shouldWriteFile()
-    {
-        return true;
-    }
-
-    /**
-     * Ensure's this user's password is secured
-     *
-     * @param bool $save Whether the save after securing
-     * @throws \Exception
-     */
-    public function ensureSecured($save = true)
-    {
-        // If they don't have a password set, their status is pending.
-        // It's not "secured" but there's also nothing *to* secure.
-        if ($this->status() == 'pending') {
-            return;
-        }
-
-        if (! $this->isSecured()) {
-            $this->securePassword($save);
-        }
-    }
-
-    /**
-     * Check if the password is secured
-     *
-     * @return bool
-     */
-    public function isSecured()
-    {
-        return (bool) $this->get('password_hash', false);
-    }
-
-    /**
-     * Secure the password
-     *
-     * @param bool $save  Whether to save the user
-     */
-    public function securePassword($save = true)
-    {
-        if ($this->isSecured()) {
-            return;
-        }
-
-        if ($password = $this->get('password')) {
-            $password = Hash::make($password);
-
-            $this->set('password_hash', $password);
-            $this->remove('password');
-        }
-
-        if ($save) {
-            $this->save();
-        }
-    }
-
-    /**
-     * Get the user's status
-     *
-     * @return string
-     */
-    public function status()
-    {
-        if (! $this->get('password') && ! $this->get('password_hash')) {
-            return 'pending';
-        }
-
-        return 'active';
+        return vsprintf('%s/%s.yaml', [
+            rtrim(Stache::store('users')->directory(), '/'),
+            $this->email(),
+        ]);
     }
 
     /**
@@ -228,111 +163,6 @@ class User extends BaseUser
     public function getRememberTokenName()
     {
         return 'remember_token';
-    }
-
-    /**
-     * Get the path to the remember me tokens file
-     *
-     * @return string
-     */
-    private function rememberPath()
-    {
-        return cache_path('remember_me.yaml');
-    }
-
-    /**
-     * Get the user's OAuth ID for the requested provider
-     *
-     * @return string
-     */
-    public function getOAuthId($provider)
-    {
-        if (! self::$oauth_ids) {
-            self::$oauth_ids = YAML::parse(File::get($this->oAuthIdsPath(), ''));
-        }
-
-        return array_get(self::$oauth_ids, $provider.'.'.$this->id());
-    }
-
-    /**
-     * Set a user's oauth ID
-     *
-     * @param string $provider
-     * @param string $id
-     * @return void
-     */
-    public function setOAuthId($provider, $id)
-    {
-        $yaml = YAML::parse(File::get($this->oAuthIdsPath(), ''));
-
-        $yaml[$provider][$this->id()] = $id;
-
-        File::put($this->oAuthIdsPath(), YAML::dump($yaml));
-    }
-
-    /**
-     * Get the path to the oauth IDs file
-     *
-     * @return string
-     */
-    private function oAuthIdsPath()
-    {
-        return cache_path('oauth_ids.yaml');
-    }
-
-    /**
-     * Get the path before the object was modified.
-     *
-     * @return string
-     * @throws \Exception
-     */
-    public function originalPath()
-    {
-        if (! $this->original) {
-            return null;
-        }
-
-        if (! $path = $this->original['attributes']['email']) {
-            throw new \Exception('Cannot get the path of a user without an email.');
-        }
-
-        return $path . '.yaml';
-    }
-
-    /**
-     * Get the path to a localized version before the object was modified.
-     *
-     * @param string $locale
-     * @return string
-     */
-    public function originalLocalizedPath($locale)
-    {
-        // TODO:
-        dd('todo: extend data@localizedPath');
-    }
-
-    /**
-     * Delete the data
-     *
-     * @return mixed
-     */
-    public function delete()
-    {
-        File::disk('users')->delete($this->path());
-
-        // Whoever wants to know about it can do so now.
-        $event_class = 'Statamic\Events\Data\UserDeleted';
-        event(new $event_class($this->id(), [$this->path()]));
-    }
-
-    /**
-     * Whether the data can be taxonomized
-     *
-     * @return bool
-     */
-    public function isTaxonomizable()
-    {
-        return true;
     }
 
     public function roles($roles = null)
@@ -467,5 +297,25 @@ class User extends BaseUser
         $this->set('super', true);
 
         return $this;
+    }
+
+    public function toCacheableArray()
+    {
+        return [
+            'path' => $this->path(),
+            'email' => $this->email,
+            'password' => $this->password,
+            'data' => $this->data(),
+            'preferences' => $this->preferences(),
+        ];
+    }
+
+    protected function fileData()
+    {
+        return array_merge($this->data(), [
+            'id' => (string) $this->id(),
+            'password_hash' => $this->password(),
+            'preferences' => $this->preferences(),
+        ]);
     }
 }

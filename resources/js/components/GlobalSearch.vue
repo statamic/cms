@@ -2,7 +2,7 @@
     <div>
         <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
             <div class="state-container w-4 h-4 text-grey-light" @click="focus">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="9.813" cy="9.812" r="9.063" transform="rotate(-23.025 9.813 9.812)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.221 16.22l7.029 7.03"/></svg>
+                <svg-icon name="magnifying-glass"></svg-icon>
             </div>
 
             <input type="text"
@@ -14,17 +14,31 @@
                 @keydown.down.prevent="moveDown"
                 @keydown.enter.prevent="hit"
                 @keydown.esc.prevent="reset"
+                @focus="focused = true"
                 :placeholder="placeholder"
                 />
 
-            <i class="icon icon-cross" v-show="isDirty || searching" @click="reset"></i>
+            <span v-if="! (isDirty || searching)" class="rounded px-sm text-2xs border text-grey-light">/</span>
 
-            <ul v-show="hasResults">
-                <li v-for="(result, index) in results" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
-                    <span class="title" v-html="result.title"></span>
-                    <span class="url" v-html="result.url"></span>
-                </li>
-            </ul>
+            <div v-show="focused" class="global-search-results">
+
+                <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
+                    <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
+                    <div class="flex-1 ml-1 title" v-html="result.title"></div>
+                    <span class="rounded px-sm py-px text-2xs uppercase bg-grey-lightest text-grey" v-html="result.collection"></span>
+                </div>
+
+                <div v-if="! hasResults && hasFavorites">
+                    <div class="px-1.5 py-1 text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
+
+                    <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
+                        <svg-icon name="pin" class="icon"></svg-icon>
+                        <div class="flex-1 ml-1 title" v-html="favorite.name"></div>
+                    </div>
+
+                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm text-2xs border text-grey-light">/</span> key</div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -47,7 +61,8 @@ export default {
             results: [],
             query: '',
             current: -1,
-            searching: false
+            searching: false,
+            focused: false
         }
     },
 
@@ -56,13 +71,21 @@ export default {
             return this.results.length > 0;
         },
 
+        favorites() {
+            return this.$preferences.get('favorites', []);
+        },
+
+        hasFavorites() {
+            return this.favorites.length > 0;
+        },
+
         isEmpty() {
             return !this.query && !this.searching;
         },
 
         isDirty() {
             return !!this.query && !this.searching;
-        }
+        },
     },
 
     methods: {
@@ -88,6 +111,7 @@ export default {
             this.results = [];
             this.query = '';
             this.searching = false;
+            this.focused = false;
         },
 
         setActive(index) {
@@ -96,11 +120,14 @@ export default {
 
         focus() {
             this.$refs.input.focus();
+            this.focused = true;
         },
 
         hit() {
             if (this.hasResults) {
                 window.location.href = this.results[this.current].edit_url;
+            } else {
+                window.location.href = this.favorites[this.current].url;
             }
         },
 
@@ -109,7 +136,15 @@ export default {
         },
 
         moveDown() {
-            if (this.current < this.results.length-1) this.current++;
+            if (this.hasResults) {
+                if (this.current < this.results.length-1) this.current++;
+            } else {
+                if (this.current < this.favorites.length-1) this.current++;
+            }
+        },
+
+        getResultIcon(result) {
+            return 'content-writing';
         }
     },
 
@@ -119,7 +154,7 @@ export default {
         },
 
         searching(searching) {
-            this.$progress.loading('global-search', searching);
+            // this.$progress.loading('global-search', searching);
         }
     },
 

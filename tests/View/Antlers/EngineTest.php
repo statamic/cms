@@ -3,9 +3,9 @@
 namespace Tests\View\Antlers;
 
 use Mockery;
-use Statamic\DataStore;
 use Tests\TestCase;
 use Statamic\View\Antlers\Engine;
+use Statamic\View\Antlers\Parser;
 use Illuminate\Filesystem\Filesystem;
 
 class EngineTest extends TestCase
@@ -15,7 +15,8 @@ class EngineTest extends TestCase
         parent::setUp();
 
         $this->engine = new Engine(
-            $this->files = Mockery::mock(Filesystem::class)
+            $this->files = Mockery::mock(Filesystem::class),
+            new Parser
         );
     }
 
@@ -41,6 +42,28 @@ class EngineTest extends TestCase
             ->with('/path/to/foo.antlers.html')
             ->andReturn('Hello {{ foo }} {{ noparse }}{{ bar }}{{ /noparse }} {{ bar }}');
 
+        $this->assertEquals(
+            'Hello World {{ bar }} Bar',
+            $this->engine->get('/path/to/foo.antlers.html', ['foo' => 'World', 'bar' => 'Bar'])
+        );
+    }
+
+    /** @test */
+    function it_can_prevent_injecting_noparse_extractions()
+    {
+        $this->files
+            ->shouldReceive('get')
+            ->with('/path/to/foo.antlers.html')
+            ->andReturn('Hello {{ foo }} {{ noparse }}{{ bar }}{{ /noparse }} {{ bar }}');
+
+        $this->assertEquals(
+            'Hello World noparse_8e726b27d1e6ef37447e1aa0aaa30932 Bar',
+            $this->engine
+                ->withoutExtractions()
+                ->get('/path/to/foo.antlers.html', ['foo' => 'World', 'bar' => 'Bar'])
+        );
+
+        // Proof that the prevention of injecting extractions only happens once.
         $this->assertEquals(
             'Hello World {{ bar }} Bar',
             $this->engine->get('/path/to/foo.antlers.html', ['foo' => 'World', 'bar' => 'Bar'])

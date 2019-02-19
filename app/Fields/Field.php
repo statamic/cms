@@ -43,7 +43,7 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', Str::humanize($this->handle));
+        return array_get($this->config, 'display', Str::slugToTitle($this->handle));
     }
 
     public function instructions()
@@ -54,6 +54,7 @@ class Field implements Arrayable
     public function rules()
     {
         $rules = [$this->handle => array_merge(
+            $this->get('required') ? ['required'] : [],
             Validation::explodeRules(array_get($this->config, 'validate')),
             Validation::explodeRules($this->fieldtype()->rules())
         )];
@@ -73,6 +74,15 @@ class Field implements Arrayable
     public function isLocalizable()
     {
         return (bool) $this->get('localizable');
+    }
+
+    public function isListable()
+    {
+        if (is_null($this->get('listable'))) {
+            return true;
+        }
+
+        return (bool) $this->get('listable');
     }
 
     public function toPublishArray()
@@ -126,6 +136,13 @@ class Field implements Arrayable
         $value = $this->value ?? $this->defaultValue();
 
         $this->value = $this->fieldtype()->preProcess($value);
+
+        return $this;
+    }
+
+    public function preProcessIndex()
+    {
+        $this->value = $this->fieldtype()->preProcessIndex($this->value);
 
         return $this;
     }
