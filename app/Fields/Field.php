@@ -168,7 +168,7 @@ class Field implements Arrayable
 
     public function get(string $key, $fallback = null)
     {
-        return $this->config[$key] ?? $fallback;
+        return array_get($this->config, $key, $fallback);
     }
 
     private function preProcessedConfig()
