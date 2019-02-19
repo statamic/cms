@@ -110,4 +110,39 @@ class Blueprint
 
         return $this;
     }
+
+    public function ensureField($handle, $field, $section = null, $prepend = false)
+    {
+        if ($this->hasField($handle)) {
+            return $this;
+        }
+
+        // If a section hasn't been provided we'll just use the first section.
+        if (! $section) {
+            $section = array_keys($this->contents['sections'])[0];
+        }
+
+        $sectionContents = $this->contents['sections'][$section] ?? [];
+
+        if ($section === 'sidebar' && !isset($section['display'])) {
+            $sectionContents['display'] = 'Meta';
+        }
+
+        $new = compact('handle', 'field');
+
+        if ($prepend) {
+            array_unshift($sectionContents['fields'], $new);
+        } else {
+            $sectionContents['fields'][] = $new;
+        }
+
+        $this->contents['sections'][$section] = $sectionContents;
+
+        return $this;
+    }
+
+    public function ensureFieldPrepended($handle, $field, $section = null)
+    {
+        return $this->ensureField($handle, $field, $section, true);
+    }
 }

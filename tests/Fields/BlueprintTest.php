@@ -254,4 +254,109 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
     }
+
+    /** @test */
+    function it_ensures_a_field_exists_if_it_doesnt()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']]
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                    ]
+                ]
+            ]
+        ]);
+        $this->assertFalse($blueprint->hasField('three'));
+
+        $return = $blueprint
+            ->ensureField('three', ['type' => 'textarea']) // field "three" doesnt exist, so it should get added.
+            ->ensureField('two', ['type' => 'textarea']);  // field "two" exists so nothing should happen.
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('three'));
+        tap($blueprint->fields()->all(), function ($items) {
+            $this->assertCount(3, $items);
+            $this->assertEveryItemIsInstanceOf(Field::class, $items);
+            $this->assertEquals(['one', 'three', 'two'], $items->map->handle()->values()->all());
+            $this->assertEquals(['text', 'textarea', 'text'], $items->map->type()->values()->all());
+        });
+    }
+
+    /** @test */
+    function it_ensures_a_field_exists_if_it_doesnt_and_prepends_it()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']]
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                    ]
+                ]
+            ]
+        ]);
+        $this->assertFalse($blueprint->hasField('three'));
+
+        $return = $blueprint
+            ->ensureFieldPrepended('three', ['type' => 'textarea']); // field "three" doesnt exist, so it should get added to the start.
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('three'));
+        tap($blueprint->fields()->all(), function ($items) {
+            $this->assertCount(3, $items);
+            $this->assertEveryItemIsInstanceOf(Field::class, $items);
+            $this->assertEquals(['three', 'one', 'two'], $items->map->handle()->values()->all());
+            $this->assertEquals(['textarea', 'text', 'text'], $items->map->type()->values()->all());
+        });
+    }
+
+    /** @test */
+    function it_ensures_a_field_exists_in_a_given_section_if_it_doesnt_exist_at_all()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']]
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                    ]
+                ]
+            ]
+        ]);
+        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertEquals(2, $blueprint->sections()->count());
+
+        $return = $blueprint
+            // field "three" doesnt exist, so it will be added to a new "section_three" section
+            ->ensureField('three', ['type' => 'textarea'], 'section_three')
+            // field "two" exists, even though its in a different section than the one requested, so nothing happens
+            ->ensureField('two', ['type' => 'textarea'], 'section_three');
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertEquals(3, $blueprint->sections()->count());
+        tap($blueprint->fields()->all(), function ($items) {
+            $this->assertCount(3, $items);
+            $this->assertEveryItemIsInstanceOf(Field::class, $items);
+            $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
+            $this->assertEquals(['text', 'text', 'textarea'], $items->map->type()->values()->all());
+        });
+    }
 }
