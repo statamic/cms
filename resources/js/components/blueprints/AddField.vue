@@ -108,7 +108,6 @@ export default {
         addInlineField() {
             this.selectingFieldtype = true;
             this.$refs.popper.doClose();
-            this.$nextTick(() => this.$modal.show('fieldtype-selector'));
         },
 
         fieldtypeSelected(field) {
