@@ -1,62 +1,27 @@
 <?php
 
-namespace Statamic\Addons\ReplicatorSets;
+namespace Statamic\Fields\Fieldtypes;
 
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 
-class ReplicatorSetsFieldtype extends Fieldtype
+class Sets extends Fieldtype
 {
     protected $selectable = false;
 
     public function preProcess($data)
     {
-        $processed = [];
-
-        foreach ($data as $set_name => $set_config) {
-            $set_config['handle'] = $set_name;
-            $set_config['id'] = $set_name; // Used by Vue so the name can be modified freely and not lose track.
-            $set_config['fields'] = $this->moveInNameKey(array_get($set_config, 'fields', []));
-            $processed[] = $set_config;
-        }
-
-        return $processed;
-    }
-
-    private function moveInNameKey($fields)
-    {
-        $processed = [];
-
-        foreach ($fields as $name => $config) {
-            $config['handle'] = $name;
-            $processed[] = $this->recursivelyPreProcess($config);
-        }
-
-        return $processed;
-    }
-
-    private function recursivelyPreProcess($config)
-    {
-        // Get the fieldtype for this field
-        $type = $config['type'];
-        $config_fieldtype = FieldtypeFactory::create($type);
-
-        // Get the fieldtype's config fieldset
-        $fieldset = $config_fieldtype->getConfigFieldset();
-
-        // Pre-process all the fields in the fieldset
-        foreach ($fieldset->fieldtypes() as $field) {
-            // Ignore if the field isn't in the config
-            if (! in_array($field->getName(), array_keys($config))) {
-                continue;
-            }
-
-            $field->is_config = true;
-            $config[$field->getName()] = $field->preProcess($config[$field->getName()]);
-        }
-
-        return $config;
+        return collect($data)
+            ->map(function ($config, $name) {
+                return array_merge($config, [
+                    'handle' => $name,
+                    'id' => $name,
+                    'fields' => (new NestedFields)->preProcess(array_get($config, 'fields', [])),
+                ]);
+            })
+            ->values()
+            ->all();
     }
 
     public function process($data)

@@ -28,7 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $bundledFieldtypes = [
         'arr', 'asset_container', 'asset_folder', 'bard', 'checkboxes', 'collection',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
+        'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
         'revealer', 'section', 'select', 'slug', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
     ];
@@ -94,15 +94,17 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Code::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Date::class,
-        \Statamic\Forms\Fieldtype::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
-        Fieldtypes\Relationship::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Relationship::class,
+        Fieldtypes\Replicator::class,
+        Fieldtypes\Sets::class,
         Fieldtypes\Template::class,
         Fieldtypes\Time::class,
         Fieldtypes\Yaml::class,
+        \Statamic\Forms\Fieldtype::class,
     ];
 
     /**
