@@ -9,6 +9,7 @@ use Statamic\View\Modify;
 use Statamic\Fields\Value;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions\ParsingException;
 use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
@@ -237,7 +238,7 @@ class Parser
             }
 
             if ($value instanceof Arrayable) {
-                $value = $value->toArray();
+                $value = $value instanceof Augmentable ? $value->toAugmentedArray() : $value->toArray();
             }
 
             // If it's not an array, the user is trying to loop over something unloopable.

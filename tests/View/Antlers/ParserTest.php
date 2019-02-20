@@ -6,8 +6,12 @@ use Tests\TestCase;
 use Statamic\API\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Blueprint;
 use Illuminate\Support\Facades\Log;
+use Statamic\Contracts\Data\Augmentable;
 use Illuminate\Contracts\Support\Arrayable;
+use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Data\Augmentable as AugmentableTrait;
 
 class ParserTest extends TestCase
 {
@@ -676,6 +680,22 @@ EOT;
             ])
         );
     }
+
+    /** @test */
+    function it_automatically_augments_when_using_tag_pairs()
+    {
+        $augmentable = new AugmentableObject([
+            'one' => 'foo',
+            'two' => 'bar',
+        ]);
+
+        $this->assertEquals(
+            'FOO! bar',
+            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+                'object' => $augmentable
+            ])
+        );
+    }
 }
 
 class NonArrayableObject
@@ -690,5 +710,24 @@ class ArrayableObject extends NonArrayableObject implements Arrayable
 {
     function toArray() {
         return $this->data;
+    }
+}
+
+class AugmentableObject extends ArrayableObject implements Augmentable
+{
+    use AugmentableTrait;
+
+    public function blueprint()
+    {
+        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype {
+            public function augment($data)
+            {
+                return strtoupper($data) . '!';
+            }
+        });
+
+        return (new Blueprint)->setContents(['fields' => [
+            ['handle' => 'one', 'field' => ['type' => 'test']]
+        ]]);
     }
 }
