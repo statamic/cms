@@ -124,6 +124,9 @@ class UpdateEntryTest extends TestCase
         $blueprint = Mockery::mock(Blueprint::class);
         $blueprint->shouldReceive('fields')->andReturn(new Fields($fields));
 
+        $blueprint->shouldReceive('ensureField')->andReturnSelf();
+        $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
+
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
     }
 }
