@@ -48,15 +48,6 @@ class BrowserController extends CpController
         $assets = $container->assets($path);
         $assets = $this->supplementAssetsForDisplay($assets);
 
-        // Get data about the subfolders in the requested asset folder.
-        $folders = [];
-        foreach ($container->assetFolders($path) as $f) {
-            $folders[] = [
-                'path' => $f->path(),
-                'title' => $f->title()
-            ];
-        }
-
         // Set up the paginator, since we don't want to display all the assets.
         // TODO: Instead of manually creating a paginator, get one from the Asset QueryBuilder once it exists.
         $totalAssetCount = $assets->count();
@@ -74,7 +65,7 @@ class BrowserController extends CpController
 
         return Resource::collection($assets)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
-            'folders' => $folders,
+            'folders' => $container->assetFolders($path)->values()->toArray(),
             'folder' => $container->assetFolder($path)->toArray()
         ]]);
     }
