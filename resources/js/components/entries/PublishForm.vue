@@ -52,6 +52,7 @@
             :values="values"
             :meta="meta"
             :errors="errors"
+            :site="site"
             @updated="values = $event"
         >
             <publish-sections slot-scope="{ }" />
@@ -73,6 +74,7 @@ export default {
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
+        initialSite: String,
         collectionTitle: String,
         collectionUrl: String,
         initialAction: String,
@@ -89,6 +91,7 @@ export default {
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
             localizations: _.clone(this.initialLocalizations),
+            site: this.initialSite,
             error: null,
             errors: {}
         }
@@ -168,6 +171,7 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.action = data.actions.update;
                 this.fieldset = data.blueprint;
+                this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.removeNavigationWarning());
             })

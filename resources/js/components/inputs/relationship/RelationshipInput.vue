@@ -29,6 +29,7 @@
                         </button>
                         <inline-create-form
                             v-if="isCreating"
+                            :site="site"
                             @created="itemCreated"
                             @closed="stopCreating"
                         />
@@ -43,6 +44,7 @@
             <stack name="item-selector" v-if="isSelecting">
                 <item-selector
                     :url="selectionsUrl"
+                    :site="site"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="selections"
@@ -78,7 +80,8 @@ export default {
         selectionsUrl: String,
         statusIcons: Boolean,
         editableItems: Boolean,
-        columns: Array
+        columns: Array,
+        site: String,
     },
 
     components: {

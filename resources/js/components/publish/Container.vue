@@ -22,6 +22,9 @@ export default {
         },
         errors: {
             type: Object
+        },
+        site: {
+            type: String
         }
     },
 
@@ -49,6 +52,7 @@ export default {
                 fieldset: _.clone(this.fieldset),
                 values: _.clone(this.values),
                 meta: _.clone(this.meta),
+                site: this.site,
             };
 
             // If the store already exists, just reinitialize the state.
@@ -64,7 +68,8 @@ export default {
                     fieldset: initial.fieldset,
                     values: initial.values,
                     meta: initial.meta,
-                    errors: {}
+                    site: initial.site,
+                    errors: {},
                 },
                 mutations: {
                     setValue(state, payload) {
@@ -80,10 +85,14 @@ export default {
                     setErrors(state, errors) {
                         state.errors = errors;
                     },
+                    setSite(state, site) {
+                        state.site = site;
+                    },
                     initialize(state, payload) {
                         state.fieldset = payload.fieldset;
                         state.values = payload.values;
                         state.meta = payload.meta;
+                        state.site = payload.site;
                     }
                 },
                 actions: {
@@ -133,6 +142,10 @@ export default {
             handler(fieldset) {
                 this.$store.commit(`publish/${this.name}/setFieldset`, fieldset);
             }
+        },
+
+        site(site) {
+            this.$store.commit(`publish/${this.name}/setSite`, site);
         },
 
         errors(errors) {

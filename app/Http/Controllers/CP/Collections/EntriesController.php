@@ -118,6 +118,7 @@ class EntriesController extends CpController
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
+            'locale' => $entry->locale(),
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
                 $exists = $entry->entry()->existsIn($handle);
                 $localized = $entry->entry()->inOrClone($handle);

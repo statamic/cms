@@ -3,6 +3,7 @@
     <relationship-input
         :name="name"
         v-model="selections"
+        :site="site"
         :initial-data="initialData"
         :max-items="maxItems"
         :item-data-url="itemDataUrl"
@@ -27,6 +28,8 @@ export default {
             initialData: this.meta.data
         }
     },
+
+    inject: ['storeName'],
 
     computed: {
 
@@ -54,6 +57,10 @@ export default {
             }
 
             return params;
+        },
+
+        site() {
+            return this.$store.state.publish[this.storeName].site;
         }
 
     },

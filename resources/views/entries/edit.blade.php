@@ -13,6 +13,7 @@
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
+        initial-site="{{ $locale }}"
     ></entry-publish-form>
 
 @endsection
