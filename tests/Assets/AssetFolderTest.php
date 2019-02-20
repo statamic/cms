@@ -33,6 +33,7 @@ class AssetFolderTest extends TestCase
 
         $this->assertEquals($folder, $return);
         $this->assertEquals('path/to/folder', $folder->path());
+        $this->assertEquals('folder', $folder->basename());
     }
 
     /** @test */

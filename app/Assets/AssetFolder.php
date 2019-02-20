@@ -37,6 +37,11 @@ class AssetFolder implements Contract, Arrayable
         return $this;
     }
 
+    public function basename()
+    {
+        return pathinfo($this->path(), PATHINFO_BASENAME);
+    }
+
     public function title($title = null)
     {
         if (func_num_args() === 0) {
@@ -154,6 +159,7 @@ class AssetFolder implements Contract, Arrayable
             'title' => $this->title(),
             'path' => $this->path(),
             'parent_path' => optional($this->parent())->path(),
+            'basename' => $this->basename()
         ];
     }
 }
