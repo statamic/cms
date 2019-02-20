@@ -129,7 +129,7 @@ class Blueprint
 
         // If a section hasn't been provided we'll just use the first section.
         if (! $section) {
-            $section = array_keys($this->contents['sections'])[0];
+            $section = array_keys($this->contents['sections'] ?? [])[0] ?? 'main';
         }
 
         $this->extraFields[$section][$handle] = compact('prepend', 'field');
