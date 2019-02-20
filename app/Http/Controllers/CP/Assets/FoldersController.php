@@ -3,97 +3,39 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Statamic\API\Path;
-use Statamic\API\Folder;
-use Statamic\API\Helper;
-use Statamic\API\Stache;
+use Illuminate\Http\Request;
 use Statamic\API\AssetContainer;
-use Statamic\Http\Requests\StoreAssetFolder;
 use Statamic\Http\Controllers\CP\CpController;
+use Illuminate\Validation\ValidationException;
 
 class FoldersController extends CpController
 {
-    /**
-     * Create a new folder
-     *
-     * @return array
-     */
-    public function store(StoreAssetFolder $request)
+    public function store(Request $request, $container)
     {
-        $this->request = $request;
+        $request->validate([
+            'path' => 'required',
+            'directory' => 'required|alpha_dash',
+        ]);
 
-        $container = AssetContainer::find($this->request->input('container'));
+        $container = AssetContainer::find($container);
 
-        $path = ltrim(Path::assemble(
-            $this->request->input('parent'),
-            $this->request->input('basename')
-        ), '/');
+        $path = ltrim(Path::assemble($request->path, $request->directory), '/');
 
-        $folder = $container->assetFolder($path);
-
-        if ($this->request->has('title')) {
-            $folder->set('title', $this->request->input('title'));
+        if ($container->disk()->exists($path)) {
+            throw ValidationException::withMessages([
+                'directory' => __('Directory already exists.'),
+            ]);
         }
 
-        $folder->save();
+        $path = strtolower($path); // Prevent case sensitivity collisions
 
-        return ['success' => true, 'message' => 'Folder created', 'folder' => $folder->toArray()];
+        return $container->assetFolder($path)->title($request->title)->save();
     }
 
-    /**
-     * Get the data for an existing folder in order to edit it
-     *
-     * @param string $container
-     * @param string $folder
-     * @return array
-     */
-    public function edit($container, $folder = '/')
+    public function update(Request $request, $container, $folder)
     {
         $container = AssetContainer::find($container);
 
-        $folder = $container->assetFolder($folder);
-
-        return $folder->toArray();
-    }
-
-    /**
-     * Update an existing folder
-     *
-     * @param string $container
-     * @param string $folder
-     * @return array
-     */
-    public function update($container, $folder = '/')
-    {
-        $container = AssetContainer::find($container);
-
-        $folder = $container->assetFolder($folder);
-
-        if ($this->request->has('title')) {
-            $folder->set('title', $this->request->input('title'));
-        } else {
-            $folder->remove('title');
-        }
-
-        $folder->save();
-
-        return ['success' => true, 'message' => 'Folder updated', 'folder' => $folder->toArray()];
-    }
-
-    /**
-     * Delete one or more folder in a container
-     *
-     * @return array
-     */
-    public function delete()
-    {
-        $container = AssetContainer::find($this->request->input('container'));
-
-        $folders = Helper::ensureArray($this->request->input('folders'));
-
-        foreach ($folders as $folder) {
-            $container->assetFolder($folder)->delete();
-        }
-
-        return ['success' => true];
+        return $container->assetFolder($folder)->title($request->title)->save();
     }
 }

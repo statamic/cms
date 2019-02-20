@@ -49,6 +49,8 @@ Route::group([
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');
+        Route::post('asset-containers/{container}/folders', 'FoldersController@store');
+        Route::patch('asset-containers/{container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
         Route::post('assets/action', 'ActionController')->name('assets.action');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
         Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');

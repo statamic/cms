@@ -49,9 +49,17 @@
 
                                 <button
                                     class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
+                                    @click="creatingFolder = true"
+                                >
+                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current" />
+                                    <span>{{ __('Create Folder') }}</span>
+                                </button>
+
+                                <button
+                                    class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
                                     @click="openFileBrowser"
                                 >
-                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
+                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current" />
                                     <span>{{ __('Upload') }}</span>
                                 </button>
                             </div>
@@ -83,7 +91,7 @@
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="folder in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
@@ -91,7 +99,23 @@
                                                 {{ folder.title || folder.path }}
                                             </a>
                                         </td>
-                                        <td :colspan="columns.length" />
+                                        <td class="text-right" :colspan="columns.length">
+                                            <dropdown-list>
+                                                <ul class="dropdown-menu">
+                                                    <li><a @click="editedFolderPath = folder.path">Edit</a></li>
+                                                </ul>
+                                            </dropdown-list>
+
+                                            <folder-editor
+                                                v-if="editedFolderPath === folder.path"
+                                                :initial-directory="folder.basename"
+                                                :initial-title="folder.title"
+                                                :container="container"
+                                                :path="path"
+                                                @closed="editedFolderPath = null"
+                                                @updated="folderUpdated(i, $event)"
+                                            />
+                                        </td>
                                     </tr>
                                 </template>
 
@@ -142,8 +166,16 @@
             :id="editedAssetId"
             @closed="closeAssetEditor"
             @saved="assetSaved"
-            @deleted="assetDeleted">
-        </asset-editor>
+            @deleted="assetDeleted"
+        />
+
+        <folder-creator
+            v-if="creatingFolder"
+            :container="container"
+            :path="path"
+            @closed="creatingFolder = false"
+            @created="folderCreated"
+        />
 
     </div>
 
@@ -153,6 +185,8 @@
 import axios from 'axios';
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
+import FolderCreator from '../Folder/Create.vue';
+import FolderEditor from '../Folder/Edit.vue';
 import HasActions from '../../data-list/HasActions';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
@@ -168,6 +202,8 @@ export default {
         AssetEditor,
         Uploader,
         Uploads,
+        FolderEditor,
+        FolderCreator,
     },
 
     props: {
@@ -198,6 +234,8 @@ export default {
             folder: {},
             searchQuery: '',
             editedAssetId: null,
+            editedFolderPath: null,
+            creatingFolder: false,
             uploads: [],
             page: 1,
             perPage: 25, // TODO: Should come from the controller, or a config.
@@ -376,6 +414,17 @@ export default {
         openFileBrowser() {
             this.$refs.uploader.browse();
         },
+
+        folderCreated(folder) {
+            this.folders.push(folder);
+            this.folders = _.sortBy(this.folders, 'title');
+            this.creatingFolder = false;
+        },
+
+        folderUpdated(index, newFolder) {
+            this.folders[index] = newFolder;
+            this.editedFolderPath = null;
+        }
     }
 
 }
