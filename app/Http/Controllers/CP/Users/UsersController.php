@@ -60,6 +60,7 @@ class UsersController extends CpController
             });
 
         return Resource::collection($users)->additional(['meta' => [
+            'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
                 ['label' => __('Name'), 'field' => 'name'],
