@@ -12,6 +12,7 @@ class Blueprint
 {
     protected $handle;
     protected $contents = [];
+    protected $extraFields = [];
 
     public function setHandle(string $handle)
     {
@@ -46,10 +47,19 @@ class Blueprint
     public function sections(): Collection
     {
         $sections = array_get($this->contents, 'sections', []);
+        $extra = $this->extraFields ?? [];
 
-        return collect($sections)->map(function ($contents, $handle) {
-            return (new Section($handle))->setContents($contents);
+        $sections = collect($sections)->map(function ($contents, $handle) use (&$extra) {
+            return (new Section($handle))
+                ->setContents($contents)
+                ->extraFields(array_pull($extra, $handle) ?? []);
         });
+
+        foreach ($extra as $section => $fields) {
+            $sections->put($section, (new Section($section))->extraFields($fields));
+        }
+
+        return $sections;
     }
 
     public function fields(): Fields
@@ -122,21 +132,7 @@ class Blueprint
             $section = array_keys($this->contents['sections'])[0];
         }
 
-        $sectionContents = $this->contents['sections'][$section] ?? [];
-
-        if ($section === 'sidebar' && !isset($section['display'])) {
-            $sectionContents['display'] = 'Meta';
-        }
-
-        $new = compact('handle', 'field');
-
-        if ($prepend) {
-            array_unshift($sectionContents['fields'], $new);
-        } else {
-            $sectionContents['fields'][] = $new;
-        }
-
-        $this->contents['sections'][$section] = $sectionContents;
+        $this->extraFields[$section][$handle] = compact('prepend', 'field');
 
         return $this;
     }
