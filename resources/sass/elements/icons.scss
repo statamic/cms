@@ -24,6 +24,7 @@
 	height: 7px;
 	position: relative;
 	width: 7px;
+    flex-shrink: 0;
 }
 .icon-status-draft {
 	background: $color_gray_light;
