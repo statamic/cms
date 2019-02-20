@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use Statamic\API\Arr;
 use Statamic\API\Path;
 use Statamic\API\YAML;
 use Statamic\Data\DataFolder;
@@ -107,7 +108,12 @@ class AssetFolder implements Contract, Arrayable
         }
 
         $this->disk()->makeDirectory($this->path());
-        $this->disk()->put($path, YAML::dump(['title' => $this->title]));
+
+        $arr = Arr::removeNullValues(['title' => $this->title]);
+
+        if (! empty($arr)) {
+            $this->disk()->put($path, YAML::dump($arr));
+        }
 
         return $this;
     }

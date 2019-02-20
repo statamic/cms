@@ -196,6 +196,24 @@ EOT;
     }
 
     /** @test */
+    function it_doesnt_save_meta_file_if_theres_no_title()
+    {
+        Storage::fake('local');
+
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('path/to/folder')
+            ->title(null);
+
+        $return = $folder->save();
+
+        $disk->assertMissing('path/to/folder/folder.yaml');
+    }
+
+    /** @test */
     function deleting_a_folder_deletes_the_assets_and_the_meta_file()
     {
         Storage::fake('local');
