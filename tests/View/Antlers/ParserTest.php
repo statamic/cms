@@ -650,11 +650,6 @@ EOT;
             'two' => 'bar',
         ]);
 
-        $nonArrayableObject = new NonArrayableObject([
-            'one' => 'foo',
-            'two' => 'bar',
-        ]);
-
         $this->assertEquals(
             'foo bar',
             Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
@@ -663,10 +658,16 @@ EOT;
         );
     }
 
+    /** @test */
     function it_cannot_cast_non_arrayable_objects_to_arrays_when_using_tag_pairs()
     {
         Log::shouldReceive('debug')->once()
             ->with('Cannot loop over non-loopable variable: {{ object }}');
+
+        $nonArrayableObject = new NonArrayableObject([
+            'one' => 'foo',
+            'two' => 'bar',
+        ]);
 
         $this->assertEquals(
             '',
