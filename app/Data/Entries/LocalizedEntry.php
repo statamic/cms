@@ -8,6 +8,7 @@ use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\Routable;
 use Illuminate\Support\Carbon;
+use Statamic\Data\Augmentable;
 use Statamic\Data\Publishable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Localization;
@@ -17,11 +18,12 @@ use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Entries\LocalizedEntry as Contract;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Localization as LocalizationContract;
 
-class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationContract
+class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Responsable, LocalizationContract
 {
-    use Routable, Localization, ContainsData, ExistsAsFile, Publishable;
+    use Routable, Localization, ContainsData, ExistsAsFile, Publishable, Augmentable;
 
     protected $order;
 

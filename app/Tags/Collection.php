@@ -310,7 +310,7 @@ class Collection extends Tags
                 // Paginated? we need to nest inside a scope key
                 $as = $as ?: 'entries';
 
-                $data = [$as => $this->collection->toArray()];
+                $data = [$as => $this->collection->toAugmentedArray()];
 
                 $data['paginate'] = $this->pagination_data;
 
@@ -323,14 +323,14 @@ class Collection extends Tags
                 if ($as) {
                     $data = [
                         array_merge(
-                            [$as => $this->collection->toArray()],
+                            [$as => $this->collection->toAugmentedArray()],
                             $this->getCollectionMetaData()
                         )
                     ];
                 } else {
                     // Add the meta data (total_results, etc) into each iteration.
                     $meta = $this->getCollectionMetaData();
-                    $data = collect($this->collection->toArray())->map(function ($item) use ($meta) {
+                    $data = collect($this->collection->toAugmentedArray())->map(function ($item) use ($meta) {
                         return array_merge($item, $meta);
                     })->all();
                 }

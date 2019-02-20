@@ -106,19 +106,10 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $fields = $global->blueprint()
-                ? $global->blueprint()->fields()->all()
-                : collect();
-
             // TODO: The global should know what meta data to exclude.
-            $data = array_except($global->data(), ['blueprint']);
+            $data = array_except($global->toAugmentedArray(), ['blueprint']);
 
-            $variables = collect($data)
-                ->map(function ($value, $handle) use ($fields) {
-                    return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
-                })->all();
-
-            $this->set($global->handle(), $variables);
+            $this->set($global->handle(), $data);
         }
 
         $mainGlobal = $this->get('global') ?? [];
@@ -136,14 +127,9 @@ class Cascade
             return $this;
         }
 
-        $fields = (method_exists($this->content, 'blueprint') ? $this->content->blueprint() : false)
-            ? $this->content->blueprint()->fields()->all()
-            : collect();
-
-        $variables = collect($this->content->toArray())
-            ->map(function ($value, $handle) use ($fields) {
-                return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
-            })->all();
+        $variables = $this->content instanceof Augmentable
+            ? $this->content->toAugmentedArray()
+            : $this->content->toArray();
 
         foreach ($variables as $key => $value) {
             $this->set($key, $value);
@@ -199,7 +185,6 @@ class Cascade
     protected function hydrateViewModel()
     {
         if ($class = $this->get('view_model')) {
-            $class = $class->raw();
             $viewModel = new $class($this);
             $this->data = array_merge($this->data, $viewModel->data());
         }
