@@ -92,7 +92,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'id' => $this->id(),
             'email' => $this->email(),
             'preferences' => $this->preferences(),
-        ], $roles, $groups);
+        ], $roles, $groups, $this->supplements);
     }
 
     public function getAuthIdentifierName()

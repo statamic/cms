@@ -4,12 +4,15 @@ namespace Statamic\Eloquent\Auth;
 
 use Statamic\API\Role;
 use Statamic\API\UserGroup;
+use Statamic\Data\SupplementsData;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Contracts\Auth\User as UserContract;
 
 class User extends BaseUser
 {
+    use SupplementsData;
+
     protected $model;
     protected $roles;
     protected $groups;

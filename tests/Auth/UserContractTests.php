@@ -21,6 +21,7 @@ trait UserContractTests
                 'foo' => 'bar',
                 'content' => 'Lorem Ipsum',
             ])
+            ->setSupplement('supplemented', 'qux')
             ->assignRole($this->createRole('role_one'))
             ->assignRole($this->createRole('role_two'))
             ->addToGroup($this->createGroup('group_one'))
@@ -150,6 +151,7 @@ trait UserContractTests
             'in_group_one' => true,
             'in_group_two' => true,
             'preferences' => [],
+            'supplemented' => 'qux'
         ], $this->user()->toArray());
     }
 
