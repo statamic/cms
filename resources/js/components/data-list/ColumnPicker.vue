@@ -1,5 +1,5 @@
 <template>
-    <dropdown-list>
+    <dropdown-list ref="dropdown">
         <button class="btn btn-icon-only antialiased ml-2 dropdown-toggle" slot="trigger">
             <svg-icon name="picker" class="h-4 w-4 mr-1 text-current"></svg-icon>
             <span>{{ __('Columns') }}</span>
@@ -77,6 +77,7 @@ export default {
             axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
                 this.saving = false;
                 this.$notify.success(__('Columns saved'), { timeout: 3000 });
+                this.$refs.dropdown.close();
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {
