@@ -336,7 +336,9 @@ class LocalizedEntryTest extends TestCase
     {
         $blueprint = new Blueprint;
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
-        $entry = (new LocalizedEntry)->set('blueprint', 'test');
+        $entry = (new LocalizedEntry)
+            ->entry((new Entry)->collection(new Collection))
+            ->set('blueprint', 'test');
 
         $this->assertEquals($blueprint, $entry->blueprint());
     }

@@ -20,6 +20,9 @@ class FrontendTest extends TestCase
     {
         parent::setUp();
 
+        Blueprint::shouldReceive('find')->with('empty')->andReturn(new \Statamic\Fields\Blueprint);
+        $this->addToAssertionCount(-1);
+
         $this->withStandardFakeViews();
     }
 
@@ -326,7 +329,8 @@ class FrontendTest extends TestCase
     {
         $collection = Collection::create('pages')
             ->route('{slug}')
-            ->template('default');
+            ->template('default')
+            ->entryBlueprints(['empty']);
 
         $entry = Entry::create()
             ->id($slug)

@@ -36,7 +36,6 @@
 
 
 <script>
-import Fieldset from '../publish/Fieldset';
 import PublishFields from '../publish/Fields.vue';
 
 export default {

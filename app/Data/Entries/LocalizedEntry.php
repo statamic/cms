@@ -78,7 +78,9 @@ class LocalizedEntry implements Contract, Arrayable, Responsable, LocalizationCo
     public function blueprint()
     {
         if ($blueprint = $this->get('blueprint')) {
-            return Blueprint::find($blueprint);
+            return $this->collection()->ensureEntryBlueprintFields(
+                Blueprint::find($blueprint)
+            );
         }
 
         return $this->collection()->entryBlueprint();

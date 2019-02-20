@@ -63,7 +63,6 @@
 
 <script>
 import axios from 'axios';
-import Fieldset from '../publish/Fieldset';
 
 export default {
 
@@ -85,7 +84,7 @@ export default {
             action: this.initialAction,
             saving: false,
             localizing: false,
-            fieldset: null,
+            fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
@@ -105,10 +104,6 @@ export default {
             return this.$progress.isComplete();
         }
 
-    },
-
-    created() {
-        this.initializeFieldset(this.initialFieldset);
     },
 
     watch: {
@@ -172,18 +167,10 @@ export default {
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
                 this.action = data.actions.update;
-                this.initializeFieldset(data.blueprint);
+                this.fieldset = data.blueprint;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.removeNavigationWarning());
             })
-        },
-
-        initializeFieldset(fieldset) {
-            this.fieldset = new Fieldset(this.initialFieldset)
-                .showSlug(true)
-                .prependTitle()
-                .prependMeta()
-                .getFieldset();
         },
 
         localizationStatusText(localization) {

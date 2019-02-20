@@ -189,7 +189,6 @@
 
 <script>
 import axios from 'axios';
-import Fieldset from '../../publish/Fieldset';
 
 export default {
 
@@ -292,12 +291,10 @@ export default {
             const url = cp_url(`publish-blueprints/${this.asset.blueprint}`);
 
             axios.get(url).then(response => {
-                const fieldset = new Fieldset(response.data);
-
-                this.fieldset = fieldset.fieldset;
+                this.fieldset = response.data;
 
                 // Flatten fields from all sections into one array.
-                this.fields = _.chain(fieldset.sections)
+                this.fields = _.chain(this.fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)
                     .value();

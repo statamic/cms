@@ -105,8 +105,23 @@ class Collection implements Contract
 
     public function entryBlueprint()
     {
-        return $this->entryBlueprints()->first()
-            ?? Blueprint::find(config('statamic.theming.blueprints.default'));
+        return $this->ensureEntryBlueprintFields(
+            $this->entryBlueprints()->first()
+                ?? Blueprint::find(config('statamic.theming.blueprints.default'))
+        );
+    }
+
+    public function ensureEntryBlueprintFields($blueprint)
+    {
+        $blueprint
+            ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
+            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+
+        if ($this->order() === 'date') {
+            $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
+        }
+
+        return $blueprint;
     }
 
     public function sites($sites = null)

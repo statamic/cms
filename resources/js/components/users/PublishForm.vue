@@ -1,6 +1,5 @@
 <script>
 import axios from 'axios';
-import Fieldset from '../publish/Fieldset';
 import ChangePassword from './ChangePassword.vue';
 
 export default {
@@ -18,7 +17,7 @@ export default {
 
     data() {
         return {
-            fieldset: null,
+            fieldset: _.clone(this.initialFieldset),
             values: _.clone(this.initialValues),
             error: null,
             errors: {}
@@ -31,10 +30,6 @@ export default {
             return this.error || Object.keys(this.errors).length;
         }
 
-    },
-
-    created() {
-        this.fieldset = new Fieldset(this.initialFieldset).getFieldset();
     },
 
     methods: {

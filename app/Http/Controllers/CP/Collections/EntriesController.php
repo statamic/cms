@@ -34,22 +34,21 @@ class EntriesController extends CpController
                 ];
             })->preProcessForIndex();
 
-        $columns = $collection
-            ->entryBlueprint()
-            ->columns()
-            ->ensurePrepended(Column::make('title'));
-
         if ($collection->order() === 'date') {
-            $columns->ensureHas(Column::make('date'));
             $entries->supplement('date', function ($entry) {
                 return $entry->date()->inPreferredFormat();
             });
         }
 
+        $columns = $collection->entryBlueprint()
+            ->columns()
+            ->setPreferred("collections.{$handle}.columns")
+            ->values();
+
         return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sort,
-            'columns' => $columns->setPreferred("collections.{$handle}.columns")->values(),
+            'columns' => $columns,
         ]]);
     }
 
@@ -156,7 +155,7 @@ class EntriesController extends CpController
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
-            'slug' => 'required',
+            'slug' => 'required|alpha_dash',
         ]);
 
         $request->validate($validation->rules());
