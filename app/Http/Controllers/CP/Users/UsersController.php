@@ -51,11 +51,13 @@ class UsersController extends CpController
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'));
-
-        $users->setCollection($users->getCollection()->supplement(function ($user) use ($request) {
-            return ['deleteable' => $request->user()->can('delete', $user)];
-        }));
+            ->paginate(request('perPage'))
+            ->supplement(function ($user) use ($request) {
+                return [
+                    'edit_url' => $user->editUrl(),
+                    'deleteable' => $request->user()->can('delete', $user)
+                ];
+            });
 
         return Resource::collection($users)->additional(['meta' => [
             'sortColumn' => $sort,
