@@ -15,10 +15,10 @@
     }
 
     li a {
-        @apply p-0 flex items-center text-grey-dark;
+        @apply p-0 flex items-center text-grey-80;
 
         &:hover {
-            @apply font-medium text-grey-darker;
+            @apply font-medium text-grey-90;
         }
 
         i {
@@ -27,7 +27,7 @@
     }
 
     li.current > a {
-        @apply text-grey-darker font-medium;
+        @apply text-grey-90 font-medium;
 
         i {
             @apply bg-white;
@@ -54,7 +54,7 @@
     outline: none !important;
 
     &:hover {
-        @apply .bg-grey-lightest;
+        @apply .bg-grey-20;
     }
 }
 

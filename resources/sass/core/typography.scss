@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply .font-sans .text-grey-darker .text-base .tracking-normal;
+    @apply .font-sans .text-grey-90 .text-base .tracking-normal;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings: "zero", "ss01";
 }
@@ -41,7 +41,7 @@ h6 {
 }
 
 a {
-    @apply .text-grey-dark .cursor-pointer;
+    @apply .text-grey-80 .cursor-pointer;
 
     &:hover {
         @apply .text-blue;
@@ -54,7 +54,7 @@ a {
     }
 
     p {
-        @apply text-grey text-sm;
+        @apply text-grey-70 text-sm;
         &:last-child {
             @apply .mb-0;
         }
@@ -257,7 +257,7 @@ sup {
 
     .highlight pre,
     pre {
-        @apply p-2 bg-grey-lighter rounded;
+        @apply p-2 bg-grey-30 rounded;
         overflow: auto;
         font-size: 85%;
         line-height: 1.45;

@@ -17,7 +17,7 @@
                     v-for="loc in localizations"
                     :key="loc.handle"
                     class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
-                    :class="{ 'bg-grey-lightest': loc.active }"
+                    :class="{ 'bg-grey-20': loc.active }"
                     @click="localizationSelected(loc)"
                     v-popover:tooltip.top="localizationStatusText(loc)"
                 >
@@ -26,7 +26,7 @@
                         <span v-if="localizing != loc.handle" class="little-dot"
                             :class="{
                                 'bg-green': loc.published,
-                                'bg-grey-light': !loc.published,
+                                'bg-grey-40': !loc.published,
                                 'bg-red': !loc.exists
                             }" />
                     </div>

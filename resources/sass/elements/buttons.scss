@@ -39,9 +39,9 @@
 
 .btn-flat {
     @include button(white, black);
-    @apply shadow-none text-grey-dark bg-grey-lightest;
+    @apply shadow-none text-grey-80 bg-grey-20;
     &:hover {
-        @apply bg-grey-lighter;
+        @apply bg-grey-30;
         box-shadow: none !important;
     }
 }

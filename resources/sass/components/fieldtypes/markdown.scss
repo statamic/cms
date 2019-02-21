@@ -33,7 +33,7 @@
         }
 
         a {
-            @apply text-grey-light outline-none;
+            @apply text-grey-40 outline-none;
 
             &:hover {
                 @apply text-blue;
@@ -41,7 +41,7 @@
         }
 
         .active a {
-            @apply .text-grey-dark;
+            @apply .text-grey-80;
         }
     }
 
@@ -50,7 +50,7 @@
     }
 
     .CodeMirror {
-        @apply .bg-grey-lighten-6 .shadow-inner .h-auto .font-mono .leading-normal .p-1.5 .text-xs;
+        @apply .bg-grey-10 .shadow-inner .h-auto .font-mono .leading-normal .p-1.5 .text-xs;
         border-radius: 0 0 3px 3px;
 
         .cm-comment {

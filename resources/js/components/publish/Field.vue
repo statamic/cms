@@ -5,7 +5,7 @@
             <template v-if="config.display">{{ config.display }}</template>
             <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
-            <i class="icon icon-chat text-xs text-grey-lighten-2" v-if="config.localizable" v-popover:tooltip.top="__('This field will be localized.')" />
+            <i class="icon icon-chat text-xs text-grey-50" v-if="config.localizable" v-popover:tooltip.top="__('This field will be localized.')" />
         </label>
 
         <div

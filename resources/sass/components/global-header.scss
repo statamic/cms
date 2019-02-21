@@ -51,7 +51,7 @@
     }
 
     .active {
-        @apply bg-grey-lighter;
+        @apply bg-grey-30;
     }
 
     .title {
@@ -59,7 +59,7 @@
     }
 
     .url {
-        @apply text-2xs text-grey-light;
+        @apply text-2xs text-grey-40;
     }
 
     .status {

@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="hasSelections" class="flex items-center bg-grey-lighter text-sm border-b px-2 py-1">
+    <div v-if="hasSelections" class="flex items-center bg-grey-30 text-sm border-b px-2 py-1">
 
         <div
             class="text-grey mr-2"
@@ -17,7 +17,7 @@
             >
                 <button
                     slot-scope="{ action, select }"
-                    class="ml-2 hover:text-grey-dark"
+                    class="ml-2 hover:text-grey-80"
                     :class="[action.dangerous ? 'text-red' : 'text-blue']"
                     @click="select"
                     v-text="action.title" />

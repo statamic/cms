@@ -37,7 +37,7 @@
                     <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-light']" />
+                                <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
                                 <a :href="entry.edit_url">{{ entry.title }}</a>
                             </div>
                         </template>

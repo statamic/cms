@@ -2,7 +2,7 @@
 
     <div>
         <stack name="configure-global" v-if="editing" @closed="editing = false">
-            <div class="h-full overflow-auto p-3 bg-grey-lighter">
+            <div class="h-full overflow-auto p-3 bg-grey-30">
                 <div v-if="saving" class="absolute pin z-200 flex items-center justify-center text-center">
                     <loading-graphic :text="__('Saving')" />
                 </div>

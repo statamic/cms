@@ -3,7 +3,7 @@
     <div class="blueprint-section" :class="{ 'w-full': isEditing }">
         <div class="blueprint-section-card card p-0 h-full flex flex-col">
 
-            <div class="bg-grey-lightest border-b text-sm flex rounded-t;">
+            <div class="bg-grey-20 border-b text-sm flex rounded-t;">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="px-2 py-1 flex-1">
                     <span class="font-medium mr-1">

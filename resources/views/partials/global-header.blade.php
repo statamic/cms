@@ -24,7 +24,7 @@
         ></favorite-creator>
 
         <dropdown-list>
-            <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-dark" slot="trigger">
+            <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-80" slot="trigger">
                 @svg('book-open')
             </a>
             <ul class="dropdown-menu">
@@ -47,7 +47,7 @@
                 </li>
             </ul>
         </dropdown-list>
-        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-dark" href="{{ route('statamic.site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
+        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('statamic.site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
             @svg('browser-com')
         </a>
         <dropdown-list>
@@ -62,7 +62,7 @@
                 <li class="px-1">
                     <div class="text-base mb-px">{{ my()->email() }}</div>
                     @if (me()->isSuper())
-                        <div class="text-2xs mt-px text-grey-light">{{ __('Super Admin') }}</div>
+                        <div class="text-2xs mt-px text-grey-40">{{ __('Super Admin') }}</div>
                     @endif
                 </li>
                 <li class="divider"></li>

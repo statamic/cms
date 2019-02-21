@@ -16,7 +16,7 @@
                     />
                 </div>
 
-                <div class="border-grey-lighter border-t mt-2 pt-2 text-grey-light text-xs">
+                <div class="border-grey-30 border-t mt-2 pt-2 text-grey-40 text-xs">
                     <div class="mb-1">More options:</div>
                     <ul class="pl-2">
                         <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>

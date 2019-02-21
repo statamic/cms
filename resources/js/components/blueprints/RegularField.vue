@@ -5,10 +5,10 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex-1 px-2 py-1 pl-1">
-                    <span v-if="isReferenceField" class="icon icon-link text-grey-light mr-1"></span>
-                    <span v-if="isInlineField" class="icon icon-layers text-grey-light mr-1"></span>
+                    <span v-if="isReferenceField" class="icon icon-link text-grey-40 mr-1"></span>
+                    <span v-if="isInlineField" class="icon icon-layers text-grey-40 mr-1"></span>
                     <span class="font-medium mr-1">{{ field.config.display || field.handle }}</span>
-                    <span class="font-mono text-2xs text-grey-light">{{ field.handle }}</span>
+                    <span class="font-mono text-2xs text-grey-40">{{ field.handle }}</span>
                 </div>
                 <div class="pr-1 flex">
                     <width-selector v-model="width" class="mr-1" v-show="isSectionExpanded" />

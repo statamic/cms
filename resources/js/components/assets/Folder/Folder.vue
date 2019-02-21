@@ -2,7 +2,7 @@
 
     <modal name="folder-editor" :pivotY="0.1">
 
-        <div class="flex items-center justify-between p-3 bg-grey-lightest border-b text-center">
+        <div class="flex items-center justify-between p-3 bg-grey-20 border-b text-center">
             {{ modalTitle }}
             <button class="text-grey" @click="cancel">&times;</button>
         </div>

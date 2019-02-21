@@ -5,7 +5,7 @@
         @apply w-4 border-r h-full p-1;
         cursor: grab;
         background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
-        &:hover { @apply .bg-grey-lighter; }
+        &:hover { @apply .bg-grey-30; }
     }
 
     .item-inner {
@@ -20,7 +20,7 @@
 
     &.unpublished {
         .little-dot {
-            @apply bg-grey-light;
+            @apply bg-grey-40;
         }
     }
 

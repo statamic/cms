@@ -18,7 +18,7 @@
     @apply w-full text-left text-grey;
 
     thead {
-        @apply bg-grey-lightest text-grey-darker uppercase text-2xs tracking-wide;
+        @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
 
         th {
             @apply font-medium px-2 py-1.5;
@@ -31,7 +31,7 @@
             @apply border-t text-sm;
 
             &:hover {
-                @apply bg-grey-lightest;
+                @apply bg-grey-20;
             }
 
             td:first-child { @apply .rounded-bl; }
@@ -51,7 +51,7 @@
         @apply cursor-pointer select-none;
 
         &:hover {
-            @apply bg-grey-lighter;
+            @apply bg-grey-30;
         }
 
         &.current-column {

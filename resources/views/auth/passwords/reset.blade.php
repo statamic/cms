@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <h1 class="mb-3 pt-7 text-center text-grey-dark">{{ __('Reset Password') }}</h1>
+    <h1 class="mb-3 pt-7 text-center text-grey-80">{{ __('Reset Password') }}</h1>
 
     <div class="card auth-card mx-auto">
 

@@ -3,27 +3,28 @@ var defaultConfig = require('tailwindcss/defaultConfig')
 var colors = {
     'transparent':      'transparent',
     'black':            '#000000',
-    'grey-darkest':     'hsla(210, 20%, 10%, 1)', // grey-darken-3
-    'grey-darker':      'hsla(210, 15%, 20%, 1)', // grey-darken-2
-    'grey-dark':        'hsla(210, 10%, 30%, 1)', // grey-darken-1
-    'grey':             'hsla(210, 10%, 50%, 1)', // grey
-    'grey-light':       'hsla(210, 15%, 70%, 1)', // lighten-1
-    'grey-lighten-2':   'hsla(210, 15%, 80%, 1)', // lighten-2
-    'grey-lighten-3':   'hsla(210, 15%, 86%, 1)', // lighten-3
-    'grey-lighter':     'hsla(210, 30%, 95%, 1)', // lighten-4
-    'grey-lightest':    'hsla(210, 40%, 98%, 1)', // lighten-5
-    'grey-lighten-6':   'hsla(210, 40%, 99%, 1)', // lighten-6
+    'grey-100':         'hsla(210, 20%, 10%, 1)',
+    'grey':             'hsla(210, 10%, 50%, 1)', // default grey is grey-70
+    'grey-90':          'hsla(210, 15%, 20%, 1)',
+    'grey-80':          'hsla(210, 10%, 30%, 1)',
+    'grey-70':          'hsla(210, 10%, 50%, 1)',
+    'grey-60':          'hsla(210, 15%, 70%, 1)',
+    'grey-50':          'hsla(210, 15%, 80%, 1)',
+    'grey-40':          'hsla(210, 15%, 86%, 1)',
+    'grey-30':          'hsla(210, 30%, 95%, 1)',
+    'grey-20':          'hsla(210, 40%, 98%, 1)',
+    'grey-10':          'hsla(210, 40%, 99%, 1)',
+    'white':            '#ffffff',
     'green':            '#479967',
     'blue-light':       'hsla(210, 100%, 75%, 1)',
     'blue':             'hsla(200, 80%, 50%, 1)',
     'blue-dark':        'hsla(200, 70%, 40%, 1)',
     'red-dark':         'hsla(2, 57%, 53%, 1)',
     'red':              'hsla(2, 76%, 60%, 1)',
-    'red-light':        'hsla(2, 76%, 70%, 1)', // lighten-1
-    'red-lighter':      'hsla(2, 76%, 95%, 1)', // lighten-2
+    'red-light':        'hsla(2, 76%, 70%, 1)',
+    'red-lighter':      'hsla(2, 76%, 95%, 1)',
     'yellow':           '#fbfab0',
     'yellow-dark':      '#d8cd1b',
-    'white':            '#ffffff',
     'pink':             '#ff269e',
     'purple':           '#c471ed',
 }
@@ -243,7 +244,7 @@ module.exports = {
     |
     */
 
-    borderColors: Object.assign({ default: colors['grey-lighten-3'] }, colors),
+    borderColors: Object.assign({ default: colors['grey-40'] }, colors),
 
 
 

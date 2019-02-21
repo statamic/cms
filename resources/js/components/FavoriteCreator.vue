@@ -10,12 +10,12 @@
                 </div>
             </div>
 
-            <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-dark" v-popover:tooltip.bottom="__('Pin to Favorites')">
+            <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-popover:tooltip.bottom="__('Pin to Favorites')">
                 <svg-icon name="pin"></svg-icon>
             </button>
         </popper>
         <div v-else>
-            <button @click="remove" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-dark" v-popover:tooltip.bottom="__('Unpin from Favorites')">
+            <button @click="remove" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-popover:tooltip.bottom="__('Unpin from Favorites')">
                 <svg-icon name="pin"></svg-icon>
             </button>
         </div>

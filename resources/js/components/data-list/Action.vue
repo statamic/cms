@@ -24,7 +24,7 @@
                     <div v-else class="p-3" v-text="confirmationText" />
                 </div>
 
-                <div class="p-3 bg-grey-lightest border-t flex items-center text-sm">
+                <div class="p-3 bg-grey-20 border-t flex items-center text-sm">
                     <button class="btn" :class="[ action.dangerous ? 'btn-danger' : 'btn-primary' ]" @click="confirm" v-text="runButtonText" />
                     <button @click="cancel" class="ml-3 text-grey">Cancel</button>
                 </div>

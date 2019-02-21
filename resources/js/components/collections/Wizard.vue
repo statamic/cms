@@ -18,7 +18,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Name of your Collection</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-light mt-1 flex items-center">
+                <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Usually a noun, like "Blog", "Product", or "Breakfast Foods".
                 </div>
@@ -26,7 +26,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Handle</label>
                 <input type="text" v-model="handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-light mt-1 flex items-center">
+                <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     How you'll reference to this collection in your templates. Cannot be easily changed.
                 </div>
@@ -77,22 +77,22 @@
             </div>
             <!-- Date Collection -->
             <div class="max-w-md mx-auto px-2 pb-6" v-if="sort == 'date'">
-                <label class="border-2 cursor-pointer border-grey-lighter p-2 rounded flex items-center" for="behavior-scheduled">
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="behavior-scheduled">
                     <input type="checkbox" v-model="behavior.scheduled" id="behavior-scheduled">
                     <p><strong class="text-md ml-2 font-bold">Scheduled</strong> &ndash; Entries with publish dates in the future will be private.</p>
                 </label>
-                <label class="border-2 cursor-pointer border-grey-lighter p-2 mt-4 rounded flex items-center" for="behavior-expirable">
+                <label class="border-2 cursor-pointer border-grey-30 p-2 mt-4 rounded flex items-center" for="behavior-expirable">
                     <input type="checkbox" v-model="behavior.expirable" id="behavior-expirable">
                     <p><strong class="text-md ml-2 font-bold">Expirable</strong> &ndash; Entries can be expired and made private after a specified date.</p>
                 </label>
             </div>
             <!-- Alphabetical Collection -->
             <div class="max-w-md mx-auto px-2 pb-6" v-if="sort == 'alphabetical'">
-                <label class="border-2 cursor-pointer border-grey-lighter p-2 rounded flex items-center" for="direction-asc">
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-asc">
                     <input type="radio" v-model="behavior.direction" value="asc" id="direction-asc">
                     <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash; Entries will be sorted in ascending order, from A to Z.</p>
                 </label>
-                <label class="border-2 mt-4 cursor-pointer border-grey-lighter p-2 rounded flex items-center" for="direction-desc">
+                <label class="border-2 mt-4 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-desc">
                     <input type="radio" v-model="behavior.direction" value="desc" id="direction-desc">
                     <p><strong class="text-md ml-2 font-bold">Descending</strong> &ndash; Entries will be sorted in descending order, from Z to A.</p>
                 </label>
@@ -112,7 +112,7 @@
                     :value="blueprint ? [blueprint] : null"
                     @updated="blueprint = $event[0]"
                 ></blueprints-fieldtype>
-                <div class="text-2xs text-grey-light mt-1 flex items-center">
+                <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     You can pick an existing Blueprint or create a new one.
                 </div>
@@ -123,7 +123,7 @@
                     <option value="" selected>Choose a template</option>
                     <option value="simple">Simple Page</option>
                 </select>
-                <div class="text-2xs text-grey-light mt-1 flex items-center">
+                <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default template.
                 </div>

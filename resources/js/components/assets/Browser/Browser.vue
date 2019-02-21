@@ -25,7 +25,7 @@
                         v-text="item.title"
                         :class="{
                             active: item.id === container.id,
-                            'border-b border-grey-lighter': item.id !== container.id
+                            'border-b border-grey-30': item.id !== container.id
                         }"
                         @click="selectContainer(item.id)"
                     />
@@ -152,7 +152,7 @@
                             @page-selected="page = $event"
                         />
 
-                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
+                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-40">
                             There are no assets.
                         </div>
 

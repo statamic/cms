@@ -1,14 +1,14 @@
 @extends('statamic::layout')
 
-@section('content')
+@section('nontent')
 
-    <stack-test :depth="0"></stack-test>
+    <collection-wizard
+        :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Front-End']">
+    </collection-wizard>
 
 @stop
 
-@section('nontent')
-    <collection-wizard :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Front-End']">
-    </collection-wizard>
+@section('content')
 
     <div class="flex mb-5">
         <h1>{{ __('The Statamic Playground') }}</h1>
@@ -99,15 +99,18 @@
 
         <h6 class="mb-2">Greys</h6>
         <div class="flex flex-row-reverse text-sm text-center mb-4">
-            <div class="text-black bg-white p-3 flex-1">White</div>
-            <div class="text-black bg-grey-lightest p-3 flex-1">Lightest</div>
-            <div class="text-black bg-grey-lighter p-3 flex-1">Lighter</div>
-            <div class="text-black bg-grey-light p-3 flex-1">Light</div>
-            <div class="text-black bg-grey p-3 flex-1">Base</div>
-            <div class="text-white bg-grey-dark p-3 flex-1">Dark</div>
-            <div class="text-white bg-grey-darker p-3 flex-1">Darker</div>
-            <div class="text-white bg-grey-darkest p-3 flex-1">Darkest</div>
-            <div class="text-white bg-black p-3 flex-1">Black</div>
+            <div class="text-black bg-white p-2 flex-1">White</div>
+            <div class="text-black bg-grey-10 p-2 flex-1">10</div>
+            <div class="text-black bg-grey-20 p-2 flex-1">20</div>
+            <div class="text-black bg-grey-30 p-2 flex-1">30</div>
+            <div class="text-black bg-grey-40 p-2 flex-1">40</div>
+            <div class="text-black bg-grey-50 p-2 flex-1">50</div>
+            <div class="text-black bg-grey-60 p-2 flex-1">60</div>
+            <div class="text-black bg-grey-70 p-2 flex-1">70</div>
+            <div class="text-white bg-grey-80 p-2 flex-1">80</div>
+            <div class="text-white bg-grey-90 p-2 flex-1">90</div>
+            <div class="text-white bg-grey-100 p-2 flex-1">100</div>
+            <div class="text-white bg-black p-2 flex-1">Black</div>
         </div>
 
         <h6 class="mb-2">Other Colors (needs simplifying)</h6>
@@ -155,17 +158,17 @@
             </div>
         </div>
         <div class="w-1/3 px-2">
-            <div class="card bg-grey-darker px-3">
+            <div class="card bg-grey-90 px-3">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-bold text-grey-light">New Users</h3>
-                    <select class="text-xs" name="" id="" class="bg-grey-dark border-grey-dark text-grey-light">
+                    <h3 class="font-bold text-grey-40">New Users</h3>
+                    <select class="text-xs" name="" id="" class="bg-grey-80 border-grey-80 text-grey-40">
                         <option value="">30 Days</option>
                     </select>
                 </div>
-                <div class="text-4xl mb-2 text-grey-light">251</div>
+                <div class="text-4xl mb-2 text-grey-40">251</div>
                 <div class="flex items-center ">
                     <span class="w-4 h-4 text-green mr-1">@svg('performance-increase')</span>
-                    <span class="leading-none text-grey-light text-sm">8.54% Increase</span>
+                    <span class="leading-none text-grey-40 text-sm">8.54% Increase</span>
                 </div>
             </div>
         </div>

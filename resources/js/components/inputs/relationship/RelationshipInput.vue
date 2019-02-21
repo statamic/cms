@@ -23,7 +23,7 @@
             <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
-                        <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center outline-none" @click="isCreating = true">
+                        <button class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
                             <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                             {{ __('Create & Link Entry') }}
                         </button>
@@ -34,7 +34,7 @@
                             @closed="stopCreating"
                         />
                     </div>
-                    <button class="text-blue hover:text-grey-dark flex mb-1 outline-none" @click.prevent="isSelecting = true">
+                    <button class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                         Link Existing Entry
                     </button>

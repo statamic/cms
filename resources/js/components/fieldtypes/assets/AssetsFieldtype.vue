@@ -30,7 +30,7 @@
 
                     <div
                         v-if="!maxFilesReached"
-                        class="flex items-center p-2 bg-grey-lightest border rounded"
+                        class="flex items-center p-2 bg-grey-20 border rounded"
                         :class="{
                             'border-b-0 rounded-b-none': expanded,
                             'bard-drag-handle': isInBardField
@@ -55,7 +55,7 @@
                             {{ __('Upload') }}
                         </button>
 
-                        <p class="ml-3 text-sm text-grey-light">{{ __('or drag and drop files') }}</p>
+                        <p class="ml-3 text-sm text-grey-40">{{ __('or drag and drop files') }}</p>
 
                         <button
                             type="button"

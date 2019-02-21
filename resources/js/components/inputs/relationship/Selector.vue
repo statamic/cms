@@ -55,8 +55,8 @@
                 </data-list>
             </div>
 
-            <div class="p-2 border-t flex items-center justify-between bg-grey-lightest">
-                <div class="text-sm text-grey-light"
+            <div class="p-2 border-t flex items-center justify-between bg-grey-20">
+                <div class="text-sm text-grey-40"
                     v-text="hasMaxSelections
                         ? __n(':count/:max selected', selections, { max: maxSelections })
                         : __n(':count selected', selections)"

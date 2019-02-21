@@ -8,7 +8,7 @@
         </button>
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
-            <div class="flex items-center p-3 bg-grey-lightest border-b text-center">
+            <div class="flex items-center p-3 bg-grey-20 border-b text-center">
                 {{ __('Resume Your Session') }}
             </div>
             <div class="publish-fields">

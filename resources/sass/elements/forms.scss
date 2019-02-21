@@ -11,7 +11,7 @@ form {
 }
 
 label {
-    @apply .text-grey-dark .font-normal .text-sm .block .leading-normal;
+    @apply .text-grey-80 .font-normal .text-sm .block .leading-normal;
 }
 
 input[type="checkbox"] {
@@ -19,7 +19,7 @@ input[type="checkbox"] {
 }
 
 select {
-    @apply .text-base .bg-grey-lighter .border-2 .border-grey-lighter .cursor-pointer;
+    @apply .text-base .bg-grey-30 .border-2 .border-grey-30 .cursor-pointer;
 }
 
 
@@ -27,7 +27,7 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-lighten-6 w-full border p-1 rounded shadow-inner;
+    @apply appearance-none bg-grey-10 w-full border p-1 rounded shadow-inner;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
@@ -48,7 +48,7 @@ textarea.input-text {
     @apply appearance-none shadow-none bg-white w-full p-1;
 
     &:focus {
-        @apply outline-none bg-grey-lightest;
+        @apply outline-none bg-grey-20;
     }
 }
 
@@ -96,7 +96,7 @@ textarea.input-text {
       }
 
       .select-input-toggle {
-          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-darker;
+          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-90;
 
           svg {
               @apply fill-current h-4 w-4;
@@ -108,7 +108,7 @@ textarea.input-text {
   /* @TODO Legacy stuff to remove, reduce, or refactor
     ========================================================================== */
 .form-control {
-    @apply .text-sm .w-full .rounded .border-0 .bg-grey-lightest .shadow-inner;
+    @apply .text-sm .w-full .rounded .border-0 .bg-grey-20 .shadow-inner;
 
     padding: 8px 10px;
 
@@ -216,11 +216,11 @@ input.slug {
     }
 
     .help-block {
-        @apply .block .mb-1 .text-grey-light .text-xs;
+        @apply .block .mb-1 .text-grey-40 .text-xs;
         a {
             @apply .text-red;
             &:hover {
-                @apply .text-grey-dark;
+                @apply .text-grey-80;
             }
         }
     }

@@ -13,7 +13,7 @@
         >
             <div
                 v-if="!goingSolo"
-                class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between"
+                class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between"
             >
                 <div class="pt-1">
                     <label class="mb-1 leading-none" v-text="display" />

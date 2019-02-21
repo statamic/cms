@@ -1,11 +1,11 @@
 <template>
 
     <div
-        class="bg-grey-lightest shadow mb-2 rounded border"
+        class="bg-grey-20 shadow mb-2 rounded border"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div
-            class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between"
+            class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between"
             :class="sortableHandleClass"
         >
             {{ index }}
