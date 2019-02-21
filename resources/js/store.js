@@ -7,6 +7,9 @@ export default {
         fieldtypes: null,
         composer: {},
         preferences: Statamic.preferences,
+        livePreview: {
+            enabled: false
+        }
     },
 
     mutations: {
@@ -26,6 +29,10 @@ export default {
         preferences(state, preferences) {
             state.preferences = preferences;
         },
+
+        livePreview(state, livePreview) {
+            state.livePreview = livePreview;
+        }
 
     }
 

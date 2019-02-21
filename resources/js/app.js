@@ -40,6 +40,7 @@ require('./components/stacks/Stacks');
 require('./components/ProgressBar');
 require('./components/DirtyState');
 require('./components/Preference');
+require('./components/LivePreview');
 
 var vm = new Vue({
     el: '#statamic',

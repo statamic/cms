@@ -34,6 +34,9 @@
                 </button>
             </div>
 
+
+            <button class="btn mr-2" v-text="__('Live Preview')" @click="isPreviewing = true" />
+
             <button
                 class="btn btn-primary"
                 :class="{ disabled: !canSave }"
@@ -55,7 +58,16 @@
             :site="site"
             @updated="values = $event"
         >
-            <publish-sections slot-scope="{ }" />
+            <live-preview
+                slot-scope="{}"
+                :name="publishContainer"
+                :url="livePreviewUrl"
+                :previewing="isPreviewing"
+                :values="values"
+                @closed="isPreviewing = false"
+            >
+                <publish-sections />
+            </live-preview>
         </publish-container>
     </div>
 
@@ -64,8 +76,13 @@
 
 <script>
 import axios from 'axios';
+import LivePreview from '../live-preview/LivePreview.vue';
 
 export default {
+
+    components: {
+        LivePreview,
+    },
 
     props: {
         publishContainer: String,
@@ -93,7 +110,8 @@ export default {
             localizations: _.clone(this.initialLocalizations),
             site: this.initialSite,
             error: null,
-            errors: {}
+            errors: {},
+            isPreviewing: false,
         }
     },
 
@@ -105,6 +123,10 @@ export default {
 
         canSave() {
             return this.$progress.isComplete();
+        },
+
+        livePreviewUrl() {
+            return _.findWhere(this.localizations, { active: true }).url + '/preview';
         }
 
     },

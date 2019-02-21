@@ -39,6 +39,8 @@
 
             <vue-toast ref="toast"></vue-toast>
 
+            <portal-target name="live-preview"></portal-target>
+
             <portal-target
                   v-for="(modal, i) in modals"
                   :key="`modal-${modal}-${i}`"

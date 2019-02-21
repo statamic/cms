@@ -63,7 +63,7 @@ export default {
             return [
                 'form-group',
                 `${this.config.type}-fieldtype`,
-                tailwind_width_class(this.config.width),
+                !this.$preview.enabled() ? tailwind_width_class(this.config.width) : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];

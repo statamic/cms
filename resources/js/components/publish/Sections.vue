@@ -15,10 +15,10 @@
             ></a>
         </div>
 
-        <div class="flex justify-between">
+        <div :class="{ 'flex justify-between': !livePreviewing }">
             <div class="w-full">
                 <div
-                    class="card p-0"
+                    :class="{ 'card p-0': !livePreviewing }"
                     v-for="section in mainSections"
                     :key="section.handle"
                     v-show="section.handle === active"
@@ -27,8 +27,8 @@
                 </div>
             </div>
 
-            <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
-                <div class="card p-0">
+            <div class="publish-sidebar" :class="{ 'ml-4': !livePreviewing }" v-if="shouldShowSidebar">
+                <div :class="{ 'card p-0': !livePreviewing }">
                     <publish-fields :fields="sidebarSection.fields" />
                 </div>
             </div>
@@ -74,9 +74,9 @@ export default {
         shouldShowSidebar() {
             if (! this.sidebarSection) return false;
 
-            const width = this.$store.state.statamic.windowWidth;
+            if (this.livePreviewing) return false;
 
-            // TODO: or is live previewing
+            const width = this.$store.state.statamic.windowWidth;
             if (this.sidebarSection.fields.length == 0 || width < 1366) return false;
 
             return true;
@@ -105,6 +105,10 @@ export default {
             });
             return errors;
         },
+
+        livePreviewing() {
+            return this.$preview.enabled();
+        }
 
     },
 
