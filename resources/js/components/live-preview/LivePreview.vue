@@ -24,12 +24,12 @@
                 <div class="live-preview-main flex flex-1">
 
                     <transition name="live-preview-editor-slide">
-                        <div v-show="panesVisible" class="live-preview-editor" :style="{ width: '350px' }">
+                        <div v-show="panesVisible" class="live-preview-editor" :style="{ width: `${editorWidth}px` }">
                             <div class="live-preview-fields flex-1 h-full overflow-scroll">
                                 <portal-target name="live-preview-fields" />
                             </div>
 
-                            <div class="live-preview-resizer h-full absolute pin-t" />
+                            <div class="live-preview-resizer h-full absolute pin-t" @mousedown="resizeStart" />
                         </div>
                     </transition>
 
@@ -52,6 +52,8 @@
 import axios from 'axios';
 import Provider from './Provider.vue';
 
+const widthLocalStorageKey = 'statamic.live-preview.editor-width';
+
 export default {
 
     components: {
@@ -69,6 +71,7 @@ export default {
         return {
             panesVisible: false,
             headerVisible: false,
+            editorWidth: null,
             provides: {
                 storeName: this.name
             }
@@ -95,6 +98,10 @@ export default {
             }
         }
 
+    },
+
+    created() {
+        this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
     },
 
     methods: {
@@ -145,6 +152,31 @@ export default {
             return new Promise(resolve => {
                 setTimeout(resolve, ms);
             });
+        },
+
+        resizeStart() {
+            window.addEventListener('mousemove', this.resizing);
+            window.addEventListener('mouseup', this.resizeEnd);
+        },
+
+        resizeEnd() {
+            window.removeEventListener('mousemove', this.resizing, false);
+            window.removeEventListener('mouseup', this.resizeEnd, false);
+        },
+
+        resizing(e) {
+            e.preventDefault();
+            let width = e.clientX;
+
+            // Prevent the width being too narrow.
+            width = (width < 350) ? 350 : width;
+
+            this.setEditorWidth(width);
+        },
+
+        setEditorWidth(width) {
+            this.editorWidth = width;
+            localStorage.setItem(widthLocalStorageKey, width);
         }
     }
 
