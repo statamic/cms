@@ -83,14 +83,10 @@ export default {
     watch: {
 
         previewing(enabled) {
-            if (enabled) {
-                this.update();
-                this.animateIn();
-            }
+            if (!enabled) return;
 
-            let state = this.$store.state.statamic.livePreview;
-            state.enabled = enabled;
-            this.$store.commit('statamic/livePreview', state);
+            this.update();
+            this.animateIn();
         },
 
         values: {
