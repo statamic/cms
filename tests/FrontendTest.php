@@ -118,25 +118,6 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
-    function live_preview_overrides_data()
-    {
-        $this->markTestIncomplete(); // todo: live preview
-
-        $this->fakeRoles(['cp_accessor' => ['permissions' => ['cp:access']]]);
-        $user = User::make()->data(['roles' => ['cp_accessor']]);
-
-        $page = $this->createPage('/about');
-        $page->set('content', 'Testing 123');
-        $page->set('fieldset', 'default');
-
-        $this
-            ->actingAs($user)
-            ->post('/about', ['preview' => true, 'fields' => ['content' => 'Updated content']])
-            ->assertStatus(200)
-            ->assertSee('Updated content');
-    }
-
-    /** @test */
     function key_variables_key_added()
     {
         $page = $this->createPage('about');
