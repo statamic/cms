@@ -177,14 +177,17 @@ class LocalizedEntryTest extends TestCase
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
+        $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->url());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
+        $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
         $this->assertEquals('/das-blog/das-foo', $entryDe->url());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
+        $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
     }
 
     /** @test */

@@ -40,15 +40,7 @@ class EntryPreviewController extends CpController
     {
         $kernel = app()->make(HttpKernel::class);
 
-        $url = $entry->absoluteUrl();
-
-        if ($request->amp) {
-            $url = vsprintf('%s/%s%s', [
-                str_before($url, $entry->url()),
-                config('statamic.amp.route'),
-                $entry->url()
-            ]);
-        }
+        $url = $request->amp ? $entry->ampUrl() : $entry->absoluteUrl();
 
         $response = $kernel->handle(
             $subrequest = Request::createFromBase(SymfonyRequest::create($url))
