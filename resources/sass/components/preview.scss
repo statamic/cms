@@ -1,7 +1,6 @@
 .live-preview {
     @apply pin;
-    z-index: 98; // arbitrary under stacks.
-    top: 48px; // under header
+    z-index: 998; // arbitrary under stacks.
 }
 
 .live-preview-header {
