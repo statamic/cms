@@ -53,6 +53,7 @@ import axios from 'axios';
 import Provider from './Provider.vue';
 import Resizer from './Resizer.vue';
 
+let source;
 const widthLocalStorageKey = 'statamic.live-preview.editor-width';
 
 export default {
@@ -104,15 +105,21 @@ export default {
 
     methods: {
 
-        update() {
+        update: _.debounce(function () {
+            if (source) source.cancel();
+            source = axios.CancelToken.source();
+
             const payload = {
                 preview: this.values
             };
 
-            axios.post(this.url, payload).then(response => {
+            axios.post(this.url, payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
-            })
-        },
+            }).catch(e => {
+                if (axios.isCancel(e)) return;
+                throw e;
+            });
+        }, 150),
 
         updateIframeContents(contents) {
             const iframe = this.$refs.iframe;
