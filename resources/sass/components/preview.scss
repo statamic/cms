@@ -31,7 +31,7 @@
 
 .live-preview-header-slide-enter-active,
 .live-preview-header-slide-leave-active {
-    transition: all 0.3s;
+    transition: all 0.3s ease;
 }
 .live-preview-header-slide-enter,
 .live-preview-header-slide-leave-to {
@@ -40,21 +40,21 @@
 
 .live-preview-editor-slide-enter-active,
 .live-preview-editor-slide-leave-active {
-    transition: all 0.3s;
+    transition: all 0.3s ease;
 }
 .live-preview-editor-slide-enter,
 .live-preview-editor-slide-leave-to {
-    transform: translateX(-100px);
+    transform: translateX(-50px);
     opacity: 0;
 }
 
 .live-preview-contents-slide-enter-active,
 .live-preview-contents-slide-leave-active {
-    transition: all 0.3s;
+    transition: all 0.3s ease;
 }
 .live-preview-contents-slide-enter,
 .live-preview-contents-slide-leave-to {
-    transform: translateX(500px);
+    transform: translateX(50px);
     opacity: 0;
 }
 
