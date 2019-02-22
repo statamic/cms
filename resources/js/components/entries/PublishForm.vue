@@ -35,7 +35,7 @@
             </div>
 
 
-            <button class="btn mr-2" v-text="__('Live Preview')" @click="isPreviewing = true" />
+            <button v-if="isBase" class="btn mr-2" v-text="__('Live Preview')" @click="isPreviewing = true" />
 
             <button
                 class="btn btn-primary"
@@ -127,6 +127,10 @@ export default {
 
         livePreviewUrl() {
             return _.findWhere(this.localizations, { active: true }).url + '/preview';
+        },
+
+        isBase() {
+            return this.publishContainer === 'base';
         }
 
     },
