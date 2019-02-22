@@ -13,10 +13,6 @@
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
                         <div class="text-lg font-medium mr-2">Live Preview</div>
-                        <div>
-                            <button class="font-bold mx-1">Desktop</button>
-                            <button class="text-blue mx-1">Mobile</button>
-                        </div>
                         <button class="text-grey" @click="close">&times;</button>
                     </div>
                 </transition>
