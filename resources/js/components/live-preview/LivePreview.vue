@@ -10,28 +10,34 @@
         <portal v-if="previewing" to="live-preview">
             <div class="live-preview fixed flex flex-col">
 
-                <div class="live-preview-header relative bg-grey-lighter border-b px-3 py-2 shadow flex items-center justify-between">
-                    <div class="text-lg font-medium mr-2">Live Preview</div>
-                    <div>
-                        <button class="font-bold mx-1">Desktop</button>
-                        <button class="text-blue mx-1">Mobile</button>
+                <transition name="live-preview-header-slide">
+                    <div v-show="headerVisible" class="live-preview-header">
+                        <div class="text-lg font-medium mr-2">Live Preview</div>
+                        <div>
+                            <button class="font-bold mx-1">Desktop</button>
+                            <button class="text-blue mx-1">Mobile</button>
+                        </div>
+                        <button class="text-grey" @click="close">&times;</button>
                     </div>
-                    <button class="text-grey" @click="$emit('closed')">&times;</button>
-                </div>
+                </transition>
 
                 <div class="live-preview-main flex flex-1">
 
-                    <div class="live-preview-editor relative bg-white shadow-lg h-full" :style="{ width: '350px' }">
-                        <div class="live-preview-fields flex-1 h-full overflow-scroll">
-                            <portal-target name="live-preview-fields" />
+                    <transition name="live-preview-editor-slide">
+                        <div v-show="panesVisible" class="live-preview-editor" :style="{ width: '350px' }">
+                            <div class="live-preview-fields flex-1 h-full overflow-scroll">
+                                <portal-target name="live-preview-fields" />
+                            </div>
+
+                            <div class="live-preview-resizer h-full absolute pin-t" />
                         </div>
+                    </transition>
 
-                        <div class="live-preview-resizer h-full absolute pin-t" />
-                    </div>
-
-                    <div class="live-preview-contents relative bg-white flex-1 flex flex-col">
-                        <iframe ref="iframe" frameborder="0" class="w-full h-full" />
-                    </div>
+                    <transition name="live-preview-contents-slide">
+                        <div v-show="panesVisible" class="live-preview-contents">
+                            <iframe ref="iframe" frameborder="0" class="w-full h-full" />
+                        </div>
+                    </transition>
 
                 </div>
 
@@ -61,6 +67,8 @@ export default {
 
     data() {
         return {
+            panesVisible: false,
+            headerVisible: false,
             provides: {
                 storeName: this.name
             }
@@ -70,7 +78,10 @@ export default {
     watch: {
 
         previewing(enabled) {
-            if (enabled) this.update();
+            if (enabled) {
+                this.update();
+                this.animateIn();
+            }
 
             let state = this.$store.state.statamic.livePreview;
             state.enabled = enabled;
@@ -108,8 +119,33 @@ export default {
             iframe.contentWindow.document.open();
             iframe.contentWindow.document.write(contents);
             iframe.contentWindow.document.close();
-        }
+        },
 
+        close() {
+            this.animateOut().then(() => this.$emit('closed'));
+        },
+
+        animateIn() {
+            return this
+                .$wait(100)
+                .then(() => {
+                    this.headerVisible = true;
+                    return this.$wait(200);
+                })
+                .then(() => this.panesVisible = true);
+        },
+
+        animateOut() {
+            this.panesVisible = false;
+            this.headerVisible = false;
+            return this.$wait(300);
+        },
+
+        $wait(ms) {
+            return new Promise(resolve => {
+                setTimeout(resolve, ms);
+            });
+        }
     }
 
 }
