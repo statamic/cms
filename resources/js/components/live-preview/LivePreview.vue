@@ -29,7 +29,7 @@
                                 <portal-target name="live-preview-fields" />
                             </div>
 
-                            <div class="live-preview-resizer h-full absolute pin-t" @mousedown="resizeStart" />
+                            <resizer @resized="setEditorWidth" />
                         </div>
                     </transition>
 
@@ -51,13 +51,15 @@
 <script>
 import axios from 'axios';
 import Provider from './Provider.vue';
+import Resizer from './Resizer.vue';
 
 const widthLocalStorageKey = 'statamic.live-preview.editor-width';
 
 export default {
 
     components: {
-        Provider
+        Provider,
+        Resizer
     },
 
     props: {
@@ -152,26 +154,6 @@ export default {
             return new Promise(resolve => {
                 setTimeout(resolve, ms);
             });
-        },
-
-        resizeStart() {
-            window.addEventListener('mousemove', this.resizing);
-            window.addEventListener('mouseup', this.resizeEnd);
-        },
-
-        resizeEnd() {
-            window.removeEventListener('mousemove', this.resizing, false);
-            window.removeEventListener('mouseup', this.resizeEnd, false);
-        },
-
-        resizing(e) {
-            e.preventDefault();
-            let width = e.clientX;
-
-            // Prevent the width being too narrow.
-            width = (width < 350) ? 350 : width;
-
-            this.setEditorWidth(width);
         },
 
         setEditorWidth(width) {
