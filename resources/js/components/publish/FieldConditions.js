@@ -24,7 +24,13 @@ export default {
         },
 
         normalizeConditionLhs(field) {
-            return data_get(this.$store.state.publish.base.values, field, undefined);
+            let lhs = data_get(this.$store.state.publish.base.values, field, undefined);
+
+            if (_.isString(lhs)) {
+                lhs = `'${lhs.trim()}'`;
+            }
+
+            return lhs;
         },
 
         normalizeConditionOperator(condition, operator='==') {
@@ -34,9 +40,15 @@ export default {
         },
 
         normalizeConditionRhs(condition) {
-            OPERATORS.forEach(op => condition = condition.toString().replace(op, ''));
+            let rhs = condition;
 
-            return condition.trim();
+            OPERATORS.forEach(op => rhs = rhs.toString().replace(op, ''));
+
+            if (_.isString(rhs)) {
+                rhs = `'${rhs.trim()}'`;
+            }
+
+            return rhs;
         },
 
         passesCondition(condition) {
