@@ -13,6 +13,7 @@
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
                         <div class="text-lg font-medium mr-2">Live Preview</div>
+                        <label v-if="ampEnabled"><input type="checkbox" v-model="amp" /> AMP</label>
                         <button class="text-grey" @click="close">&times;</button>
                     </div>
                 </transition>
@@ -71,10 +72,23 @@ export default {
             panesVisible: false,
             headerVisible: false,
             editorWidth: null,
+            amp: false,
+            ampEnabled: Statamic.ampEnabled,
             provides: {
                 storeName: this.name
             }
         }
+    },
+
+    computed: {
+
+        payload() {
+            return {
+                amp: this.amp,
+                preview: this.values
+            }
+        }
+
     },
 
     watch: {
@@ -86,9 +100,9 @@ export default {
             this.animateIn();
         },
 
-        values: {
+        payload: {
             deep: true,
-            handler(values) {
+            handler(payload) {
                 if (this.previewing) this.update();
             }
         }
@@ -113,11 +127,7 @@ export default {
             if (source) source.cancel();
             source = axios.CancelToken.source();
 
-            const payload = {
-                preview: this.values
-            };
-
-            axios.post(this.url, payload, { cancelToken: source.token }).then(response => {
+            axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
             }).catch(e => {
                 if (axios.isCancel(e)) return;

@@ -19,6 +19,7 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $isAmpRequest = false;
 
     public static function version()
     {
@@ -98,6 +99,16 @@ class Statamic
        }
 
         return starts_with(request()->path(), config('statamic.cp.route'));
+   }
+
+   public static function isAmpRequest()
+   {
+       return static::$isAmpRequest;
+   }
+
+   public static function setAmpRequest()
+   {
+       static::$isAmpRequest = true;
    }
 
     public static function jsonVariables(Request $request)

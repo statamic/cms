@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Statamic\API\URL;
 use Statamic\API\Site;
+use Statamic\Statamic;
 use Statamic\API\Content;
 use Statamic\Routing\Router;
 use Illuminate\Http\Request;
@@ -42,6 +43,15 @@ class FrontendController extends Controller
 
         if ($url === '') {
             $url = '/';
+        }
+
+        if (config('statamic.amp.enabled')) {
+            $route = config('statamic.amp.route');
+
+            if (starts_with($url, "/$route/")) {
+                Statamic::setAmpRequest();
+                $url = str_after($url, "/$route");
+            }
         }
 
         $url = $this->removeIgnoredSegments($url);

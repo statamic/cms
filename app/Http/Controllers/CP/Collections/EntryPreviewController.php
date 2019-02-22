@@ -36,19 +36,19 @@ class EntryPreviewController extends CpController
         return $this->getEntryResponse($request, $entry)->getContent();
     }
 
-    protected function getEntryResponse($originalRequest, $entry)
+    protected function getEntryResponse($request, $entry)
     {
         $kernel = app()->make(HttpKernel::class);
 
-        $request = Request::createFromBase(
-            SymfonyRequest::create($entry->absoluteUrl())
+        $url = $request->amp ? $entry->ampUrl() : $entry->absoluteUrl();
+
+        $response = $kernel->handle(
+            $subrequest = Request::createFromBase(SymfonyRequest::create($url))
         );
 
-        $response = $kernel->handle($request);
+        $kernel->terminate($subrequest, $response);
 
-        $kernel->terminate($request, $response);
-
-        app()->instance('request', $originalRequest);
+        app()->instance('request', $request);
 
         return $response;
     }

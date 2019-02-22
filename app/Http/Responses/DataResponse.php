@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Responses;
 
+use Statamic\Statamic;
 use Statamic\View\Antlers\View;
 use Facades\Statamic\View\Cascade;
 use Statamic\Events\ResponseCreated;
@@ -85,10 +86,23 @@ class DataResponse implements Responsable
     protected function contents()
     {
         return (new View)
-            ->template($this->data->template())
-            ->layout($this->data->layout())
+            ->template($this->amped($this->data->template()))
+            ->layout($this->amped($this->data->layout()))
             ->cascadeContent($this->data)
             ->render();
+    }
+
+    protected function amped($view)
+    {
+        if (! Statamic::isAmpRequest()) {
+            return $view;
+        }
+
+        if (view()->exists($amp = "amp.$view")) {
+            return $amp;
+        }
+
+        return $view;
     }
 
     protected function cascade()
