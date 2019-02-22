@@ -66,7 +66,7 @@
                 :values="values"
                 @closed="isPreviewing = false"
             >
-                <publish-sections />
+                <publish-sections :live-preview="isPreviewing" />
             </live-preview>
         </publish-container>
     </div>

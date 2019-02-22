@@ -16,7 +16,8 @@ export default {
         meta: {
             type: Object,
             default: () => { return {}; }
-        }
+        },
+        livePreview: Boolean
     },
 
     methods: {
