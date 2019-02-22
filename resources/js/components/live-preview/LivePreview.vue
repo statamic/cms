@@ -97,6 +97,14 @@ export default {
 
     created() {
         this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
+
+        this.$mousetrap.bindGlobal('meta+shift+p', () => {
+            this.previewing ? this.close() : this.$emit('opened-via-keyboard');
+        });
+    },
+
+    destroyed() {
+        this.$mousetrap.unbind('meta+shift+p');
     },
 
     methods: {

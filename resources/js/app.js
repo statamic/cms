@@ -13,6 +13,7 @@ axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.csrfToken;
 
 Vue.prototype.axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
+require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();
 
 Vue.moment = require('moment');

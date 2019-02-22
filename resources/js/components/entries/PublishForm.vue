@@ -64,6 +64,7 @@
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
                 :values="values"
+                @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
                 <transition name="live-preview-sections-drop">
