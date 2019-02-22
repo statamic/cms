@@ -50,6 +50,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             'uri' => $this->uri(),
             'url' => $this->url(),
             'edit_url' => $this->editUrl(),
+            'permalink' => $this->absoluteUrl(),
             'published' => $this->published(),
             'date' => $this->date(),
             'is_entry' => true,
