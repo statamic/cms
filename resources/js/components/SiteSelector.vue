@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex items-center px-2 border-l h-full text-sm">
+    <div class="flex items-center px-2 border-l border-r mr-2 h-full text-sm">
         <dropdown-list>
             <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-80" slot="trigger">
                 <i class="block h-6 w-6 mr-1"><slot name="icon" /></i><span>{{ activeName }}</span>

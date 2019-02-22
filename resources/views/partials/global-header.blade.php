@@ -11,13 +11,13 @@
     <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
     </global-search>
 
-    @if (Statamic\API\Site::hasMultiple())
-        <site-selector>
-            <template slot="icon">@svg('sites')</template>
-        </site-selector>
-    @endif
-
     <div class="head-link h-full px-3 flex items-center">
+
+        @if (Statamic\API\Site::hasMultiple())
+            <site-selector>
+                <template slot="icon">@svg('sites')</template>
+            </site-selector>
+        @endif
 
         <favorite-creator
             current-url="{{ request()->fullUrl() }}"
