@@ -15,21 +15,21 @@
             ></a>
         </div>
 
-        <div class="flex justify-between">
+        <div :class="{ 'flex justify-between': !livePreview }">
             <div class="w-full">
                 <div
-                    class="card p-0"
+                    :class="{ 'card p-0': !livePreview }"
                     v-for="section in mainSections"
                     :key="section.handle"
                     v-show="section.handle === active"
                 >
-                    <publish-fields :fields="section.fields" />
+                    <publish-fields :fields="section.fields" :live-preview="livePreview" />
                 </div>
             </div>
 
-            <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
-                <div class="card p-0">
-                    <publish-fields :fields="sidebarSection.fields" />
+            <div class="publish-sidebar" :class="{ 'ml-4': !livePreview }" v-if="shouldShowSidebar">
+                <div :class="{ 'card p-0': !livePreview }">
+                    <publish-fields :fields="sidebarSection.fields" :live-preview="livePreview" />
                 </div>
             </div>
         </div>
@@ -40,6 +40,10 @@
 
 <script>
 export default {
+
+    props: {
+        livePreview: Boolean
+    },
 
     inject: ['storeName'],
 
@@ -74,9 +78,9 @@ export default {
         shouldShowSidebar() {
             if (! this.sidebarSection) return false;
 
-            const width = this.$store.state.statamic.windowWidth;
+            if (this.livePreview) return false;
 
-            // TODO: or is live previewing
+            const width = this.$store.state.statamic.windowWidth;
             if (this.sidebarSection.fields.length == 0 || width < 1366) return false;
 
             return true;
@@ -104,7 +108,7 @@ export default {
                 errors[field] = this.sectionFields[field];
             });
             return errors;
-        },
+        }
 
     },
 

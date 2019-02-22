@@ -25,7 +25,7 @@ export default {
 
         preferences(state, preferences) {
             state.preferences = preferences;
-        },
+        }
 
     }
 

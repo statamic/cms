@@ -4,10 +4,9 @@
 
 .stacks-on-stacks {
     position: fixed;
-    top: 48px;
-    left: 0; right: 0; bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     // padding-top: 48px;
-    z-index: 99;
+    z-index: 999; // arbitrary to make it sit on top of random stuff.
 
     .vue-portal-target {
         @apply absolute pin;

@@ -34,6 +34,9 @@
                 </button>
             </div>
 
+
+            <button v-if="isBase" class="btn mr-2" v-text="__('Live Preview')" @click="openLivePreview" />
+
             <button
                 class="btn btn-primary"
                 :class="{ disabled: !canSave }"
@@ -55,7 +58,19 @@
             :site="site"
             @updated="values = $event"
         >
-            <publish-sections slot-scope="{ }" />
+            <live-preview
+                slot-scope="{}"
+                :name="publishContainer"
+                :url="livePreviewUrl"
+                :previewing="isPreviewing"
+                :values="values"
+                @opened-via-keyboard="openLivePreview"
+                @closed="closeLivePreview"
+            >
+                <transition name="live-preview-sections-drop">
+                    <publish-sections v-show="sectionsVisible" :live-preview="isPreviewing" />
+                </transition>
+            </live-preview>
         </publish-container>
     </div>
 
@@ -64,8 +79,13 @@
 
 <script>
 import axios from 'axios';
+import LivePreview from '../live-preview/LivePreview.vue';
 
 export default {
+
+    components: {
+        LivePreview,
+    },
 
     props: {
         publishContainer: String,
@@ -93,7 +113,9 @@ export default {
             localizations: _.clone(this.initialLocalizations),
             site: this.initialSite,
             error: null,
-            errors: {}
+            errors: {},
+            isPreviewing: false,
+            sectionsVisible: true,
         }
     },
 
@@ -105,6 +127,14 @@ export default {
 
         canSave() {
             return this.$progress.isComplete();
+        },
+
+        livePreviewUrl() {
+            return _.findWhere(this.localizations, { active: true }).url + '/preview';
+        },
+
+        isBase() {
+            return this.publishContainer === 'base';
         }
 
     },
@@ -183,6 +213,21 @@ export default {
             return localization.published
                 ? 'This entry exists in this site, and is published.'
                 : 'This entry exists in this site, but is not published.';
+        },
+
+        openLivePreview() {
+            this.sectionsVisible = false;
+            this.$wait(200)
+                .then(() => {
+                    this.isPreviewing = true;
+                    return this.$wait(300);
+                })
+                .then(() => this.sectionsVisible = true);
+        },
+
+        closeLivePreview() {
+            this.isPreviewing = false;
+            this.sectionsVisible = true;
         }
 
     }

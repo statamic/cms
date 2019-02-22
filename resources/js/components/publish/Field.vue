@@ -13,10 +13,6 @@
             v-if="config.instructions"
             v-html="$options.filters.markdown(config.instructions)" />
 
-        <div v-if="hasError">
-            <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
-
         <slot name="fieldtype">
             <component
                 :is="fieldtypeComponent"
@@ -24,9 +20,14 @@
                 :value="value"
                 :meta="meta"
                 :name="config.handle"
+                :live-preview="livePreview"
                 @updated="updated"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
+
+        <div v-if="hasError">
+            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
     </div>
 
 </template>
@@ -46,7 +47,8 @@ export default {
         },
         errors: {
             type: Array
-        }
+        },
+        livePreview: Boolean
     },
 
     computed: {
@@ -63,7 +65,7 @@ export default {
             return [
                 'form-group',
                 `${this.config.type}-fieldtype`,
-                tailwind_width_class(this.config.width),
+                !this.livePreview ? tailwind_width_class(this.config.width) : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];
