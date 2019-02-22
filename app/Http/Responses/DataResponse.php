@@ -31,7 +31,6 @@ class DataResponse implements Responsable
         $this
             ->protect()
             ->handleDraft()
-            ->handleLivePreview()
             ->adjustResponseType()
             ->addContentHeaders();
 
@@ -79,13 +78,6 @@ class DataResponse implements Responsable
         }
 
         $this->headers['X-Statamic-Draft'] = true;
-
-        return $this;
-    }
-
-    protected function handleLivePreview()
-    {
-        // todo
 
         return $this;
     }
