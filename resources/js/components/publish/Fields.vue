@@ -4,6 +4,7 @@
 
         <publish-field
             v-for="field in fields"
+            v-if="showField(field)"
             :key="field.handle"
             :config="field"
             :value="values[field.handle]"
@@ -19,10 +20,13 @@
 
 <script>
 import PublishField from './Field.vue';
+import FieldConditions from './FieldConditions.js';
 
 export default {
 
     components: { PublishField },
+
+    mixins: [FieldConditions],
 
     inject: ['storeName'],
 
