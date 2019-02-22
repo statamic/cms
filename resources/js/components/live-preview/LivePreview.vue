@@ -146,12 +146,6 @@ export default {
             return this.$wait(300);
         },
 
-        $wait(ms) {
-            return new Promise(resolve => {
-                setTimeout(resolve, ms);
-            });
-        },
-
         setEditorWidth(width) {
             this.editorWidth = width;
             localStorage.setItem(widthLocalStorageKey, width);

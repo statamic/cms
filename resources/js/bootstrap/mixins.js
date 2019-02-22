@@ -17,6 +17,11 @@ Vue.mixin({
         },
         translate(key, replacements) { // TODO: Remove
             return __(key, replacements);
-        }
+        },
+        $wait(ms) {
+            return new Promise(resolve => {
+                setTimeout(resolve, ms);
+            });
+        },
     }
 })
