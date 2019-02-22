@@ -35,7 +35,7 @@
             </div>
 
 
-            <button v-if="isBase" class="btn mr-2" v-text="__('Live Preview')" @click="isPreviewing = true" />
+            <button v-if="isBase" class="btn mr-2" v-text="__('Live Preview')" @click="openLivePreview" />
 
             <button
                 class="btn btn-primary"
@@ -64,9 +64,11 @@
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
                 :values="values"
-                @closed="isPreviewing = false"
+                @closed="closeLivePreview"
             >
-                <publish-sections :live-preview="isPreviewing" />
+                <transition name="live-preview-sections-drop">
+                    <publish-sections v-show="sectionsVisible" :live-preview="isPreviewing" />
+                </transition>
             </live-preview>
         </publish-container>
     </div>
@@ -112,6 +114,7 @@ export default {
             error: null,
             errors: {},
             isPreviewing: false,
+            sectionsVisible: true,
         }
     },
 
@@ -209,6 +212,21 @@ export default {
             return localization.published
                 ? 'This entry exists in this site, and is published.'
                 : 'This entry exists in this site, but is not published.';
+        },
+
+        openLivePreview() {
+            this.sectionsVisible = false;
+            this.$wait(200)
+                .then(() => {
+                    this.isPreviewing = true;
+                    return this.$wait(300);
+                })
+                .then(() => this.sectionsVisible = true);
+        },
+
+        closeLivePreview() {
+            this.isPreviewing = false;
+            this.sectionsVisible = true;
         }
 
     }
