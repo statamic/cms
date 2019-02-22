@@ -45,13 +45,8 @@ class FrontendController extends Controller
             $url = '/';
         }
 
-        if (config('statamic.amp.enabled')) {
-            $route = config('statamic.amp.route');
-
-            if (starts_with($url, "/$route/")) {
-                Statamic::setAmpRequest();
-                $url = str_after($url, "/$route");
-            }
+        if (Statamic::isAmpRequest()) {
+            $url = str_after($url, '/' . config('statamic.amp.route'));
         }
 
         $url = $this->removeIgnoredSegments($url);

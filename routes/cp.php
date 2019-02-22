@@ -38,7 +38,8 @@ Route::group([
         Route::get('collections/{collection}/entries/create/{site}', 'EntriesController@create')->name('collections.entries.create');
         Route::post('collections/{collection}/entries/{site}', 'EntriesController@store')->name('collections.entries.store');
         Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
-        Route::post('collections/{collection}/entries/{id}/{slug}/{site}/preview', 'EntryPreviewController@edit')->name('collections.entries.preview');
+        Route::post('collections/{collection}/entries/{id}/{slug}/{site}/preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
+        Route::post('collections/{collection}/entries/create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
         Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
     });
 

@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Statamic\API\File;
+use Statamic\API\Site;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
 use Statamic\API\Preference;
@@ -19,7 +20,6 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
-    protected static $isAmpRequest = false;
 
     public static function version()
     {
@@ -103,12 +103,15 @@ class Statamic
 
    public static function isAmpRequest()
    {
-       return static::$isAmpRequest;
-   }
+        if (! config('statamic.amp.enabled')) {
+            return false;
+        }
 
-   public static function setAmpRequest()
-   {
-       static::$isAmpRequest = true;
+        $url = Site::current()->relativePath(
+            str_finish(request()->getUri(), '/')
+        );
+
+        return starts_with($url, '/' . config('statamic.amp.route'));
    }
 
     public static function jsonVariables(Request $request)

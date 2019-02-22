@@ -64,6 +64,7 @@
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
                 :values="values"
+                :blueprint="fieldset.handle"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >

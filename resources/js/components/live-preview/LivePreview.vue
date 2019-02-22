@@ -65,6 +65,7 @@ export default {
         previewing: Boolean,
         values: Object,
         name: String,
+        blueprint: String,
     },
 
     data() {
@@ -85,6 +86,7 @@ export default {
         payload() {
             return {
                 amp: this.amp,
+                blueprint: this.blueprint,
                 preview: this.values
             }
         }
