@@ -6,6 +6,7 @@ use Statamic\Sites\Site;
 use Statamic\Fields\Value;
 use Statamic\API\GlobalSet;
 use Illuminate\Http\Request;
+use Statamic\Contracts\Data\Augmentable;
 
 class Cascade
 {
