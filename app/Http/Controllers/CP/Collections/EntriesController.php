@@ -12,6 +12,7 @@ use Statamic\API\Preference;
 use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
@@ -96,7 +97,7 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
-        // event(new PublishBlueprintFound($blueprint, 'entry', $entry)); // TODO
+        event(new PublishBlueprintFound($blueprint, 'entry', $entry));
 
         $fields = $blueprint
             ->fields()

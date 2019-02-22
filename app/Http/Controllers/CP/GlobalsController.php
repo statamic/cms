@@ -6,6 +6,7 @@ use Statamic\API\Helper;
 use Statamic\API\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
+use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalSetContract;
 
 class GlobalsController extends CpController
@@ -47,7 +48,7 @@ class GlobalsController extends CpController
 
         $blueprint = $set->blueprint();
 
-        // event(new PublishBlueprintFound($blueprint, 'globals', $set)); // TODO
+        event(new PublishBlueprintFound($blueprint, 'globals', $set));
 
         $fields = $blueprint
             ->fields()
