@@ -38,10 +38,10 @@ global.dd = function(args) {
     console.log(args);
 };
 
-global.data_get = function(obj, key) {
-    return key.split(".").reduce(function(o, x) {
-        return (typeof o == "undefined" || o === null) ? o : o[x];
-    }, obj);
+global.data_get = function(obj, path, fallback=null) {
+    // Source: https://stackoverflow.com/a/22129960
+    var properties = Array.isArray(path) ? path : path.split('.');
+    return properties.reduce((prev, curr) => prev && prev[curr], obj) || fallback;
 };
 
 global.Cookies = require('cookies-js');
