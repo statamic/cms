@@ -18,8 +18,28 @@
 }
 
 .live-preview-contents {
-    @apply relative bg-white flex-1 flex flex-col;
+    @apply relative bg-grey-50 flex-1 flex flex-col;
     z-index: 1;
+}
+
+.live-preview-contents iframe.Responsive {
+    @apply h-full w-full;
+}
+
+.live-preview-contents iframe.Laptop {
+    @apply mt-2 shadow-lg rounded;
+    height: 900px;
+    width: 1440px;
+}
+.live-preview-contents iframe.Tablet {
+    @apply mt-2 shadow-lg rounded;
+    height: 786px;
+    width: 1024px;
+}
+.live-preview-contents iframe.Mobile {
+    @apply mt-2 shadow-lg rounded;
+    height: 812px;
+    width: 375px;
 }
 
 .live-preview-resizer {

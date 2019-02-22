@@ -12,9 +12,19 @@
 
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-lg font-medium mr-2">Live Preview</div>
+                        <div class="text-lg font-medium mr-2">{{ __('Live Preview') }}</div>
                         <label v-if="ampEnabled"><input type="checkbox" v-model="amp" /> AMP</label>
-                        <button class="text-grey" @click="close">&times;</button>
+                        <div class="flex">
+                            <div class="select-input-container w-32 mr-1">
+                                <select class="select-input" v-model="previewDevice">
+                                    <option :value="device" v-text="device" :selected="previewDevice === device" v-for="device in previewDevices"></option>
+                                </select>
+                                <div class="select-input-toggle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                            <button class="btn" @click="close">{{ __('Close') }}</button>
+                        </div>
                     </div>
                 </transition>
 
@@ -32,7 +42,9 @@
 
                     <transition name="live-preview-contents-slide">
                         <div v-show="panesVisible" class="live-preview-contents">
-                            <iframe ref="iframe" frameborder="0" class="w-full h-full" />
+                            <div class="flex items-start justify-center h-full w-full">
+                                <iframe ref="iframe" frameborder="0" :class="previewDevice" />
+                            </div>
                         </div>
                     </transition>
 
@@ -73,11 +85,13 @@ export default {
             panesVisible: false,
             headerVisible: false,
             editorWidth: null,
+            previewDevice: 'Responsive',
             amp: false,
             ampEnabled: Statamic.ampEnabled,
+            previewDevices: ['Responsive', 'Laptop', 'Tablet', 'Mobile'],
             provides: {
                 storeName: this.name
-            }
+            },
         }
     },
 
@@ -89,8 +103,7 @@ export default {
                 blueprint: this.blueprint,
                 preview: this.values
             }
-        }
-
+        },
     },
 
     watch: {
