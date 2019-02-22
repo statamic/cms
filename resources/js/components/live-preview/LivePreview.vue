@@ -13,7 +13,7 @@
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
                         <div class="text-lg font-medium mr-2">Live Preview</div>
-                        <label><input type="checkbox" v-model="amp" /> AMP</label>
+                        <label v-if="ampEnabled"><input type="checkbox" v-model="amp" /> AMP</label>
                         <button class="text-grey" @click="close">&times;</button>
                     </div>
                 </transition>
@@ -73,6 +73,7 @@ export default {
             headerVisible: false,
             editorWidth: null,
             amp: false,
+            ampEnabled: Statamic.ampEnabled,
             provides: {
                 storeName: this.name
             }

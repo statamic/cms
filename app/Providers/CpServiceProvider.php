@@ -24,7 +24,8 @@ class CpServiceProvider extends ServiceProvider
             'translationLocale' => $this->app['translator']->locale(),
             'translations' => $this->app['translator']->toJson(),
             'sites' => $this->sites(),
-            'selectedSite' => Site::selected()->handle()
+            'selectedSite' => Site::selected()->handle(),
+            'ampEnabled' => config('statamic.amp.enabled'),
         ]);
     }
 
