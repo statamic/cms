@@ -27,14 +27,14 @@ export default {
             let lhs = data_get(this.$store.state.publish.base.values, field, undefined);
 
             if (_.isString(lhs)) {
-                lhs = `'${lhs.trim()}'`;
+                lhs = JSON.stringify(lhs.trim());
             }
 
             return lhs;
         },
 
         normalizeConditionOperator(condition, operator='==') {
-            OPERATORS.forEach(op => condition.toString().startsWith(op) ? operator = op : false);
+            OPERATORS.forEach(value => condition.toString().startsWith(value) ? operator = value : false);
 
             return operator;
         },
@@ -45,7 +45,7 @@ export default {
             OPERATORS.forEach(op => rhs = rhs.toString().replace(op, ''));
 
             if (_.isString(rhs)) {
-                rhs = `'${rhs.trim()}'`;
+                rhs = JSON.stringify(rhs.trim());
             }
 
             return rhs;
