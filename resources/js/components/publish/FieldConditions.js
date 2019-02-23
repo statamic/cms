@@ -54,6 +54,13 @@ export default {
 
             OPERATORS.forEach(value => rhs = rhs.toString().replace(new RegExp(`^${value} `), ''));
 
+            switch (rhs) {
+                case 'null':
+                case 'empty':
+                    rhs = null;
+                    break;
+            }
+
             if (_.isString(rhs)) {
                 rhs = JSON.stringify(rhs.trim());
             }
