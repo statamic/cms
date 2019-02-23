@@ -52,7 +52,7 @@ export default {
         normalizeConditionRhs(condition) {
             let rhs = condition;
 
-            OPERATORS.forEach(op => rhs = rhs.toString().replace(op, ''));
+            OPERATORS.forEach(value => rhs = rhs.toString().replace(new RegExp(`^${value} `), ''));
 
             if (_.isString(rhs)) {
                 rhs = JSON.stringify(rhs.trim());
