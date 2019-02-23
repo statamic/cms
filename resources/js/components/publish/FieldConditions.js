@@ -1,4 +1,4 @@
-const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<='];
+const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not'];
 
 export default {
     methods: {
@@ -35,6 +35,16 @@ export default {
 
         normalizeConditionOperator(condition, operator='==') {
             OPERATORS.forEach(value => condition.toString().startsWith(value) ? operator = value : false);
+
+            switch (operator) {
+                case 'is':
+                case 'equals':
+                    operator = '==';
+                    break;
+                case 'not':
+                    operator = '!=';
+                    break;
+            }
 
             return operator;
         },
