@@ -34,7 +34,7 @@ export default {
         },
 
         normalizeConditionOperator(condition, operator='==') {
-            OPERATORS.forEach(value => condition.toString().startsWith(value) ? operator = value : false);
+            OPERATORS.forEach(value => condition.toString().startsWith(value + ' ') ? operator = value : false);
 
             switch (operator) {
                 case 'is':
