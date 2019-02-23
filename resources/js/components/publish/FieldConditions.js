@@ -52,11 +52,7 @@ export default {
         },
 
         passesCondition(condition) {
-            let expression = `${condition.lhs} ${condition.operator} ${condition.rhs}`;
-
-            dd(expression);
-
-            return eval(expression);
+            return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
         },
     }
 }
