@@ -90,3 +90,15 @@ test('it only shows when multiple conditions are met', () => {
     expect(showFieldIf({first_name: 'is San', last_name: 'is Holo', age: '> 40'})).toBe(false);
 });
 
+test('it can run conditions on nested data', () => {
+    Store.commit('setValues', {
+        related_posts: [
+            {title: 'Learning Laravel', slug: 'learning-laravel'},
+            {title: 'Learning Vue', slug: 'learning-vue'},
+        ]
+    });
+
+    expect(showFieldIf({'related_posts.*.title': 'Learning Vue'})).toBe(true);
+    expect(showFieldIf({'related_posts.*.title': 'Learning Vim'})).toBe(false);
+})
+
