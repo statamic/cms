@@ -8,7 +8,9 @@
     "watch-poll": "npm run watch -- --watch-poll",
     "hot": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
     "prod": "npm run production",
-    "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+    "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "test": "cross-env NODE_ENV=test jest",
+    "test-watch": "npm run test -- --watch --notify"
   },
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
@@ -52,9 +54,14 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "babel-jest": "^24.1.0",
     "cross-env": "^5.1",
+    "jest": "^24.1.0",
     "laravel-mix": "^2.0",
     "tailwindcss": "^0.6",
     "vue-template-compiler": "^2.6.5"
+  },
+  "jest": {
+    "roots": ["<rootDir>/resources/assets/js"]
   }
 }
