@@ -2,13 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Parse;
-use Statamic\Tags\Tags;
-use Statamic\API\Config;
-use Statamic\API\Antlers;
-
 class Partial extends Tags
 {
     public function __call($method, $arguments)
