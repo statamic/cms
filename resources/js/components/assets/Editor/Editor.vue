@@ -12,7 +12,7 @@
 
             <div class="editor-meta">
                 <div class="asset-editor-meta-items">
-                    <div class="meta-item one-line">
+                    <div class="meta-item one-line text-xs border-none">
                         <file-icon :extension="asset.extension"></file-icon>
                         {{ asset.path }}
                     </div>
@@ -139,10 +139,10 @@
                         </div>
 
                         <div class="editor-form-actions text-right">
-                            <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
+                            <button type="button" class="btn-danger mr-1" @click="destroy" v-if="allowDeleting">
                                 {{ __('Delete') }}
                             </button>
-                            <button type="button" class="btn btn-primary" @click="save">
+                            <button type="button" class="btn-primary" @click="save">
                                 {{ __('Save') }}
                             </button>
                         </div>

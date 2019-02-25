@@ -78,11 +78,8 @@
 }
 
 
-/**
- * Table listing
- *
- * Inside the asset browser when viewing in "table" mode.
- */
+ /* Table Listing
+   ========================================================================== */
 
 .asset-table-listing {
 	position: relative;
@@ -170,11 +167,8 @@
 
 
 
-/**
- * Grid listing
- *
- * Used in the asset browser when using 'grid' style and inside the fieldtype.
- */
+/* Grid Listing
+  ========================================================================== */
 
 .asset-grid-listing {
     background: #fff;
@@ -207,11 +201,8 @@
 
 
 
-/**
- * Solo Asset
- *
- * Used in a fieldtypes showing just one Asset.
- */
+/* Solo Asset (max_files: 1)
+  ========================================================================== */
 
  .asset-solo-container {
 
@@ -234,11 +225,8 @@
  }
 
 
-/**
- * Asset tile
- *
- * The "asset" used in grid listings and in the fieldtype.
- */
+ /* Asset Tile
+   ========================================================================== */
 
 .asset-tile {
     min-width: 0;
@@ -339,10 +327,8 @@
 }
 
 
-
-/**
- * Asset Editor
- */
+/* The Asset Editor
+  ========================================================================== */
 
 @media all and (max-width: 800px) {
     .asset-editor-meta-items .meta-item {
@@ -389,30 +375,26 @@
 }
 
 .asset-editor-meta-items {
-    display: flex;
-    flex: 1;
+    @apply flex flex-1 items-center;
 
     .meta-item {
-        border-left: 1px solid $border;
-        padding: 10px 30px;
-        color: $color_gray_light;
-        cursor: text;
+		@apply flex items-start flex-col border-l px-2 cursor-text h-full justify-center;
 
         &.one-line {
-            display: flex;
-            align-items: center;
+			@apply flex-row;
         }
 
         &:first-child {
-            padding-left: 15px;
+            @apply pl-2 items-center;
         }
     }
 
     .meta-label {
-        display: block;
-        padding: 0;
-        font-size: 13px;
-        color: $color_gray_dark;
+		@apply block p-0 text-sm text-grey-80;
+    }
+
+	.meta-value {
+		@apply block p-0 text-xs text-grey-60;
     }
 
     .file-icon {
@@ -443,11 +425,7 @@
 }
 
 .asset-editor .editor-preview {
-    background: $asset_bg;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
+	@apply bg-grey-80 flex flex-col justify-between relative;
 
     .editor-preview-image {
         flex-grow: 1;
@@ -475,30 +453,19 @@
         position: relative;
 
         img {
-            position: absolute;
+			@apply absolute w-auto h-auto max-w-full max-h-full;
+			box-shadow: 0 0 32px rgba(0, 0, 0, .35);
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: auto;
-            height: auto;
-            max-width: 100%;
-            max-height: 100%;
-            box-shadow: 0 0 30px rgba(black, .35);
         }
     }
 
     .editor-file-actions {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-
-        right: 0;
-        background: rgba(black, .45);
-        text-align: center;
-        padding: 15px;
+		@apply absolute pin-b pin-l pin-r bg-grey-90 p-2 text-center h-16;
 
         button {
-            margin: 0 5px;
+            @apply mx-sm;
         }
     }
 }
