@@ -30,7 +30,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
-        'revealer', 'section', 'select', 'slug', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
+        'revealer', 'section', 'slug', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
     ];
 
     /**
