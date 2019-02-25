@@ -14,6 +14,7 @@
         :initial-meta="{{ json_encode($meta) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         initial-site="{{ $locale }}"
+        :amp="{{ bool_str($entry->ampable()) }}"
     ></entry-publish-form>
 
 @endsection

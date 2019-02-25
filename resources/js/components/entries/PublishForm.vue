@@ -65,6 +65,7 @@
                 :previewing="isPreviewing"
                 :values="values"
                 :blueprint="fieldset.handle"
+                :amp="amp"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
@@ -99,7 +100,8 @@ export default {
         collectionTitle: String,
         collectionUrl: String,
         initialAction: String,
-        method: String
+        method: String,
+        amp: Boolean,
     },
 
     data() {
