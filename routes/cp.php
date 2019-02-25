@@ -125,7 +125,7 @@ Route::group([
         Route::get('blueprints/data', 'BlueprintsFieldtypeController@data');
     });
 
-    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
+    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'API'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');
     });
