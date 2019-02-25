@@ -2,6 +2,32 @@
    GRID & REPLICATOR
    ========================================================================== */
 
+.form-group.replicator-fieldtype {
+   @apply px-0 bg-grey-20 border-t border-b mt-2;
+   > label {
+       @apply ml-3;
+   }
+}
+
+.replicator {
+    @apply px-3;
+}
+
+.replicator-set-container {
+    &:focus {
+        @apply outline-none;
+    }
+}
+
+.replicator-set {
+    @apply bg-white shadow mb-3 rounded outline-none;
+
+    &:focus, &:focus-within {
+        @apply outline-none;
+    }
+
+}
+
 .grid-field, .replicator-fieldtype {
 
     .form-group {
