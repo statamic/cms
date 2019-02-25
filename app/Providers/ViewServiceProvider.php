@@ -49,26 +49,5 @@ class ViewServiceProvider extends ServiceProvider
             $view->addExtension('antlers.html', 'antlers', $resolver);
             $view->addExtension('antlers.php', 'antlers', $resolver);
         });
-
-        $this->app->booted(function () {
-            // Update the view finder with paths to automatically find amp or site subdirectories.
-            $finder = $this->app['view']->getFinder();
-            $finder->setPaths($this->getViewPaths($finder->getPaths()));
-        });
-    }
-
-    protected function getViewPaths($paths)
-    {
-        $amp = Statamic::isAmpRequest();
-        $site = Site::current()->handle();
-
-        return collect($paths)->flatMap(function ($path) use ($site, $amp) {
-            return [
-                $amp ? $path . '/' . $site . '/amp' : null,
-                $path . '/' . $site,
-                $amp ? $path . '/amp' : null,
-                $path,
-            ];
-        })->filter()->values()->all();
     }
 }

@@ -34,6 +34,7 @@ class DataResponse implements Responsable
             ->handleDraft()
             ->adjustResponseType()
             ->addContentHeaders()
+            ->addViewPaths()
             ->handleAmp();
 
         $response = response()
@@ -43,6 +44,26 @@ class DataResponse implements Responsable
         ResponseCreated::dispatch($response);
 
         return $response;
+    }
+
+    protected function addViewPaths()
+    {
+        $finder = view()->getFinder();
+        $amp = Statamic::isAmpRequest();
+        $site = $this->data->site()->handle();
+
+        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+            return [
+                $amp ? $path . '/' . $site . '/amp' : null,
+                $path . '/' . $site,
+                $amp ? $path . '/amp' : null,
+                $path,
+            ];
+        })->filter()->values()->all();
+
+        $finder->setPaths($paths);
+
+        return $this;
     }
 
     protected function handleAmp()
