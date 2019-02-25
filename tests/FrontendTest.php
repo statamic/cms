@@ -267,6 +267,18 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    function amp_requests_load_their_amp_directory_counterparts()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function amp_requests_without_an_amp_template_result_in_a_404()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
     function routes_pointing_to_controllers_should_render()
     {
         $this->markTestIncomplete();

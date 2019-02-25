@@ -44,7 +44,7 @@ trait Routable
 
     public function ampUrl()
     {
-        return vsprintf('%s/%s/%s', [
+        return !$this->ampable() ? null : vsprintf('%s/%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
             config('statamic.amp.route'),
             ltrim($this->uri(), '/')

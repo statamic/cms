@@ -33,7 +33,8 @@ class DataResponse implements Responsable
             ->protect()
             ->handleDraft()
             ->adjustResponseType()
-            ->addContentHeaders();
+            ->addContentHeaders()
+            ->handleAmp();
 
         $response = response()
             ->make($this->contents())
@@ -42,6 +43,15 @@ class DataResponse implements Responsable
         ResponseCreated::dispatch($response);
 
         return $response;
+    }
+
+    protected function handleAmp()
+    {
+        if (Statamic::isAmpRequest() && ! $this->data->ampable()) {
+            abort(404);
+        }
+
+        return $this;
     }
 
     protected function getRedirect()

@@ -21,6 +21,7 @@ class Collection implements Contract
     protected $sites = [];
     protected $blueprints = [];
     protected $searchIndex;
+    protected $ampable = false;
 
     public function handle($handle = null)
     {
@@ -66,6 +67,17 @@ class Collection implements Contract
         }
 
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function ampable($ampable = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->ampable;
+        }
+
+        $this->ampable = $ampable;
 
         return $this;
     }

@@ -193,4 +193,9 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             'published' => $this->published === false ? false : null
         ]);
     }
+
+    public function ampable()
+    {
+        return $this->collection()->ampable();
+    }
 }

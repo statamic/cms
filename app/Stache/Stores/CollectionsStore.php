@@ -25,6 +25,7 @@ class CollectionsStore extends BasicStore
             ->title(array_get($data, 'title'))
             ->route(array_get($data, 'route'))
             ->order(array_get($data, 'order'))
+            ->ampable(array_get($data, 'amp'))
             ->sites($sites)
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
