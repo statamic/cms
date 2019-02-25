@@ -82,7 +82,7 @@ class Engine implements EngineInterface
 
         $contents = $this->getContents($path);
 
-        list($frontMatter, $contents) = $this->extractFrontMatter($contents);
+        [$frontMatter, $contents] = $this->extractFrontMatter($contents);
 
         // If the data has provided front matter with this special key, it will override
         // front matter defined in the view itself. This is typically used by partials.
