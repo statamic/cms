@@ -70,7 +70,6 @@ class ExtensionServiceProvider extends ServiceProvider
         'email' => 'obfuscateEmail',
         'l10n' => 'formatLocalized',
         'lowercase' => 'lower',
-        '85' => 'slackEasterEgg',
         'tz' => 'timezone',
         'in_future' => 'isFuture',
         'inPast' => 'isPast',

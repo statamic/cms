@@ -1581,16 +1581,6 @@ class BaseModifiers extends Modifier
     }
 
     /**
-     * If you don't get it, it wasn't for you.
-     *
-     * @return string
-     */
-    public function slackEasterEgg()
-    {
-        return "Bigfoot was here.";
-    }
-
-    /**
      * Converts the string into an URL slug. This includes replacing non-ASCII
      * characters with their closest ASCII equivalents, removing remaining non-ASCII
      * and non-alphanumeric characters, and replacing whitespace with $replacement.
