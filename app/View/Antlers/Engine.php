@@ -78,11 +78,16 @@ class Engine implements EngineInterface
      */
     public function get($path, array $data = [])
     {
+        $parser = $this->parser->allowPhp(Str::endsWith($path, '.php'));
+
         $contents = $this->getContents($path);
 
         list($frontMatter, $contents) = $this->extractFrontMatter($contents);
 
-        $parser = $this->parser->allowPhp(Str::endsWith($path, '.php'));
+        // If the data has provided front matter with this special key, it will override
+        // front matter defined in the view itself. This is typically used by partials.
+        // ie. data defined in the partial tag parameters will win the array merge.
+        $frontMatter = array_merge($frontMatter, $data['__frontmatter'] ?? []);
 
         $contents = $parser->parse($contents, array_merge($data, $frontMatter));
 

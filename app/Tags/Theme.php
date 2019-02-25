@@ -112,39 +112,6 @@ class Theme extends Tags
     }
 
     /**
-     * The {{ theme:partial }} tag
-     *
-     * Renders a partial template
-     *
-     * @return string
-     */
-    public function partial()
-    {
-        $src = $this->get('src');
-
-        $partialPath = config('statamic.theming.dedicated_view_directories')
-            ? resource_path("partials/{$src}.antlers")
-            : resource_path("views/{$src}.antlers");
-
-        if (! $partial = File::get($partialPath.'.html')) {
-            if ($partial = File::get($partialPath.'.php')) {
-                $php = true;
-            }
-        }
-
-        // Allow front matter in these suckers
-        $parsed = Parse::frontMatter($partial);
-        $variables = array_get($parsed, 'data', []);
-        $template = array_get($parsed, 'content');
-
-        // Front-matter, tag parameters, and the context is all passed through to the partial.
-        // Since 2.5, parameters need to be prefixed with a colon in order to read from the field.
-        $variables = array_merge($this->context, $variables, $this->parameters);
-
-        return Antlers::parser()->allowPhp($php ?? false)->parse($template, $variables);
-    }
-
-    /**
      * The {{ theme:output }} tag
      *
      * Outputs the contents of the specified file.
