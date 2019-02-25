@@ -224,6 +224,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
+            $studly = studly_case($actual);
             $this->app[$parent][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
 
