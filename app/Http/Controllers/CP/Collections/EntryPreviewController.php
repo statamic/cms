@@ -12,6 +12,7 @@ use Statamic\API\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class EntryPreviewController extends CpController
