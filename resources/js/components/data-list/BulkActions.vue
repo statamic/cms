@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="hasSelections" class="flex items-center bg-grey-30 text-sm border-b px-2 py-1">
+    <div v-if="hasSelections" class="flex items-center bg-grey-30 text-sm border-t px-2 py-1">
 
         <div
             class="text-grey mr-2"

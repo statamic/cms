@@ -28,12 +28,6 @@
                             @per-page-changed="perPageChanged" />
                         <data-list-column-picker :save-url="saveColumnsUrl" />
                     </div>
-                    <data-list-bulk-actions
-                        :url="actionUrl"
-                        :actions="actions"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
                     <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
@@ -61,8 +55,14 @@
                             </dropdown-list>
                         </template>
                     </data-list-table>
+                    <data-list-bulk-actions
+                        class="rounded-b"
+                        :url="actionUrl"
+                        :actions="actions"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
                 </div>
-
                 <data-list-pagination
                     class="mt-3"
                     :resource-meta="meta"

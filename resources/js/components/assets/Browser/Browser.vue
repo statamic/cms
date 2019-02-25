@@ -64,14 +64,6 @@
                                 </button>
                             </div>
 
-                            <data-list-bulk-actions
-                                v-if="hasActions"
-                                :url="actionUrl"
-                                :actions="actions"
-                                @started="actionStarted"
-                                @completed="bulkActionsCompleted"
-                            />
-
                             <uploads
                                 v-if="uploads.length"
                                 :uploads="uploads"
@@ -143,6 +135,15 @@
                                 </template>
 
                             </data-list-table>
+
+                            <data-list-bulk-actions
+                                class="rounded-b"
+                                v-if="hasActions"
+                                :url="actionUrl"
+                                :actions="actions"
+                                @started="actionStarted"
+                                @completed="bulkActionsCompleted"
+                            />
 
                         </div>
 

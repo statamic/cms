@@ -25,12 +25,6 @@
                             @filters-changed="filtersChanged"
                             @per-page-changed="perPageChanged" />
                     </div>
-                    <data-list-bulk-actions
-                        :url="actionUrl"
-                        :actions="actions"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
                     <data-list-table :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-name" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url">{{ value }}</a>
@@ -49,6 +43,13 @@
                                 </div>
                             </dropdown-list>
                         </template>
+                        <data-list-bulk-actions
+                            class="rounded-b"
+                            :url="actionUrl"
+                            :actions="actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                     </data-list-table>
                 </div>
 
