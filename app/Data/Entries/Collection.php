@@ -74,7 +74,7 @@ class Collection implements Contract
     public function ampable($ampable = null)
     {
         if (func_num_args() === 0) {
-            return $this->ampable;
+            return config('statamic.amp.enabled') && $this->ampable;
         }
 
         $this->ampable = $ampable;
