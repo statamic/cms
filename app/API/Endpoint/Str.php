@@ -120,4 +120,20 @@ class Str extends \Illuminate\Support\Str
 
         return $string;
     }
+
+    public static function tailwindWidthClass($width)
+    {
+        $widths = [
+            25 => '1/4',
+            33 => '1/3',
+            50 => '1/2',
+            66 => '2/3',
+            75 => '3/4',
+            100 => 'full'
+        ];
+
+        $class = $widths[$width] ?? 'full';
+
+        return "w-$class";
+    }
 }
