@@ -103,6 +103,27 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'user.address.country': 'Australia'})).toBe(false);
 })
 
+test('it can run conditions on array values using wildcards', () => {
+    Store.commit('setValues', {
+        reasons_for_cancellation: [
+            'slow service',
+            'found another service'
+        ]
+    });
+
+    expect(showFieldIf({'reasons_for_cancellation.*': 'other'})).toBe(false);
+
+    Store.commit('setValues', {
+        reasons_for_cancellation: [
+            'slow service',
+            'found another service',
+            'other'
+        ]
+    });
+
+    expect(showFieldIf({'reasons_for_cancellation.*': 'other'})).toBe(true);
+})
+
 test('it can run conditions on nested data using wildcards', () => {
     Store.commit('setValues', {
         related_posts: [
