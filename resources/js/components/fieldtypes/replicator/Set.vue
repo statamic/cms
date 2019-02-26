@@ -22,6 +22,7 @@
         <div>
             <set-field
                 v-for="field in fields"
+                v-if="showField(field)"
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
@@ -47,10 +48,15 @@
 
 <script>
 import SetField from './Field.vue';
+import FieldConditions from '../../publish/FieldConditions.js';
 
 export default {
 
     components: { SetField },
+
+    mixins: [FieldConditions],
+
+    inject: ['storeName'],
 
     props: {
         config: {
