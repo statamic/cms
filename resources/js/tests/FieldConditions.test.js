@@ -38,7 +38,7 @@ test('it shows or hides field based on shorthand equals conditions', () => {
     expect(showFieldIf({first_name: 'Jack'})).toBe(false);
 });
 
-test('it can use custom operators in conditions', () => {
+test('it can use comparison operators in conditions', () => {
     Store.commit('setValues', {age: 13});
 
     expect(showFieldIf({age: '== 13'})).toBe(true);
@@ -59,6 +59,32 @@ test('it can use custom operators in conditions', () => {
     expect(showFieldIf({age: 'is 13'})).toBe(true);
     expect(showFieldIf({age: 'equals 13'})).toBe(true);
     expect(showFieldIf({age: 'not 13'})).toBe(false);
+});
+
+test('it can use includes or contains operators in conditions', () => {
+    Store.commit('setValues', {
+        cancellation_reasons: [
+            'found another service',
+            'other'
+        ],
+        example_string: 'The quick brown fox jumps over the lazy dog',
+        age: 13,
+    });
+
+    expect(showFieldIf({cancellation_reasons: 'includes other'})).toBe(true);
+    expect(showFieldIf({cancellation_reasons: 'contains other'})).toBe(true);
+    expect(showFieldIf({cancellation_reasons: 'includes slow service'})).toBe(false);
+    expect(showFieldIf({cancellation_reasons: 'contains slow service'})).toBe(false);
+
+    expect(showFieldIf({example_string: 'includes fox jumps'})).toBe(true);
+    expect(showFieldIf({example_string: 'contains fox jumps'})).toBe(true);
+    expect(showFieldIf({example_string: 'includes dog jumps'})).toBe(false);
+    expect(showFieldIf({example_string: 'contains dog jumps'})).toBe(false);
+
+    expect(showFieldIf({age: 'includes 13'})).toBe(true);
+    expect(showFieldIf({age: 'contains 13'})).toBe(true);
+    expect(showFieldIf({age: 'includes fox'})).toBe(false);
+    expect(showFieldIf({age: 'contains fox'})).toBe(false);
 });
 
 test('it handles null and empty in condition as literal null', () => {
@@ -120,27 +146,6 @@ test('it can run conditions on nested data', () => {
 
     expect(showFieldIf({'user.address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'user.address.country': 'Australia'})).toBe(false);
-})
-
-test('it can run conditions on array values using wildcards', () => {
-    Store.commit('setValues', {
-        reasons_for_cancellation: [
-            'slow service',
-            'found another service'
-        ]
-    });
-
-    expect(showFieldIf({'reasons_for_cancellation.*': 'other'})).toBe(false);
-
-    Store.commit('setValues', {
-        reasons_for_cancellation: [
-            'slow service',
-            'found another service',
-            'other'
-        ]
-    });
-
-    expect(showFieldIf({'reasons_for_cancellation.*': 'other'})).toBe(true);
 })
 
 test('it can run conditions on nested data using wildcards', () => {
