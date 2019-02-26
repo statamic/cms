@@ -1,9 +1,11 @@
 const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not', 'includes', 'contains'];
 
 class FieldConditionsValidator {
-    constructor(field, store) {
+    constructor(field, values, store, storeName) {
         this.field = field;
+        this.values = values;
         this.store = store;
+        this.storeName = storeName;
         this.showOnPass = true;
     }
 
@@ -12,6 +14,8 @@ class FieldConditionsValidator {
 
         if (conditions === undefined) {
             return true;
+        } else if (_.isString(conditions)) {
+            return this.passesCustomLogicFunction(conditions);
         }
 
         let failedConditions = _.chain(conditions)
@@ -43,7 +47,7 @@ class FieldConditionsValidator {
     }
 
     normalizeConditionLhs(field) {
-        let lhs = data_get(this.store.state.publish.base.values, field, undefined);
+        let lhs = data_get(this.values, field, undefined);
 
         if (_.isString(lhs)) {
             lhs = JSON.stringify(lhs.trim());
@@ -111,13 +115,27 @@ class FieldConditionsValidator {
 
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
     }
+
+    passesCustomLogicFunction(functionName) {
+        let customFunction = data_get(Statamic, 'conditions.' + functionName);
+
+        let extra = {
+            store: this.store,
+            storeName: this.storeName,
+            storeValues: this.store.state.publish[this.storeName].values
+        }
+
+        return this.showOnPass ? customFunction(this.values, extra) : ! customFunction(this.values, extra);
+    }
 }
 
 // Export select methods for use as Vue mixin.
 export default {
     methods: {
         showField(field) {
-            return (new FieldConditionsValidator(field, this.$store)).passesConditions();
+            let validator = new FieldConditionsValidator(field, this.values, this.$store, this.storeName);
+
+            return validator.passesConditions();
         }
     }
 }

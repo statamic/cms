@@ -16,15 +16,30 @@ const Store = new Vuex.Store({
 
 const Fields = new Vue({
     mixins: [FieldConditions],
-    store: Store
+    store: Store,
+    data() {
+        return {
+            storeName: 'base',
+            values: {}
+        }
+    },
+    methods: {
+        setValues(values) {
+            this.values = values;
+            Store.commit('setValues', values);
+        }
+    }
 });
 
 let showFieldIf = function (conditions=null) {
     return Fields.showField(conditions ? {'if': conditions} : {});
 };
 
+global.Statamic = {conditions: {}};
+
 afterEach(() => {
-    Store.commit('setValues', {});
+    Fields.values = {};
+    Statamic.conditions = {};
 });
 
 test('it shows field by default', () => {
@@ -32,14 +47,14 @@ test('it shows field by default', () => {
 });
 
 test('it shows or hides field based on shorthand equals conditions', () => {
-    Store.commit('setValues', {first_name: 'Jesse'});
+    Fields.setValues({first_name: 'Jesse'});
 
     expect(showFieldIf({first_name: 'Jesse'})).toBe(true);
     expect(showFieldIf({first_name: 'Jack'})).toBe(false);
 });
 
 test('it can use comparison operators in conditions', () => {
-    Store.commit('setValues', {age: 13});
+    Fields.setValues({age: 13});
 
     expect(showFieldIf({age: '== 13'})).toBe(true);
     expect(showFieldIf({age: '!= 5'})).toBe(true);
@@ -62,7 +77,7 @@ test('it can use comparison operators in conditions', () => {
 });
 
 test('it can use includes or contains operators in conditions', () => {
-    Store.commit('setValues', {
+    Fields.setValues({
         cancellation_reasons: [
             'found another service',
             'other'
@@ -105,7 +120,7 @@ test('it handles null, empty, true, and false in condition as literal', () => {
 });
 
 test('it can use operators with multi-word values', () => {
-    Store.commit('setValues', {ace_ventura_says: 'Allllllrighty then!'});
+    Fields.setValues({ace_ventura_says: 'Allllllrighty then!'});
 
     expect(showFieldIf({ace_ventura_says: 'Allllllrighty then!'})).toBe(true);
     expect(showFieldIf({ace_ventura_says: '== Allllllrighty then!'})).toBe(true);
@@ -114,7 +129,7 @@ test('it can use operators with multi-word values', () => {
 });
 
 test('it only shows when multiple conditions are met', () => {
-    Store.commit('setValues', {
+    Fields.setValues({
         first_name: 'San',
         last_name: 'Holo',
         age: 22
@@ -125,7 +140,7 @@ test('it only shows when multiple conditions are met', () => {
 });
 
 test('it shows or hides with parent key variants', () => {
-    Store.commit('setValues', {
+    Fields.setValues({
         first_name: 'Rincess',
         last_name: 'Pleia'
     });
@@ -144,7 +159,7 @@ test('it shows or hides with parent key variants', () => {
 });
 
 test('it can run conditions on nested data', () => {
-    Store.commit('setValues', {
+    Fields.setValues({
         user: {
             address: {
                 country: 'Canada'
@@ -156,9 +171,32 @@ test('it can run conditions on nested data', () => {
     expect(showFieldIf({'user.address.country': 'Australia'})).toBe(false);
 });
 
-// TODO: Implement wildcards using asterisks...
+test('it can call a custom logic function', () => {
+    var storeValues = {
+        favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
+        favorite_animals: ['cats', 'dogs'],
+    };
+
+    Fields.setValues(storeValues);
+
+    Statamic.conditions.reallyLovesFood = function (values, extra) {
+        expect(extra.store).toBe(Store);
+        expect(extra.storeName).toBe('base');
+        expect(extra.storeValues).toBe(storeValues);
+        return values.favorite_foods.length > 3;
+    };
+
+    Statamic.conditions.reallyLovesAnimals = function (values) {
+        return values.favorite_animals.length > 3;
+    };
+
+    expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
+    expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
+});
+
+// TODO: Implement wildcards using asterisks? Is this useful?
 // test('it can run conditions on nested data using wildcards', () => {
-//     Store.commit('setValues', {
+//     Fields.setValues({
 //         related_posts: [
 //             {title: 'Learning Laravel', slug: 'learning-laravel'},
 //             {title: 'Learning Vue', slug: 'learning-vue'},
@@ -168,4 +206,3 @@ test('it can run conditions on nested data', () => {
 //     expect(showFieldIf({'related_posts.*.title': 'Learning Vue'})).toBe(true);
 //     expect(showFieldIf({'related_posts.*.title': 'Learning Vim'})).toBe(false);
 // });
-
