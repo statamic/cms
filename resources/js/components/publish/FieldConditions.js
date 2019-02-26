@@ -1,4 +1,4 @@
-const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not'];
+const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not', 'includes', 'contains'];
 
 class FieldConditionsValidator {
     constructor(field, store) {
@@ -52,8 +52,12 @@ class FieldConditionsValidator {
         return lhs;
     }
 
-    normalizeConditionOperator(condition, operator='==') {
+    normalizeConditionOperator(condition) {
+        let operator = '==';
+
         OPERATORS.forEach(value => condition.toString().startsWith(value + ' ') ? operator = value : false);
+
+        this.stringifyRhs = true;
 
         switch (operator) {
             case 'is':
@@ -62,6 +66,11 @@ class FieldConditionsValidator {
                 break;
             case 'not':
                 operator = '!=';
+                break;
+            case 'includes':
+            case 'contains':
+                operator = 'includes';
+                this.stringifyRhs = false;
                 break;
         }
 
@@ -80,7 +89,7 @@ class FieldConditionsValidator {
                 break;
         }
 
-        if (_.isString(rhs)) {
+        if (_.isString(rhs) && this.stringifyRhs) {
             rhs = JSON.stringify(rhs.trim());
         }
 
@@ -88,6 +97,12 @@ class FieldConditionsValidator {
     }
 
     passesCondition(condition) {
+        if (condition.operator === 'includes') {
+            return _.isObject(condition.lhs)
+                ? condition.lhs.includes(condition.rhs)
+                : condition.lhs.toString().includes(condition.rhs);
+        }
+
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
     }
 }
