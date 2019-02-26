@@ -87,6 +87,12 @@ class FieldConditionsValidator {
             case 'empty':
                 rhs = null;
                 break;
+            case 'true':
+                rhs = true;
+                break;
+            case 'false':
+                rhs = false;
+                break;
         }
 
         if (_.isString(rhs) && this.stringifyRhs) {

@@ -87,13 +87,21 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({age: 'contains fox'})).toBe(false);
 });
 
-test('it handles null and empty in condition as literal null', () => {
-    Store.commit('setValues', {last_name: 'HasselHoff'});
+test('it handles null, empty, true, and false in condition as literal', () => {
+    Fields.setValues({
+        last_name: 'HasselHoff',
+        likes_food: true,
+        likes_animals: false,
+        not_real_boolean: 'false'
+    });
 
-    expect(showFieldIf({first_name: 'null'})).toBe(true);
-    expect(showFieldIf({first_name: 'empty'})).toBe(true);
-    expect(showFieldIf({last_name: 'not null'})).toBe(true);
-    expect(showFieldIf({last_name: 'not empty'})).toBe(true);
+    expect(showFieldIf({first_name: '=== null'})).toBe(true);
+    expect(showFieldIf({first_name: '=== empty'})).toBe(true);
+    expect(showFieldIf({last_name: '!== null'})).toBe(true);
+    expect(showFieldIf({last_name: '!== empty'})).toBe(true);
+    expect(showFieldIf({likes_food: '=== true'})).toBe(true);
+    expect(showFieldIf({likes_animals: '=== false'})).toBe(true);
+    expect(showFieldIf({not_real_boolean: '=== false'})).toBe(false);
 });
 
 test('it can use operators with multi-word values', () => {
