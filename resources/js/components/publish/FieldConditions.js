@@ -4,19 +4,34 @@ class FieldConditionsValidator {
     constructor(field, store) {
         this.field = field;
         this.store = store;
+        this.showOnPass = true;
     }
 
     passesConditions() {
-        if (this.field.if === undefined) {
+        let conditions = this.getConditions();
+
+        if (conditions === undefined) {
             return true;
         }
 
-        let failedConditions = _.chain(this.field.if)
+        let failedConditions = _.chain(conditions)
             .map((condition, field) => this.normalizeCondition(field, condition))
             .reject(condition => this.passesCondition(condition))
             .value();
 
-        return _.isEmpty(failedConditions);
+        return this.showOnPass ? _.isEmpty(failedConditions) : ! _.isEmpty(failedConditions);
+    }
+
+    getConditions() {
+        var conditions;
+
+        if (conditions = this.field.if || this.field.show_when) {
+            return conditions;
+        }
+
+        this.showOnPass = false;
+
+        return this.field.unless || this.field.hide_when;
     }
 
     normalizeCondition(field, condition) {
