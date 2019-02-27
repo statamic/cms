@@ -88,9 +88,14 @@ class Route implements Responsable
     public function ampUrl()
     {
         return !$this->ampable() ? null : vsprintf('%s/%s/%s', [
-            rtrim(Site::current()->absoluteUrl(), '/'),
+            rtrim($this->site()->absoluteUrl(), '/'),
             config('statamic.amp.route'),
             ltrim($this->uri, '/')
         ]);
+    }
+
+    public function site()
+    {
+        return Site::current();
     }
 }
