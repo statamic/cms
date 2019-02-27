@@ -47,7 +47,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
 
         return $this->collect($results)->map(function ($result) {
             return Content::find($result['id']);
-        })->filter();
+        })->filter()->values();
     }
 
     protected function collect($items = [])
