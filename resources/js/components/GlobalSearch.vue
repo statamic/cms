@@ -20,7 +20,7 @@
 
             <span v-if="! (isDirty || searching)" class="rounded px-sm text-2xs border text-grey-40">/</span>
 
-            <div v-show="focused" class="global-search-results">
+            <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
                 <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
                     <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
