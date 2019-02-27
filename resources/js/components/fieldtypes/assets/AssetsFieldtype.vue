@@ -1,8 +1,7 @@
 <template>
     <div class="assets-fieldtype">
 
-        <div v-if="!containerSpecified">
-            <i class="icon icon-warning"></i>
+        <div v-if="!containerSpecified" class="error-container">
             {{ __('No asset container specified') }}
         </div>
 
@@ -15,7 +14,7 @@
             @upload-complete="uploadComplete"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="relative">
+            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div v-if="loading" class="loading loading-basic">
                     <loading-graphic :inline="true" />
@@ -30,32 +29,29 @@
 
                     <div
                         v-if="!maxFilesReached"
-                        class="flex items-center p-2 bg-grey-20 border rounded"
+                        class="assets-fieldtype-picker"
                         :class="{
-                            'border-b-0 rounded-b-none': expanded,
+                            'is-expanded': expanded,
                             'bard-drag-handle': isInBardField
                         }"
                     >
 
                         <button
                             type="button"
-                            class="btn btn-with-icon mr-1"
+                            class="btn btn-with-icon"
                             @click="openSelector"
                             @keyup.space.enter="openSelector"
                             tabindex="0">
-                            <span class="icon icon-folder-images"></span>
-                            {{ __('Browse Assets') }}
+                            <svg-icon name="folder-image" class="w-6 h-6 text-grey-80"></svg-icon>
+                            {{ __('Assets') }}
                         </button>
 
-                        <button
-                            type="button"
-                            class="btn btn-with-icon"
-                            @click.prevent="uploadFile">
-                            <span class="icon icon-upload-to-cloud"></span>
-                            {{ __('Upload') }}
-                        </button>
-
-                        <p class="ml-3 text-sm text-grey-40">{{ __('or drag and drop files') }}</p>
+                        <p class="ml-2 text-xs text-grey-60">
+                            <button type="button" class="text-blue underline hover:text-blue-dark" @click.prevent="uploadFile">
+                                {{ __('Select file') }}
+                            </button>
+                            <span v-text="__('or drag & drop to upload.')"></span>
+                        </p>
 
                         <button
                             type="button"
