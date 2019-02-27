@@ -27,7 +27,7 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-10 w-full border p-1 rounded shadow-inner;
+    @apply appearance-none bg-grey-10 text-grey-80 w-full border p-1 rounded shadow-inner;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
@@ -88,7 +88,11 @@ textarea.input-text {
 /* Select Fields
   ========================================================================== */
   .select-input-container {
-      position: relative;
+      @apply rounded relative;
+
+      &:focus, &:focus-within {
+          @apply focus-outline;
+      }
 
       select {
           @include button(#fff, $color_gray_dark);
