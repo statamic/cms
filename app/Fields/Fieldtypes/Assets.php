@@ -130,9 +130,15 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        $data = Arr::wrap($this->augment($data));
+        if (! $assets = $this->augment($data)) {
+            return [];
+        }
 
-        return collect($data)->map(function ($asset) {
+        if ($this->config('max_files') === 1) {
+            $assets = collect([$assets]);
+        }
+
+        return $assets->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
