@@ -11,11 +11,16 @@
             :row-index="index"
             :grid-name="name"
             @updated="updated"
+            :class="sortableHandleClass"
         />
 
         <td class="row-controls">
-            <span class="icon icon-menu move cursor-move" :class="sortableHandleClass"></span>
-            <span class="icon icon-cross delete" @click="$emit('removed', index)"></span>
+            <dropdown-list>
+                <ul class="dropdown-menu">
+                    <li><a @click="$emit('duplicate', index)" v-text="__('Duplicate Row')"></a></li>
+                    <li class="warning"><a @click="$emit('removed', index)" v-text="__('Delete Row')"></a></li>
+                </ul>
+            </dropdown-list>
         </td>
     </tr>
 

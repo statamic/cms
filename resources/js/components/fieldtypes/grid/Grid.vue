@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="grid-fieldtype-container">
 
         <small v-if="hasExcessRows" class="help-block text-red">
             Only {{ maxRows }} rows are allowed.
@@ -13,6 +13,7 @@
             :name="name"
             @updated="updated"
             @removed="removed"
+            @duplicate="duplicate"
             @sorted="sorted"
         />
 
@@ -116,6 +117,14 @@ export default {
             if (confirm(__('Are you sure?'))) {
                 this.rows.splice(index, 1);
             }
+        },
+
+        duplicate(index) {
+            const row = _.clone(this.rows[index]);
+
+            row._id = uniqid();
+
+            this.rows.push(row);
         },
 
         sorted(rows) {

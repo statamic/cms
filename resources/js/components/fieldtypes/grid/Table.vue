@@ -1,6 +1,6 @@
 <template>
 
-    <table class="data-table w-full mb-2 border">
+    <table class="grid-table">
         <thead>
             <tr>
                 <grid-header-cell
@@ -8,7 +8,7 @@
                     :key="field.handle"
                     :field="field"
                 />
-                <th></th>
+                <th class="row-controls"></th>
             </tr>
         </thead>
         <sortable-list
@@ -26,6 +26,7 @@
                     :values="row"
                     :name="name"
                     @updated="(row, value) => $emit('updated', row, value)"
+                    @duplicate="(row) => $emit('duplicate', row)"
                     @removed="(row) => $emit('removed', row)"
                 />
             </tbody>

@@ -1,6 +1,6 @@
 <template>
 
-    <th class="border">
+    <th>
         <div class="flex items-center justify-between">
             <div>{{ field.display || field.handle }}</div>
             <div

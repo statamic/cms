@@ -1,6 +1,6 @@
 <template>
 
-    <td class="border">
+    <td class="grid-cell" :class="fieldtypeComponent">
         <component
             :is="fieldtypeComponent"
             :config="field"
