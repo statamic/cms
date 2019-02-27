@@ -54,12 +54,16 @@ test('it shows or hides field based on shorthand equals conditions', () => {
 });
 
 test('it can use comparison operators in conditions', () => {
-    Fields.setValues({age: 13});
+    Fields.setValues({
+        last_name: 'Hasselhoff',
+        age: 13
+    });
 
     expect(showFieldIf({age: '== 13'})).toBe(true);
     expect(showFieldIf({age: '!= 5'})).toBe(true);
+    expect(showFieldIf({last_name: '=== Hasselhoff'})).toBe(true);
+    expect(showFieldIf({last_name: '!== Fischer'})).toBe(true);
     expect(showFieldIf({age: '=== 13'})).toBe(false); // Fails because we don't cast their condition to int
-    expect(showFieldIf({age: '!== 13'})).toBe(true);
 
     expect(showFieldIf({age: '> 5'})).toBe(true);
     expect(showFieldIf({age: '> 13'})).toBe(false);
@@ -74,6 +78,11 @@ test('it can use comparison operators in conditions', () => {
     expect(showFieldIf({age: 'is 13'})).toBe(true);
     expect(showFieldIf({age: 'equals 13'})).toBe(true);
     expect(showFieldIf({age: 'not 13'})).toBe(false);
+
+    // Space between operator and rhs shouldn't be required
+    expect(showFieldIf({age: '==13'})).toBe(true);
+    expect(showFieldIf({age: '>=13'})).toBe(true);
+    expect(showFieldIf({age: '<=13'})).toBe(true);
 });
 
 test('it can use includes or contains operators in conditions', () => {

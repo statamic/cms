@@ -89,7 +89,9 @@ class FieldConditionsValidator {
     normalizeConditionOperator(condition) {
         let operator = '==';
 
-        OPERATORS.forEach(value => condition.toString().startsWith(value + ' ') ? operator = value : false);
+        _.chain(OPERATORS)
+            .filter(value => new RegExp(`^${value}[^=]`).test(condition.toString()))
+            .each(value => operator = value);
 
         this.stringifyRhs = true;
 
@@ -112,9 +114,11 @@ class FieldConditionsValidator {
     }
 
     normalizeConditionRhs(condition) {
-        let rhs = condition;
+        let rhs = condition.toString();
 
-        OPERATORS.forEach(value => rhs = rhs.toString().replace(new RegExp(`^${value} `), ''));
+        _.chain(OPERATORS)
+            .filter(value => new RegExp(`^${value}[^=]`).test(rhs))
+            .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
 
         switch (rhs) {
             case 'null':
