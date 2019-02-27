@@ -214,7 +214,7 @@ test('it can call a custom logic function', () => {
     };
 
     expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
-    expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
+    expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
 });
 
 // TODO: Implement wildcards using asterisks? Is this useful?

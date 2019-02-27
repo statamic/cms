@@ -1,3 +1,4 @@
+const KEYS = ['if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'];
 const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not', 'includes', 'contains'];
 
 class FieldConditionsValidator {
@@ -6,6 +7,7 @@ class FieldConditionsValidator {
         this.values = values;
         this.store = store;
         this.storeName = storeName;
+        this.passOnAny = false;
         this.showOnPass = true;
     }
 
@@ -18,24 +20,48 @@ class FieldConditionsValidator {
             return this.passesCustomLogicFunction(conditions);
         }
 
-        let failedConditions = _.chain(conditions)
-            .map((condition, field) => this.normalizeCondition(field, condition))
-            .reject(condition => this.passesCondition(condition))
-            .value();
+        let passes = this.passOnAny
+            ? this.passesAnyConditions(conditions)
+            : this.passesAllConditions(conditions);
 
-        return this.showOnPass ? _.isEmpty(failedConditions) : ! _.isEmpty(failedConditions);
+        return this.showOnPass ? passes : ! passes;
     }
 
     getConditions() {
-        var conditions;
+        let key = _.chain(KEYS)
+            .filter(key => this.field[key])
+            .first()
+            .value();
 
-        if (conditions = this.field.if || this.field.show_when) {
-            return conditions;
+        if (! key) {
+            return undefined;
         }
 
-        this.showOnPass = false;
+        if (key.includes('any')) {
+            this.passOnAny = true;
+        }
 
-        return this.field.unless || this.field.hide_when;
+        if (key.includes('unless') || key.includes('hide_when')) {
+            this.showOnPass = false;
+        }
+
+        return this.field[key];
+    }
+
+    passesAllConditions(conditions) {
+        return _.chain(conditions)
+            .map((condition, field) => this.normalizeCondition(field, condition))
+            .reject(condition => this.passesCondition(condition))
+            .isEmpty()
+            .value();
+    }
+
+    passesAnyConditions(conditions) {
+        return ! _.chain(conditions)
+            .map((condition, field) => this.normalizeCondition(field, condition))
+            .filter(condition => this.passesCondition(condition))
+            .isEmpty()
+            .value();
     }
 
     normalizeCondition(field, condition) {
@@ -125,7 +151,9 @@ class FieldConditionsValidator {
             storeValues: this.store.state.publish[this.storeName].values
         }
 
-        return this.showOnPass ? customFunction(this.values, extra) : ! customFunction(this.values, extra);
+        let passes = customFunction(this.values, extra);
+
+        return this.showOnPass ? passes : ! passes;
     }
 }
 
