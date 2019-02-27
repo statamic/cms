@@ -127,6 +127,11 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         ]);
     }
 
+    public function orderType()
+    {
+        return $this->collection()->order();
+    }
+
     public function order($order = null)
     {
         if (func_num_args() === 0) {

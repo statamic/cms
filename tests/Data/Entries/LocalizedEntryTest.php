@@ -266,6 +266,20 @@ class LocalizedEntryTest extends TestCase
     }
 
     /** @test */
+    function it_gets_the_order_type_from_the_collection()
+    {
+        $collection = (new Collection)->handle('blog');
+        $parent = (new Entry)->collection($collection);
+        $entry = (new LocalizedEntry)->entry($parent);
+
+        $this->assertEquals('alphabetical', $entry->orderType());
+
+        $collection->order('number');
+
+        $this->assertEquals('number', $entry->orderType());
+    }
+
+    /** @test */
     function it_gets_and_sets_the_order()
     {
         $entry = new LocalizedEntry;
