@@ -32,6 +32,7 @@
                 @arrow-up-at-start="goToPreviousTextField"
                 @arrow-down-at-end="goToNextTextField"
                 @text-updated="updateText"
+                @updated="updateSet"
                 @selection-changed="selectionChanged"
             >
                 <template slot="divider-start">
@@ -480,6 +481,10 @@ export default {
 
         updateText(i, text) {
             this.values[i].text = text;
+        },
+
+        updateSet(i, set) {
+            this.values.splice(i, 1, set);
         },
 
         getReplicatorPreviewText() {
