@@ -1,16 +1,13 @@
 <template>
 
     <td class="border">
-        <div v-show="shown">
-            <component
-                v-show="shown"
-                :is="fieldtypeComponent"
-                :config="field"
-                :value="value"
-                :name="name"
-                @updated="updated"
-            />
-        </div>
+        <component
+            :is="fieldtypeComponent"
+            :config="field"
+            :value="value"
+            :name="name"
+            @updated="updated"
+        />
 
         <div v-if="hasError">
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
@@ -40,10 +37,6 @@ export default {
         },
         gridName: {
             type: String,
-            required: true
-        },
-        shown: {
-            type: Boolean,
             required: true
         }
     },
