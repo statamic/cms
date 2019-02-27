@@ -72,6 +72,17 @@ return [
 
     'php_max_memory_limit' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Date Format
+    |--------------------------------------------------------------------------
+    |
+    | Any time Carbon is cast to a string in views, it should use this format.
+    |
+    */
+
+    'date_format' => 'F, jS Y',
+
     'charset' => 'UTF-8',
     // 'parser_backtrack_limit' => null,
     'timezone' => 'UTC',
