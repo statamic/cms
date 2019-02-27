@@ -349,13 +349,13 @@ export default {
          * Accepts an array of asset URLs and/or IDs.
          */
         loadAssets(assets) {
-            this.loading = true;
-
             if (! assets || ! assets.length) {
                 this.loading = false;
                 this.assets = [];
                 return;
             }
+
+            this.loading = true;
 
             axios.get(cp_url('assets-fieldtype'), {
                 params: { assets }
@@ -458,11 +458,8 @@ export default {
             this.update(_.pluck(this.assets, 'id'));
         },
 
-        loading: {
-            immediate: true,
-            handler(loading) {
-                this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
-            }
+        loading(loading) {
+            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
         }
 
     },
