@@ -3,7 +3,7 @@
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
         <grid-cell
             v-for="(field, i) in fields"
-            v-if="showField(field)"
+            v-show="showField(field)"
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"

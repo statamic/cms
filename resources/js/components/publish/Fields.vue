@@ -4,7 +4,7 @@
 
         <publish-field
             v-for="field in fields"
-            v-if="showField(field)"
+            v-show="showField(field)"
             :key="field.handle"
             :config="field"
             :value="values[field.handle]"
