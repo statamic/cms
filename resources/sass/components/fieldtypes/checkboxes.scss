@@ -3,16 +3,11 @@
    ========================================================================== */
 
 .checkboxes-fieldtype {
-    ul {
-        @apply list-reset m-0;
+    .option {
+        @apply flex items-center mb-1;
     }
-    li { margin-bottom: 5px; }
 
-    li label { margin: 0; }
+    label {
+        @apply ml-1;
+    }
 }
-
-
-/* Inside a Grid field
-  ========================================================================== */
-
-.grid-fieldtype .checkboxes-fieldtype { padding: 10px }
