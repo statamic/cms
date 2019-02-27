@@ -158,13 +158,15 @@ class LocalizedEntryTest extends TestCase
     /** @test */
     function it_gets_the_url_from_the_collection()
     {
+        config(['statamic.amp.enabled' => true]);
+
         API\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
         ]]);
 
-        $collection = (new Collection)->route([
+        $collection = (new Collection)->ampable(true)->route([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
