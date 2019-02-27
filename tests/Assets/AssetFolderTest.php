@@ -291,6 +291,7 @@ EOT;
             'title' => 'Test',
             'path' => 'grandparent/parent/child',
             'parent_path' => 'grandparent/parent',
+            'basename' => 'child',
         ], $folder->toArray());
     }
 }
