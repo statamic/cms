@@ -73,7 +73,11 @@ class FieldConditionsValidator {
     }
 
     normalizeConditionLhs(field) {
-        let lhs = data_get(this.values, field, undefined);
+        let lhs = data_get(this.values, field);
+
+        if (_.isString(lhs) && _.isEmpty(lhs)) {
+            lhs = null;
+        }
 
         if (_.isString(lhs)) {
             lhs = JSON.stringify(lhs.trim());
@@ -114,7 +118,6 @@ class FieldConditionsValidator {
 
         switch (rhs) {
             case 'null':
-            case 'empty':
                 rhs = null;
                 break;
             case 'true':
@@ -122,6 +125,9 @@ class FieldConditionsValidator {
                 break;
             case 'false':
                 rhs = false;
+                break;
+            case 'empty':
+                this.stringifyRhs = false;
                 break;
         }
 
@@ -133,6 +139,11 @@ class FieldConditionsValidator {
     }
 
     passesCondition(condition) {
+        if (condition.rhs === 'empty') {
+            condition.lhs = _.isEmpty(condition.lhs);
+            condition.rhs = true;
+        }
+
         if (condition.operator === 'includes') {
             return _.isObject(condition.lhs)
                 ? condition.lhs.includes(condition.rhs)

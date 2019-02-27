@@ -102,21 +102,41 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({age: 'contains fox'})).toBe(false);
 });
 
-test('it handles null, empty, true, and false in condition as literal', () => {
+test('it handles null, true, and false in condition as literal', () => {
     Fields.setValues({
         last_name: 'HasselHoff',
         likes_food: true,
         likes_animals: false,
+        favorite_animal: null,
         not_real_boolean: 'false'
     });
 
     expect(showFieldIf({first_name: '=== null'})).toBe(true);
-    expect(showFieldIf({first_name: '=== empty'})).toBe(true);
     expect(showFieldIf({last_name: '!== null'})).toBe(true);
-    expect(showFieldIf({last_name: '!== empty'})).toBe(true);
     expect(showFieldIf({likes_food: '=== true'})).toBe(true);
     expect(showFieldIf({likes_animals: '=== false'})).toBe(true);
+    expect(showFieldIf({favorite_animal: '=== null'})).toBe(true);
     expect(showFieldIf({not_real_boolean: '=== false'})).toBe(false);
+});
+
+test('it can check if value is empty', () => {
+    Fields.setValues({
+        last_name: 'HasselHoff',
+        user: {email: 'david@hasselhoff.com'},
+        favorite_foods: ['lasagna'],
+        empty_string: '',
+        empty_array: [],
+        empty_object: {},
+    });
+
+    expect(showFieldIf({first_name: 'empty'})).toBe(true);
+    expect(showFieldIf({last_name: 'is empty'})).toBe(false);
+    expect(showFieldIf({last_name: 'not empty'})).toBe(true);
+    expect(showFieldIf({user: 'empty'})).toBe(false);
+    expect(showFieldIf({favorite_foods: 'empty'})).toBe(false);
+    expect(showFieldIf({empty_string: 'empty'})).toBe(true);
+    expect(showFieldIf({empty_array: 'empty'})).toBe(true);
+    expect(showFieldIf({empty_object: 'empty'})).toBe(true);
 });
 
 test('it can use operators with multi-word values', () => {
