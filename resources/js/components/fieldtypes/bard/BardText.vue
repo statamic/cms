@@ -1,6 +1,9 @@
 <template>
 
-    <div class="bard-block bard-text">
+    <div class="bard-block bard-text" :class="{
+        'divider-at-start': dividerAtStart,
+        'divider-at-end': dividerAtEnd
+    }">
 
         <div class="bard-set-selector" v-show="hasSets && isShowingOptions" :style="optionStyles">
             <dropdown-list>
@@ -33,8 +36,10 @@
 
         <div
             class="bard-editor"
+            :class="style"
             v-show="!showSource"
             ref="input"
+            :spellcheck="spellcheckEnabled"
         ></div>
 
         <selector v-if="showAssetSelector"
@@ -55,9 +60,19 @@
 
 <script>
 
+    import ScribeEditor from 'scribe-editor';
+    import ScribeToolbar from 'scribe-plugin-toolbar';
+    import ScribeHeadingCommand from 'scribe-plugin-heading-command';
+    import ScribeBlockquoteCommand from 'scribe-plugin-blockquote-command';
+    import ScribeSanitizer from 'scribe-plugin-sanitizer';
+    import ScribeCodeCommand from 'scribe-plugin-code-command';
+    import ScribePluginSmartLists from 'scribe-plugin-smart-lists';
+    import ScribePluginFormatterHtmlEnsureSemanticElements from 'scribe-plugin-formatter-html-ensure-semantic-elements';
+    import ScribeAssetCommand from './AssetCommand';
+    import ScribeLinkTooltip from './LinkTooltip';
+    import ScribePluginAutoHr from './AutoHr';
+    import ScribePluginAutoBlockquote from './AutoBlockquote';
     import autosize from 'autosize';
-    import AutoList from './AutoList';
-    import AutoHR from 'medium-editor-autohr';
     import InsertsAssets from '../InsertsAssets';
 
     export default {
@@ -70,7 +85,7 @@
 
         mixins: [InsertsAssets],
 
-        props: ['values', 'index', 'showSource'],
+        props: ['values', 'index', 'showSource', 'dividerAtStart', 'dividerAtEnd'],
 
         data() {
             return {
@@ -79,7 +94,8 @@
                 optionsTopPosition: 0,
                 focusedElement: null,
                 dropped: { sibling: null, position: null },
-                text: this.values.text || ''
+                text: this.values.text || '',
+                style: this.$parent.config.style || 'sans'
             };
         },
 
@@ -105,6 +121,14 @@
 
             hasSets() {
                 return this.$parent.hasSets;
+            },
+
+            spellcheckEnabled() {
+                const spellcheck = this.$parent.config.spellcheck;
+
+                // Spellcheck will only be disabled if it has been explicitly set to false.
+                // If the config value doesn't exist, we will default to being enabled.
+                return (spellcheck === false) ? false : true;
             }
 
         },
@@ -120,9 +144,7 @@
             },
 
             text(text) {
-                let set = JSON.parse(JSON.stringify(this.values));
-                set.text = text;
-                this.$emit('updated', this.index, set);
+                this.$emit('text-updated', this.index, text);
             },
 
             'values.text': function (text, oldText) {
@@ -138,7 +160,9 @@
         mounted() {
             autosize(this.sourceField);
 
-            this.initMedium();
+            this.initScribe();
+
+            this.removeDropAreas();
         },
 
         methods: {
@@ -151,11 +175,14 @@
             },
 
             plainText() {
-                return this.editor.elements[0].textContent;
+                return this.editor.el.textContent;
             },
 
             addDropAreas() {
-                const editor = this.editor.elements[0];
+                // Prevent scribe from cleaning up the dom, therefore removing the divs we're about to add.
+                this.editor._skipFormatters = true;
+
+                const editor = this.editor.el;
 
                 let firstAdded = false;
 
@@ -169,16 +196,14 @@
 
                     this.addDropAreaAfter(child, editor);
                 });
+
+                this.$nextTick(() => this.addDropAreaMouseoverListeners(editor.children));
             },
 
             addDropAreaBefore(child, editor) {
                 let newNode = document.createElement('div');
                 let childNode = document.createElement('div');
                 childNode.className += 'bard-drop-area-inner';
-                childNode.addEventListener('mouseover', () => {
-                    this.dropped.sibling = child;
-                    this.dropped.position = 'previous';
-                });
                 newNode.appendChild(childNode);
                 newNode.className += 'bard-drop-area bard-drop-area-before';
                 editor.insertBefore(newNode, child);
@@ -188,144 +213,153 @@
                 let newNode = document.createElement('div');
                 let childNode = document.createElement('div');
                 childNode.className += 'bard-drop-area-inner';
-                childNode.addEventListener('mouseover', () => {
-                    this.dropped.sibling = child;
-                    this.dropped.position = 'next'
-                });
                 newNode.appendChild(childNode);
                 newNode.className += 'bard-drop-area bard-drop-area-after';
                 editor.insertBefore(newNode, child.nextSibling);
             },
 
+            addDropAreaMouseoverListeners(children) {
+                Array.from(children).forEach(child => {
+                    if (! child.classList.contains('bard-drop-area')) return;
+
+                    if (child.classList.contains('bard-drop-area-before')) {
+                        child.children[0].addEventListener('mouseover', () => {
+                            this.dropped.sibling = child.nextElementSibling;
+                            this.dropped.position = 'previous';
+                        });
+                    } else {
+                        child.children[0].addEventListener('mouseover', () => {
+                            this.dropped.sibling = child.previousElementSibling;
+                            this.dropped.position = 'next';
+                        });
+                    }
+                });
+            },
+
             removeDropAreas() {
-                const els = this.editor.elements[0].getElementsByClassName('bard-drop-area');
+                const els = this.editor.el.getElementsByClassName('bard-drop-area');
                 Array.from(els).forEach(el => el.remove());
                 this.text = this.editor.getContent();
             },
+            initScribe() {
+                this.editor = new ScribeEditor(this.field);
 
-            localizeButtons(buttons) {
-                let localizations = {
-                    'bold':   'bold',
-                    'italic': 'italic',
-                    'anchor': 'link',
-                    'h2':     'h2',
-                    'h3':     'h3',
-                    'quote':  'blockquote',
-                }
-
-                return buttons.map((button) => {
-                    if (! localizations.hasOwnProperty(button)) {
-                        return button;
+                this.editor.use(ScribeHeadingCommand(1));
+                this.editor.use(ScribeHeadingCommand(2));
+                this.editor.use(ScribeHeadingCommand(3));
+                this.editor.use(ScribeHeadingCommand(4));
+                this.editor.use(ScribeHeadingCommand(5));
+                this.editor.use(ScribeHeadingCommand(6));
+                this.editor.use(ScribeBlockquoteCommand());
+                this.editor.use(ScribeAssetCommand(this));
+                this.editor.use(ScribePluginSmartLists());
+                this.editor.use(ScribePluginAutoHr());
+                this.editor.use(ScribePluginAutoBlockquote());
+                this.editor.use(ScribeSanitizer(Statamic.bard.sanitizer || {
+                    tags: {
+                        p: {},
+                        br: {},
+                        b: {},
+                        strong: {},
+                        i: {},
+                        strike: {},
+                        blockquote: {},
+                        code: {},
+                        ol: {},
+                        ul: {},
+                        li: {},
+                        a: { href: true, target: true, rel: true },
+                        h1: {},
+                        h2: {},
+                        h3: {},
+                        h4: {},
+                        h5: {},
+                        h6: {},
+                        u: {},
+                        sup: {},
+                        sub: {},
+                        hr: {},
                     }
+                }));
 
-                    return {
-                        name: button,
-                        aria: __('cp.' + localizations[button]),
-                    };
-                })
-            },
-
-            initMedium() {
-                let buttons = this.localizeButtons(this.$parent.config.buttons || ['bold', 'italic', 'anchor', 'unorderedlist', 'orderedlist', 'h2', 'h3', 'quote']);
-
-                let extensions = Object.assign({
-                    imageDragging: {},
-                    autolist: new AutoList,
-                    autohr: new AutoHR
-                }, _.map(Statamic.MediumEditorExtensions, ext => new ext));
-
-                if (this.$parent.config.container) {
-                    extensions.assets = this.assetButtonExtension();
-                    if (! buttons.includes('assets')) buttons.push('assets');
+                if (!this.$parent.config.markdown) {
+                    this.editor.use(ScribeToolbar(this.$parent.$refs.toolbar, { shared: true }));
+                    this.editor.use(ScribeLinkTooltip(this.$parent.$refs.linkToolbar));
                 }
 
-                let opts = {
-                    toolbar:        { buttons },
-                    buttonLabels:   'fontawesome',
-                    autoLink:       this.$parent.config.autolink || false,
-                    placeholder:    false,
-                    paste:          { forcePlainText: this.$parent.config.force_plain_text, cleanPastedHTML: this.$parent.config.clean_pasted_html },
-                    spellcheck:     this.$parent.config.spellcheck || true,
-                    targetBlank:    this.$parent.config.target_blank || false,
-                    linkValidation: this.$parent.config.link_validation || false,
-                    anchor: {
-                        placeholderText: __('Paste or type link'),
-                        aria: __('Link'),
-                    },
-                    extensions
-                };
-
+                // Disable cmd+b and cmd+i when in markdown mode, as this would change the html.
                 if (this.$parent.config.markdown) {
-                    opts.toolbar = false;
-                    opts.keyboardCommands = { commands: [
-                        { command: false, key: 'B', meta: true, shift: false },
-                        { command: false, key: 'I', meta: true, shift: false },
-                        { command: false, key: 'U', meta: true, shift: false }
-                    ]};
+                    this.editor.el.addEventListener('keydown', (e) => {
+                        if (e.metaKey && (e.keyCode === 66 || e.keyCode === 73)) e.preventDefault();
+                    });
                 }
 
-                this.editor = new MediumEditor(this.field, opts);
+                this.editor.use(ScribeCodeCommand());
 
-                this.updateEditorHtml(this.text);
+                if (this.$parent.config.semantic_elements) {
+                    this.editor.use(ScribePluginFormatterHtmlEnsureSemanticElements());
+                }
 
-                this.editor.subscribe('editableInput', e => {
-                    if (this.editor.getFocusedElement()) {
-                        this.focusElement(this.editor.getSelectedParentElement());
-                    }
+                Statamic.bard.plugins.forEach(plugin => this.editor.use(plugin.call()));
 
-                    // Clean up any annoying span tags that were added by contenteditable.
-                    $(this.field).find('span[style]').contents().unwrap();
-
-                    this.text = this.editor.getContent();
+                this.editor.on('content-changed', () => {
+                    this.text = this.editor.getHTML();
                 });
 
-                this.editor.subscribe('editableClick', e => {
-                    this.focusElement(e.target);
-                });
-
-                this.editor.subscribe('editableKeyup', e => {
-                    this.focusElement(this.editor.getSelectedParentElement());
-                });
-
-                this.editor.subscribe('editableKeydownDelete', e => {
-                    if (this.isBlank) {
-                        this.$emit('deleted', this.index);
+                this.editor.el.addEventListener('keyup', (e) => {
+                    const selection = new this.editor.api.Selection().selection;
+                    if (selection.focusNode != this.editor.el) {
+                        let el = this.getParentElement(selection.focusNode);
+                        this.focusElement(el);
                     }
                 });
 
-                this.editor.subscribe('editableKeydown', e => {
+                this.editor.el.addEventListener('keyup', (e) => {
+                    this.$emit('selection-changed');
+                });
+
+                this.editor.el.addEventListener('keydown', (e) => {
                     const isUp = e.key === 'ArrowUp' || e.key === 'ArrowLeft';
                     const isDown = e.key === 'ArrowDown' || e.key === 'ArrowRight';
 
                     if (!isUp && !isDown) return;
 
-                    const pos = this.editor.exportSelection();
-                    const isInFirstElement = !this.editor.getSelectedParentElement().previousSibling;
-                    const isInLastElement = !this.editor.getSelectedParentElement().nextSibling;
+                    const selection = new this.editor.api.Selection();
 
-                    if (isUp && pos.start === 0 && pos.end === 0 && isInFirstElement) {
+                    // We only care about caret movements. Ranges imply that you are selecting text, so we
+                    // shouln't attempt to go beyond the text. That'll just be confusing.
+                    if (selection.selection.type === 'Range') return;
+
+                    const selectedElement = this.getParentElement(selection.selection.focusNode);
+                    const isInFirstElement = !selectedElement.previousElementSibling;
+                    const isInLastElement = !selectedElement.nextElementSibling;
+
+                    if (isUp && isInFirstElement && selection.range.startOffset === 0) {
                         this.$emit('arrow-up-at-start', this.index);
-                    } else if (isDown && pos.start === this.plainText().length && pos.end === this.plainText().length && isInLastElement) {
-                        this.$emit('arrow-down-at-end', this.index);
+                    } else if (isDown && isInLastElement) {
+                        let caretPosition = this.getCaretPositionInElement(selectedElement);
+                        if (caretPosition === selectedElement.textContent.length) {
+                            this.$emit('arrow-down-at-end', this.index);
+                        }
                     }
                 });
-            },
 
-            assetButtonExtension() {
-                const vm = this;
-                const extension = MediumEditor.extensions.button.extend({
-                    name: 'assets',
-                    tagNames: ['a'],
-                    contentDefault: '<span class="icon icon-images"></span>',
-                    aria: __('Assets'),
-                    handleClick: function () {
-                        let toolbar = this.base.getExtensionByName('toolbar');
-                        if (toolbar) toolbar.hideToolbar();
-                        this.base.saveSelection();
-                        vm.addAsset();
-                    }
+                this.editor.el.addEventListener('click', (e) => {
+                    if (e.target === this.editor.el) return;
+
+                    let el = this.getParentElement(e.target);
+                    this.focusElement(el);
                 });
-                return new extension;
+
+                this.editor.el.addEventListener('mousedown', () => {
+                    const listener = () => {
+                        setTimeout(() => { this.$emit('selection-changed') }, 1);
+                        window.removeEventListener('mouseup', listener);
+                    };
+                    window.addEventListener('mouseup', listener);
+                });
+
+                this.updateEditorHtml(this.text);
             },
 
             moveOptionsToElement(el) {
@@ -338,8 +372,7 @@
             },
 
             elementIsEmpty(el) {
-                const html = el.innerHTML;
-                return html === '' || html === '<br>';
+                return el.textContent == '';
             },
 
             focusElement(el) {
@@ -373,21 +406,37 @@
             },
 
             focus() {
-                this.focusAt('start');
+                this.focusAtStart();
             },
 
-            focusAt(position) {
-                if (position === 'start') {
-                    position = 0;
-                } else if (position === 'end') {
-                    position = this.plainText().length;
-                }
-
-                this.setCaret(position);
+            focusAtStart() {
+                this.setCaretBefore(this.editor.el.children[0]);
             },
 
-            setCaret(position) {
-                this.editor.importSelection({ start: position, end: position });
+            focusAtEnd() {
+                const lastElement = this.editor.el.children[this.editor.el.children.length-1];
+                this.setCaretAfter(lastElement);
+            },
+
+            setCaretBefore(el) {
+                const selection = new this.editor.api.Selection();
+                const range = selection.range;
+                range.selectNode(el);
+                selection.selection.removeAllRanges();
+                selection.selection.addRange(range);
+            },
+
+            setCaretAfter(el) {
+                const placeholder = document.createElement('span');
+                el.appendChild(placeholder);
+
+                const selection = new this.editor.api.Selection();
+                const range = selection.range;
+                range.selectNode(placeholder);
+                selection.selection.removeAllRanges();
+                selection.selection.addRange(range);
+
+                placeholder.remove();
             },
 
             insertSet(type) {
@@ -421,16 +470,6 @@
                 let newNode = document.createElement('p');
                 this.field.insertBefore(newNode, nextNode);
 
-                // Set the caret to the new paragraph position. We'll find the position by inserting
-                // a string that shouldn't already exist and we can easily grab from the text.
-                // We'll also get rid of the placeholder string after we're done.
-                const caretPlaceholder = '%%%CARET%%%';
-                newNode.innerHTML = caretPlaceholder;
-                this.setCaret(this.plainText().indexOf(caretPlaceholder));
-                newNode.innerHTML = '<br>';
-
-                this.text = this.editor.getContent();
-
                 // Bring the + options to the new paragraph.
                 this.focusElement(newNode);
             },
@@ -440,12 +479,41 @@
             },
 
             assetsSelected(assets) {
-                this.editor.restoreSelection();
-
                 // Loop over returned assets, even though there will only be one.
                 this.$http.post(cp_url('assets/get'), { assets }, (response) => {
-                    _(response).each(asset => this.editor.createLink({ value: asset.url }));
+                    _(response).each(asset => {
+                        var selection = new this.editor.api.Selection();
+                        selection.selectMarkers();
+                        this.editor.el.focus();
+                        this.editor.getCommand('createLink').execute(asset.url);
+                    });
                 });
+            },
+
+            closeAssetSelector() {
+                this.showAssetSelector = false;
+
+                var selection = new this.editor.api.Selection();
+                selection.selectMarkers();
+            },
+
+            // Takes an element from within a contenteditable, and returns the top-most
+            // parent element as a direct child of the editor div.
+            // For example: <p><b><i>foo</i></b></p>
+            // If you give the foo text node, it will return the p tag.
+            getParentElement(el) {
+                while (el.parentNode != this.editor.el) {
+                    el = el.parentNode;
+                }
+                return el;
+            },
+
+            getCaretPositionInElement(element) {
+                let range = new this.editor.api.Selection().range;
+                let preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.endContainer, range.endOffset);
+                return preCaretRange.toString().length;
             }
 
         }

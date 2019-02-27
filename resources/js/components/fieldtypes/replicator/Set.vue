@@ -102,7 +102,7 @@ export default {
         },
 
         isHidden() {
-            return false; // TODO
+            return this.values['#hidden'] === true;
         }
 
     },
@@ -120,7 +120,15 @@ export default {
         },
 
         toggle() {
-            // TODO
+            this.isHidden ? this.expand() : this.collapse();
+        },
+
+        expand() {
+            Vue.set(this.values, '#hidden', false);
+        },
+
+        collapse() {
+            Vue.set(this.values, '#hidden', true);
         }
 
     }

@@ -26,6 +26,7 @@ class CpServiceProvider extends ServiceProvider
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
             'ampEnabled' => config('statamic.amp.enabled'),
+            'bard' => ['plugins' => [], 'buttons' => []],
         ]);
     }
 

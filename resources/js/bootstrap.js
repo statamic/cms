@@ -6,7 +6,6 @@ Vue.config.devtools = true;
 window.Vue = Vue;
 window._ = require('underscore');
 window.$ = window.jQuery = require('jquery');
-window.MediumEditor = require('medium-editor');
 window.rangy = require('rangy');
 
 require('./bootstrap/globals');

@@ -13,10 +13,10 @@
         >
             <div
                 v-if="!goingSolo"
-                class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between"
+                class="bard-drag-handle cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between"
             >
                 <div class="pt-1">
-                    <label class="mb-1 leading-none" v-text="display" />
+                    <label class="mb-1 leading-none" v-text="display" @click="toggle" />
                     <div
                         v-if="config.instructions"
                         v-html="instructions"

@@ -26,8 +26,6 @@ mix.extract([
     'luminous-lightbox',
     'marked',
     'marked-plaintext',
-    'medium-editor',
-    'medium-editor-autohr',
     'moment',
     'mousetrap',
     'redactor',
@@ -41,7 +39,6 @@ mix.extract([
     'vue-clickaway',
     'vue-js-modal',
     'vue-js-popover',
-    'vue-typeahead',
 ]);
 
 mix.copyDirectory(`${src}/img`, `${dest}/img`);
