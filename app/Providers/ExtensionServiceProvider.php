@@ -30,7 +30,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate',
         'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
-        'revealer', 'section', 'select', 'slug', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
+        'revealer', 'section', 'select', 'slug', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text',
     ];
 
     /**
@@ -102,6 +102,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Replicator::class,
         Fieldtypes\Sets::class,
         Fieldtypes\Template::class,
+        Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
