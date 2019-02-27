@@ -179,7 +179,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
 
     public function date()
     {
-        if ($this->collection()->order() === 'date') {
+        if ($this->orderType() === 'date') {
             return Carbon::parse($this->order());
         }
 
