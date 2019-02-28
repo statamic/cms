@@ -45,7 +45,6 @@ export default {
             data: JSON.parse(JSON.stringify(this.value || [])),
             max_rows: this.config.max_rows || null,
             max_columns: this.config.max_columns || null,
-            sortableInitialized: false
         }
     },
 
@@ -97,41 +96,6 @@ export default {
     },
 
     methods: {
-
-        sortable() {
-            if (this.sortableInitialized || this.data.length === 0) return;
-
-            var self = this,
-                start = '';
-
-            $(this.$el).find('tbody').sortable({
-                axis: "y",
-                revert: 175,
-                handle: '.drag-handle',
-                placeholder: "table-row-placeholder",
-                forcePlaceholderSize: true,
-
-                start: function(e, ui) {
-                    start = ui.item.index();
-                    ui.placeholder.height(ui.item.height());
-                },
-
-                update: function(e, ui) {
-                    var end  = ui.item.index(),
-                        swap = self.data.splice(start, 1)[0];
-
-                    self.data.splice(end, 0, swap);
-                }
-            });
-
-            this.sortableInitialized = true;
-        },
-
-        destroySortable() {
-            $(this.$el).find('tbody').sortable('destroy');
-            this.sortableInitialized = false;
-        },
-
     	addRow: function() {
             // If there are no columns, we will add one when we add a row.
             var count = (this.columnCount === 0) ? 1 : this.columnCount;
@@ -188,29 +152,6 @@ export default {
                 .map(row => row.cells.filter(cell => !!cell).join(', '))
                 .filter(row => !!row).join(', ');
         }
-    },
-
-    mounted() {
-        this.sortable();
-    },
-
-    watch: {
-
-        data: {
-            deep: true,
-            handler (data) {
-                this.update(data);
-
-                this.$nextTick(() => {
-                    if (this.data.length) {
-                        this.sortable();
-                    } else {
-                        this.destroySortable();
-                    }
-                });
-            }
-        }
-
     }
 }
 </script>
