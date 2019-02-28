@@ -26,8 +26,17 @@
 
 .grid-table tbody {
     @apply outline-none;
+
+    tr {
+        @apply outline-none;
+    }
+
     td {
         @apply border-b px-1 py-1.5 align-top;
+
+        &:first-child.grid-cell {
+            @apply pl-1.5;
+        }
 
         &.grid-drag-handle {
             @apply w-3 border-r h-full p-1;
@@ -35,10 +44,6 @@
             background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
             &:hover { @apply .bg-grey-30; }
         }
-    }
-
-    tr {
-        @apply outline-none;
     }
 
     tr:last-child td {

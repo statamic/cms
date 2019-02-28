@@ -2,7 +2,6 @@
    GRID/TABLE FIELDTYPE
    ========================================================================== */
 
-.grid-field,
 .table-field {
     > table { @extend .bordered-table; }
 
@@ -67,8 +66,6 @@
         padding: 0;
     }
 }
-
-.grid-field th:nth-last-child(2) { border-right: none; }
 
 .grid-mode-table {
     label { margin-bottom: 0; }
@@ -188,7 +185,7 @@
   ========================================================================== */
 
 .replicator-fieldtype {
-    .grid-field, .table-field {
+    .table-field {
         > table > thead > tr > th { background: #fff; }
         > table > tbody > tr > td:not(.row-controls) { background: #fff; }
 
