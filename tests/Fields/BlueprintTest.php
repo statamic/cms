@@ -237,7 +237,8 @@ class BlueprintTest extends TestCase
                             'display' => 'Two',
                             'instructions' => 'Two instructions',
                             'required' => false,
-                            'validate' => 'min:2'
+                            'validate' => 'min:2',
+                            'character_limit' => null,
                         ]
                     ]
                 ]
