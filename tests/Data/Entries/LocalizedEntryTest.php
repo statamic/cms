@@ -312,8 +312,13 @@ class LocalizedEntryTest extends TestCase
         $dateEntry->order('2017-01-02');
         $numberEntry->order('2017-01-02');
 
-        $this->assertEquals(Carbon::parse('2017-01-02'), $dateEntry->date());
+        $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertFalse($dateEntry->hasTime());
         $this->assertNull($numberEntry->date());
+
+        $dateEntry->order('2017-01-02-1523');
+        $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertTrue($dateEntry->hasTime());
     }
 
     /** @test */

@@ -180,10 +180,17 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
     public function date()
     {
         if ($this->orderType() === 'date') {
-            return Carbon::parse($this->order());
+            return $this->hasTime()
+                ? Carbon::createFromFormat('Y-m-d-Hi', $this->order())
+                : Carbon::createFromFormat('Y-m-d', $this->order())->startOfDay();
         }
 
         return null;
+    }
+
+    public function hasTime()
+    {
+        return $this->orderType() === 'date' && strlen($this->order()) === 15;
     }
 
     public function sites()
