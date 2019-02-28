@@ -249,7 +249,11 @@ abstract class AggregateStore extends Store
     // There's an equivalent test for the BasicStore.
     public function removeByPath($path)
     {
-        $id = $this->getIdFromPath($path);
+        if (! $id = $this->getIdFromPath($path)) {
+            // If there's no ID, the deleted path may actually have been a renamed
+            // one, which would have already been updated in the Stache.
+            return $this;
+        }
 
         list(, $store) = $this->extractKeys($this->getIdMap()->get($id));
 
