@@ -3,7 +3,7 @@
     <div class="grid-fieldtype-container">
 
         <small v-if="hasExcessRows" class="help-block text-red">
-            Only {{ maxRows }} rows are allowed.
+            {{ __('Max Rows') }}: {{ maxRows }}
         </small>
 
         <component
