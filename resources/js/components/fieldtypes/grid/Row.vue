@@ -66,7 +66,6 @@ export default {
         'reorderable',
         'sortableItemClass',
         'sortableHandleClass',
-        'storeName'
     ],
 
     computed: {

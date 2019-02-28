@@ -56,8 +56,6 @@ export default {
 
     mixins: [FieldConditions],
 
-    inject: ['storeName'],
-
     props: {
         config: {
             type: Object,

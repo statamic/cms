@@ -174,6 +174,8 @@ class FieldConditionsValidator {
 
 // Export select methods for use as Vue mixin.
 export default {
+    inject: ['storeName'],
+
     methods: {
         showField(field) {
             let validator = new FieldConditionsValidator(field, this.values, this.$store, this.storeName);
