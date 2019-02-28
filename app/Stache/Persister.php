@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\AggregateStore;
 
 class Persister
@@ -24,6 +25,10 @@ class Persister
         // steps are combined within `$store->cache()`. We need to split that out.
         $this->updatedStores()->each(function ($store) {
             $store->load()->cache();
+        });
+
+        $this->stache->queuedTimestampCaches()->each(function ($timestamps, $key) {
+            Cache::forever($key, $timestamps);
         });
 
         $this->stache->stopTimer();

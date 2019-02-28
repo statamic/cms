@@ -270,6 +270,20 @@ class StacheTest extends TestCase
         $this->assertEquals($entriesTwo, $this->stache->getStoreById('456'));
         $this->assertEquals($collectionsStore, $this->stache->getStoreById('789'));
     }
+
+    /** @test */
+    function it_queues_timestamp_cache_payloads_for_persistence()
+    {
+        $this->assertEquals([], $this->stache->queuedTimestampCaches()->all());
+
+        $this->stache->queueTimestampCache('one', ['foo' => 'bar']);
+        $this->stache->queueTimestampCache('two', ['baz' => 'qux']);
+
+        $this->assertEquals([
+            'one' => ['foo' => 'bar'],
+            'two' => ['baz' => 'qux'],
+        ], $this->stache->queuedTimestampCaches()->all());
+    }
 }
 
 class CountableFakeBootstrapper
