@@ -10,17 +10,24 @@
     				<th class="row-controls"></th>
     			</tr>
     		</thead>
-    		<tbody>
-    			<tr v-for="(row, rowIndex) in data" :key="rowIndex">
-    				<td v-for="(cell, cellIndex) in row.cells" :key="cellIndex">
-    					<input type="text" v-model="row['cells'][cellIndex]" class="form-control" />
-    				</td>
-    				<td class="row-controls">
-    					<span class="icon icon-menu move drag-handle"></span>
-    					<span class="icon icon-cross delete" v-on:click="deleteRow(cellIndex)"></span>
-    				</td>
-    			</tr>
-    		</tbody>
+            <sortable-list
+                v-model="data"
+                :vertical="true"
+                item-class="sortable-row"
+                handle-class="sortable-handle"
+            >
+                <tbody>
+                    <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="rowIndex">
+                        <td v-for="(cell, cellIndex) in row.cells" :key="cellIndex">
+                            <input type="text" v-model="row['cells'][cellIndex]" class="form-control" :key="`${rowIndex}-${cellIndex}`"/>
+                        </td>
+                        <td class="row-controls">
+                            <span class="icon icon-menu move sortable-handle"></span>
+                            <span class="icon icon-cross delete" @click="deleteRow(rowIndex)"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </sortable-list>
     	</table>
 
     	<div class="btn-group">
@@ -36,9 +43,16 @@
 </template>
 
 <script>
+import { SortableList, SortableItem } from '../sortable/Sortable';
+
 export default {
 
     mixins: [Fieldtype],
+
+    components: {
+        SortableList,
+        SortableItem
+    },
 
     data: function () {
         return {
