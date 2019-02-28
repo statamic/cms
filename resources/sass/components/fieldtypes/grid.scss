@@ -4,7 +4,6 @@
 
 .grid-table {
     @apply w-full text-left border text-grey relative mb-2 outline-none shadow-sm rounded;
-
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -36,6 +35,10 @@
             background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
             &:hover { @apply .bg-grey-30; }
         }
+    }
+
+    tr {
+        @apply outline-none;
     }
 
     tr:last-child td {
