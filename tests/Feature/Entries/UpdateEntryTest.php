@@ -64,6 +64,7 @@ class UpdateEntryTest extends TestCase
             ])
             ->assertOk();
 
+        $entry = Entry::find($entry->id());
         $this->assertEquals('updated-slug', $entry->slug());
         $this->assertEquals([
             'blueprint' => 'test',
