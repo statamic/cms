@@ -42,8 +42,6 @@ export default {
 
     mixins: [FieldConditions],
 
-    inject: ['reorderable', 'storeName'],
-
     props: {
         index: {
             type: Number,
@@ -63,7 +61,13 @@ export default {
         }
     },
 
-    inject: ['gridConfig', 'sortableItemClass', 'sortableHandleClass'],
+    inject: [
+        'gridConfig',
+        'reorderable',
+        'sortableItemClass',
+        'sortableHandleClass',
+        'storeName'
+    ],
 
     computed: {
 
