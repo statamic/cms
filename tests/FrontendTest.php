@@ -86,8 +86,7 @@ class FrontendTest extends TestCase
     function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
-        $page = $this->createPage('/about');
-        $page->published(false);
+        $this->createPage('/about')->published(false)->save();
 
         $this->get('/about')->assertStatus(404);
     }
@@ -98,9 +97,7 @@ class FrontendTest extends TestCase
         $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
         $user = User::make()->assignRole('draft_viewer');
 
-        $page = $this->createPage('/about');
-        $page->published(false);
-        $page->set('content', 'Testing 123');
+        $this->createPage('/about')->published(false)->set('content', 'Testing 123')->save();
 
         $response = $this
             ->actingAs($user)
@@ -241,8 +238,7 @@ class FrontendTest extends TestCase
         $this->withoutExceptionHandling();
         Event::fake();
 
-        $page = $this->createPage('about');
-        $page->set('headers', ['X-Foo' => 'Bar']);
+        $this->createPage('about')->set('headers', ['X-Foo' => 'Bar'])->save();
 
         $this->get('about')->assertStatus(200);
 
