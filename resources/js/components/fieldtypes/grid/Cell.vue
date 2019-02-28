@@ -1,13 +1,15 @@
 <template>
 
     <td class="grid-cell" :class="fieldtypeComponent">
-        <component
-            :is="fieldtypeComponent"
-            :config="field"
-            :value="value"
-            :name="name"
-            @updated="updated"
-        />
+        <div v-show="showInner">
+            <component
+                :is="fieldtypeComponent"
+                :config="field"
+                :value="value"
+                :name="name"
+                @updated="updated"
+            />
+        </div>
 
         <div v-if="hasError">
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
@@ -37,6 +39,10 @@ export default {
         },
         gridName: {
             type: String,
+            required: true
+        },
+        showInner: {
+            type: Boolean,
             required: true
         }
     },
