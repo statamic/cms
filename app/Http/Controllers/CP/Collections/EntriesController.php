@@ -109,6 +109,12 @@ class EntriesController extends CpController
             'slug' => $entry->slug()
         ]);
 
+        if ($entry->orderType() === 'date') {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
         $viewData = [
             'editing' => true,
             'actions' => [
@@ -162,7 +168,7 @@ class EntriesController extends CpController
 
         $request->validate($validation->rules());
 
-        $values = array_except($fields->values(), ['slug']);
+        $values = array_except($fields->values(), ['slug', 'date']);
 
         foreach ($values as $key => $value) {
             $entry->set($key, $value);
@@ -170,8 +176,19 @@ class EntriesController extends CpController
 
         $entry
             ->set('title', $request->title)
-            ->slug($request->slug)
-            ->save();
+            ->slug($request->slug);
+
+        if ($entry->orderType() === 'date') {
+            // If there's a time, adjust the format into a datetime order string.
+            if (strlen($date = $request->date) > 10) {
+                $date = str_replace(':', '', $date);
+                $date = str_replace(' ', '-', $date);
+            }
+
+            $entry->order($date);
+        }
+
+        $entry->save();
 
         return $entry->toArray();
     }
