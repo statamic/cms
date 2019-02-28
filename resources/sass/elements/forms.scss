@@ -28,19 +28,13 @@ select {
 
 .input-text {
     @apply appearance-none bg-grey-10 text-grey-80 w-full border p-1 rounded shadow-inner;
+    height: 38px;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
-
-    height: 38px;
 
     &:focus, &:focus-within {
         @apply focus-outline;
     }
-}
-
-textarea.input-text {
-    @apply p-2;
-    min-height: 80px;
 }
 
 // Used inside tables, grids, and so on
