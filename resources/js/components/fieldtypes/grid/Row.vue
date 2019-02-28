@@ -1,6 +1,7 @@
 <template>
 
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
+        <td :class="sortableHandleClass" v-if="reorderable"></td>
         <grid-cell
             v-for="(field, i) in fields"
             :show-inner="showField(field)"
@@ -11,7 +12,6 @@
             :row-index="index"
             :grid-name="name"
             @updated="updated"
-            :class="sortableHandleClass"
         />
 
         <td class="row-controls">
@@ -42,7 +42,7 @@ export default {
 
     mixins: [FieldConditions],
 
-    inject: ['storeName'],
+    inject: ['reorderable', 'storeName'],
 
     props: {
         index: {

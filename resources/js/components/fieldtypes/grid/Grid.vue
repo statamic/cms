@@ -73,13 +73,18 @@ export default {
         hasExcessRows() {
             if (! this.hasMaxRows) return false;
             return (this.rows.length - this.maxRows) > 0;
+        },
+
+        isReorderable() {
+            return this.config.reorderable && this.maxRows > 1
         }
 
     },
 
     provide() {
         return {
-            gridConfig: this.config
+            gridConfig: this.config,
+            reorderable: this.isReorderable
         }
     },
 

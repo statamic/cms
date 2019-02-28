@@ -1,8 +1,9 @@
 <template>
 
-    <table class="grid-table">
+    <table class="grid-table" v-if="rows.length > 0">
         <thead>
             <tr>
+                <th class="grid-drag-handle-header" v-if="reorderable"></th>
                 <grid-header-cell
                     v-for="field in fields"
                     :key="field.handle"
@@ -44,6 +45,8 @@ import { SortableList, SortableItem } from '../../sortable/Sortable';
 export default {
 
     mixins: [View],
+
+    inject: ['reorderable'],
 
     components: {
         GridRow,
