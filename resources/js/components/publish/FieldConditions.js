@@ -174,7 +174,11 @@ class FieldConditionsValidator {
 
 // Export select methods for use as Vue mixin.
 export default {
-    inject: ['storeName'],
+    inject: {
+        storeName: {
+            default: 'base'
+        }
+    },
 
     methods: {
         showField(field) {
