@@ -164,22 +164,34 @@ class EntryRepositoryTest extends TestCase
     {
         $entry = EntryAPI::make()
             ->id('test-blog-entry')
-            ->collection(Collection::whereHandle('blog'))
-            ->in('en', function ($loc) {
-                $loc
-                    ->slug('test')
-                    ->published(false)
-                    ->order('2017-07-04')
-                    ->data(['foo' => 'bar']);
-            });
+            ->collection(Collection::whereHandle('blog'));
+
+        $localized = $entry->in('en', function ($loc) {
+            $loc
+                ->slug('test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $localizedFr = $entry->in('fr', function ($loc) {
+            $loc
+                ->slug('le-test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
 
-        $this->repo->save($entry);
+        $this->repo->save($localized);
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertNotSame($entry, $item);
+        $this->assertNotSame($localized, $item->in('en'));
+        $this->assertNotSame($localizedFr, $item->in('fr'));
         $this->assertArraySubset(['foo' => 'bar'], $item->data());
         $this->assertFileExists($path = $this->directory.'/blog/2017-07-04.test.md');
         @unlink($path);
