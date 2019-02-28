@@ -1,11 +1,11 @@
 <template>
     <div class="table-field">
-    	<table class="bordered-table" v-if="rowCount || columnCount">
+    	<table class="bordered-table" v-if="rowCount">
     		<thead>
     			<tr>
-    				<th v-for="(column, $index) in columnCount" :key="$index">
-    					<span class="column-count">{{ $index + 1 }}</span>
-    					<span class="icon icon-cross delete-column" @click="deleteColumn($index)"></span>
+    				<th v-for="(column, index) in columnCount" :key="index">
+    					<span class="column-count">{{ index + 1 }}</span>
+    					<span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="deleteColumn(index)"></span>
     				</th>
     				<th class="row-controls"></th>
     			</tr>
@@ -30,14 +30,12 @@
             </sortable-list>
     	</table>
 
-    	<div class="btn-group">
-    		<a class="btn btn-default" @click="addRow" v-if="canAddRows">
-    			{{ __('Row') }} <i class="icon icon-plus icon-right"></i>
-    		</a>
-    		<a class="btn btn-default" @click="addColumn" v-if="canAddColumns">
-    			{{ __('Column') }} <i class="icon icon-plus icon-right"></i>
-    		</a>
-    	</div>
+        <button class="btn" @click="addRow" :disabled="atRowMax">
+            {{ __('Add Row') }}
+        </button>
+        <button class="btn ml-1" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+            {{ __('Add Column') }}
+        </button>
     </div>
 
 </template>
@@ -57,69 +55,51 @@ export default {
     data: function () {
         return {
             data: JSON.parse(JSON.stringify(this.value || [])),
-            max_rows: this.config.max_rows || null,
-            max_columns: this.config.max_columns || null,
         }
     },
 
     computed: {
-    	columnCount: function() {
-            if (! this.data) {
-                return 0;
-            }
+        maxRows() {
+            return this.config.max_rows || null;
+        },
 
-            if (this.data[0]) {
-                return this.data[0].cells.length;
-            }
+        maxColumns() {
+            return this.config.max_columns || null;
+        },
 
-            return 0;
+        rowCount() {
+            return this.data.length;
+        },
+
+    	columnCount() {
+            return data_get(this, 'data.0.cells.length', 0);
     	},
 
-        rowCount: function() {
-            if (! this.data) {
-                return 0;
-            }
-
-            if (this.data.length) {
-                return this.data.length;
-            }
-
-            return 0;
+        atRowMax() {
+            return this.maxRows ? this.rowCount === this.maxRows : false;
         },
 
-        canAddRows: function() {
-            if (this.max_rows) {
-                return this.rowCount < this.max_rows;
-            }
-
-            return true;
+        atColumnMax() {
+            return this.maxColumns ? this.columnCount === this.maxColumns : false;
         },
 
-        canAddColumns: function() {
-            if (this.rowCount || this.columnCount) {
+        canAddColumns() {
+            return this.rowCount > 0;
+        },
 
-                if (this.max_columns) {
-                    return this.columnCount < this.max_columns;
-                }
-
-                return true;
-            }
-
-            return false;
+        canDeleteColumns() {
+            return this.columnCount > 1;
         }
     },
 
     methods: {
-    	addRow: function() {
-            // If there are no columns, we will add one when we add a row.
-            var count = (this.columnCount === 0) ? 1 : this.columnCount;
-
+    	addRow() {
             this.data.push({
-                cells: new Array(count)
+                cells: new Array(this.columnCount || 1)
             });
     	},
 
-    	addColumn: function() {
+    	addColumn() {
             var rows = this.data.length;
 
             for (var i = 0; i < rows; i++) {
@@ -127,23 +107,19 @@ export default {
             }
     	},
 
-        deleteRow: function(index) {
-            var self = this;
-
+        deleteRow(index) {
             swal({
                 type: 'warning',
                 title: __('Are you sure?'),
                 confirmButtonText: __('Yes, I\'m sure'),
                 cancelButtonText: __('Cancel'),
                 showCancelButton: true
-            }, function() {
-                self.data.splice(index, 1);
-            });
+            }, function () {
+                this.data.splice(index, 1);
+            }.bind(this));
         },
 
-        deleteColumn: function(index) {
-            var self = this;
-
+        deleteColumn(index) {
             swal({
                 type: 'warning',
                 title: __('Are you sure?'),
@@ -152,12 +128,12 @@ export default {
                 cancelButtonText: __('Cancel'),
                 showCancelButton: true
             }, function() {
-                var rows = self.data.length;
+                var rows = this.data.length;
 
                 for (var i = 0; i < rows; i++) {
-                    self.data[i].cells.splice(index, 1);
+                    this.data[i].cells.splice(index, 1);
                 }
-            });
+            }.bind(this));
         },
 
         getReplicatorPreviewText() {
