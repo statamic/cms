@@ -90,7 +90,7 @@ class EntryRepository implements RepositoryContract
         return new QueryBuilder;
     }
 
-    public function make()
+    public function make(): Entry
     {
         return new \Statamic\Data\Entries\Entry;
     }

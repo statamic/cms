@@ -13,4 +13,7 @@ interface EntryRepository
     public function find($id): ?Entry;
     public function findByUri(string $uri): ?Entry;
     public function findBySlug(string $slug, string $collection): ?Entry;
+    public function make(): Entry;
+    public function query();
+    public function save($entry);
 }
