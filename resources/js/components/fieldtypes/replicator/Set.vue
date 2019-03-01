@@ -2,15 +2,16 @@
 
     <div :class="sortableItemClass" class="replicator-set">
 
-        <div :class="sortableHandleClass" class="cursor-move border-b px-2 py-1 text-sm flex items-center justify-between">
-            <div class="pt-1">
-                <label class="mb-1 leading-none" v-text="config.display" />
+        <div class="replicator-set-header">
+            <div class="item-move sortable-handle" :class="sortableHandleClass"></div>
+            <div class="replicator-set-title">
+                <label v-text="config.display" />
                 <div
                     v-if="config.instructions"
                     v-html="instructions"
-                    class="help-block -mt-1" />
+                    class="help-block" />
             </div>
-            <div>
+            <div class="replicator-set-controls">
                 <dropdown-list>
                     <ul class="dropdown-menu">
                         <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
@@ -19,7 +20,7 @@
             </div>
         </div>
 
-        <div>
+        <div class="replicator-set-body">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field)"

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="replicator">
+    <div class="replicator-fieldtype-container">
 
         <sortable-list
             v-model="values"

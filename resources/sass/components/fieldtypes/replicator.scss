@@ -1,0 +1,44 @@
+/* ==========================================================================
+   REPLICATOR FIELDTYPE
+   ========================================================================== */
+
+.replicator-set-container {
+    @apply outline-none;
+}
+
+.replicator-set {
+    @apply mb-4 shadow-button rounded bg-white;
+}
+
+.replicator-set-header {
+    @apply bg-grey-30 border-b rounded-t pr-1.5 flex items-center select-none;
+
+    .replicator-set-title {
+        @apply flex-1 ml-1 flex items-center;
+
+        .help-block {
+            @apply ml-1 mb-0;
+            p { @apply mb-0; }
+        }
+    }
+
+    .sortable-handle {
+        @apply w-4 border-r rounded-tl p-1 h-9;
+        cursor: grab;
+        background: transparent url('../img/drag-dots.svg') center center no-repeat;
+        &:hover { @apply .bg-grey-20; }
+    }
+}
+
+// Extra contrast when full width
+.replicator-fieldtype.w-full {
+    @apply py-3 px-0 bg-grey-20 border-t border-b;
+
+    > label {
+        @apply ml-3;
+    }
+
+    .replicator-fieldtype-container {
+        @apply px-3;
+    }
+}
