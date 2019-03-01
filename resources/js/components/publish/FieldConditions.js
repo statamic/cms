@@ -101,6 +101,7 @@ class FieldConditionsValidator {
                 operator = '==';
                 break;
             case 'not':
+            case 'isnt':
                 operator = '!=';
                 break;
             case 'includes':
