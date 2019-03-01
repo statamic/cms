@@ -5,8 +5,8 @@
 // @TODO: Remove dependency on .form-control, use a standard grey.
 
 .environment-field {
-    @extend .form-control;
-    color: #bbb;
+    // @extend .form-control;
+    // color: #bbb;
     cursor: not-allowed;
 
     .icon {

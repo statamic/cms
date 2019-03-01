@@ -1,8 +1,8 @@
 <template>
 
-    <div :class="sortableItemClass" class="bg-grey-20 shadow mb-2 rounded border">
+    <div :class="sortableItemClass" class="replicator-set">
 
-        <div :class="sortableHandleClass" class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between">
+        <div :class="sortableHandleClass" class="cursor-move border-b px-2 py-1 text-sm flex items-center justify-between">
             <div class="pt-1">
                 <label class="mb-1 leading-none" v-text="config.display" />
                 <div
@@ -13,7 +13,7 @@
             <div>
                 <dropdown-list>
                     <ul class="dropdown-menu">
-                        <li class="warning"><a @click.prevent="destroy">Delete Set</a></li>
+                        <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
                     </ul>
                 </dropdown-list>
             </div>

@@ -23,7 +23,6 @@ import RelateFieldtype from '../components/fieldtypes/relate/RelateFieldtype.vue
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
-import SuggestFieldtype from '../components/fieldtypes/SuggestFieldtype.vue'
 import TaxonomyFieldtype from '../components/fieldtypes/TaxonomyFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
@@ -64,7 +63,6 @@ Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue'));
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue'));
 Vue.component('status-fieldtype', StatusFieldtype);
-Vue.component('suggest-fieldtype', SuggestFieldtype);
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue'));
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue'));
 Vue.component('taxonomy-fieldtype', TaxonomyFieldtype);

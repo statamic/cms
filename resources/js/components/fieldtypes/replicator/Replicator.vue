@@ -8,7 +8,7 @@
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
         >
-            <div slot-scope="{}">
+            <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
                     v-for="(set, index) in values"
                     :key="`set-${set._id}`"

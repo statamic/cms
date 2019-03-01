@@ -105,35 +105,35 @@ select {
 
   /* @TODO Legacy stuff to remove, reduce, or refactor
     ========================================================================== */
-.form-control {
-    @apply .text-sm .w-full .rounded .border-0 .bg-grey-20 .shadow-inner;
+// .form-control {
+//     @apply .text-sm .w-full .rounded .border-0 .bg-grey-20 .shadow-inner;
+//
+//     padding: 8px 10px;
+//
+//     .replicator-fieldtype & {
+//         background: #fff;
+//     }
+//
+//     &.code {
+//         font-family: $font_monospace;
+//         font-size: 12px;
+//         color: $color_red;
+//     }
+//
+//     &.alt {
+//         background: $color_search_alt;
+//         box-shadow: none;
+//     }
+//
+//     &.mono {
+//         font-family: $font_monospace;
+//         font-size: 12px;
+//     }
+// }
 
-    padding: 8px 10px;
-
-    .replicator-fieldtype & {
-        background: #fff;
-    }
-
-    &.code {
-        font-family: $font_monospace;
-        font-size: 12px;
-        color: $color_red;
-    }
-
-    &.alt {
-        background: $color_search_alt;
-        box-shadow: none;
-    }
-
-    &.mono {
-        font-family: $font_monospace;
-        font-size: 12px;
-    }
-}
-
-textarea.form-control {
-    min-height: 80px;
-}
+// textarea.form-control {
+//     min-height: 80px;
+// }
 
 label .required {
     color: $color_red;
