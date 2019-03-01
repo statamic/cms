@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Events;
+namespace Statamic\View\Events;
 
+use Statamic\Events\Event;
 use Statamic\View\Antlers\View;
 
 class ViewRendered extends Event

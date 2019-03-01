@@ -2,8 +2,8 @@
 
 namespace Statamic\View\Antlers;
 
-use Statamic\Events\ViewRendered;
 use Facades\Statamic\View\Cascade;
+use Statamic\View\Events\ViewRendered;
 
 class View
 {

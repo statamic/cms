@@ -13,7 +13,7 @@ class EventServiceProvider extends ServiceProvider
         'Form.submission.created' => [
             \Statamic\Forms\Listeners\SendEmails::class
         ],
-        \Statamic\Events\ViewRendered::class => [
+        \Statamic\View\Events\ViewRendered::class => [
             \Statamic\Listeners\AddViewVariablesToDebugBar::class,
         ],
     ];

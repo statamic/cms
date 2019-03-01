@@ -6,8 +6,8 @@ use Mockery;
 use Tests\TestCase;
 use Tests\FakesViews;
 use Statamic\View\Antlers\View;
-use Statamic\Events\ViewRendered;
 use Illuminate\Support\Facades\Event;
+use Statamic\View\Events\ViewRendered;
 use Statamic\Extensions\View\FileViewFinder;
 
 class ViewTest extends TestCase
