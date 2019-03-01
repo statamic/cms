@@ -21,9 +21,9 @@
                 handle-class="sortable-handle"
             >
                 <tbody>
-                    <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="rowIndex">
-                        <td v-for="(cell, cellIndex) in row.cells" :key="cellIndex">
-                            <input type="text" v-model="row['cells'][cellIndex]" class="form-control" :key="`${rowIndex}-${cellIndex}`"/>
+                    <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
+                        <td v-for="(cell, cellIndex) in row.cells">
+                            <input type="text" v-model="row['cells'][cellIndex]" class="form-control" />
                         </td>
                         <td class="row-controls">
                             <span class="icon icon-menu move sortable-handle"></span>
@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import { SortableList, SortableItem } from '../sortable/Sortable';
 
 export default {
@@ -81,7 +82,7 @@ export default {
 
     data: function () {
         return {
-            data: JSON.parse(JSON.stringify(this.value || [])),
+            data: [],
             deletingRow: false,
             deletingColumn: false,
         }
@@ -94,6 +95,12 @@ export default {
                 this.update(data);
             }
         }
+    },
+
+    created() {
+        // Assign each row a unique id that Vue can use as a v-for key.
+        this.data = JSON.parse(JSON.stringify(this.value || []))
+            .map(row => Object.assign(row, { _id: uniqid() }));
     },
 
     computed: {
@@ -133,6 +140,7 @@ export default {
     methods: {
         addRow() {
             this.data.push({
+                _id: uniqid(),
                 cells: new Array(this.columnCount || 1)
             });
         },
