@@ -102,6 +102,7 @@ class FieldConditionsValidator {
                 break;
             case 'not':
             case 'isnt':
+            case '¯\\_(ツ)_/¯':
                 operator = '!=';
                 break;
             case 'includes':

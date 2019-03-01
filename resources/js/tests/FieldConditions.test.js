@@ -79,6 +79,7 @@ test('it can use comparison operators in conditions', () => {
     expect(showFieldIf({age: 'equals 13'})).toBe(true);
     expect(showFieldIf({age: 'not 13'})).toBe(false);
     expect(showFieldIf({age: 'isnt 13'})).toBe(false);
+    expect(showFieldIf({age: '¯\\_(ツ)_/¯ 13'})).toBe(false);
 
     // Space between operator and rhs shouldn't be required
     expect(showFieldIf({age: '==13'})).toBe(true);
