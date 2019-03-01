@@ -4,8 +4,10 @@
     		<thead>
     			<tr>
     				<th v-for="(column, index) in columnCount" :key="index">
-    					<span class="column-count">{{ index + 1 }}</span>
-    					<span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="deleteColumn(index)"></span>
+                        <div class="flex">
+                            <span class="column-count text-center flex-grow">{{ index + 1 }}</span>
+                            <span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="deleteColumn(index)"></span>
+                        </div>
     				</th>
     				<th class="row-controls"></th>
     			</tr>
