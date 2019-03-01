@@ -1,11 +1,10 @@
 <?php
 
-namespace Statamic\Listeners;
+namespace Statamic\View\Debugbar;
 
-use Statamic\Events\ViewRendered;
-use DebugBar\DataCollector\ConfigCollector;
+use Statamic\View\Events\ViewRendered;
 
-class AddViewVariablesToDebugbar
+class AddVariables
 {
     /**
      * Handle the event.
@@ -19,10 +18,10 @@ class AddViewVariablesToDebugbar
             return;
         }
 
-        $variables = $event->view->data();
+        $variables = $event->view->gatherData();
 
         ksort($variables);
 
-        debugbar()->addCollector(new ConfigCollector($variables, 'Variables'));
+        debugbar()->addCollector(new VariableCollector($variables, 'Variables'));
     }
 }

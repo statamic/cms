@@ -14,7 +14,7 @@ class EventServiceProvider extends ServiceProvider
             \Statamic\Forms\Listeners\SendEmails::class
         ],
         \Statamic\View\Events\ViewRendered::class => [
-            \Statamic\Listeners\AddViewVariablesToDebugBar::class,
+            \Statamic\View\Debugbar\AddVariables::class,
         ],
     ];
 
