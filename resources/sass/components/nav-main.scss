@@ -16,6 +16,7 @@
 
     li a {
         @apply p-0 flex items-center text-grey-80;
+        transition: all .08s ease-in-out;
 
         &:hover {
             @apply font-medium text-grey-90;
