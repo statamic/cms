@@ -38,7 +38,10 @@ class ViewServiceProvider extends ServiceProvider
     public function boot()
     {
         View::macro('withoutExtractions', function () {
-            $this->engine->withoutExtractions();
+            if ($this->engine instanceof Engine) {
+                $this->engine->withoutExtractions();
+            }
+
             return $this;
         });
 
