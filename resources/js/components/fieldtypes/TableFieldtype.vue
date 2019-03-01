@@ -6,7 +6,7 @@
     				<th v-for="(column, index) in columnCount" :key="index">
                         <div class="flex">
                             <span class="column-count text-center flex-grow">{{ index + 1 }}</span>
-                            <span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="deleteColumn(index)"></span>
+                            <span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="confirmDeleteColumn(index)"></span>
                         </div>
     				</th>
     				<th class="row-controls"></th>
@@ -25,7 +25,7 @@
                         </td>
                         <td class="row-controls">
                             <span class="icon icon-menu move sortable-handle"></span>
-                            <span class="icon icon-cross delete" @click="deleteRow(rowIndex)"></span>
+                            <span class="icon icon-cross delete" @click="confirmDeleteRow(rowIndex)"></span>
                         </td>
                     </tr>
                 </tbody>
@@ -38,6 +38,28 @@
         <button class="btn ml-1" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
             {{ __('Add Column') }}
         </button>
+
+        <confirmation-modal
+            v-if="deletingRow !== false"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteRow(deletingRow)"
+            @cancel="deleteCancelled"
+        >
+        </confirmation-modal>
+
+        <confirmation-modal
+            v-if="deletingColumn !== false"
+            :title="__('Delete Column')"
+            :bodyText="__('Are you sure you want to delete this column?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteColumn(deletingColumn)"
+            @cancel="deleteCancelled"
+        >
+        </confirmation-modal>
     </div>
 
 </template>
@@ -57,6 +79,8 @@ export default {
     data: function () {
         return {
             data: JSON.parse(JSON.stringify(this.value || [])),
+            deletingRow: false,
+            deletingColumn: false,
         }
     },
 
@@ -109,33 +133,33 @@ export default {
             }
     	},
 
+        confirmDeleteRow(index) {
+            this.deletingRow = index;
+        },
+
+        confirmDeleteColumn(index) {
+            this.deletingColumn = index;
+        },
+
         deleteRow(index) {
-            swal({
-                type: 'warning',
-                title: __('Are you sure?'),
-                confirmButtonText: __('Yes, I\'m sure'),
-                cancelButtonText: __('Cancel'),
-                showCancelButton: true
-            }, function () {
-                this.data.splice(index, 1);
-            }.bind(this));
+            this.deletingRow = false;
+
+            this.data.splice(index, 1);
         },
 
         deleteColumn(index) {
-            swal({
-                type: 'warning',
-                title: __('Are you sure?'),
-                text: __n('cp.confirm_delete_items', 1),
-                confirmButtonText: __('Yes I\'m sure'),
-                cancelButtonText: __('Cancel'),
-                showCancelButton: true
-            }, function() {
-                var rows = this.data.length;
+            this.deletingColumn = false;
 
-                for (var i = 0; i < rows; i++) {
-                    this.data[i].cells.splice(index, 1);
-                }
-            }.bind(this));
+            var rows = this.data.length;
+
+            for (var i = 0; i < rows; i++) {
+                this.data[i].cells.splice(index, 1);
+            }
+        },
+
+        deleteCancelled() {
+            this.deletingRow = false;
+            this.deletingColumn = false;
         },
 
         getReplicatorPreviewText() {
