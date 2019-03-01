@@ -1,17 +1,19 @@
 <template>
+
     <div class="table-field">
-    	<table class="bordered-table" v-if="rowCount">
-    		<thead>
-    			<tr>
-    				<th v-for="(column, index) in columnCount" :key="index">
+        <table class="bordered-table" v-if="rowCount">
+            <thead>
+                <tr>
+                    <th v-for="(column, index) in columnCount" :key="index">
                         <div class="flex">
                             <span class="column-count text-center flex-grow">{{ index + 1 }}</span>
                             <span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="confirmDeleteColumn(index)"></span>
                         </div>
-    				</th>
-    				<th class="row-controls"></th>
-    			</tr>
-    		</thead>
+                    </th>
+                    <th class="row-controls"></th>
+                </tr>
+            </thead>
+
             <sortable-list
                 v-model="data"
                 :vertical="true"
@@ -30,11 +32,12 @@
                     </tr>
                 </tbody>
             </sortable-list>
-    	</table>
+        </table>
 
         <button class="btn" @click="addRow" :disabled="atRowMax">
             {{ __('Add Row') }}
         </button>
+
         <button class="btn ml-1" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
             {{ __('Add Column') }}
         </button>
@@ -97,9 +100,9 @@ export default {
             return this.data.length;
         },
 
-    	columnCount() {
+        columnCount() {
             return data_get(this, 'data.0.cells.length', 0);
-    	},
+        },
 
         atRowMax() {
             return this.maxRows ? this.rowCount === this.maxRows : false;
@@ -119,19 +122,19 @@ export default {
     },
 
     methods: {
-    	addRow() {
+        addRow() {
             this.data.push({
                 cells: new Array(this.columnCount || 1)
             });
-    	},
+        },
 
-    	addColumn() {
+        addColumn() {
             var rows = this.data.length;
 
             for (var i = 0; i < rows; i++) {
                 this.data[i].cells.push('');
             }
-    	},
+        },
 
         confirmDeleteRow(index) {
             this.deletingRow = index;
