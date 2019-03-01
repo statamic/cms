@@ -5,7 +5,8 @@
                 {{ title }}
             </div>
             <div class="flex-1 overflow-scrollf p-3">
-                <slot>
+                <p v-if="bodyText" v-text="bodyText" />
+                <slot v-else>
                     <p>{{ __('Are you sure?') }}</p>
                 </slot>
             </div>
@@ -23,6 +24,9 @@ export default {
         title: {
             type: String,
             required: true
+        },
+        bodyText: {
+            type: String
         },
         buttonText: {
             type: String,
