@@ -87,6 +87,15 @@ export default {
         }
     },
 
+    watch: {
+        data: {
+            deep: true,
+            handler (data) {
+                this.update(data);
+            }
+        }
+    },
+
     computed: {
         maxRows() {
             return this.config.max_rows || null;
