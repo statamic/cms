@@ -18,7 +18,6 @@ class NotFoundHttpException extends SymfonyException
         return (new View)
             ->template('errors.404')
             ->layout($this->layout())
-            ->data(Cascade::instance()->hydrate()->toArray())
             ->render();
     }
 
