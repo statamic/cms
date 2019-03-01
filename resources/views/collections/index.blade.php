@@ -11,7 +11,7 @@
                 {{ __('Collections are groups of entries that hold similar content and share behaviors and attributes.') }}
             </p>
             @can('super')
-                <a href="{{ cp_route('forms.create') }}" class="btn-primary btn-lg">{{ __('Create Form') }}</a>
+                <a href="{{ cp_route('collections.create') }}" class="btn-primary btn-lg">{{ __('Create Collection') }}</a>
             @endcan
         </div>
     @endif
