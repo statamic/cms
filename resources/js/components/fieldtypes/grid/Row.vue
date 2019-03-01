@@ -1,7 +1,9 @@
 <template>
 
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
-        <td :class="sortableHandleClass" v-if="reorderable"></td>
+        <td :class="sortableHandleClass" v-if="reorderable">
+            <!-- TODO: needs draggable icon? -->
+        </td>
         <grid-cell
             v-for="(field, i) in fields"
             :show-inner="showField(field)"
