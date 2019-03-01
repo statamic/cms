@@ -1,19 +1,19 @@
 <template>
-    <!-- <select-input :name="name" :value="value" @input="update" :options="config.options" /> -->
-    <v-select :options="['foo', 'bar']"></v-select>
+    <select-input :name="name" :value="value" @input="update" :options="config.options" />
+    <!-- <v-select :options="['foo', 'bar']"></v-select> -->
 </template>
 
 <script>
 
-import vSelect from 'vue-select'
+// import vSelect from 'vue-select'
 
 export default {
 
     mixins: [Fieldtype],
 
-    components: {
-        'v-select': vSelect
-    },
+    // components: {
+    //     'v-select': vSelect
+    // },
 
     computed: {
         label: function() {
