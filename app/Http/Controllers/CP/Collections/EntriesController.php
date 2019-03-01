@@ -26,14 +26,13 @@ class EntriesController extends CpController
 
         $this->filter($query, $request->filters);
 
-        $entries = $query
+        $paginator = $query
             ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
-            ->paginate(request('perPage'))
-            ->supplement(function ($entry) {
-                return [
-                    'deleteable' => me()->can('delete', $entry)
-                ];
-            })->preProcessForIndex();
+            ->paginate(request('perPage'));
+
+        $entries = $paginator->supplement(function ($entry) {
+            return ['deleteable' => me()->can('delete', $entry)];
+        })->preProcessForIndex();
 
         if ($collection->order() === 'date') {
             $entries->supplement('date', function ($entry) {
@@ -46,7 +45,7 @@ class EntriesController extends CpController
             ->setPreferred("collections.{$handle}.columns")
             ->values();
 
-        return Resource::collection($entries)->additional(['meta' => [
+        return Resource::collection($paginator)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => $columns,
