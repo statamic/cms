@@ -31,7 +31,7 @@ class ViewTest extends TestCase
         $view = (new View)
             ->template('template')
             ->layout('layout')
-            ->data(['foo' => 'bar']);
+            ->with(['foo' => 'bar']);
 
         $this->assertEquals('Layout: bar | Template: bar', $view->render());
 
@@ -47,7 +47,7 @@ class ViewTest extends TestCase
 
         $view = (new View)
             ->template('template')
-            ->data(['foo' => 'bar']);
+            ->with(['foo' => 'bar']);
 
         $this->assertEquals('Template: bar', $view->render());
     }
@@ -61,7 +61,7 @@ class ViewTest extends TestCase
         $view = (new View)
             ->template('template')
             ->layout('layout')
-            ->data(['foo' => 'bar']);
+            ->with(['foo' => 'bar']);
 
         $this->assertEquals('Layout: bar | Template: {{ foo }}', $view->render());
     }
@@ -75,7 +75,7 @@ class ViewTest extends TestCase
         $view = (new View)
             ->template('template')
             ->layout('layout')
-            ->data(['foo' => 'bar']);
+            ->with(['foo' => 'bar']);
 
         $this->assertEquals('Layout: {{ foo }} | Template: bar', $view->render());
     }
@@ -89,7 +89,7 @@ class ViewTest extends TestCase
         $view = (new View)
             ->template('template')
             ->layout('layout')
-            ->data(['foo' => 'bar']);
+            ->with(['foo' => 'bar']);
 
         $this->assertEquals('Layout: {{ foo }} | Template: {{ foo }}', $view->render());
     }
@@ -97,7 +97,7 @@ class ViewTest extends TestCase
     /** @test */
     function gets_data()
     {
-        $view = (new View)->data(['foo' => 'bar']);
+        $view = (new View)->with(['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $view->data());
     }

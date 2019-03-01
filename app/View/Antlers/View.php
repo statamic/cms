@@ -20,15 +20,21 @@ class View
         return $view;
     }
 
-    public function data($data = null)
+    public function with($data)
     {
-        if (! $data) {
-            return $this->data;
-        }
-
         $this->data = $data;
 
         return $this;
+    }
+
+    public function data()
+    {
+        return $this->data;
+    }
+
+    public function gatherData()
+    {
+        return array_merge($this->data, $this->cascade());
     }
 
     public function layout($layout = null)
@@ -55,7 +61,7 @@ class View
 
     public function render()
     {
-        $cascade = array_merge($this->data, $this->cascade());
+        $cascade = $this->gatherData();
 
         $contents = view($this->template, $cascade);
 
