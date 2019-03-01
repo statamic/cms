@@ -68,6 +68,10 @@ export default {
             handler(loading) {
                 this.$progress.loading(this.listingKey, loading);
             }
+        },
+
+        searchQuery(query) {
+            this.page = 1;
         }
 
     },
