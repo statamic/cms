@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\View\Antlers;
+namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
 use Statamic\View\Events\ViewRendered;

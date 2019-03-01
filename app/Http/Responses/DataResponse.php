@@ -3,7 +3,7 @@
 namespace Statamic\Http\Responses;
 
 use Statamic\Statamic;
-use Statamic\View\Antlers\View;
+use Statamic\View\View;
 use Facades\Statamic\View\Cascade;
 use Statamic\Events\ResponseCreated;
 use Statamic\Auth\Protect\Protection;
