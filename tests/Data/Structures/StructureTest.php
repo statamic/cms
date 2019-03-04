@@ -12,7 +12,7 @@ use Statamic\API\Structure as StructureAPI;
 
 class StructureTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

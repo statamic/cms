@@ -19,7 +19,7 @@ class CascadeTest extends TestCase
 
     private $cascade;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->fakeSiteConfig();

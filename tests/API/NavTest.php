@@ -14,7 +14,7 @@ class NavTest extends TestCase
 
     protected $shouldPreventNavBeingBuilt = false;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

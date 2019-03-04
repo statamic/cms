@@ -11,7 +11,7 @@ class StatusParserTest extends \PHPUnit\Framework\TestCase
      */
     protected $parser;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

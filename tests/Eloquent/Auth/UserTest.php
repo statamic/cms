@@ -12,7 +12,7 @@ class UserTest extends TestCase
 {
     use UserContractTests;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

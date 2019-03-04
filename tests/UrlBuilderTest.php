@@ -17,7 +17,7 @@ class UrlBuilderTest extends TestCase
      */
     protected $entry;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

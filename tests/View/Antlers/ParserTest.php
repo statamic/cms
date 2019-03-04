@@ -17,7 +17,7 @@ class ParserTest extends TestCase
 {
     private $variables;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

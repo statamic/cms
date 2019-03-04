@@ -12,7 +12,7 @@ use Illuminate\Support\Collection as IlluminateCollection;
 
 class CollectionRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

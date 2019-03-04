@@ -12,7 +12,7 @@ use Statamic\Contracts\Auth\User;
 
 class UsersStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
@@ -22,7 +22,7 @@ class UsersStoreTest extends TestCase
         $this->store = (new UsersStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown()
+    function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);

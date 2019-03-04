@@ -11,14 +11,14 @@ class ExtensionGeneratorTest extends TestCase
 {
     public $testedPaths = [];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->files = app(Filesystem::class);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->cleanupPaths();
 

@@ -10,7 +10,7 @@ class ThemeTagsTest extends TestCase
 {
     protected $path;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->path = '';
 

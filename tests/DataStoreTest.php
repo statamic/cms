@@ -7,7 +7,7 @@ class DataStoreTest extends \PHPUnit\Framework\TestCase
     /** @var \Statamic\DataStore */
     private $store;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

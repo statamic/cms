@@ -12,7 +12,7 @@ use Statamic\Contracts\Data\Structures\Structure;
 
 class StructuresStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
@@ -22,7 +22,7 @@ class StructuresStoreTest extends TestCase
         $this->store = (new StructuresStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown()
+    function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);

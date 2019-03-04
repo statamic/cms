@@ -16,7 +16,7 @@ class FrontendTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

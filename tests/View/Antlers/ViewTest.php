@@ -14,7 +14,7 @@ class ViewTest extends TestCase
 {
     use FakesViews;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

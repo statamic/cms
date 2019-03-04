@@ -13,7 +13,7 @@ use Statamic\Auth\Protect\Protectors\Authenticated;
 
 class ProtectionTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

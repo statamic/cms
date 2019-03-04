@@ -13,7 +13,7 @@ use Statamic\Fields\BlueprintRepository;
 
 class BlueprintRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -23,7 +23,7 @@ class BlueprintRepositoryTest extends TestCase
         $this->repo = app(BlueprintRepository::class)->setDirectory($this->tempDir);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

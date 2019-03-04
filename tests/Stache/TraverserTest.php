@@ -14,7 +14,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class TraverserTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +24,7 @@ class TraverserTest extends TestCase
         $this->traverser = new Traverser(new Filesystem);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);

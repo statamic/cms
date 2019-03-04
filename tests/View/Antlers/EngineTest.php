@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class EngineTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

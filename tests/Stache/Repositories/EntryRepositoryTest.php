@@ -15,7 +15,7 @@ use Statamic\Stache\Repositories\EntryRepository;
 
 class EntryRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

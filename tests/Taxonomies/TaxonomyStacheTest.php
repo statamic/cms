@@ -16,7 +16,7 @@ class TaxonomyStacheTest extends TestCase
      */
     protected $stache;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->markTestSkipped();
 

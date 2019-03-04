@@ -11,7 +11,7 @@ use Statamic\Stache\Repositories\UserRepository;
 
 class UserRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

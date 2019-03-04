@@ -10,7 +10,7 @@ use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 
 class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($container = \Mockery::getContainer()) {
             $this->addToAssertionCount($container->mockery_getExpectationCount());

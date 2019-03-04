@@ -20,7 +20,7 @@ class AssetTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

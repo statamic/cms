@@ -12,7 +12,7 @@ use Statamic\Stache\Stores\CollectionsStore;
 
 class StacheTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->stache = new Stache;
         $this->stache->setBootstrapper($this->bootstrapper = new CountableFakeBootstrapper);

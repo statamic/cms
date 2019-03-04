@@ -14,7 +14,7 @@ use Statamic\Stache\Stores\AssetContainersStore;
 
 class AssetContainersStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +24,7 @@ class AssetContainersStoreTest extends TestCase
         $this->store = (new AssetContainersStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown()
+    function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);

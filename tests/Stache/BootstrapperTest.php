@@ -8,7 +8,7 @@ use Statamic\Stache\Bootstrapper;
 
 class BootstrapperTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

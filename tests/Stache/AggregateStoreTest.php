@@ -12,7 +12,7 @@ use Statamic\Stache\Stores\AggregateStore;
 
 class AggregateStoreTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

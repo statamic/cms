@@ -8,7 +8,7 @@ use Statamic\Stache\Stores\Store;
 
 class StoreTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

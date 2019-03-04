@@ -13,7 +13,7 @@ use Statamic\Stache\Stores\BasicStore;
 
 class StoreUpdaterTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -43,7 +43,7 @@ class StoreUpdaterTest extends TestCase
         $this->updater = (new StoreUpdater($this->stache, new Filesystem))->store($this->store);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

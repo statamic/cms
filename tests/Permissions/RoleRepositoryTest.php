@@ -10,7 +10,7 @@ use Statamic\Auth\File\RoleRepository;
 
 class RoleRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

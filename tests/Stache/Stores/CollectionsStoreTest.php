@@ -12,7 +12,7 @@ use Statamic\Contracts\Data\Entries\Collection;
 
 class CollectionsStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
@@ -22,7 +22,7 @@ class CollectionsStoreTest extends TestCase
         $this->store = (new CollectionsStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown()
+    function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);

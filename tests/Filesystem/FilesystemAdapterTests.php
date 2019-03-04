@@ -7,7 +7,7 @@ use Statamic\Filesystem\FilesystemAdapter;
 
 trait FilesystemAdapterTests
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -17,7 +17,7 @@ trait FilesystemAdapterTests
         $this->adapter = $this->makeAdapter();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

@@ -18,7 +18,7 @@ class GlideImageManipulatorTest extends TestCase
      */
     protected $builder;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

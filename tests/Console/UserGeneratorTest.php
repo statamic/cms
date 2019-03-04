@@ -8,7 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class UserGeneratorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         $path = __DIR__.'/../__fixtures__/users';
 

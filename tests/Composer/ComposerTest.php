@@ -9,7 +9,7 @@ use Tests\Fakes\Composer\Package\PackToTheFuture;
 
 class ComposerTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -18,7 +18,7 @@ class ComposerTest extends TestCase
         $this->ensureTestPackageNotInstalled();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->ensureTestPackageNotInstalled();
 

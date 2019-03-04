@@ -12,7 +12,7 @@ use Statamic\Contracts\Data\Entries\Entry;
 
 class EntriesStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
