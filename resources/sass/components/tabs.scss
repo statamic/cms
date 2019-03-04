@@ -3,18 +3,22 @@
    ========================================================================== */
 
 .tabs {
-    @apply .bg-white .shadow .rounded-md .text-center .flex .w-full .overflow-hidden;
+    @apply .flex .w-full items-end overflow-hidden pl-1 -ml-1;
     height: 48px;
 
     a {
-        @apply .bg-grey-20 .py-sm .px-1 .leading-tight .text-xs .w-full .h-full .min-h-full .relative .flex-1 .flex .items-center .justify-center;
-        box-shadow: inset -1px 0 #e6ebf1;
+        @apply .bg-grey-20 .py-sm .px-1 .leading-tight .text-xs .w-auto .relative .flex .items-center .justify-center rounded-t-md shadow border-b;
+        min-width: 140px;
+        height: 94%;
+        min-height: 94%;
+        // box-shadow: inset 0 -1px 0 config('colors.grey-30');
+
     }
 
     a.active {
-        color: $brand-primary;
-        background-color: #fff;
-        box-shadow: $brand-primary 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+        @apply bg-white text-blue border-t-2 border-blue relative .h-full .min-h-full border-b-0;
+        z-index: 2;
+        // box-shadow: $brand-primary 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
     }
 
     a.has-error {

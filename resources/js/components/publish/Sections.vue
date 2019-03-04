@@ -2,9 +2,8 @@
 
     <div>
 
-        <div class="publish-tabs tabs mb-2" v-show="mainSections.length > 1">
-            <a href=""
-                v-for="section in mainSections"
+        <div class="publish-tabs tabs" v-show="mainSections.length > 1">
+            <a v-for="section in mainSections"
                 :key="section.handle"
                 :class="{
                     'active': section.handle == active,
@@ -18,7 +17,7 @@
         <div :class="{ 'flex justify-between': !livePreview }">
             <div class="w-full">
                 <div
-                    :class="{ 'card p-0': !livePreview }"
+                    :class="{ 'card p-0': !livePreview, 'rounded-tl-none' : mainSections.length > 1 }"
                     v-for="section in mainSections"
                     :key="section.handle"
                     v-show="section.handle === active"
