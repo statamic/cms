@@ -1,148 +1,163 @@
 <template>
     <div class="array-fieldtype-container">
 
-        <table class="array-table" v-if="componentType === 'keyed'">
+        <table v-if="isKeyed" class="array-table">
             <tbody>
-                <tr v-if="data" v-for="(key, index) in config.keys" :key="index">
-                    <th>{{ key.text }}</th>
+                <tr v-if="data" v-for="(element, index) in data" :key="element._id">
+                    <th>{{ config.keys[index].value }}</th>
                     <td>
-                        <input type="text" class="input-text-minimal" v-model="data[key.value]" />
+                        <input type="text" class="input-text-minimal" v-model="data[index].value" />
                     </td>
                 </tr>
             </tbody>
         </table>
 
-
-        <template v-if="componentType === 'dynamic'">
-            <div class="grid-field array-dynamic">
-                <table class="grid-table grid-mode-table" v-if="hasRows">
+        <template v-else-if="isDynamic">
+            <div class="table-field">
+                <table class="bordered-table" v-if="valueCount">
                     <thead>
                         <tr>
-                            <th>{{ valueHeader }}</th>
-                            <th>{{ textHeader }}</th>
+                            <th class="text-center p-1">{{ keyHeader }}</th>
+                            <th class="text-center p-1">{{ valueHeader }}</th>
                             <th class="row-controls"></th>
                         </tr>
                     </thead>
-                    <tbody ref="tbody">
-                        <tr v-for="(row, rowIndex) in data" :key="rowIndex">
-                            <td>
-                                <input type="text" class="form-control" v-model="row.value" />
-                            </td>
-                            <td>
-                                <input type="text" class="form-control" v-model="row.text" />
-                            </td>
-                            <td class="row-controls">
-                                <span class="icon icon-menu move drag-handle"></span>
-                                <span class="icon icon-cross delete" v-on:click="deleteRow(rowIndex)"></span>
-                            </td>
-                        </tr>
-                    </tbody>
+
+                    <sortable-list
+                        v-model="data"
+                        :vertical="true"
+                        item-class="sortable-row"
+                        handle-class="sortable-handle"
+                    >
+                        <tbody>
+                            <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
+                                <td>
+                                    <input type="text" class="input-text-minimal" v-model="element.key" />
+                                </td>
+                                <td>
+                                    <input type="text" class="input-text-minimal" v-model="element.value" />
+                                </td>
+                                <td class="row-controls">
+                                    <span class="icon icon-menu move sortable-handle"></span>
+                                    <span class="icon icon-cross delete" @click="confirmDeleteValue(index)"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </sortable-list>
                 </table>
 
-                <button type="button" class="btn btn-default" @click="addRow">
-                    {{ addRowButton }} <i class="icon icon-plus"></i>
+                <button class="btn" @click="addValue" :disabled="atValueMax">
+                    {{ addButton }}
                 </button>
+
+                <confirmation-modal
+                    v-if="deleting !== false"
+                    :title="__('Delete Value')"
+                    :bodyText="__('Are you sure you want to delete this value?')"
+                    :buttonText="__('Delete')"
+                    :danger="true"
+                    @confirm="deleteValue(deleting)"
+                    @cancel="deleteCancelled"
+                >
+                </confirmation-modal>
             </div>
         </template>
 
     </div>
-
 </template>
 
 <script>
+import uniqid from 'uniqid';
+import { SortableList, SortableItem } from '../sortable/Sortable';
+
 export default {
 
     mixins: [Fieldtype],
 
+    components: {
+        SortableList,
+        SortableItem
+    },
+
     data() {
         return {
-            data: null
-        }
-    },
-
-    created() {
-        this.data = this.value || [];
-
-        if (this.componentType === 'keyed') {
-            this.data = (this.data.length === 0) ? {} : this.data;
-        }
-    },
-
-    mounted() {
-        if (this.componentType === 'dynamic') {
-            this.initSortable();
-        }
-    },
-
-    computed: {
-        componentType: function() {
-            return (this.config.keys) ? 'keyed' : 'dynamic';
-        },
-
-        hasRows: function() {
-            return this.data && this.data.length > 0;
-        },
-
-        addRowButton: function() {
-            return this.config.add_row || __('Row');
-        },
-
-        valueHeader: function() {
-            return this.config.value_header || __('Value');
-        },
-
-        textHeader: function() {
-            return this.config.text_header || __('Text');
+            data: [],
+            deleting: false,
         }
     },
 
     watch: {
-
         data: {
             deep: true,
-            handler(value) {
-                this.update(value);
+            handler (data) {
+                this.update(data);
             }
         }
+    },
 
+    created() {
+        // Assign each row a unique id that Vue can use as a v-for key.
+        this.data = JSON.parse(JSON.stringify(this.value || []))
+            .map(row => Object.assign(row, { _id: uniqid() }));
+    },
+
+    computed: {
+        isKeyed() {
+            return this.config.keys.length;
+        },
+
+        isDynamic() {
+            return ! this.isKeyed;
+        },
+
+        maxValues() {
+            return this.config.max_values || null;
+        },
+
+        valueCount() {
+            return this.data.length;
+        },
+
+        atValueMax() {
+            return this.maxValues ? this.valueCount >= this.maxValues : false;
+        },
+
+        addButton() {
+            return __(this.config.add_button || 'Add Value');
+        },
+
+        keyHeader() {
+            return __(this.config.key_header || 'Key');
+        },
+
+        valueHeader() {
+            return __(this.config.value_header || 'Value');
+        }
     },
 
     methods: {
-        addRow: function() {
-            this.data.push({ value: '', text: '' });
-            this.initSortable();
+        addValue() {
+            this.data.push({
+                _id: uniqid(),
+                key: '',
+                value: ''
+            });
         },
 
-        deleteRow: function(index) {
+        confirmDeleteValue(index) {
+            this.deleting = index;
+        },
+
+        deleteValue(index) {
+            this.deleting = false;
+
             this.data.splice(index, 1);
         },
 
-        initSortable: function() {
-            var self = this;
-            var start = '';
-
-            $(this.$refs.tbody).sortable({
-                axis: "y",
-                revert: 175,
-                handle: '.drag-handle',
-                placeholder: 'table-row-placeholder',
-                forcePlaceholderSize: true,
-
-                start: function(e, ui) {
-                    start = ui.item.index();
-                    ui.placeholder.height(ui.item.height());
-                },
-
-                update: function(e, ui) {
-                    var end  = ui.item.index(),
-                        swap = self.data.splice(start, 1)[0];
-
-                    self.data.splice(end, 0, swap);
-                }
-            });
+        deleteCancelled() {
+            this.deleting = false;
         }
     }
 
-};
-
+}
 </script>

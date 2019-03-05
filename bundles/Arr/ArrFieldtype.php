@@ -8,54 +8,40 @@ class ArrFieldtype extends Fieldtype
 {
     protected static $handle = 'array';
 
-    public function blank()
-    {
-        return [];
-    }
-
     public function preProcess($data)
     {
-        if (! $data) return $data;
-
-        if ($this->keyed()) {
-            $processed = [];
-            foreach (format_input_options($this->config('keys')) as $formatted) {
-                $value = $formatted['value'];
-                $processed[$value] = array_get($data, $value);
-            }
-            $data = $processed;
-        } else {
-            $data = format_input_options($data);
-        }
-
-        return $data;
+        return collect(array_merge($this->blankKeyed(), $data ?? []))
+            ->map(function ($value, $key) {
+                return [
+                    'key' => $key,
+                    'value' => $value
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     public function process($data)
     {
-        // The keyed version is fine as-is.
-        if ($this->keyed()) {
-            return $data;
-        }
-
-        $result = [];
-
-        if (! is_array($data)) {
-            return $data;
-        }
-
-        foreach ($data as $i => $arr) {
-            $key = $arr['value'];
-            $value = $arr['text'];
-
-            $result[$key] = $value;
-        }
-
-        return $result;
+        return collect($data)
+            ->pluck('value', 'key')
+            ->when($this->isKeyed(), function ($data) {
+                return $data->filter();
+            })
+            ->all();
     }
 
-    private function keyed()
+    protected function isKeyed()
     {
         return (bool) $this->config('keys');
+    }
+
+    protected function blankKeyed()
+    {
+        return collect($this->config('keys'))
+            ->map(function () {
+                return null;
+            })
+            ->all();
     }
 }
