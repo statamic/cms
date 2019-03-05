@@ -46,7 +46,7 @@
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addValue" :disabled="atValueMax">
+                <button class="btn" @click="addValue" :disabled="atMax">
                     {{ addButton }}
                 </button>
 
@@ -110,16 +110,16 @@ export default {
             return ! this.isKeyed;
         },
 
-        maxValues() {
-            return this.config.max_values || null;
+        maxItems() {
+            return this.config.max_items || null;
         },
 
         valueCount() {
             return this.data.length;
         },
 
-        atValueMax() {
-            return this.maxValues ? this.valueCount >= this.maxValues : false;
+        atMax() {
+            return this.maxItems ? this.valueCount >= this.maxItems : false;
         },
 
         addButton() {
