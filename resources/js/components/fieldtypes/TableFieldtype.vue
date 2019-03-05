@@ -121,11 +121,11 @@ export default {
         },
 
         atRowMax() {
-            return this.maxRows ? this.rowCount === this.maxRows : false;
+            return this.maxRows ? this.rowCount >= this.maxRows : false;
         },
 
         atColumnMax() {
-            return this.maxColumns ? this.columnCount === this.maxColumns : false;
+            return this.maxColumns ? this.columnCount >= this.maxColumns : false;
         },
 
         canAddColumns() {
@@ -189,5 +189,6 @@ export default {
                 .filter(row => !!row).join(', ');
         }
     }
+
 }
 </script>
