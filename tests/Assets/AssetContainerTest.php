@@ -331,6 +331,7 @@ class AssetContainerTest extends TestCase
         });
     }
 
+    /** @test */
     function it_gets_assets_in_a_folder_recursively()
     {
         tap($this->containerWithDisk()->assets('/', true), function ($assets) {
