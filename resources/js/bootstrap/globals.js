@@ -45,6 +45,10 @@ global.data_get = function(obj, path, fallback=null) {
     return value !== undefined ? value : fallback;
 };
 
+global.clone = function (value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
 global.Cookies = require('cookies-js');
 
 global.tailwind_width_class = function (width) {
