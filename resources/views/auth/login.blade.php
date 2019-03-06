@@ -36,12 +36,12 @@
 
             <div class="mb-4">
                 <label class="mb-1">{{ __('Email') }}</label>
-                <input type="text" class="input-text form-control" name="email" value="{{ old('email') }}" autofocus>
+                <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus>
             </div>
 
             <div class="mb-4">
                 <label class="mb-1">{{ __('Password') }}</label>
-                <input type="password" class="input-text form-control" name="password" id="password">
+                <input type="password" class="input-text input-text" name="password" id="password">
             </div>
             <div class="flex justify-between items-center">
                 <label for="remember_me" class="flex items-center cursor-pointer">

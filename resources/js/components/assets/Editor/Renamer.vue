@@ -14,7 +14,7 @@
 
             <div class="form-group">
                 <input type="text" autofocus
-                       class="form-control"
+                       class="input-text"
                        ref="input"
                        v-model="filename"
                        @keyup.esc="cancel"

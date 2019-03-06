@@ -2,10 +2,10 @@
    ENVIRONMENT FIELDTYPE
    ========================================================================== */
 
-// @TODO: Remove dependency on .form-control, use a standard grey.
+// @TODO: Remove dependency on .input-text, use a standard grey.
 
 .environment-field {
-    // @extend .form-control;
+    // @extend .input-text;
     // color: #bbb;
     cursor: not-allowed;
 

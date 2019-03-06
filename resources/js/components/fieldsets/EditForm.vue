@@ -15,7 +15,7 @@
                 <div v-if="errors.title">
                     <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
                 </div>
-                <input type="text" name="title" class="form-control" v-model="fieldset.title" autofocus="autofocus">
+                <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus">
             </div>
 
         </div>

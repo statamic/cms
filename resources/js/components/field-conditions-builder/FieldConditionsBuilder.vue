@@ -38,7 +38,7 @@
 
             <template v-if="isCustom">
                 <small class="help-block">{{ __('cp.display_custom_instructions') }}</small>
-                <input type="text" class="form-control" v-model="data.custom" />
+                <input type="text" class="input-text" v-model="data.custom" />
             </template>
 
         </template>

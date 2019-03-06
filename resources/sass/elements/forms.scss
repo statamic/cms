@@ -132,7 +132,7 @@ input.slug {
     -webkit-font-smoothing: antialiased;
     &:hover,
     &:focus {
-        @extend .form-control;
+        @extend .input-text;
         transition: none !important;
     }
 }

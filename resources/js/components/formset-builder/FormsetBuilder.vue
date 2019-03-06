@@ -20,13 +20,13 @@
                     <div class="form-group">
                         <label class="block">{{ __('Title') }}</label>
                         <small class="help-block">{{ __('cp.formset_title_instructions') }}</small>
-                        <input type="text" class="form-control" v-model="formset.title" autofocus="autofocus" />
+                        <input type="text" class="input-text" v-model="formset.title" autofocus="autofocus" />
                     </div>
 
                     <div class="form-group" v-if="create">
                         <label class="block">{{ __('Slug') }}</label>
                         <small class="help-block">{{ __('cp.formset_slug_instructions') }}</small>
-                        <input type="text" class="form-control" v-model="slug" />
+                        <input type="text" class="input-text" v-model="slug" />
                     </div>
 
                     <div class="form-group">
@@ -44,7 +44,7 @@
                     <div class="form-group">
                         <label class="block">{{ __('Honeypot Field') }}</label>
                         <small class="help-block">{{ __('cp.formset_honeypot_instructions') }} <a href="https://docs.statamic.com/forms#honeypot">{{ __('What\'s a honeypot?') }}</a></small>
-                        <input type="text" class="form-control" v-model="formset.honeypot" />
+                        <input type="text" class="input-text" v-model="formset.honeypot" />
                     </div>
 
                     <div class="form-group">

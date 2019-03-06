@@ -26,7 +26,7 @@
                 @if ($errors->has('email'))
                     <small class="block text-red -mt-1 mb-1">{{ $errors->first('email') }}</small>
                 @endif
-                <input id="email" type="text" class="input-text form-control" name="email" value="{{ old('email') }}" >
+                <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
             </div>
             <button type="submit" class="btn btn-primary">
                 {{ __('Submit') }}

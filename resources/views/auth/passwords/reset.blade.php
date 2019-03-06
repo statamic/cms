@@ -23,7 +23,7 @@
                     <small class="block text-red -mt-1 mb-1">{{ $errors->first('email') }}</small>
                 @endif
 
-                <input id="email" type="email" class="input-text form-control" name="email" value="{{ $email ?? old('email') }}" autofocus required>
+                <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
             </div>
 
             <div class="mb-4">
@@ -33,13 +33,13 @@
                     <small class="block text-red -mt-1 mb-1">{{ $errors->first('password') }}</small>
                 @endif
 
-                <input id="password" type="password" class="input-text form-control" name="password" required>
+                <input id="password" type="password" class="input-text input-text" name="password" required>
             </div>
 
             <div class="mb-4">
                 <label for="password-confirm" class="mb-1">{{ __('Confirm Password') }}</label>
 
-                <input id="password-confirm" type="password" class="input-text form-control" name="password_confirmation" required>
+                <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>
             </div>
 
             <button type="submit" class="btn btn-primary">

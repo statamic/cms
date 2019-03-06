@@ -14,7 +14,7 @@
                 <div class="form-group flex-1">
                     <label>{{ t('json_file') }}</label>
                     <small class="help-block"></small>
-                    <input type="file" class="form-control" name="file" />
+                    <input type="file" class="input-text" name="file" />
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg ml-2">{{ t('import') }}</button>
             </div>

@@ -5,7 +5,7 @@
 			<input
 				type="text"
 				v-model="data[$index]"
-				class="form-control"
+				class="input-text"
 				@keydown.enter="updateItem(item, $index, $event)"
 				@keyup.up="goUp"
 				@keyup.down="goDown"
@@ -17,7 +17,7 @@
 		</span>
 	</li>
 	<li>
-		<input type="text" class="form-control new-item" v-model="newItem"
+		<input type="text" class="input-text new-item" v-model="newItem"
             :placeholder="`${__('Add another item')}...`"
             @keydown.enter.prevent="addItem"
             @blur="addItem"

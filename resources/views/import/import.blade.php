@@ -45,7 +45,7 @@
                 <h2>Collection: @{{ collectionName }}</h2>
                 <div class="form-group">
                     <label>{{ t('route') }}</label>
-                    <input type="text" v-model="collection.route" class="form-control" />
+                    <input type="text" v-model="collection.route" class="input-text" />
                 </div>
                 <div class="form-group">
                     <label>{{ trans_choice('entries', 2) }}</label>
@@ -82,7 +82,7 @@
                 <h2>Taxonomy: @{{ taxonomyName }}</h2>
                 <div class="form-group">
                     <label>{{ t('route') }}</label>
-                    <input type="text" v-model="taxonomy.route" class="form-control" />
+                    <input type="text" v-model="taxonomy.route" class="input-text" />
                 </div>
                 <div class="form-group">
                     <label>{{ trans_choice('cp.terms', 2) }}</label>

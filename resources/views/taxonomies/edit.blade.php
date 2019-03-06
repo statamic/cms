@@ -16,7 +16,7 @@
                 <div class="form-group">
                     <label class="block">{{ t('title') }}</label>
                     <small class="help-block">{{ t('taxonomies_title_instructions') }}</small>
-                    <input type="text" name="title" class="form-control" value="{{ $group->title() }}" />
+                    <input type="text" name="title" class="input-text" value="{{ $group->title() }}" />
                 </div>
 
                 <div class="form-group">
@@ -28,7 +28,7 @@
                 <div class="form-group">
                     <label class="block">{{ t('route') }}</label>
                     <small class="help-block">{{ t('taxonomies_route_instructions') }}</small>
-                    <input type="text" name="route" class="form-control" value="{{ $group->route() }}" />
+                    <input type="text" name="route" class="input-text" value="{{ $group->route() }}" />
                 </div>
 
             </div>

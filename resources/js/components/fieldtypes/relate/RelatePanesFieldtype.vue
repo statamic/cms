@@ -5,7 +5,7 @@
         <div class="relate-pane pane-suggestions">
             <div class="pane-header">
                 <input type="text"
-                       class="form-control relate-search"
+                       class="input-text relate-search"
                        placeholder="Filter"
                        ref="filter"
                        v-model="search"

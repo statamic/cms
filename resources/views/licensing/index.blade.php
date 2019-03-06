@@ -29,7 +29,7 @@
                         <tr>
                             <td class="first-cell">{{ $license->name() }}</td>
                             <td width="320">
-                                <input type="text" class="form-control font-mono text-xs" name="{{ $license->id() }}" value="{{ $license->key() }}">
+                                <input type="text" class="input-text font-mono text-xs" name="{{ $license->id() }}" value="{{ $license->key() }}">
                             </td>
                             <td class="text-xs mt-1 text-grey">
                                 @if ($license->status())

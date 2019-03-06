@@ -28,12 +28,12 @@
 
             <div class="form-group">
                 <label>{{ trans_choice('cp.passwords', 1) }}</label>
-                <input type="password" class="form-control" name="password" id="password">
+                <input type="password" class="input-text" name="password" id="password">
             </div>
 
             <div class="form-group">
                 <label>{{ trans('cp.confirm_password') }}</label>
-                <input type="password" class="form-control" name="password_confirmation" id="password_confirmation">
+                <input type="password" class="input-text" name="password_confirmation" id="password_confirmation">
             </div>
 
             <div>

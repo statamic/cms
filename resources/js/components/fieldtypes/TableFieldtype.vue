@@ -23,7 +23,7 @@
                 <tbody>
                     <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
                         <td v-for="(cell, cellIndex) in row.cells">
-                            <input type="text" v-model="row['cells'][cellIndex]" class="form-control" />
+                            <input type="text" v-model="row['cells'][cellIndex]" class="input-text" />
                         </td>
                         <td class="row-controls">
                             <span class="icon icon-menu move sortable-handle"></span>

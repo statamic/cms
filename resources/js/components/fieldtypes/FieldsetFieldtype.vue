@@ -10,7 +10,7 @@
             <div class="flex" v-if="creating">
                 <input type="text"
                        ref="createField"
-                       class="form-control flex-1"
+                       class="input-text flex-1"
                        v-model="newFieldsetName"
                        @keydown.enter.prevent="create"
                        @keydown.esc="cancelAdd"

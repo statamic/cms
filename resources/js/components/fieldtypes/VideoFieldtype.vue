@@ -1,6 +1,6 @@
 <template>
     <div>
-        <input type="text" v-model="data" class="form-control" />
+        <input type="text" v-model="data" class="input-text" />
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
             <div class="video-preview">
