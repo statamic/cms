@@ -38,6 +38,9 @@
                     :search-query="searchQuery"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
+                    :sort="false"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }">
@@ -70,7 +73,7 @@
                                 class="-mt-px"
                             />
 
-                            <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
+                            <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true" @sorted="sorted">
 
                                 <template slot="tbody-start">
                                     <tr v-if="folder.parent_path && !restrictFolderNavigation">
@@ -222,8 +225,8 @@ export default {
         return {
             columns: [
                 { label: __('File'), field: 'basename', visible: true },
-                { label: __('Size'), field: 'size_formatted', visible: true },
-                { label: __('Last Modified'), field: 'last_modified_relative', visible: true },
+                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true },
+                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true },
             ],
             containers: [],
             container: {},
@@ -241,6 +244,8 @@ export default {
             page: 1,
             perPage: 25, // TODO: Should come from the controller, or a config.
             meta: {},
+            sortColumn: 'basename',
+            sortDirection: 'asc',
         }
     },
 
@@ -273,7 +278,9 @@ export default {
         parameters() {
             return {
                 page: this.page,
-                perPage: this.perPage
+                perPage: this.perPage,
+                sort: this.sortColumn,
+                order: this.sortDirection,
             }
         },
 
@@ -425,7 +432,12 @@ export default {
         folderUpdated(index, newFolder) {
             this.folders[index] = newFolder;
             this.editedFolderPath = null;
-        }
+        },
+
+        sorted(column, direction) {
+            this.sortColumn = column;
+            this.sortDirection = direction;
+        },
     }
 
 }

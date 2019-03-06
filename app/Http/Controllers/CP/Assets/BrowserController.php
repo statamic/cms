@@ -44,26 +44,15 @@ class BrowserController extends CpController
 
         $container = AssetContainer::find($container);
 
-        // Grab all the assets from the container.
-        $assets = $container->assets($path);
-        $assets = $this->supplementAssetsForDisplay($assets);
+        $paginator = $container
+            ->queryAssets()
+            ->where('folder', $path)
+            ->orderBy($request->sort, $request->order)
+            ->paginate(15);
 
-        // Set up the paginator, since we don't want to display all the assets.
-        // TODO: Instead of manually creating a paginator, get one from the Asset QueryBuilder once it exists.
-        $totalAssetCount = $assets->count();
-        $perPage = request('perPage');
-        $currentPage = (int) $this->request->page ?: 1;
-        $offset = ($currentPage - 1) * $perPage;
-        $assets = new LengthAwarePaginator(
-            $assets->values()->slice($offset, $perPage),
-            $totalAssetCount, $perPage, $currentPage
-        );
+        $this->supplementAssetsForDisplay($paginator->getCollection());
 
-        $assets->each(function($asset) {
-            $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
-        });
-
-        return Resource::collection($assets)->additional(['meta' => [
+        return Resource::collection($paginator)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
             'folders' => $container->assetFolders($path)->values()->toArray(),
             'folder' => $container->assetFolder($path)->toArray()
@@ -82,6 +71,7 @@ class BrowserController extends CpController
             // Set some values for better listing formatting.
             $asset->setSupplement('size_formatted', Str::fileSizeForHumans($asset->size(), 0));
             $asset->setSupplement('last_modified_formatted', $asset->lastModified()->format(config('statamic.cp.date_format')));
+            $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
         }
 
         return $assets;
