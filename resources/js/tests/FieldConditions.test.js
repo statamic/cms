@@ -27,6 +27,9 @@ const Fields = new Vue({
         setValues(values) {
             this.values = values;
             Store.commit('setValues', values);
+        },
+        setStoreValues(values) {
+            Store.commit('setValues', values);
         }
     }
 });
@@ -230,6 +233,15 @@ test('it can run conditions on nested data', () => {
 
     expect(showFieldIf({'user.address.country': 'Canada'})).toBe(true);
     expect(showFieldIf({'user.address.country': 'Australia'})).toBe(false);
+});
+
+test('it can run conditions on parent store values', () => {
+    Fields.setStoreValues({
+        favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
+    });
+
+    expect(showFieldIf({'favorite_foods': 'contains lasagna'})).toBe(false);
+    expect(showFieldIf({'storeValues.favorite_foods': 'contains lasagna'})).toBe(true);
 });
 
 test('it can call a custom logic function', () => {
