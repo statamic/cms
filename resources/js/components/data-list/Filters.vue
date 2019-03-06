@@ -1,9 +1,8 @@
 <template>
     <dropdown-list>
-        <button class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative" slot="trigger">
-            <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
-            <span>{{ __('Filter') }}</span>
-            <div v-if="activeFilterCount" class="badge ml-1 bg-blue" v-text="activeFilterCount" />
+        <button class="btn btn-icon-only ml-2 dropdown-toggle relative" slot="trigger">
+            <span>{{ __('Filters') }}</span>
+            <div v-if="activeFilterCount" class="badge ml-1" v-text="activeFilterCount" />
         </button>
         <ul class="dropdown-menu">
             <li><h6>{{ __('Filter List') }}</h6></li>
