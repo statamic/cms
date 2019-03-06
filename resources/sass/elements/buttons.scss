@@ -258,56 +258,6 @@ td .btn-icon {
 /* Specialty Buttons
   ========================================================================== */
 
-.btn-upload {
-    @apply .shadow-inner;
-    border: dashed 1px $color_gray_upload;
-    color: $color_gray_upload;
-    font-size: 11px;
-    padding: 6px 20px;
-
-    strong {
-        color: $color_gray_upload_alt;
-        font-weight: normal;
-        text-transform: uppercase;
-    }
-
-    &.btn-upload-full {
-        border: none;
-        display: block;
-        font-size: 16px;
-        min-height: 400px;
-        padding-top: 40%;
-        width: 100%;
-
-        strong {
-            color: $color_gray_dark;
-            display: block;
-            font-size: 18px;
-            margin-top: -30%;
-            padding-top: 120px;
-
-            @include background('../img/arrow-drop.png', 12px 101px, transparent, top center);
-        }
-    }
-    &.btn-upload-small {
-        border: none;
-        font-size: 13px;
-        padding:30px 0;
-        width: 20%;
-
-        a {
-            font-weight: bold;
-        }
-        strong {
-            color: $color_gray_dark;
-            display: block;
-            padding-top: 35px;
-
-            @include background('../img/arrow-drop-small.png', 9px 31px, transparent, top center);
-        }
-    }
-}
-
 .btn-more,
 .btn-more:active {
     background: none;
