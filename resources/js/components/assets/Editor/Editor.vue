@@ -201,7 +201,9 @@ export default {
 
 
     props: {
-        id: String,
+        id: {
+            required: true
+        },
         allowDeleting: {
             type: Boolean,
             default() {
