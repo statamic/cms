@@ -150,8 +150,8 @@ class FieldConditionsValidator {
     }
 
     getFieldValue(field) {
-        return field.startsWith('storeValues.')
-            ?  data_get(this.storeValues, field.replace(new RegExp('^storeValues.'), ''))
+        return field.startsWith('root.')
+            ?  data_get(this.storeValues, field.replace(new RegExp('^root.'), ''))
             :  data_get(this.values, field);
     }
 
