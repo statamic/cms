@@ -10,15 +10,7 @@ class ArrFieldtype extends Fieldtype
 
     public function preProcess($data)
     {
-        return collect(array_merge($this->blankKeyed(), $data ?? []))
-            ->map(function ($value, $key) {
-                return [
-                    'key' => $key,
-                    'value' => $value
-                ];
-            })
-            ->values()
-            ->all();
+        return array_merge($this->blankKeyed(), $data ?? []);
     }
 
     public function process($data)

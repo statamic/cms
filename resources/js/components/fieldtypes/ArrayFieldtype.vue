@@ -3,8 +3,8 @@
 
         <table v-if="isKeyed" class="array-table">
             <tbody>
-                <tr v-if="data" v-for="(element, index) in data" :key="element._id">
-                    <th>{{ config.keys[index].value }}</th>
+                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                    <th>{{ config.keys[element.key] }}</th>
                     <td>
                         <input type="text" class="input-text-minimal" v-model="data[index].value" />
                     </td>
@@ -67,12 +67,11 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
-import { SortableList, SortableItem } from '../sortable/Sortable';
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
@@ -86,28 +85,30 @@ export default {
         }
     },
 
+    created() {
+        this.data = this.objectToSortable(this.value || []);
+    },
+
     watch: {
         data: {
             deep: true,
             handler (data) {
-                this.update(data);
+                this.update(this.sortableToObject(data));
             }
         }
     },
 
-    created() {
-        // Assign each row a unique id that Vue can use as a v-for key.
-        this.data = JSON.parse(JSON.stringify(this.value || []))
-            .map(row => Object.assign(row, { _id: uniqid() }));
-    },
-
     computed: {
         isKeyed() {
-            return this.config.keys.length;
+            return Boolean(Object.keys(this.config.keys).length);
         },
 
         isDynamic() {
             return ! this.isKeyed;
+        },
+
+        keyedData() {
+            return _.filter(this.data, element => this.config.keys[element.key]);
         },
 
         maxItems() {
@@ -137,11 +138,7 @@ export default {
 
     methods: {
         addValue() {
-            this.data.push({
-                _id: uniqid(),
-                key: '',
-                value: ''
-            });
+            this.data.push(this.newSortableKeyValue());
         },
 
         confirmDeleteValue(index) {
