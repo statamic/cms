@@ -13,7 +13,7 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        perPage: {
+        initialPerPage: {
             type: Number,
             default: 25
         }
@@ -28,6 +28,7 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
+            perPage: this.initialPerPage,
             meta: null,
             searchQuery: '',
         }

@@ -7,6 +7,6 @@
         collection="{{ $collection->handle() }}"
         initial-sort-column="title"
         initial-sort-direction="asc"
-        :per-page="{{ $limit }}"
+        :initial-per-page="{{ $limit }}"
     ></collection-widget>
 </div>
