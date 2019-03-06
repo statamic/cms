@@ -16,7 +16,6 @@ class ArrFieldtype extends Fieldtype
     public function process($data)
     {
         return collect($data)
-            ->pluck('value', 'key')
             ->when($this->isKeyed(), function ($data) {
                 return $data->filter();
             })
