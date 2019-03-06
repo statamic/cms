@@ -56,14 +56,15 @@ test('it shows or hides field based on shorthand equals conditions', () => {
 test('it can use comparison operators in conditions', () => {
     Fields.setValues({
         last_name: 'Hasselhoff',
-        age: 13
+        age: 13,
+        string_age: "3"
     });
 
     expect(showFieldIf({age: '== 13'})).toBe(true);
     expect(showFieldIf({age: '!= 5'})).toBe(true);
     expect(showFieldIf({last_name: '=== Hasselhoff'})).toBe(true);
     expect(showFieldIf({last_name: '!== Fischer'})).toBe(true);
-    expect(showFieldIf({age: '=== 13'})).toBe(false); // Fails because we don't cast their condition to int
+    expect(showFieldIf({age: '=== 13'})).toBe(false); // We don't cast their condition on strict equality comparisons
 
     expect(showFieldIf({age: '> 5'})).toBe(true);
     expect(showFieldIf({age: '> 13'})).toBe(false);
@@ -74,6 +75,7 @@ test('it can use comparison operators in conditions', () => {
     expect(showFieldIf({age: '< 13'})).toBe(false);
     expect(showFieldIf({age: '< 20'})).toBe(true);
     expect(showFieldIf({age: '<= 13'})).toBe(true);
+    expect(showFieldIf({string_age: '<= 13'})).toBe(true); // We cast to number when doing greater/less than comparisons
 
     expect(showFieldIf({age: 'is 13'})).toBe(true);
     expect(showFieldIf({age: 'equals 13'})).toBe(true);
