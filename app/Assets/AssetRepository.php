@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\AssetContainer;
 use Statamic\Assets\AssetCollection;
