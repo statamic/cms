@@ -103,6 +103,11 @@ class FieldConditionsValidator {
     normalizeConditionLhs(field) {
         let lhs = data_get(this.values, field);
 
+        // When performing a number comparison, cast to number.
+        if (NUMBER_COMPARISONS.includes(this.operator)) {
+            return Number(lhs);
+        }
+
         // When performing lhs.includes(), if lhs is not an object or array, cast to string.
         if (this.operator === 'includes' && ! _.isObject(lhs)) {
             return lhs ? lhs.toString() : '';
