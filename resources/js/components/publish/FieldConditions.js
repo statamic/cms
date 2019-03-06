@@ -8,6 +8,7 @@ class FieldConditionsValidator {
         this.values = values;
         this.store = store;
         this.storeName = storeName;
+        this.storeValues = store.state.publish[storeName].values;
         this.passOnAny = false;
         this.showOnPass = true;
     }
@@ -101,7 +102,7 @@ class FieldConditionsValidator {
     }
 
     normalizeConditionLhs(field) {
-        let lhs = data_get(this.values, field);
+        let lhs = this.getFieldValue(field);
 
         // When performing a number comparison, cast to number.
         if (NUMBER_COMPARISONS.includes(this.operator)) {
@@ -158,6 +159,12 @@ class FieldConditionsValidator {
             : rhs;
     }
 
+    getFieldValue(field) {
+        return field.startsWith('storeValues.')
+            ?  data_get(this.storeValues, field.replace(new RegExp('^storeValues.'), ''))
+            :  data_get(this.values, field);
+    }
+
     passesCondition(condition) {
         if (condition.operator === 'includes') {
             return condition.lhs.includes(condition.rhs);
@@ -177,7 +184,7 @@ class FieldConditionsValidator {
         let extra = {
             store: this.store,
             storeName: this.storeName,
-            storeValues: this.store.state.publish[this.storeName].values
+            storeValues: this.storeValues
         }
 
         let passes = customFunction(this.values, extra);
