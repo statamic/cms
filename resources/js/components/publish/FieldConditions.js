@@ -77,12 +77,7 @@ class FieldConditionsValidator {
     }
 
     normalizeConditionOperator(condition) {
-        let operator = '==';
-
-        // Extract operator from yaml condition value.
-        _.chain(OPERATORS)
-            .filter(value => new RegExp(`^${value}[^=]`).test(condition.toString()))
-            .each(value => operator = value);
+        let operator = this.getOperatorFromCondition(condition, '==');
 
         // Normalize operator aliases.
         switch (operator) {
@@ -126,12 +121,7 @@ class FieldConditionsValidator {
     }
 
     normalizeConditionRhs(condition) {
-        let rhs = condition.toString();
-
-        // Extract rhs from yaml condition value.
-        _.chain(OPERATORS)
-            .filter(value => new RegExp(`^${value}[^=]`).test(rhs))
-            .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
+        let rhs = this.getRhsFromCondition(condition);
 
         // When comparing against null, true, false, cast to literals.
         switch (rhs) {
@@ -163,6 +153,26 @@ class FieldConditionsValidator {
         return field.startsWith('storeValues.')
             ?  data_get(this.storeValues, field.replace(new RegExp('^storeValues.'), ''))
             :  data_get(this.values, field);
+    }
+
+    getOperatorFromCondition(condition, defaultOperator) {
+        let operator = defaultOperator;
+
+        _.chain(OPERATORS)
+            .filter(value => new RegExp(`^${value}[^=]`).test(condition.toString()))
+            .each(value => operator = value);
+
+        return operator;
+    }
+
+    getRhsFromCondition(condition) {
+        let rhs = condition.toString();
+
+        _.chain(OPERATORS)
+            .filter(value => new RegExp(`^${value}[^=]`).test(rhs))
+            .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
+
+        return rhs;
     }
 
     passesCondition(condition) {
