@@ -39,10 +39,6 @@ class AssetContainersStore extends BasicStore
             ->title(array_get($data, 'title'))
             ->blueprint(array_get($data, 'blueprint'));
 
-        foreach (array_get($data, 'assets', []) as $path => $data) {
-            $container->addAsset((new Asset)->path($path)->data($data));
-        }
-
         return $container;
     }
 

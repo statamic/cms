@@ -2,12 +2,15 @@
 
 namespace Statamic\Assets;
 
+use Statamic\API;
 use Stringy\Stringy;
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Arr;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
+use Statamic\API\YAML;
 use Statamic\API\Image;
 use Statamic\Data\Data;
 use Statamic\API\Blueprint;
@@ -26,14 +29,61 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class Asset implements AssetContract, Arrayable
 {
-    use ContainsData;
+    use ContainsData {
+        set as traitSet;
+        get as traitGet;
+        remove as traitRemove;
+        data as traitData;
+    }
 
     protected $container;
     protected $path;
+    protected $meta;
 
-    public function id()
+    public function id($id = null)
     {
+        if ($id) {
+            throw new \Exception('Asset IDs cannot be set directly.');
+        }
+
         return $this->container->id() . '::' . $this->path();
+    }
+
+    public function get($key, $fallback = null)
+    {
+        return $this->hydrate()->traitGet($key, $fallback);
+    }
+
+    public function set($key, $value)
+    {
+        return $this->hydrate()->traitSet($key, $value);
+    }
+
+    public function remove($key)
+    {
+        unset($this->meta['data'][$key]);
+
+        return $this;
+    }
+
+    public function data($data = null)
+    {
+        $this->hydrate();
+
+        return call_user_func_array([$this, 'traitData'], func_get_args());
+    }
+
+    public function hydrate()
+    {
+        if ($this->meta) {
+            return $this;
+        }
+
+        $this->meta = $this->meta();
+
+        $this->data = $this->meta['data'];
+
+        return $this;
     }
 
     /**
@@ -44,6 +94,62 @@ class Asset implements AssetContract, Arrayable
     public function disk()
     {
         return $this->container()->disk();
+    }
+
+    public function exists()
+    {
+        if (! $path = $this->path()) {
+            return false;
+        }
+
+        return $this->disk()->exists($path);
+    }
+
+    public function meta()
+    {
+        if ($this->meta) {
+            return array_merge($this->meta, ['data' => $this->data]);
+        }
+
+        if ($this->disk()->exists($path = $this->metaPath())) {
+            return YAML::parse($this->disk()->get($path));
+        }
+
+        $this->writeMeta($this->meta = $this->generateMeta());
+
+        return $this->meta;
+    }
+
+    public function generateMeta()
+    {
+        $meta = ['data' => $this->data];
+
+        if ($this->exists()) {
+            $dimensions = Dimensions::asset($this)->get();
+
+            $meta = array_merge($meta, [
+                'size' => $this->disk()->size($this->path()),
+                'last_modified' => $this->disk()->lastModified($this->path()),
+                'width' => $dimensions[0],
+                'height' => $dimensions[1],
+            ]);
+        }
+
+        return $meta;
+    }
+
+    public function metaPath()
+    {
+        return dirname($this->path()) . '/.meta/' . $this->basename() . '.yaml';
+    }
+
+    public function writeMeta($meta)
+    {
+        $meta['data'] = Arr::removeNullValues($meta['data']);
+
+        $contents = YAML::dump($meta);
+
+        $this->disk()->put($this->metaPath(), $contents);
     }
 
     /**
@@ -207,7 +313,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->disk()->lastModified($this->path()));
+        return Carbon::createFromTimestamp($this->meta()['last_modified']);
     }
 
     /**
@@ -217,11 +323,11 @@ class Asset implements AssetContract, Arrayable
      */
     public function save()
     {
-        $this->container()->addAsset($this)->save();
+        API\Asset::save($this);
 
         event('asset.saved', $this);
 
-        return $this;
+        return true;
     }
 
     /**
@@ -231,10 +337,6 @@ class Asset implements AssetContract, Arrayable
      */
     public function delete()
     {
-        // Delete the data from the container, if any is in there.
-        $this->container()->removeAsset($this)->save();
-
-        // Also, delete the actual file
         $this->disk()->delete($this->path());
 
         return $this;
@@ -292,20 +394,15 @@ class Asset implements AssetContract, Arrayable
     public function move($folder, $filename = null)
     {
         $filename = $filename ?: $this->filename();
-
-        // Remove the asset definition from the container.
-        // It'll be re-added in a moment under its new path.
-        $this->container()->removeAsset($this);
-
         $oldPath = $this->path();
-
+        $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder . '/' . $filename . '.' . pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
 
         if ($oldPath !== $newPath) {
-            // Actually rename the file.
             $this->disk()->rename($oldPath, $newPath);
-
-            $this->path($newPath)->save();
+            $this->path($newPath);
+            $this->disk()->rename($oldMetaPath, $this->metaPath());
+            $this->save();
         }
 
         return $this;
@@ -318,7 +415,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function dimensions()
     {
-        return Dimensions::asset($this)->get();
+        return [$this->meta()['width'], $this->meta()['height']];
     }
 
     /**
@@ -348,7 +445,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function size()
     {
-        return $this->disk()->size($this->path());
+        return $this->meta()['size'];
     }
 
     /**
@@ -377,14 +474,14 @@ class Asset implements AssetContract, Arrayable
             'url'            => $this->url(),
         ];
 
-        if ($this->disk() && $this->disk()->exists($this->path())) {
+        if ($this->exists()) {
             $size = $this->size();
             $kb = number_format($size / 1024, 2);
             $mb = number_format($size / 1048576, 2);
             $gb = number_format($size / 1073741824, 2);
 
             $attributes = array_merge($attributes, [
-                'size'           => $this->disk()->sizeHuman($this->path()),
+                'size'           => Str::fileSizeForHumans($this->size()),
                 'size_bytes'     => $size,
                 'size_kilobytes' => $kb,
                 'size_megabytes' => $mb,

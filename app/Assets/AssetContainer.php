@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Statamic\API;
-use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\YAML;
@@ -26,12 +25,6 @@ class AssetContainer implements AssetContainerContract
     protected $disk;
     protected $private;
     protected $blueprint;
-    protected $assets;
-
-    public function __construct()
-    {
-        $this->assets = collect();
-    }
 
     public function id($id = null)
     {
@@ -141,28 +134,9 @@ class AssetContainer implements AssetContainerContract
     {
         API\AssetContainer::save($this);
 
+        // event(new AssetContainerSaved($this));
+
         return $this;
-        $path = "assets/{$this->id}.yaml";
-
-        $data = array_filter($this->toArray());
-        unset($data['id']);
-
-        // Get rid of the driver key if it's local. It's local by default.
-        if (array_get($data, 'driver') === 'local') {
-            unset($data['driver']);
-        }
-
-        // Move assets array to the bottom because it's just easier to read.
-        if ($assets = array_get($data, 'assets')) {
-            unset($data['assets']);
-            $data['assets'] = $assets;
-        }
-
-        $yaml = YAML::dump($data);
-
-        File::disk('content')->put($path, $yaml);
-
-        event(new AssetContainerSaved($this));
     }
 
     /**
@@ -218,7 +192,9 @@ class AssetContainer implements AssetContainerContract
 
         // Get rid of files we never want to show up.
         $files = $files->reject(function ($path) {
-            return Str::endsWith($path, ['.DS_Store', 'folder.yaml']);
+            return Str::startsWith($path, '.meta/')
+                || Str::contains($path, '/.meta/')
+                || Str::endsWith($path, ['.DS_Store']);
         });
 
         return $files->values();
@@ -239,9 +215,11 @@ class AssetContainer implements AssetContainerContract
             $recursive = true;
         }
 
-        $folders = collect($this->disk()->getFolders($folder, $recursive));
+        $paths = $this->disk()->getFolders($folder, $recursive);
 
-        return $folders->values();
+        return collect($paths)->reject(function ($path) {
+            return basename($path) === '.meta';
+        })->values();
     }
 
     /**
@@ -253,13 +231,15 @@ class AssetContainer implements AssetContainerContract
      */
     public function assets($folder = null, $recursive = false)
     {
-        $assets = $this->files($folder, $recursive)->keyBy(function ($path) {
-            return $path;
-        })->map(function ($path) {
-            return $this->asset($path);
-        });
+        $query = $this->queryAssets();
 
-        return collect_assets($assets);
+        if ($folder && $recursive) {
+            $query->where('folder', 'like', "{$folder}%");
+        } elseif ($folder) {
+            $query->where('folder', $folder);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -295,15 +275,13 @@ class AssetContainer implements AssetContainerContract
      */
     public function asset($path)
     {
-        if (! $this->disk()->exists($path)) {
-            return;
+        $asset = API\Asset::make()->container($this)->path($path);
+
+        if (! $asset->disk()->exists($asset->path())) {
+            return null;
         }
 
-        if (! $asset = $this->assets->get($path)) {
-            $asset = API\Asset::make();
-            $asset->container($this);
-            $asset->path($path);
-        }
+        $asset->hydrate();
 
         return $asset;
     }
@@ -322,27 +300,6 @@ class AssetContainer implements AssetContainerContract
             ->container($this)
             ->path($path)
             ->title(array_get($data, 'title'));
-    }
-
-    public function addAsset(\Statamic\Assets\Asset $asset)
-    {
-        $asset->container($this);
-
-        $this->assets[$asset->path()] = $asset;
-
-        return $this;
-    }
-
-    public function removeAsset(\Statamic\Assets\Asset $asset)
-    {
-        $this->assets->forget($asset->path());
-
-        return $this;
-    }
-
-    public function pendingAssets()
-    {
-        return $this->assets;
     }
 
     /**
@@ -372,16 +329,16 @@ class AssetContainer implements AssetContainerContract
             'title' => $this->title(),
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
-            'assets' => $this->assets->map->data()->map(function ($data) {
-                return Arr::removeNullValues($data);
-            })->reject(function ($data) {
-                return empty($data);
-            })->all(),
         ];
     }
 
     public function toCacheableArray()
     {
         return $this->fileData();
+    }
+
+    public function queryAssets()
+    {
+        return API\Asset::query()->where('container', $this);
     }
 }

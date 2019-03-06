@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Statamic\API;
 use Carbon\Carbon;
 use Tests\TestCase;
+use Statamic\API\YAML;
 use Statamic\Assets\Asset;
 use Statamic\Fields\Blueprint;
 use Illuminate\Http\UploadedFile;
@@ -40,7 +41,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_sets_and_gets_data_values()
     {
-        $asset = new Asset;
+        $asset = (new Asset)->container($this->container);
         $this->assertNull($asset->get('foo'));
 
         $return = $asset->set('foo', 'bar');
@@ -54,7 +55,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_and_sets_data_values_using_magic_properties()
     {
-        $asset = new Asset;
+        $asset = (new Asset)->container($this->container);
         $this->assertNull($asset->foo);
 
         $asset->foo = 'bar';
@@ -66,7 +67,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_and_sets_all_data()
     {
-        $asset = new Asset;
+        $asset = (new Asset)->container($this->container);
         $this->assertEquals([], $asset->data());
 
         $return = $asset->data(['foo' => 'bar']);
@@ -144,6 +145,20 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($container);
 
         $this->assertEquals('test', $asset->disk());
+    }
+
+    /** @test */
+    function it_checks_if_it_exists()
+    {
+        $disk = Storage::fake('test');
+        $disk->put('yes.txt', '');
+        $existing = (new Asset)->container($this->container)->path('yes.txt');
+        $nonExistent = (new Asset)->container($this->container)->path('no.txt');
+        $noPath = (new Asset)->container($this->container);
+
+        $this->assertTrue($existing->exists());
+        $this->assertFalse($nonExistent->exists());
+        $this->assertFalse($noPath->exists());
     }
 
     /** @test */
@@ -262,19 +277,73 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    function it_gets_meta_data()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($meta = [
+            'data' => ['foo' => 'bar'],
+            'size' => 123,
+        ]));
+
+        $container = API\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+
+        $this->assertEquals($meta, $asset->meta());
+    }
+
+    /** @test */
+    function it_generates_meta_on_demand_if_it_doesnt_exist()
+    {
+        Storage::fake('test');
+        Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
+
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
+        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix() . 'foo/image.jpg';
+        touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
+
+        $container = API\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/image.jpg')->set('foo', 'bar');
+
+        $this->assertEquals([
+            'data' => ['foo' => 'bar'],
+            'size' => 723,
+            'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
+            'width' => 30,
+            'height' => 60,
+        ], $asset->meta());
+        Storage::disk('test')->assertExists('foo/.meta/image.jpg.yaml');
+    }
+
+    /** @test */
+    function it_hydrates_data_from_meta_file()
+    {
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', '');
+        $disk->put('foo/.meta/test.txt.yaml', YAML::dump(['data' => ['hello' => 'world']]));
+
+        $container = API\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+
+        $this->assertEquals(['hello' => 'world'], $asset->data());
+    }
+
+    /** @test */
     function it_saves()
     {
-        $asset = new Asset;
-        $container = $this->spy(AssetContainer::class);
-        $container->shouldReceive('addAsset')->once()->with($asset)->andReturn($container);
-        $container->shouldReceive('save')->once();
-        $asset->container($container);
+        Storage::fake('test');
+        $container = API\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        API\Asset::shouldReceive('save')->with($asset);
 
         $return = $asset->save();
 
-        $this->assertEquals($asset, $return);
+        $this->assertTrue($return);
 
-        // TODO: Assert about event, or convert to a callback
+        // TODO: Assert about event
+
+        // Assertion about the meta file is in the AssetRepository test
     }
 
     /** @test */
@@ -286,7 +355,6 @@ class AssetTest extends TestCase
         $container = API\AssetContainer::make('test')->disk('local');
         API\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('path/to/asset.txt');
-        $container->addAsset($asset);
         $disk->assertExists('path/to/asset.txt');
 
         $return = $asset->delete();
@@ -306,20 +374,23 @@ class AssetTest extends TestCase
         $container = API\AssetContainer::make('test')->disk('local');
         API\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
-        $container->addAsset($asset);
+        $asset->save();
         $disk->assertExists('old/asset.txt');
+        $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
 
         $return = $asset->move('new');
 
         $this->assertEquals($asset, $return);
         $disk->assertMissing('old/asset.txt');
+        $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/asset.txt');
+        $disk->assertExists('new/.meta/asset.txt.yaml');
         $this->assertEquals([
             'new/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
     }
 
     /** @test */
@@ -331,54 +402,58 @@ class AssetTest extends TestCase
         $container = API\AssetContainer::make('test')->disk('local');
         API\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
-        $container->addAsset($asset);
+        $asset->save();
         $disk->assertExists('old/asset.txt');
+        $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
 
         $return = $asset->move('new', 'newfilename');
 
         $this->assertEquals($asset, $return);
         $disk->assertMissing('old/asset.txt');
+        $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('new/newfilename.txt');
+        $disk->assertExists('new/.meta/newfilename.txt.yaml');
         $this->assertEquals([
             'new/newfilename.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
     }
 
     /** @test */
     function it_renames()
     {
-        Storage::fake('local');
-        $disk = Storage::disk('local');
+        $disk = Storage::fake('local');
         $disk->put('old/asset.txt', 'The asset contents');
         $container = API\AssetContainer::make('test')->disk('local');
         API\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
-        $container->addAsset($asset);
+        $asset->save();
         $disk->assertExists('old/asset.txt');
+        $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
 
         $return = $asset->rename('newfilename');
 
         $this->assertEquals($asset, $return);
         $disk->assertMissing('old/asset.txt');
+        $disk->assertMissing('old/.meta/asset.txt.yaml');
         $disk->assertExists('old/newfilename.txt');
+        $disk->assertExists('old/.meta/newfilename.txt.yaml');
         $this->assertEquals([
             'old/newfilename.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
     }
 
     /** @test */
     function it_gets_dimensions()
     {
-        $asset = new Asset;
-
-        Dimensions::shouldReceive('asset')->with($asset)->andReturnSelf();
-        Dimensions::shouldReceive('get')->andReturn([30, 60]);
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60);
+        Storage::fake('test')->putFileAs('foo', $file, 'image.jpg');
+        $asset = (new Asset)->path('foo/image.jpg')->container($this->container);
 
         $this->assertEquals([30, 60], $asset->dimensions());
         $this->assertEquals(30, $asset->width());
