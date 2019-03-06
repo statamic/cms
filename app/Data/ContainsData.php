@@ -54,7 +54,7 @@ trait ContainsData
 
     public function merge($data)
     {
-        $this->data = array_merge($this->data, $data);
+        $this->data(array_merge($this->data(), $data));
 
         return $this;
     }
