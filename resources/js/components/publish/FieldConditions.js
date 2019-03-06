@@ -1,5 +1,6 @@
 const KEYS = ['if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'];
 const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not', 'includes', 'contains'];
+const NUMBER_COMPARISONS = ['>', '>=', '<', '<='];
 
 class FieldConditionsValidator {
     constructor(field, values, store, storeName) {
@@ -65,95 +66,101 @@ class FieldConditionsValidator {
     }
 
     normalizeCondition(field, condition) {
+        this.operator = this.normalizeConditionOperator(condition);
+
         return {
             'lhs': this.normalizeConditionLhs(field),
-            'operator': this.normalizeConditionOperator(condition),
+            'operator': this.operator,
             'rhs': this.normalizeConditionRhs(condition)
         };
-    }
-
-    normalizeConditionLhs(field) {
-        let lhs = data_get(this.values, field);
-
-        if (_.isString(lhs) && _.isEmpty(lhs)) {
-            lhs = null;
-        }
-
-        if (_.isString(lhs)) {
-            lhs = JSON.stringify(lhs.trim());
-        }
-
-        return lhs;
     }
 
     normalizeConditionOperator(condition) {
         let operator = '==';
 
+        // Extract operator from yaml condition value.
         _.chain(OPERATORS)
             .filter(value => new RegExp(`^${value}[^=]`).test(condition.toString()))
             .each(value => operator = value);
 
-        this.stringifyRhs = true;
-
+        // Normalize operator aliases.
         switch (operator) {
             case 'is':
             case 'equals':
-                operator = '==';
-                break;
+                return '==';
             case 'not':
             case 'isnt':
             case '¯\\_(ツ)_/¯':
-                operator = '!=';
-                break;
+                return '!=';
             case 'includes':
             case 'contains':
-                operator = 'includes';
-                this.stringifyRhs = false;
-                break;
+                return 'includes';
         }
 
         return operator;
     }
 
+    normalizeConditionLhs(field) {
+        let lhs = data_get(this.values, field);
+
+        // When performing lhs.includes(), if lhs is not an object or array, cast to string.
+        if (this.operator === 'includes' && ! _.isObject(lhs)) {
+            return lhs ? lhs.toString() : '';
+        }
+
+        // When lhs is an empty string, cast to null.
+        if (_.isString(lhs) && _.isEmpty(lhs)) {
+            lhs = null;
+        }
+
+        // Prepare for eval() and return.
+        return _.isString(lhs)
+            ? JSON.stringify(lhs.trim())
+            : lhs;
+    }
+
     normalizeConditionRhs(condition) {
         let rhs = condition.toString();
 
+        // Extract rhs from yaml condition value.
         _.chain(OPERATORS)
             .filter(value => new RegExp(`^${value}[^=]`).test(rhs))
             .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
 
+        // When comparing against null, true, false, cast to literals.
         switch (rhs) {
             case 'null':
-                rhs = null;
-                break;
+                return null;
             case 'true':
-                rhs = true;
-                break;
+                return true;
             case 'false':
-                rhs = false;
-                break;
-            case 'empty':
-                this.stringifyRhs = false;
-                break;
+                return false;
         }
 
-        if (_.isString(rhs) && this.stringifyRhs) {
-            rhs = JSON.stringify(rhs.trim());
+        // When performing a number comparison, cast to number.
+        if (NUMBER_COMPARISONS.includes(this.operator)) {
+            return Number(rhs);
         }
 
-        return rhs;
+        // When performing a comparison that cannot be eval()'d, return rhs as is.
+        if (rhs === 'empty' || this.operator === 'includes') {
+            return rhs;
+        }
+
+        // Prepare for eval() and return.
+        return _.isString(rhs)
+            ? JSON.stringify(rhs.trim())
+            : rhs;
     }
 
     passesCondition(condition) {
+        if (condition.operator === 'includes') {
+            return condition.lhs.includes(condition.rhs);
+        }
+
         if (condition.rhs === 'empty') {
             condition.lhs = _.isEmpty(condition.lhs);
             condition.rhs = true;
-        }
-
-        if (condition.operator === 'includes') {
-            return _.isObject(condition.lhs)
-                ? condition.lhs.includes(condition.rhs)
-                : condition.lhs.toString().includes(condition.rhs);
         }
 
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
