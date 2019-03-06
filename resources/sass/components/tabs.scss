@@ -19,6 +19,14 @@
         z-index: 2;
     }
 
+    a.ghost {
+        @apply bg-transparent relative .h-full .min-h-full shadow-none border-none text-grey-50 px-3;
+        min-width: 0;
+        &:hover {
+            @apply text-blue;
+        }
+    }
+
     a.has-error {
         @apply text-red;
 
