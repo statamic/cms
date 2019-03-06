@@ -58,6 +58,13 @@ export default {
             });
         }
 
+    },
+
+    mounted() {
+        this.$mousetrap.bind(['command+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     }
 
 }
