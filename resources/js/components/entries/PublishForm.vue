@@ -233,6 +233,13 @@ export default {
             this.sectionsVisible = true;
         }
 
+    },
+
+    mounted() {
+        this.$mousetrap.bind(['command+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     }
 
 }
