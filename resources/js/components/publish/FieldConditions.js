@@ -6,9 +6,9 @@ class FieldConditionsValidator {
     constructor(field, values, store, storeName) {
         this.field = field;
         this.values = values;
+        this.rootValues = store.state.publish[storeName].values;
         this.store = store;
         this.storeName = storeName;
-        this.storeValues = store.state.publish[storeName].values;
         this.passOnAny = false;
         this.showOnPass = true;
     }
@@ -151,7 +151,7 @@ class FieldConditionsValidator {
 
     getFieldValue(field) {
         return field.startsWith('root.')
-            ?  data_get(this.storeValues, field.replace(new RegExp('^root.'), ''))
+            ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
             :  data_get(this.values, field);
     }
 
@@ -193,11 +193,10 @@ class FieldConditionsValidator {
 
         let extra = {
             store: this.store,
-            storeName: this.storeName,
-            storeValues: this.storeValues
+            storeName: this.storeName
         }
 
-        let passes = customFunction(this.values, extra);
+        let passes = customFunction(this.values, this.rootValues, extra);
 
         return this.showOnPass ? passes : ! passes;
     }

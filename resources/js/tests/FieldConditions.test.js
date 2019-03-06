@@ -245,26 +245,30 @@ test('it can run conditions on root store values', () => {
 });
 
 test('it can call a custom logic function', () => {
-    var storeValues = {
-        favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
+    Fields.setValues({
         favorite_animals: ['cats', 'dogs'],
-    };
-
-    Fields.setValues(storeValues);
-
-    Statamic.conditions.reallyLovesFood = function (values, extra) {
-        expect(extra.store).toBe(Store);
-        expect(extra.storeName).toBe('base');
-        expect(extra.storeValues).toBe(storeValues);
-        return values.favorite_foods.length > 3;
-    };
+    });
 
     Statamic.conditions.reallyLovesAnimals = function (values) {
         return values.favorite_animals.length > 3;
     };
 
-    expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
+    expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
+});
+
+test('it can call a custom logic function and has access to root values and extra store stuff', () => {
+    Fields.setStoreValues({
+        favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
+    });
+
+    Statamic.conditions.reallyLovesFood = function (values, root, extra) {
+        expect(extra.store).toBe(Store);
+        expect(extra.storeName).toBe('base');
+        return root.favorite_foods.length > 3;
+    };
+
+    expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
 });
 
 // TODO: Implement wildcards using asterisks? Is this useful?
