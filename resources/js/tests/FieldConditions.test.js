@@ -97,6 +97,8 @@ test('it can use includes or contains operators in conditions', () => {
         ],
         example_string: 'The quick brown fox jumps over the lazy dog',
         age: 13,
+        empty_string: '',
+        null_value: null,
     });
 
     expect(showFieldIf({cancellation_reasons: 'includes other'})).toBe(true);
@@ -113,6 +115,9 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({age: 'contains 13'})).toBe(true);
     expect(showFieldIf({age: 'includes fox'})).toBe(false);
     expect(showFieldIf({age: 'contains fox'})).toBe(false);
+
+    expect(showFieldIf({empty_string: 'contains fox'})).toBe(false);
+    expect(showFieldIf({null_values: 'contains fox'})).toBe(false);
 });
 
 test('it handles null, true, and false in condition as literal', () => {
