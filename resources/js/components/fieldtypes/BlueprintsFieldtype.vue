@@ -7,7 +7,7 @@
         :max-items="maxItems"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
-        :columns="['title']"
+        :columns="[{ label: __('Title'), field: 'title' }]"
     />
 
 </template>
