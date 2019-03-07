@@ -42,6 +42,10 @@ export default {
 
     watch: {
 
+        value(value) {
+            this.data = value;
+        },
+
         data(value) {
             this.update(value);
         }
