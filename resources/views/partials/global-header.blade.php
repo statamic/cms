@@ -23,6 +23,12 @@
             current-url="{{ request()->fullUrl() }}"
         ></favorite-creator>
 
+        @if (config('telescope.enabled'))
+            <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-popover:tooltip.bottom="'Laravel Telescope'">
+                @svg('earth')
+            </a>
+        @endif
+
         <dropdown-list>
             <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-80" slot="trigger">
                 @svg('book-open')
