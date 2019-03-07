@@ -6,7 +6,7 @@ use Statamic\API\Blueprint;
 
 class Blueprints extends Relationship
 {
-    protected function toItemArray($id)
+    protected function toItemArray($id, $site = null)
     {
         if ($blueprint = Blueprint::find($id)) {
             return [

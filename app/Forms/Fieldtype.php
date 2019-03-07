@@ -14,7 +14,7 @@ class Fieldtype extends Relationship
         return [];
     }
 
-    protected function toItemArray($id)
+    protected function toItemArray($id, $site = null)
     {
         if ($form = API\Form::find($id)) {
             return [

@@ -6,7 +6,7 @@ use Statamic\API\Collection;
 
 class Collections extends Relationship
 {
-    protected function toItemArray($id)
+    protected function toItemArray($id, $site = null)
     {
         if ($collection = Collection::whereHandle($id)) {
             return [

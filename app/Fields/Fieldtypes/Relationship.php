@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Content;
 use Illuminate\Support\Arr;
@@ -64,17 +65,19 @@ class Relationship extends Fieldtype
         return compact('data');
     }
 
-    public function getItemData($values)
+    public function getItemData($values, $site = null)
     {
-        return collect($values)->map(function ($id) {
-            return $this->toItemArray($id);
+        $site = $site ?? Site::selected()->handle();
+
+        return collect($values)->map(function ($id) use ($site) {
+            return $this->toItemArray($id, $site);
         })->values();
     }
 
-    protected function toItemArray($id)
+    protected function toItemArray($id, $site)
     {
         if ($entry = Entry::find($id)) {
-            return $entry->toArray();
+            return $entry->in($site)->toArray();
         }
 
         return $this->invalidItemArray($id);

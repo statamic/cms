@@ -98,7 +98,8 @@ export default {
         initialSortColumn: String,
         initialSortDirection: String,
         initialColumns: Array,
-        maxSelections: Number
+        maxSelections: Number,
+        site: String,
     },
 
     data() {
@@ -125,6 +126,7 @@ export default {
                 order: this.sortDirection,
                 page: this.page,
                 search: this.searchQuery,
+                site: this.site
             }
         },
 

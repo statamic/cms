@@ -46,13 +46,17 @@ class RelationshipFieldtypeController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
+        if ($site = request('site')) {
+            $query->where('site', $site);
+        }
+
         return $query;
     }
 
     public function data(Request $request)
     {
         $items = $this->fieldtype()
-            ->getItemData($request->selections)
+            ->getItemData($request->selections, $request->site)
             ->values();
 
         return Resource::collection($items);
