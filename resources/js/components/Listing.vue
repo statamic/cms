@@ -90,7 +90,11 @@ export default {
                 this.meta = response.data.meta;
                 this.loading = false;
                 this.initializing = false;
-            });
+            }).catch(e => {
+                this.loading = false;
+                this.initializing = false;
+                this.$notify.error(e.response ? e.response.data.message : __('Something went wrong'));
+            })
         },
 
         sorted(column, direction) {
