@@ -25,7 +25,7 @@
                     <div class="relative mb-1">
                         <button class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
                             <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                            {{ __('Create & Link Entry') }}
+                            {{ __('Create & Link Item') }}
                         </button>
                         <inline-create-form
                             v-if="isCreating"
@@ -36,7 +36,7 @@
                     </div>
                     <button class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                        Link Existing Entry
+                        {{ __('Link Existing Item') }}
                     </button>
                 </div>
             </div>
