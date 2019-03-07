@@ -25,7 +25,7 @@
 
 
         <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-popover:tooltip.bottom="'Laravel Telescope'">
-            @svg('astronomy-telescope')
+            @svg('telescope')
         </a>
 
 
