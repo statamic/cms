@@ -120,7 +120,6 @@ class Statamic
         $defaults = [
             'version' => static::version(),
             'csrfToken' => csrf_token(),
-            'siteRoot' => site_root(),
             'cpRoot' => cp_root(),
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => Statamic::assetUrl(),

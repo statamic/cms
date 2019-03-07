@@ -11,18 +11,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
-$GLOBALS['statamictodos'] = [];
-function log_todo()
-{
-    $backtrace = debug_backtrace()[1];
-    $str = array_get($backtrace, 'class', '') . '::' . $backtrace['function'];
-
-    if (!array_has($GLOBALS['statamictodos'], $str)) {
-        \Log::debug('Todo: ' . $str);
-        $GLOBALS['statamictodos'][$str] = true;
-    }
-}
-
 if (! function_exists('array_get_colon')) {
     /**
      * Get an item from an array using "dot" or "colon" notation.
@@ -408,18 +396,6 @@ function collect_pages($value = [])
 function bool_str($bool)
 {
     return ((bool) $bool) ? 'true' : 'false';
-}
-
-function site_root()
-{
-    log_todo();
-    return '/';
-}
-
-function resources_root()
-{
-    log_todo();
-    return '_resources';
 }
 
 function cp_root()

@@ -180,18 +180,6 @@ class URL
     }
 
     /**
-     * Remove the site root from the start of a URL
-     *
-     * @param string      $url
-     * @param string|null $locale
-     * @return string
-     */
-    public function removeSiteRoot($url, $locale = null)
-    {
-        return self::tidy('/' . Str::removeLeft($url, site_root()));
-    }
-
-    /**
      * Removes the site root url from the beginning of a URL
      *
      * @param string $url
