@@ -410,17 +410,6 @@ function bool_str($bool)
     return ((bool) $bool) ? 'true' : 'false';
 }
 
-function cp_resource_url($url)
-{
-    return resource_url('cp/' . $url);
-}
-
-function resource_url($url)
-{
-    log_todo();
-    return '/resources/' . $url;
-}
-
 function site_root()
 {
     log_todo();

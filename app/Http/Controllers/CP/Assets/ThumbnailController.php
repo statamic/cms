@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Statamic\Statamic;
 use Statamic\API\Asset;
 use Statamic\API\Config;
 use League\Glide\Server;
@@ -144,6 +145,6 @@ class ThumbnailController extends Controller
             return;
         }
 
-        return redirect(cp_resource_url('img/filetypes/' . $this->asset->extension() . '.png'));
+        return redirect(Statamic::assetUrl('img/filetypes/' . $this->asset->extension() . '.png'));
     }
 }

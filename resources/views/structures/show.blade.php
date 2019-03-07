@@ -7,7 +7,7 @@
         pages-url="{{ cp_route('structures.pages.index', $structure->handle()) }}"
         submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
         edit-url="{{ cp_route('structures.edit', $structure->handle()) }}"
-        sound-drop-url="{{ cp_resource_url('audio/click.mp3') }}"
+        sound-drop-url="{{ Statamic::assetUrl('audio/click.mp3') }}"
         :root="{{ json_encode($root) }}"
     >
         <template slot="header">

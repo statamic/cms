@@ -3,6 +3,7 @@
 namespace Statamic;
 
 use Closure;
+use Statamic\API\URL;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Stringy\StaticStringy;
@@ -122,7 +123,7 @@ class Statamic
             'siteRoot' => site_root(),
             'cpRoot' => cp_root(),
             'urlPath' => '/' . request()->path(),
-            'resourceUrl' => cp_resource_url('/'),
+            'resourceUrl' => Statamic::assetUrl(),
             'locales' => \Statamic\API\Config::get('statamic.system.locales'),
             'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
             'conditions' => [],
@@ -151,5 +152,15 @@ class Statamic
         return StaticStringy::collapseWhitespace(
             File::get(statamic_path("resources/dist/svg/{$name}.svg"))
         );
+    }
+
+    public static function assetUrl($url = '/')
+    {
+        return static::url('vendor/statamic/' . $url);
+    }
+
+    public static function url($url = '/')
+    {
+        return URL::tidy(Site::default()->url() . '/' . $url);
     }
 }

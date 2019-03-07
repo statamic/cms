@@ -71,13 +71,13 @@
         <mount-collection></mount-collection>
 
         <audio ref="click">
-            <source src="{{ cp_resource_url('audio/click.mp3') }}" type="audio/mp3">
+            <source src="{{ Statamic::assetUrl('audio/click.mp3') }}" type="audio/mp3">
         </audio>
         <audio ref="card_drop">
-            <source src="{{ cp_resource_url('audio/card_drop.mp3') }}" type="audio/mp3">
+            <source src="{{ Statamic::assetUrl('audio/card_drop.mp3') }}" type="audio/mp3">
         </audio>
         <audio ref="card_set">
-            <source src="{{ cp_resource_url('audio/card_set.mp3') }}" type="audio/mp3">
+            <source src="{{ Statamic::assetUrl('audio/card_set.mp3') }}" type="audio/mp3">
         </audio>
     </div>
 </page-tree>

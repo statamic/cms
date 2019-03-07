@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/dist" => public_path('resources/cp')
+            "{$this->root}/resources/dist" => public_path('vendor/statamic')
         ], 'statamic-cp');
 
         $this->loadTranslationsFrom("{$this->root}/resources/lang", 'statamic');
