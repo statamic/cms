@@ -23,11 +23,11 @@
             current-url="{{ request()->fullUrl() }}"
         ></favorite-creator>
 
-
-        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-popover:tooltip.bottom="'Laravel Telescope'">
-            @svg('telescope')
-        </a>
-
+        @if (config('telescope.enabled'))
+            <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-popover:tooltip.bottom="'Laravel Telescope'">
+                @svg('telescope')
+            </a>
+        @endif
 
         <dropdown-list>
             <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-80" slot="trigger">
