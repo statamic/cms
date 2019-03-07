@@ -1257,6 +1257,10 @@ class Parser
             return $data->raw();
         }
 
+        if ($modifier === 'noparse') {
+            return $data->value();
+        }
+
         try {
             return Modify::value($data->value())->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
