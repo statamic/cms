@@ -5,6 +5,5 @@ export default class SortableKeyValue {
         this._id = uniqid();
         this.key = key;
         this.value = value;
-        this.jason = 'wahat you chasin';
     }
 }
