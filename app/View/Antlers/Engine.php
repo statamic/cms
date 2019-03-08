@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\Parse;
@@ -156,8 +157,9 @@ class Engine implements EngineInterface
 
             $output = call_user_func([$tag, $method]);
 
+            // Allow tags to return an array. We'll parse it for them.
             if (is_array($output)) {
-                $output = Parse::template($content, $output, $context);
+                $output = Arr::assoc($output) ? $tag->parse($output) : $tag->parseLoop($output);
             }
 
             return $output;

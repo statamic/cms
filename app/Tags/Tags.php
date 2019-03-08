@@ -126,7 +126,7 @@ abstract class Tags
      * @param array $data     Data to be parsed into template
      * @return string
      */
-    protected function parse($data = [])
+    public function parse($data = [])
     {
         if ($this->trim) {
             $this->content = trim($this->content);
@@ -146,7 +146,7 @@ abstract class Tags
      * @param bool                                $supplement  Whether to supplement with contextual values
      * @return string
      */
-    protected function parseLoop($data, $supplement = true)
+    public function parseLoop($data, $supplement = true)
     {
         if ($this->trim) {
             $this->content = trim($this->content);
@@ -163,7 +163,7 @@ abstract class Tags
      * @param array $data Extra data to merge
      * @return string
      */
-    protected function parseNoResults($data = [])
+    public function parseNoResults($data = [])
     {
         return $this->parse(array_merge($data, [
             'no_results' => true,

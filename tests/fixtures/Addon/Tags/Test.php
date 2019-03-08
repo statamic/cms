@@ -31,4 +31,17 @@ class Test extends Tags
             [], [],
         ]);
     }
+
+    public function returnSimpleArray()
+    {
+        return ['one' => 'a', 'two' => 'b'];
+    }
+
+    public function returnMultidimensionalArray()
+    {
+        return [
+            ['one' => 'a', 'two' => 'b'],
+            ['one' => 'c', 'two' => 'd'],
+        ];
+    }
 }

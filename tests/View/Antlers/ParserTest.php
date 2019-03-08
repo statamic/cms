@@ -771,6 +771,49 @@ EOT;
     }
 
     /** @test */
+    function callback_tags_that_return_unparsed_simple_arrays_get_parsed()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $template = <<<EOT
+{{ string }}
+{{ test:return_simple_array }}
+    {{ one }} {{ two }} {{ string }}
+{{ /test:return_simple_array }}
+EOT;
+
+        $expected = <<<EOT
+Hello wilderness
+    a b Hello wilderness
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
+    function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $template = <<<EOT
+{{ string }}
+{{ test:return_multidimensional_array }}
+    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
+{{ /test:return_multidimensional_array }}
+EOT;
+
+        $expected = <<<EOT
+Hello wilderness
+    1 first not-last a b Hello wilderness
+    2 not-first last c d Hello wilderness
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
     function it_automatically_augments_when_using_tag_pairs()
     {
         $augmentable = new AugmentableObject([
