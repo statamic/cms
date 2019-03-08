@@ -62,8 +62,15 @@ abstract class Tags
      */
     protected $trim = false;
 
+    /**
+     * The parser instance that executed this tag.
+     * @var \Statamic\View\Antlers\Parser
+     */
+    protected $parser;
+
     public function setProperties($properties)
     {
+        $this->parser      = $properties['parser'];
         $this->content     = $properties['content'];
         $this->context     = $properties['context'];
         $this->parameters  = $this->setUpParameters($properties['parameters']);
@@ -127,7 +134,9 @@ abstract class Tags
 
         $variables = array_merge($this->context, $this->addScope($data));
 
-        return Antlers::parse($this->content, $variables);
+        return Antlers::usingParser($this->parser, function ($antlers) use ($variables) {
+            return $antlers->parse($this->content, $variables);
+        });
     }
 
     /**
@@ -143,7 +152,9 @@ abstract class Tags
             $this->content = trim($this->content);
         }
 
-        return Antlers::parseLoop($this->content, $this->addScope($data), $supplement, $this->context);
+        return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
+            return $antlers->parseLoop($this->content, $this->addScope($data), $supplement, $this->context);
+        });
     }
 
     /**

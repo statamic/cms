@@ -2,11 +2,26 @@
 
 namespace Statamic\View\Antlers;
 
+use Closure;
+
 class Antlers
 {
+    protected $parser;
+
     public function parser()
     {
-        return app(Parser::class);
+        return $this->parser ?? app(Parser::class);
+    }
+
+    public function usingParser(Parser $parser, Closure $callback)
+    {
+        $this->parser = $parser;
+
+        $contents = $callback($this);
+
+        $this->parser = null;
+
+        return $contents;
     }
 
     public function parse($str, $variables = [])

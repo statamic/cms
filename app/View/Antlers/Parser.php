@@ -529,7 +529,7 @@ class Parser
 
             // now, check to see if a callback should happen
             if ($this->callback) {
-                $replacement = call_user_func_array($this->callback, [$name, $parameters, $content, $data]);
+                $replacement = call_user_func_array($this->callback, [$this, $name, $parameters, $content, $data]);
                 $replacement = $this->parseRecursives($replacement, $content);
             }
 

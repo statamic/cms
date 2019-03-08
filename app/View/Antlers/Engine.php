@@ -130,7 +130,7 @@ class Engine implements EngineInterface
      * @throws Exceptions\FatalException
      * @throws \Exception
      */
-    public static function renderTag($name, $parameters = [], $content = '', $context = [])
+    public static function renderTag(Parser $parser, $name, $parameters = [], $content = '', $context = [])
     {
         $tag_measure = 'tag_' . $name . microtime();
         start_measure($tag_measure, 'Tag: ' . $name);
@@ -146,6 +146,7 @@ class Engine implements EngineInterface
 
         try {
             $tag = app(TagLoader::class)->load($name, [
+                'parser'     => $parser,
                 'parameters' => $parameters,
                 'content'    => $content,
                 'context'    => $context,
