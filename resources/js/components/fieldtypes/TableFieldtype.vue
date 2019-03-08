@@ -26,8 +26,8 @@
                 <tbody>
                     <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
                         <td class="table-drag-handle"></td>
-                        <td v-for="(cell, cellIndex) in row.cells">
-                            <input type="text" v-model="row['cells'][cellIndex]" class="input-text" />
+                        <td v-for="(cell, cellIndex) in row.value.cells">
+                            <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" />
                         </td>
                         <td class="row-controls">
                             <a @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
@@ -71,12 +71,11 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
-import { SortableList, SortableItem } from '../sortable/Sortable';
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SortableHelpers],
 
     components: {
         SortableList,
@@ -91,19 +90,17 @@ export default {
         }
     },
 
+    created() {
+        this.data = this.arrayToSortable(this.value || []);
+    },
+
     watch: {
         data: {
             deep: true,
             handler (data) {
-                this.update(data);
+                this.update(this.sortableToArray(data));
             }
         }
-    },
-
-    created() {
-        // Assign each row a unique id that Vue can use as a v-for key.
-        this.data = JSON.parse(JSON.stringify(this.value || []))
-            .map(row => Object.assign(row, { _id: uniqid() }));
     },
 
     computed: {
@@ -120,7 +117,7 @@ export default {
         },
 
         columnCount() {
-            return data_get(this, 'data.0.cells.length', 0);
+            return data_get(this, 'data.0.value.cells.length', 0);
         },
 
         atRowMax() {
@@ -142,17 +139,16 @@ export default {
 
     methods: {
         addRow() {
-            this.data.push({
-                _id: uniqid(),
-                cells: new Array(this.columnCount || 1)
-            });
+            this.data.push(this.newSortableValue({
+                'cells': new Array(this.columnCount || 1)
+            }));
         },
 
         addColumn() {
             var rows = this.data.length;
 
             for (var i = 0; i < rows; i++) {
-                this.data[i].cells.push('');
+                this.data[i].value.cells.push('');
             }
         },
 
@@ -176,7 +172,7 @@ export default {
             var rows = this.data.length;
 
             for (var i = 0; i < rows; i++) {
-                this.data[i].cells.splice(index, 1);
+                this.data[i].value.cells.splice(index, 1);
             }
         },
 
@@ -188,7 +184,7 @@ export default {
         getReplicatorPreviewText() {
             // Join all values with commas. Exclude any empties.
             return _(this.data)
-                .map(row => row.cells.filter(cell => !!cell).join(', '))
+                .map(row => row.value.cells.filter(cell => !!cell).join(', '))
                 .filter(row => !!row).join(', ');
         }
     }
