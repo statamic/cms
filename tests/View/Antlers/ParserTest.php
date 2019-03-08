@@ -150,7 +150,7 @@ EOT;
     {
         $template = "{{ missing }}";
 
-        $this->assertEquals(null, Antlers::parse($template, $this->variables));
+        $this->assertEquals('', Antlers::parse($template, $this->variables));
     }
 
     /** @test */
