@@ -201,16 +201,6 @@ table.table-legacy {
 	}
 }
 
-.table-field {
-	th {
-		padding: 5px;
-	}
-	.column-count {
-		display: inline-block;
-		padding: 2px 0 0 0;
-	}
-}
-
 .column-sortable {
 	cursor: pointer;
 	position: relative;
@@ -254,18 +244,6 @@ table.table-legacy {
 
 table.control {
     @apply select-none;
-}
-
-.table-fieldtype table {
-    .input-text,
-    textarea,
-    input {
-        background-color: #fff;
-        box-shadow: none;
-        padding: 10px;
-        height: auto;
-        &:hover { background-color: #fafafa; }
-    }
 }
 
 .flush table.control {

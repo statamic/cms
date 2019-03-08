@@ -1,13 +1,16 @@
 <template>
 
-    <div class="table-field">
-        <table class="bordered-table" v-if="rowCount">
+    <div class="table-fieldtype-container">
+        <table class="table-fieldtype-table" v-if="rowCount">
             <thead>
                 <tr>
+                    <th class="grid-drag-handle-header"></th>
                     <th v-for="(column, index) in columnCount" :key="index">
-                        <div class="flex">
-                            <span class="column-count text-center flex-grow">{{ index + 1 }}</span>
-                            <span v-if="canDeleteColumns" class="icon icon-cross delete-column" @click="confirmDeleteColumn(index)"></span>
+                        <div class="flex items-center justify-between h-6">
+                            <span class="column-count">{{ index + 1 }}</span>
+                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)">
+                                &times;
+                            </a>
                         </div>
                     </th>
                     <th class="row-controls"></th>
@@ -18,16 +21,16 @@
                 v-model="data"
                 :vertical="true"
                 item-class="sortable-row"
-                handle-class="sortable-handle"
+                handle-class="table-drag-handle"
             >
                 <tbody>
                     <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
+                        <td class="table-drag-handle"></td>
                         <td v-for="(cell, cellIndex) in row.cells">
                             <input type="text" v-model="row['cells'][cellIndex]" class="input-text" />
                         </td>
                         <td class="row-controls">
-                            <span class="icon icon-menu move sortable-handle"></span>
-                            <span class="icon icon-cross delete" @click="confirmDeleteRow(rowIndex)"></span>
+                            <a @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
                         </td>
                     </tr>
                 </tbody>

@@ -49,6 +49,7 @@
 .btn-danger {
     @include button(transparent, $color_red);
     border: 1px solid $color_red;
+    line-height: 36px;
 
     box-shadow:
         rgba($color_red, .05) 0 2px 5px 0,
