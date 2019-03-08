@@ -159,7 +159,11 @@ class Engine implements EngineInterface
 
             // Allow tags to return an array. We'll parse it for them.
             if (is_array($output)) {
-                $output = Arr::assoc($output) ? $tag->parse($output) : $tag->parseLoop($output);
+                if (empty($output)) {
+                    $output = $tag->parseNoResults();
+                } else {
+                    $output = Arr::assoc($output) ? $tag->parse($output) : $tag->parseLoop($output);
+                }
             }
 
             return $output;

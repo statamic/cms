@@ -44,4 +44,9 @@ class Test extends Tags
             ['one' => 'c', 'two' => 'd'],
         ];
     }
+
+    public function returnEmptyArray()
+    {
+        return [];
+    }
 }

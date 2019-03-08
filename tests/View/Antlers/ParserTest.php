@@ -814,6 +814,24 @@ EOT;
     }
 
     /** @test */
+    function callback_tags_that_return_empty_arrays_get_parsed_with_no_results()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $template = <<<EOT
+{{ test:return_empty_array }}
+    {{ if no_results }}no results{{ else }}there are results{{ /if }}
+{{ /test:return_empty_array }}
+EOT;
+
+        $expected = <<<EOT
+    no results
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
     function it_automatically_augments_when_using_tag_pairs()
     {
         $augmentable = new AugmentableObject([
