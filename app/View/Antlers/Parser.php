@@ -548,7 +548,6 @@ class Parser
                     if ( ! empty($values)) {
                         // parse the tag found with the value(s) related to it
                         $tmpname = md5($name);
-                        $vars = [$tmpname => $values];
                         $replacement = $this->parseVariables("{{ $tmpname }}$content{{ /$tmpname }}", [$tmpname => $values]);
                     }
                 } else {
