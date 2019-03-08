@@ -15,9 +15,9 @@
         />
 
         <td class="row-controls">
-            <dropdown-list>
+            <dropdown-list ref="dropdown">
                 <ul class="dropdown-menu">
-                    <li><a @click="$emit('duplicate', index)" v-text="__('Duplicate Row')"></a></li>
+                    <li><a @click="duplicate(index)" v-text="__('Duplicate Row')"></a></li>
                     <li class="warning"><a @click="$emit('removed', index)" v-text="__('Delete Row')"></a></li>
                 </ul>
             </dropdown-list>
@@ -79,6 +79,10 @@ export default {
     },
 
     methods: {
+        duplicate(index) {
+            this.$emit('duplicate', index);
+            this.$refs.dropdown.close();
+        },
 
         updated(handle, value) {
             let row = JSON.parse(JSON.stringify(this.values));
