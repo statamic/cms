@@ -5,20 +5,20 @@
 			<input
 				type="text"
 				v-model="data[$index]"
-				class="input-text"
+				class="list-input"
 				@keydown.enter="updateItem(item, $index, $event)"
 				@keyup.up="goUp"
 				@keyup.down="goDown"
 			/>
 		</span>
-		<span v-if="editing != $index" @dblclick="editItem($index, $event)">
+		<span v-if="editing != $index" @click="editItem($index, $event)">
 		    {{ item }}
 			<i class="delete" @click="deleteItem($index)"></i>
 		</span>
 	</li>
 	<li>
-		<input type="text" class="input-text new-item" v-model="newItem"
-            :placeholder="`${__('Add another item')}...`"
+		<input type="text" class="list-input new-item" v-model="newItem"
+            :placeholder="`${__('Add an item')}...`"
             @keydown.enter.prevent="addItem"
             @blur="addItem"
             @keyup.up="goUp"

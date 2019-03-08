@@ -1,25 +1,6 @@
 /* ==========================================================================
-   LISTS
+   LIST FIELDTYPE
    ========================================================================== */
-
-.form-group .list-group,
-.list-group {
-	&.no-border .list-group-item {
-		border-left: none;
-		border-right: none;
-		border-radius: 0;
-		padding: 10px 15px 10px 15px;
-
-		.icon-status {
-			margin-right: 7px;
-			margin-top: 7px;
-		}
-	}
-}
-
-
-/* List Fieldtype
-  ========================================================================== */
 
 .list-fieldtype ul {
     padding: 0;
