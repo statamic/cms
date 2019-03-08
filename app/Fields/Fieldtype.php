@@ -141,6 +141,10 @@ abstract class Fieldtype implements Arrayable
 
     public function config(string $key = null, $fallback = null)
     {
+        if (!$this->field) {
+            return $fallback;
+        }
+
         return $key
             ? $this->field->get($key, $fallback)
             : $this->field->config();

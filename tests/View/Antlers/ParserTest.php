@@ -710,6 +710,44 @@ EOT;
     }
 
     /** @test */
+    function it_parses_value_objects_values_when_configured_to_do_so()
+    {
+        $fieldtypeOne = new class extends Fieldtype {
+            public function augment($value) { return 'augmented ' . $value; }
+            public function config(?string $key = null, $fallback = null) { return true; } // fake what's being returned from the field config
+        };
+        $fieldtypeTwo = new class extends Fieldtype {
+            public function augment($value) { return 'augmented ' . $value; }
+            public function config(?string $key = null, $fallback = null) { return false; } // fake what's being returned from the field config
+        };
+
+        $parseable = new Value('before {{ string }} after', 'parseable', $fieldtypeOne);
+        $nonParseable = new Value('before {{ string }} after', 'non_parseable', $fieldtypeTwo);
+
+        $template = <<<EOT
+{{ parseable }}
+{{ non_parseable }}
+EOT;
+
+        $expected = <<<EOT
+augmented before hello after
+augmented before  after
+EOT;
+
+        $variables = [
+            'parseable' => $parseable,
+            'non_parseable' => $nonParseable,
+            'string' => 'hello'
+        ];
+
+        $this->assertEquals($expected, Antlers::parse($template, $variables));
+        $this->assertEquals('AUGMENTED BEFORE HELLO AFTER', Antlers::parse('{{ parseable | upper }}', $variables));
+        $this->assertEquals('AUGMENTED BEFORE  AFTER', Antlers::parse('{{ non_parseable | upper }}', $variables));
+        $this->assertEquals('AUGMENTED BEFORE HELLO AFTER', Antlers::parse('{{ parseable upper="true" }}', $variables));
+        $this->assertEquals('AUGMENTED BEFORE  AFTER', Antlers::parse('{{ non_parseable upper="true" }}', $variables));
+    }
+
+    /** @test */
     function it_casts_objects_to_string_when_using_single_tags()
     {
         $object = new class {

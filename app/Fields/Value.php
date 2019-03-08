@@ -4,12 +4,15 @@ namespace Statamic\Fields;
 
 use ArrayIterator;
 use IteratorAggregate;
+use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate
 {
     protected $raw;
     protected $handle;
     protected $fieldtype;
+    protected $parser;
+    protected $context;
 
     public function __construct($value, $handle = null, $fieldtype = null)
     {
@@ -29,7 +32,13 @@ class Value implements IteratorAggregate
             return $this->raw;
         }
 
-        return $this->fieldtype->augment($this->raw);
+        $value = $this->fieldtype->augment($this->raw);
+
+        if ($this->shouldParse()) {
+            $value = $this->parse($value);
+        }
+
+        return $value;
     }
 
     public function __toString()
@@ -40,5 +49,33 @@ class Value implements IteratorAggregate
     public function getIterator()
     {
         return new ArrayIterator($this->value());
+    }
+
+    public function parseUsing(Parser $parser, $context)
+    {
+        $this->parser = $parser;
+        $this->context = $context;
+
+        return $this;
+    }
+
+    public function shouldParse()
+    {
+        if (!$this->parser || !$this->fieldtype) {
+            return false;
+        }
+
+        return $this->fieldtype->config('antlers');
+    }
+
+    public function parse($value)
+    {
+        $value = $this->parser->parse($value, $this->context);
+
+        // After parsing, reset the values. Wherever the parser needs to
+        // parse this object, it would add itself and the contextual data.
+        $this->parser = $this->context = null;
+
+        return $value;
     }
 }

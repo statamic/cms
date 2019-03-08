@@ -1038,7 +1038,7 @@ class Parser
         }
 
         if ($data instanceof Value) {
-            $data = $data->value();
+            $data = $data->parseUsing($this, $context)->value();
         }
 
         return $data;
@@ -1219,14 +1219,16 @@ class Parser
             return $data->value();
         }
 
+        $value = $data->parseUsing($this, $context)->value();
+
         try {
-            return Modify::value($data->value())->context($context)->$modifier($parameters)->fetch();
+            return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
             Log::notice(
                 sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage())
             );
 
-            return $data->value();
+            return $value;
         }
     }
 
