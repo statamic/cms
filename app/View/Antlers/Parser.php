@@ -253,7 +253,7 @@ class Parser
             $value = ($associative = Arr::assoc($value)) ? [$value] : $this->addLoopIterationVariables($value);
 
             $parses = collect($value)->map(function ($iteration) use ($contents, $data) {
-                $data = $iteration + $data + $this->callbackData;
+                $data = $iteration + $data;
                 return $this->parseLoopInstance($contents, $data);
             });
 
