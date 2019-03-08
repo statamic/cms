@@ -137,10 +137,7 @@ class Parser
         $text = $this->injectExtractions($text, 'looped_tags');
         $text = $this->parseVariables($text, $data);
         $text = $this->injectExtractions($text, 'callback_blocks');
-
-        if ($this->callback) {
-            $text = $this->parseCallbackTags($text, $data);
-        }
+        $text = $this->parseCallbackTags($text, $data);
 
         // Parse parameters inside tag pairs
         if (strpos($text, "{{") !== false) {
@@ -302,11 +299,8 @@ class Parser
         $str = $this->parseConditionals($str, $data);
         $str = $this->injectExtractions($str, 'looped_tags');
         $str = $this->parseVariables($str, $data);
-
-        if (!is_null($this->callback)) {
-            $str = $this->injectExtractions($str, 'callback_blocks');
-            $str = $this->parseCallbackTags($str, $data);
-        }
+        $str = $this->injectExtractions($str, 'callback_blocks');
+        $str = $this->parseCallbackTags($str, $data);
 
         return $str;
     }
@@ -527,11 +521,9 @@ class Parser
 
             $replacement = null; // oh look, another temporary variable.
 
-            // now, check to see if a callback should happen
-            if ($this->callback) {
-                $replacement = call_user_func_array($this->callback, [$this, $name, $parameters, $content, $data]);
-                $replacement = $this->parseRecursives($replacement, $content);
-            }
+            $replacement = call_user_func_array($this->callback, [$this, $name, $parameters, $content, $data]);
+
+            $replacement = $this->parseRecursives($replacement, $content);
 
             // look for tag pairs and (plugin) callbacks
             if ($name != "content" && !$replacement) {
@@ -613,9 +605,7 @@ class Parser
         $text = $this->parseRecursives($text, $this->original_text);
 
         // re-inject any extractions
-        if (is_null($this->callback)) {
-            $text = $this->injectExtractions($text, '__variables_not_callbacks');
-        }
+        $text = $this->injectExtractions($text, '__variables_not_callbacks');
 
         return $text;
     }
@@ -664,11 +654,9 @@ class Parser
             }
 
             // check for and extract callbacks
-            if ($this->callback) {
-                if (preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
-                    foreach ($cb_matches[0] as $m) {
-                        $condition = $this->createExtraction('__cond_callbacks', $m, "{$m}", $condition);
-                    }
+            if (preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
+                foreach ($cb_matches[0] as $m) {
+                    $condition = $this->createExtraction('__cond_callbacks', $m, "{$m}", $condition);
                 }
             }
 
@@ -700,10 +688,8 @@ class Parser
             }, $condition);
 
             // inject and parse any callbacks
-            if ($this->callback) {
-                $condition = $this->injectExtractions($condition, '__cond_callbacks');
-                $condition = $this->parseCallbackTags($condition, $data);
-            }
+            $condition = $this->injectExtractions($condition, '__cond_callbacks');
+            $condition = $this->parseCallbackTags($condition, $data);
 
             // Re-extract the strings that have may have been added.
             if (preg_match_all('/(["\']).*?(?<!\\\\)\1/s', $condition, $str_matches)) {
@@ -1192,10 +1178,8 @@ class Parser
             $parameters
         );
 
-        if ($this->callback) {
-            $parameters = preg_replace('/(.*?\s*=\s*(?!\{\s*)(?!__))('.$this->callbackNameRegex.')(?!\s*\})\b/', '$1{$2}', $parameters);
-            $parameters = $this->parseCallbackTags($parameters, $data);
-        }
+        $parameters = preg_replace('/(.*?\s*=\s*(?!\{\s*)(?!__))('.$this->callbackNameRegex.')(?!\s*\})\b/', '$1{$2}', $parameters);
+        $parameters = $this->parseCallbackTags($parameters, $data);
 
         // Re-inject extracted strings
         $parameters = $this->injectExtractions($parameters, '__param_str');
