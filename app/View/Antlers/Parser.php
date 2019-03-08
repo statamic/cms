@@ -543,31 +543,6 @@ class Parser
                             $parameters = explode(':', $parameters);
                             $values = $this->runModifier($modifier, $values, $parameters, $data);
                         }
-
-                        // loop over remaining values, adding contextual tags
-                        // to each iteration of the loop
-                        $i = 0;
-                        $total_results = count($values);
-
-                        foreach ($values as $value_key => $value_value) {
-                            $i++;
-
-                            // if this isn't an array, we need to make it one
-                            if (!is_array($values[$value_key])) {
-                                // not an array, set contextual tags
-                                // note: these are for tag-pairs only
-                                $values[$value_key] = [
-                                    'key'           => $i - 1,
-                                    'value'         => $values[$value_key],
-                                    'name'          => $values[$value_key], // 'value' alias (legacy)
-                                    'index'         => $i,
-                                    'zero_index'    => $i - 1,
-                                    'total_results' => $total_results,
-                                    'first'         => ($i === 1) ? true : false,
-                                    'last'          => ($i === $total_results) ? true : false
-                                ];
-                            }
-                        }
                     }
 
                     if ( ! empty($values)) {
