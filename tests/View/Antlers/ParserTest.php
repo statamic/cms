@@ -430,7 +430,7 @@ EOT;
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
+            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing var="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
         );
     }
 
