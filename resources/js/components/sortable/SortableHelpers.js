@@ -2,7 +2,7 @@ import SortableKeyValue from './SortableKeyValue.js';
 
 export default {
     methods: {
-        newSortableKeyValue(key=null, value=null) {
+        newSortableValue(value=null, key=null) {
             return new SortableKeyValue(key, value);
         },
 
