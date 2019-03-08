@@ -138,7 +138,7 @@ export default {
 
     methods: {
         addValue() {
-            this.data.push(this.newSortableKeyValue());
+            this.data.push(this.newSortableValue());
         },
 
         confirmDeleteValue(index) {
