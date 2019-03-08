@@ -24,4 +24,11 @@ class Test extends Tags
 
         return $this->parse([$var => $val]);
     }
+
+    public function someLoopParsing()
+    {
+        return $this->parseLoop([
+            [], [],
+        ]);
+    }
 }

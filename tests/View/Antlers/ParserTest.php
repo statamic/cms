@@ -483,6 +483,95 @@ EOT;
     }
 
     /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $variables = [
+            'string' => 'hello',
+            'content' => 'before {{ string }} after',
+        ];
+
+        $parsed = $parser->parse('{{ content | noparse }} {{ string }}', $variables);
+
+        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
+
+        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_doesnt_parse_noparse_tags_inside_callbacks_and_requires_extractions_to_be_reinjected()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $parser = Antlers::parser();
+
+$template = <<<EOT
+{{ test:some_parsing }}{{ noparse }}{{ string }}{{ /noparse }}{{ /test:some_parsing }}
+{{ test:some_loop_parsing }}
+    {{ index }} {{ noparse }}{{ string }}{{ /noparse }} {{ string }}
+{{ /test:some_loop_parsing }}
+EOT;
+
+$expectedBeforeInjection = <<<EOT
+noparse_ac3458695912d204af897d3c67f93cbe
+    1 noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness
+    2 noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness
+
+EOT;
+
+$expectedAfterInjection = <<<EOT
+{{ string }}
+    1 {{ string }} Hello wilderness
+    2 {{ string }} Hello wilderness
+
+EOT;
+
+        $parsed = $parser->parse($template, $this->variables);
+        $this->assertEquals($expectedBeforeInjection, $parsed);
+        $this->assertEquals($expectedAfterInjection, $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_inside_callbacks_and_requires_extractions_to_be_reinjected()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $parser = Antlers::parser();
+
+        $variables = [
+            'string' => 'hello',
+            'content_for_single_tag' => 'beforesingle {{ string }} aftersingle',
+            'content_for_tag_pair' => 'beforepair {{ string }} afterpair',
+        ];
+
+$template = <<<EOT
+{{ test:some_parsing }}{{ content_for_single_tag | noparse }}{{ /test:some_parsing }}
+{{ test:some_loop_parsing }}
+    {{ index }} {{ content_for_tag_pair | noparse }} {{ string }}
+{{ /test:some_loop_parsing }}
+EOT;
+
+$expectedBeforeInjection = <<<EOT
+noparse_0548be789865a16ab6e495f84a3080c0
+    1 noparse_aa4a7fa8e2faf61751b68038fee92c4d hello
+    2 noparse_aa4a7fa8e2faf61751b68038fee92c4d hello
+
+EOT;
+
+$expectedAfterInjection = <<<EOT
+beforesingle {{ string }} aftersingle
+    1 beforepair {{ string }} afterpair hello
+    2 beforepair {{ string }} afterpair hello
+
+EOT;
+
+        $parsed = $parser->parse($template, $variables);
+        $this->assertEquals($expectedBeforeInjection, $parsed);
+        $this->assertEquals($expectedAfterInjection, $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
     function it_accepts_an_arrayable_object()
     {
         $this->assertEquals(
