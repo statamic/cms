@@ -10,7 +10,7 @@
         :selections-url="selectionsUrl"
         :status-icons="true"
         :editable-items="true"
-        :columns="[{ field: 'title', label: 'Title', visible: true }, { field: 'url', label: 'URL', visible: true }]"
+        :columns="columns"
     />
 
 </template>
@@ -25,7 +25,11 @@ export default {
     data() {
         return {
             selections: _.clone(this.value),
-            initialData: this.meta.data
+            initialData: this.meta.data,
+            columns: [
+                { field: 'title', label: 'Title', visible: true },
+                { field: 'url', label: 'URL', visible: true }
+            ]
         }
     },
 
