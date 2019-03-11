@@ -1,11 +1,11 @@
 <template>
 
     <div :class="classes">
-        <label class="block" :class="{'bold': config.bold}">
+        <label class="flex" :class="{'bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
             <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
-            <i class="icon icon-chat text-xs text-grey-50" v-if="config.localizable" v-popover:tooltip.top="__('This field will be localized.')" />
+            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="config.localizable" v-popover:tooltip.top="__('Localizable field')" />
         </label>
 
         <div
