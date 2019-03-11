@@ -107,10 +107,7 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            // TODO: The global should know what meta data to exclude.
-            $data = array_except($global->toAugmentedArray(), ['blueprint']);
-
-            $this->set($global->handle(), $data);
+            $this->set($global->handle(), $global->toAugmentedArray());
         }
 
         $mainGlobal = $this->get('global') ?? [];
