@@ -99,6 +99,9 @@ export default {
             const rowsToAdd = this.config.min_rows - this.rows.length;
             for (var i = 1; i <= rowsToAdd; i++) this.addRow();
         }
+
+        // Add watcher manually after initial data wangjangling to prevent a premature dirty state.
+        this.$watch('rows', rows => this.update(rows));
     },
 
     methods: {
@@ -142,14 +145,6 @@ export default {
 
         focus() {
             // TODO
-        }
-
-    },
-
-    watch: {
-
-        rows(rows) {
-            this.$emit('updated', rows);
         }
 
     }
