@@ -19,6 +19,7 @@ var colors = {
     'blue-light':       'hsla(210, 100%, 75%, 1)',
     'blue':             'hsla(200, 80%, 50%, 1)',
     'blue-dark':        'hsla(200, 75%, 45%, 1)', //#4990bb
+    'blue-darker':      'hsla(200, 75%, 40%, 1)',
     'red-dark':         'hsla(2, 57%, 53%, 1)',
     'red':              'hsla(2, 76%, 60%, 1)',
     'red-light':        'hsla(2, 76%, 70%, 1)',

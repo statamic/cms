@@ -34,16 +34,32 @@
                 </button>
             </div>
 
+            <div class="pt-px text-2xs text-grey-60" v-text="stateMsg" />
 
-            <button v-if="isBase" class="btn mr-2" v-text="__('Live Preview')" @click="openLivePreview" />
+            <button v-if="isBase" class="btn ml-2" v-text="__('Live Preview')" @click="openLivePreview" />
 
-            <button
-                class="btn btn-primary"
-                :class="{ disabled: !canSave }"
-                :disabled="!canSave"
-                @click.prevent="save"
-                v-text="__('Save')"
-            ></button>
+            <div class="btn-dropdown-primary ml-2">
+                <button
+                    class="cta"
+                    :class="{ disabled: !canSave }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="__('Save Changes')"
+                ></button>
+                <dropdown-list>
+                    <button class="trigger flex items-center" slot="trigger">
+                        <svg-icon class="text-white w-2 h-3" name="chevron-down-small" />
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="" v-text="__('Save as Draft')"></a></li>
+                        <li><a href="" v-text="__('Save & Publish')"></a></li>
+                        <li><a href="" v-text="__('Save & Unpublish')"></a></li>
+                        <li><a href="" v-text="__('Save & Create Another')"></a></li>
+                        <li><a href="" v-text="__('Duplicate')"></a></li>
+                        <li class="warning"><a href="" v-text="__('Delete')"></a></li>
+                    </ul>
+                </dropdown-list>
+            </div>
             <slot name="action-buttons-right" />
         </div>
 
@@ -119,6 +135,7 @@ export default {
             errors: {},
             isPreviewing: false,
             sectionsVisible: true,
+            state: 'new'
         }
     },
 
@@ -138,6 +155,24 @@ export default {
 
         isBase() {
             return this.publishContainer === 'base';
+        },
+
+        stateMsg() {
+            if (this.state === 'new') {
+                return __('New Unsaved Entry')
+            } else if (this.state === 'unsaved') {
+                return __('Unsaved Changes')
+            } else if (this.state === 'unpublished') {
+                return __('Unpublished Entry')
+            } else if (this.state === 'published') {
+                return __('Published Entry')
+            } else if (this.state === 'scheduled') {
+                return __('Scheduled Entry')
+            } else if (this.state === 'expired') {
+                return __('Expired Entry')
+            } else {
+                return __('Mystery Entry')
+            }
         }
 
     },

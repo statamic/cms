@@ -1,6 +1,9 @@
 /* ==========================================================================
    BUTTONS
    ========================================================================== */
+button, .btn, .btn-* {
+    cursor: pointer;
+}
 
 .selectize-control.single .selectize-input,
 .btn,
@@ -177,83 +180,121 @@ td .btn-icon {
 /* Button Groups
   ========================================================================== */
 
-.btn-group {
-    border-radius: 3px;
-    box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.07), 0 1px 2px 0 rgba(0,0,0,.08), 0 0 0 0 transparent;
-    background: #fff;
-    cursor: pointer;
-    white-space: nowrap;
+.btn-dropdown {
+    @extend .btn;
+}
 
-    .btn, .select {
-        box-shadow: none;
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
-        display: flex;
-        align-items: center;
+.btn-dropdown-primary {
+    @extend .btn-primary;
+    @apply flex items-center p-0;
 
-        &:hover, &.depressed {
-            background: rgba(0,0,0,.02);
-            box-shadow: inset 0 0 2px rgba(0,0,0,.06);
-            z-index: 2;
-        }
+    .cta {
+        height: 100%;
+        padding: 0 16px;
     }
 
-    .btn:first-child:active { border-left: 1px solid transparent; }
-    .btn:last-child:active { border-right: 1px solid transparent; }
-
-    .btn:not(:first-child), {
-        border-left: 1px solid rgba(0,0,0,.06);
+    .trigger {
+        @apply h-full border-l border-blue-dark;
+        padding: 0 12px;
     }
 
-    .btn:not(:last-of-type) {
-        border-right: 1px solid rgba(0,0,0,.06);
+    &:hover .trigger {
+        @apply border-blue-darker;
     }
 
-    .btn.btn-primary:hover {
-        background: mix(black, $brand-primary, 5%);
+    button:focus {
+        @apply outline-none;
     }
 
-    .btn.btn-danger:hover,
-    .btn.btn-danger.depressed {
-        background-color: #ac2925;
+    &:focus-within {
+        @apply focus-outline;
     }
 
-    > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-        border-radius: 3px 0 0 3px;
+    button:hover {
+        @apply bg-blue-dark;
     }
 
-    > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
-        border-radius: 0 3px 3px 0;
+    div {
+        height: 100%;
     }
 }
 
-.btn-group.open .dropdown-toggle.btn-more {
-    box-shadow: none;
-    transform: rotate(90deg);
-}
-
-.btn-group.open .dropdown-toggle {
-    box-shadow: inset 0 0 2px rgba(0,0,0,.06);
-}
-
-.btn-group.action-more {
-    background: transparent;
-    box-shadow: none;
-}
-
-.btn-group.btn-group-primary {
-    background-color: $brand-primary;
-    box-shadow:
-        0 2px 5px 0 rgba($brand-primary,.05),
-        0 1px 2px 0 rgba(0,0,0,.07),
-        0 1px 3px 0 rgba(0,0,0,.08);
-    border-bottom: 1px solid #2090d5;
-
-    .btn.btn-primary {
-        border-top: none;
-        border-bottom: none;
-    }
-}
+// .btn-group {
+//     @apply shadow-button;
+//     @apply select-none border-0 rounded inline-block text-xs relative align-middle text-center whitespace-no-wrap;
+//     cursor: pointer;
+//     white-space: nowrap;
+//
+//     .btn, .select {
+//         box-shadow: none;
+//         border-left: 1px solid transparent;
+//         border-right: 1px solid transparent;
+//         display: flex;
+//         align-items: center;
+//
+//         &:hover, &.depressed {
+//             background: rgba(0,0,0,.02);
+//             box-shadow: inset 0 0 2px rgba(0,0,0,.06);
+//             z-index: 2;
+//         }
+//     }
+//
+//     .btn:first-child:active { border-left: 1px solid transparent; }
+//     .btn:last-child:active { border-right: 1px solid transparent; }
+//
+//     .btn:not(:first-child), {
+//         border-left: 1px solid rgba(0,0,0,.06);
+//     }
+//
+//     .btn:not(:last-of-type) {
+//         border-right: 1px solid rgba(0,0,0,.06);
+//     }
+//
+//     .btn.btn-primary:hover {
+//         background: mix(black, $brand-primary, 5%);
+//     }
+//
+//     .btn.btn-danger:hover,
+//     .btn.btn-danger.depressed {
+//         background-color: #ac2925;
+//     }
+//
+//     > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+//         border-radius: 3px 0 0 3px;
+//     }
+//
+//     > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
+//         border-radius: 0 3px 3px 0;
+//     }
+// }
+//
+// .btn-group.open .dropdown-toggle.btn-more {
+//     box-shadow: none;
+//     transform: rotate(90deg);
+// }
+//
+// .btn-group.open .dropdown-toggle {
+//     box-shadow: inset 0 0 2px rgba(0,0,0,.06);
+// }
+//
+// .btn-group.action-more {
+//     background: transparent;
+//     box-shadow: none;
+// }
+//
+// .btn-group.btn-group-primary {
+//     background-color: $brand-primary;
+//     box-shadow:
+//         0 2px 5px 0 rgba($brand-primary,.05),
+//         0 1px 2px 0 rgba(0,0,0,.07),
+//         0 1px 3px 0 rgba(0,0,0,.08);
+//     border-bottom: 1px solid #2090d5;
+//
+//     .btn.btn-primary {
+//         border-top: none;
+//         border-bottom: none;
+//     }
+// }
 
 
 /* Specialty Buttons
