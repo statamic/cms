@@ -28,6 +28,8 @@ class GlobalSet implements Contract
 
         $this->id = $id;
 
+        $this->localizations()->each->id($id);
+
         return $this;
     }
 
