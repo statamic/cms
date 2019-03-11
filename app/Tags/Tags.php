@@ -8,13 +8,14 @@ use Statamic\API\Parse;
 use Statamic\API\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
+use Statamic\Extend\HasContext;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters, RegistersItself;
+    use HasHandle, HasAliases, HasParameters, HasContext, RegistersItself;
 
     protected static $binding = 'tags';
 
