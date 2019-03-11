@@ -5,10 +5,11 @@ namespace Statamic\Data\Entries;
 use Closure;
 use Statamic\API\Site;
 use Statamic\Data\Localizable;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions\InvalidLocalizationException;
 use Statamic\Contracts\Data\Entries\Entry as Contract;
 
-class Entry implements Contract
+class Entry implements Contract, Augmentable
 {
     use Localizable;
 
@@ -65,5 +66,15 @@ class Entry implements Contract
     protected function makeLocalization()
     {
         return new LocalizedEntry;
+    }
+
+    public function toAugmentedArray()
+    {
+        return $this->forCurrentSite()->toAugmentedArray();
+    }
+
+    public function published($published = null)
+    {
+        return call_user_func_array([$this->forCurrentSite(), 'published'], func_get_args());
     }
 }
