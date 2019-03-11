@@ -173,7 +173,10 @@ export default {
                     this.headerVisible = true;
                     return this.$wait(200);
                 })
-                .then(() => this.panesVisible = true);
+                .then(() => {
+                    this.panesVisible = true;
+                    EQCSS.apply();
+                });
         },
 
         animateOut() {

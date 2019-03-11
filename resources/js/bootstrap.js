@@ -7,6 +7,7 @@ window.Vue = Vue;
 window._ = require('underscore');
 window.$ = window.jQuery = require('jquery');
 window.rangy = require('rangy');
+window.EQCSS = require('eqcss');
 
 require('./bootstrap/globals');
 require('./bootstrap/polyfills');

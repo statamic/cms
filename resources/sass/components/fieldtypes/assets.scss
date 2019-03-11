@@ -126,11 +126,10 @@
 /* Responsive Wangjangling
   ========================================================================== */
 
-// @media all and (max-width: 768px) {
-//   .assets-fieldtype {
-//       .manage-assets {
-//           text-align: center;
-//           p { display: none; }
-//       }
-//   }
-// }
+@element .assets-fieldtype and (max-width: 500px) {
+    :self .assets-fieldtype-picker {
+        @apply block;
+        .btn { @apply w-full mb-1 justify-center }
+        p { @apply ml-0 text-center }
+    }
+}

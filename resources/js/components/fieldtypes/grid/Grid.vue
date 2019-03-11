@@ -1,5 +1,6 @@
 <template>
 
+    <element-container @resized="containerWidth = $event.width">
     <div class="grid-fieldtype-container">
 
         <small v-if="hasExcessRows" class="help-block text-red">
@@ -24,6 +25,7 @@
             @click.prevent="addRow" />
 
     </div>
+    </element-container>
 
 </template>
 
@@ -43,15 +45,19 @@ export default {
 
     data() {
         return {
-            rows: null
+            rows: null,
+            containerWidth: null,
         }
     },
 
     computed: {
 
         component() {
-            // TODO: Should become stacked at <600px
-            return this.config.mode === 'stacked' ? 'GridStacked' : 'GridTable';
+            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+
+            return this.config.mode === 'stacked' || isNarrow
+                ? 'GridStacked'
+                : 'GridTable';
         },
 
         fields() {

@@ -1,5 +1,6 @@
 <template>
 
+    <element-container @resized="containerWidth = $event.width">
     <div>
 
         <div class="publish-tabs tabs" v-show="mainSections.length > 1">
@@ -34,6 +35,7 @@
         </div>
 
     </div>
+    </element-container>
 
 </template>
 
@@ -50,7 +52,8 @@ export default {
         const state = this.$store.state.publish[this.storeName];
 
         return {
-            active: state.fieldset.sections[0].handle
+            active: state.fieldset.sections[0].handle,
+            containerWidth: null
         }
     },
 
@@ -79,8 +82,7 @@ export default {
 
             if (this.livePreview) return false;
 
-            const width = this.$store.state.statamic.windowWidth;
-            if (this.sidebarSection.fields.length == 0 || width < 1366) return false;
+            if (this.sidebarSection.fields.length == 0 || this.containerWidth < 1000) return false;
 
             return true;
         },

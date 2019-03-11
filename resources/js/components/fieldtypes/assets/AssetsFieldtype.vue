@@ -1,5 +1,5 @@
 <template>
-    <div class="assets-fieldtype">
+    <div>
 
         <div v-if="!containerSpecified" class="error-container">
             {{ __('No asset container specified') }}
