@@ -22,6 +22,13 @@
     z-index: 1;
 }
 
+.live-preview .publish-tabs {
+    @apply bg-grey-30 ml-0 pl-0;
+    a {
+        border-radius: 0;
+    }
+}
+
 .live-preview-contents iframe.Responsive {
     @apply h-full w-full;
 }
