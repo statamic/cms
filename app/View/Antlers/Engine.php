@@ -7,6 +7,7 @@ use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\Parse;
 use Statamic\Exceptions;
+use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Extend\Management\TagLoader;
 use Illuminate\Contracts\View\Engine as EngineInterface;
@@ -156,6 +157,10 @@ class Engine implements EngineInterface
             ]);
 
             $output = call_user_func([$tag, $method]);
+
+            if ($output instanceof Collection) {
+                $output = $output->toAugmentedArray();
+            }
 
             // Allow tags to return an array. We'll parse it for them.
             if (is_array($output)) {
