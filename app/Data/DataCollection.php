@@ -151,10 +151,10 @@ class DataCollection extends IlluminateCollection
      * Add a new key to each item of the collection
      *
      * @param string|callable $key       New key to add, or a function to return an array of new values
-     * @param Closure         $callable  Function to return the new value when specifying a key
+     * @param mixed           $callable  Function to return the new value when specifying a key
      * @return \Statamic\Data\DataCollection
      */
-    public function supplement($key, Closure $callable = null)
+    public function supplement($key, $callable = null)
     {
         // If a callable is specified as the first parameter, we'll expect that it'll
         // return an associative array of values to be merged into the supplements.
@@ -163,7 +163,8 @@ class DataCollection extends IlluminateCollection
         }
 
         foreach ($this->items as $i => $item) {
-            $this->items[$i]->setSupplement($key, $callable($item));
+            $value = $callable instanceof Closure ? $callable($item) : $callable;
+            $this->items[$i]->setSupplement($key, $value);
         }
 
         return $this;
