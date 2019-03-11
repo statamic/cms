@@ -45,6 +45,7 @@ Route::group([
 
     Route::get('globals', 'GlobalsController@index')->name('globals.index');
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
+    Route::post('globals', 'GlobalsController@store')->name('globals.store');
     Route::get('globals/{id}/{handle}/{site}', 'GlobalsController@edit')->name('globals.edit');
     Route::patch('globals/{id}/{handle}/{site}', 'GlobalsController@update')->name('globals.update');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
