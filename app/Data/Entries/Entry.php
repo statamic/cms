@@ -24,9 +24,7 @@ class Entry implements Contract, Augmentable
 
         $this->id = $id;
 
-        $this->localizations()->each(function ($entry) use ($id) {
-            $entry->id($id);
-        });
+        $this->localizations()->each->id($id);
 
         return $this;
     }
