@@ -13,7 +13,7 @@ class TransChoice extends Tags
      */
     public function __call($method, $args)
     {
-        $key = $this->get('key', $this->tag_method);
+        $key = $this->get('key', $this->method);
         $count = $this->getInt('count', 1);
 
         return trans_choice($key, $count, $this->parameters);

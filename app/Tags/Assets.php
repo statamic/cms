@@ -29,7 +29,7 @@ class Assets extends Tags
      */
     public function __call($method, $arguments)
     {
-        $value = array_get_colon($this->context, $this->tag_method);
+        $value = array_get_colon($this->context, $this->method);
 
         return $this->assets($value);
     }

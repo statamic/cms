@@ -8,7 +8,7 @@ class Partial extends Tags
     {
         // We pass the original non-studly case value in as
         // an argument, but fall back to the studly version just in case.
-        $partial = $this->get('src', array_get_colon($arguments, 0, $this->tag_method));
+        $partial = $this->get('src', array_get_colon($arguments, 0, $this->method));
 
         $variables = array_merge($this->context, $this->parameters, [
             '__frontmatter' => $this->parameters

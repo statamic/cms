@@ -48,7 +48,7 @@ abstract class Tags
      *
      * @var string
      */
-    public $tag_method;
+    public $method;
 
     /**
      * If is a tag pair
@@ -76,7 +76,7 @@ abstract class Tags
         $this->parameters  = $this->setUpParameters($properties['parameters']);
         $this->isPair      = $this->content !== '';
         $this->tag         = array_get($properties, 'tag');
-        $this->tag_method  = array_get($properties, 'tag_method');
+        $this->method      = array_get($properties, 'tag_method');
     }
 
     /**

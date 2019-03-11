@@ -16,7 +16,7 @@ class GetContent extends Collection
      */
     public function __call($method, $args)
     {
-        $from = array_get_colon($this->context, $this->tag_method);
+        $from = array_get_colon($this->context, $this->method);
 
         return $this->index($from);
     }

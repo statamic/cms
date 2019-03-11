@@ -34,7 +34,7 @@ class Locales extends Tags
      */
     public function __call($method, $args)
     {
-        $data = $this->getLocalizedData($key = $this->tag_method);
+        $data = $this->getLocalizedData($key = $this->method);
 
         $data['locale'] = $this->getLocale($key);
 
