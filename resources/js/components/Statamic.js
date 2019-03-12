@@ -7,14 +7,10 @@ export default new Vue({
         }
     },
 
-    computed() {
+    computed: {
         $request() {
             // TODO: Any custom axios options we want to default to here?
-            return this.$axios;
-        },
-
-        $events() {
-            return this.$events;
+            return this.axios;
         },
     },
 
@@ -23,22 +19,6 @@ export default new Vue({
             return key
                 ? data_get(this.config, key, defaultValue)
                 : this.config;
-        },
-
-        $on(...args) {
-            this.$events.$on(...args);
-        },
-
-        $once(...args) {
-            this.$events.$once(...args);
-        },
-
-        $off(...args) {
-            this.$events.$off(...args);
-        },
-
-        $emit(...args) {
-            this.$events.$emit(...args);
         }
     }
 });
