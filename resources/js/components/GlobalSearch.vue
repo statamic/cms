@@ -18,7 +18,7 @@
                 :placeholder="placeholder"
                 />
 
-            <span v-if="! (isDirty || searching)" class="rounded px-sm text-2xs border text-grey-40">/</span>
+            <span v-if="! (isDirty || searching)" class="rounded px-sm pb-px text-2xs border text-grey-50">/</span>
 
             <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
@@ -36,7 +36,7 @@
                         <div class="flex-1 ml-1 title" v-html="favorite.name"></div>
                     </div>
 
-                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm text-2xs border text-grey-40">/</span> key</div>
+                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm pb-px text-2xs border text-grey-50">/</span> key</div>
                 </div>
             </div>
         </div>
