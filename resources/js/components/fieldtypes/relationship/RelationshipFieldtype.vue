@@ -3,14 +3,17 @@
     <relationship-input
         :name="name"
         v-model="selections"
+        :can-create="canCreate"
         :site="site"
         :initial-data="initialData"
         :max-items="maxItems"
+        :item-component="itemComponent"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
         :status-icons="true"
         :editable-items="true"
         :columns="columns"
+        :search="true"
     />
 
 </template>
@@ -25,11 +28,7 @@ export default {
     data() {
         return {
             selections: _.clone(this.value),
-            initialData: this.meta.data,
-            columns: [
-                { field: 'title', label: 'Title', visible: true },
-                { field: 'url', label: 'URL', visible: true }
-            ]
+            initialData: this.meta.data
         }
     },
 
@@ -41,8 +40,16 @@ export default {
             return this.config.max_items || Infinity;
         },
 
+        columns() {
+            return this.meta.columns;
+        },
+
+        itemComponent() {
+            return this.meta.itemComponent;
+        },
+
         itemDataUrl() {
-            return cp_url(`fieldtypes/relationship/data`);
+            return this.meta.itemDataUrl + '?' + qs.stringify({ config: this.configParameter });
         },
 
         selectionsUrl() {
@@ -50,11 +57,15 @@ export default {
         },
 
         baseSelectionsUrl() {
-            return cp_url(`fieldtypes/relationship`);
+            return this.meta.baseSelectionsUrl;
+        },
+
+        configParameter() {
+            return btoa(JSON.stringify(this.config));
         },
 
         selectionsUrlParameters() {
-            let params = {};
+            let params = { config: this.configParameter };
 
             if (this.config.collections) {
                 params.collections = this.config.collections;
@@ -65,6 +76,10 @@ export default {
 
         site() {
             return this.$store.state.publish[this.storeName].site;
+        },
+
+        canCreate() {
+            return this.meta.canCreate;
         }
 
     },

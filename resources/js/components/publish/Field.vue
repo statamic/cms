@@ -54,7 +54,7 @@ export default {
     computed: {
 
         fieldtypeComponent() {
-            return `${this.config.type}-fieldtype`;
+            return `${this.config.component || this.config.type}-fieldtype`;
         },
 
         hasError() {

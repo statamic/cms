@@ -45,6 +45,11 @@ abstract class Fieldtype implements Arrayable
         return Str::removeRight(static::traitHandle(), '_fieldtype');
     }
 
+    public function component(): string
+    {
+        return $this->component ?? static::handle();
+    }
+
     public function localizable(): bool
     {
         return $this->localizable;

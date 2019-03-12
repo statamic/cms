@@ -173,9 +173,13 @@ class Field implements Arrayable
 
     private function preProcessedConfig()
     {
-        $fields = $this->fieldtype()->configFields()->addValues($this->config);
+        $fieldtype = $this->fieldtype();
 
-        return array_merge($this->config, $fields->preProcess()->values());
+        $fields = $fieldtype->configFields()->addValues($this->config);
+
+        return array_merge($this->config, $fields->preProcess()->values(), [
+            'component' => $fieldtype->component(),
+        ]);
     }
 
     public function meta()

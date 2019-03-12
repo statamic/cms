@@ -1,5 +1,5 @@
 .item {
-    @apply text-sm outline-none flex items-center rounded cursor-pointer border bg-white shadow-sm select-none;
+    @apply text-sm outline-none flex items-center rounded border bg-white shadow-sm;
 
     .item-move {
         @apply w-4 border-r rounded-l h-full p-1;
@@ -34,7 +34,7 @@
     }
 
     // Drag interaction
-    .draggable-source--is-dragging {
+    &.draggable-source--is-dragging {
         opacity: 0.5;
     }
 }

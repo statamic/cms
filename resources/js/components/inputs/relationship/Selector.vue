@@ -17,9 +17,9 @@
                     <div slot-scope="{ filteredRows: rows }" class="flex flex-col h-full justify-start">
                         <div class="data-list-header">
                             <data-list-toggle-all v-if="!hasMaxSelections" />
-                            <data-list-search v-model="searchQuery" />
+                            <data-list-search v-if="search" v-model="searchQuery" />
 
-                            <div>
+                            <div v-if="canCreate">
                                 <button
                                     type="button"
                                     class="btn"
@@ -28,6 +28,7 @@
 
                                 <inline-create-form
                                     v-if="isCreating"
+                                    :site="site"
                                     @created="itemCreated"
                                     @closed="stopCreating"
                                 />
@@ -100,6 +101,8 @@ export default {
         initialColumns: Array,
         maxSelections: Number,
         site: String,
+        search: Boolean,
+        canCreate: Boolean
     },
 
     data() {

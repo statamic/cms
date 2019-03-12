@@ -5,7 +5,8 @@
 
         <div v-if="!initializing">
             <div ref="items" class="outline-none">
-                <related-item
+                <component
+                    :is="itemComponent"
                     v-for="(item, i) in items"
                     :key="item.id"
                     :item="item"
@@ -23,7 +24,7 @@
             <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
-                        <button class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
+                        <button v-if="canCreate" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
                             <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                             {{ __('Create & Link Item') }}
                         </button>
@@ -41,7 +42,7 @@
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting">
+            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     :url="selectionsUrl"
                     :site="site"
@@ -50,6 +51,8 @@
                     :initial-selections="selections"
                     :initial-columns="columns"
                     :max-selections="maxItems"
+                    :search="search"
+                    :can-create="canCreate"
                     @selected="selectionsUpdated"
                     @closed="isSelecting = false"
                 />
@@ -76,12 +79,18 @@ export default {
         value: { required: true },
         initialData: Array,
         maxItems: Number,
+        itemComponent: {
+            type: String,
+            default: 'RelatedItem',
+        },
         itemDataUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
         editableItems: Boolean,
         columns: Array,
         site: String,
+        search: Boolean,
+        canCreate: Boolean,
     },
 
     components: {

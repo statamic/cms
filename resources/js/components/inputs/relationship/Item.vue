@@ -1,7 +1,7 @@
 <template>
 
     <div
-        class="item mb-1"
+        class="item mb-1 select-none"
         :class="{ 'published': item.published, 'unpublished': !item.published, 'invalid': item.invalid }"
     >
         <div class="item-move">&nbsp;</div>

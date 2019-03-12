@@ -4,13 +4,18 @@ namespace Statamic\Fields\Fieldtypes;
 
 use Statamic\API\Site;
 use Statamic\API\Entry;
+use Statamic\CP\Column;
 use Statamic\API\Content;
 use Illuminate\Support\Arr;
 use Statamic\Fields\Fieldtype;
+use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 
 class Relationship extends Fieldtype
 {
+    protected $component = 'relationship';
+    protected $itemComponent = 'related-item';
     protected $categories = ['relationship'];
+    protected $canCreate = true;
 
     protected $configFields = [
         'max_items' => ['type' => 'integer'],
@@ -24,7 +29,7 @@ class Relationship extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        return $this->augment($data)->map(function ($item) {
+        return $this->augment($data)->map(function ($item) use ($data) {
             return [
                 'id' => $item->id(),
                 'title' => $item->get('title'),
@@ -60,9 +65,46 @@ class Relationship extends Fieldtype
 
     public function preload()
     {
-        $data = $this->getItemData($this->field->value())->all();
+        return [
+            'data' => $this->getItemData($this->field->value())->all(),
+            'columns' => $this->getColumns(),
+            'itemDataUrl' => $this->getItemDataUrl(),
+            'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
+            'itemComponent' => $this->getItemComponent(),
+            'canCreate' => $this->canCreate(),
+        ];
+    }
 
-        return compact('data');
+    protected function canCreate()
+    {
+        if ($this->canCreate === false) {
+            return false;
+        }
+
+        return $this->config('create', true);
+    }
+
+    protected function getItemComponent()
+    {
+        return $this->itemComponent;
+    }
+
+    protected function getColumns()
+    {
+        return [
+            Column::make('title'),
+            Column::make('url')->label('URL'),
+        ];
+    }
+
+    protected function getItemDataUrl()
+    {
+        return action([RelationshipFieldtypeController::class, 'data']);
+    }
+
+    protected function getBaseSelectionsUrl()
+    {
+        return action([RelationshipFieldtypeController::class, 'index']);
     }
 
     public function getItemData($values, $site = null)
@@ -97,5 +139,41 @@ class Relationship extends Fieldtype
         return collect($values)->map(function ($value) {
             return Content::find($value);
         });
+    }
+
+    public function getIndexItems($request)
+    {
+        return $this->getIndexQuery($request)
+            ->orderBy($this->getSortColumn($request), $this->getSortDirection($request))
+            ->paginate();
+    }
+
+    public function getSortColumn($request)
+    {
+        return $request->get('sort', 'title');
+    }
+
+    public function getSortDirection($request)
+    {
+        return $request->get('order', 'asc');
+    }
+
+    protected function getIndexQuery($request)
+    {
+        $query = Entry::query();
+
+        if ($collections = $request->collections) {
+            $query->whereIn('collection', $collections);
+        }
+
+        if ($search = $request->search) {
+            $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        if ($site = $request->site) {
+            $query->where('site', $site);
+        }
+
+        return $query;
     }
 }
