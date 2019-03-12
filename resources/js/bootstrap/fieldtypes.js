@@ -36,7 +36,6 @@ Vue.component('assets-fieldtype-index', require('../components/fieldtypes/assets
 Vue.component('asset_container-fieldtype', AssetContainerFieldtype);
 Vue.component('asset_folder-fieldtype', AssetsFolderFieldtype);
 Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardFieldtype.vue'));
-Vue.component('blueprints-fieldtype', require('../components/fieldtypes/BlueprintsFieldtype.vue'));
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue'));
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue'));
 Vue.component('collection-fieldtype', CollectionFieldtype);
