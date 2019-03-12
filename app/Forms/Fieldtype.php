@@ -11,6 +11,7 @@ class Fieldtype extends Relationship
     protected static $handle = 'form';
     protected $statusIcons = false;
     protected $canCreate = false;
+    protected $canEdit = false;
     protected $canSearch = false;
 
     public function fieldsetContents()
