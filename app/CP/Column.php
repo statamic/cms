@@ -13,6 +13,7 @@ class Column
     public $fieldtype;
     public $label;
     public $visible = true;
+    public $value = null;
 
     /**
      * Make new column instance.
@@ -42,6 +43,17 @@ class Column
                 $this->label(Str::slugToTitle($this->field), true);
             }
         });
+    }
+
+    /**
+     * Get or set the value field.
+     *
+     * @param null|string $field
+     * @return mixed
+     */
+    public function value($field = null)
+    {
+        return $this->fluentlyGetOrSet('value', $field);
     }
 
     /**
