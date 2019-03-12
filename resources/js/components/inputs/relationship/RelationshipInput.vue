@@ -11,7 +11,7 @@
                     :key="item.id"
                     :item="item"
                     :status-icon="statusIcons"
-                    :editable="editableItems"
+                    :editable="canEdit"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -86,10 +86,10 @@ export default {
         itemDataUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
-        editableItems: Boolean,
         columns: Array,
         site: String,
         search: Boolean,
+        canEdit: Boolean,
         canCreate: Boolean,
     },
 

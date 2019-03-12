@@ -3,6 +3,7 @@
     <relationship-input
         :name="name"
         v-model="selections"
+        :can-edit="canEdit"
         :can-create="canCreate"
         :site="site"
         :initial-data="initialData"
@@ -11,7 +12,6 @@
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
         :status-icons="statusIcons"
-        :editable-items="true"
         :columns="columns"
         :search="true"
     />
@@ -76,6 +76,10 @@ export default {
 
         site() {
             return this.$store.state.publish[this.storeName].site;
+        },
+
+        canEdit() {
+            return this.meta.canEdit;
         },
 
         canCreate() {
