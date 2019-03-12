@@ -1,8 +1,10 @@
+import Statamic from './components/Statamic.js';
 import Vue from 'vue';
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
 
+window.Statamic = Statamic;
 window.Vue = Vue;
 window._ = require('underscore');
 window.$ = window.jQuery = require('jquery');
