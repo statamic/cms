@@ -157,11 +157,17 @@ export default {
             return this.publishContainer === 'base';
         },
 
+        isDirty() {
+            return this.$dirty.has(this.publishContainer);
+        },
+
         stateMsg() {
+            if (this.isDirty) {
+                return __('Unsaved Changes');
+            }
+
             if (this.state === 'new') {
                 return __('New Unsaved Entry')
-            } else if (this.state === 'unsaved') {
-                return __('Unsaved Changes')
             } else if (this.state === 'unpublished') {
                 return __('Unpublished Entry')
             } else if (this.state === 'published') {
@@ -222,7 +228,7 @@ export default {
         localizationSelected(localization) {
             if (localization.active) return;
 
-            if (this.$dirty.has(this.publishContainer)) {
+            if (this.isDirty) {
                 if (! confirm('Are you sure? Unsaved changes will be lost.')) {
                     return;
                 }
