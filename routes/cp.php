@@ -118,8 +118,6 @@ Route::group([
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data');
-        Route::get('collections', 'CollectionsFieldtypeController@index');
-        Route::get('collections/data', 'CollectionsFieldtypeController@data');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'API'], function () {
