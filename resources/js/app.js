@@ -25,6 +25,15 @@ Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(Vuex);
 
+Statamic.$store = new Vuex.Store({
+    modules: {
+        statamic: StatamicStore,
+        publish: {
+            namespaced: true
+        }
+    }
+});
+
 // Vue.http.interceptors.push({
 //     response: function (response) {
 //         if (response.status === 401) {
@@ -47,14 +56,7 @@ var vm = new Vue({
 
     mixins: [Notifications],
 
-    store: new Vuex.Store({
-        modules: {
-            statamic: StatamicStore,
-            publish: {
-                namespaced: true
-            }
-        }
-    }),
+    store: Statamic.$store,
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue'),
