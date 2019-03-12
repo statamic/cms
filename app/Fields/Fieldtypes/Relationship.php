@@ -17,6 +17,7 @@ class Relationship extends Fieldtype
     protected $categories = ['relationship'];
     protected $canEdit = true;
     protected $canCreate = true;
+    protected $canSearch = true;
     protected $statusIcons = true;
 
     protected $configFields = [
@@ -75,6 +76,7 @@ class Relationship extends Fieldtype
             'itemComponent' => $this->getItemComponent(),
             'canEdit' => $this->canEdit(),
             'canCreate' => $this->canCreate(),
+            'canSearch' => $this->canSearch(),
             'statusIcons' => $this->statusIcons,
         ];
     }
@@ -95,6 +97,11 @@ class Relationship extends Fieldtype
         }
 
         return $this->config('edit', true);
+    }
+
+    protected function canSearch()
+    {
+        return $this->canSearch;
     }
 
     protected function getItemComponent()

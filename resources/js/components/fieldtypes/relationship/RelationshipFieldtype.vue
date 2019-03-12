@@ -13,7 +13,7 @@
         :selections-url="selectionsUrl"
         :status-icons="statusIcons"
         :columns="columns"
-        :search="true"
+        :search="canSearch"
     />
 
 </template>
@@ -84,6 +84,10 @@ export default {
 
         canCreate() {
             return this.meta.canCreate;
+        },
+
+        canSearch() {
+            return this.meta.canSearch;
         },
 
         statusIcons() {
