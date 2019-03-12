@@ -16,6 +16,7 @@ class Relationship extends Fieldtype
     protected $itemComponent = 'related-item';
     protected $categories = ['relationship'];
     protected $canCreate = true;
+    protected $statusIcons = true;
 
     protected $configFields = [
         'max_items' => ['type' => 'integer'],
@@ -72,6 +73,7 @@ class Relationship extends Fieldtype
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
             'itemComponent' => $this->getItemComponent(),
             'canCreate' => $this->canCreate(),
+            'statusIcons' => $this->statusIcons,
         ];
     }
 

@@ -10,7 +10,7 @@
         :item-component="itemComponent"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
-        :status-icons="true"
+        :status-icons="statusIcons"
         :editable-items="true"
         :columns="columns"
         :search="true"
@@ -80,6 +80,10 @@ export default {
 
         canCreate() {
             return this.meta.canCreate;
+        },
+
+        statusIcons() {
+            return this.meta.statusIcons;
         }
 
     },
