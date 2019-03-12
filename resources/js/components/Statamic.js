@@ -4,7 +4,7 @@ export default new Vue({
     data() {
         // State is initially set in scripts.blade.php.
         return {
-            booting: [],
+            bootingCallbacks: [],
             config: {},
             flash: [],
             translations: {}
@@ -25,13 +25,13 @@ export default new Vue({
                 : this.config;
         },
 
-        $booting(callback) {
-            this.booting.push(callback);
+        booting(callback) {
+            this.bootingCallbacks.push(callback);
         },
 
-        $start(app) {
-            this.booting.forEach(callback => callback(this));
-            this.booting = [];
+        start(app) {
+            this.bootingCallbacks.forEach(callback => callback(this));
+            this.bootingCallbacks = [];
 
             new Vue(app);
         }

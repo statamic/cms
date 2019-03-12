@@ -51,7 +51,7 @@ require('./components/ProgressBar');
 require('./components/DirtyState');
 require('./components/Preference');
 
-Statamic.$start({
+Statamic.start({
     el: '#statamic',
 
     mixins: [Notifications],
