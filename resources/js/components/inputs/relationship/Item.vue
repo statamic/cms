@@ -12,7 +12,10 @@
                 v-if="item.invalid"
                 v-popover:tooltip.top="__('An item with this ID could not be found')"
                 v-text="item.title" />
-            <a v-else  @click="edit" v-text="item.title" />
+
+            <a v-if="!item.invalid && editable" @click="edit" v-text="item.title" />
+
+            <div v-if="!item.invalid && !editable" v-text="item.title" />
 
             <inline-edit-form
                 v-if="isEditing"

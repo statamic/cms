@@ -3,15 +3,28 @@
 namespace Statamic\Forms;
 
 use Statamic\API;
+use Statamic\CP\Column;
 use Statamic\Fields\Fieldtypes\Relationship;
 
 class Fieldtype extends Relationship
 {
     protected static $handle = 'form';
+    protected $statusIcons = false;
+    protected $canCreate = false;
+    protected $canEdit = false;
+    protected $canSearch = false;
 
     public function fieldsetContents()
     {
         return [];
+    }
+
+    protected function getColumns()
+    {
+        return [
+            Column::make('title'),
+            Column::make('submissions'),
+        ];
     }
 
     protected function toItemArray($id, $site = null)
@@ -24,5 +37,16 @@ class Fieldtype extends Relationship
         }
 
         return $this->invalidItemArray($id);
+    }
+
+    public function getIndexItems($request)
+    {
+        return API\Form::all()->map(function ($form) {
+            return [
+                'id' => $form->handle(),
+                'title' => $form->title(),
+                'submissions' => $form->submissions()->count(),
+            ];
+        })->values();
     }
 }

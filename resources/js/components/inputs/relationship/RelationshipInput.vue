@@ -11,7 +11,7 @@
                     :key="item.id"
                     :item="item"
                     :status-icon="statusIcons"
-                    :editable="editableItems"
+                    :editable="canEdit"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -44,6 +44,7 @@
 
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
+                    slot-scope="{ close }"
                     :url="selectionsUrl"
                     :site="site"
                     initial-sort-column="title"
@@ -54,7 +55,7 @@
                     :search="search"
                     :can-create="canCreate"
                     @selected="selectionsUpdated"
-                    @closed="isSelecting = false"
+                    @closed="close"
                 />
             </stack>
 
@@ -86,10 +87,10 @@ export default {
         itemDataUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
-        editableItems: Boolean,
         columns: Array,
         site: String,
         search: Boolean,
+        canEdit: Boolean,
         canCreate: Boolean,
     },
 

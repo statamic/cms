@@ -1,39 +1,58 @@
 <template>
 
-        <div class="flex flex-col justify-end h-full bg-white">
+    <div class="h-full bg-white">
 
-            <div class="flex-1 flex flex-col">
-                <data-list
-                    v-if="!initializing"
-                    :rows="items"
-                    :columns="columns"
-                    :sort="false"
-                    :sort-column="sortColumn"
-                    :sort-direction="sortDirection"
-                    :selections="selections"
-                    :max-selections="maxSelections"
-                    @selections-updated="selectionsUpdated"
-                >
-                    <div slot-scope="{ filteredRows: rows }" class="flex flex-col h-full justify-start">
-                        <div class="data-list-header">
-                            <data-list-toggle-all v-if="!hasMaxSelections" />
-                            <data-list-search v-if="search" v-model="searchQuery" />
+        <div v-if="initializing" class="absolute pin z-200 flex items-center justify-center text-center">
+            <loading-graphic />
+        </div>
 
-                            <div v-if="canCreate">
-                                <button
-                                    type="button"
-                                    class="btn"
-                                    @click="isCreating = true"
-                                    v-text="__('Create')" />
-
-                                <inline-create-form
-                                    v-if="isCreating"
-                                    :site="site"
-                                    @created="itemCreated"
-                                    @closed="stopCreating"
-                                />
-                            </div>
+        <data-list
+            v-if="!initializing"
+            :rows="items"
+            :columns="columns"
+            :sort="false"
+            :sort-column="sortColumn"
+            :sort-direction="sortDirection"
+            :selections="selections"
+            :max-selections="maxSelections"
+            @selections-updated="selectionsUpdated"
+        >
+            <div slot-scope="{}" class="flex flex-col h-full">
+                <div class="border-b flex items-center justify-between bg-grey-20">
+                    <data-list-toggle-all v-if="!hasMaxSelections" />
+                    <div class="p-2 flex flex-1 items-center">
+                        <div class="flex-1">
+                            <data-list-search
+                                v-if="search"
+                                v-model="searchQuery"
+                                class="bg-transparent p-0" />
                         </div>
+
+                        <button
+                            v-if="canCreate"
+                            type="button"
+                            class="ml-2 btn"
+                            @click="isCreating = true"
+                            v-text="`${__('Create')}...`" />
+
+                        <button
+                            type="button"
+                            class="btn btn-primary ml-2"
+                            @click="select"
+                            v-text="hasMaxSelections
+                                ? __n('Select (:count/:max)', selections, { max: maxSelections })
+                                : __n('Select (:count)', selections)" />
+
+                        <button
+                            type="button"
+                            class="ml-2 p-1 text-xl text-grey-60"
+                            @click="close"
+                            v-html="'&times'" />
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col">
+                    <div class="flex flex-col h-full justify-start">
                         <div class="flex-1 overflow-scroll">
                             <data-list-table
                                 :loading="loading"
@@ -53,31 +72,18 @@
                             :resource-meta="meta"
                             @page-selected="setPage" />
                     </div>
-                </data-list>
-            </div>
-
-            <div class="p-2 border-t flex items-center justify-between bg-grey-20">
-                <div class="text-sm text-grey-40"
-                    v-text="hasMaxSelections
-                        ? __n(':count/:max selected', selections, { max: maxSelections })
-                        : __n(':count selected', selections)"
-                />
-                <div>
-                    <button
-                        type="button"
-                        class="btn"
-                        @click="close"
-                        v-text="__('Cancel')" />
-
-                    <button
-                        type="button"
-                        class="btn btn-primary ml-1"
-                        @click="select"
-                        v-text="__('Select')" />
                 </div>
-            </div>
 
-        </div>
+                <inline-create-form
+                    v-if="isCreating"
+                    :site="site"
+                    @created="itemCreated"
+                    @closed="stopCreating"
+                />
+
+            </div>
+        </data-list>
+    </div>
 
 </template>
 

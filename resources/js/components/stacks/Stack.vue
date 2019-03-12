@@ -5,7 +5,7 @@
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering }"
             :style="{ zIndex: (depth + 1) * 1000, left: `${offset * depth}px` }"
         >
-            <transition name="stack-overlay">
+            <transition name="stack-overlay-fade">
                 <div class="stack-overlay" v-if="visible" :style="{ left: `-${offset * depth}px` }" />
             </transition>
 
@@ -13,7 +13,7 @@
 
             <transition name="stack-slide">
                 <div class="stack-content" v-if="visible">
-                    <slot name="default" :depth="depth" />
+                    <slot name="default" :depth="depth" :close="close" />
                 </div>
             </transition>
         </div>
@@ -110,7 +110,8 @@ export default {
         },
 
         close() {
-            this.$emit('closed');
+            this.visible = false;
+            this.$wait(800).then(() => { this.$emit('closed') });
         },
     },
 

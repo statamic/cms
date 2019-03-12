@@ -26,7 +26,11 @@
             @saved="saved"
         >
             <template slot="action-buttons-right">
-                <button class="btn ml-1" v-text="__('Cancel')" @click="confirmClose" />
+                <button
+                    type="button"
+                    class="ml-2 p-1 text-xl text-grey-60"
+                    @click="confirmClose"
+                    v-html="'&times'" />
             </template>
         </entry-publish-form>
 

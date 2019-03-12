@@ -13,9 +13,7 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 import AssetsFolderFieldtype from '../components/fieldtypes/AssetsFolderFieldtype.vue'
 import AssetContainerFieldtype from '../components/fieldtypes/AssetContainerFieldtype.vue'
 import CollectionFieldtype from '../components/fieldtypes/CollectionFieldtype.vue'
-import CollectionsFieldtype from '../components/fieldtypes/CollectionsFieldtype.vue'
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
-import FormFieldtype from '../components/fieldtypes/FormFieldtype.vue'
 import LocaleSettingsFieldtype from '../components/fieldtypes/LocaleSettingsFieldtype.vue'
 import PagesFieldtype from '../components/fieldtypes/PagesFieldtype.vue'
 import RedactorSettingsFieldtype from '../components/fieldtypes/redactor/RedactorSettingsFieldtype.vue'
@@ -39,10 +37,8 @@ Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardField
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue'));
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue'));
 Vue.component('collection-fieldtype', CollectionFieldtype);
-Vue.component('collections-fieldtype', CollectionsFieldtype);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue'));
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
-Vue.component('form-fieldtype', FormFieldtype);
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue'));
 Vue.component('hidden-fieldtype', require('../components/fieldtypes/HiddenFieldtype.vue'));
 Vue.component('integer-fieldtype', require('../components/fieldtypes/IntegerFieldtype.vue'));

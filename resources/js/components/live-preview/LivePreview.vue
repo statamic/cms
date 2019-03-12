@@ -15,7 +15,7 @@
                         <div class="text-lg font-medium mr-2">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
-                            <div class="select-input-container w-32 mr-1">
+                            <div class="select-input-container w-32">
                                 <select class="select-input" v-model="previewDevice">
                                     <option :value="device" :key="device" v-text="device" :selected="previewDevice === device" v-for="device in previewDevices"></option>
                                 </select>
@@ -23,7 +23,12 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                                 </div>
                             </div>
-                            <button class="btn" @click="close">{{ __('Close') }}</button>
+
+                            <button
+                                type="button"
+                                class="ml-2 p-1 text-xl text-grey-60"
+                                @click="close"
+                                v-html="'&times'" />
                         </div>
                     </div>
                 </transition>
