@@ -44,6 +44,7 @@
 
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
+                    slot-scope="{ close }"
                     :url="selectionsUrl"
                     :site="site"
                     initial-sort-column="title"
@@ -54,7 +55,7 @@
                     :search="search"
                     :can-create="canCreate"
                     @selected="selectionsUpdated"
-                    @closed="isSelecting = false"
+                    @closed="close"
                 />
             </stack>
 

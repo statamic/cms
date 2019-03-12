@@ -22,7 +22,12 @@
         z-index: 99;
         opacity: 0.2;
         pointer-events: none;
-        transition: left .3s ease;
+        transition: all .3s ease;
+    }
+
+    .stack-overlay-fade-enter,
+    .stack-overlay-fade-leave-to {
+        opacity: 0;
     }
 
     .stack-hit-area {
@@ -57,17 +62,4 @@
 .stack-slide-leave-to {
     transform: translateX(10px);
     opacity: 0;
-}
-
-.stack-overlay-enter-active {
-  animation: overlay-fade-in .5s;
-}
-
-.stack-overlay-leave-active {
-  animation: overlay-fade-in .5s reverse;
-}
-
-@keyframes overlay-fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 0.2; }
 }
