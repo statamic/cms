@@ -23,12 +23,13 @@
         opacity: 0.2;
         pointer-events: none;
         transition: all .3s ease;
+
+        &.stack-overlay-fade-enter,
+        &.stack-overlay-fade-leave-to {
+            opacity: 0;
+        }
     }
 
-    .stack-overlay-fade-enter,
-    .stack-overlay-fade-leave-to {
-        opacity: 0;
-    }
 
     .stack-hit-area {
         @apply absolute pin cursor-pointer;
@@ -39,27 +40,16 @@
         @apply h-full relative shadow-lg;
         z-index: 101;
         transition: all 0.2s ease;
+
+        &.stack-slide-enter,
+        &.stack-slide-leave-to {
+            transform: translateX(10px);
+            opacity: 0;
+        }
     }
+
 
     .hovering .stack-content {
         transform: translateX(-16px);
     }
-}
-
-
-/* Transitions
-  ========================================================================== */
-
-.stack-slide-enter-active {
-    transition: all .3s ease;
-}
-
-.stack-slide-leave-active {
-    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-
-.stack-slide-enter,
-.stack-slide-leave-to {
-    transform: translateX(10px);
-    opacity: 0;
 }

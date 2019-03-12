@@ -111,7 +111,7 @@ export default {
 
         close() {
             this.visible = false;
-            this.$wait(800).then(() => { this.$emit('closed') });
+            this.$wait(300).then(() => { this.$emit('closed') });
         },
     },
 
