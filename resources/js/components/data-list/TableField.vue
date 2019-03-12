@@ -1,5 +1,5 @@
 <template>
-    <div><component :is="component" :value="value" /></div>
+    <div><component :is="component" :value="value" :values="values" /></div>
 </template>
 
 <script>
@@ -11,6 +11,7 @@ export default {
 
     props: {
         value: { required: true },
+        values: { required: true },
         fieldtype: String
     },
 

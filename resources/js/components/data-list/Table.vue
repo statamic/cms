@@ -34,12 +34,13 @@
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
+                        :values="row"
                         :row="row"
                         :index="actualIndex(row)"
                         :display-index="index"
                         :checkbox-id="`checkbox-${row.id}`"
                     >
-                        <table-field :value="row[column.value || column.field]" :fieldtype="column.fieldtype" />
+                        <table-field :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" />
                     </slot>
                 </td>
                 <td class="text-right">

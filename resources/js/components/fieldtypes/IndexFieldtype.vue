@@ -2,7 +2,8 @@
 export default {
 
     props: {
-        value: { required: true }
+        value: { required: true },
+        values: { required: true },
     }
 
 }
