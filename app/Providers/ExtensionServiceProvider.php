@@ -105,6 +105,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Template::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
+        Fieldtypes\Users::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
     ];
