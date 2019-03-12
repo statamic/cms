@@ -9,7 +9,7 @@ import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.csrfToken;
+axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.config.csrfToken;
 
 Vue.prototype.axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
@@ -24,6 +24,15 @@ Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(Vuex);
+
+Statamic.$store = new Vuex.Store({
+    modules: {
+        statamic: StatamicStore,
+        publish: {
+            namespaced: true
+        }
+    }
+});
 
 // Vue.http.interceptors.push({
 //     response: function (response) {
@@ -42,19 +51,12 @@ require('./components/ProgressBar');
 require('./components/DirtyState');
 require('./components/Preference');
 
-var vm = new Vue({
+Statamic.start({
     el: '#statamic',
 
     mixins: [Notifications],
 
-    store: new Vuex.Store({
-        modules: {
-            statamic: StatamicStore,
-            publish: {
-                namespaced: true
-            }
-        }
-    }),
+    store: Statamic.$store,
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue'),
@@ -89,7 +91,7 @@ var vm = new Vue({
     },
 
     data: {
-        version: Statamic.version,
+        version: Statamic.config.version,
         showLoginModal: false,
         navOpen: true,
         modals: [],

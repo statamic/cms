@@ -2,18 +2,18 @@ import marked from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 
 global.cp_url = function(url) {
-    url = Statamic.cpRoot + '/' + url;
+    url = Statamic.config.cpRoot + '/' + url;
     return url.replace(/\/+/g, '/');
 };
 
 global.resource_url = function(url) {
-    url = Statamic.resourceUrl + '/' + url;
+    url = Statamic.config.resourceUrl + '/' + url;
     return url.replace(/\/+/g, '/');
 };
 
 // Get url segments from the nth segment
 global.get_from_segment = function(count) {
-    return Statamic.urlPath.split('/').splice(count).join('/');
+    return Statamic.config.urlPath.split('/').splice(count).join('/');
 };
 
 global.format_input_options = function(options) {
@@ -67,7 +67,7 @@ global.tailwind_width_class = function (width) {
 global.markdown = function (value) {
     marked.setOptions({
         gfm: true,
-        breaks: Statamic.markdownHardWrap,
+        breaks: Statamic.config.markdownHardWrap,
         tables: true
     });
     return marked(value);
