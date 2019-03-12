@@ -169,15 +169,7 @@ td .btn-icon {
     }
 }
 
-.btn i.icon {
-    color: #d0d4d7;
-}
-.btn:hover i.icon {
-    color: darken(#d0d4d7, 10%);
-}
-
-
-/* Button Groups
+/* Button with Dropdown
   ========================================================================== */
 
 .btn-dropdown {
@@ -187,6 +179,18 @@ td .btn-icon {
 .btn-dropdown-primary {
     @extend .btn-primary;
     @apply flex items-center p-0;
+
+    &:hover .trigger {
+        @apply border-blue-darker;
+    }
+
+    &:active, &:focus:active {
+        bottom: 0;
+    }
+
+    &:focus-within {
+        @apply focus-outline;
+    }
 
     .cta {
         height: 100%;
@@ -198,16 +202,9 @@ td .btn-icon {
         padding: 0 12px;
     }
 
-    &:hover .trigger {
-        @apply border-blue-darker;
-    }
-
-    button:focus {
+    button:focus, button:active, button:focus:active {
         @apply outline-none;
-    }
-
-    &:focus-within {
-        @apply focus-outline;
+        box-shadow: inset 1px 3px 5px rgba(0, 0, 0, .15);
     }
 
     button:hover {
@@ -218,83 +215,6 @@ td .btn-icon {
         height: 100%;
     }
 }
-
-// .btn-group {
-//     @apply shadow-button;
-//     @apply select-none border-0 rounded inline-block text-xs relative align-middle text-center whitespace-no-wrap;
-//     cursor: pointer;
-//     white-space: nowrap;
-//
-//     .btn, .select {
-//         box-shadow: none;
-//         border-left: 1px solid transparent;
-//         border-right: 1px solid transparent;
-//         display: flex;
-//         align-items: center;
-//
-//         &:hover, &.depressed {
-//             background: rgba(0,0,0,.02);
-//             box-shadow: inset 0 0 2px rgba(0,0,0,.06);
-//             z-index: 2;
-//         }
-//     }
-//
-//     .btn:first-child:active { border-left: 1px solid transparent; }
-//     .btn:last-child:active { border-right: 1px solid transparent; }
-//
-//     .btn:not(:first-child), {
-//         border-left: 1px solid rgba(0,0,0,.06);
-//     }
-//
-//     .btn:not(:last-of-type) {
-//         border-right: 1px solid rgba(0,0,0,.06);
-//     }
-//
-//     .btn.btn-primary:hover {
-//         background: mix(black, $brand-primary, 5%);
-//     }
-//
-//     .btn.btn-danger:hover,
-//     .btn.btn-danger.depressed {
-//         background-color: #ac2925;
-//     }
-//
-//     > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-//         border-radius: 3px 0 0 3px;
-//     }
-//
-//     > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
-//         border-radius: 0 3px 3px 0;
-//     }
-// }
-//
-// .btn-group.open .dropdown-toggle.btn-more {
-//     box-shadow: none;
-//     transform: rotate(90deg);
-// }
-//
-// .btn-group.open .dropdown-toggle {
-//     box-shadow: inset 0 0 2px rgba(0,0,0,.06);
-// }
-//
-// .btn-group.action-more {
-//     background: transparent;
-//     box-shadow: none;
-// }
-//
-// .btn-group.btn-group-primary {
-//     background-color: $brand-primary;
-//     box-shadow:
-//         0 2px 5px 0 rgba($brand-primary,.05),
-//         0 1px 2px 0 rgba(0,0,0,.07),
-//         0 1px 3px 0 rgba(0,0,0,.08);
-//     border-bottom: 1px solid #2090d5;
-//
-//     .btn.btn-primary {
-//         border-top: none;
-//         border-bottom: none;
-//     }
-// }
 
 
 /* Specialty Buttons
