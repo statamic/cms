@@ -31,7 +31,7 @@
 
         computed: {
             toEleven() {
-                return {timeout: window.Statamic.ajaxTimeout};
+                return {timeout: window.Statamic.config.ajaxTimeout};
             },
 
             package() {

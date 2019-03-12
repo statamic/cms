@@ -9,7 +9,7 @@ import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.csrfToken;
+axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.config.csrfToken;
 
 Vue.prototype.axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
@@ -89,7 +89,7 @@ var vm = new Vue({
     },
 
     data: {
-        version: Statamic.version,
+        version: Statamic.config.version,
         showLoginModal: false,
         navOpen: true,
         modals: [],

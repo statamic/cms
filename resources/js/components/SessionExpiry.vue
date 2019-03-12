@@ -153,7 +153,7 @@ export default {
             return axios.get(cp_url('auth/token')).then(response => {
                 const csrf = response.data;
                 axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
-                Statamic.csrfToken = csrf;
+                Statamic.config.csrfToken = csrf;
             });
         },
 

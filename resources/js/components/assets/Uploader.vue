@@ -45,7 +45,7 @@ export default {
             return {
                 container: this.container,
                 folder: this.path,
-                _token: Statamic.csrfToken
+                _token: Statamic.config.csrfToken
             };
         }
 

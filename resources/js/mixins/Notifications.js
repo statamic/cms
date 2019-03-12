@@ -6,7 +6,7 @@ export default {
 
     data: {
         toast: null,
-        flash: Statamic.flash,
+        flash: Statamic.config.flash,
     },
 
     created() {

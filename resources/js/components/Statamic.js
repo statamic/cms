@@ -2,8 +2,11 @@ import Vue from 'vue';
 
 export default new Vue({
     data() {
+        // State is initially set in scripts.blade.php.
         return {
-            config: {} // Set in scripts.blade.php.
+            config: {},
+            flash: [],
+            translations: {}
         }
     },
 
