@@ -51,7 +51,7 @@ require('./components/ProgressBar');
 require('./components/DirtyState');
 require('./components/Preference');
 
-var vm = new Vue({
+Statamic.$start({
     el: '#statamic',
 
     mixins: [Notifications],
