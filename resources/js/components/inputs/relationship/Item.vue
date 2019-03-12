@@ -28,7 +28,7 @@
 
         <dropdown-list class="pr-1">
             <ul class="dropdown-menu">
-                <li><a @click.prevent="edit" v-text="__('Edit')"></a></li>
+                <li v-if="editable"><a @click.prevent="edit" v-text="__('Edit')"></a></li>
                 <li class="warning"><a @click.prevent="$emit('removed')" v-text="__('Unlink')"></a></li>
             </ul>
         </dropdown-list>
