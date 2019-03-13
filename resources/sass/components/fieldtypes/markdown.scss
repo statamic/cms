@@ -66,7 +66,7 @@
     }
 
     .helpers {
-        @apply border-t text-xs text-grey;
+        @apply border-t text-xs text-grey flex items-center;
     }
 
     .markdown-cheatsheet-helper {
@@ -77,16 +77,11 @@
             position: relative;
             bottom: -2px;
             margin-right: 3px;
-            opacity: 0.65;
         }
     }
 
     .markdown-asset-helper {
         @apply py-1 px-2 inline-block;
-
-        .icon {
-            @apply mr-sm;
-        }
     }
 }
 
