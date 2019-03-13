@@ -26,7 +26,7 @@ export default new Vue({
         },
 
         app(app) {
-            this.app = app;
+            this.$app = app;
         },
 
         config(config) {
@@ -37,7 +37,7 @@ export default new Vue({
             this.bootingCallbacks.forEach(callback => callback(this));
             this.bootingCallbacks = [];
 
-            this.app = new Vue(this.app);
+            this.$app = new Vue(this.$app);
 
             this.bootedCallbacks.forEach(callback => callback(this));
             this.bootedCallbacks = [];
