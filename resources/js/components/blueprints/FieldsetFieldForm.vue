@@ -122,7 +122,7 @@ export default {
 
             axios.post(url, this.field).then(response => {
                 const reference = `${this.fieldset}/${this.field.handle}`;
-                window.Statamic.fieldsetFields[reference] = response.data;
+                window.Statamic.$config.get('fieldsetFields')[reference] = response.data;
                 this.$emit('created', reference);
                 this.$notify.success('Field created');
             });

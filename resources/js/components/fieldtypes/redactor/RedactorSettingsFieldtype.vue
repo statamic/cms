@@ -13,7 +13,7 @@ export default {
         selectConfig: function () {
             var options = [{ value: null, text: '' }];
 
-            _.each(Statamic.redactorSettings, function (config, key) {
+            _.each(Statamic.$config.get('redactorSettings'), function (config, key) {
                 options.push({
                     value: key,
                     text: key

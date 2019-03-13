@@ -26,11 +26,11 @@ export default {
     computed: {
 
         sites() {
-            return Statamic.sites;
+            return Statamic.$config.get('sites');
         },
 
         active() {
-            return Statamic.selectedSite;
+            return Statamic.$config.get('selectedSite');
         },
 
         activeName() {

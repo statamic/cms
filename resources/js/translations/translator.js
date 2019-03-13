@@ -36,7 +36,7 @@ export const translateChoice = function (key, count, replacements) {
     // Get the full translation. It will include all the piped plural versions, but with all replacements done.
     let message = translate(key, replacements);
 
-    return selectPluralMessage(message, count, Statamic.translationLocale);
+    return selectPluralMessage(message, count, Statamic.$config.get('translationLocale'));
 };
 
 /**
@@ -44,7 +44,7 @@ export const translateChoice = function (key, count, replacements) {
  * @param {String} key
  */
 const getLine = function (key) {
-    const translations = Statamic.translations;
+    const translations = Statamic.$config.get('translations');
 
     return translations[`*.${key}`]
         || translations[key]

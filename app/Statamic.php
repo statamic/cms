@@ -127,9 +127,9 @@ class Statamic
             'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
             'conditions' => [],
             'MediumEditorExtensions' => [],
-            'flash' => [],
+            'flash' => static::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-            'preferences' => Preference::all(),
+            'preferences' => Preference::all(), // TODO: Move to CpServiceProvider
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);
@@ -161,5 +161,14 @@ class Statamic
     public static function url($url = '/')
     {
         return URL::tidy(Site::default()->url() . '/' . $url);
+    }
+
+    public static function flash()
+    {
+        if ($success = session('success')) {
+            $messages[] = ['type' => 'success', 'message' => $success];
+        }
+
+        return $messages ?? [];
     }
 }

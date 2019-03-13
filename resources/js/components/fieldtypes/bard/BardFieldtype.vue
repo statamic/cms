@@ -531,12 +531,12 @@ export default {
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map(button => {
-                return _.findWhere(availableButtons, { name: button.toLowerCase() })
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() })
                     || button;
             });
 
             // Let addons add, remove, or control the position of buttons.
-            Statamic.bard.buttons.forEach(callback => callback.call(null, buttons));
+            Statamic.$config.get('bard').buttons.forEach(callback => callback.call(null, buttons));
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
             buttons = buttons.filter(button => typeof button != 'string');

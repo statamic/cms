@@ -59,7 +59,6 @@
 
             </installer>
         </div>
-        <script>Statamic.translations = {!! $translations !!};</script>
         @include('statamic::partials.scripts')
         @yield('scripts')
     </body>

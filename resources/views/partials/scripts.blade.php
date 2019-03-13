@@ -7,14 +7,9 @@
 @endforeach
 
 <script>
-    Statamic.config = @json(Statamic::jsonVariables(request()));
-
-    @if(session()->has('success'))
-        Statamic.flash = [{
-            type:    'success',
-            message: '{{ session()->get('success') }}',
-        }];
-    @endif
+    Statamic.booting(function (Statamic) {
+        Statamic.$store.commit('statamic/config', @json(Statamic::jsonVariables(request())));
+    });
 </script>
 
 <script src="{{ Statamic::assetUrl('js/app.js') }}?v={{ Statamic::version() }}"></script>

@@ -2,29 +2,20 @@ import Vue from 'vue';
 
 export default new Vue({
     data() {
-        // State is initially set in scripts.blade.php.
         return {
             bootingCallbacks: [],
-            config: {},
-            flash: [],
-            translations: {}
+            conditions: {}, // TODO: Move to $conditions API
         }
     },
 
     computed: {
         $request() {
-            // TODO: Any custom axios options we want to default to here?
+            // TODO: Any custom error handling, etc.?
             return this.axios;
         },
     },
 
     methods: {
-        $config(key=null, defaultValue=null) {
-            return key
-                ? data_get(this.config, key, defaultValue)
-                : this.config;
-        },
-
         booting(callback) {
             this.bootingCallbacks.push(callback);
         },

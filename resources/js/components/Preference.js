@@ -7,7 +7,7 @@ class Preference {
     }
 
     all() {
-        return this.instance.$store.state.statamic.preferences;
+        return this.instance.$store.state.statamic.config.preferences;
     }
 
     get(key, fallback) {

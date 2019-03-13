@@ -8,17 +8,17 @@ import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.config.csrfToken;
+Statamic.booting(Statamic => {
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
+});
 
-Vue.prototype.axios = axios;
+Vue.prototype.axios = axios; // TODO: $axios
 Vue.prototype.$mousetrap = require('mousetrap');
 require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();
 
 Vue.moment = require('moment');
-
-Vue.config.productionTip = false
 
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
@@ -49,6 +49,7 @@ require('./components/ModalBus');
 require('./components/stacks/Stacks');
 require('./components/ProgressBar');
 require('./components/DirtyState');
+require('./components/Config');
 require('./components/Preference');
 
 Statamic.start({
@@ -91,7 +92,6 @@ Statamic.start({
     },
 
     data: {
-        version: Statamic.config.version,
         showLoginModal: false,
         navOpen: true,
         modals: [],
@@ -99,6 +99,10 @@ Statamic.start({
     },
 
     computed: {
+
+        version() {
+            return Statamic.$config.get('version');
+        },
 
         computedNavOpen() {
             if (this.stackCount > 0) return false;

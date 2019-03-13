@@ -1,4 +1,4 @@
-const availableButtons = [
+const availableButtons = () => [
     { name: 'h1', text: __('cp.heading_1'), command: 'h1', html: '<i class="fa fa-header"><sup>1</sup></i>' },
     { name: 'h2', text: __('cp.heading_2'), command: 'h2', html: '<i class="fa fa-header"><sup>2</sup></i>' },
     { name: 'h3', text: __('cp.heading_3'), command: 'h3', html: '<i class="fa fa-header"><sup>3</sup></i>' },
@@ -19,7 +19,6 @@ const availableButtons = [
     { name: 'assets', text: __('cp.link_to_asset'), command: 'insertAsset', icon: 'picture-o', condition: (config) => config.container },
     { name: 'code', text: __('cp.code'), command: 'code', icon: 'code' },
 ];
-
 
 const addButtonHtml = (buttons) => {
     return buttons.map(button => {

@@ -3,6 +3,7 @@ import Vue from 'vue';
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
+Vue.config.productionTip = false
 
 window.Statamic = Statamic;
 window.Vue = Vue;

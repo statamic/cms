@@ -157,7 +157,7 @@ export default {
         // Get the appropriate configuration. If the one they've requested
         // doesnt exist, we'll use the first one defined.
         // TODO: Get it from whatever we decide the new pattern is.
-        // if (_.has(Statamic.redactorSettings, this.config.settings)) {
+        // if (_.has(Statamic.$config.get('redactorSettings'), this.config.settings)) {
         //     var config = Statamic.redactorSettings[this.config.settings];
         // } else {
         //     var config = Statamic.redactorSettings[_.first(_.keys(Statamic.redactorSettings))];

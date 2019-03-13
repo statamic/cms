@@ -1,8 +1,6 @@
-if (Statamic.permissions) {
-    var permissions = JSON.parse(atob(Statamic.permissions));
-}
-
 var can = function(permission) {
+    var permissions = JSON.parse(atob(Statamic.$config.get('permissions')));
+
     if (_.contains(permissions, 'super')) {
         return true;
     }

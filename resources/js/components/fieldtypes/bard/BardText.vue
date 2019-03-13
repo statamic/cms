@@ -255,7 +255,7 @@
                 this.editor.use(ScribePluginSmartLists());
                 this.editor.use(ScribePluginAutoHr());
                 this.editor.use(ScribePluginAutoBlockquote());
-                this.editor.use(ScribeSanitizer(Statamic.bard.sanitizer || {
+                this.editor.use(ScribeSanitizer(Statamic.$config.get('bard').sanitizer || {
                     tags: {
                         p: {},
                         br: {},
@@ -300,7 +300,7 @@
                     this.editor.use(ScribePluginFormatterHtmlEnsureSemanticElements());
                 }
 
-                Statamic.bard.plugins.forEach(plugin => this.editor.use(plugin.call()));
+                Statamic.$config.get('bard').plugins.forEach(plugin => this.editor.use(plugin.call()));
 
                 this.editor.on('content-changed', () => {
                     this.text = this.editor.getHTML();

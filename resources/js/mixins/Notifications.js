@@ -6,10 +6,12 @@ export default {
 
     data: {
         toast: null,
-        flash: Statamic.config.flash,
+        flash: null,
     },
 
     created() {
+        this.flash = Statamic.$config.get('flash');
+
         this.$events.$on('notify.success', this.setFlashSuccess);
         this.$events.$on('notify.error', this.setFlashError);
     },

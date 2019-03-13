@@ -122,7 +122,7 @@ export default {
         },
 
         canBeLocalized: function() {
-            return this.root && Object.keys(Statamic.locales).length > 1 && this.fieldtype.canBeLocalized;
+            return this.root && Object.keys(Statamic.$config.get('locales')).length > 1 && this.fieldtype.canBeLocalized;
         },
 
         canBeValidated: function() {

@@ -65,7 +65,7 @@ export default {
             fieldReference: null,
             selectingFieldtype: false,
             creatingFieldsetField: false,
-            suggestions: Object.values(window.Statamic.fieldsetFields).map(field => {
+            suggestions: Object.values(window.Statamic.$config.get('fieldsetFields')).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
                     text: field.display,
@@ -90,7 +90,7 @@ export default {
 
             this.fieldReference = reference;
 
-            const field = JSON.parse(JSON.stringify(window.Statamic.fieldsetFields[reference]));
+            const field = JSON.parse(JSON.stringify(window.Statamic.$config.get('fieldsetFields')[reference]));
 
             this.$emit('added', {
                 _id: uniqid(),

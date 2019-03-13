@@ -107,7 +107,7 @@
 
         computed: {
             toEleven() {
-                return {timeout: window.Statamic.config.ajaxTimeout};
+                return {timeout: Statamic.$config.get('ajaxTimeout')};
             },
 
             composer() {
