@@ -51,7 +51,7 @@
                                 <data-list-search v-model="searchQuery" />
 
                                 <button
-                                    class="btn btn-icon-only ml-2 dropdown-toggle relative"
+                                    class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative"
                                     @click="creatingFolder = true"
                                 >
                                     <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
@@ -59,7 +59,7 @@
                                 </button>
 
                                 <button
-                                    class="btn btn-icon-only ml-2 dropdown-toggle relative"
+                                    class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative"
                                     @click="openFileBrowser"
                                 >
                                     <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
