@@ -15,7 +15,7 @@ class Assets extends Fieldtype
 
     protected $configFields = [
         'container' => ['type' => 'asset_container', 'max_items' => 1],
-        'folder' => ['type' => 'asset_folder'],
+        'folder' => ['type' => 'asset_folder', 'max_items' => 1],
         'restrict' => ['type' => 'toggle'],
         'max_files' => ['type' => 'integer'],
         'mode' => [
