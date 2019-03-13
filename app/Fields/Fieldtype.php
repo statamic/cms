@@ -116,7 +116,7 @@ abstract class Fieldtype implements Arrayable
             return compact('handle', 'field');
         });
 
-        return new Fields($fields);
+        return new ConfigFields($fields);
     }
 
     protected function configFieldItems(): array
@@ -137,6 +137,11 @@ abstract class Fieldtype implements Arrayable
     public function preProcess($data)
     {
         return $data;
+    }
+
+    public function preProcessConfig($data)
+    {
+        return $this->preProcess($data);
     }
 
     public function preProcessIndex($data)

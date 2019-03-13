@@ -30,6 +30,13 @@ class Relationship extends Fieldtype
         return Arr::wrap($data);
     }
 
+    public function preProcessConfig($data)
+    {
+        $data = $this->preProcess($data);
+
+        return $this->config('max_items') === 1 ? Arr::first($data) : $data;
+    }
+
     public function preProcessIndex($data)
     {
         return $this->augment($data)->map(function ($item) use ($data) {
