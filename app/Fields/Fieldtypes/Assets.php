@@ -14,7 +14,7 @@ class Assets extends Fieldtype
     protected $categories = ['media', 'relationship'];
 
     protected $configFields = [
-        'container' => ['type' => 'asset_container'],
+        'container' => ['type' => 'asset_container', 'max_items' => 1],
         'folder' => ['type' => 'asset_folder'],
         'restrict' => ['type' => 'toggle'],
         'max_files' => ['type' => 'integer'],

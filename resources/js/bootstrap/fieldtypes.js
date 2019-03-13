@@ -11,7 +11,6 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 
 // Fieldtypes
 import AssetsFolderFieldtype from '../components/fieldtypes/AssetsFolderFieldtype.vue'
-import AssetContainerFieldtype from '../components/fieldtypes/AssetContainerFieldtype.vue'
 import CollectionFieldtype from '../components/fieldtypes/CollectionFieldtype.vue'
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import LocaleSettingsFieldtype from '../components/fieldtypes/LocaleSettingsFieldtype.vue'
@@ -28,7 +27,6 @@ import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
 Vue.component('array-fieldtype', require('../components/fieldtypes/ArrayFieldtype.vue'));
 Vue.component('assets-fieldtype', require('../components/fieldtypes/assets/AssetsFieldtype.vue'));
 Vue.component('assets-fieldtype-index', require('../components/fieldtypes/assets/AssetsIndexFieldtype.vue'));
-Vue.component('asset_container-fieldtype', AssetContainerFieldtype);
 Vue.component('asset_folder-fieldtype', AssetsFolderFieldtype);
 Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardFieldtype.vue'));
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue'));
