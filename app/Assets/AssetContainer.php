@@ -107,6 +107,11 @@ class AssetContainer implements AssetContainerContract
         return cp_route('asset-containers.destroy', $this->id());
     }
 
+    public function showUrl()
+    {
+        return cp_route('assets.browse.show', $this->handle());
+    }
+
     /**
      * Get or set the blueprint to be used by assets in this container
      *
