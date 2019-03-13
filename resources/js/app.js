@@ -1,5 +1,30 @@
 import Vue from 'vue';
 import Notifications from './mixins/Notifications.js';
+import Statamic from './components/Statamic.js';
+
+Vue.config.silent = false;
+Vue.config.devtools = true;
+Vue.config.productionTip = false
+
+window.Vue = Vue;
+window.Statamic = Statamic;
+window._ = require('underscore');
+window.$ = window.jQuery = require('jquery');
+window.rangy = require('rangy');
+window.EQCSS = require('eqcss');
+
+require('./bootstrap/globals');
+require('./bootstrap/polyfills');
+require('./bootstrap/underscore-mixins');
+require('./bootstrap/jquery-plugins');
+require('./bootstrap/redactor-plugins');
+require('./bootstrap/plugins');
+require('./bootstrap/filters');
+require('./bootstrap/mixins');
+require('./bootstrap/components');
+require('./bootstrap/fieldtypes');
+require('./bootstrap/directives');
+
 // import Wizard from './mixins/Wizard.js';
 import axios from 'axios';
 import PortalVue from "portal-vue";
@@ -52,7 +77,7 @@ require('./components/DirtyState');
 require('./components/Config');
 require('./components/Preference');
 
-Statamic.start({
+Statamic.app({
     el: '#statamic',
 
     mixins: [Notifications],

@@ -12,7 +12,6 @@ mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     ],
 });
 
-mix.js(`${src}/js/bootstrap.js`, `${dest}/js`);
 mix.js(`${src}/js/app.js`, `${dest}/js`);
 mix.extract([
     'autosize',

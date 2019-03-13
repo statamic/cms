@@ -20,11 +20,20 @@ export default new Vue({
             this.bootingCallbacks.push(callback);
         },
 
-        start(app) {
+        app(app) {
+            this.app = app;
+        },
+
+        config(config) {
+            this.$store.commit('statamic/config', config);
+        },
+
+        start() {
             this.bootingCallbacks.forEach(callback => callback(this));
             this.bootingCallbacks = [];
 
-            new Vue(app);
+            new Vue(this.app);
+            this.app = null;
         }
     }
 });
