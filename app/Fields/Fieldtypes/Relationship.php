@@ -8,7 +8,6 @@ use Statamic\CP\Column;
 use Statamic\API\Content;
 use Illuminate\Support\Arr;
 use Statamic\Fields\Fieldtype;
-use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
 
 class Relationship extends Fieldtype
 {
@@ -127,12 +126,12 @@ class Relationship extends Fieldtype
 
     protected function getItemDataUrl()
     {
-        return action([RelationshipFieldtypeController::class, 'data']);
+        return cp_route('relationship.data');
     }
 
     protected function getBaseSelectionsUrl()
     {
-        return action([RelationshipFieldtypeController::class, 'index']);
+        return cp_route('relationship.index');
     }
 
     protected function getBaseSelectionsUrlParameters()
