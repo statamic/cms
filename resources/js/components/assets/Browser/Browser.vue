@@ -17,7 +17,7 @@
             <div slot-scope="{ dragging }" class="relative" :class="{ 'shadow': showContainerTabs }">
                 <div class="drag-notification" v-show="dragging">
                     <i class="icon icon-download" />
-                    Drop to upload.
+                    {{ __('Drop to upload.') }}
                 </div>
 
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
@@ -51,18 +51,18 @@
                                 <data-list-search v-model="searchQuery" />
 
                                 <button
-                                    class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
+                                    class="btn btn-icon-only ml-2 dropdown-toggle relative"
                                     @click="creatingFolder = true"
                                 >
-                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current" />
+                                    <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                     <span>{{ __('Create Folder') }}</span>
                                 </button>
 
                                 <button
-                                    class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
+                                    class="btn btn-icon-only ml-2 dropdown-toggle relative"
                                     @click="openFileBrowser"
                                 >
-                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current" />
+                                    <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
                                     <span>{{ __('Upload') }}</span>
                                 </button>
                             </div>
@@ -97,7 +97,7 @@
                                         <td class="text-right" :colspan="columns.length">
                                             <dropdown-list>
                                                 <ul class="dropdown-menu">
-                                                    <li><a @click="editedFolderPath = folder.path">Edit</a></li>
+                                                    <li><a @click="editedFolderPath = folder.path" v-text="__('Edit')"></a></li>
                                                 </ul>
                                             </dropdown-list>
 
