@@ -1,6 +1,10 @@
 <template>
     <dropdown-list ref="dropdown">
-        <button v-text="__('Columns')" class="btn btn-icon-only ml-2 dropdown-toggle" slot="trigger" />
+        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle" slot="trigger">
+            <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
+            <span>{{ __('Columns') }}</span>
+        </button>
+
         <div class="dropdown-menu">
             <h6 class="text-center">{{ __('Customize Columns') }}</h6>
             <div class="li divider"></div>

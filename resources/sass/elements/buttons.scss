@@ -42,9 +42,9 @@ button, .btn, .btn-* {
 
 .btn-flat {
     @include button(white, black);
-    @apply shadow-none text-grey-80 bg-grey-20;
+    @apply shadow-none text-grey-80 bg-grey-30;
     &:hover {
-        @apply bg-grey-30;
+        @apply bg-grey-40;
         box-shadow: none !important;
     }
 }

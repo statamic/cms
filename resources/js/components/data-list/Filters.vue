@@ -1,6 +1,7 @@
 <template>
     <dropdown-list>
-        <button class="btn btn-icon-only ml-2 dropdown-toggle relative" slot="trigger">
+        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" slot="trigger">
+            <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1" v-text="activeFilterCount" />
         </button>
