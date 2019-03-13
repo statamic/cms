@@ -61,8 +61,8 @@
     .CodeMirror-code { min-height: 100px; }
 
     .CodeMirror-lines {
+        @apply border-r border-grey-30;
         max-width: 860px;
-        margin: 0 auto;
     }
 
     .helpers {
@@ -144,15 +144,11 @@
     height: 100vh;
 
     .CodeMirror {
+        @apply border-r border-grey-20;
         box-shadow: none !important;
         background: #fff;
         padding: 64px 32px;
         max-width: 860px;
-        margin: 0 auto;
-    }
-
-    .CodeMirror-lines {
-        border-right: none !important;
     }
 }
 
