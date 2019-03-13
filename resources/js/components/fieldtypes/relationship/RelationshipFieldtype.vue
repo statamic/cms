@@ -53,7 +53,10 @@ export default {
         },
 
         selectionsUrl() {
-            return this.baseSelectionsUrl + '?' + qs.stringify(this.selectionsUrlParameters);
+            return this.baseSelectionsUrl + '?' + qs.stringify({
+                config: this.configParameter,
+                ...this.meta.getBaseSelectionsUrlParameters,
+            });
         },
 
         baseSelectionsUrl() {
@@ -62,16 +65,6 @@ export default {
 
         configParameter() {
             return btoa(JSON.stringify(this.config));
-        },
-
-        selectionsUrlParameters() {
-            let params = { config: this.configParameter };
-
-            if (this.config.collections) {
-                params.collections = this.config.collections;
-            }
-
-            return params;
         },
 
         site() {

@@ -80,6 +80,7 @@ class Relationship extends Fieldtype
             'columns' => $this->getColumns(),
             'itemDataUrl' => $this->getItemDataUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
+            'getBaseSelectionsUrlParameters' => $this->getBaseSelectionsUrlParameters(),
             'itemComponent' => $this->getItemComponent(),
             'canEdit' => $this->canEdit(),
             'canCreate' => $this->canCreate(),
@@ -132,6 +133,13 @@ class Relationship extends Fieldtype
     protected function getBaseSelectionsUrl()
     {
         return action([RelationshipFieldtypeController::class, 'index']);
+    }
+
+    protected function getBaseSelectionsUrlParameters()
+    {
+        return [
+            'collections' => $this->config('collections'),
+        ];
     }
 
     public function getItemData($values, $site = null)
