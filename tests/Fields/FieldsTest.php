@@ -324,7 +324,8 @@ class FieldsTest extends TestCase
                 'display' => 'One',
                 'instructions' => 'One instructions',
                 'required' => true,
-                'validate' => 'required|min:2'
+                'validate' => 'required|min:2',
+                'component' => 'text',
             ],
             [
                 'handle' => 'two',
@@ -334,6 +335,7 @@ class FieldsTest extends TestCase
                 'required' => false,
                 'validate' => 'min:2',
                 'character_limit' => null,
+                'component' => 'textarea',
             ]
         ], $fields->toPublishArray());
     }
