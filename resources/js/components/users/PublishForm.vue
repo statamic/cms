@@ -11,6 +11,7 @@ export default {
     props: {
         initialFieldset: Object,
         initialValues: Object,
+        initialMeta: Object,
         action: String,
         method: String
     },
@@ -19,6 +20,7 @@ export default {
         return {
             fieldset: _.clone(this.initialFieldset),
             values: _.clone(this.initialValues),
+            meta: _.clone(this.initialMeta),
             error: null,
             errors: {}
         }

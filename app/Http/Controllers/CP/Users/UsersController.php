@@ -89,9 +89,12 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
+        $fields = $blueprint->fields()->preProcess();
+
         return view('statamic::users.create', [
             'blueprint' => $blueprint,
-            'values' => $blueprint->fields()->values()
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
         ]);
     }
 
@@ -128,20 +131,15 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $values = $user->blueprint()
+        $fields = $user->blueprint()
             ->fields()
-            ->addValues($user->data())
-            ->preProcess()
-            ->values();
-
-        $values['email'] = $user->email();
-        $values['roles'] = $user->roles()->map->id()->values()->all();
-        $values['groups'] = $user->groups()->map->id()->values()->all();
-        $values['status'] = $user->status();
+            ->addValues(array_merge($user->data(), ['email' => $user->email()]))
+            ->preProcess();
 
         return view('statamic::users.edit', [
             'user' => $user,
-            'values' => $values
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
         ]);
     }
 
