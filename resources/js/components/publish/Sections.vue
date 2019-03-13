@@ -82,7 +82,7 @@ export default {
 
             if (this.livePreview) return false;
 
-            if (this.sidebarSection.fields.length == 0 || this.containerWidth < 1000) return false;
+            if (this.sidebarSection.fields.length == 0 || this.containerWidth < 1010) return false;
 
             return true;
         },
