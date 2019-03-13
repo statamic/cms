@@ -32,8 +32,7 @@ export default new Vue({
             this.bootingCallbacks.forEach(callback => callback(this));
             this.bootingCallbacks = [];
 
-            new Vue(this.app);
-            this.app = null;
+            this.app = new Vue(this.app);
         }
     }
 });
