@@ -29,7 +29,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'arr', 'asset_container', 'asset_folder', 'checkboxes', 'collection',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'pages', 'partial', 'radio', 'redactor', 'redactor_settings',
-        'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
+        'theme', 'time', 'title', 'toggle', 'video', 'yaml',
         'revealer', 'section', 'slug', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
     ];
 
@@ -105,6 +105,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Template::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
+        Fieldtypes\UserGroups::class,
+        Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,

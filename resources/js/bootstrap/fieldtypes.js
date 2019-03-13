@@ -24,8 +24,6 @@ import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TaxonomyFieldtype from '../components/fieldtypes/TaxonomyFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
-import UserGroupsFieldtype from '../components/fieldtypes/UserGroupsFieldtype.vue'
-import UserRolesFieldtype from '../components/fieldtypes/UserRolesFieldtype.vue'
 
 Vue.component('array-fieldtype', require('../components/fieldtypes/ArrayFieldtype.vue'));
 Vue.component('assets-fieldtype', require('../components/fieldtypes/assets/AssetsFieldtype.vue'));
@@ -64,7 +62,5 @@ Vue.component('template-fieldtype', TemplateFieldtype);
 Vue.component('theme-fieldtype', ThemeFieldtype);
 Vue.component('time-fieldtype', require('../components/fieldtypes/TimeFieldtype.vue'));
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue'));
-Vue.component('user_groups-fieldtype', UserGroupsFieldtype);
-Vue.component('user_roles-fieldtype', UserRolesFieldtype);
 Vue.component('video-fieldtype', require('../components/fieldtypes/VideoFieldtype.vue'));
 Vue.component('yaml-fieldtype', require('../components/fieldtypes/YamlFieldtype.vue'));
