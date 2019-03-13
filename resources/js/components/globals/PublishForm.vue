@@ -64,7 +64,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bind(['command+s'], e => {
+        this.$mousetrap.bindGlobal(['command+s'], e => {
             e.preventDefault();
             this.save();
         });
