@@ -2,7 +2,7 @@
 
     <div>
         <popper ref="popper" trigger="click" :append-to-body="true" :options="{ placement: 'left-start' }">
-            <div class="popover w-96">
+            <div class="popover w-96"><div class="popover-inner p-2">
                 <div class="saving flex justify-center text-center" v-if="saving">
                     <loading-graphic :text="__('Saving')" />
                 </div>
@@ -30,7 +30,7 @@
                         {{ __('Reveal Password') }}
                     </label>
                 </div>
-            </div>
+            </div></div>
 
             <button
                 slot="reference"
