@@ -109,7 +109,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 var CodeMirror = require('codemirror');
 var marked = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
@@ -419,7 +418,7 @@ export default {
             // We don't want to maintain the asset selections
             this.selectedAssets = [];
 
-            axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
+            this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.alt || '';
                     var url = encodeURI(asset.url);

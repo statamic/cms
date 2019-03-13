@@ -42,8 +42,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 var counter;
 
 export default {
@@ -135,7 +133,7 @@ export default {
 
             this.pinging = true;
 
-            return axios.get(cp_url('session-timeout')).then(response => {
+            return this.$axios.get(cp_url('session-timeout')).then(response => {
                 this.count = this.remaining = response.data;
             }).catch(e => {
                 if (e.response.status === 401) this.remaining = 0;
@@ -150,9 +148,9 @@ export default {
         },
 
         updateCsrfToken() {
-            return axios.get(cp_url('auth/token')).then(response => {
+            return this.$axios.get(cp_url('auth/token')).then(response => {
                 const csrf = response.data;
-                axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
+                this.$axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
                 this.$config.set('csrfToken', csrf);
             });
         },
@@ -164,7 +162,7 @@ export default {
         },
 
         login() {
-            axios.post(cp_url('auth/login'), {
+            this.$axios.post(cp_url('auth/login'), {
                 email: this.email,
                 password: this.password
             }).then(response => {
@@ -185,7 +183,7 @@ export default {
         },
 
         extend() {
-            axios.get(cp_url('auth/extend')).then(response => {
+            this.$axios.get(cp_url('auth/extend')).then(response => {
                 this.remaining = this.lifetime;
             });
         }

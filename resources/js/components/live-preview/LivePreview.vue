@@ -63,7 +63,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Provider from './Provider.vue';
 import Resizer from './Resizer.vue';
 
@@ -145,12 +144,12 @@ export default {
 
         update: _.debounce(function () {
             if (source) source.cancel();
-            source = axios.CancelToken.source();
+            source = this.$axios.CancelToken.source();
 
-            axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
+            this.$axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
             }).catch(e => {
-                if (axios.isCancel(e)) return;
+                if (this.$axios.isCancel(e)) return;
                 throw e;
             });
         }, 150),

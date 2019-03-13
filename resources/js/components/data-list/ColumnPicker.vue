@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { SortableList } from '../sortable/Sortable';
 
 export default {
@@ -71,7 +70,7 @@ export default {
 
         save() {
             this.saving = true;
-            axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
+            this.$axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
                 this.saving = false;
                 this.$notify.success(__('Columns saved'), { timeout: 3000 });
                 this.$refs.dropdown.close();

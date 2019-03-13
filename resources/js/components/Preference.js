@@ -16,19 +16,19 @@ class Preference {
 
     set(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.post(this.storeUrl, {'key': key, 'value': value})
+            this.instance.$axios.post(this.storeUrl, {'key': key, 'value': value})
         );
     }
 
     append(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.post(this.storeUrl, {'key': key, 'value': value, append: true})
+            this.instance.$axios.post(this.storeUrl, {'key': key, 'value': value, append: true})
         );
     }
 
     remove(key, value=null) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.delete(`${this.storeUrl}/${key}`, {data: {'value': value}})
+            this.instance.$axios.delete(`${this.storeUrl}/${key}`, {data: {'value': value}})
         );
     }
 

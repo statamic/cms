@@ -30,7 +30,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import uniqid from 'uniqid';
 import Sections from './Sections.vue';
 
@@ -81,8 +80,8 @@ export default {
         },
 
         save() {
-            // axios[this.method](this.action, this.fieldset)
-            axios['patch'](this.action, this.blueprint)
+            // this.$axios[this.method](this.action, this.fieldset)
+            this.$axios['patch'](this.action, this.blueprint)
                 .then(response => this.saved(response))
                 .catch(e => {
                     this.$notify.error(e.response.data.message);

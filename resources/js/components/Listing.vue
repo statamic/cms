@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 
@@ -82,7 +81,7 @@ export default {
         request() {
             this.loading = true;
 
-            axios.get(this.requestUrl, { params: this.parameters }).then(response => {
+            this.$axios.get(this.requestUrl, { params: this.parameters }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.activeFilters = {...response.data.meta.filters};

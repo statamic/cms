@@ -186,7 +186,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import FolderCreator from '../Folder/Create.vue';
@@ -335,7 +334,7 @@ export default {
         },
 
         loadContainers() {
-            axios.get(cp_url('asset-containers')).then(response => {
+            this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
             });
@@ -345,7 +344,7 @@ export default {
             this.loadingAssets = true;
             const url = cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
 
-            axios.get(url, { params: this.parameters }).then(response => {
+            this.$axios.get(url, { params: this.parameters }).then(response => {
                 this.assets = response.data.data;
                 this.folders = response.data.meta.folders;
                 this.folder = response.data.meta.folder;

@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import ChangePassword from './ChangePassword.vue';
 
 export default {
@@ -44,7 +43,7 @@ export default {
         save() {
             this.clearErrors();
 
-            axios[this.method](this.action, this.values).then(response => {
+            this.$axios[this.method](this.action, this.values).then(response => {
                 this.$notify.success('Saved');
                 const redirect = response.data.redirect;
                 if (redirect) window.location = redirect;

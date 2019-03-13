@@ -45,8 +45,6 @@
 
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: {
@@ -96,7 +94,7 @@ export default {
         save() {
             this.clearErrors();
 
-            axios[this.method](this.action, this.payload).then(response => {
+            this.$axios[this.method](this.action, this.payload).then(response => {
                 this.$notify.success('Saved');
                 if (!this.initialHandle || (this.initialHandle !== this.handle)) {
                     window.location = response.data.redirect;

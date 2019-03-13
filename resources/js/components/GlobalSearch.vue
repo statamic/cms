@@ -99,7 +99,7 @@ export default {
 
             let payload = {params: Object.assign({ q:this.query }, this.data) };
 
-            this.axios.get(this.endpoint, payload)
+            this.$axios.get(this.endpoint, payload)
                 .then(response => {
                     this.results = !!this.limit ? response.data.slice(0, this.limit) : response.data;
                     this.current = -1;

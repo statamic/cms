@@ -11,8 +11,8 @@ export default new Vue({
 
     computed: {
         $request() {
-            // TODO: Any custom error handling, etc.?
-            return this.axios;
+            // TODO: Custom $request error handling, etc?  For now, we'll just alias directly to $axios.
+            return this.$axios;
         },
     },
 

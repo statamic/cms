@@ -60,7 +60,7 @@ export default {
                 password: this.password
             };
 
-            this.axios.post(cp_url('auth/login'), payload).then(response => {
+            this.$axios.post(cp_url('auth/login'), payload).then(response => {
                 this.errors = [];
                 this.$notify.success(__('Logged in'));
                 this.show = false;

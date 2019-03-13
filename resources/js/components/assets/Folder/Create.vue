@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import Folder from './Folder.vue';
 
 export default {
@@ -23,7 +22,7 @@ export default {
                 title: this.title
             };
 
-            axios.post(url, payload).then(response => {
+            this.$axios.post(url, payload).then(response => {
                 this.$notify.success(__('Folder created'));
                 this.$emit('created', response.data);
             }).catch(e => {

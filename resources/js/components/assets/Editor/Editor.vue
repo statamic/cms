@@ -188,8 +188,6 @@
 
 
 <script>
-import axios from 'axios';
-
 export default {
 
     components: {
@@ -278,7 +276,7 @@ export default {
 
             const url = cp_url(`assets/${btoa(this.id)}`);
 
-            axios.get(url).then(response => {
+            this.$axios.get(url).then(response => {
                 this.asset = response.data.asset;
                 this.values = response.data.values;
                 this.meta = response.data.meta;
@@ -292,7 +290,7 @@ export default {
         getFieldset() {
             const url = cp_url(`publish-blueprints/${this.asset.blueprint}`);
 
-            axios.get(url).then(response => {
+            this.$axios.get(url).then(response => {
                 this.fieldset = response.data;
 
                 // Flatten fields from all sections into one array.
@@ -334,7 +332,7 @@ export default {
             this.saving = true;
             const url = cp_url(`assets/${btoa(this.id)}`);
 
-            axios.patch(url, this.values).then(response => {
+            this.$axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);
                 this.$notify.success('Saved');
                 this.saving = false;
@@ -369,7 +367,7 @@ export default {
 
             const url = cp_url(`assets/${btoa(this.id)}`);
 
-            axios.delete(url).then(response => {
+            this.$axios.delete(url).then(response => {
                 this.$emit('deleted', this.asset.id);
                 this.saving = false;
             });

@@ -5,8 +5,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
-
     export default {
         props: {
             initialCount: Number
@@ -26,7 +24,7 @@
             getCount(clearCache = true) {
                 let params = clearCache ? {'clearCache': clearCache} : {};
 
-                axios.get('/cp/updater/count', params).then(response => {
+                this.$axios.get('/cp/updater/count', params).then(response => {
                     this.count = response.data;
                 });
             }

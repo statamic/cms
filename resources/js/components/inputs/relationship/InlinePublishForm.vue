@@ -41,8 +41,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     data() {
@@ -73,7 +71,7 @@ export default {
     methods: {
 
         getItem() {
-            axios.get(this.itemUrl).then(response => {
+            this.$axios.get(this.itemUrl).then(response => {
                 const data = response.data;
                 this.blueprint = data.blueprint;
                 this.values = this.initialValues = data.values;

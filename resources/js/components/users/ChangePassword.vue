@@ -43,7 +43,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Popper from 'vue-popperjs';
 
 export default {
@@ -90,7 +89,7 @@ export default {
             this.clearErrors();
             this.saving = true;
 
-            axios.patch(this.saveUrl, {
+            this.$axios.patch(this.saveUrl, {
                 password: this.password,
                 password_confirmation: this.confirmation
             }).then(response => {

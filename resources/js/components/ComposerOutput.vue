@@ -9,8 +9,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
-
     export default {
         props: {
             package: {
@@ -55,7 +53,7 @@
             },
 
             checkComposer() {
-                axios.get('/cp/composer/check', {params: this.params}).then(response => {
+                this.$axios.get('/cp/composer/check', {params: this.params}).then(response => {
                     this.output = response.data.output;
 
                     if (response.data.output === false || response.data.completed) {

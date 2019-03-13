@@ -15,8 +15,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
-
     export default {
         props: [
             'addon',
@@ -54,7 +52,7 @@
 
         methods: {
             install() {
-                axios.post('/cp/addons/install', {'addon': this.package}, this.toEleven);
+                this.$axios.post('/cp/addons/install', {'addon': this.package}, this.toEleven);
 
                 this.waitingForRefresh = true;
 
@@ -68,7 +66,7 @@
             },
 
             uninstall() {
-                axios.post('/cp/addons/uninstall', {'addon': this.package}, this.toEleven);
+                this.$axios.post('/cp/addons/uninstall', {'addon': this.package}, this.toEleven);
 
                 this.waitingForRefresh = true;
 

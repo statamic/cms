@@ -55,8 +55,6 @@
 
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: {
@@ -97,7 +95,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            axios.post(this.action, this.values).then(response => {
+            this.$axios.post(this.action, this.values).then(response => {
                 this.saving = false;
                 window.location = response.data.redirect;
             }).catch(e => {

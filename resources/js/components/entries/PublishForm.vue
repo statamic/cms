@@ -96,7 +96,6 @@
 
 
 <script>
-import axios from 'axios';
 import LivePreview from '../live-preview/LivePreview.vue';
 
 export default {
@@ -206,7 +205,7 @@ export default {
                 blueprint: this.fieldset.handle
             }};
 
-            axios[this.method](this.action, payload).then(response => {
+            this.$axios[this.method](this.action, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
                 this.$notify.success('Saved');
@@ -235,7 +234,7 @@ export default {
             }
 
             this.localizing = localization.handle;
-            axios.get(localization.url).then(response => {
+            this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
                 this.meta = data.meta;

@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Popper from 'vue-popperjs';
 
 export default {
@@ -115,7 +114,7 @@ export default {
             this.clearErrors();
             this.saving = true;
 
-            axios.patch(this.saveUrl, this.values).then(response => {
+            this.$axios.patch(this.saveUrl, this.values).then(response => {
                 window.location.reload();
             }).catch(e => {
                 if (e.response && e.response.status === 422) {

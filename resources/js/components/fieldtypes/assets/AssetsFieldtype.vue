@@ -178,8 +178,6 @@
 
 
 <script>
-import axios from 'axios';
-
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
@@ -357,7 +355,7 @@ export default {
 
             this.loading = true;
 
-            axios.get(cp_url('assets-fieldtype'), {
+            this.$axios.get(cp_url('assets-fieldtype'), {
                 params: { assets }
             }).then(response => {
                 this.assets = response.data;

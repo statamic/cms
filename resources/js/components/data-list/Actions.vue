@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import DataListAction from './Action.vue';
 
 export default {
@@ -36,7 +35,7 @@ export default {
                 values
             };
 
-            axios.post(this.url, payload).then(response => {
+            this.$axios.post(this.url, payload).then(response => {
                 this.$emit('completed');
             }).catch(error => {
                 this.$notify.error(error.response.data.message);

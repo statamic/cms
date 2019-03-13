@@ -70,8 +70,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     components: {
@@ -204,7 +202,7 @@ export default {
                 return;
             }
 
-            axios[this.saveMethod](this.saveUrl, {
+            this.$axios[this.saveMethod](this.saveUrl, {
                 slug: this.slug,
                 formset: this.formset
             }).then(function(response) {

@@ -43,7 +43,6 @@
 
 
 <script>
-import axios from 'axios';
 import {Sortable, Plugins} from '@shopify/draggable';
 import {DraggableTree} from 'vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
@@ -88,7 +87,7 @@ export default {
             this.loading = true;
             const url = this.pagesUrl;
 
-            axios.get(url).then(response => {
+            this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;
                 this.treeData = JSON.parse(JSON.stringify(this.pages));
                 this.loading = false;
@@ -104,7 +103,7 @@ export default {
         save() {
             this.saving = true;
 
-            axios.post(this.submitUrl, { pages: this.pages }).then(response => {
+            this.$axios.post(this.submitUrl, { pages: this.pages }).then(response => {
                 this.changed = false;
                 this.saving = false;
                 this.$notify.success(__('Pages reordered.'), { timeout: 3000 });

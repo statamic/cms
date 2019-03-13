@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 import FieldSettings from '../fields/Settings.vue';
@@ -120,7 +119,7 @@ export default {
 
             const url = cp_url(`fieldsets/${this.fieldset}/fields`);
 
-            axios.post(url, this.field).then(response => {
+            this.$axios.post(url, this.field).then(response => {
                 const reference = `${this.fieldset}/${this.field.handle}`;
                 window.Statamic.$config.get('fieldsetFields')[reference] = response.data;
                 this.$emit('created', reference);

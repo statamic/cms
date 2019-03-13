@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: {
@@ -46,7 +44,7 @@ export default {
 
         destroy(id, index) {
             const url = cp_url(`user-groups/${id}`);
-            axios.delete(url).then(response => {
+            this.$axios.delete(url).then(response => {
                 this.rows.splice(index, 1);
                 this.$notify.success(__('User group deleted'));
             }).catch(error => {

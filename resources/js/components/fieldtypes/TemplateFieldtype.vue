@@ -19,7 +19,7 @@ export default {
 
     mounted() {
 
-        this.axios.get(cp_url('api/templates')).then(response => {
+        this.$axios.get(cp_url('api/templates')).then(response => {
             var options = [];
 
             _.each(response.data, function(template) {

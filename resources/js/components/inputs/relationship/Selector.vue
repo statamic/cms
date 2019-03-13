@@ -88,7 +88,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Popper from 'vue-popperjs';
 import InlineCreateForm from './InlineCreateForm.vue';
 
@@ -173,7 +172,7 @@ export default {
         request() {
             this.loading = true;
 
-            return axios.get(this.url, { params: this.parameters }).then(response => {
+            return this.$axios.get(this.url, { params: this.parameters }).then(response => {
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;

@@ -46,8 +46,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     mixins: [Fieldtype],
@@ -100,7 +98,7 @@ export default {
 
             this.storePending = true;
 
-            axios.post(cp_url('fieldsets/quick'), { title: this.newFieldsetName }).then(response => {
+            this.$axios.post(cp_url('fieldsets/quick'), { title: this.newFieldsetName }).then(response => {
                 this.update(this.newFieldsetName);
                 this.storePending = false;
                 this.cancelAdd();
@@ -115,7 +113,7 @@ export default {
         },
 
         getFieldsets() {
-            axios.get(cp_url('fieldsets')).then(response => {
+            this.$axios.get(cp_url('fieldsets')).then(response => {
                 this.options = response.data.map(fieldset => {
                     return {
                         value: fieldset.id,

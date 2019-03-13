@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Popper from 'vue-popperjs';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
@@ -176,7 +175,7 @@ export default {
             this.loading = true;
             const params = { selections };
 
-            return axios.get(this.itemDataUrl, { params }).then(response => {
+            return this.$axios.get(this.itemDataUrl, { params }).then(response => {
                 this.loading = false;
                 this.initializing = false;
 

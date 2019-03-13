@@ -36,8 +36,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: {
@@ -84,7 +82,7 @@ export default {
             this.loading = true;
             const url = cp_url(`forms/${this.form}/submissions`);
 
-            axios.get(url, { params: this.parameters }).then(response => {
+            this.$axios.get(url, { params: this.parameters }).then(response => {
                 this.columns = response.data.meta.columns.map(column => column.field);
                 this.sortColumn = response.data.meta.sortColumn;
                 this.submissions = response.data.data;
@@ -99,7 +97,7 @@ export default {
 
         destroy(id, index) {
             const url = cp_url(`forms/${this.form}/submissions/${id}`);
-            axios.delete(url).then(response => {
+            this.$axios.delete(url).then(response => {
                 this.submissions.splice(index, 1);
                 this.$notify.success(__('Submission deleted'));
             }).catch(error => {

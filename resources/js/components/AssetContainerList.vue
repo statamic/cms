@@ -19,8 +19,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: [
@@ -39,7 +37,7 @@ export default {
 
         destroy(container, index) {
             if (confirm('Are you sure?')) {
-                axios.delete(container.delete_url).then(response => {
+                this.$axios.delete(container.delete_url).then(response => {
                     this.rows.splice(index, 1);
                 });
             }

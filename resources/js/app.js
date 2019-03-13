@@ -38,7 +38,7 @@ Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
 });
 
-Vue.prototype.axios = axios; // TODO: $axios
+Vue.prototype.$axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
 require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();

@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 export default {
 
     computed: {
@@ -25,7 +23,7 @@ export default {
 
         this.$store.commit('statamic/fieldtypes', 'loading');
 
-        axios.get(cp_url('fieldtypes?selectable=true')).then(response => this.$store.commit('statamic/fieldtypes', response.data));
+        this.$axios.get(cp_url('fieldtypes?selectable=true')).then(response => this.$store.commit('statamic/fieldtypes', response.data));
     }
 
 }

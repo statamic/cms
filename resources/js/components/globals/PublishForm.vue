@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import ConfigureSet from './Configure.vue';
 
 export default {
@@ -47,7 +46,7 @@ export default {
         save() {
             this.clearErrors();
 
-            axios.patch(this.action, this.values).then(response => {
+            this.$axios.patch(this.action, this.values).then(response => {
                 this.$notify.success('Saved');
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
