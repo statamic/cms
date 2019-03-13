@@ -59,16 +59,6 @@ Statamic.$store = new Vuex.Store({
     }
 });
 
-// Vue.http.interceptors.push({
-//     response: function (response) {
-//         if (response.status === 401) {
-//             this.$root.showLoginModal = true;
-//         }
-//
-//         return response;
-//     }
-// });
-
 require('./components/NotificationBus');
 require('./components/ModalBus');
 require('./components/stacks/Stacks');
