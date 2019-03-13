@@ -4,6 +4,7 @@ export default new Vue({
     data() {
         return {
             bootingCallbacks: [],
+            bootedCallbacks: [],
             conditions: {}, // TODO: Move to $conditions API
         }
     },
@@ -20,6 +21,10 @@ export default new Vue({
             this.bootingCallbacks.push(callback);
         },
 
+        booted(callback) {
+            this.bootedCallbacks.push(callback);
+        },
+
         app(app) {
             this.app = app;
         },
@@ -33,6 +38,9 @@ export default new Vue({
             this.bootingCallbacks = [];
 
             this.app = new Vue(this.app);
+
+            this.bootedCallbacks.forEach(callback => callback(this));
+            this.bootedCallbacks = [];
         }
     }
 });
