@@ -91,7 +91,7 @@
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
                                                 <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                                {{ folder.title || folder.path }}
+                                                {{ folder.path }}
                                             </a>
                                         </td>
                                         <td class="text-right" :colspan="columns.length">
@@ -104,7 +104,6 @@
                                             <folder-editor
                                                 v-if="editedFolderPath === folder.path"
                                                 :initial-directory="folder.basename"
-                                                :initial-title="folder.title"
                                                 :container="container"
                                                 :path="path"
                                                 @closed="editedFolderPath = null"
@@ -156,7 +155,7 @@
                             @page-selected="page = $event"
                         />
 
-                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-40">
+                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-70">
                             There are no assets.
                         </div>
 

@@ -18,7 +18,7 @@
             @selections-updated="selectionsUpdated"
         >
             <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="border-b flex items-center justify-between bg-grey-20">
+                <div class="bg-white border-b flex items-center justify-between bg-grey-20">
                     <data-list-toggle-all v-if="!hasMaxSelections" />
                     <div class="p-2 flex flex-1 items-center">
                         <div class="flex-1">
@@ -45,7 +45,7 @@
 
                         <button
                             type="button"
-                            class="ml-2 p-1 text-xl text-grey-60"
+                            class="ml-2 p-1 text-xl text-grey-60 hover:text-grey-90"
                             @click="close"
                             v-html="'&times'" />
                     </div>

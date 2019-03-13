@@ -29,13 +29,13 @@ class FoldersController extends CpController
 
         $path = strtolower($path); // Prevent case sensitivity collisions
 
-        return $container->assetFolder($path)->title($request->title)->save();
+        return $container->assetFolder($path)->save();
     }
 
     public function update(Request $request, $container, $folder)
     {
         $container = AssetContainer::find($container);
 
-        return $container->assetFolder($folder)->title($request->title)->save();
+        return $container->assetFolder($folder)->save();
     }
 }
