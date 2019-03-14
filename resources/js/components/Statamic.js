@@ -41,6 +41,10 @@ export default new Vue({
 
             this.bootedCallbacks.forEach(callback => callback(this));
             this.bootedCallbacks = [];
+        },
+
+        component(name, component) {
+            Vue.component(name, component);
         }
     }
 });
