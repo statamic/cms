@@ -155,7 +155,7 @@ class Statamic
 
     public static function assetUrl($url = '/')
     {
-        return static::url('vendor/statamic/' . $url);
+        return static::url('vendor/statamic/cp/' . $url);
     }
 
     public static function url($url = '/')

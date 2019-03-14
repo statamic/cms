@@ -271,7 +271,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
-            $path => public_path("resources/vendor/{$name}/{$filename}.js"),
+            $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ]);
 
         Statamic::script($name, $filename);
@@ -287,7 +287,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
-            $path => public_path("resources/vendor/{$name}/{$filename}.css"),
+            $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ]);
 
         Statamic::style($name, $filename);
