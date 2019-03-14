@@ -5,7 +5,7 @@
             <template v-if="config.display">{{ config.display }}</template>
             <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
-            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="config.localizable" v-popover:tooltip.top="__('Localizable field')" />
+            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-popover:tooltip.top="__('Localizable field')" />
         </label>
 
         <div
