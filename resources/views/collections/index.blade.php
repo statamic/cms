@@ -3,20 +3,7 @@
 
 @section('content')
 
-    @if(count($collections) == 0)
-        <div class="text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
-            @svg('empty/collection')
-            <h1 class="my-3">{{ __('Create your first Collection now') }}</h1>
-            <p class="text-grey mb-3">
-                {{ __('Collections are groups of entries that hold similar content and share behaviors and attributes.') }}
-            </p>
-            @can('super')
-                <a href="{{ cp_route('collections.create') }}" class="btn-primary btn-lg">{{ __('Create Collection') }}</a>
-            @endcan
-        </div>
-    @endif
-
-    @if(count($collections) > 0)
+    @unless($collections->isEmpty())
 
         <div class="flex mb-3">
             <h1 class="flex-1">{{ __('Collections') }}</h1>
@@ -31,6 +18,16 @@
             :columns="{{ json_encode($columns) }}"
             :endpoints="{}">
         </collection-list>
-    @endif
+
+    @else
+
+        @include('statamic::partials.create-first', [
+            'resource' => 'Collection',
+            'description' => 'Collections are groups of entries that hold similar content and share behaviors and attributes.',
+            'svg' => 'empty/collection',
+            'route' => cp_route('collections.create')
+        ])
+
+    @endunless
 
 @endsection
