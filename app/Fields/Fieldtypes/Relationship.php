@@ -41,7 +41,7 @@ class Relationship extends Fieldtype
     {
         return $this->augment($data)->map(function ($item) use ($data) {
             return [
-                'id' => $item->id(),
+                'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
                 'edit_url' => $item->editUrl(),
                 'published' => $this->statusIcons ? $item->published() : null,
@@ -172,8 +172,13 @@ class Relationship extends Fieldtype
     public function augment($values)
     {
         return collect($values)->map(function ($value) {
-            return Content::find($value);
+            return $this->augmentValue($value);
         });
+    }
+
+    protected function augmentValue($value)
+    {
+        return Content::find($value);
     }
 
     public function getIndexItems($request)
