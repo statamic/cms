@@ -235,6 +235,7 @@ class FieldTest extends TestCase
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
             ->andReturn(new class extends Fieldtype {
+                protected $component = 'example';
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
                     'a_config_field_without_pre_processing' => ['type' => 'without_processing']
@@ -273,6 +274,7 @@ class FieldTest extends TestCase
             'instructions' => 'Test instructions',
             'required' => true,
             'validate' => 'required',
+            'component' => 'example',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
         ], $field->toPublishArray());

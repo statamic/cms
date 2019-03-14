@@ -223,7 +223,8 @@ class BlueprintTest extends TestCase
                             'display' => 'One',
                             'instructions' => 'One instructions',
                             'required' => true,
-                            'validate' => 'required|min:2'
+                            'validate' => 'required|min:2',
+                            'component' => 'text',
                         ]
                     ]
                 ],
@@ -239,6 +240,7 @@ class BlueprintTest extends TestCase
                             'required' => false,
                             'validate' => 'min:2',
                             'character_limit' => null,
+                            'component' => 'textarea',
                         ]
                     ]
                 ]
