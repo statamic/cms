@@ -29,4 +29,9 @@ class UserGroups extends Relationship
             ];
         })->values();
     }
+
+    protected function augmentValue($value)
+    {
+        return UserGroup::find($value);
+    }
 }

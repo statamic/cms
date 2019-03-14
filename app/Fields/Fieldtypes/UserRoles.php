@@ -29,4 +29,9 @@ class UserRoles extends Relationship
             ];
         })->values();
     }
+
+    protected function augmentValue($value)
+    {
+        return Role::find($value);
+    }
 }

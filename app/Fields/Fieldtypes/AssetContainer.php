@@ -31,4 +31,9 @@ class AssetContainer extends Relationship
             ];
         })->values();
     }
+
+    public function augmentValue($value)
+    {
+        return API\AssetContainer::find($value);
+    }
 }

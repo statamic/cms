@@ -49,4 +49,9 @@ class Fieldtype extends Relationship
             ];
         })->values();
     }
+
+    public function augmentValue($value)
+    {
+        return API\Form::find($value);
+    }
 }

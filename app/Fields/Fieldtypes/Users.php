@@ -50,4 +50,21 @@ class Users extends Relationship
             Column::make('email'),
         ];
     }
+
+    public function preProcessIndex($data)
+    {
+        return $this->augment($data)->map(function ($user) use ($data) {
+            return [
+                'id' => $user->id(),
+                'title' => $user->get('name', $user->email()),
+                'edit_url' => $user->editUrl(),
+                'published' => null,
+            ];
+        });
+    }
+
+    protected function augmentValue($value)
+    {
+        return User::find($value);
+    }
 }

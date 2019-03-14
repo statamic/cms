@@ -41,4 +41,9 @@ class Collections extends Relationship
             Column::make('entries'),
         ];
     }
+
+    protected function augmentValue($value)
+    {
+        return Collection::whereHandle($value);
+    }
 }

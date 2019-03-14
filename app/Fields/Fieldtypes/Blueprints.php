@@ -29,4 +29,9 @@ class Blueprints extends Relationship
             ];
         })->values();
     }
+
+    public function augmentValue($value)
+    {
+        return Blueprint::find($value);
+    }
 }
