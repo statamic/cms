@@ -207,13 +207,13 @@ class DefaultNav
             ->route('')
             ->icon('hammer-wrench');
 
-        Nav::site('Fieldsets')
-            ->route('fieldsets.index')
-            ->icon('wireframe');
-
         Nav::site('Blueprints')
             ->route('blueprints.index')
             ->icon('blueprints');
+
+        Nav::site('Fieldsets')
+            ->route('fieldsets.index')
+            ->icon('wireframe');
 
         return $this;
     }
