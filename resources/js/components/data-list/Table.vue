@@ -40,7 +40,7 @@
                         :display-index="index"
                         :checkbox-id="`checkbox-${row.id}`"
                     >
-                        <table-field :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" />
+                        <table-field :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
                 </td>
                 <td class="text-right">
