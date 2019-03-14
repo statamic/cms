@@ -41,9 +41,9 @@ class Relationship extends Fieldtype
         return $this->augment($data)->map(function ($item) use ($data) {
             return [
                 'id' => $item->id(),
-                'title' => $item->get('title'),
+                'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
                 'edit_url' => $item->editUrl(),
-                'published' => $item->published(),
+                'published' => $this->statusIcons ? $item->published() : null,
             ];
         });
     }
