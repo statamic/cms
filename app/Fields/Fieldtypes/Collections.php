@@ -10,6 +10,7 @@ class Collections extends Relationship
     protected $canEdit = false;
     protected $canCreate = false;
     protected $canSearch = false;
+    protected $statusIcons = false;
 
     protected function toItemArray($id, $site = null)
     {
