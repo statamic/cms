@@ -50,6 +50,11 @@ abstract class Fieldtype implements Arrayable
         return $this->component ?? static::handle();
     }
 
+    public function indexComponent(): string
+    {
+        return $this->indexComponent ?? static::handle();
+    }
+
     public function localizable(): bool
     {
         return $this->localizable;

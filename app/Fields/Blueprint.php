@@ -84,7 +84,7 @@ class Blueprint
         return new Columns($this->fields()->all()->map(function ($field) {
             return Column::make()
                 ->field($field->handle())
-                ->fieldtype($field->fieldtype()->component())
+                ->fieldtype($field->fieldtype()->indexComponent())
                 ->label(__($field->display()))
                 ->visible($field->isListable());
         }));

@@ -12,6 +12,7 @@ use Statamic\Fields\Fieldtype;
 class Relationship extends Fieldtype
 {
     protected $component = 'relationship';
+    protected $indexComponent = 'relationship';
     protected $itemComponent = 'related-item';
     protected $categories = ['relationship'];
     protected $canEdit = true;
