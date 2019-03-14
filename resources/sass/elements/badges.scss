@@ -14,3 +14,8 @@
 .badge-pill-sm {
     @apply bg-grey-30 px-sm py-px rounded;
 }
+
+.badge-updates {
+    @apply text-3xs roman bg-red text-white rounded-full leading-normal;
+    padding: 2px 6px 1px;
+}
