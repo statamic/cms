@@ -13,8 +13,8 @@
 }
 
 .live-preview-editor {
-    @apply relative bg-white shadow-lg h-full;
-    z-index: 2;
+    @apply flex relative bg-white h-full;
+    z-index: 3;
 }
 
 .live-preview-contents {
@@ -49,10 +49,16 @@
     width: 375px;
 }
 
+.live-preview-fields {
+    @apply relative bg-white;
+    z-index: 2;
+}
+
 .live-preview-resizer {
-    right: -5px;
-    width: 10px;
+    @apply w-4 border-l border-r border-grey-30 shadow-sm;
+    z-index: 1;
     cursor: ew-resize;
+    background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
 }
 
 

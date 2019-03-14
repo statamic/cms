@@ -41,12 +41,17 @@
                                 <portal-target name="live-preview-fields" />
                             </div>
 
-                            <resizer @resized="setEditorWidth" />
+                            <resizer
+                                @resized="setEditorWidth"
+                                @resize-start="editorResizing = true"
+                                @resize-end="editorResizing = false"
+                                @collapsed="collapseEditor"
+                            />
                         </div>
                     </transition>
 
                     <transition name="live-preview-contents-slide">
-                        <div v-show="panesVisible" class="live-preview-contents">
+                        <div v-show="panesVisible" class="live-preview-contents" :class="{ 'pointer-events-none': editorResizing }">
                             <div class="flex items-start justify-center h-full w-full">
                                 <iframe ref="iframe" frameborder="0" :class="previewDevice" />
                             </div>
@@ -90,6 +95,8 @@ export default {
             panesVisible: false,
             headerVisible: false,
             editorWidth: null,
+            editorResizing: false,
+            editorCollapsed: false,
             previewDevice: 'Responsive',
             previewAmp: false,
             previewDevices: ['Responsive', 'Laptop', 'Tablet', 'Mobile'],
@@ -190,8 +197,14 @@ export default {
         },
 
         setEditorWidth(width) {
+            this.editorCollapsed = false;
             this.editorWidth = width;
             localStorage.setItem(widthLocalStorageKey, width);
+        },
+
+        collapseEditor() {
+            this.editorCollapsed = true;
+            this.editorWidth = 16;
         }
     }
 
