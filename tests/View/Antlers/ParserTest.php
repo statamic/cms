@@ -892,7 +892,7 @@ EOT;
     }
 
     /** @test */
-    function it_automatically_augments_when_using_tag_pairs()
+    function it_automatically_augments_augmentable_objects_when_using_tag_pairs()
     {
         $augmentable = new AugmentableObject([
             'one' => 'foo',
@@ -902,6 +902,22 @@ EOT;
         $this->assertEquals(
             'FOO! bar',
             Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+                'object' => $augmentable
+            ])
+        );
+    }
+
+    /** @test */
+    function it_automatically_augments_collections_when_using_tag_pairs()
+    {
+        $augmentable = collect([
+            new AugmentableObject(['one' => 'foo', 'two' => 'bar']),
+            new AugmentableObject(['one' => 'baz', 'two' => 'qux']),
+        ]);
+
+        $this->assertEquals(
+            'FOO! bar BAZ! qux ',
+            Antlers::parse('{{ object }}{{ one }} {{ two }} {{ /object }}', [
                 'object' => $augmentable
             ])
         );
