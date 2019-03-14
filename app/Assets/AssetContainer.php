@@ -12,11 +12,12 @@ use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
 use Statamic\API\Asset as AssetAPI;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class AssetContainer implements AssetContainerContract
+class AssetContainer implements AssetContainerContract, Augmentable
 {
     use ExistsAsFile;
 
@@ -84,12 +85,19 @@ class AssetContainer implements AssetContainerContract
      */
     public function toArray()
     {
-        $data = $this->data();
+        return [
+            'title' => $this->title(),
+            'disk' => $this->disk,
+            'blueprint' => $this->blueprint,
+        ];
+    }
 
-        $data['id'] = $this->id();
-        $data['disk'] = array_get($this->data(), 'disk');
-
-        return $data;
+    public function toAugmentedArray()
+    {
+        return array_merge($this->toArray(), [
+            'handle' => $this->handle(),
+            'assets' => $this->assets()
+        ]);
     }
 
     /**
@@ -330,11 +338,7 @@ class AssetContainer implements AssetContainerContract
 
     protected function fileData()
     {
-        return [
-            'title' => $this->title(),
-            'disk' => $this->disk,
-            'blueprint' => $this->blueprint,
-        ];
+        return $this->toArray();
     }
 
     public function toCacheableArray()
