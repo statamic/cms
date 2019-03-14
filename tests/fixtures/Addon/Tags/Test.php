@@ -49,4 +49,9 @@ class Test extends Tags
     {
         return [];
     }
+
+    public function returnCollection()
+    {
+        return collect($this->returnMultidimensionalArray());
+    }
 }
