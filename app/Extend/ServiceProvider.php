@@ -58,8 +58,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
     protected function bootTags()
     {
-        foreach ($this->tags as $handle => $class) {
-            $this->registerTags($handle, $class);
+        foreach ($this->tags as $class) {
+            $this->registerTags($class);
         }
 
         return $this;
@@ -67,8 +67,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
     protected function bootFieldtypes()
     {
-        foreach ($this->fieldtypes as $handle => $class) {
-            $this->registerFieldtype($handle, $class);
+        foreach ($this->fieldtypes as $class) {
+            $this->registerFieldtype($class);
         }
 
         return $this;
@@ -76,8 +76,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
     protected function bootModifiers()
     {
-        foreach ($this->fieldtypes as $handle => $class) {
-            $this->registerFieldtype($handle, $class);
+        foreach ($this->modifiers as $class) {
+            $this->registerModifier($class);
         }
 
         return $this;
@@ -231,37 +231,34 @@ abstract class ServiceProvider extends LaravelServiceProvider
     /**
      * Register a tags class.
      *
-     * @param string $tag    The name of the tag. (eg. "foo" would handle {{ foo }}, {{ foo:bar }}, etc)
      * @param string $class  The name of the class.
      * @return void
      */
-    public function registerTags(string $tag, string $class)
+    public function registerTags(string $class)
     {
-        $this->app['statamic.tags'][$tag] = $class;
+        $this->app['statamic.tags'][$class::handle()] = $class;
     }
 
     /**
      * Register a modifier class.
      *
-     * @param string $modifier  The name of the modifier. (eg. "foo" would handle {{ x | foo }})
-     * @param string $class     The name of the class.
+     * @param string $class  The name of the class.
      * @return void
      */
-    public function registerModifier(string $modifier, string $class)
+    public function registerModifier(string $class)
     {
-        $this->app['statamic.modifiers'][$modifier] = $class;
+        $this->app['statamic.modifiers'][$class::handle()] = $class;
     }
 
     /**
      * Register a fieldtype class.
      *
-     * @param string $fieldtype  The name of the fieldtype. (eg. "foo" would handle `type: foo`)
-     * @param string $class      The name of the class.
+     * @param string $class  The name of the class.
      * @return void
      */
-    public function registerFieldtype(string $fieldtype, string $class)
+    public function registerFieldtype(string $class)
     {
-        $this->app['statamic.fieldtypes'][$fieldtype] = $class;
+        $this->app['statamic.fieldtypes'][$class::handle()] = $class;
     }
 
     public function registerScript(string $path)
