@@ -67,7 +67,7 @@ abstract class Tags
      * The parser instance that executed this tag.
      * @var \Statamic\View\Antlers\Parser
      */
-    protected $parser;
+    public $parser;
 
     public function setProperties($properties)
     {
