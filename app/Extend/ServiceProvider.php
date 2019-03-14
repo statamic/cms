@@ -59,7 +59,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     protected function bootTags()
     {
         foreach ($this->tags as $class) {
-            $this->registerTags($class);
+            $class::register();
         }
 
         return $this;
@@ -68,7 +68,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     protected function bootFieldtypes()
     {
         foreach ($this->fieldtypes as $class) {
-            $this->registerFieldtype($class);
+            $class::register();
         }
 
         return $this;
@@ -77,7 +77,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     protected function bootModifiers()
     {
         foreach ($this->modifiers as $class) {
-            $this->registerModifier($class);
+            $class::register();
         }
 
         return $this;
@@ -226,39 +226,6 @@ abstract class ServiceProvider extends LaravelServiceProvider
         return array_merge($overrides, [
             'namespace' => $this->getAddon()->namespace()
         ]);
-    }
-
-    /**
-     * Register a tags class.
-     *
-     * @param string $class  The name of the class.
-     * @return void
-     */
-    public function registerTags(string $class)
-    {
-        $this->app['statamic.tags'][$class::handle()] = $class;
-    }
-
-    /**
-     * Register a modifier class.
-     *
-     * @param string $class  The name of the class.
-     * @return void
-     */
-    public function registerModifier(string $class)
-    {
-        $this->app['statamic.modifiers'][$class::handle()] = $class;
-    }
-
-    /**
-     * Register a fieldtype class.
-     *
-     * @param string $class  The name of the class.
-     * @return void
-     */
-    public function registerFieldtype(string $class)
-    {
-        $this->app['statamic.fieldtypes'][$class::handle()] = $class;
     }
 
     public function registerScript(string $path)
