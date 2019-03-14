@@ -6,6 +6,8 @@ use Statamic\API\UserGroup;
 
 class UserGroups extends Relationship
 {
+    protected $canEdit = false;
+    protected $canCreate = false;
     protected $statusIcons = false;
 
     protected function toItemArray($id, $site = null)

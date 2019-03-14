@@ -6,6 +6,8 @@ use Statamic\API\Role;
 
 class UserRoles extends Relationship
 {
+    protected $canEdit = false;
+    protected $canCreate = false;
     protected $statusIcons = false;
 
     protected function toItemArray($id, $site = null)
