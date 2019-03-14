@@ -94,7 +94,7 @@ class AssetContainersController extends CpController
             ->blueprint(Arr::first(json_decode($request->blueprint, true)))
             ->save();
 
-        return redirect($container->editUrl())->with('success', 'Container saved');
+        return redirect($container->showUrl())->with('success', 'Container saved');
     }
 
     public function destroy($container)
