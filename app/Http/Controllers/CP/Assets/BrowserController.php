@@ -16,6 +16,10 @@ class BrowserController extends CpController
     {
         $containers = AssetContainer::all();
 
+        if ($containers->isEmpty()) {
+            return view('statamic::assets.index');
+        }
+
         // TODO: Filter out unauthorized containers
         // TODO: Handle no authorized containers
 
