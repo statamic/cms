@@ -85,11 +85,7 @@ export default {
     watch: {
 
         count(count) {
-            if (this.remaining === 0) {
-                this.stopCountdown();
-                this.showLogin();
-                return;
-            }
+            this.isShowingLogin = this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -119,10 +115,6 @@ export default {
             }, 1000);
         },
 
-        stopCountdown() {
-            clearInterval(counter);
-        },
-
         restartCountdown() {
             this.count = this.remaining = this.lifetime;
             this.startCountdown();
@@ -141,10 +133,6 @@ export default {
             }).finally(response => {
                 this.pinging = false;
             });
-        },
-
-        showLogin() {
-            this.isShowingLogin = true;
         },
 
         updateCsrfToken() {
