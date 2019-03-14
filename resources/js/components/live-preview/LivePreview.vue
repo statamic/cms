@@ -51,10 +51,8 @@
                     </transition>
 
                     <transition name="live-preview-contents-slide">
-                        <div v-show="panesVisible" class="live-preview-contents" :class="{ 'pointer-events-none': editorResizing }">
-                            <div class="flex items-start justify-center h-full w-full">
-                                <iframe ref="iframe" frameborder="0" :class="previewDevice" />
-                            </div>
+                        <div v-show="panesVisible" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
+                            <iframe ref="iframe" frameborder="0" :class="previewDevice" />
                         </div>
                     </transition>
 
