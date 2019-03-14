@@ -27,7 +27,7 @@ class TagsTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $class->context);
         $this->assertEquals(['limit' => 3], $class->parameters);
         $this->assertEquals('test:listing', $class->tag);
-        $this->assertEquals('listing', $class->tag_method);
+        $this->assertEquals('listing', $class->method);
         $this->assertEquals($parser, $class->parser);
         $this->assertInstanceOf(TestDependency::class, $class->dependency);
     }
