@@ -26,11 +26,11 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'arr', 'checkboxes', 'collection',
+        'arr', 'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'pages', 'partial', 'radio', 'redactor', 'redactor_settings',
+        'partial', 'radio', 'redactor', 'redactor_settings',
         'theme', 'time', 'title', 'toggle', 'video', 'yaml',
-        'revealer', 'section', 'slug', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
+        'revealer', 'section', 'slug', 'table', 'tags', 'template', 'text', 'textarea',
     ];
 
     /**
