@@ -32,7 +32,11 @@ export default {
         }
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: {
+            default: null
+        }
+    },
 
     computed: {
 
@@ -68,6 +72,8 @@ export default {
         },
 
         site() {
+            if (! this.storeName) return this.$config.get('selectedSite');
+
             return this.$store.state.publish[this.storeName].site;
         },
 

@@ -69,6 +69,7 @@ Route::group([
     });
 
     Route::group(['namespace' => 'Fields'], function () {
+        Route::get('field-meta', 'MetaController@show');
         Route::resource('fieldsets', 'FieldsetController');
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');
         Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');

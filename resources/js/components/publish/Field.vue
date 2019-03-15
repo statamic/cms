@@ -1,6 +1,11 @@
 <template>
 
-    <div :class="classes">
+    <publish-field-meta
+        :config="config"
+        :initial-value="value"
+        :initial-meta="meta"
+    >
+    <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <label class="flex" :class="{'bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
             <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
@@ -13,7 +18,9 @@
             v-if="config.instructions"
             v-html="$options.filters.markdown(config.instructions)" />
 
-        <slot name="fieldtype">
+        <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
+
+        <slot name="fieldtype" v-if="!loadingMeta">
             <component
                 :is="fieldtypeComponent"
                 :config="config"
@@ -29,6 +36,7 @@
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
+    </publish-field-meta>
 
 </template>
 

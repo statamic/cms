@@ -41,7 +41,7 @@
             <form-group
                 handle="blueprint"
                 fieldtype="blueprints"
-                :config="{ max_items: 1 }"
+                :config="{ component: 'relationship', max_items: 1 }"
                 :display="__('Blueprint')"
                 :instructions="__('global_set_blueprint_instructions')"
                 v-model="blueprint"

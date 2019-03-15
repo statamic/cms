@@ -7,6 +7,7 @@ use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,7 @@ class CpServiceProvider extends ServiceProvider
             'selectedSite' => Site::selected()->handle(),
             'ampEnabled' => config('statamic.amp.enabled'),
             'bard' => ['plugins' => [], 'buttons' => []],
+            'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
         ]);
     }
 

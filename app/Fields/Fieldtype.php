@@ -169,4 +169,9 @@ abstract class Fieldtype implements Arrayable
     {
         //
     }
+
+    public static function preloadable()
+    {
+        return static::$preloadable ?? (new \ReflectionClass(static::class))->getMethod('preload')->class === static::class;
+    }
 }

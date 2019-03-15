@@ -11,6 +11,7 @@ use Statamic\Fields\Fieldtype;
 
 class Relationship extends Fieldtype
 {
+    protected static $preloadable = true;
     protected $component = 'relationship';
     protected $indexComponent = 'relationship';
     protected $itemComponent = 'related-item';
