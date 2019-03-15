@@ -33,6 +33,11 @@ class CacheServiceProvider extends ServiceProvider
                 $this->app['config']["cache.stores.file"]['path']
             ));
         });
+
+        if (config('cache.default') === 'file') {
+            config(['cache.stores.statamic' => ['driver' => 'statamic']]);
+            config(['cache.default' => 'statamic']);
+        }
     }
 
     /**
