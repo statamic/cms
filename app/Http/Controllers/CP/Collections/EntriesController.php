@@ -271,10 +271,9 @@ class EntriesController extends CpController
                     ->data($values);
             });
 
-        // TODO: Date handling
-        // if ($collection->order() === 'date') {
-        //     $entry->date($request->date ?? now());
-        // }
+        if ($collection->order() === 'date') {
+            $entry->order($values['date'] ?? now()->format('Y-m-d-Hi'));
+        }
 
         $entry->save();
 
