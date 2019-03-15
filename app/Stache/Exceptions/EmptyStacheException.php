@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Stache;
+namespace Statamic\Stache\Exceptions;
 
 class EmptyStacheException extends \RuntimeException
 {

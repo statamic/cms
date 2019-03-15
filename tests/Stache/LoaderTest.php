@@ -9,7 +9,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\BasicStore;
-use Statamic\Stache\EmptyStacheException;
+use Statamic\Stache\Exceptions\EmptyStacheException;
 
 class LoaderTest extends TestCase
 {

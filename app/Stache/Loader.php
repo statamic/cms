@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Stache\Exceptions\EmptyStacheException;
 
 class Loader
 {
