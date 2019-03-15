@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\Arr;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
@@ -9,6 +10,7 @@ use Statamic\API\YAML;
 use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Statamic\Data\Entries\LocalizedEntry;
+use Statamic\Stache\Exceptions\StoreExpiredException;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesStore extends AggregateStore
@@ -22,10 +24,19 @@ class EntriesStore extends AggregateStore
     {
         $entries = collect();
 
+        if ($cache->isEmpty()) {
+            return $entries;
+        }
+
+        $collection = Collection::whereHandle(Arr::first($cache)['collection']);
+
+        // The collection has been deleted.
+        throw_unless($collection, new StoreExpiredException);
+
         foreach ($cache as $id => $item) {
             $entry = $entries->get($id) ?? Entry::make()
                 ->id($id)
-                ->collection(Collection::whereHandle($item['collection']));
+                ->collection($collection);
 
             foreach ($item['localizations'] as $site => $attributes) {
                 $localized = (new LocalizedEntry)
@@ -116,6 +127,10 @@ class EntriesStore extends AggregateStore
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
+        }
+
+        if (! Collection::whereHandle(explode('/', $relative)[0])) {
+            return false;
         }
 
         return $file->getExtension() !== 'yaml' && substr_count($relative, '/') > 0;

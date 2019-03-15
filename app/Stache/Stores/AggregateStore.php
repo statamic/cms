@@ -7,6 +7,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\ChildStore;
+use Statamic\Stache\Exceptions\StoreExpiredException;
 
 abstract class AggregateStore extends Store
 {
@@ -200,7 +201,7 @@ abstract class AggregateStore extends Store
 
     public function cacheMetaKeys()
     {
-        Cache::forever($this->getMetaKeysCacheKey(), $this->stores->keys()->all());
+        Cache::forever($this->getMetaKeysCacheKey(), $this->stores->reject->isExpired()->keys()->all());
     }
 
     public function cacheHasMeta()

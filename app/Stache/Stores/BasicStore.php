@@ -6,6 +6,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Data\Localizable;
+use Statamic\Stache\Exceptions\StoreExpiredException;
 
 abstract class BasicStore extends Store
 {
@@ -15,6 +16,7 @@ abstract class BasicStore extends Store
     protected $items;
     protected $loaded = false;
     protected $updated = false;
+    protected $expired = false;
     protected $markUpdates = true;
     protected $files;
 
@@ -220,6 +222,18 @@ abstract class BasicStore extends Store
         return $return;
     }
 
+    public function isExpired()
+    {
+        return $this->expired;
+    }
+
+    public function markAsExpired()
+    {
+        $this->expired = true;
+
+        return $this;
+    }
+
     protected function loadingComplete()
     {
         //
@@ -234,7 +248,14 @@ abstract class BasicStore extends Store
         $this->withoutMarkingAsUpdated(function () {
             $cache = Cache::get($this->getItemsCacheKey());
 
-            $this->getItemsFromCache(collect($cache))->each(function ($item, $key) {
+            try {
+                $items = $this->getItemsFromCache(collect($cache));
+            } catch (StoreExpiredException $e) {
+                $this->markAsExpired();
+                return;
+            }
+
+            $items->each(function ($item, $key) {
                 $this->setItem($key, $item);
             });
         });
@@ -291,6 +312,13 @@ abstract class BasicStore extends Store
         Cache::forever($this->getItemsCacheKey(), $this->getCacheableItems());
 
         Cache::forever($this->getMetaCacheKey(), $this->getCacheableMeta());
+    }
+
+    public function uncache()
+    {
+        Cache::forget($this->getItemsCacheKey());
+
+        Cache::forget($this->getMetaCacheKey());
     }
 
     protected function getItemsCacheKey()
