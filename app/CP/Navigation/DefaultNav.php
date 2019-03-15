@@ -86,7 +86,7 @@ class DefaultNav
             });
 
         Nav::content('Taxonomies')
-            ->route('')
+            ->route('taxonomies.index')
             ->icon('tags');
             // ->can() // TODO: Permission to manage taxonomies?
 

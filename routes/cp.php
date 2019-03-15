@@ -43,6 +43,10 @@ Route::group([
         Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
     });
 
+    Route::group(['namespace' => 'Taxonomies'], function () {
+        Route::resource('taxonomies', 'TaxonomiesController');
+    });
+
     Route::get('globals', 'GlobalsController@index')->name('globals.index');
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
     Route::post('globals', 'GlobalsController@store')->name('globals.store');
