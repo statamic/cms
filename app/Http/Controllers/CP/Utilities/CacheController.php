@@ -104,6 +104,9 @@ class CacheController extends CpController
     {
         Artisan::call('cache:clear');
 
+        // TODO: Stache doesn't appear to be clearing?
+        // Maybe related to https://github.com/statamic/three-cms/issues/149
+
         return back()->withSuccess('Application cache cleared.');
     }
 
