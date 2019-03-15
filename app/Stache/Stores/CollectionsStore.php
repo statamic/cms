@@ -59,4 +59,15 @@ class CollectionsStore extends BasicStore
 
         $this->files->put($path, $contents);
     }
+
+    public function removeByPath($path)
+    {
+        parent::removeByPath($path);
+
+        $collection = $this->getItemKey(null, $path);
+
+        $this->stache->store('entries::'.$collection)->markAsExpired();
+
+        return $this;
+    }
 }
