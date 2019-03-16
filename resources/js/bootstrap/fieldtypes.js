@@ -18,7 +18,6 @@ import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
-import ThemeFieldtype from '../components/fieldtypes/ThemeFieldtype.vue'
 
 Vue.component('array-fieldtype', require('../components/fieldtypes/ArrayFieldtype.vue'));
 Vue.component('assets-fieldtype', require('../components/fieldtypes/assets/AssetsFieldtype.vue'));
@@ -50,7 +49,6 @@ Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue'));
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue'));
 Vue.component('template-fieldtype', TemplateFieldtype);
-Vue.component('theme-fieldtype', ThemeFieldtype);
 Vue.component('time-fieldtype', require('../components/fieldtypes/TimeFieldtype.vue'));
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue'));
 Vue.component('video-fieldtype', require('../components/fieldtypes/VideoFieldtype.vue'));

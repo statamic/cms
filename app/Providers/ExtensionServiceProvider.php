@@ -28,8 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $bundledFieldtypes = [
         'arr', 'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'partial', 'radio', 'redactor', 'redactor_settings',
-        'theme', 'time', 'title', 'toggle', 'video', 'yaml',
+        'partial', 'radio', 'redactor', 'redactor_settings', 'time', 'title', 'toggle', 'video', 'yaml',
         'revealer', 'section', 'slug', 'table', 'tags', 'template', 'text', 'textarea',
     ];
 
