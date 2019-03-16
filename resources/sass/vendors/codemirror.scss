@@ -1,4 +1,6 @@
-/* BASICS */
+/* ==========================================================================
+   CODEMIRROR
+   ========================================================================== */
 
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
@@ -8,6 +10,23 @@
 
 .code-mode {
     @apply select-none z-10 opacity-25 absolute pin-r pin-r p-1 text-white text-2xs uppercase;
+}
+
+/* Light Theme
+  ========================================================================== */
+.code-fieldtype .theme-light {
+
+    .code-mode {
+        @apply text-grey-90;
+    }
+
+    .CodeMirror {
+        @apply border p-0
+    }
+
+    .CodeMirror-scroll {
+        min-height: 80px;
+    }
 }
 
 /* PADDING */
