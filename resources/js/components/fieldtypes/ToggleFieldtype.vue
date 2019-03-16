@@ -15,7 +15,7 @@ export default {
 
     data() {
         return {
-            state: this.value || false
+            state: this.value ||this.config.default || false
         }
     },
 
