@@ -16,8 +16,8 @@
         >
             <div slot-scope="{ dragging }" class="relative" :class="{ 'shadow': showContainerTabs }">
                 <div class="drag-notification" v-show="dragging">
-                    <i class="icon icon-download" />
-                    {{ __('Drop to upload.') }}
+                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    {{ __('Drop File to Upload') }}
                 </div>
 
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
