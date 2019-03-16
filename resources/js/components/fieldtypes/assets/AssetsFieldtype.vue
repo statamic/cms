@@ -21,8 +21,8 @@
                 </div>
 
                 <div class="drag-notification" v-show="containerSpecified && dragging && !showSelector">
-                    <i class="icon icon-download"></i>
-                    <h3>{{ __('Drop to Upload') }}</h3>
+                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    {{ __('Drop File to Upload') }}
                 </div>
 
                 <template v-if="!loading">
