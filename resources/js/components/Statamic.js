@@ -5,7 +5,6 @@ export default new Vue({
         return {
             bootingCallbacks: [],
             bootedCallbacks: [],
-            conditions: {}, // TODO: Move to $conditions API
         }
     },
 

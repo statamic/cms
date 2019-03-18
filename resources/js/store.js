@@ -7,6 +7,7 @@ export default {
         fieldtypes: null,
         composer: {},
         config: {},
+        conditions: {},
     },
 
     mutations: {
@@ -33,6 +34,10 @@ export default {
 
         preferences(state, preferences) {
             state.config.preferences = preferences;
+        },
+
+        condition(state, payload) {
+            state.conditions[payload.name] = payload.condition;
         }
 
     }
