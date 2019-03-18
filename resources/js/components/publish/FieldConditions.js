@@ -189,7 +189,7 @@ class FieldConditionsValidator {
     }
 
     passesCustomLogicFunction(functionName) {
-        let customFunction = data_get(Statamic, 'conditions.' + functionName);
+        let customFunction = data_get(this.store.state.statamic.conditions, functionName);
 
         let extra = {
             store: this.store,
