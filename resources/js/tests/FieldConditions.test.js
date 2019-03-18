@@ -6,13 +6,23 @@ global._ = require('underscore');
 Vue.use(Vuex);
 
 const Store = new Vuex.Store({
-    state: {publish: {base: {values: {}}}},
+    state: {
+        publish: {base: {values: {}}},
+        statamic: {conditions: {}}
+    },
     mutations: {
         setValues(state, values) {
-            this.state.publish.base.values = values;
+            state.publish.base.values = values;
+        },
+        setCondition(state, payload) {
+            state.statamic.conditions[payload.name] = payload.condition;
         }
     }
 });
+
+const Statamic = {
+    condition: (name, condition) => Store.commit('setCondition', {name, condition})
+};
 
 const Fields = new Vue({
     mixins: [FieldConditions],
@@ -38,11 +48,8 @@ let showFieldIf = function (conditions=null) {
     return Fields.showField(conditions ? {'if': conditions} : {});
 };
 
-global.Statamic = {conditions: {}};
-
 afterEach(() => {
     Fields.values = {};
-    Statamic.conditions = {};
 });
 
 test('it shows field by default', () => {
@@ -249,9 +256,9 @@ test('it can call a custom logic function', () => {
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.conditions.reallyLovesAnimals = function (values) {
+    Statamic.condition('reallyLovesAnimals', function (values) {
         return values.favorite_animals.length > 3;
-    };
+    });
 
     expect(Fields.showField({if: 'reallyLovesAnimals'})).toBe(false);
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
@@ -262,11 +269,11 @@ test('it can call a custom logic function and has access to root values and extr
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    Statamic.conditions.reallyLovesFood = function (values, root, extra) {
+    Statamic.condition('reallyLovesFood', function (values, root, extra) {
         expect(extra.store).toBe(Store);
         expect(extra.storeName).toBe('base');
         return root.favorite_foods.length > 3;
-    };
+    });
 
     expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
 });
