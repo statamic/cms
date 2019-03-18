@@ -11,7 +11,7 @@ class ServiceProvider extends LaravelServiceProvider
 {
     public function register()
     {
-        $this->app->bind(IndexManager::class, function ($app) {
+        $this->app->singleton(IndexManager::class, function ($app) {
             return new IndexManager($app);
         });
     }
