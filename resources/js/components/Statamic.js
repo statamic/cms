@@ -44,6 +44,10 @@ export default new Vue({
 
         component(name, component) {
             Vue.component(name, component);
+        },
+
+        condition(name, condition) {
+            this.$store.commit('statamic/condition', {name, condition});
         }
     }
 });
