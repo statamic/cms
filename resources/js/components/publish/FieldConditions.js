@@ -191,6 +191,11 @@ class FieldConditionsValidator {
     passesCustomLogicFunction(functionName) {
         let customFunction = data_get(this.store.state.statamic.conditions, functionName);
 
+        if (typeof customFunction !== 'function') {
+            console.error(`Statamic field condition [${functionName}] was not properly defined.`);
+            return false;
+        }
+
         let extra = {
             store: this.store,
             storeName: this.storeName
