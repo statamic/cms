@@ -76,6 +76,10 @@ export default {
 
         'sharedState.selections': function (selections) {
             this.$emit('selections-updated', selections);
+        },
+
+        sortColumn(column) {
+            this.sharedState.sortColumn = column;
         }
 
     },
