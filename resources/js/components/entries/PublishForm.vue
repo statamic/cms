@@ -96,13 +96,7 @@
 
 
 <script>
-import LivePreview from '../live-preview/LivePreview.vue';
-
 export default {
-
-    components: {
-        LivePreview,
-    },
 
     props: {
         publishContainer: String,

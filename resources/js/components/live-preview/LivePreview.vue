@@ -15,6 +15,7 @@
                         <div class="text-lg font-medium mr-2">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
+                            <button class="btn mr-2" @click="popout">Pop out</button>
                             <div class="select-input-container w-32">
                                 <select class="select-input" v-model="previewDevice">
                                     <option :value="device" :key="device" v-text="device" :selected="previewDevice === device" v-for="device in previewDevices"></option>
@@ -101,6 +102,10 @@ export default {
             provides: {
                 storeName: this.name
             },
+            channel: null,
+            poppedOut: false,
+            popoutWindow: null,
+            popoutResponded: false,
         }
     },
 
@@ -141,6 +146,10 @@ export default {
         });
     },
 
+    beforeDestroy() {
+        this.closePopout();
+    },
+
     destroyed() {
         this.$mousetrap.unbind('meta+shift+p');
     },
@@ -148,6 +157,11 @@ export default {
     methods: {
 
         update: _.debounce(function () {
+            if (this.poppedOut) {
+                this.sendPayloadToPoppedOutWindow();
+                return;
+            }
+
             if (source) source.cancel();
             source = this.$axios.CancelToken.source();
 
@@ -172,6 +186,8 @@ export default {
         },
 
         close() {
+            if (this.poppedOut) this.closePopout();
+
             this.animateOut().then(() => this.$emit('closed'));
         },
 
@@ -203,6 +219,51 @@ export default {
         collapseEditor() {
             this.editorCollapsed = true;
             this.editorWidth = 16;
+        },
+
+        popout() {
+            this.poppedOut = true;
+            this.channel = new BroadcastChannel('livepreview');
+            this.channel.onmessage = e => {
+                switch (e.data.event) {
+                    case 'popout.opened':
+                        this.listenForPopoutClose();
+                        this.sendPayloadToPoppedOutWindow();
+                        this.updateIframeContents('');
+                        break;
+                    case 'popout.closed':
+                        this.poppedOut = false;
+                        this.update();
+                    case 'popout.pong':
+                        this.popoutResponded = true;
+                        break;
+                    default:
+                        break;
+                }
+            };
+            this.popoutWindow = window.open(this.url, 'livepreview', 'width=700,height=900');
+        },
+
+        closePopout() {
+            this.popoutWindow.close();
+        },
+
+        sendPayloadToPoppedOutWindow() {
+            this.channel.postMessage({ event: 'updated', url: this.url, payload: this.payload })
+        },
+
+        listenForPopoutClose() {
+            this.channel.postMessage({ event: 'ping' });
+            setTimeout(() => {
+                if (this.popoutResponded) {
+                    this.listenForPopoutClose();
+                } else {
+                    this.poppedOut = false;
+                    this.update();
+                }
+
+                this.popoutResponded = false;
+            }, 200);
         }
     }
 
