@@ -12,7 +12,7 @@
                     class="help-block replicator-set-instructions" />
             </div>
             <div class="replicator-set-controls">
-                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="enabled" />
+                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
                     <ul class="dropdown-menu">
                         <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
