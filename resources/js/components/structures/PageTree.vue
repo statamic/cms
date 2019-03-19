@@ -106,7 +106,7 @@ export default {
             this.$axios.post(this.submitUrl, { pages: this.pages }).then(response => {
                 this.changed = false;
                 this.saving = false;
-                this.$notify.success(__('Pages reordered.'), { timeout: 3000 });
+                this.$notify.success(__('Pages reordered.'));
             });
         }
 

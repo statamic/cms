@@ -409,7 +409,7 @@ export default {
 
         uploadCompleted(asset) {
             this.loadAssets();
-            this.$notify.success(__(':file uploaded', { file: asset.basename }), { timeout: 3000 });
+            this.$notify.success(__(':file uploaded', { file: asset.basename }));
         },
 
         uploadError(upload, uploads) {

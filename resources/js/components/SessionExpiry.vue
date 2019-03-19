@@ -165,7 +165,7 @@ export default {
                     this.errors = e.response.data.errors;
                     this.$notify.error(e.response.data.message);
                 } else {
-                    this.$notify.error(__('Something went wrong'), { timeout: 3000 })
+                    this.$notify.error(__('Something went wrong'))
                 }
             });
         },

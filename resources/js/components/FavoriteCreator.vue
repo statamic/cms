@@ -69,7 +69,7 @@ export default {
             this.saving = true;
             this.$preferences.append('favorites', this.favorite).then(response => {
                 this.saving = false;
-                this.$notify.success(__('Favorite saved'), { timeout: 3000 });
+                this.$notify.success(__('Favorite saved'));
                 this.$refs.popper.doClose();
             }).catch(e => {
                 this.saving = false;

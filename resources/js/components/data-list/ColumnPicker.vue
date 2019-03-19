@@ -76,7 +76,7 @@ export default {
             this.saving = true;
             this.$axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
                 this.saving = false;
-                this.$notify.success(__('Columns saved'), { timeout: 3000 });
+                this.$notify.success(__('Columns saved'));
                 this.$refs.dropdown.close();
             }).catch(e => {
                 this.saving = false;

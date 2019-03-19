@@ -60,7 +60,7 @@ export default {
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 this.errors = errors;
-                this.$notify.error(message, { timeout: 2000 });
+                this.$notify.error(message);
                 this.saving = false;
             } else {
                 this.$notify.error(__('Something went wrong'));

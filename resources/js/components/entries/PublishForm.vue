@@ -217,7 +217,7 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message, { timeout: 2000 });
+                    this.$notify.error(message);
                 } else {
                     this.$notify.error('Something went wrong');
                 }
