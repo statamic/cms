@@ -4,14 +4,15 @@
 
         <div class="replicator-set-header">
             <div class="item-move sortable-handle" :class="sortableHandleClass"></div>
-            <div class="replicator-set-title">
-                <label v-text="config.display" />
+            <div class="flex-1 ml-1 flex items-center">
+                <label v-text="config.display" class="text-xs"/>
                 <div
                     v-if="config.instructions"
                     v-html="instructions"
-                    class="help-block" />
+                    class="help-block replicator-set-instructions" />
             </div>
             <div class="replicator-set-controls">
+                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="enabled" />
                 <dropdown-list>
                     <ul class="dropdown-menu">
                         <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
@@ -120,6 +121,10 @@ export default {
 
         toggle() {
             this.isHidden ? this.expand() : this.collapse();
+        },
+
+        toggleEnabledState() {
+            Vue.set(this.values, 'enabled', ! this.values.enabled);
         },
 
         expand() {

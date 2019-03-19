@@ -16,6 +16,7 @@ var colors = {
     'grey-10':          'hsla(200, 90%, 99%, 1)',
     'white':            '#ffffff',
     'green':            '#479967',
+    'green-light':      '#64BD63',
     'blue-light':       'hsla(210, 100%, 75%, 1)',
     'blue':             'hsla(200, 80%, 50%, 1)',
     'blue-dark':        'hsla(200, 75%, 45%, 1)', //#4990bb

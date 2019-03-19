@@ -80,7 +80,7 @@ export default {
         let values = JSON.parse(JSON.stringify(this.value || []));
 
         // Assign each set a unique id that Vue can use as a v-for key.
-        this.values = values.map(set => Object.assign(set, { _id: uniqid() }));
+        this.values = values.map(set => Object.assign(set, { _id: uniqid(), enabled: true }));
     },
 
     methods: {
@@ -103,6 +103,7 @@ export default {
             let newSet = {
                 _id: uniqid(), // Assign a unique id that Vue can use as a v-for key.
                 type: handle,
+                enabled: true
             };
 
             // Get nulls for all the set's fields so Vue can track them more reliably.
