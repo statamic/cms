@@ -59,6 +59,10 @@ export default {
     watch: {
 
         parameters(after, before) {
+            // A change to the search query would trigger both watchers.
+            // We only want the searchQuery one to kick in.
+            if (before.search !== after.search) return;
+
             if (JSON.stringify(before) === JSON.stringify(after)) return;
             this.request();
         },
@@ -72,6 +76,9 @@ export default {
 
         searchQuery(query) {
             this.page = 1;
+            this.sortColumn = null;
+            this.sortDirection = null;
+            this.request();
         }
 
     },

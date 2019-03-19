@@ -26,8 +26,16 @@ class EntriesController extends CpController
 
         $this->filter($query, $request->filters);
 
+        $sortField = request('sort');
+        $sortDirection = request('order');
+
+        if (!$sortField && !request('search')) {
+            $sortField = $collection->sortColumn();
+            $sortDirection = $collection->sortDirection();
+        }
+
         $paginator = $query
-            ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
+            ->orderBy($sortField, $sortDirection)
             ->paginate(request('perPage'));
 
         $entries = $paginator->supplement(function ($entry) {
@@ -47,7 +55,7 @@ class EntriesController extends CpController
 
         return Resource::collection($paginator)->additional(['meta' => [
             'filters' => $request->filters,
-            'sortColumn' => $sort,
+            'sortColumn' => $sortField,
             'columns' => $columns,
         ]]);
     }
