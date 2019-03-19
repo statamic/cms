@@ -15,7 +15,7 @@ class Sets extends Fieldtype
         return collect($data)
             ->map(function ($config, $name) {
                 return array_merge($config, [
-                    'handle' => $name,
+                    'handle' => $config['handle'],
                     'id' => $name,
                     'fields' => (new NestedFields)->preProcess(array_get($config, 'fields', [])),
                 ]);
