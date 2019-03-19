@@ -14,31 +14,31 @@ use Statamic\Contracts\Assets\AssetRepository as Contract;
 
 class AssetRepository implements Contract
 {
-    public function all(): AssetCollection
+    public function all()
     {
         return collect_assets(AssetContainer::all()->flatMap(function ($container) {
             return $container->assets();
         }));
     }
 
-    public function whereContainer(string $container): AssetCollection
+    public function whereContainer(string $container)
     {
         return AssetContainer::find($container)->assets();
     }
 
-    public function whereFolder(string $folder, string $container): AssetCollection
+    public function whereFolder(string $folder, string $container)
     {
         return AssetContainer::find($container)->assets($folder);
     }
 
-    public function find(string $asset): ?Asset
+    public function find(string $asset)
     {
         return Str::contains($asset, '::')
             ? $this->findById($asset)
             : $this->findByUrl($asset);
     }
 
-    public function findByUrl(string $url): ?Asset
+    public function findByUrl(string $url)
     {
         // If a container can't be resolved, we'll assume there's no asset.
         if (! $container = $this->resolveContainerFromUrl($url)) {
@@ -76,7 +76,7 @@ class AssetRepository implements Contract
         return $this->findByUrl($url); // TODO: Replace usages with findByUrl
     }
 
-    public function findById(string $id): ?Asset
+    public function findById(string $id)
     {
         list($container_id, $path) = explode('::', $id);
 
@@ -93,7 +93,7 @@ class AssetRepository implements Contract
         return $this->findById($id); // TODO: Replace usages with findById
     }
 
-    public function findByPath(string $path): ?Asset
+    public function findByPath(string $path)
     {
         return $this->all()->filter(function ($asset) use ($path) {
             return $asset->resolvedPath() === $path;
@@ -105,7 +105,7 @@ class AssetRepository implements Contract
         return $this->findByPath($path); // TODO: Replace usages with findByPath
     }
 
-    public function make(): Asset
+    public function make()
     {
         return app(Asset::class);
     }
@@ -115,7 +115,7 @@ class AssetRepository implements Contract
         return app(QueryBuilder::class);
     }
 
-    public function save(Asset $asset)
+    public function save($asset)
     {
         $asset->writeMeta($asset->generateMeta());
     }
