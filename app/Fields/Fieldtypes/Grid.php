@@ -87,6 +87,14 @@ class Grid extends Fieldtype
 
     public function preload()
     {
-        return $this->fields()->meta();
+        return [
+            'defaults' => $this->defaultRowData(),
+            'fields' => $this->fields()->meta(),
+        ];
+    }
+
+    protected function defaultRowData()
+    {
+        return $this->fields()->all()->map->defaultValue();
     }
 }

@@ -17,6 +17,11 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class EntryPreviewController extends CpController
 {
+    public function show()
+    {
+        return view('statamic::entries.preview');
+    }
+
     public function edit(Request $request, $collection, $id, $slug, $site)
     {
         if (! Site::get($site)) {

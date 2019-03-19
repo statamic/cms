@@ -11,7 +11,7 @@
             :is="component"
             :fields="fields"
             :rows="rows"
-            :meta="meta"
+            :meta="meta.fields"
             :name="name"
             @updated="updated"
             @removed="removed"
@@ -116,7 +116,7 @@ export default {
         addRow() {
             const row = _.chain(this.fields)
                 .indexBy('handle')
-                .mapObject(field => null)
+                .mapObject(field => this.meta.defaults[field.handle])
                 .value();
 
             row._id = uniqid(); // Assign a unique id that Vue can use as a v-for key.
