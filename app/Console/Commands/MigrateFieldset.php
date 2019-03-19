@@ -128,10 +128,24 @@ class MigrateFieldset extends Command
     {
         return collect($fields)
             ->map(function ($field, $handle) {
-                return ! isset($field['handle']) ? Arr::prepend($field, $handle, 'handle') : $field;
+                return $this->migrateField($field, $handle);
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Migrate field.
+     *
+     * @param array $field
+     * @param mixed $handle
+     */
+    protected function migrateField($field, $handle)
+    {
+        return [
+            'handle' => $field['handle'] ?? $handle,
+            'field' => $field['field'] ?? collect($field)->except(['handle', 'field'])->all(),
+        ];
     }
 
     /**
