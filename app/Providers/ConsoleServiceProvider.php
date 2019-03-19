@@ -22,6 +22,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\MakeWidget::class,
         Commands\MakeUser::class,
         Commands\MakeBiscuit::class,
+        Commands\MigrateFieldset::class,
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
         Commands\StaticClear::class,
