@@ -70,4 +70,11 @@ class Replicator extends Fieldtype
     {
         return array_get($this->getFieldConfig('sets'), $handle);
     }
+
+    public function augment($array)
+    {
+        return collect($array)->reject(function ($value, $key) {
+            return array_get($value, 'enabled', true) === false;
+        });
+    }
 }
