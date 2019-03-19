@@ -19,8 +19,8 @@
 
         <entry-list
             collection="{{ $collection->handle() }}"
-            initial-sort-column="title"
-            initial-sort-direction="asc"
+            initial-sort-column="{{ $collection->sortField() }}"
+            initial-sort-direction="{{ $collection->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
             :actions="{{ $actions->toJson() }}"
             action-url="{{ cp_route('collections.entries.action', $collection->handle()) }}"
