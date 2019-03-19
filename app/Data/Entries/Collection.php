@@ -60,6 +60,27 @@ class Collection implements Contract
         return $this;
     }
 
+    public function sortField()
+    {
+        switch ($this->order()) {
+            case 'date':
+                return 'date';
+            case 'number':
+                return 'order';
+            default:
+                return 'title';
+        }
+    }
+
+    public function sortDirection()
+    {
+        if ($this->order() === 'date') {
+            return 'desc';
+        }
+
+        return 'asc';
+    }
+
     public function title($title = null)
     {
         if (func_num_args() === 0) {

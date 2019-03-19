@@ -161,6 +161,24 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    function it_gets_sort_field_and_direction()
+    {
+        $collection = new Collection;
+        $this->assertEquals('title', $collection->sortField());
+        $this->assertEquals('asc', $collection->sortDirection());
+
+        $collection->order('date');
+        $this->assertEquals('date', $collection->sortField());
+        $this->assertEquals('desc', $collection->sortDirection());
+
+        $collection->order('number');
+        $this->assertEquals('order', $collection->sortField());
+        $this->assertEquals('asc', $collection->sortDirection());
+
+        // TODO: Ability to control sort direction
+    }
+
+    /** @test */
     function it_saves_the_collection_through_the_api()
     {
         $collection = new Collection;
