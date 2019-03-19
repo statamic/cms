@@ -12,6 +12,7 @@
                     :item="item"
                     :status-icon="statusIcons"
                     :editable="canEdit"
+                    :sortable="canReorder"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -91,6 +92,7 @@ export default {
         search: Boolean,
         canEdit: Boolean,
         canCreate: Boolean,
+        canReorder: Boolean,
     },
 
     components: {

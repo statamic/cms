@@ -4,7 +4,7 @@
         class="item mb-1 select-none"
         :class="{ 'published': item.published, 'unpublished': !item.published, 'invalid': item.invalid }"
     >
-        <div class="item-move">&nbsp;</div>
+        <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
             <div v-if="statusIcon" class="little-dot mr-1" />
 
@@ -50,7 +50,8 @@ export default {
     props: {
         item: Object,
         statusIcon: Boolean,
-        editable: Boolean
+        editable: Boolean,
+        sortable: Boolean,
     },
 
     data() {

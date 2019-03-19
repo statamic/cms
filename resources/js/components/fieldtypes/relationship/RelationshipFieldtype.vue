@@ -5,6 +5,7 @@
         v-model="selections"
         :can-edit="canEdit"
         :can-create="canCreate"
+        :can-reorder="canReorder"
         :site="site"
         :initial-data="initialData"
         :max-items="maxItems"
@@ -87,6 +88,10 @@ export default {
 
         canSearch() {
             return this.meta.canSearch;
+        },
+
+        canReorder() {
+            return this.config.max_items > 1;
         },
 
         statusIcons() {
