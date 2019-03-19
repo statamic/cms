@@ -184,6 +184,6 @@ class Field implements Arrayable
 
     public function meta()
     {
-        return $this->fieldtype()->preload($this->value());
+        return $this->fieldtype()->preload();
     }
 }
