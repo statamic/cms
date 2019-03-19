@@ -232,6 +232,14 @@ class Asset implements AssetContract, Arrayable
         return URL::assemble($this->container()->url(), $this->path());
     }
 
+    public function thumbnailUrl($preset = null)
+    {
+        return cp_route('assets.thumbnails.show', [
+            'asset' => base64_encode($this->id()),
+            'size' => $preset
+        ]);
+    }
+
     /**
      * Get either a image URL builder instance, or a URL if passed params.
      *
