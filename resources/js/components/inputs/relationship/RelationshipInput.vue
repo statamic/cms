@@ -3,8 +3,8 @@
     <div class="relationship-input">
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <div v-if="!initializing">
-            <div ref="items" class="outline-none">
+        <template v-if="!initializing">
+            <div ref="items" class="relationship-input-items outline-none">
                 <component
                     :is="itemComponent"
                     v-for="(item, i) in items"
@@ -60,7 +60,7 @@
             </stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
-        </div>
+        </template>
     </div>
 
 </template>
