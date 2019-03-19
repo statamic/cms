@@ -8,6 +8,7 @@
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"
+            :meta="meta[field.handle]"
             :index="i"
             :row-index="index"
             :grid-name="name"
@@ -52,6 +53,10 @@ export default {
             required: true
         },
         values: {
+            type: Object,
+            required: true
+        },
+        meta: {
             type: Object,
             required: true
         },

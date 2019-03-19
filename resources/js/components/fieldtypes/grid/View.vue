@@ -1,7 +1,7 @@
 <script>
 export default {
 
-    props: ['fields', 'rows', 'name'],
+    props: ['fields', 'rows', 'meta', 'name'],
 
     data() {
         return {

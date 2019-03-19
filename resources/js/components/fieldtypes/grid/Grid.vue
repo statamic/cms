@@ -11,6 +11,7 @@
             :is="component"
             :fields="fields"
             :rows="rows"
+            :meta="meta"
             :name="name"
             @updated="updated"
             @removed="removed"

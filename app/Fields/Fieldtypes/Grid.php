@@ -7,6 +7,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Fields\ConfigFields;
 
 class Grid extends Fieldtype
 {
@@ -82,5 +83,10 @@ class Grid extends Fieldtype
         return collect($rules)->mapWithKeys(function ($rules, $handle) {
             return ["{$this->field->handle()}.*.{$handle}" => $rules];
         })->all();
+    }
+
+    public function preload()
+    {
+        return $this->fields()->meta();
     }
 }

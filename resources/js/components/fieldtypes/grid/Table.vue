@@ -25,6 +25,7 @@
                     :index="index"
                     :fields="fields"
                     :values="row"
+                    :meta="meta"
                     :name="name"
                     @updated="(row, value) => $emit('updated', row, value)"
                     @duplicate="(row) => $emit('duplicate', row)"

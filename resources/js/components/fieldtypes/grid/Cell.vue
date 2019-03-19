@@ -6,6 +6,7 @@
                 :is="fieldtypeComponent"
                 :config="field"
                 :value="value"
+                :meta="meta"
                 :name="name"
                 @updated="updated"
             />
@@ -27,6 +28,9 @@ export default {
             required: true
         },
         value: {
+            required: true
+        },
+        meta: {
             required: true
         },
         index: {
