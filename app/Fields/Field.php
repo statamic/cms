@@ -85,6 +85,15 @@ class Field implements Arrayable
         return (bool) $this->get('listable');
     }
 
+    public function isSortable()
+    {
+        if (is_null($this->get('sortable'))) {
+            return true;
+        }
+
+        return (bool) $this->get('sortable');
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [

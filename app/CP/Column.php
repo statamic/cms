@@ -13,6 +13,7 @@ class Column
     public $fieldtype;
     public $label;
     public $visible = true;
+    public $sortable = true;
     public $value = null;
 
     /**
@@ -87,6 +88,17 @@ class Column
     public function visible($visible = null)
     {
         return $this->fluentlyGetOrSet('visible', $visible);
+    }
+
+    /**
+     * Get or set sortable.
+     *
+     * @param null|bool $sortable
+     * @return mixed
+     */
+    public function sortable($sortable = null)
+    {
+        return $this->fluentlyGetOrSet('sortable', $sortable);
     }
 
     /**

@@ -96,6 +96,12 @@ export default {
             const columns = this.sharedState.columns.filter(column => column.visible);
 
             return columns.length ? columns : this.sharedState.columns;
+        },
+
+        sortableColumns() {
+            return this.sharedState.columns
+                .filter(column => column.sortable)
+                .map(column => column.field);
         }
 
     },
@@ -103,6 +109,10 @@ export default {
     methods: {
 
         changeSortColumn(column) {
+            if (! this.sortableColumns.includes(column)) {
+                return;
+            }
+
             this.sharedState.currentPage = 1;
             if (this.sharedState.sortColumn === column) this.swapSortDirection();
             this.sharedState.sortColumn = column;
