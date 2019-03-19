@@ -20,6 +20,7 @@ class Relationship extends Fieldtype
     protected $canCreate = true;
     protected $canSearch = true;
     protected $statusIcons = true;
+    protected $defaultValue = [];
 
     protected $configFields = [
         'max_items' => ['type' => 'integer'],
