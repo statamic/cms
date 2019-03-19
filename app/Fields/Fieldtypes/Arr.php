@@ -1,16 +1,27 @@
 <?php
 
-namespace Statamic\Addons\Arr;
+namespace Statamic\Fields\Fieldtypes;
 
-use Statamic\Addons\BundleFieldtype as Fieldtype;
+use Statamic\Fields\Fieldtype;
 
-class ArrFieldtype extends Fieldtype
+class Arr extends Fieldtype
 {
     protected static $handle = 'array';
+
+    protected $configFields = [
+        'keys' => [
+            'type' => 'array'
+        ]
+    ];
 
     public function preProcess($data)
     {
         return array_merge($this->blankKeyed(), $data ?? []);
+    }
+
+    public function preProcessConfig($data)
+    {
+        return format_input_options($data);
     }
 
     public function process($data)

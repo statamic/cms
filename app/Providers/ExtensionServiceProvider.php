@@ -26,7 +26,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'arr', 'checkboxes',
+        'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'partial', 'radio', 'redactor', 'redactor_settings', 'time', 'title', 'toggle', 'video', 'yaml',
         'revealer', 'section', 'slug', 'table', 'tags', 'template', 'text', 'textarea',
@@ -86,6 +86,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $fieldtypes = [
+        Fieldtypes\Arr::class,
         Fieldtypes\AssetContainer::class,
         Fieldtypes\AssetFolder::class,
         Fieldtypes\Assets::class,
