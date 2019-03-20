@@ -138,14 +138,80 @@ class MigrateFieldset extends Command
      * Migrate field.
      *
      * @param array $field
-     * @param mixed $handle
+     * @param string $handle
+     * @return array
      */
     protected function migrateField($field, $handle)
     {
         return [
             'handle' => $field['handle'] ?? $handle,
-            'field' => $field['field'] ?? collect($field)->except(['handle', 'field'])->all(),
+            'field' => $field['field'] ?? $this->migrateFieldConfig($field),
         ];
+    }
+
+    /**
+     * Migrate field config.
+     *
+     * @param array $config
+     * @return array
+     */
+    protected function migrateFieldConfig($config)
+    {
+        $config = collect($config)->except(['handle', 'field']);
+
+        switch ($config['type']) {
+            case 'grid':
+                $config = $this->migrateGridConfig($config);
+                break;
+            case 'replicator':
+            case 'bard':
+                $config = $this->migrateReplicatorConfig($config);
+                break;
+        }
+
+        return $this->normalizeConfigToArray($config);
+    }
+
+    /**
+     * Migrate grid config.
+     *
+     * @param \Illuminate\Support\Collection $config
+     * @return \Illuminate\Support\Collection
+     */
+    protected function migrateGridConfig($config)
+    {
+        return $config->put('fields', $this->migrateFields($config['fields']));
+    }
+
+    /**
+     * Migrate replicator config.
+     *
+     * @param \Illuminate\Support\Collection $config
+     * @return \Illuminate\Support\Collection
+     */
+    protected function migrateReplicatorConfig($config)
+    {
+        $sets = collect($config['sets'])
+            ->map(function ($set) {
+                return collect($set)->put('fields', $this->migrateFields($set['fields']))->all();
+            })
+            ->all();
+
+        return $config->put('sets', $sets);
+    }
+
+    /**
+     * Normalize config and cast back to array.
+     *
+     * @param \Illuminate\Support\Collection $config
+     * @return array
+     */
+    protected function normalizeConfigToArray($config)
+    {
+        return $config
+            ->except('type')
+            ->prepend($config['type'], 'type')
+            ->all();
     }
 
     /**
