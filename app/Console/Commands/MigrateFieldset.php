@@ -159,45 +159,30 @@ class MigrateFieldset extends Command
     {
         $config = collect($config)->except(['handle', 'field']);
 
-        switch ($config['type']) {
-            case 'grid':
-                $config = $this->migrateGridConfig($config);
-                break;
-            case 'replicator':
-            case 'bard':
-                $config = $this->migrateReplicatorConfig($config);
-                break;
+        if ($fields = $config['fields'] ?? false) {
+            $config->put('fields', $this->migrateFields($fields));
+        }
+
+        if ($sets = $config['sets'] ?? false) {
+            $config->put('sets', $this->migrateSets($sets));
         }
 
         return $this->normalizeConfigToArray($config);
     }
 
     /**
-     * Migrate grid config.
+     * Migrate replicator/bard/etc sets.
      *
-     * @param \Illuminate\Support\Collection $config
-     * @return \Illuminate\Support\Collection
+     * @param array $sets
+     * @return array
      */
-    protected function migrateGridConfig($config)
+    protected function migrateSets($sets)
     {
-        return $config->put('fields', $this->migrateFields($config['fields']));
-    }
-
-    /**
-     * Migrate replicator config.
-     *
-     * @param \Illuminate\Support\Collection $config
-     * @return \Illuminate\Support\Collection
-     */
-    protected function migrateReplicatorConfig($config)
-    {
-        $sets = collect($config['sets'])
+        return collect($sets)
             ->map(function ($set) {
                 return collect($set)->put('fields', $this->migrateFields($set['fields']))->all();
             })
             ->all();
-
-        return $config->put('sets', $sets);
     }
 
     /**
