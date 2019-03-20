@@ -85,22 +85,14 @@ class Assets extends Fieldtype
             }
 
             if ($asset->isImage()) {
-                $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
-                $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
+                $asset->setSupplement('thumbnail', $asset->thumbnailUrl('small'));
+                $asset->setSupplement('toenail', $asset->thumbnailUrl('large'));
             }
 
             $assets->put($url, $asset);
         }
 
         return $assets->values();
-    }
-
-    protected function thumbnail($asset, $preset = null)
-    {
-        return cp_route('assets.thumbnails.show', [
-            'asset' => base64_encode($asset->id()),
-            'size' => $preset
-        ]);
     }
 
     public function augment($value)
