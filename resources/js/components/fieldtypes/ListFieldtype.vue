@@ -88,59 +88,43 @@ export default {
             this.editing = this.data.length;
         },
 
-        editItem: function(index, event) {
-            event.preventDefault();
+        editItem(index) {
 
             this.editing = index;
 
-            // Async is good times.
             this.$nextTick(function () {
-                $(this.$el).find('.editing input').focus().select();
+                this.focusItem(index);
             });
         },
 
-        goUp: function() {
-            if (this.editing > 0) {
-                this.editing = this.editing - 1;
-                this.$nextTick(function () {
-                    $(this.$el).find('.editing input').focus().select();
-                });
-            }
+        focusItem(index) {
+            return this.editing === this.data.length
+                ? this.$refs.newItem.focus()
+                : this.$refs.items[this.editing].querySelector('input').select();
         },
 
-        goDown: function() {
-
-            // Check if we're at the last one
-            if (this.editing === this.data.length - 1) {
-                this.editing = this.data.length;
-                $(this.$el).find('.new-item').focus();
-            } else {
-                this.editing = this.editing + 1;
-                this.$nextTick(function () {
-                    $(this.$el).find('.editing input').focus().select();
-                });
-            }
+        goUp() {
+            this.editItem(Math.max(this.editing - 1, 0));
         },
 
-        updateItem: function(value, index, event) {
-            event.preventDefault();
-
-            // Let's remove blank items
-            if (value == '') {
-                this.data.$remove(index);
-            } else {
-                this.data[index] = value;
-            }
-
-            this.editing = this.data.length;
-
-            // Back to adding new items.
-            $(this.$el).find('.new-item').focus();
-
+        goDown() {
+            this.editItem(this.editing + 1);
         },
 
-        deleteItem: function(i) {
-            this.data.splice(i, 1);
+        updateItem(index) {
+            this.editItem(this.data.length);
+        },
+
+        deleteItem(index) {
+            this.data.splice(index, 1);
+        },
+
+        removeEmptyValues() {
+            this.data.forEach((item, index) => {
+                if (item.value === '') {
+                    this.deleteItem(index);
+                }
+            });
         },
 
         getReplicatorPreviewText() {
