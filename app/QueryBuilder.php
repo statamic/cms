@@ -16,6 +16,7 @@ abstract class QueryBuilder
     protected $orderDirection;
     protected $operators = [
         '=' => 'Equals',
+        '<>' => 'NotEquals',
         'like' => 'Like',
     ];
 
