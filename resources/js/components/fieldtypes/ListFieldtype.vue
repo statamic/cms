@@ -39,24 +39,25 @@ export default {
         SortableItem
     },
 
-    data: function () {
+    data() {
         return {
-            data: this.value || [],
+            data: [],
             newItem: '',
             editing: null,
         }
     },
 
+    created() {
+        this.data = this.arrayToSortable(this.value || []);
+    },
+
     watch: {
-
-        value(value) {
-            this.data = value;
-        },
-
-        data(value) {
-            this.update(value);
+        data: {
+            deep: true,
+            handler (data) {
+                this.update(this.sortableToArray(data));
+            }
         }
-
     },
 
     methods: {
