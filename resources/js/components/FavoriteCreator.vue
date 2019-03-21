@@ -86,6 +86,12 @@ export default {
                 this.$notify.success(__('Favorite removed'), { timeout: 3000 });
             });
         }
+    },
+
+    mounted() {
+        this.$mousetrap.bindGlobal(['esc'], e => {
+            this.$refs.popper.doClose();
+        });
     }
 }
 </script>
