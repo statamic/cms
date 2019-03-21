@@ -16,6 +16,12 @@
             <div class="flex-1">
                 <text-input name="value" v-model="value.value" />
             </div>
+
+            <button
+                type="button"
+                class="ml-2 p-1 text-xl text-grey-60"
+                @click="$emit('removed')"
+                v-html="'&times'" />
         </div>
     </div>
 

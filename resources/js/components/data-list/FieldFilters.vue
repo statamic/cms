@@ -8,6 +8,7 @@
             :value="values[field.handle]"
             class="mb-3"
             @updated="updateField(field.handle, $event)"
+            @removed="removeField(field.handle)"
         />
 
         <h6 v-show="unselectedFields.length">Add filter...</h6>
@@ -81,6 +82,10 @@ export default {
 
         updateField(handle, value) {
             Vue.set(this.values, handle, value);
+        },
+
+        removeField(handle) {
+            Vue.delete(this.values, handle);
         }
 
     }
