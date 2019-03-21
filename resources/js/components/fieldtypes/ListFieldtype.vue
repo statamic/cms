@@ -89,6 +89,7 @@ export default {
         },
 
         editItem(index) {
+            // this.removeEmptyValues(); // TODO: Need to update this.editing if index is affected?
 
             this.editing = index;
 
@@ -128,7 +129,7 @@ export default {
         },
 
         getReplicatorPreviewText() {
-            return this.data.join(', ');
+            return this.data.join(', '); // TODO: Do we still use this?
         }
     }
 };
