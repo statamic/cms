@@ -19,7 +19,7 @@
                     class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
                     :class="{ 'bg-grey-20': loc.active }"
                     @click="localizationSelected(loc)"
-                    v-popover:tooltip.top="localizationStatusText(loc)"
+                    v-tooltip.top="localizationStatusText(loc)"
                 >
                     <div class="w-4 text-right flex items-center">
                         <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === loc.handle" />

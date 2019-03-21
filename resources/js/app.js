@@ -32,6 +32,7 @@ import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
+import VTooltip from 'v-tooltip'
 
 Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -48,6 +49,7 @@ Vue.moment = require('moment');
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
+Vue.use(VTooltip)
 Vue.use(Vuex);
 
 Statamic.$store = new Vuex.Store({

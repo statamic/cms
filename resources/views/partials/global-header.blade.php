@@ -2,7 +2,7 @@
     <div class="w-54 pl-3 flex items-center">
         <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
-            <div v-popover:tooltip.bottom="version">
+            <div v-tooltip="version">
                 @svg('statamic-wordmark')
             </div>
         </a>
@@ -24,13 +24,13 @@
         ></favorite-creator>
 
         @if (config('telescope.enabled'))
-            <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-popover:tooltip.bottom="'Laravel Telescope'">
+            <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @svg('telescope')
             </a>
         @endif
 
         <dropdown-list>
-            <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-80" slot="trigger">
+            <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-80" slot="trigger" v-tooltip="__('Useful Links')">
                 @svg('book-open')
             </a>
             <ul class="dropdown-menu">
@@ -53,7 +53,7 @@
                 </li>
             </ul>
         </dropdown-list>
-        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('statamic.site') }}" target="_blank" v-popover:tooltip.bottom="'{{ __('View Site') }}'">
+        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('statamic.site') }}" target="_blank" v-tooltip="'{{ __('View Site') }}'">
             @svg('browser-com')
         </a>
         <dropdown-list>

@@ -51,6 +51,7 @@
     "transliterations": "^1.6.4",
     "underscore": "^1.8.3",
     "uniqid": "^5.0.3",
+    "v-tooltip": "^2.0.0-rc.33",
     "vue": "^2.6.5",
     "vue-clickaway": "~2.2.2",
     "vue-draggable-nested-tree": "^2.2.2",
