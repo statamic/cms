@@ -5,15 +5,15 @@
             <span>{{ __('Filters') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1" v-text="activeFilterCount" />
         </button>
-        <stack name="filters" v-if="filtering" @closed="filtering = false">
-            <div slot-scope="{ close }" class="h-full bg-white p-3">
+        <modal name="filters" v-if="filtering">
+            <div class="h-full bg-white p-3">
 
                 <div class="pb-3 text-lg font-medium flex items-center justify-between">
                     {{ __('Filters') }}
                     <button
                         type="button"
                         class="ml-2 p-1 text-xl text-grey-60"
-                        @click="close"
+                        @click="filtering = false"
                         v-html="'&times'" />
                 </div>
 
@@ -41,7 +41,7 @@
                 <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
 
             </div>
-        </stack>
+        </modal>
     </div>
 </template>
 
