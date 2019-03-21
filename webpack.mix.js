@@ -31,7 +31,6 @@ mix.extract([
     'selectize',
     'sweetalert',
     '@shopify/draggable',
-    'tippy.js',
     'transliterations',
     'underscore',
     'vue',
