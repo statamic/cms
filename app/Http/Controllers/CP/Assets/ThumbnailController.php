@@ -97,12 +97,17 @@ class ThumbnailController extends Controller
 
         $path = $this->generator->generateByAsset(
             $this->asset,
-            $this->size ? ['p' => "cp_thumbnail_{$this->size}"] : []
+            $this->size ? ['p' => $this->getPreset()] : []
         );
 
         Cache::forget($this->mutex());
 
         return $path;
+    }
+
+    public function getPreset()
+    {
+        return "cp_thumbnail_{$this->size}_{$this->asset->orientation()}";
     }
 
     /**
