@@ -78,14 +78,14 @@ export default {
     },
 
     methods: {
-        addItem: function() {
-            // Blank items are losers.
-            if (this.newItem !== '') {
-                this.data.push(this.newItem);
-                this.newItem = '';
-                this.editing = this.data.length;
+        addItem() {
+            if (this.newItem === '') {
+                return;
             }
 
+            this.data.push(this.newSortableValue(this.newItem));
+            this.newItem = '';
+            this.editing = this.data.length;
         },
 
         editItem: function(index, event) {
