@@ -10,7 +10,7 @@
             @updated="updateField(field.handle, $event)"
         />
 
-        <h6>Add filter...</h6>
+        <h6 v-show="unselectedFields.length">Add filter...</h6>
 
         <button
             v-for="field in unselectedFields"
