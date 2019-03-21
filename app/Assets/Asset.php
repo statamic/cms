@@ -471,6 +471,10 @@ class Asset implements AssetContract, Arrayable
      */
     public function ratio()
     {
+        if (! $this->isImage()) {
+            return null;
+        }
+
         return $this->width() / $this->height();
     }
 
