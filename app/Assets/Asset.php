@@ -447,6 +447,34 @@ class Asset implements AssetContract, Arrayable
     }
 
     /**
+     * Get the asset's orientation
+     *
+     * @return string|null
+     */
+    public function orientation()
+    {
+        if ($this->height() > $this->width()) {
+            return 'portrait';
+        } elseif ($this->height() < $this->width()) {
+            return 'landscape';
+        } elseif ($this->height() === $this->width()) {
+            return 'square';
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the asset's ratio
+     *
+     * @return
+     */
+    public function ratio()
+    {
+        return $this->width() / $this->height();
+    }
+
+    /**
      * Get the asset's file size
      *
      * @return int
@@ -502,6 +530,10 @@ class Asset implements AssetContract, Arrayable
                 'last_modified_timestamp' => $this->lastModified()->timestamp,
                 'last_modified_instance'  => $this->lastModified(),
                 'focus_css' => \Statamic\View\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
+                'height' => $this->height(),
+                'width' => $this->width(),
+                'orientation' => $this->orientation(),
+                'ratio' => $this->ratio()
             ]);
         }
 
