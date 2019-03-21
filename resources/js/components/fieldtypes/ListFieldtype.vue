@@ -1,30 +1,47 @@
 <template>
-<ul>
-	<li v-for="(item, $index) in data" :key="$index" :class="{ editing: (editing == $index) }">
-		<span v-if="editing == $index">
-			<input
-				type="text"
-				v-model="data[$index]"
-				class="list-input"
-				@keydown.enter="updateItem(item, $index, $event)"
-				@keyup.up="goUp"
-				@keyup.down="goDown"
-			/>
-		</span>
-		<span v-if="editing != $index" @click="editItem($index, $event)">
-		    {{ item }}
-			<i class="delete" @click="deleteItem($index)"></i>
-		</span>
-	</li>
-	<li>
-		<input type="text" class="list-input new-item" v-model="newItem"
-            :placeholder="`${__('Add an item')}...`"
-            @keydown.enter.prevent="addItem"
-            @blur="addItem"
-            @keyup.up="goUp"
-		/>
-	</li>
-</ul>
+    <sortable-list
+        v-model="data"
+        :vertical="true"
+        item-class="sortable-row"
+        handle-class="sortable-handle"
+    >
+        <ul>
+            <li class="sortable-row"
+                v-for="(item, index) in data"
+                ref="items"
+                :key="item._id"
+                :class="{ editing: (editing === index) }"
+            >
+                <span v-if="editing === index">
+                    <input
+                        type="text"
+                        class="list-input"
+                        v-model="data[index].value"
+                        @keydown.enter.prevent="updateItem(index)"
+                        @keyup.up="goUp"
+                        @keyup.down="goDown"
+                        @focus="editItem(index)"
+                    />
+                </span>
+                <span v-if="editing !== index" @click.prevent="editItem(index)">
+                    <span class="sortable-handle">{{ item.value }}</span>
+                    <i class="delete" @click="deleteItem(index)"></i>
+                </span>
+            </li>
+            <li>
+                <input
+                    type="text"
+                    class="list-input new-item"
+                    v-model="newItem"
+                    ref="newItem"
+                    :placeholder="`${__('Add an item')}...`"
+                    @keydown.enter.prevent="addItem"
+                    @blur="addItem"
+                    @keyup.up="goUp"
+                />
+            </li>
+        </ul>
+    </sortable-list>
 </template>
 
 <script>
