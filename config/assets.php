@@ -97,8 +97,8 @@ return [
     */
 
     'thumbnails' => [
-        'max_width' => 6000,
-        'max_height' => 6000,
+        'max_width' => 10000,
+        'max_height' => 10000,
     ],
 
 ];
