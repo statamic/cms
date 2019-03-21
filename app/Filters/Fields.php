@@ -13,7 +13,7 @@ class Fields extends Filter
         return collect($this->context['blueprints'])->map(function ($blueprint) {
             return Blueprint::find($blueprint);
         })->mapWithKeys(function ($blueprint) {
-            return $blueprint->fields()->all()->map(function ($field) {
+            return $blueprint->fields()->all()->filter->isFilterable()->map(function ($field) {
                 return [
                     'handle' => $field->handle(),
                     'display' => $field->display(),
