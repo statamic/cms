@@ -80,7 +80,13 @@ export default {
         },
 
         activeFilterCount() {
-            return Object.keys(this.activeFilters).length;
+            let count = Object.keys(this.activeFilters).length;
+
+            if (this.activeFilters.hasOwnProperty('fields')) {
+                count = count + Object.keys(this.activeFilters.fields).length - 1;
+            }
+
+            return count;
         }
 
     },
