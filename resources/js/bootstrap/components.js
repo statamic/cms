@@ -30,6 +30,7 @@ Vue.component('data-list-toggle-all', require('../components/data-list/ToggleAll
 Vue.component('data-list-pagination', require('../components/data-list/Pagination.vue'));
 Vue.component('data-list-filters', require('../components/data-list/Filters.vue'));
 Vue.component('data-list-table', require('../components/data-list/Table.vue'));
+Vue.component('data-list-grid', require('../components/data-list/Grid.vue'));
 
 // Resource Type Lists
 Vue.component('entry-list', require('../components/entries/Listing.vue'));

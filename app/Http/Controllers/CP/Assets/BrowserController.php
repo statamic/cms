@@ -52,7 +52,7 @@ class BrowserController extends CpController
             ->queryAssets()
             ->where('folder', $path)
             ->orderBy($request->sort, $request->order)
-            ->paginate(15);
+            ->paginate(30);
 
         $this->supplementAssetsForDisplay($paginator->getCollection());
 

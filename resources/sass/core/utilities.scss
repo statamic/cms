@@ -35,6 +35,12 @@
     box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
 }
 
+.selected-outline {
+    @apply border-blue;
+    outline: 0;
+    box-shadow: 0 0 0 2px config('colors.blue');
+}
+
 .ease-quick {
     transition: all 60ms ease;
 }
@@ -102,4 +108,10 @@
 .help-block {
     width: 100%;
     p { @apply mb-1 }
+}
+
+.text-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

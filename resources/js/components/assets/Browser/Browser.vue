@@ -65,6 +65,14 @@
                                     <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
                                     <span>{{ __('Upload') }}</span>
                                 </button>
+
+                                <button class="btn btn-flat ml-2">
+                                    <svg-icon name="grid" class="h-4 w-4"/>
+                                </button>
+
+                                <button class="btn btn-flat ml-1">
+                                    <svg-icon name="table" class="h-4 w-4"/>
+                                </button>
                             </div>
 
                             <uploads
@@ -73,7 +81,7 @@
                                 class="-mt-px"
                             />
 
-                            <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true" @sorted="sorted">
+                            <data-list-table v-if="mode === 'table'" :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true" @sorted="sorted">
 
                                 <template slot="tbody-start">
                                     <tr v-if="folder.parent_path && !restrictFolderNavigation">
@@ -137,6 +145,9 @@
                                 </template>
 
                             </data-list-table>
+
+                            <!-- Grid Mode -->
+                            <data-list-grid  v-if="mode === 'grid'"></data-list-grid>
 
                             <data-list-bulk-actions
                                 class="rounded-b"
@@ -240,10 +251,11 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: 25, // TODO: Should come from the controller, or a config.
+            perPage: 30, // TODO: Should come from the controller, or a config.
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
+            mode: 'table'
         }
     },
 

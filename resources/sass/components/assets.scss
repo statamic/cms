@@ -442,3 +442,21 @@
         }
     }
 }
+
+.selected img {
+	border: 1px solid white;
+    box-shadow: 0 0 0 3px config('colors.blue-dark');
+}
+
+/* Lazyloading
+  ========================================================================== */
+
+.lazyload,
+.lazyloading {
+	opacity: 0;
+
+}
+.lazyloaded {
+	opacity: 1;
+	transition: opacity 180ms;
+}

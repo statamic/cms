@@ -27,6 +27,7 @@
     "fuse.js": "^3.2.1",
     "jquery": "^3.3.1",
     "jquery-ui": "file:resources/js/vendor/jquery-ui",
+    "lazysizes": "^4.1.7",
     "luminous-lightbox": "^0.2.0",
     "marked": "^0.3.6",
     "marked-plaintext": "0.0.2",
