@@ -14,6 +14,7 @@ class UserGroupRepository implements RepositoryContract
 {
     protected $groups;
     protected $path;
+    protected static $files = [];
 
     public function path($path)
     {
@@ -85,11 +86,17 @@ class UserGroupRepository implements RepositoryContract
 
     protected function raw()
     {
-        if (! File::exists($this->path)) {
-            return collect();
+        if ($cached = array_get(static::$files, $this->path)) {
+            return $cached;
         }
 
-        return collect(YAML::parse(File::get($this->path)));
+        if (! File::exists($this->path)) {
+            return static::$files[$this->path] = collect();
+        }
+
+        return static::$files[$this->path] = collect(
+            YAML::parse(File::get($this->path))
+        );
     }
 
     protected function write($groups)
