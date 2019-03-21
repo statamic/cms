@@ -28,9 +28,16 @@
 </template>
 
 <script>
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SortableHelpers],
+
+    components: {
+        SortableList,
+        SortableItem
+    },
 
     data: function () {
         return {
