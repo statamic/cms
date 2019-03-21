@@ -66,12 +66,12 @@
                                     <span>{{ __('Upload') }}</span>
                                 </button>
 
-                                <button class="btn btn-flat ml-2">
-                                    <svg-icon name="grid" class="h-4 w-4"/>
+                                <button class="btn btn-flat ml-2" @click="mode = 'grid'">
+                                    <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                 </button>
 
-                                <button class="btn btn-flat ml-1">
-                                    <svg-icon name="table" class="h-4 w-4"/>
+                                <button class="btn btn-flat ml-sm" @click="mode = 'table'">
+                                    <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                 </button>
                             </div>
 
