@@ -1,4 +1,6 @@
 <script>
+let source;
+
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 
@@ -88,7 +90,13 @@ export default {
         request() {
             this.loading = true;
 
-            this.$axios.get(this.requestUrl, { params: this.parameters }).then(response => {
+            if (source) source.cancel();
+            source = this.$axios.CancelToken.source();
+
+            this.$axios.get(this.requestUrl, {
+                params: this.parameters,
+                cancelToken: source.token
+            }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.activeFilters = {...response.data.meta.filters};
@@ -97,6 +105,7 @@ export default {
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {
+                if (this.$axios.isCancel(e)) return;
                 this.loading = false;
                 this.initializing = false;
                 this.$notify.error(e.response ? e.response.data.message : __('Something went wrong'));

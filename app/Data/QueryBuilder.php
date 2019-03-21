@@ -80,6 +80,11 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return strtolower($item) === strtolower($value);
     }
 
+    protected function filterTestNotEquals($item, $value)
+    {
+        return strtolower($item) !== strtolower($value);
+    }
+
     protected function filterTestLike($item, $like)
     {
         $like = strtolower($like);

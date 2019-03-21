@@ -56,7 +56,10 @@ class CollectionsController extends CpController
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => Filter::for('entries', $context = ['collection' => $collectionHandle]),
+            'filters' => Filter::for('entries', $context = [
+                'collection' => $collectionHandle,
+                'blueprints' => $blueprints->pluck('handle')->all(),
+            ]),
             'actions' => Action::for('entries', $context),
         ]);
     }

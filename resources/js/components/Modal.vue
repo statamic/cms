@@ -15,7 +15,7 @@ export default {
         name: { type: String, required: true },
         adaptive: { type: Boolean, default: true },
         draggable: { type: Boolean, default: false },
-        pivotY: { type: Number, default: 0.5 },
+        pivotY: { type: Number, default: 0.1 },
         height: { default: 'auto' },
         width: {}
     },

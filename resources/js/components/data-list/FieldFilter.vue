@@ -1,0 +1,52 @@
+<template>
+
+    <div>
+        <h6 class="mb-1">{{ field.display }}</h6>
+        <div class="flex items-center text-sm">
+            <select-input
+                class="w-1/5 mr-1"
+                name="operator"
+                v-model="value.operator"
+                :options="[
+                    { text: 'Equal to', value: '=' },
+                    { text: 'Not equal to', value: '<>' },
+                    { text: 'Like', value: 'like' },
+                ]" />
+
+            <div class="flex-1">
+                <text-input name="value" v-model="value.value" />
+            </div>
+        </div>
+    </div>
+
+</template>
+
+<script>
+export default {
+
+    props: {
+        field: Object,
+        value: {
+            type: Object,
+            default: () => {
+                return {
+                    value: null,
+                    operator: '=',
+                }
+            }
+        }
+    },
+
+    watch: {
+
+        value: {
+            deep: true,
+            handler(value) {
+                this.$emit('updated', value);
+            }
+        }
+
+    }
+
+}
+</script>
