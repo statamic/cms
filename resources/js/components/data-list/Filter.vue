@@ -1,16 +1,14 @@
 <template>
 
-    <li>
-        <h6>{{ filter.title }}</h6>
-        <select class="w-full" v-model="value">
-            <option value="" :disabled="filter.required">--</option>
-            <option
-                v-for="option in filter.options"
-                :key="option.value"
-                :value="option.value"
-                v-text="option.text" />
-        </select>
-    </li>
+    <div class="mb-3">
+        <h6 class="mb-1">{{ filter.title }}</h6>
+
+        <select-input
+            name="value"
+            v-model="value"
+            :options="filter.options" />
+        <!-- todo bring back the blank, and whether its required -->
+    </div>
 
 </template>
 

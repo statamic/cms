@@ -250,6 +250,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $parent = 'statamic.filters';
 
         $filters = [
+            Filters\Fields::class,
             Filters\Site::class,
             Filters\UserRole::class,
             Filters\UserGroup::class,
