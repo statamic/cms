@@ -1,5 +1,138 @@
 @extends('statamic::layout')
 
+@section('content')
+
+    <h1 class="mb-3">Revisions Prototype</h1>
+    <div class="card w-1/2 p-0">
+        <div>
+            <h2 class="p-3">Entry History</h2>
+            <h6 class="px-3 pb-1 mb-1 border-b">Today</h6>
+            <div class="revisions-listing text-sm pb-2">
+                <div class="py-1 px-3 hover:bg-grey-20 block group">
+                    <div class="flex items-center text-blue">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status bg-blue mr-1"></i>
+                        </span>
+                        <span>10:25 AM &mdash; Jack McDade</span>
+                        <span class="badge bg-blue uppercase text-white text-4xs ml-1">Working Copy</span>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block group">
+                    <div class="flex items-center text-green">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-live mr-1"></i>
+                        </span>
+                        <span>09:47 AM &mdash; Jack McDade</span>
+                        <span class="badge bg-green-light uppercase text-white text-4xs ml-1">Published</span>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>08:35 AM &mdash; Jack McDade</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>08:34 AM &mdash; André Basse</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>08:31 AM &mdash; André Basse</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>08:26 AM &mdash; Jack McDade</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="px-3 pb-1 pt-2 mb-1 border-b">March 19, 2019</h6>
+            <div class="revisions-listing text-sm pb-2">
+                <div class="py-1 px-3 hover:bg-grey-20 flex items-center text-green block group">
+                    <div class="flex items-center justify-between cursor-pointer enter">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-live mr-1"></i>
+                        </span>
+                        <span>10:45 PM &mdash; Jack McDade</span>
+                        <span class="badge bg-green-light uppercase text-white text-4xs ml-1">Published</span>
+                    </div>
+                    <div class="ml-2">
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>09:47 PM &mdash; Jack McDade</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>04:40 PM &mdash; Jack McDade</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
+                    <div class="flex items-center">
+                        <span class="w-6 text-center pb-sm">
+                            <i class="icon-status icon-status-draft mr-1"></i>
+                        </span>
+                        <span>01:18 PM &mdash; Jack McDade</span>
+                    </div>
+                    <div>
+                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
+                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+@stop
 @section('nontent')
 
     <collection-wizard
@@ -8,7 +141,7 @@
 
 @stop
 
-@section('content')
+@section('nontent')
 
     <div class="flex mb-5">
         <h1>{{ __('The Statamic Playground') }}</h1>
