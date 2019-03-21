@@ -146,27 +146,6 @@ export default {
         getReplicatorPreviewText() {
             return this.data.join(', ');
         }
-    },
-
-    mounted() {
-        var self = this,
-            start = '';
-        $(this.$el).sortable({
-            axis: "y",
-            revert: 175,
-            items: '> li:not(:last-child)',
-
-            start: function(e, ui) {
-                start = ui.item.index();
-            },
-
-            update: function(e, ui) {
-                var end  = ui.item.index(),
-                    swap = self.data.splice(start, 1)[0];
-
-                self.data.splice(end, 0, swap);
-            }
-        });
     }
 };
 </script>
