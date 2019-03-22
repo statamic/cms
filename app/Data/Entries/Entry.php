@@ -71,6 +71,16 @@ class Entry implements Contract, Augmentable
         return $this->forCurrentSite()->toAugmentedArray();
     }
 
+    public function slug($slug = null)
+    {
+        return call_user_func_array([$this->forCurrentSite(), 'slug'], func_get_args());
+    }
+
+    public function date($date = null)
+    {
+        return call_user_func_array([$this->forCurrentSite(), 'date'], func_get_args());
+    }
+
     public function published($published = null)
     {
         return call_user_func_array([$this->forCurrentSite(), 'published'], func_get_args());
