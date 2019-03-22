@@ -28,7 +28,10 @@
                             @per-page-changed="perPageChanged" />
                         <data-list-column-picker :save-url="saveColumnsUrl" />
                     </div>
-                    <data-list-table :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
+
+                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
+                    <data-list-table v-show="items.length" :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
