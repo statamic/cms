@@ -35,6 +35,10 @@ select {
     &:focus, &:focus-within {
         @apply focus-outline;
     }
+
+    &:disabled {
+        @apply bg-grey-30 text-grey-70;
+    }
 }
 
 // Used inside tables, grids, and so on
