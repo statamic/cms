@@ -1,7 +1,7 @@
 <template>
 
-    <div>
-        <h6 class="mb-1">{{ field.display }}</h6>
+    <div class="form-group">
+        <label>{{ field.display }}</label>
         <div class="flex items-center text-sm">
             <select-input
                 class="w-1/5 mr-1"

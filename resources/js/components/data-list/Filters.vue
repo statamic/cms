@@ -3,12 +3,12 @@
         <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" @click="filtering = true">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
-            <div v-if="activeFilterCount" class="badge ml-1" v-text="activeFilterCount" />
+            <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
         </button>
         <modal name="filters" v-if="filtering">
-            <div class="h-full bg-white p-3">
+            <div class="h-full bg-white">
 
-                <div class="pb-3 text-lg font-medium flex items-center justify-between">
+                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
                     {{ __('Filters') }}
                     <button
                         type="button"
@@ -31,14 +31,16 @@
                     @changed="filterChanged('fields', $event)"
                 />
 
-                <select class="w-auto mt-3" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
-                    <option
-                        v-for="value in perPageOptions"
-                        :key="value"
-                        :value="value"
-                        v-text="value" />
-                </select>
-                <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
+                <div class="p-3 pt-0">
+                    <select class="w-auto mt-3" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
+                        <option
+                            v-for="value in perPageOptions"
+                            :key="value"
+                            :value="value"
+                            v-text="value" />
+                    </select>
+                    <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
+                </div>
 
             </div>
         </modal>

@@ -1,24 +1,25 @@
 <template>
 
-    <div>
+    <div class="publish-fields">
         <field-filter
             v-for="field in selectedFields"
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"
-            class="mb-3"
             @updated="updateField(field.handle, $event)"
             @removed="removeField(field.handle)"
         />
 
-        <h6 v-show="unselectedFields.length">Add filter...</h6>
+        <div class="p-3" v-show="unselectedFields.length">
+            <h6>Add filter...</h6>
 
-        <button
-            v-for="field in unselectedFields"
-            :key="field.handle"
-            class="btn btn-flat mt-1 mr-1 text-xs"
-            @click="selectField(field.handle)"
-            v-text="field.display" />
+            <button
+                v-for="field in unselectedFields"
+                :key="field.handle"
+                class="btn btn-flat mt-1 mr-1 text-xs"
+                @click="selectField(field.handle)"
+                v-text="field.display" />
+        </div>
     </div>
 
 </template>

@@ -2,17 +2,21 @@
 
 namespace Statamic\Filters;
 
+use Statamic\Fields\Fields;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
-use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\RegistersItself;
+use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Filter implements Arrayable
 {
     use HasTitle, HasHandle, RegistersItself;
 
     protected static $binding = 'filters';
-    protected $context;
+
+    protected $context = [];
+    protected $field;
+    protected $fields = [];
 
     public function required()
     {
@@ -41,6 +45,24 @@ abstract class Filter implements Arrayable
         return [];
     }
 
+    public function fields()
+    {
+        $fields = collect($this->fieldItems())->map(function ($field, $handle) {
+            return compact('handle', 'field');
+        });
+
+        return new Fields($fields);
+    }
+
+    protected function fieldItems()
+    {
+        if ($this->field) {
+            return ['value' => $this->field];
+        }
+
+        return $this->fields;
+    }
+
     public function toArray()
     {
         return [
@@ -49,6 +71,8 @@ abstract class Filter implements Arrayable
             'options' => format_input_options($this->options()),
             'extra' => $this->extra(),
             'required' => $this->required(),
+            'fields' => $this->fields()->toPublishArray(),
+            'meta' => $this->fields()->meta(),
         ];
     }
 }
