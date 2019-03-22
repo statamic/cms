@@ -57,7 +57,7 @@
             @svg('browser-com')
         </a>
         <dropdown-list>
-            <a class="dropdown-toggle ml-2 hide md:block" slot="trigger">
+            <a class="dropdown-toggle items-center ml-2 hide md:flex" slot="trigger">
                 @if (my()->avatar())
                     <div class="icon-header-avatar"><img src="{{ my()->avatar() }}" /></div>
                 @else
