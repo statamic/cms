@@ -1,5 +1,5 @@
 <template>
-    <text-input :name="name" :value="value" @input="update" :autofocus="config.autofocus" :type="config.input" :disabled="isReadOnly" />
+    <text-input :name="name" :value="value" @input="update" :autofocus="config.autofocus" :type="config.input" />
 </template>
 
 <script>

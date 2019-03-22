@@ -1,5 +1,5 @@
 <template>
-    <textarea-input :name="name" :value="value" @input="update" :limit="config.character_limit || null" :disabled="isReadOnly" />
+    <textarea-input :name="name" :value="value" @input="update" :limit="config.character_limit || null" />
 </template>
 
 <script>

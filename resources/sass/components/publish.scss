@@ -77,8 +77,16 @@ code.parent-url {
         right: 0;
         z-index: 100;
         cursor: not-allowed;
-        background: rgba(white, 0.3);
+        background: rgba(white, 0.25);
     }
+}
+
+.publish-field {
+    position: relative;
+}
+
+.publish-field-label {
+    @apply flex items-center;
 }
 
 .publish-sidebar {

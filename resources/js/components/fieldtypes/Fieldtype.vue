@@ -17,11 +17,7 @@ export default {
             type: Object,
             default: () => { return {}; }
         },
-        livePreview: Boolean,
-        readOnly: {
-            type: Boolean,
-            default: false
-        }
+        livePreview: Boolean
     },
 
     methods: {
@@ -30,12 +26,6 @@ export default {
             this.$emit('updated', value);
         }
 
-    },
-
-    computed: {
-        isReadOnly() {
-            return this.readOnly || this.config.read_only || false;
-        }
     }
 
 }

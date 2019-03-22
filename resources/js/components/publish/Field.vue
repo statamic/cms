@@ -6,11 +6,13 @@
         :initial-meta="meta"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <label class="flex" :class="{'bold': config.bold}">
+        <div class="read-only-overlay" v-if="isReadOnly"></div>
+        <label class="publish-field-label" :class="{'font-bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
             <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
-            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">({{ __('Read Only') }})</span>
+            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-tooltip.top="__('Localizable field')" />
         </label>
 
         <div
@@ -56,7 +58,8 @@ export default {
         errors: {
             type: Array
         },
-        livePreview: Boolean
+        livePreview: Boolean,
+        readOnly: Boolean
     },
 
     computed: {
@@ -69,11 +72,16 @@ export default {
             return this.errors && this.errors.length > 0;
         },
 
+        isReadOnly() {
+            return this.config.read_only || false;
+        },
+
         classes() {
             return [
-                'form-group',
+                'form-group publish-field',
                 `${this.config.type}-fieldtype`,
                 !this.livePreview ? tailwind_width_class(this.config.width) : '',
+                this.isReadOnly ? 'disabled' : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];
