@@ -20,7 +20,7 @@
                         </li>
                     </ul>
 
-                    <ul class="markdown-buttons">
+                    <ul class="markdown-buttons" v-if="! isReadOnly">
                         <li><a @click="bold" tabindex="-1"><b>B</b></a></li>
                         <li><a @click="italic" tabindex="-1"><i>i</i></a></li>
                         <li><a @click="insertLink('')" tabindex="-1">
@@ -88,7 +88,7 @@
             </div>
         </uploader>
 
-        <stack v-if="showAssetSelector" name="markdown-asset-selector" @closed="closeAssetSelector">
+        <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
             <selector
                   :container="container"
                   :folder="folder"
@@ -516,6 +516,7 @@ export default {
             viewportMargin: Infinity,
             tabindex: 0,
             autoRefresh: true,
+            readOnly: this.isReadOnly ? 'nocursor' : false,
             extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
         });
 

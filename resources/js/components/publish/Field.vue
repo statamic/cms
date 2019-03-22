@@ -6,10 +6,9 @@
         :initial-meta="meta"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <div class="read-only-overlay" v-if="isReadOnly"></div>
         <label class="publish-field-label" :class="{'font-bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
-            <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
+            <template v-else>{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">({{ __('Read Only') }})</span>
             <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-tooltip.top="__('Localizable field')" />
@@ -81,7 +80,7 @@ export default {
                 'form-group publish-field',
                 `${this.config.type}-fieldtype`,
                 !this.livePreview ? tailwind_width_class(this.config.width) : '',
-                this.isReadOnly ? 'disabled' : '',
+                this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];
@@ -90,12 +89,10 @@ export default {
     },
 
     methods: {
-
         updated(value) {
             this.$emit('updated', this.config.handle, value);
         }
-
     }
-
 }
+
 </script>

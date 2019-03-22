@@ -7,6 +7,7 @@
             :value="value"
             :type="type"
             :disabled="disabled"
+            :readonly="isReadOnly"
             :placeholder="placeholder"
             @input="$emit('input', $event.target.value)"
         >
@@ -24,6 +25,7 @@ export default {
     props: {
         name: {},
         disabled: { default: false },
+        isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         type: { default: "text" },
         value: { required: true },
