@@ -4,6 +4,7 @@
         :name="name"
         v-model="selections"
         :can-edit="canEdit"
+        :config="config"
         :can-create="canCreate"
         :can-reorder="canReorder"
         :site="site"

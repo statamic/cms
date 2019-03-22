@@ -10,6 +10,7 @@
                     v-for="(item, i) in items"
                     :key="item.id"
                     :item="item"
+                    :config="config"
                     :status-icon="statusIcons"
                     :editable="canEdit"
                     :sortable="canReorder"
@@ -78,6 +79,7 @@ export default {
     props: {
         name: String,
         value: { required: true },
+        config: Object,
         initialData: Array,
         maxItems: Number,
         itemComponent: {

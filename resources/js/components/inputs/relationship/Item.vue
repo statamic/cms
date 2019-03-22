@@ -49,6 +49,7 @@ export default {
 
     props: {
         item: Object,
+        config: Object,
         statusIcon: Boolean,
         editable: Boolean,
         sortable: Boolean,
