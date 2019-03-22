@@ -30,7 +30,7 @@ class EntriesController extends CpController
         $sortDirection = request('order');
 
         if (!$sortField && !request('search')) {
-            $sortField = $collection->sortColumn();
+            $sortField = $collection->sortField();
             $sortDirection = $collection->sortDirection();
         }
 
