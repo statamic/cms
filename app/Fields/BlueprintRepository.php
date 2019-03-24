@@ -34,6 +34,10 @@ class BlueprintRepository
 
     public function find($handle): ?Blueprint
     {
+        if (! $handle) {
+            return null;
+        }
+
         if ($cached = array_get(static::$blueprints, $handle)) {
             return $cached;
         }
