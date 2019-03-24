@@ -1,33 +1,46 @@
 <template>
-    <dropdown-list ref="dropdown">
-        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle" slot="trigger">
+    <div>
+        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle" @click="customizing = !customizing">
             <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
             <span>{{ __('Columns') }}</span>
         </button>
 
-        <div class="dropdown-menu">
-            <h6 class="text-center">{{ __('Customize Columns') }}</h6>
-            <div class="li divider"></div>
+        <pane name="columns" v-if="customizing">
+            <div>
 
-            <sortable-list
-                v-model="columns"
-                :vertical="true"
-                item-class="column-picker-item"
-                handle-class="column-picker-item"
-            >
-                <div>
-                    <div class="column-picker-item column" v-for="column in sharedState.columns" :key="column.field">
-                        <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
-                    </div>
+                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                    {{ __('Columns') }}
+                    <button
+                        type="button"
+                        class="ml-2 p-1 text-xl text-grey-60"
+                        @click="customizing = false"
+                        v-html="'&times'" />
                 </div>
-            </sortable-list>
-            <div class="li divider"></div>
-            <div class="">
-                <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
+
+                <div class="p-2">
+
+                    <sortable-list
+                        v-model="columns"
+                        :vertical="true"
+                        item-class="column-picker-item"
+                        handle-class="column-picker-item"
+                    >
+                        <div>
+                            <div class="column-picker-item column" v-for="column in sharedState.columns" :key="column.field">
+                                <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
+                            </div>
+                        </div>
+                    </sortable-list>
+
+                    <div class="flex justify-center mt-3">
+                        <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                        <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
-    </dropdown-list>
+        </pane>
+    </div>
 </template>
 
 <script>
@@ -45,6 +58,7 @@ export default {
 
     data() {
         return {
+            customizing: false,
             saving: false,
         }
     },
@@ -77,7 +91,7 @@ export default {
             this.$axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
                 this.saving = false;
                 this.$notify.success(__('Columns saved'));
-                this.$refs.dropdown.close();
+                this.customizing = false;
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {

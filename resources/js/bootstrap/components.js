@@ -63,3 +63,5 @@ Vue.component('keyboard-shortcuts-modal', require('../components/modals/Keyboard
 
 Vue.component('stack', require('../components/stacks/Stack.vue'));
 Vue.component('stack-test', require('../components/stacks/StackTest.vue'));
+
+Vue.component('pane', require('../components/panes/Pane.vue'));

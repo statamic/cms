@@ -1,12 +1,12 @@
 <template>
     <div>
-        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" @click="filtering = true">
+        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" @click="filtering = !filtering">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
         </button>
-        <modal name="filters" v-if="filtering">
-            <div class="h-full bg-white">
+        <pane name="filters" v-if="filtering">
+            <div>
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
                     {{ __('Filters') }}
@@ -43,7 +43,7 @@
                 </div>
 
             </div>
-        </modal>
+        </pane>
     </div>
 </template>
 

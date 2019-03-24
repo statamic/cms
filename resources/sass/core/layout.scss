@@ -12,7 +12,7 @@ a {
 }
 
 #main {
-    @apply flex pb-6;
+    @apply flex;
 }
 
 #main .nav-main {
@@ -70,7 +70,7 @@ a {
 /* Page Wrapper
   ========================================================================== */
 .page-wrapper {
-    @apply .px-3 .pb-5 .w-full;
+    @apply .p-3 pt-0 .w-full;
 }
 
 .fieldtype-hidden {

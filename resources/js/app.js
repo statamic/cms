@@ -64,6 +64,7 @@ Statamic.$store = new Vuex.Store({
 require('./components/NotificationBus');
 require('./components/ModalBus');
 require('./components/stacks/Stacks');
+require('./components/panes/Panes');
 require('./components/ProgressBar');
 require('./components/DirtyState');
 require('./components/Config');
@@ -112,7 +113,8 @@ Statamic.app({
         showLoginModal: false,
         navOpen: true,
         modals: [],
-        stacks: []
+        stacks: [],
+        pane: false,
     },
 
     computed: {

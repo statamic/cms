@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply select-none pl-3 relative hidden;
+    @apply select-none pl-3 pb-3 relative hidden;
 
     ul {
         @apply list-reset mt-0 mb-3;

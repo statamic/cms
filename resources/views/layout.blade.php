@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <div id="statamic">
+    <div id="statamic" :style="{ marginRight: pane ? `24rem` : null }">
 
       <session-expiry
           email="{{ my()->email() }}"
@@ -48,6 +48,8 @@
             ></portal-target>
 
             <stacks v-if="stacks.length"></stacks>
+
+            <portal-target name="pane" :slim="true"></portal-target>
 
             <portal-target name="outside"></portal-target>
       </div>
