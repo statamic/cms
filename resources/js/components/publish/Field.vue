@@ -11,7 +11,7 @@
             <template v-else>{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">({{ __('Read Only') }})</span>
-            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-tooltip.top="__('Localizable field')" />
+            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
         </label>
 
         <div
