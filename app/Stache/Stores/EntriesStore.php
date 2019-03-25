@@ -9,7 +9,6 @@ use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Entry;
 use Statamic\API\Collection;
-use Statamic\Data\Entries\LocalizedEntry;
 use Statamic\Stache\Exceptions\StoreExpiredException;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
@@ -39,16 +38,14 @@ class EntriesStore extends AggregateStore
                 ->collection($collection);
 
             foreach ($item['localizations'] as $site => $attributes) {
-                $localized = (new LocalizedEntry)
-                    ->id($id)
-                    ->locale($site)
-                    ->slug($attributes['slug'])
-                    ->initialPath($attributes['path'])
-                    ->published($attributes['published'])
-                    ->order($attributes['order'])
-                    ->data($attributes['data']);
-
-                $entry->addLocalization($localized);
+                $entry->in($site, function ($localized) use ($attributes) {
+                    $localized
+                        ->slug($attributes['slug'])
+                        ->initialPath($attributes['path'])
+                        ->published($attributes['published'])
+                        ->order($attributes['order'])
+                        ->data($attributes['data']);
+                });
             }
 
             $entries[$id] = $entry;
@@ -84,21 +81,11 @@ class EntriesStore extends AggregateStore
         }
 
         $data = YAML::parse($contents);
-        $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
         if (! $id = array_pull($data, 'id')) {
             $idGenerated = true;
             $id = $this->stache->generateId();
         }
-
-        $localized = (new LocalizedEntry)
-            ->id($id)
-            ->locale($site)
-            ->slug($slug)
-            ->initialPath($path)
-            ->published(array_pull($data, 'published', true))
-            ->order(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path))
-            ->data($data);
 
         if (! $entry = $this->store($collection)->getItem($id)) {
             $entry = Entry::make()
@@ -106,7 +93,16 @@ class EntriesStore extends AggregateStore
                 ->collection(Collection::whereHandle($collection));
         }
 
-        $entry->addLocalization($localized);
+        $localized = $entry->in($site, function ($localized) use ($data, $path) {
+            $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
+
+            $localized
+                ->slug($slug)
+                ->initialPath($path)
+                ->published(array_pull($data, 'published', true))
+                ->order(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path))
+                ->data($data);
+        });
 
         if (isset($idGenerated)) {
             $localized->save();
