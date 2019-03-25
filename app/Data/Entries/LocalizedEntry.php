@@ -177,6 +177,11 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
     }
 
+    public function toLivePreviewResponse($request)
+    {
+        return $this->toResponse($request);
+    }
+
     public function date()
     {
         if ($this->orderType() === 'date') {
