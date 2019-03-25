@@ -1,6 +1,6 @@
 <template>
     <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
-        <div class="option" v-for="(option, $index) in config.options" :key="$index">
+        <div class="option" v-for="(option, $index) in options" :key="$index">
             <input type="checkbox"
                    :name="name + '[]'"
                    :id="name + $index"
@@ -13,13 +13,21 @@
 </template>
 
 <script>
+import HasInputOptions from './HasInputOptions.js'
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, HasInputOptions],
 
     data() {
         return {
             values: this.value || []
+        }
+    },
+
+    computed: {
+        options() {
+            return this.normalizeInputOptions(this.config.options);
         }
     },
 

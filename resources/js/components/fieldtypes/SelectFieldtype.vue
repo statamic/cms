@@ -1,15 +1,15 @@
 <template>
-    <select-input :name="name" :value="value" @input="update" :options="config.options" />
+    <select-input :name="name" :value="value" @input="update" :options="options" />
     <!-- <v-select :options="['foo', 'bar']"></v-select> -->
 </template>
 
 <script>
-
+import HasInputOptions from './HasInputOptions.js'
 // import vSelect from 'vue-select'
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, HasInputOptions],
 
     // components: {
     //     'v-select': vSelect
@@ -24,6 +24,10 @@ export default {
             var option = _.findWhere(this.selectOptions, {value: val});
 
             return (option) ? option.text : this.data;
+        },
+
+        options() {
+            return this.normalizeInputOptions(this.config.options);
         }
     },
 
