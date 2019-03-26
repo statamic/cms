@@ -16,20 +16,6 @@ global.get_from_segment = function(count) {
     return Statamic.$config.get('urlPath').split('/').splice(count).join('/');
 };
 
-global.format_input_options = function(options) {
-
-	if (typeof options[0] === 'string') {
-		return options;
-	}
-
-	var formatted = [];
-	_.each(options, function(value, key, list) {
-	    formatted.push({'value': key, 'text': value});
-	});
-
-	return formatted;
-};
-
 global.file_icon = function(extension) {
     return resource_url('img/filetypes/'+ extension +'.png');
 };
