@@ -13,4 +13,12 @@ class WorkingCopy extends Revision
             $this->key()
         ]);
     }
+
+    public static function fromRevision(Revision $revision)
+    {
+        return (new self)
+            ->key($revision->key())
+            ->message($revision->message())
+            ->attributes($revision->attributes());
+    }
 }

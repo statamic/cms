@@ -35,9 +35,21 @@ trait Revisable
 
     public function fromWorkingCopy()
     {
-        return $this->makeFromRevision(
-            Revisions::findWorkingCopyByKey($this->revisionKey())
-        );
+        return $this->makeFromRevision($this->workingCopy());
+    }
+
+    public function hasWorkingCopy()
+    {
+        return $this->workingCopy() !== null;
+    }
+
+    public function workingCopy()
+    {
+        if (! $revision = Revisions::findWorkingCopyByKey($this->revisionKey())) {
+            return null;
+        }
+
+        return WorkingCopy::fromRevision($revision);
     }
 
     abstract protected function revisionKey();

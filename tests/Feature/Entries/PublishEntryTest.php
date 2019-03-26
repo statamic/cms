@@ -49,6 +49,12 @@ class PublishEntryTest extends TestCase
                 'foo' => 'bar',
             ])->create();
 
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['foo'] = 'foo modified in working copy';
+            $copy->attributes($attrs);
+        })->save();
+
         $this->assertFalse($entry->published());
         $this->assertCount(0, $entry->revisions());
 
@@ -58,6 +64,11 @@ class PublishEntryTest extends TestCase
             ->assertOk();
 
         $entry = Entry::find($entry->id());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Title',
+            'foo' => 'foo modified in working copy',
+        ], $entry->data());
         $this->assertTrue($entry->published());
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();
@@ -67,11 +78,12 @@ class PublishEntryTest extends TestCase
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
-                'foo' => 'bar',
+                'foo' => 'foo modified in working copy',
             ]
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
+        $this->assertFalse($entry->hasWorkingCopy());
     }
 
     /** @test */

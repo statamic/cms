@@ -94,4 +94,9 @@ class Revision implements Arrayable
     {
         Revisions::save($this);
     }
+
+    public function delete()
+    {
+        Revisions::delete($this);
+    }
 }

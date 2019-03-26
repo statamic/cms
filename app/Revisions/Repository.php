@@ -46,6 +46,11 @@ class Repository
         File::put($revision->path(), $revision->fileContents());
     }
 
+    public function delete(Revision $revision)
+    {
+        File::delete($revision->path());
+    }
+
     protected function makeRevisionFromFile($key, $path)
     {
         $yaml = YAML::parse(File::get($path));
