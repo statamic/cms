@@ -12,8 +12,8 @@ var colors = {
     'grey-50':          'hsla(210, 15%, 80%, 1)',
     'grey-40':          'hsla(210, 15%, 86%, 1)',
     'grey-30':          'hsla(210, 30%, 95%, 1)',
-    'grey-20':          'hsla(205, 60%, 98%, 1)',
-    'grey-10':          'hsla(200, 90%, 99%, 1)',
+    'grey-20':          'hsla(215, 45%, 97%, 1)',
+    'grey-10':          'hsla(203, 45%, 98%, 1)',
     'white':            '#ffffff',
     'green':            '#479967',
     'green-light':      '#64BD63',
@@ -27,8 +27,11 @@ var colors = {
     'red-lighter':      'hsla(2, 76%, 95%, 1)',
     'yellow':           '#fbfab0',
     'yellow-dark':      '#d8cd1b',
+    'orange':           '#f5a82f',
     'pink':             '#ff269e',
     'purple':           '#c471ed',
+    'darken-10':        'rgba(0,0,0,.1)',
+    'darken-20':        'rgba(0,0,0,.2)',
 }
 
 // Set brand colors
@@ -285,6 +288,7 @@ module.exports = {
         '2':      '0.5rem',
         '3':      '0.75rem',
         '4':      '1rem',
+        '5':      '1.25rem',
         '6':      '1.5rem',
         '8':      '2rem',
         '10':     '2.5rem',
