@@ -34,47 +34,51 @@
                 </button>
             </div>
 
-            <div class="pt-px text-2xs text-grey-60" v-text="stateMsg" />
+            <button href="" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
-            <button v-if="isBase" class="btn ml-2" v-text="__('Live Preview')" @click="openLivePreview" />
-
-            <div class="btn-dropdown-primary ml-2">
-                <button
-                    class="cta"
-                    :class="{ disabled: !canSave }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="__('Save Changes')"
-                ></button>
-                <dropdown-list>
-                    <button class="trigger flex items-center" slot="trigger">
-                        <svg-icon class="text-white w-2 h-3" name="chevron-down-small" />
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="" v-text="__('Save as Draft')"></a></li>
-                        <li><a href="" v-text="__('Save & Publish')"></a></li>
-                        <li><a href="" v-text="__('Save & Unpublish')"></a></li>
-                        <li><a href="" v-text="__('Save & Create Another')"></a></li>
-                        <li><a href="" v-text="__('Duplicate')"></a></li>
-                        <li class="warning"><a href="" v-text="__('Delete')"></a></li>
-                    </ul>
-                </dropdown-list>
-            </div>
-            <slot name="action-buttons-right" />
-        </div>
-
-        <div class="mb-3 flex items-center justify-end">
             <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false">
                 <revision-history slot-scope="{ close }" :url="actions.revisions" @closed="close" />
             </stack>
 
-            <button class="btn" @click="showRevisionHistory = true">History</button>
+            <div class="btn flex items-center leading-none py-0 px-sm h-auto justify-between">
 
-            <button class="btn btn-primary mx-2" @click="publish">
-                Publish
-            </button>
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    v-if="isBase"
+                    v-text="__('Live Preview')"
+                    @click="openLivePreview" />
 
-            <text-input v-model="revisionMessage" placeholder="Commit message" />
+                <div
+                    class="m-sm cursor-pointer p-1 hover:bg-grey-30 rounded"
+                    :class="{ 'opacity-25': !canSave }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="__('Save')" />
+
+                <div class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center">
+                    <span @click="confirmPublish">{{ __('Publish') }}</span>
+                    <dropdown-list>
+                        <svg-icon class="text-grey-80 w-2 h-3 ml-sm" name="chevron-down-small" slot="trigger" />
+                        <ul class="dropdown-menu">
+                            <li><a href="">Example</a></li>
+                        </ul>
+                    </dropdown-list>
+                </div>
+            </div>
+
+            <confirmation-modal
+                v-if="confirmingPublish"
+                :title="__('Publish')"
+                :danger="true"
+                :buttonText="__('Publish')"
+                @confirm="publish"
+                @cancel="confirmingPublish = false"
+            >
+                <p class="mb-3">{{ __('Are you sure you want to publish this entry?') }}</p>
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about your changes')" />
+            </confirmation-modal>
+
+            <slot name="action-buttons-right" />
         </div>
 
         <publish-container
@@ -151,6 +155,7 @@ export default {
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
+            confirmingPublish: false,
         }
     },
 
@@ -240,8 +245,13 @@ export default {
             })
         },
 
+        confirmPublish() {
+            this.confirmingPublish = true;
+        },
+
         publish() {
             this.saving = true;
+            this.confirmingPublish = false;
             this.clearErrors();
             const payload = { message: this.revisionMessage };
 
