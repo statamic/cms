@@ -124,13 +124,16 @@ button, .btn, .btn-* {
         @include button(white, black);
         @apply shadow-none text-grey-80 bg-grey-30 flex items-center h-full;
 
-        &:hover {
+        &:hover, &.active, &:focus {
             @apply bg-grey-40 text-grey-80;
             box-shadow: none !important;
+            bottom: 0;
         }
 
-        &.active {
-            @apply bg-grey-40;
+        &:active, &:active:focus {
+            @apply bg-grey-50;
+            box-shadow: none !important;
+            bottom: 0;
         }
     }
 
