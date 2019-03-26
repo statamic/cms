@@ -3,7 +3,13 @@
 
         @svg($svg)
 
-        <h1 class="my-3">{{ __("Create your first {$resource} now") }}</h1>
+        <h1 class="my-3">
+            @if ($can ?? user()->can('super'))
+                {{ __("Create your first {$resource} now") }}
+            @else
+                {{ __('No ' . Statamic\API\Str::plural($resource) . ' exist yet') }}
+            @endif
+        </h1>
 
         @if ($description ?? false)
             <p class="text-grey mb-3">
@@ -11,13 +17,13 @@
             </p>
         @endif
 
-        @can($can ?? 'super')
+        @if ($can ?? user()->can('super'))
             @if($button ?? false)
                 {{ $button }}
             @else
                 <a href="{{ $route ?? null }}" class="btn-primary btn-lg">{{ __("Create {$resource}") }}</a>
             @endif
-        @endcan
+        @endif
 
     </div>
 </div>
