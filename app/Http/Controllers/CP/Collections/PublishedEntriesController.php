@@ -35,7 +35,7 @@ class PublishedEntriesController extends CpController
         $entry
             ->makeRevision()
             ->user($request->user())
-            ->message($request->message)
+            ->message($request->message ?? false)
             ->save();
 
         $entry->save();
