@@ -38,6 +38,6 @@ class PublishedEntriesController extends CpController
             ->message($request->message ?? false)
             ->save();
 
-        $entry->save();
+        $entry->fromWorkingCopy()->save();
     }
 }

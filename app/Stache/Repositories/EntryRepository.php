@@ -74,9 +74,15 @@ class EntryRepository implements RepositoryContract
         // Clone the entry and all of its localizations so that any modifications to the
         // original objects aren't reflected in the cache until explicitly saved again.
         $localizable = clone $localizable;
-        $localizable->localizations()->each(function ($localization) use ($localizable) {
-            $localizable->addLocalization(clone $localization);
-        });
+        $localizable
+            ->localizations()
+            ->except($entry->locale())
+            ->each(function ($localization) use ($localizable) {
+                $localizable->addLocalization(clone $localization);
+            });
+
+        // Make sure the version we're saving is re-added to the entry.
+        $localizable->addLocalization($entry);
 
         $this->store
             ->store($entry->collectionHandle())
