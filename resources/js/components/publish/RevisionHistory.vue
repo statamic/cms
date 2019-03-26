@@ -13,7 +13,11 @@
 
         <div class="flex-1 overflow-auto p-3">
 
-            <div v-if="revisions.length === 0" class="">
+            <div class="flex h-full items-center justify-center loading" v-if="loading">
+                <loading-graphic />
+            </div>
+
+            <div v-if="!loading && revisions.length === 0" class="">
                 {{ __('No revisions') }}
             </div>
 
@@ -55,12 +59,14 @@ export default {
     data() {
         return {
             revisions: [],
+            loading: true,
             previewing: null,
         }
     },
 
     mounted() {
         this.$axios.get(this.url).then(response => {
+            this.loading = false;
             this.revisions = response.data.reverse();
         });
     },
