@@ -193,6 +193,46 @@ class MigrateFieldsetTest extends TestCase
         ]);
     }
 
+    /** @test */
+    function it_migrates_field_conditions()
+    {
+        $blueprint = $this->migrateFieldsetToBlueprint([
+            'title' => 'Post',
+            'fields' => [
+                'has_author' => [
+                    'type' => 'toggle'
+                ],
+                'author_name' => [
+                    'type' => 'text',
+                    'show_when' => [
+                        'has_author' => 'not empty'
+                    ],
+                ],
+            ]
+        ]);
+
+        $this->assertEquals($blueprint, [
+            'title' => 'Post',
+            'fields' => [
+                [
+                    'handle' => 'has_author',
+                    'field' => [
+                        'type' => 'toggle'
+                    ]
+                ],
+                [
+                    'handle' => 'author_name',
+                    'field' => [
+                        'type' => 'text',
+                        'show_when' => [
+                            'has_author' => true
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
     private function migrateFieldsetToBlueprint($fieldsetConfig)
     {
         $path = base_path('resources/blueprints/post.yaml');

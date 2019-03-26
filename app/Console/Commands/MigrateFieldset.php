@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\API\Arr;
+use Statamic\API\Str;
 use Statamic\API\YAML;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
@@ -167,6 +168,10 @@ class MigrateFieldset extends Command
             $config->put('sets', $this->migrateSets($sets));
         }
 
+        if ($config['show_when'] ?? $config['hide_when'] ?? false) {
+            $config = $this->migrateFieldConditions($config);
+        }
+
         return $this->normalizeConfigToArray($config);
     }
 
@@ -183,6 +188,32 @@ class MigrateFieldset extends Command
                 return collect($set)->put('fields', $this->migrateFields($set['fields']))->all();
             })
             ->all();
+    }
+
+    /**
+     * Migrate field conditions.
+     *
+     * @param array $config
+     */
+    public function migrateFieldConditions($config)
+    {
+        $key = $config->has('hide_when') ? 'hide_when' : 'show_when';
+
+        $conditions = collect($config->get($key))
+            ->each(function ($condition, $field) use (&$key) {
+                $key = Str::startsWith($field, 'or_') ? "{$key}_any" : $key;
+            })
+            ->mapWithKeys(function ($condition, $field) {
+                return [preg_replace('/^or_/', '', $field) => $condition];
+            })
+            ->map(function ($condition) {
+                return str_replace('not null', 'not empty', Str::lower($condition));
+            });
+
+        return $config
+            ->forget('show_when')
+            ->forget('hide_when')
+            ->put($key, $conditions);
     }
 
     /**
