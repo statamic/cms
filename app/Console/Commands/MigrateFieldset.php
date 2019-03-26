@@ -18,7 +18,7 @@ class MigrateFieldset extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:migrate:fieldset';
+    protected $name = 'statamic:migrate:fieldset';
 
     /**
      * The console command description.
