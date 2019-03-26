@@ -61,22 +61,17 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
 
     public function editUrl()
     {
-        return cp_route('collections.entries.edit', [
-            $this->collectionHandle(),
-            $this->id(),
-            $this->slug(),
-            $this->locale(),
-        ]);
+        return $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
     {
-        return cp_route('collections.entries.update', [
-            $this->collectionHandle(),
-            $this->id(),
-            $this->slug(),
-            $this->locale(),
-        ]);
+        return $this->cpUrl('collections.entries.update');
+    }
+
+    protected function cpUrl($route)
+    {
+        return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug(), $this->locale()]);
     }
 
     public function blueprint()
