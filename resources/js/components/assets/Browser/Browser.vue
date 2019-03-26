@@ -50,30 +50,34 @@
                                 <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
-                                <button
-                                    class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative"
-                                    @click="creatingFolder = true"
-                                >
-                                    <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
-                                    <span>{{ __('Create Folder') }}</span>
-                                </button>
+                                <data-list-bulk-actions
+                                    class="rounded-b"
+                                    v-if="hasSelections && hasActions"
+                                    :url="actionUrl"
+                                    :actions="actions"
+                                    @started="actionStarted"
+                                    @completed="bulkActionsCompleted"
+                                />
 
-                                <button
-                                    class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative"
-                                    @click="openFileBrowser"
-                                >
-                                    <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
-                                    <span>{{ __('Upload') }}</span>
-                                </button>
+                                <template v-if="! hasSelections">
+                                    <button class="btn btn-flat btn-icon-only" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
+                                        <span>{{ __('Create Folder') }}</span>
+                                    </button>
+
+                                    <button class="btn btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
+                                </template>
 
                                 <div class="btn-group-flat ml-2">
-                                <button @click="mode = 'grid'" :class="{'active': mode === 'grid'}">
-                                    <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
-                                </button>
-
-                                <button @click="mode = 'table'" :class="{'active': mode === 'table'}">
-                                    <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                                </button>
+                                    <button @click="mode = 'grid'" :class="{'active': mode === 'grid'}">
+                                        <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
+                                    </button>
+                                    <button @click="mode = 'table'" :class="{'active': mode === 'table'}">
+                                        <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                                    </button>
                                 </div>
 
                             </div>
@@ -151,15 +155,6 @@
 
                             <!-- Grid Mode -->
                             <data-list-grid  v-if="mode === 'grid'"></data-list-grid>
-
-                            <data-list-bulk-actions
-                                class="rounded-b"
-                                v-if="hasActions"
-                                :url="actionUrl"
-                                :actions="actions"
-                                @started="actionStarted"
-                                @completed="bulkActionsCompleted"
-                            />
 
                         </div>
 
@@ -299,6 +294,10 @@ export default {
 
         hasMaxFiles() {
             return this.maxFiles !== undefined && this.maxFiles !== Infinity;
+        },
+
+        hasSelections() {
+            return this.selectedAssets.length > 0;
         }
 
     },

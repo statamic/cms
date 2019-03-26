@@ -20,6 +20,12 @@
                     <div class="data-list-header">
                         <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
+                        <data-list-bulk-actions
+                            :url="actionUrl"
+                            :actions="actions"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                         <data-list-filters
                             :filters="filters"
                             :active-filters="activeFilters"
@@ -44,8 +50,8 @@
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
                                 <div class="dropdown-menu">
-                                    <div class="li"><a :href="entry.permalink">View</a></div>
-                                    <div class="li"><a :href="entry.edit_url">Edit</a></div>
+                                    <div class="li"><a :href="entry.permalink" :v-text="__('View')"></a></div>
+                                    <div class="li"><a :href="entry.edit_url" :v-text="__('Edit')"></a></div>
                                     <div class="li divider" />
                                     <data-list-inline-actions
                                         :item="entry.id"
@@ -58,13 +64,6 @@
                             </dropdown-list>
                         </template>
                     </data-list-table>
-                    <data-list-bulk-actions
-                        class="rounded-b"
-                        :url="actionUrl"
-                        :actions="actions"
-                        @started="actionStarted"
-                        @completed="actionCompleted"
-                    />
                 </div>
                 <data-list-pagination
                     class="mt-3"

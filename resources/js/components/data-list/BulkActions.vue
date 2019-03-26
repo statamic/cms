@@ -1,12 +1,9 @@
 <template>
 
-    <div v-if="hasSelections" class="flex items-center bg-grey-30 text-sm border-t px-2 py-1">
+    <div v-if="hasSelections" class="flex items-center">
 
-        <div
-            class="text-grey mr-2"
+        <div class="text-grey text-2xs mr-1"
             v-text="__n(`:count Selected`, selections.length)" />
-
-        <div class="flex-1 text-right">
 
             <data-list-action
                 v-for="action in sortedActions"
@@ -17,13 +14,11 @@
             >
                 <button
                     slot-scope="{ action, select }"
-                    class="ml-2 hover:text-grey-80"
-                    :class="[action.dangerous ? 'text-red' : 'text-blue']"
+                    class="btn-flat ml-1"
+                    :class="{'text-red': action.dangerous}"
                     @click="select"
                     v-text="action.title" />
             </data-list-action>
-
-        </div>
 
     </div>
 
