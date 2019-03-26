@@ -6,9 +6,7 @@
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Forms') }}</h1>
-            @can('super')
-                <a href="{{ cp_route('forms.create') }}" class="btn-primary">{{ __('Create Form') }}</a>
-            @endcan
+            <a href="{{ cp_route('forms.create') }}" class="btn-primary">{{ __('Create Form') }}</a>
         </div>
 
         <form-listing :forms="{{ json_encode($forms) }}"></form-listing>

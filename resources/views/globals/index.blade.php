@@ -19,7 +19,8 @@
             'resource' => 'Global Set',
             'description' => 'Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.',
             'svg' => 'empty/global',
-            'route' => cp_route('globals.create')
+            'route' => cp_route('globals.create'),
+            'can' => user()->can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
         ])
 
     @endunless

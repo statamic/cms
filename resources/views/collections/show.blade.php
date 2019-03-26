@@ -11,10 +11,12 @@
                 </small>
                 {{ $collection->title() }}
             </h1>
-            <create-entry-button
-                url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
-                :blueprints="{{ $blueprints->toJson() }}">
-            </create-entry-button>
+            @can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
+                <create-entry-button
+                    url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
+                    :blueprints="{{ $blueprints->toJson() }}">
+                </create-entry-button>
+            @endcan
         </div>
 
         <entry-list
@@ -31,6 +33,7 @@
         @component('statamic::partials.create-first', [
             'resource' => __("{$collection->title()} Entry"),
             'svg' => 'empty/collection', // TODO: Do we want separate entry SVG?
+            'can' => user()->can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
         ])
             @slot('button')
                 <create-entry-button
