@@ -27,7 +27,7 @@ trait Revisable
 
     public function makeWorkingCopy()
     {
-        return (new WorkingCopy($this))
+        return (new WorkingCopy)
             ->date(Carbon::now())
             ->key($this->revisionKey())
             ->attributes($this->revisionAttributes());
