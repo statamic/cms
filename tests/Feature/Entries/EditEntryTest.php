@@ -35,20 +35,30 @@ class EditEntryTest extends TestCase
     /** @test */
     function it_shows_the_entry_form()
     {
-        BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
+        BlueprintRepository::shouldReceive('find')->with('test')->andReturn((new Blueprint)->setContents(['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]));
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
 
         $entry = EntryFactory::slug('test')
             ->collection('blog')
-            ->data(['blueprint' => 'test'])
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Test',
+                'foo' => 'bar'
+            ])
             ->create();
 
         $this
             ->actingAs($user)
             ->get($entry->editUrl())
             ->assertSuccessful()
-            ->assertViewHas('entry', $entry->in('en'))
+            ->assertViewHas('values', [
+                'foo' => 'bar',
+                'title' => 'Test',
+                'slug' => 'test',
+            ])
             ->assertViewHas('readOnly', false);
     }
 
