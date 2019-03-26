@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bg-white h-full">
+    <div class="bg-white h-full flex flex-col">
 
         <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
             {{ __('Revision History') }}
@@ -11,7 +11,7 @@
                 v-html="'&times'" />
         </div>
 
-        <div class="p-3">
+        <div class="flex-1 overflow-auto p-3">
 
             <div v-if="revisions.length === 0" class="">
                 {{ __('No revisions') }}
