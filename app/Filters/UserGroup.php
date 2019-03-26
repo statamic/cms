@@ -7,16 +7,20 @@ use Statamic\Filters\Filter;
 
 class UserGroup extends Filter
 {
-    public function options()
+    public function fieldItems()
     {
-        return API\UserGroup::all()->mapWithKeys(function ($group) {
-            return [$group->handle() => $group->title()];
-        })->all();
+        return [
+            'value' => [
+                'display' => __('User Group'),
+                'type' => 'select',
+                'options' => $this->options()
+            ]
+        ];
     }
 
-    public function apply($query, $value)
+    public function apply($query, $values)
     {
-        $query->where('group', $value);
+        $query->where('group', $values['value']);
     }
 
     public function visibleTo($key)
@@ -26,5 +30,12 @@ class UserGroup extends Filter
         }
 
         return $key === 'users';
+    }
+
+    protected function options()
+    {
+        return API\UserGroup::all()->mapWithKeys(function ($group) {
+            return [$group->handle() => $group->title()];
+        })->all();
     }
 }

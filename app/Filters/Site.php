@@ -7,16 +7,24 @@ use Statamic\Filters\Filter;
 
 class Site extends Filter
 {
-    public function options()
+    public function fieldItems()
     {
-        return API\Site::all()->mapWithKeys(function ($site) {
+        $options = API\Site::all()->mapWithKeys(function ($site) {
             return [$site->handle() => $site->name()];
         })->all();
+
+        return [
+            'value' => [
+                'display' => __('Site'),
+                'type' => 'select',
+                'options' => $options
+            ]
+        ];
     }
 
-    public function apply($query, $value)
+    public function apply($query, $values)
     {
-        $query->where('site', $value);
+        $query->where('site', $values['value']);
     }
 
     public function required()

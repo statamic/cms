@@ -37,7 +37,10 @@ class UsersController extends CpController
 
         return view('statamic::users.index', [
             'filters' => Filter::for('users'),
-            'actions' => Action::for('users'),
+            'filters' => Filter::for('users', $context = [
+                'blueprints' => ['user'],
+            ]),
+            'actions' => Action::for('users', $context),
         ]);
     }
 
