@@ -4,7 +4,7 @@
 
     <entry-publish-form
         publish-container="base"
-        initial-action="{{ $actions['update'] }}"
+        :initial-actions="{{ json_encode($actions) }}"
         method="patch"
         collection-title="{{ $collection['title'] }}"
         collection-url="{{ $collection['url'] }}"

@@ -63,6 +63,20 @@
             <slot name="action-buttons-right" />
         </div>
 
+        <div class="mb-3 flex items-center justify-end">
+            <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false">
+                <revision-history slot-scope="{ close }" :url="actions.revisions" @closed="close" />
+            </stack>
+
+            <button class="btn" @click="showRevisionHistory = true">History</button>
+
+            <button class="btn btn-primary mx-2" @click="publish">
+                Publish
+            </button>
+
+            <text-input v-model="revisionMessage" placeholder="Commit message" />
+        </div>
+
         <publish-container
             v-if="fieldset"
             ref="container"
@@ -96,7 +110,13 @@
 
 
 <script>
+import RevisionHistory from '../publish/RevisionHistory.vue';
+
 export default {
+
+    components: {
+        RevisionHistory,
+    },
 
     props: {
         publishContainer: String,
@@ -108,14 +128,14 @@ export default {
         initialSite: String,
         collectionTitle: String,
         collectionUrl: String,
-        initialAction: String,
+        initialActions: Object,
         method: String,
         amp: Boolean,
     },
 
     data() {
         return {
-            action: this.initialAction,
+            actions: this.initialActions,
             saving: false,
             localizing: false,
             fieldset: this.initialFieldset,
@@ -128,7 +148,9 @@ export default {
             errors: {},
             isPreviewing: false,
             sectionsVisible: true,
-            state: 'new'
+            state: 'new',
+            revisionMessage: null,
+            showRevisionHistory: false,
         }
     },
 
@@ -199,11 +221,35 @@ export default {
                 blueprint: this.fieldset.handle
             }};
 
-            this.$axios[this.method](this.action, payload).then(response => {
+            this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
                 this.$notify.success('Saved');
                 this.$refs.container.saved();
+                this.$nextTick(() => this.$emit('saved', response));
+            }).catch(e => {
+                this.saving = false;
+                if (e.response && e.response.status === 422) {
+                    const { message, errors } = e.response.data;
+                    this.error = message;
+                    this.errors = errors;
+                    this.$notify.error(message);
+                } else {
+                    this.$notify.error('Something went wrong');
+                }
+            })
+        },
+
+        publish() {
+            this.saving = true;
+            this.clearErrors();
+            const payload = { message: this.revisionMessage };
+
+            this.$axios.post(this.actions.publish, payload).then(response => {
+                this.saving = false;
+                this.$notify.success(__('Published'));
+                this.$refs.container.saved();
+                this.revisionMessage = null;
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => {
                 this.saving = false;
@@ -236,7 +282,7 @@ export default {
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
-                this.action = data.actions.update;
+                this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
                 this.localizing = false;

@@ -102,6 +102,8 @@ class EntriesController extends CpController
 
         $this->authorize('view', $entry);
 
+        $entry = $entry->fromWorkingCopy();
+
         $blueprint = $entry->blueprint();
 
         event(new PublishBlueprintFound($blueprint, 'entry', $entry));
@@ -125,7 +127,9 @@ class EntriesController extends CpController
         $viewData = [
             'editing' => true,
             'actions' => [
-                'update' => $entry->updateUrl()
+                'save' => $entry->updateUrl(),
+                'publish' => $entry->publishUrl(),
+                'revisions' => $entry->revisionsUrl(),
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -195,7 +199,10 @@ class EntriesController extends CpController
             $entry->order($date);
         }
 
-        $entry->save();
+        $entry
+            ->makeWorkingCopy()
+            ->user($request->user())
+            ->save();
 
         return $entry->toArray();
     }

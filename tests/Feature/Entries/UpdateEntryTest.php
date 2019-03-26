@@ -7,6 +7,7 @@ use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\API\User;
 use Statamic\API\Entry;
+use Statamic\API\Folder;
 use Statamic\Fields\Fields;
 use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
@@ -18,6 +19,19 @@ class UpdateEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->dir = __DIR__.'/tmp';
+        config(['statamic.revisions.path' => $this->dir]);
+    }
+
+    public function tearDown(): void
+    {
+        Folder::delete($this->dir);
+        parent::tearDown();
+    }
 
     /** @test */
     function it_denies_access_if_you_dont_have_permission()
@@ -34,7 +48,7 @@ class UpdateEntryTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($entry, [])
+            ->save($entry, [])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
@@ -57,20 +71,27 @@ class UpdateEntryTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->submit($entry, [
+            ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => 'updated foo',
                 'slug' => 'updated-slug'
             ])
             ->assertOk();
 
-        $entry = Entry::find($entry->id());
-        $this->assertEquals('updated-slug', $entry->slug());
+        $this->assertEquals('test', $entry->slug());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Original title',
+            'foo' => 'bar',
+        ], $entry->data());
+
+        $workingCopy = $entry->fromWorkingCopy();
+        $this->assertEquals('updated-slug', $workingCopy->slug());
         $this->assertEquals([
             'blueprint' => 'test',
             'title' => 'Updated title',
             'foo' => 'updated foo',
-        ], $entry->data());
+        ], $workingCopy->data());
     }
 
     /** @test */
@@ -92,7 +113,7 @@ class UpdateEntryTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($entry, [
+            ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => '',
                 'slug' => 'updated-slug'
@@ -108,12 +129,9 @@ class UpdateEntryTest extends TestCase
         ], $entry->data());
     }
 
-    private function submit($entry, $payload)
+    private function save($entry, $payload)
     {
-        return $this->patch(
-            cp_route('collections.entries.update', [$entry->collectionHandle(), $entry->id(), $entry->slug(), 'en']),
-            $payload
-        );
+        return $this->patch($entry->updateUrl(), $payload);
     }
 
     private function setTestBlueprint($handle, $fields)
