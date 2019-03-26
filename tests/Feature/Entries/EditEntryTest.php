@@ -37,6 +37,7 @@ class EditEntryTest extends TestCase
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn((new Blueprint)->setContents(['fields' => [
             ['handle' => 'foo', 'field' => ['type' => 'text']],
+            ['handle' => 'unused', 'field' => ['type' => 'text']],
         ]]));
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
@@ -56,6 +57,7 @@ class EditEntryTest extends TestCase
             ->assertSuccessful()
             ->assertViewHas('values', [
                 'foo' => 'bar',
+                'unused' => null,
                 'title' => 'Test',
                 'slug' => 'test',
             ])
