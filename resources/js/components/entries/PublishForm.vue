@@ -255,17 +255,7 @@ export default {
                 this.$notify.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => {
-                this.saving = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$notify.error(message);
-                } else {
-                    this.$notify.error('Something went wrong');
-                }
-            })
+            }).catch(e => this.handleAxiosError(e));
         },
 
         confirmPublish() {
@@ -288,17 +278,7 @@ export default {
                 this.$refs.container.saved();
                 this.revisionMessage = null;
                 this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => {
-                this.saving = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$notify.error(message);
-                } else {
-                    this.$notify.error('Something went wrong');
-                }
-            })
+            }).catch(e => this.handleAxiosError(e));
         },
 
         unpublish() {
@@ -313,17 +293,19 @@ export default {
                 this.$refs.container.saved();
                 this.revisionMessage = null;
                 this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => {
-                this.saving = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$notify.error(message);
-                } else {
-                    this.$notify.error('Something went wrong');
-                }
-            })
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        handleAxiosError(e) {
+            this.saving = false;
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                this.errors = errors;
+                this.$notify.error(message);
+            } else {
+                this.$notify.error('Something went wrong');
+            }
         },
 
         localizationSelected(localization) {
