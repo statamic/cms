@@ -7,6 +7,11 @@ use Facades\Statamic\Revisions\Repository as Revisions;
 
 trait Revisable
 {
+    public function revision(string $reference)
+    {
+        return $this->revisions()->get($reference);
+    }
+
     public function revisions()
     {
         return Revisions::whereKey($this->revisionKey());
@@ -54,5 +59,5 @@ trait Revisable
 
     abstract protected function revisionKey();
     abstract protected function revisionAttributes();
-    abstract protected function makeFromRevision($revision);
+    abstract public function makeFromRevision($revision);
 }

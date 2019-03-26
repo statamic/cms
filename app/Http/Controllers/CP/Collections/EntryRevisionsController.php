@@ -14,6 +14,6 @@ class EntryRevisionsController extends CpController
             return $this->pageNotFound();
         }
 
-        return $entry->in($site)->revisions();
+        return $entry->in($site)->revisions()->values();
     }
 }

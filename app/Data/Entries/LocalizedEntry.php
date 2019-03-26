@@ -80,6 +80,11 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return $this->cpUrl('collections.entries.revisions.index');
     }
 
+    public function restoreRevisionUrl()
+    {
+        return $this->cpUrl('collections.entries.restore-revision');
+    }
+
     protected function cpUrl($route)
     {
         return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug(), $this->locale()]);
@@ -240,7 +245,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         ];
     }
 
-    protected function makeFromRevision($revision)
+    public function makeFromRevision($revision)
     {
         $entry = clone $this;
 

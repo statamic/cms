@@ -27,6 +27,8 @@ class Repository
             return $this
                 ->makeRevisionFromFile($key, $path)
                 ->date(Carbon::createFromTimestamp(pathinfo($path, PATHINFO_FILENAME)));
+        })->keyBy(function ($revision) {
+            return $revision->date()->timestamp;
         });
     }
 

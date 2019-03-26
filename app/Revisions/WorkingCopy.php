@@ -18,7 +18,7 @@ class WorkingCopy extends Revision
     {
         return (new self)
             ->key($revision->key())
-            ->message($revision->message())
+            ->message($revision->message() ?? false)
             ->attributes($revision->attributes());
     }
 }

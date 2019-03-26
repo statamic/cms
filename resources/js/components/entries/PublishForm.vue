@@ -37,7 +37,12 @@
             <button href="" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
             <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false">
-                <revision-history slot-scope="{ close }" :url="actions.revisions" @closed="close" />
+                <revision-history
+                    slot-scope="{ close }"
+                    :index-url="actions.revisions"
+                    :restore-url="actions.restore"
+                    @closed="close"
+                />
             </stack>
 
             <div class="btn flex items-center leading-none py-0 px-sm h-auto justify-between">
@@ -136,7 +141,7 @@
 
 
 <script>
-import RevisionHistory from '../publish/RevisionHistory.vue';
+import RevisionHistory from '../revision-history/History.vue';
 
 export default {
 
