@@ -62,6 +62,7 @@ class PublishEntryTest extends TestCase
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();
         $this->assertEquals([
+            'published' => true,
             'slug' => 'test',
             'data' => [
                 'blueprint' => 'test',
@@ -104,6 +105,7 @@ class PublishEntryTest extends TestCase
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();
         $this->assertEquals([
+            'published' => false,
             'slug' => 'test',
             'data' => [
                 'blueprint' => 'test',

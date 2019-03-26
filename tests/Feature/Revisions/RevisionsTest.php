@@ -37,7 +37,7 @@ class RevisionsTest extends TestCase
         $this->assertEquals($user, $revision->user());
         $this->assertEquals($now, $revision->date());
         $this->assertEquals('collections/test/default/123', $revision->key());
-        $this->assertEquals(['slug' => 'my-entry', 'data' => ['foo' => 'bar']], $revision->attributes());
+        $this->assertEquals(['published' => true, 'slug' => 'my-entry', 'data' => ['foo' => 'bar']], $revision->attributes());
         $this->assertEquals('/path/to/collections/test/default/123/'.$now->timestamp.'.yaml', $revision->path());
     }
 }

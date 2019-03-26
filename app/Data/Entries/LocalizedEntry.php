@@ -235,6 +235,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
     {
         return [
             'slug' => $this->slug(),
+            'published' => $this->published(),
             'data' => $this->data(),
         ];
     }
@@ -250,6 +251,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         $attrs = $revision->attributes();
 
         return $entry
+            ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
     }
