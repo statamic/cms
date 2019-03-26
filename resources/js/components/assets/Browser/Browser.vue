@@ -66,13 +66,16 @@
                                     <span>{{ __('Upload') }}</span>
                                 </button>
 
-                                <button class="btn btn-flat ml-2" @click="mode = 'grid'">
+                                <div class="btn-group-flat ml-2">
+                                <button @click="mode = 'grid'" :class="{'active': mode === 'grid'}">
                                     <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                 </button>
 
-                                <button class="btn btn-flat ml-sm" @click="mode = 'table'">
+                                <button @click="mode = 'table'" :class="{'active': mode === 'table'}">
                                     <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                 </button>
+                                </div>
+
                             </div>
 
                             <uploads
