@@ -241,13 +241,15 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
 
     protected function makeFromRevision($revision)
     {
+        $entry = clone $this;
+
         if (! $revision) {
-            return $this;
+            return $entry;
         }
 
         $attrs = $revision->attributes();
 
-        return $this
+        return $entry
             ->data($attrs['data'])
             ->slug($attrs['slug']);
     }

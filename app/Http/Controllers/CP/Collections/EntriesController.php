@@ -166,7 +166,7 @@ class EntriesController extends CpController
             return $this->pageNotFound();
         }
 
-        $entry = $entry->inOrClone($site);
+        $entry = $entry->inOrClone($site)->fromWorkingCopy();
 
         $this->authorize('edit', $entry);
 
