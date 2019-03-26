@@ -75,7 +75,7 @@
                 @cancel="confirmingPublish = false"
             >
                 <p class="mb-3">{{ __('Are you sure you want to publish this entry?') }}</p>
-                <text-input v-model="revisionMessage" :placeholder="__('Notes about your changes')" />
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" />
             </confirmation-modal>
 
             <slot name="action-buttons-right" />
