@@ -95,7 +95,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block"></file-icon>
                                                 ..
                                             </a>
                                         </td>
@@ -105,7 +105,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block"></file-icon>
                                                 {{ folder.path }}
                                             </a>
                                         </td>
@@ -130,7 +130,7 @@
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                        <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
+                                        <asset-thumbnail :asset="asset" class="w-8 h-8 mr-1" />
                                         <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
                                     </div>
                                 </template>
