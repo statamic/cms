@@ -35,8 +35,8 @@
                 <div>
                     <button class="btn btn-flat" @click="previewing = revision.date">Preview</button>
                     <stack name="revision-preview" v-if="previewing === revision.date" @closed="previewing = null">
-                        <div class="bg-white h-full p-3">
-                            the preview goes here.
+                        <div class="bg-white h-full p-3 overflow-auto">
+                            <pre class="whitespace-pre-wrap text-xs font-mono" v-text="JSON.stringify(revision.attributes, null, 2)" />
                         </div>
                     </stack>
                     <button class="btn btn-flat ml-1" @click="restore(revision)">Restore</button>
