@@ -64,7 +64,29 @@
                         </ul>
                     </dropdown-list>
                 </div>
+
+                <div class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center">
+                    <span @click="confirmUnpublish">{{ __('Unpublish') }}</span>
+                    <dropdown-list>
+                        <svg-icon class="text-grey-80 w-2 h-3 ml-sm" name="chevron-down-small" slot="trigger" />
+                        <ul class="dropdown-menu">
+                            <li><a href="">Example</a></li>
+                        </ul>
+                    </dropdown-list>
+                </div>
             </div>
+
+            <confirmation-modal
+                v-if="confirmingUnpublish"
+                :title="__('Unpublish')"
+                :danger="true"
+                :buttonText="__('Unpublish')"
+                @confirm="unpublish"
+                @cancel="confirmingUnpublish = false"
+            >
+                <p class="mb-3">{{ __('Are you sure you want to unpublish this entry?') }}</p>
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" />
+            </confirmation-modal>
 
             <confirmation-modal
                 v-if="confirmingPublish"
@@ -156,6 +178,7 @@ export default {
             revisionMessage: null,
             showRevisionHistory: false,
             confirmingPublish: false,
+            confirmingUnpublish: false,
         }
     },
 
@@ -249,6 +272,10 @@ export default {
             this.confirmingPublish = true;
         },
 
+        confirmUnpublish() {
+            this.confirmingUnpublish = true;
+        },
+
         publish() {
             this.saving = true;
             this.confirmingPublish = false;
@@ -258,6 +285,31 @@ export default {
             this.$axios.post(this.actions.publish, payload).then(response => {
                 this.saving = false;
                 this.$notify.success(__('Published'));
+                this.$refs.container.saved();
+                this.revisionMessage = null;
+                this.$nextTick(() => this.$emit('saved', response));
+            }).catch(e => {
+                this.saving = false;
+                if (e.response && e.response.status === 422) {
+                    const { message, errors } = e.response.data;
+                    this.error = message;
+                    this.errors = errors;
+                    this.$notify.error(message);
+                } else {
+                    this.$notify.error('Something went wrong');
+                }
+            })
+        },
+
+        unpublish() {
+            this.saving = true;
+            this.confirmingUnpublish = false;
+            this.clearErrors();
+            const payload = { message: this.revisionMessage };
+
+            this.$axios.delete(this.actions.publish, payload).then(response => {
+                this.saving = false;
+                this.$notify.success(__('Unpublished'));
                 this.$refs.container.saved();
                 this.revisionMessage = null;
                 this.$nextTick(() => this.$emit('saved', response));
