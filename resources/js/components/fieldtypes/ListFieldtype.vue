@@ -5,10 +5,9 @@
         item-class="sortable-row"
         handle-class="sortable-handle"
     >
-        <ul>
+        <ul ref="list">
             <li class="sortable-row"
                 v-for="(item, index) in data"
-                ref="items"
                 :key="item._id"
                 :class="{ editing: (editing === index) }"
             >
@@ -23,7 +22,7 @@
                         @focus="editItem(index)"
                     />
                 </span>
-                <span v-if="editing !== index" @click.prevent="editItem(index)">
+                <span v-else @click.prevent="editItem(index)">
                     <span class="sortable-handle">{{ item.value }}</span>
                     <i class="delete" @click="deleteItem(index)"></i>
                 </span>
@@ -101,7 +100,7 @@ export default {
         focusItem(index) {
             return this.editing === this.data.length
                 ? this.$refs.newItem.focus()
-                : this.$refs.items[this.editing].querySelector('input').select();
+                : this.$refs.list.querySelector('.editing input').select();
         },
 
         goUp() {
