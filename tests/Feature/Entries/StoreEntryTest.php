@@ -12,10 +12,9 @@ use Statamic\Fields\Fields;
 use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
 
-class UpdateEntryTest extends TestCase
+class StoreEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -38,100 +37,79 @@ class UpdateEntryTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
-
-        $entry = EntryFactory::id('1')
-            ->slug('test')
-            ->collection('blog')
-            ->data(['blueprint' => 'test'])
-            ->create();
+        Collection::make('blog')->sites(['en'])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->save($entry, [])
+            ->store([])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
 
     /** @test */
-    function entry_gets_saved()
+    function entry_gets_created()
     {
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
-        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $this->setTestBlueprint('test', ['title' => ['type' => 'text'], 'foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'create blog entries']]);
         $user = User::make()->assignRole('test');
+        Collection::make('blog')->sites(['en'])->save();
+        $this->assertCount(0, Entry::all());
 
-        $entry = EntryFactory::id('1')
-            ->slug('test')
-            ->collection('blog')
-            ->data([
-                'blueprint' => 'test',
-                'title' => 'Original title',
-                'foo' => 'bar',
-            ])->create();
-
-        $this
+        $response = $this
             ->actingAs($user)
-            ->save($entry, [
-                'title' => 'Updated title',
-                'foo' => 'updated foo',
-                'slug' => 'updated-slug'
+            ->store([
+                'blueprint' => 'test',
+                'title' => 'The title',
+                'slug' => 'the-slug',
+                'foo' => 'bar',
             ])
             ->assertOk();
 
-        $this->assertEquals('test', $entry->slug());
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+
+        $response->assertJson([
+            'redirect' => "http://localhost/cp/collections/blog/entries/{$entry->id()}/the-slug/en",
+            'entry' => []
+        ]);
+
+        $this->assertEquals('the-slug', $entry->slug());
         $this->assertEquals([
-            'blueprint' => 'test',
-            'title' => 'Original title',
+            'title' => 'The title',
             'foo' => 'bar',
         ], $entry->data());
-
-        $workingCopy = $entry->fromWorkingCopy();
-        $this->assertEquals('updated-slug', $workingCopy->slug());
-        $this->assertEquals([
-            'blueprint' => 'test',
-            'title' => 'Updated title',
-            'foo' => 'updated foo',
-        ], $workingCopy->data());
+        $this->assertFalse($entry->published());
+        $this->assertCount(1, $entry->revisions());
     }
 
     /** @test */
     function validation_error_returns_back()
     {
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text', 'validate' => 'required']]);
-        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $this->setTestBlueprint('test', ['title' => ['type' => 'text'], 'foo' => ['type' => 'text', 'validate' => 'required']]);
+        $this->setTestRoles(['test' => ['access cp', 'create blog entries']]);
         $user = User::make()->assignRole('test');
-
-        $entry = EntryFactory::id('1')
-            ->slug('test')
-            ->collection('blog')
-            ->data([
-                'blueprint' => 'test',
-                'title' => 'Original title',
-                'foo' => 'bar',
-            ])->create();
+        Collection::make('blog')->sites(['en'])->save();
+        $this->assertCount(0, Entry::all());
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->save($entry, [
-                'title' => 'Updated title',
+            ->store([
+                'blueprint' => 'test',
+                'title' => 'The title',
+                'slug' => 'the-slug',
                 'foo' => '',
-                'slug' => 'updated-slug'
             ])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('foo');
 
-        $this->assertEquals('test', $entry->slug());
-        $this->assertEquals([
-            'blueprint' => 'test',
-            'title' => 'Original title',
-            'foo' => 'bar',
-        ], $entry->data());
+        $this->assertCount(0, Entry::all());
     }
 
-    private function save($entry, $payload)
+    private function store($payload)
     {
-        return $this->patch($entry->updateUrl(), $payload);
+        return $this->post(cp_route('collections.entries.store', ['blog', 'en']), $payload);
     }
 
     private function setTestBlueprint($handle, $fields)

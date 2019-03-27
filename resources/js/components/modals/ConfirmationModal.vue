@@ -1,7 +1,7 @@
 <template>
     <modal name="confirmation-modal" :pivotY="0.1">
-        <div class="flex flex-col h-full text-center">
-            <div class="text-lg font-medium p-4 pb-0">
+        <div class="flex flex-col h-full">
+            <div class="text-lg font-medium p-3 pb-0">
                 {{ title }}
             </div>
             <div class="flex-1 overflow-scroll p-3 text-grey">
@@ -10,7 +10,7 @@
                     <p>{{ __('Are you sure?') }}</p>
                 </slot>
             </div>
-            <div class="p-2 bg-grey-20 border-t flex items-center justify-center text-sm">
+            <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
                 <button class="text-grey hover:text-grey-90 mx-1" @click="$emit('cancel')">{{ __('Cancel') }}</button>
                 <button class="btn mx-1" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
             </div>

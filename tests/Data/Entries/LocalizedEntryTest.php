@@ -334,28 +334,6 @@ class LocalizedEntryTest extends TestCase
     }
 
     /** @test */
-    function it_can_be_published()
-    {
-        $entry = (new LocalizedEntry)->published(false);
-
-        $return = $entry->publish();
-
-        $this->assertEquals($entry, $return);
-        $this->assertTrue($entry->published());
-    }
-
-    /** @test */
-    function it_can_be_unpublished()
-    {
-        $entry = (new LocalizedEntry)->published(true);
-
-        $return = $entry->unpublish();
-
-        $this->assertEquals($entry, $return);
-        $this->assertFalse($entry->published());
-    }
-
-    /** @test */
     function it_gets_the_blueprint_based_on_the_data()
     {
         $blueprint = new Blueprint;

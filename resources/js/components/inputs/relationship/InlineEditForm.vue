@@ -11,6 +11,7 @@ export default {
 
     data() {
         return {
+            creating: false,
             method: 'patch',
             action: 'update',
             title: this.item.title,

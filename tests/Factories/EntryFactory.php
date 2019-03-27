@@ -10,6 +10,7 @@ class EntryFactory
     protected $id;
     protected $slug;
     protected $data = [];
+    protected $published = true;
 
     public function id($id)
     {
@@ -35,6 +36,12 @@ class EntryFactory
         return $this;
     }
 
+    public function published($published)
+    {
+        $this->published = $published;
+        return $this;
+    }
+
     public function make()
     {
         $entry = Entry::make()->collection($this->createCollection());
@@ -46,7 +53,8 @@ class EntryFactory
         $entry->in('en', function ($localized) {
             $localized
                 ->slug($this->slug)
-                ->data($this->data);
+                ->data($this->data)
+                ->published($this->published);
         });
 
         return $entry;

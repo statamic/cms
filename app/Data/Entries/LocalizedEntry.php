@@ -9,10 +9,10 @@ use Statamic\API\Blueprint;
 use Statamic\Data\Routable;
 use Illuminate\Support\Carbon;
 use Statamic\Data\Augmentable;
-use Statamic\Data\Publishable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Localization;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Revisions\Revisable;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Arrayable;
@@ -23,7 +23,7 @@ use Statamic\Contracts\Data\Localization as LocalizationContract;
 
 class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Responsable, LocalizationContract
 {
-    use Routable, Localization, ContainsData, ExistsAsFile, Publishable, Augmentable;
+    use Routable, Localization, ContainsData, ExistsAsFile, Augmentable, Revisable;
 
     protected $order;
 
@@ -61,22 +61,32 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
 
     public function editUrl()
     {
-        return cp_route('collections.entries.edit', [
-            $this->collectionHandle(),
-            $this->id(),
-            $this->slug(),
-            $this->locale(),
-        ]);
+        return $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
     {
-        return cp_route('collections.entries.update', [
-            $this->collectionHandle(),
-            $this->id(),
-            $this->slug(),
-            $this->locale(),
-        ]);
+        return $this->cpUrl('collections.entries.update');
+    }
+
+    public function publishUrl()
+    {
+        return $this->cpUrl('collections.entries.published.store');
+    }
+
+    public function revisionsUrl()
+    {
+        return $this->cpUrl('collections.entries.revisions.index');
+    }
+
+    public function restoreRevisionUrl()
+    {
+        return $this->cpUrl('collections.entries.restore-revision');
+    }
+
+    protected function cpUrl($route)
+    {
+        return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug(), $this->locale()]);
     }
 
     public function blueprint()
@@ -214,5 +224,39 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
     public function ampable()
     {
         return $this->collection()->ampable();
+    }
+
+    protected function revisionKey()
+    {
+        return vsprintf('collections/%s/%s/%s', [
+            $this->collectionHandle(),
+            $this->locale(),
+            $this->id()
+        ]);
+    }
+
+    protected function revisionAttributes()
+    {
+        return [
+            'slug' => $this->slug(),
+            'published' => $this->published(),
+            'data' => $this->data(),
+        ];
+    }
+
+    public function makeFromRevision($revision)
+    {
+        $entry = clone $this;
+
+        if (! $revision) {
+            return $entry;
+        }
+
+        $attrs = $revision->attributes();
+
+        return $entry
+            ->published($attrs['published'])
+            ->data($attrs['data'])
+            ->slug($attrs['slug']);
     }
 }

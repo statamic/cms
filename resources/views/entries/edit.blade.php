@@ -4,7 +4,7 @@
 
     <entry-publish-form
         publish-container="base"
-        initial-action="{{ $actions['update'] }}"
+        :initial-actions="{{ json_encode($actions) }}"
         method="patch"
         collection-title="{{ $collection['title'] }}"
         collection-url="{{ $collection['url'] }}"
@@ -12,6 +12,7 @@
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
+        :initial-published="{{ bool_str($entry->published()) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         initial-site="{{ $locale }}"
         :amp="{{ bool_str($entry->ampable()) }}"

@@ -41,13 +41,13 @@
 
             <portal-target name="live-preview"></portal-target>
 
+            <stacks v-if="stacks.length"></stacks>
+
             <portal-target
                   v-for="(modal, i) in modals"
                   :key="`modal-${modal}-${i}`"
                   :name="`modal-${i}`"
             ></portal-target>
-
-            <stacks v-if="stacks.length"></stacks>
 
             <portal-target name="pane" :slim="true"></portal-target>
 

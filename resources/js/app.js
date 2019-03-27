@@ -44,7 +44,7 @@ Vue.prototype.$mousetrap = require('mousetrap');
 require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();
 
-Vue.moment = require('moment');
+window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)

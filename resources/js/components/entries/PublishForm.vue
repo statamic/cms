@@ -34,32 +34,69 @@
                 </button>
             </div>
 
-            <div class="pt-px text-2xs text-grey-60" v-text="stateMsg" />
+            <button href="" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
-            <button v-if="isBase" class="btn ml-2" v-text="__('Live Preview')" @click="openLivePreview" />
+            <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
+                <revision-history
+                    slot-scope="{ close }"
+                    :index-url="actions.revisions"
+                    :restore-url="actions.restore"
+                    @closed="close"
+                />
+            </stack>
 
-            <div class="btn-dropdown-primary ml-2">
-                <button
-                    class="cta"
-                    :class="{ disabled: !canSave }"
+            <div class="btn flex items-center leading-none py-0 px-sm h-auto justify-between">
+
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    v-if="isBase"
+                    v-text="__('Live Preview')"
+                    @click="openLivePreview" />
+
+                <div
+                    class="m-sm cursor-pointer p-1 hover:bg-grey-30 rounded"
+                    :class="{ 'opacity-25': !canSave }"
                     :disabled="!canSave"
                     @click.prevent="save"
-                    v-text="__('Save Changes')"
-                ></button>
-                <dropdown-list>
-                    <button class="trigger flex items-center" slot="trigger">
-                        <svg-icon class="text-white w-2 h-3" name="chevron-down-small" />
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="" v-text="__('Save as Draft')"></a></li>
-                        <li><a href="" v-text="__('Save & Publish')"></a></li>
-                        <li><a href="" v-text="__('Save & Unpublish')"></a></li>
-                        <li><a href="" v-text="__('Save & Create Another')"></a></li>
-                        <li><a href="" v-text="__('Duplicate')"></a></li>
-                        <li class="warning"><a href="" v-text="__('Delete')"></a></li>
-                    </ul>
-                </dropdown-list>
+                    v-text="__('Save')" />
+
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    :class="{ 'opacity-25': !canPublish }"
+                    :disabled="!canPublish"
+                    @click="confirmPublish"
+                    v-text="__('Publish')" />
+
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    :class="{ 'opacity-25': !canUnpublish }"
+                    :disabled="!canUnpublish"
+                    @click="confirmUnpublish"
+                    v-text="__('Unpublish')" />
             </div>
+
+            <confirmation-modal
+                v-if="confirmingUnpublish"
+                :title="__('Unpublish')"
+                :buttonText="__('Unpublish')"
+                @confirm="unpublish"
+                @cancel="confirmingUnpublish = false"
+            >
+                <p class="mb-3">{{ __('Are you sure you want to unpublish this entry?') }}</p>
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="unpublish" autofocus />
+            </confirmation-modal>
+
+            <confirmation-modal
+                v-if="confirmingPublish"
+                :title="__('Publish')"
+                :buttonText="__('Publish')"
+                @confirm="publish"
+                @cancel="confirmingPublish = false"
+            >
+                <p class="mb-3">{{ __('Are you sure you want to publish this entry?') }}</p>
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="publish" autofocus />
+            </confirmation-modal>
+
             <slot name="action-buttons-right" />
         </div>
 
@@ -96,7 +133,13 @@
 
 
 <script>
+import RevisionHistory from '../revision-history/History.vue';
+
 export default {
+
+    components: {
+        RevisionHistory,
+    },
 
     props: {
         publishContainer: String,
@@ -108,14 +151,16 @@ export default {
         initialSite: String,
         collectionTitle: String,
         collectionUrl: String,
-        initialAction: String,
+        initialActions: Object,
         method: String,
         amp: Boolean,
+        initialPublished: Boolean,
+        isCreating: Boolean,
     },
 
     data() {
         return {
-            action: this.initialAction,
+            actions: this.initialActions,
             saving: false,
             localizing: false,
             fieldset: this.initialFieldset,
@@ -128,7 +173,12 @@ export default {
             errors: {},
             isPreviewing: false,
             sectionsVisible: true,
-            state: 'new'
+            state: 'new',
+            revisionMessage: null,
+            showRevisionHistory: false,
+            published: this.initialPublished,
+            confirmingPublish: false,
+            confirmingUnpublish: false,
         }
     },
 
@@ -138,8 +188,20 @@ export default {
             return this.error || Object.keys(this.errors).length;
         },
 
+        somethingIsLoading() {
+            return ! this.$progress.isComplete();
+        },
+
         canSave() {
-            return this.$progress.isComplete();
+            return this.isDirty && !this.somethingIsLoading;
+        },
+
+        canPublish() {
+            return !this.isCreating && !this.canSave && !this.somethingIsLoading;
+        },
+
+        canUnpublish() {
+            return !this.isCreating && !this.canSave && this.published && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {
@@ -192,6 +254,8 @@ export default {
         },
 
         save() {
+            if (!this.canSave) return;
+
             this.saving = true;
             this.clearErrors();
 
@@ -199,23 +263,69 @@ export default {
                 blueprint: this.fieldset.handle
             }};
 
-            this.$axios[this.method](this.action, payload).then(response => {
+            this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
-                this.$notify.success('Saved');
+                if (!this.isCreating) this.$notify.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => {
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        confirmPublish() {
+            if (this.canPublish) {
+                this.confirmingPublish = true;
+            }
+        },
+
+        confirmUnpublish() {
+            if (this.canUnpublish) {
+                this.confirmingUnpublish = true;
+            }
+        },
+
+        publish() {
+            this.saving = true;
+            this.confirmingPublish = false;
+            this.clearErrors();
+            const payload = { message: this.revisionMessage };
+
+            this.$axios.post(this.actions.publish, payload).then(response => {
                 this.saving = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$notify.error(message);
-                } else {
-                    this.$notify.error('Something went wrong');
-                }
-            })
+                this.$notify.success(__('Published'));
+                this.$refs.container.saved();
+                this.revisionMessage = null;
+                this.published = true;
+                this.$nextTick(() => this.$emit('saved', response));
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        unpublish() {
+            this.saving = true;
+            this.confirmingUnpublish = false;
+            this.clearErrors();
+            const payload = { message: this.revisionMessage };
+
+            this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
+                this.saving = false;
+                this.$notify.success(__('Unpublished'));
+                this.$refs.container.saved();
+                this.revisionMessage = null;
+                this.published = false;
+                this.$nextTick(() => this.$emit('saved', response));
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        handleAxiosError(e) {
+            this.saving = false;
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                this.errors = errors;
+                this.$notify.error(message);
+            } else {
+                this.$notify.error('Something went wrong');
+            }
         },
 
         localizationSelected(localization) {
@@ -236,7 +346,7 @@ export default {
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
-                this.action = data.actions.update;
+                this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
                 this.localizing = false;
