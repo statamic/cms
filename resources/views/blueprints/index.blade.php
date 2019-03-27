@@ -20,7 +20,8 @@
             'resource' => 'Blueprint',
             'description' => 'Blueprints define which sections and fields you see in a publish form.',
             'svg' => 'empty/collection', // TODO: Need empty/blueprint svg
-            'route' => cp_route('blueprints.create')
+            'route' => cp_route('blueprints.create'),
+            'can' => user()->can('create', 'Statamic\Fields\Blueprint')
         ])
 
     @endunless

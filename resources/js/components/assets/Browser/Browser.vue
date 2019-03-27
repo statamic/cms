@@ -50,29 +50,36 @@
                                 <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
-                                <button
-                                    class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative"
-                                    @click="creatingFolder = true"
-                                >
-                                    <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
-                                    <span>{{ __('Create Folder') }}</span>
-                                </button>
+                                <data-list-bulk-actions
+                                    class="rounded-b"
+                                    v-if="hasSelections && hasActions"
+                                    :url="actionUrl"
+                                    :actions="actions"
+                                    @started="actionStarted"
+                                    @completed="bulkActionsCompleted"
+                                />
 
-                                <button
-                                    class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative"
-                                    @click="openFileBrowser"
-                                >
-                                    <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
-                                    <span>{{ __('Upload') }}</span>
-                                </button>
+                                <template v-if="! hasSelections">
+                                    <button class="btn btn-flat btn-icon-only" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
+                                        <span>{{ __('Create Folder') }}</span>
+                                    </button>
 
-                                <button class="btn btn-flat ml-2" @click="mode = 'grid'">
-                                    <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
-                                </button>
+                                    <button class="btn btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
+                                </template>
 
-                                <button class="btn btn-flat ml-sm" @click="mode = 'table'">
-                                    <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                                </button>
+                                <div class="btn-group-flat ml-2">
+                                    <button @click="mode = 'grid'" :class="{'active': mode === 'grid'}">
+                                        <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
+                                    </button>
+                                    <button @click="mode = 'table'" :class="{'active': mode === 'table'}">
+                                        <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                                    </button>
+                                </div>
+
                             </div>
 
                             <uploads
@@ -88,7 +95,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block"></file-icon>
                                                 ..
                                             </a>
                                         </td>
@@ -98,7 +105,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block"></file-icon>
                                                 {{ folder.path }}
                                             </a>
                                         </td>
@@ -123,7 +130,7 @@
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                        <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
+                                        <asset-thumbnail :asset="asset" class="w-8 h-8 mr-1" />
                                         <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
                                     </div>
                                 </template>
@@ -148,15 +155,6 @@
 
                             <!-- Grid Mode -->
                             <data-list-grid  v-if="mode === 'grid'"></data-list-grid>
-
-                            <data-list-bulk-actions
-                                class="rounded-b"
-                                v-if="hasActions"
-                                :url="actionUrl"
-                                :actions="actions"
-                                @started="actionStarted"
-                                @completed="bulkActionsCompleted"
-                            />
 
                         </div>
 
@@ -296,6 +294,10 @@ export default {
 
         hasMaxFiles() {
             return this.maxFiles !== undefined && this.maxFiles !== Infinity;
+        },
+
+        hasSelections() {
+            return this.selectedAssets.length > 0;
         }
 
     },

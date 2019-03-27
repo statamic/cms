@@ -113,6 +113,38 @@ button, .btn, .btn-* {
     }
 }
 
+/* Button Group
+  ========================================================================== */
+
+.btn-group-flat {
+    @apply flex items-center p-0;
+    height: 37px;
+
+    button {
+        @include button(white, black);
+        @apply shadow-none text-grey-80 bg-grey-30 flex items-center h-full;
+
+        &:hover, &.active, &:focus {
+            @apply bg-grey-40 text-grey-80;
+            box-shadow: none !important;
+            bottom: 0;
+        }
+
+        &:active, &:active:focus {
+            @apply bg-grey-50;
+            box-shadow: none !important;
+            bottom: 0;
+        }
+    }
+
+    button:first-child {
+        @apply rounded-r-none;
+    }
+
+    button:last-child {
+        @apply rounded-l-none;
+    }
+}
 
 /* With Icons
   ========================================================================== */

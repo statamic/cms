@@ -19,11 +19,6 @@ class Arr extends Fieldtype
         return array_merge($this->blankKeyed(), $data ?? []);
     }
 
-    public function preProcessConfig($data)
-    {
-        return format_input_options($data);
-    }
-
     public function process($data)
     {
         return collect($data)

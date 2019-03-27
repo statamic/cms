@@ -35,11 +35,6 @@ abstract class Filter implements Arrayable
         return $this;
     }
 
-    public function options()
-    {
-        return [];
-    }
-
     public function extra()
     {
         return [];
@@ -68,7 +63,6 @@ abstract class Filter implements Arrayable
         return [
             'handle' => $this->handle(),
             'title' => $this->title(),
-            'options' => format_input_options($this->options()),
             'extra' => $this->extra(),
             'required' => $this->required(),
             'fields' => $this->fields()->toPublishArray(),

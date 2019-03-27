@@ -3,128 +3,70 @@
 @section('content')
 
     <h1 class="mb-3">Revisions Prototype</h1>
-    <div class="card w-1/2 p-0">
+    <div class="card w-2/3 p-0">
         <div>
             <h2 class="p-3">Entry History</h2>
-            <h6 class="px-3 pb-1 mb-1 border-b">Today</h6>
-            <div class="revisions-listing text-sm pb-2">
-                <div class="py-1 px-3 hover:bg-grey-20 block group">
-                    <div class="flex items-center text-blue">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status bg-blue mr-1"></i>
-                        </span>
-                        <span>10:25 AM &mdash; Jack McDade</span>
-                        <span class="badge bg-blue uppercase text-white text-4xs ml-1">Working Copy</span>
+
+            {{-- Today --}}
+            <h6 class="revision-date">Today</h6>
+            <div class="revision-list">
+                <div class="revision-item status-working-copy">
+                    <div class="revision-item-bullet-container">
+                        <i class="revision-item-bullet"></i>
+                    </div>
+                    <div class="revision-item-content">
+                        <div class="flex items-center">
+                            <span>08:34 AM &mdash; André Basse</span>
+                            <span class="badge">Working Copy</span>
+                        </div>
                     </div>
                 </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block group">
-                    <div class="flex items-center text-green">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-live mr-1"></i>
-                        </span>
-                        <span>09:47 AM &mdash; Jack McDade</span>
-                        <span class="badge bg-green-light uppercase text-white text-4xs ml-1">Published</span>
+                <div class="revision-item status-published">
+                    <div class="revision-item-bullet-container">
+                        <i class="revision-item-bullet"></i>
+                    </div>
+                    <div class="revision-item-content">
+                        <div class="flex items-center">
+                            <span>07:25 AM &mdash; Jason Varga</span>
+                            <span class="badge">Published</span>
+                        </div>
+                        <div class="revision-item-note">Pushed the article live.</div>
                     </div>
                 </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>08:35 AM &mdash; Jack McDade</span>
+                <div class="revision-item">
+                    <div class="revision-item-bullet-container">
+                        <i class="revision-item-bullet"></i>
                     </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
-                    </div>
-                </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>08:34 AM &mdash; André Basse</span>
-                    </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
-                    </div>
-                </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>08:31 AM &mdash; André Basse</span>
-                    </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
-                    </div>
-                </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>08:26 AM &mdash; Jack McDade</span>
-                    </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    <div class="revision-item-content">
+                        <div class="flex items-center">
+                            <span>06:58 AM &mdash; André Basse</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <h6 class="px-3 pb-1 pt-2 mb-1 border-b">March 19, 2019</h6>
-            <div class="revisions-listing text-sm pb-2">
-                <div class="py-1 px-3 hover:bg-grey-20 flex items-center text-green block group">
-                    <div class="flex items-center justify-between cursor-pointer enter">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-live mr-1"></i>
-                        </span>
-                        <span>10:45 PM &mdash; Jack McDade</span>
-                        <span class="badge bg-green-light uppercase text-white text-4xs ml-1">Published</span>
+            {{-- Different Day --}}
+            <h6 class="revision-date">March 19, 2019</h6>
+            <div class="revision-list">
+                <div class="revision-item">
+                    <div class="revision-item-bullet-container">
+                        <i class="revision-item-bullet"></i>
                     </div>
-                    <div class="ml-2">
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
-                    </div>
-                </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>09:47 PM &mdash; Jack McDade</span>
-                    </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    <div class="revision-item-content">
+                        <div class="flex items-center">
+                            <span>05:30 PM &mdash; Jack McDade</span>
+                        </div>
+                        <div class="revision-item-note">Added images.</div>
                     </div>
                 </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>04:40 PM &mdash; Jack McDade</span>
+                <div class="revision-item">
+                    <div class="revision-item-bullet-container">
+                        <i class="revision-item-bullet"></i>
                     </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
-                    </div>
-                </div>
-                <div class="py-1 px-3 hover:bg-grey-20 block flex items-center justify-between cursor-pointer group">
-                    <div class="flex items-center">
-                        <span class="w-6 text-center pb-sm">
-                            <i class="icon-status icon-status-draft mr-1"></i>
-                        </span>
-                        <span>01:18 PM &mdash; Jack McDade</span>
-                    </div>
-                    <div>
-                        <a href="" class="opacity-0 group-hover:opacity-100 text-grey hover:text-blue text-xs">Preview Version</a>
-                        <a href="" class="opacity-0 group-hover:opacity-100 ml-2 text-grey hover:text-blue text-xs">Restore Version</a>
+                    <div class="revision-item-content">
+                        <div class="flex items-center">
+                            <span>03:21 PM &mdash; Jack McDade</span>
+                        </div>
                     </div>
                 </div>
             </div>

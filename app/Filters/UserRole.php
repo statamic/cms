@@ -7,16 +7,20 @@ use Statamic\Filters\Filter;
 
 class UserRole extends Filter
 {
-    public function options()
+    public function fieldItems()
     {
-        return Role::all()->mapWithKeys(function ($role) {
-            return [$role->handle() => $role->title()];
-        })->prepend('Super', 'super')->all();
+        return [
+            'value' => [
+                'display' => __('User Role'),
+                'type' => 'select',
+                'options' => $this->options()
+            ]
+        ];
     }
 
-    public function apply($query, $value)
+    public function apply($query, $values)
     {
-        $query->where('role', $value);
+        $query->where('role', $values['value']);
     }
 
     public function visibleTo($key)
@@ -26,5 +30,12 @@ class UserRole extends Filter
         }
 
         return $key === 'users';
+    }
+
+    protected function options()
+    {
+        return Role::all()->mapWithKeys(function ($role) {
+            return [$role->handle() => $role->title()];
+        })->prepend('Super', 'super')->all();
     }
 }

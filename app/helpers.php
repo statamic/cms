@@ -489,22 +489,6 @@ function current_class($pattern)
     return is_current($pattern) ? 'current' : '';
 }
 
-function format_input_options($options)
-{
-    $formatted_options = [];
-
-    foreach ($options as $key => $text) {
-        if ($options === array_values($options)) {
-            $formatted_options[] = ['value' => $text, 'text' => $text];
-        } else {
-            $formatted_options[] = ['value' => $key, 'text' => $text];
-        }
-    }
-
-    return $formatted_options;
-}
-
-
 /**
  * @param array $value
  * @return \Statamic\Assets\AssetCollection

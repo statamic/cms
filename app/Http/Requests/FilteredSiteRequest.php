@@ -11,7 +11,7 @@ class FilteredSiteRequest extends FilteredRequest
         parent::prepareForValidation();
 
         if (! $this->filters->has('site') && Site::hasMultiple()) {
-            $this->filters['site'] = Site::selected()->handle();
+            $this->filters['site'] = ['value' => Site::selected()->handle()];
         }
     }
 }
