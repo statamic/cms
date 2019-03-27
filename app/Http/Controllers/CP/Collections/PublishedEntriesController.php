@@ -44,6 +44,6 @@ class PublishedEntriesController extends CpController
             ->message($request->message ?? false)
             ->save();
 
-        $entry->workingCopy()->delete();
+        optional($entry->workingCopy())->delete();
     }
 }
