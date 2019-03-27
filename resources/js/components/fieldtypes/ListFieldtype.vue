@@ -16,11 +16,12 @@
                         type="text"
                         class="list-input"
                         v-model="data[index].value"
-                        @keydown.enter.prevent="updateItem(index)"
-                        @keyup.up="goUp"
-                        @keyup.down="goDown"
+                        @keydown.enter.prevent="saveAndAddNewItem"
+                        @keyup.up="previousItem"
+                        @keyup.down="nextItem"
                         @focus="editItem(index)"
                     />
+                    <span>(input!)</span>
                 </span>
                 <span v-else @click.prevent="editItem(index)">
                     <span class="sortable-handle">{{ item.value }}</span>
@@ -36,7 +37,7 @@
                     :placeholder="`${__('Add an item')}...`"
                     @keydown.enter.prevent="addItem"
                     @blur="addItem"
-                    @keyup.up="goUp"
+                    @keyup.up="previousItem"
                 />
             </li>
         </ul>
@@ -88,43 +89,47 @@ export default {
         },
 
         editItem(index) {
-            // this.removeEmptyValues(); // TODO: Need to update this.editing if index is affected?
-
             this.editing = index;
 
             this.$nextTick(function () {
-                this.focusItem(index);
+                this.focusItem();
             });
         },
 
-        focusItem(index) {
+        focusItem() {
             return this.editing === this.data.length
                 ? this.$refs.newItem.focus()
                 : this.$refs.list.querySelector('.editing input').select();
         },
 
-        goUp() {
+        previousItem() {
+            this.deleteIfEmpty();
+
             this.editItem(Math.max(this.editing - 1, 0));
         },
 
-        goDown() {
-            this.editItem(this.editing + 1);
+        nextItem() {
+            let deletedAdjustment = this.deleteIfEmpty() ? 1 : 0;
+
+            this.editItem(this.editing + 1 - deletedAdjustment);
         },
 
-        updateItem(index) {
+        saveAndAddNewItem() {
+            this.deleteIfEmpty();
+
             this.editItem(this.data.length);
         },
 
-        deleteItem(index) {
-            this.data.splice(index, 1);
+        deleteIfEmpty() {
+            if (data_get(this.data[this.editing], 'value', true)) {
+                return;
+            }
+
+            return this.deleteItem(this.editing);
         },
 
-        removeEmptyValues() {
-            this.data.forEach((item, index) => {
-                if (item.value === '') {
-                    this.deleteItem(index);
-                }
-            });
+        deleteItem(index) {
+            return this.data.splice(index, 1);
         },
 
         getReplicatorPreviewText() {
