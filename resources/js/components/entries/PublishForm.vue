@@ -83,7 +83,7 @@
                 @cancel="confirmingUnpublish = false"
             >
                 <p class="mb-3">{{ __('Are you sure you want to unpublish this entry?') }}</p>
-                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" />
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="unpublish" autofocus />
             </confirmation-modal>
 
             <confirmation-modal
@@ -94,7 +94,7 @@
                 @cancel="confirmingPublish = false"
             >
                 <p class="mb-3">{{ __('Are you sure you want to publish this entry?') }}</p>
-                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" />
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="publish" autofocus />
             </confirmation-modal>
 
             <slot name="action-buttons-right" />

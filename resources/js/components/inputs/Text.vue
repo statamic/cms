@@ -10,6 +10,7 @@
             :readonly="isReadOnly"
             :placeholder="placeholder"
             @input="$emit('input', $event.target.value)"
+            @keydown="$emit('keydown', $event)"
         >
         <div class="text-xs ml-1" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>

@@ -14,7 +14,7 @@
         >
             <p class="mb-2">Are you sure you want to restore this revision?</p>
             <p class="mb-3">A new revision will be created based on the state of the revision you've selected.</p>
-            <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" />
+            <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="restore" autofocus />
         </confirmation-modal>
     </div>
 
