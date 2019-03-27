@@ -21,7 +21,6 @@
                         @keyup.down="nextItem"
                         @focus="editItem(index)"
                     />
-                    <span>(input!)</span>
                 </span>
                 <span v-else @click.prevent="editItem(index)">
                     <span class="sortable-handle">{{ item.value }}</span>
