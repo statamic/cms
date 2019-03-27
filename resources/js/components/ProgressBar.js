@@ -5,7 +5,8 @@ const vm = new Vue({
 
     data: {
         progressing: false,
-        names: []
+        names: [],
+        timer: null,
     },
 
     watch: {
@@ -25,11 +26,12 @@ const vm = new Vue({
     methods: {
 
         start() {
-            progress.start();
             this.progressing = true;
+            this.timer = setTimeout(() => progress.start(), 500);
         },
 
         stop() {
+            if (this.timer) clearTimeout(this.timer);
             progress.done();
             this.progressing = false;
         },
