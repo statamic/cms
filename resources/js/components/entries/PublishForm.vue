@@ -60,25 +60,19 @@
                     @click.prevent="save"
                     v-text="__('Save')" />
 
-                <div class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center">
-                    <span @click="confirmPublish">{{ __('Publish') }}</span>
-                    <dropdown-list>
-                        <svg-icon class="text-grey-80 w-2 h-3 ml-sm" name="chevron-down-small" slot="trigger" />
-                        <ul class="dropdown-menu">
-                            <li><a href="">Example</a></li>
-                        </ul>
-                    </dropdown-list>
-                </div>
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    :class="{ 'opacity-25': !canPublish }"
+                    :disabled="!canPublish"
+                    @click="confirmPublish"
+                    v-text="__('Publish')" />
 
-                <div class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center">
-                    <span @click="confirmUnpublish">{{ __('Unpublish') }}</span>
-                    <dropdown-list>
-                        <svg-icon class="text-grey-80 w-2 h-3 ml-sm" name="chevron-down-small" slot="trigger" />
-                        <ul class="dropdown-menu">
-                            <li><a href="">Example</a></li>
-                        </ul>
-                    </dropdown-list>
-                </div>
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    :class="{ 'opacity-25': !canUnpublish }"
+                    :disabled="!canUnpublish"
+                    @click="confirmUnpublish"
+                    v-text="__('Unpublish')" />
             </div>
 
             <confirmation-modal
@@ -162,6 +156,7 @@ export default {
         initialActions: Object,
         method: String,
         amp: Boolean,
+        initialPublished: Boolean,
     },
 
     data() {
@@ -182,6 +177,7 @@ export default {
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
+            published: this.initialPublished,
             confirmingPublish: false,
             confirmingUnpublish: false,
         }
@@ -193,8 +189,20 @@ export default {
             return this.error || Object.keys(this.errors).length;
         },
 
+        somethingIsLoading() {
+            return ! this.$progress.isComplete();
+        },
+
         canSave() {
-            return this.$progress.isComplete();
+            return this.isDirty && !this.somethingIsLoading;
+        },
+
+        canPublish() {
+            return !this.canSave && !this.somethingIsLoading;
+        },
+
+        canUnpublish() {
+            return !this.canSave && this.published && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {
@@ -247,6 +255,8 @@ export default {
         },
 
         save() {
+            if (!this.canSave) return;
+
             this.saving = true;
             this.clearErrors();
 
@@ -264,11 +274,15 @@ export default {
         },
 
         confirmPublish() {
-            this.confirmingPublish = true;
+            if (this.canPublish) {
+                this.confirmingPublish = true;
+            }
         },
 
         confirmUnpublish() {
-            this.confirmingUnpublish = true;
+            if (this.canUnpublish) {
+                this.confirmingUnpublish = true;
+            }
         },
 
         publish() {
@@ -282,6 +296,7 @@ export default {
                 this.$notify.success(__('Published'));
                 this.$refs.container.saved();
                 this.revisionMessage = null;
+                this.published = true;
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
         },
@@ -297,6 +312,7 @@ export default {
                 this.$notify.success(__('Unpublished'));
                 this.$refs.container.saved();
                 this.revisionMessage = null;
+                this.published = false;
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
         },
