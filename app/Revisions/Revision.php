@@ -29,7 +29,7 @@ class Revision implements Arrayable
                 return $this->user;
             }
 
-            return $this->user = API\User::find($this->userId);
+            return $this->user = API\User::find($this->userId ?: null);
         }
 
         if ($user instanceof User) {
