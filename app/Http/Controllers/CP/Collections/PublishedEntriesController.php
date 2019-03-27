@@ -25,8 +25,6 @@ class PublishedEntriesController extends CpController
             return $this->pageNotFound();
         }
 
-        $entry = $entry->in($site)->published(false);
-
         return $this->createRevisionAndSave($entry->in($site), $request, function ($entry) {
             $entry->published(false);
         });
