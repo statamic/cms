@@ -1,0 +1,51 @@
+/* ==========================================================================
+   Revisions
+   ========================================================================== */
+
+.revision-list {
+    @apply pb-2;
+}
+
+.revision-date {
+    @apply px-3 pb-1 pt-2 mb-1 border-b;
+}
+
+.revision-item {
+    @apply py-1 px-3 text-sm block flex cursor-pointer;
+    &:hover {
+        @apply bg-grey-20;
+    }
+}
+
+.revision-item-bullet-container {
+    @apply w-4 relative;
+    top: -2px;
+
+    .revision-item-bullet {
+        @apply bg-grey-60 inline-block relative;
+        border-radius: 7px;
+        height: 7px;
+        width: 7px;
+        flex-shrink: 0;
+    }
+}
+
+.revision-item .badge {
+    @apply uppercase text-white text-4xs ml-1
+}
+
+.revision-item-note {
+    @apply text-2xs text-grey-60 mt-sm;
+}
+
+.revision-item.status-published {
+    @apply text-green;
+    .revision-item-bullet { @apply bg-green; }
+    .badge { @apply bg-green-light; }
+}
+
+.revision-item.status-working-copy {
+    @apply text-blue;
+    .revision-item-bullet { @apply bg-blue; }
+    .badge { @apply bg-blue; }
+}
