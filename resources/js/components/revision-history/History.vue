@@ -11,7 +11,7 @@
                 v-html="'&times'" />
         </div>
 
-        <div class="flex-1 overflow-auto p-3">
+        <div class="flex-1 overflow-auto py-3">
 
             <div class="flex h-full items-center justify-center loading" v-if="loading">
                 <loading-graphic />
@@ -21,13 +21,20 @@
                 {{ __('No revisions') }}
             </div>
 
-            <revision
-                v-for="revision in revisions"
-                :key="revision.date"
-                :revision="revision"
-                :restore-url="restoreUrl"
-                class="text-sm mb-3 pb-3 border-b flex items-center justify-between"
-            />
+            <div
+                v-for="group in revisions"
+                :key="group.day"
+            >
+                <h6 class="revision-date" v-text="$moment.unix(group.day).format('MMMM D, Y')" />
+                <div class="revision-list">
+                    <revision
+                        v-for="revision in group.revisions"
+                        :key="revision.date"
+                        :revision="revision"
+                        :restore-url="restoreUrl"
+                    />
+                </div>
+            </div>
 
         </div>
 

@@ -14,6 +14,17 @@ class EntryRevisionsController extends CpController
             return $this->pageNotFound();
         }
 
-        return $entry->in($site)->revisions()->values();
+        $entry = $entry->in($site);
+
+        return $entry
+            ->revisions()
+            ->reverse()
+            ->prepend($entry->workingCopy())
+            ->filter()
+            ->groupBy(function ($revision) {
+                return $revision->date()->clone()->startOfDay()->format('U');
+            })->map(function ($revisions, $day) {
+                return compact('day', 'revisions');
+            })->reverse()->values();
     }
 }

@@ -23,4 +23,11 @@ class WorkingCopy extends Revision
             ->message($revision->message() ?? false)
             ->attributes($revision->attributes());
     }
+
+    public function toArray()
+    {
+        return array_merge(parent::toArray(), [
+            'working' => true,
+        ]);
+    }
 }
