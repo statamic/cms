@@ -199,15 +199,23 @@ class MigrateFieldsetTest extends TestCase
         $blueprint = $this->migrateFieldsetToBlueprint([
             'title' => 'Post',
             'fields' => [
-                'has_author' => [
-                    'type' => 'toggle'
-                ],
                 'author_name' => [
                     'type' => 'text',
                     'show_when' => [
-                        'has_author' => 'not empty'
+                        'has_author' => 'not null'
                     ],
                 ],
+                'author_address' => [
+                    'type' => 'text',
+                    'show_when' => 'myCustomConditionMethod'
+                ],
+                'author_explain_yourself' => [
+                    'type' => 'text',
+                    'hide_when' => [
+                        'favourite_food' => 'lasagna',
+                        'or_favourite_colour' => 'red'
+                    ]
+                ]
             ]
         ]);
 
@@ -215,17 +223,28 @@ class MigrateFieldsetTest extends TestCase
             'title' => 'Post',
             'fields' => [
                 [
-                    'handle' => 'has_author',
-                    'field' => [
-                        'type' => 'toggle'
-                    ]
-                ],
-                [
                     'handle' => 'author_name',
                     'field' => [
                         'type' => 'text',
                         'show_when' => [
-                            'has_author' => true
+                            'has_author' => 'not empty'
+                        ]
+                    ]
+                ],
+                [
+                    'handle' => 'author_address',
+                    'field' => [
+                        'type' => 'text',
+                        'show_when' => 'myCustomConditionMethod'
+                    ]
+                ],
+                [
+                    'handle' => 'author_explain_yourself',
+                    'field' => [
+                        'type' => 'text',
+                        'hide_when_any' => [
+                            'favourite_food' => 'lasagna',
+                            'favourite_colour' => 'red'
                         ]
                     ]
                 ]
