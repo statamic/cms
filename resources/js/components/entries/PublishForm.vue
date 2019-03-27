@@ -36,7 +36,7 @@
 
             <button href="" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
-            <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false">
+            <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
                 <revision-history
                     slot-scope="{ close }"
                     :index-url="actions.revisions"
