@@ -78,7 +78,6 @@
             <confirmation-modal
                 v-if="confirmingUnpublish"
                 :title="__('Unpublish')"
-                :danger="true"
                 :buttonText="__('Unpublish')"
                 @confirm="unpublish"
                 @cancel="confirmingUnpublish = false"
@@ -90,7 +89,6 @@
             <confirmation-modal
                 v-if="confirmingPublish"
                 :title="__('Publish')"
-                :danger="true"
                 :buttonText="__('Publish')"
                 @confirm="publish"
                 @cancel="confirmingPublish = false"

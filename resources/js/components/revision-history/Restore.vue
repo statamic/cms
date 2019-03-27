@@ -8,7 +8,6 @@
         <confirmation-modal
             v-if="confirming"
             :title="__('Restore Revision')"
-            :danger="true"
             :buttonText="__('Restore')"
             @confirm="restore"
             @cancel="confirming = false"
