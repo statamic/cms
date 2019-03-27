@@ -24,9 +24,7 @@ class Repository
         return collect($files)->reject(function ($path) {
             return Str::endsWith($path, 'working.yaml');
         })->map(function ($path) use ($key) {
-            return $this
-                ->makeRevisionFromFile($key, $path)
-                ->date(Carbon::createFromTimestamp(pathinfo($path, PATHINFO_FILENAME)));
+            return $this->makeRevisionFromFile($key, $path);
         })->keyBy(function ($revision) {
             return $revision->date()->timestamp;
         });
@@ -59,6 +57,7 @@ class Repository
 
         return (new Revision)
             ->key($key)
+            ->date(Carbon::createFromTimestamp($yaml['date']))
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)
             ->attributes($yaml['attributes']);

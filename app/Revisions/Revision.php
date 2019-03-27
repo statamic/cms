@@ -74,6 +74,7 @@ class Revision implements Arrayable
     protected function fileData()
     {
         return [
+            'date' => $this->date->timestamp,
             'user' => $this->userId,
             'message' => $this->message,
             'attributes' => $this->attributes,
