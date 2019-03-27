@@ -7,6 +7,8 @@ use Facades\Statamic\Revisions\Repository as Revisions;
 
 trait Revisable
 {
+    protected $published = true;
+
     public function revision(string $reference)
     {
         return $this->revisions()->get($reference);
@@ -55,6 +57,53 @@ trait Revisable
         }
 
         return WorkingCopy::fromRevision($revision);
+    }
+
+    public function published($published = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->published;
+        }
+
+        $this->published = $published;
+
+        return $this;
+    }
+
+    public function publish($options = [])
+    {
+        $this->createRevisionAndSave($options, function ($item) {
+            $item->published(true);
+        });
+    }
+
+    public function unpublish($options = [])
+    {
+        $this->createRevisionAndSave($options, function ($item) {
+            $item->published(false);
+        });
+    }
+
+    public function draft($options = [])
+    {
+        return $this->unpublish($options);
+    }
+
+    protected function createRevisionAndSave($options, $callback)
+    {
+        $item = $this->fromWorkingCopy();
+
+        $callback($item);
+
+        $item->save();
+
+        $item
+            ->makeRevision()
+            ->user($options['user'] ?? false)
+            ->message($options['message'] ?? false)
+            ->save();
+
+        optional($item->workingCopy())->delete();
     }
 
     abstract protected function revisionKey();

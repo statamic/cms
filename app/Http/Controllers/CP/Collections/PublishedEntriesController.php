@@ -14,9 +14,10 @@ class PublishedEntriesController extends CpController
             return $this->pageNotFound();
         }
 
-        return $this->createRevisionAndSave($entry->in($site), $request, function ($entry) {
-            $entry->published(true);
-        });
+        $entry->publish([
+            'message' => $request->message,
+            'user' => $request->user(),
+        ]);
     }
 
     public function destroy(Request $request, $collection, $id, $slug, $site)
@@ -25,25 +26,9 @@ class PublishedEntriesController extends CpController
             return $this->pageNotFound();
         }
 
-        return $this->createRevisionAndSave($entry->in($site), $request, function ($entry) {
-            $entry->published(false);
-        });
-    }
-
-    protected function createRevisionAndSave($entry, $request, $callback)
-    {
-        $entry = $entry->fromWorkingCopy();
-
-        $callback($entry);
-
-        $entry->save();
-
-        $entry
-            ->makeRevision()
-            ->user($request->user())
-            ->message($request->message ?? false)
-            ->save();
-
-        optional($entry->workingCopy())->delete();
+        $entry->unpublish([
+            'message' => $request->message,
+            'user' => $request->user(),
+        ]);
     }
 }

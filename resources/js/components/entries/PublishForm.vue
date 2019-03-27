@@ -155,6 +155,7 @@ export default {
         method: String,
         amp: Boolean,
         initialPublished: Boolean,
+        isCreating: Boolean,
     },
 
     data() {
@@ -196,11 +197,11 @@ export default {
         },
 
         canPublish() {
-            return !this.canSave && !this.somethingIsLoading;
+            return !this.isCreating && !this.canSave && !this.somethingIsLoading;
         },
 
         canUnpublish() {
-            return !this.canSave && this.published && !this.somethingIsLoading;
+            return !this.isCreating && !this.canSave && this.published && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {
@@ -265,7 +266,7 @@ export default {
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
-                this.$notify.success('Saved');
+                if (!this.isCreating) this.$notify.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));

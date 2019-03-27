@@ -11,6 +11,7 @@ export default {
 
     data() {
         return {
+            creating: true,
             method: 'post',
             action: 'store',
             title: __('Create'),

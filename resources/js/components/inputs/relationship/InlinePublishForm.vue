@@ -13,6 +13,7 @@
 
         <entry-publish-form
             v-if="blueprint"
+            :is-creating="creating"
             :initial-action="publishUrl"
             :method="method"
             :publish-container="publishContainer"

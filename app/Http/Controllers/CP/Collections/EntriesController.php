@@ -156,6 +156,10 @@ class EntriesController extends CpController
             return $viewData;
         }
 
+        if ($request->has('created')) {
+            session()->now('success', __('Entry created'));
+        }
+
         return view('statamic::entries.edit', array_merge($viewData, [
             'entry' => $entry
         ]));
@@ -237,7 +241,7 @@ class EntriesController extends CpController
 
         $viewData = [
             'actions' => [
-                'store' => cp_route('collections.entries.store', [$collection->handle(), $site])
+                'save' => cp_route('collections.entries.store', [$collection->handle(), $site])
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -283,6 +287,7 @@ class EntriesController extends CpController
             ->collection($collection)
             ->in($site, function ($localized) use ($values, $request) {
                 $localized
+                    ->published(false)
                     ->slug($request->slug)
                     ->data($values);
             });
@@ -291,7 +296,10 @@ class EntriesController extends CpController
             $entry->order($values['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
-        $entry->save();
+        $entry->draft([
+            'message' => $request->message,
+            'user' => $request->user(),
+        ]);
 
         return [
             'redirect' => $entry->editUrl(),

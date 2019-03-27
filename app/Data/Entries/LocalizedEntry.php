@@ -9,7 +9,6 @@ use Statamic\API\Blueprint;
 use Statamic\Data\Routable;
 use Illuminate\Support\Carbon;
 use Statamic\Data\Augmentable;
-use Statamic\Data\Publishable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Localization;
 use Statamic\Data\ExistsAsFile;
@@ -24,7 +23,7 @@ use Statamic\Contracts\Data\Localization as LocalizationContract;
 
 class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Responsable, LocalizationContract
 {
-    use Routable, Localization, ContainsData, ExistsAsFile, Publishable, Augmentable, Revisable;
+    use Routable, Localization, ContainsData, ExistsAsFile, Augmentable, Revisable;
 
     protected $order;
 

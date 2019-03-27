@@ -68,7 +68,9 @@ class EntryRepository implements RepositoryContract
         $localizable = $entry->entry();
 
         if (! $localizable->id()) {
-            $localizable->id($this->stache->generateId());
+            // Put the new ID on the newly cloned item, as well as the one that was saved.
+            $localizable->id($id = $this->stache->generateId());
+            $entry->id($id);
         }
 
         // Clone the entry and all of its localizations so that any modifications to the
