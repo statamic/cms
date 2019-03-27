@@ -307,7 +307,7 @@ export default {
             this.clearErrors();
             const payload = { message: this.revisionMessage };
 
-            this.$axios.delete(this.actions.publish, payload).then(response => {
+            this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
                 this.saving = false;
                 this.$notify.success(__('Unpublished'));
                 this.$refs.container.saved();
