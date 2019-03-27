@@ -3,6 +3,7 @@ import Vue from 'vue'
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue'));
+Vue.component('asset-browser-grid', require('../components/assets/Browser/Grid.vue'));
 Vue.component('updater', require('../components/Updater.vue'));
 Vue.component('updates-badge', require('../components/UpdatesBadge.vue'));
 Vue.component('composer-output', require('../components/ComposerOutput.vue'));
@@ -30,7 +31,6 @@ Vue.component('data-list-toggle-all', require('../components/data-list/ToggleAll
 Vue.component('data-list-pagination', require('../components/data-list/Pagination.vue'));
 Vue.component('data-list-filters', require('../components/data-list/Filters.vue'));
 Vue.component('data-list-table', require('../components/data-list/Table.vue'));
-Vue.component('data-list-grid', require('../components/data-list/Grid.vue'));
 
 // Resource Type Lists
 Vue.component('entry-list', require('../components/entries/Listing.vue'));

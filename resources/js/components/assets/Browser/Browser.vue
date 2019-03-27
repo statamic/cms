@@ -154,7 +154,7 @@
                             </data-list-table>
 
                             <!-- Grid Mode -->
-                            <data-list-grid  v-if="mode === 'grid'"></data-list-grid>
+                            <asset-browser-grid v-if="mode === 'grid'"></asset-browser-grid>
 
                         </div>
 

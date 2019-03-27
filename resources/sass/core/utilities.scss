@@ -104,6 +104,10 @@
     }
 }
 
+.ease {
+    transition: all .15s ease-in-out;
+}
+
 
 .help-block {
     width: 100%;
