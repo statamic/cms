@@ -75,8 +75,8 @@ class Revision implements Arrayable
     {
         return [
             'date' => $this->date->timestamp,
-            'user' => $this->userId,
-            'message' => $this->message,
+            'user' => $this->userId ?: null,
+            'message' => $this->message ?: null,
             'attributes' => $this->attributes,
         ];
     }
