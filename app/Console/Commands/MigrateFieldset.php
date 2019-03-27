@@ -193,11 +193,16 @@ class MigrateFieldset extends Command
     /**
      * Migrate field conditions.
      *
-     * @param array $config
+     * @param \Illuminate\Support\Collection $config
+     * @return \Illuminate\Support\Collection
      */
     public function migrateFieldConditions($config)
     {
         $key = $config->has('hide_when') ? 'hide_when' : 'show_when';
+
+        if (is_string($config->get($key))) {
+            return $config;
+        }
 
         $conditions = collect($config->get($key))
             ->each(function ($condition, $field) use (&$key) {
@@ -208,7 +213,8 @@ class MigrateFieldset extends Command
             })
             ->map(function ($condition) {
                 return str_replace('not null', 'not empty', Str::lower($condition));
-            });
+            })
+            ->all();
 
         return $config
             ->forget('show_when')
