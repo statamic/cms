@@ -128,7 +128,7 @@ export default {
         },
 
         getReplicatorPreviewText() {
-            return this.data.join(', '); // TODO: Do we still use this?
+            return this.data.map(item => item.value).join(', ');
         }
     }
 };
