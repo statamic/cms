@@ -13,7 +13,7 @@
         <div class="revision-item-content">
             <div class="flex items-center">
                 <span>
-                    {{ date.fromNow() }}
+                    {{ date.format('hh:mm A') }}
                     &mdash;
                     {{ revision.user.name || revision.user.email }}
                 </span>
