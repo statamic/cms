@@ -22,4 +22,12 @@ class UserTest extends TestCase
     function makeUser() {
         return (new User)->model(new Model);
     }
+
+    /** @test */
+    function converts_to_array()
+    {
+        // TODO: Remove this once preferences are implemented for Eloquent
+        // Coverage is in the contract tests.
+        $this->markTestIncomplete();
+    }
 }
