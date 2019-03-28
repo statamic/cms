@@ -15,6 +15,7 @@
         :initial-published="{{ bool_str($entry->published()) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         initial-site="{{ $locale }}"
+        :initial-is-working-copy="{{ bool_str($entry->hasWorkingCopy()) }}"
         :amp="{{ bool_str($entry->ampable()) }}"
     ></entry-publish-form>
 

@@ -9,6 +9,11 @@
                 {{ title }}
             </h1>
 
+            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="isDirty" v-text="'Unsaved Changes'" />
+            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="isWorkingCopy" v-text="'Working Copy'" />
+            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="published" v-text="'Published'" />
+            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="!published" v-text="'Draft'" />
+
             <div
                 class="mr-3 text-xs flex items-center"
                 v-if="localizations.length > 1"
@@ -45,75 +50,35 @@
                 />
             </stack>
 
-            <div class="btn flex items-center leading-none py-0 px-sm h-auto justify-between">
+            <button
+                class="btn mr-2"
+                v-if="isBase"
+                v-text="__('Live Preview')"
+                @click="openLivePreview" />
 
-                <div
-                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
-                    v-if="isBase"
-                    v-text="__('Live Preview')"
-                    @click="openLivePreview" />
+            <button
+                v-if="!canPublish"
+                class="btn btn-primary min-w-xs"
+                :class="{ 'opacity-25': !canSave }"
+                :disabled="!canSave"
+                @click.prevent="save"
+                v-text="__('Save')" />
 
-                <div
-                    class="m-sm cursor-pointer p-1 hover:bg-grey-30 rounded"
-                    :class="{ 'opacity-25': !canSave }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="__('Save')" />
+            <button
+                v-if="canPublish"
+                class="btn btn-primary min-w-xs"
+                :class="{ 'opacity-25': !canPublish }"
+                :disabled="!canPublish"
+                @click="confirmingPublish = true"
+                v-text="`${__('Publish')}...`" />
 
-                <div
-                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
-                    :class="{ 'opacity-25': !canPublish }"
-                    :disabled="!canPublish"
-                    @click="confirmPublish"
-                    v-text="__('Publish')" />
-
-                <div
-                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
-                    :class="{ 'opacity-25': !canUnpublish }"
-                    :disabled="!canUnpublish"
-                    @click="confirmUnpublish"
-                    v-text="__('Unpublish')" />
-
-                <div
-                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
-                    :class="{ 'opacity-25': !canCreateRevision }"
-                    :disabled="!canCreateRevision"
-                    @click="confirmCreateRevision"
-                    v-text="__('Create Revision')" />
-            </div>
-
-            <confirmation-modal
-                v-if="confirmingUnpublish"
-                :title="__('Unpublish')"
-                :buttonText="__('Unpublish')"
-                @confirm="unpublish"
-                @cancel="confirmingUnpublish = false"
-            >
-                <p class="mb-3">{{ __('Are you sure you want to unpublish this entry?') }}</p>
-                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="unpublish" autofocus />
-            </confirmation-modal>
-
-            <confirmation-modal
+            <publish-actions
                 v-if="confirmingPublish"
-                :title="__('Publish')"
-                :buttonText="__('Publish')"
-                @confirm="publish"
-                @cancel="confirmingPublish = false"
-            >
-                <p class="mb-3">{{ __('Are you sure you want to publish this entry?') }}</p>
-                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="publish" autofocus />
-            </confirmation-modal>
-
-            <confirmation-modal
-                v-if="confirmingCreatingRevision"
-                :title="__('Create Revision')"
-                :buttonText="__('Create Revision')"
-                @confirm="createRevision"
-                @cancel="confirmingCreatingRevision = false"
-            >
-                <p class="mb-3">{{ __('Are you sure you want to create a revision?') }}</p>
-                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="publish" autofocus />
-            </confirmation-modal>
+                :actions="actions"
+                @closed="confirmingPublish = false"
+                @saving="saving = true"
+                @saved="publishActionCompleted"
+            />
 
             <slot name="action-buttons-right" />
         </div>
@@ -151,11 +116,13 @@
 
 
 <script>
+import PublishActions from './PublishActions.vue';
 import RevisionHistory from '../revision-history/History.vue';
 
 export default {
 
     components: {
+        PublishActions,
         RevisionHistory,
     },
 
@@ -167,6 +134,7 @@ export default {
         initialTitle: String,
         initialLocalizations: Array,
         initialSite: String,
+        initialIsWorkingCopy: Boolean,
         collectionTitle: String,
         collectionUrl: String,
         initialActions: Object,
@@ -187,6 +155,7 @@ export default {
             meta: _.clone(this.initialMeta),
             localizations: _.clone(this.initialLocalizations),
             site: this.initialSite,
+            isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
             errors: {},
             isPreviewing: false,
@@ -196,8 +165,6 @@ export default {
             showRevisionHistory: false,
             published: this.initialPublished,
             confirmingPublish: false,
-            confirmingUnpublish: false,
-            confirmingCreatingRevision: false,
         }
     },
 
@@ -219,14 +186,6 @@ export default {
             return !this.isCreating && !this.canSave && !this.somethingIsLoading;
         },
 
-        canUnpublish() {
-            return !this.isCreating && !this.canSave && this.published && !this.somethingIsLoading;
-        },
-
-        canCreateRevision() {
-            return this.canPublish;
-        },
-
         livePreviewUrl() {
             return _.findWhere(this.localizations, { active: true }).url + '/preview';
         },
@@ -237,26 +196,6 @@ export default {
 
         isDirty() {
             return this.$dirty.has(this.publishContainer);
-        },
-
-        stateMsg() {
-            if (this.isDirty) {
-                return __('Unsaved Changes');
-            }
-
-            if (this.state === 'new') {
-                return __('New Unsaved Entry')
-            } else if (this.state === 'unpublished') {
-                return __('Unpublished Entry')
-            } else if (this.state === 'published') {
-                return __('Published Entry')
-            } else if (this.state === 'scheduled') {
-                return __('Scheduled Entry')
-            } else if (this.state === 'expired') {
-                return __('Expired Entry')
-            } else {
-                return __('Mystery Entry')
-            }
         }
 
     },
@@ -289,6 +228,7 @@ export default {
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
+                this.isWorkingCopy = true;
                 if (!this.isCreating) this.$notify.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
@@ -299,65 +239,6 @@ export default {
             if (this.canPublish) {
                 this.confirmingPublish = true;
             }
-        },
-
-        confirmUnpublish() {
-            if (this.canUnpublish) {
-                this.confirmingUnpublish = true;
-            }
-        },
-
-        confirmCreateRevision() {
-            if (this.canCreateRevision) {
-                this.confirmingCreatingRevision = true;
-            }
-        },
-
-        publish() {
-            this.saving = true;
-            this.confirmingPublish = false;
-            this.clearErrors();
-            const payload = { message: this.revisionMessage };
-
-            this.$axios.post(this.actions.publish, payload).then(response => {
-                this.saving = false;
-                this.$notify.success(__('Published'));
-                this.$refs.container.saved();
-                this.revisionMessage = null;
-                this.published = true;
-                this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => this.handleAxiosError(e));
-        },
-
-        unpublish() {
-            this.saving = true;
-            this.confirmingUnpublish = false;
-            this.clearErrors();
-            const payload = { message: this.revisionMessage };
-
-            this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
-                this.saving = false;
-                this.$notify.success(__('Unpublished'));
-                this.$refs.container.saved();
-                this.revisionMessage = null;
-                this.published = false;
-                this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => this.handleAxiosError(e));
-        },
-
-        createRevision() {
-            this.saving = true;
-            this.confirmingCreatingRevision = false;
-            this.clearErrors();
-            const payload = { message: this.revisionMessage };
-
-            this.$axios.post(this.actions.createRevision, payload).then(response => {
-                this.saving = false;
-                this.$notify.success(__('Revision created'));
-                this.$refs.container.saved();
-                this.revisionMessage = null;
-                this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -419,6 +300,15 @@ export default {
         closeLivePreview() {
             this.isPreviewing = false;
             this.sectionsVisible = true;
+        },
+
+        publishActionCompleted({ published, isWorkingCopy, response }) {
+            this.saving = false;
+            this.$refs.container.saved();
+            if (published !== undefined) this.published = published;
+            this.isWorkingCopy = isWorkingCopy;
+            this.confirmingPublish = false;
+            this.$nextTick(() => this.$emit('saved', response));
         }
 
     },
@@ -426,7 +316,8 @@ export default {
     mounted() {
         this.$mousetrap.bindGlobal(['command+s'], e => {
             e.preventDefault();
-            this.save();
+            if (this.confirmingPublish) return;
+            this.canPublish ? this.confirmPublish() : this.save();
         });
     }
 
