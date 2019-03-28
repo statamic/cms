@@ -51,7 +51,6 @@
                                 <data-list-search v-model="searchQuery" />
 
                                 <data-list-bulk-actions
-                                    class="rounded-b"
                                     v-if="hasSelections && hasActions"
                                     :url="actionUrl"
                                     :actions="actions"
@@ -72,10 +71,10 @@
                                 </template>
 
                                 <div class="btn-group-flat ml-2">
-                                    <button @click="mode = 'grid'" :class="{'active': mode === 'grid'}">
+                                    <button @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                         <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                     </button>
-                                    <button @click="mode = 'table'" :class="{'active': mode === 'table'}">
+                                    <button @click="setMode('table')" :class="{'active': mode === 'table'}">
                                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                     </button>
                                 </div>
@@ -95,7 +94,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block"></file-icon>
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
                                                 ..
                                             </a>
                                         </td>
@@ -105,8 +104,8 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block"></file-icon>
-                                                {{ folder.path }}
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                                {{ folder.basename }}
                                             </a>
                                         </td>
                                         <td class="text-right" :colspan="columns.length">
@@ -130,7 +129,7 @@
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                        <asset-thumbnail :asset="asset" class="w-8 h-8 mr-1" />
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1" />
                                         <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
                                     </div>
                                 </template>
@@ -154,7 +153,37 @@
                             </data-list-table>
 
                             <!-- Grid Mode -->
-                            <asset-browser-grid v-if="mode === 'grid'"></asset-browser-grid>
+                            <div class="data-grid" v-if="mode === 'grid'">
+                                <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
+                                    <!-- Parent Folder -->
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.parent_path)">
+                                            <div class="absolute pin flex items-center justify-center">
+                                                <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
+                                            </div>
+                                        </div>
+                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate">..</div>
+                                    </div>
+                                    <!-- Sub-Folders -->
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.path)">
+                                            <div class="absolute pin flex items-center justify-center">
+                                                <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
+                                            </div>
+                                        </div>
+                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="folder.basename" :title="folder.basename" />
+                                    </div>
+                                    <!-- Assets -->
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('asset-doubleclicked', asset)">
+                                            <div class="absolute pin flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
+                                                <asset-thumbnail :asset="asset" class="h-full w-full" />
+                                            </div>
+                                        </div>
+                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="asset.basename" :title="asset.basename" />
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
 
@@ -350,6 +379,7 @@ export default {
             this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
+                this.mode = this.$preferences.get(`assets.${this.container.id}.mode`, this.mode);
             });
         },
 
@@ -387,6 +417,11 @@ export default {
             this.$emit('navigated', this.container, this.path);
         },
 
+        setMode(mode) {
+            this.mode = mode;
+            this.$preferences.set(`assets.${this.container.id}.mode`, mode);
+        },
+
         edit(id) {
             if (this.canEdit) {
                 this.editedAssetId = id;
@@ -405,16 +440,6 @@ export default {
         assetDeleted() {
             this.closeAssetEditor();
             this.loadAssets();
-        },
-
-        destroy(id) {
-            // TODO
-            console.log('deleting asset');
-        },
-
-        destroyMultiple(ids) {
-            // TODO
-            console.log('deleting multiple assets', ids);
         },
 
         uploadsUpdated(uploads) {
@@ -450,6 +475,21 @@ export default {
             this.sortColumn = column;
             this.sortDirection = direction;
         },
+
+        isSelected(id) {
+            return this.selectedAssets.includes(id);
+        },
+
+        toggleSelection(id) {
+            const i = this.selectedAssets.indexOf(id);
+
+            if (i != -1) {
+                this.selectedAssets.splice(i, 1);
+            } else if (! this.reachedSelectionLimit) {
+                this.selectedAssets.push(id);
+            }
+            this.$emit('selections-updated', this.selectedAssets);
+        }
     }
 
 }

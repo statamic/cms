@@ -443,9 +443,12 @@
     }
 }
 
-.selected img {
-	border: 1px solid white;
-    box-shadow: 0 0 0 3px config('colors.blue-dark');
+.asset-thumbnail {
+    border: 1px solid white;
+}
+
+.selected .asset-thumbnail {
+    box-shadow: 0 0 0 3px config('colors.blue');
 }
 
 /* Lazyloading

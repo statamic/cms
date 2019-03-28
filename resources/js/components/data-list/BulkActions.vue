@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="hasSelections" class="flex items-center">
+    <div class="flex items-center">
 
         <div class="text-grey text-2xs mr-1"
             v-text="__n(`:count Selected`, selections.length)" />
