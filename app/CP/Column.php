@@ -12,6 +12,7 @@ class Column
     public $field;
     public $fieldtype;
     public $label;
+    public $visibleDefault = true;
     public $visible = true;
     public $sortable = true;
     public $value = null;
@@ -77,6 +78,17 @@ class Column
     public function label($label = null)
     {
         return $this->fluentlyGetOrSet('label', $label);
+    }
+
+    /**
+     * Get or set visibility default, for resetting user preferences, etc.
+     *
+     * @param null|bool $visibleDefault
+     * @return mixed
+     */
+    public function visibleDefault($visible = null)
+    {
+        return $this->fluentlyGetOrSet('visibleDefault', $visible);
     }
 
     /**
