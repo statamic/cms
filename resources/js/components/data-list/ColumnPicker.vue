@@ -87,21 +87,22 @@ export default {
     methods: {
 
         save() {
+            if (! this.selectedColumns.length) {
+                return this.$notify.error(__('At least 1 column is required'));
+            }
+
             this.saving = true;
 
-            // TODO: Use `$preferences` API to set...
-            // this.$axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
-            //     this.saving = false;
-            //     this.$notify.success(__('Columns saved'));
-            //     this.customizing = false;
-            // }).catch(e => {
-            //     this.saving = false;
-            //     if (e.response) {
-            //         this.$notify.error(e.response.data.message);
-            //     } else {
-            //         this.$notify.error(__('Something went wrong'));
-            //     }
-            // });
+            this.$preferences.set(`collections.${this.collection}.columns`, this.selectedColumns)
+                .then(response => {
+                    this.saving = false;
+                    this.customizing = false;
+                    this.$notify.success(__('Columns saved'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
         }
 
     }
