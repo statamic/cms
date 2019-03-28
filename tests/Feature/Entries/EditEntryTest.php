@@ -86,7 +86,7 @@ class EditEntryTest extends TestCase
             ['handle' => 'unused', 'field' => ['type' => 'text']],
         ]]));
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
-        $user = User::make()->assignRole('test');
+        $user = User::make()->assignRole('test')->save();
 
         $entry = EntryFactory::slug('test')
             ->collection('blog')
