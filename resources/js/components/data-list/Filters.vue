@@ -138,6 +138,20 @@ export default {
                     this.saving = false;
                     this.$notify.error(__('Something went wrong'));
                 });
+        },
+
+        reset() {
+            this.saving = true;
+
+            this.$preferences.remove(this.preferencesKey)
+                .then(response => {
+                    this.saving = false;
+                    this.$notify.success(__('Columns reset'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
         }
 
     }
