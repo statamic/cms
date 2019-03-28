@@ -117,7 +117,15 @@ export default {
         save() {
             this.saving = true;
 
-            // TODO: Actually save eh
+            this.$preferences.set(this.preferencesKey, this.activeFilters)
+                .then(response => {
+                    this.saving = false;
+                    this.$notify.success(__('Filters saved'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
         }
 
     }
