@@ -16,11 +16,19 @@ class EntryRevisionsController extends CpController
 
         $entry = $entry->in($site);
 
-        return $entry
+        $revisions = $entry
             ->revisions()
             ->reverse()
             ->prepend($entry->workingCopy())
-            ->filter()
+            ->filter();
+
+        // The first non manually created revision would be considered the "current"
+        // version. It's what corresponds to what's in the content directory.
+        $revisions->first(function ($revision) {
+            return $revision->action() != 'revision';
+        })->attribute('current', true);
+
+        return $revisions
             ->groupBy(function ($revision) {
                 return $revision->date()->clone()->startOfDay()->format('U');
             })->map(function ($revisions, $day) {

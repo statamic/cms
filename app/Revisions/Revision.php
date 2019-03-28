@@ -58,6 +58,13 @@ class Revision implements Arrayable
         return $this->fluentlyGetOrSet('attributes', $attributes);
     }
 
+    public function attribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
     public function key($key = null)
     {
         return $this->fluentlyGetOrSet('key', $key);
