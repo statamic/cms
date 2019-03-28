@@ -59,6 +59,11 @@ trait Revisable
         return WorkingCopy::fromRevision($revision);
     }
 
+    public function deleteWorkingCopy()
+    {
+        return optional($this->workingCopy())->delete();
+    }
+
     public function published($published = null)
     {
         if (func_num_args() === 0) {
@@ -72,30 +77,9 @@ trait Revisable
 
     public function publish($options = [])
     {
-        $this->createRevisionAndSave($options, function ($item) {
-            $item->published(true);
-        });
-    }
-
-    public function unpublish($options = [])
-    {
-        $this->createRevisionAndSave($options, function ($item) {
-            $item->published(false);
-        });
-    }
-
-    public function draft($options = [])
-    {
-        return $this->unpublish($options);
-    }
-
-    protected function createRevisionAndSave($options, $callback)
-    {
         $item = $this->fromWorkingCopy();
 
-        $callback($item);
-
-        $item->save();
+        $item->published(true)->save();
 
         $item
             ->makeRevision()
@@ -103,7 +87,37 @@ trait Revisable
             ->message($options['message'] ?? false)
             ->save();
 
-        optional($item->workingCopy())->delete();
+        $item->deleteWorkingCopy();
+    }
+
+    public function unpublish($options = [])
+    {
+        $item = $this->fromWorkingCopy();
+
+        $item->published(false)->save();
+
+        $item
+            ->makeRevision()
+            ->user($options['user'] ?? false)
+            ->message($options['message'] ?? false)
+            ->save();
+
+        $item->deleteWorkingCopy();
+    }
+
+    public function draft($options = [])
+    {
+        return $this->unpublish($options);
+    }
+
+    public function createRevision($options = [])
+    {
+        $this
+            ->fromWorkingCopy()
+            ->makeRevision()
+            ->user($options['user'] ?? false)
+            ->message($options['message'] ?? false)
+            ->save();
     }
 
     abstract protected function revisionKey();

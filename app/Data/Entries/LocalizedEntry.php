@@ -79,6 +79,11 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return $this->cpUrl('collections.entries.revisions.index');
     }
 
+    public function createRevisionUrl()
+    {
+        return $this->cpUrl('collections.entries.revisions.store');
+    }
+
     public function restoreRevisionUrl()
     {
         return $this->cpUrl('collections.entries.restore-revision');

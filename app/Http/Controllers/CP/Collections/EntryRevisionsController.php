@@ -27,4 +27,16 @@ class EntryRevisionsController extends CpController
                 return compact('day', 'revisions');
             })->reverse()->values();
     }
+
+    public function store(Request $request, $collection, $id, $slug, $site)
+    {
+        if (! $entry = Entry::find($id)) {
+            return $this->pageNotFound();
+        }
+
+        $entry->createRevision([
+            'message' => $request->message,
+            'user' => $request->user(),
+        ]);
+    }
 }

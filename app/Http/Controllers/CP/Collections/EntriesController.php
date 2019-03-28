@@ -131,6 +131,7 @@ class EntriesController extends CpController
                 'publish' => $entry->publishUrl(),
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
+                'createRevision' => $entry->createRevisionUrl(),
             ],
             'values' => $values,
             'meta' => $fields->meta(),

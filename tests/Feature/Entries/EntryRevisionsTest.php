@@ -133,6 +133,60 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
+    function it_creates_a_revision()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['foo'] = 'foo modified in working copy';
+            $copy->attributes($attrs);
+        })->save();
+
+        $this->assertFalse($entry->published());
+        $this->assertCount(0, $entry->revisions());
+
+        $this
+            ->actingAs($user)
+            ->post($entry->createRevisionUrl(), ['message' => 'Test!'])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Title',
+            'foo' => 'bar',
+        ], $entry->data());
+        $this->assertFalse($entry->published());
+        $this->assertCount(1, $entry->revisions());
+        $revision = $entry->latestRevision();
+        $this->assertEquals([
+            'published' => false,
+            'slug' => 'test',
+            'data' => [
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'foo modified in working copy',
+            ]
+        ], $revision->attributes());
+        $this->assertEquals('user-1', $revision->user()->id());
+        $this->assertEquals('Test!', $revision->message());
+        $this->assertTrue($entry->hasWorkingCopy());
+    }
+
+    /** @test */
     function it_restores_an_entry_to_another_revision()
     {
         $this->withoutExceptionHandling();

@@ -73,6 +73,13 @@
                     :disabled="!canUnpublish"
                     @click="confirmUnpublish"
                     v-text="__('Unpublish')" />
+
+                <div
+                    class="cursor-pointer p-1 hover:bg-grey-30 rounded flex items-center"
+                    :class="{ 'opacity-25': !canCreateRevision }"
+                    :disabled="!canCreateRevision"
+                    @click="confirmCreateRevision"
+                    v-text="__('Create Revision')" />
             </div>
 
             <confirmation-modal
@@ -94,6 +101,17 @@
                 @cancel="confirmingPublish = false"
             >
                 <p class="mb-3">{{ __('Are you sure you want to publish this entry?') }}</p>
+                <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="publish" autofocus />
+            </confirmation-modal>
+
+            <confirmation-modal
+                v-if="confirmingCreatingRevision"
+                :title="__('Create Revision')"
+                :buttonText="__('Create Revision')"
+                @confirm="createRevision"
+                @cancel="confirmingCreatingRevision = false"
+            >
+                <p class="mb-3">{{ __('Are you sure you want to create a revision?') }}</p>
                 <text-input v-model="revisionMessage" :placeholder="__('Notes about this revision')" @keydown.enter="publish" autofocus />
             </confirmation-modal>
 
@@ -179,6 +197,7 @@ export default {
             published: this.initialPublished,
             confirmingPublish: false,
             confirmingUnpublish: false,
+            confirmingCreatingRevision: false,
         }
     },
 
@@ -202,6 +221,10 @@ export default {
 
         canUnpublish() {
             return !this.isCreating && !this.canSave && this.published && !this.somethingIsLoading;
+        },
+
+        canCreateRevision() {
+            return this.canPublish;
         },
 
         livePreviewUrl() {
@@ -284,6 +307,12 @@ export default {
             }
         },
 
+        confirmCreateRevision() {
+            if (this.canCreateRevision) {
+                this.confirmingCreatingRevision = true;
+            }
+        },
+
         publish() {
             this.saving = true;
             this.confirmingPublish = false;
@@ -312,6 +341,21 @@ export default {
                 this.$refs.container.saved();
                 this.revisionMessage = null;
                 this.published = false;
+                this.$nextTick(() => this.$emit('saved', response));
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        createRevision() {
+            this.saving = true;
+            this.confirmingCreatingRevision = false;
+            this.clearErrors();
+            const payload = { message: this.revisionMessage };
+
+            this.$axios.post(this.actions.createRevision, payload).then(response => {
+                this.saving = false;
+                this.$notify.success(__('Revision created'));
+                this.$refs.container.saved();
+                this.revisionMessage = null;
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
         },

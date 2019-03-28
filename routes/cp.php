@@ -41,6 +41,7 @@ Route::group([
         Route::post('collections/{collection}/entries/{id}/{slug}/{site}', 'PublishedEntriesController@store')->name('collections.entries.published.store');
         Route::delete('collections/{collection}/entries/{id}/{slug}/{site}', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
         Route::get('collections/{collection}/entries/{id}/{slug}/{site}/revisions', 'EntryRevisionsController@index')->name('collections.entries.revisions.index');
+        Route::post('collections/{collection}/entries/{id}/{slug}/{site}/revisions', 'EntryRevisionsController@store')->name('collections.entries.revisions.store');
         Route::post('collections/{collection}/entries/{id}/{slug}/{site}/restore-revision', 'RestoreEntryRevisionController')->name('collections.entries.restore-revision');
         Route::post('collections/{collection}/entries/{id}/{slug}/{site}/preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
         Route::get('collections/{collection}/entries/{id}/{slug}/{site}/preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
