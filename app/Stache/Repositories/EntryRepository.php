@@ -84,7 +84,7 @@ class EntryRepository implements RepositoryContract
             });
 
         // Make sure the version we're saving is re-added to the entry.
-        $localizable->addLocalization($entry);
+        $localizable->addLocalization(clone $entry);
 
         $this->store
             ->store($entry->collectionHandle())
