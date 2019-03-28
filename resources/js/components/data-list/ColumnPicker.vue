@@ -32,7 +32,7 @@
                         </div>
                     </sortable-list>
 
-                    <div class="flex justify-center mt-3">
+                    <div v-if="preferencesKey" class="flex justify-center mt-3">
                         <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                         <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
                     </div>
@@ -53,7 +53,7 @@ export default {
     },
 
     props: {
-        collection: String
+        preferencesKey: String
     },
 
     data() {
@@ -93,7 +93,7 @@ export default {
 
             this.saving = true;
 
-            this.$preferences.set(`collections.${this.collection}.columns`, this.selectedColumns)
+            this.$preferences.set(this.preferencesKey, this.selectedColumns)
                 .then(response => {
                     this.saving = false;
                     this.customizing = false;

@@ -32,7 +32,7 @@
                             :per-page="perPage"
                             @filters-changed="filtersChanged"
                             @per-page-changed="perPageChanged" />
-                        <data-list-column-picker :collection="collection" />
+                        <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
@@ -91,6 +91,12 @@ export default {
         return {
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
+        }
+    },
+
+    methods: {
+        preferencesKey(type) {
+            return `collections.${this.collection}.${type}`;
         }
     }
 
