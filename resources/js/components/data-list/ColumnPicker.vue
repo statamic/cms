@@ -32,9 +32,16 @@
                         </div>
                     </sortable-list>
 
-                    <div v-if="preferencesKey" class="flex justify-center mt-3">
+                    <div v-if="preferencesKey">
                         <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                        <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
+                        <template v-else>
+                            <div class="flex justify-center mt-3">
+                                <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
+                            </div>
+                            <div class="flex justify-center mt-2">
+                                <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                            </div>
+                        </template>
                     </div>
 
                 </div>
@@ -103,7 +110,26 @@ export default {
                     this.saving = false;
                     this.$notify.error(__('Something went wrong'));
                 });
-        }
+        },
+
+        reset() {
+            this.sharedState.columns.forEach(column => column.visible = column.visibleDefault);
+
+            this.saving = true;
+
+            this.$preferences.remove(this.preferencesKey)
+                .then(response => {
+                    this.saving = false;
+                    this.customizing = false;
+                    this.$notify.success(__('Columns reset'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
+        },
+
+
 
     }
 }
