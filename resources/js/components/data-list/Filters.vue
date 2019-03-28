@@ -42,6 +42,13 @@
                     <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
                 </div>
 
+                <div v-if="preferencesKey" class="p-3 pt-0">
+                    <div class="flex justify-center mt-3">
+                        <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                        <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
+                    </div>
+                </div>
+
             </div>
         </pane>
     </div>
@@ -61,13 +68,15 @@ export default {
     props: {
         perPage: Number,
         filters: Array,
-        activeFilters: Object
+        activeFilters: Object,
+        preferencesKey: String
     },
 
     data() {
         return {
             filtering: false,
-            perPageOptions: [2, 25, 50, 100]
+            perPageOptions: [2, 25, 50, 100],
+            saving: false,
         }
     },
 
@@ -103,6 +112,12 @@ export default {
                 Vue.delete(filters, handle);
             }
             this.$emit('filters-changed', filters);
+        },
+
+        save() {
+            this.saving = true;
+
+            // TODO: Actually save eh
         }
 
     }
