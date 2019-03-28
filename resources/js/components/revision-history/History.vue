@@ -17,7 +17,7 @@
                 <loading-graphic />
             </div>
 
-            <div v-if="!loading && revisions.length === 0" class="">
+            <div v-if="!loading && revisions.length === 0" class="px-3">
                 {{ __('No revisions') }}
             </div>
 
