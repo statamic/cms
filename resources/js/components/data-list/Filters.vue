@@ -43,10 +43,15 @@
                 </div>
 
                 <div v-if="preferencesKey" class="p-3 pt-0">
-                    <div class="flex justify-center mt-3">
-                        <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                        <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
-                    </div>
+                    <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                    <template v-else>
+                        <div class="flex justify-center mt-3">
+                            <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
+                        </div>
+                        <div class="flex justify-center mt-2">
+                            <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                        </div>
+                    </template>
                 </div>
 
             </div>
