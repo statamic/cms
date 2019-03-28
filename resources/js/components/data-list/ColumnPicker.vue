@@ -53,7 +53,7 @@ export default {
     },
 
     props: {
-        saveUrl: String,
+        collection: String
     },
 
     data() {
@@ -88,18 +88,20 @@ export default {
 
         save() {
             this.saving = true;
-            this.$axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
-                this.saving = false;
-                this.$notify.success(__('Columns saved'));
-                this.customizing = false;
-            }).catch(e => {
-                this.saving = false;
-                if (e.response) {
-                    this.$notify.error(e.response.data.message);
-                } else {
-                    this.$notify.error(__('Something went wrong'));
-                }
-            });
+
+            // TODO: Use `$preferences` API to set...
+            // this.$axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
+            //     this.saving = false;
+            //     this.$notify.success(__('Columns saved'));
+            //     this.customizing = false;
+            // }).catch(e => {
+            //     this.saving = false;
+            //     if (e.response) {
+            //         this.$notify.error(e.response.data.message);
+            //     } else {
+            //         this.$notify.error(__('Something went wrong'));
+            //     }
+            // });
         }
 
     }
