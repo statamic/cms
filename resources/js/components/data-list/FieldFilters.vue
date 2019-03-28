@@ -75,6 +75,10 @@ export default {
 
     },
 
+    created() {
+        this.$events.$on('filters-reset', this.removeAll);
+    },
+
     methods: {
 
         selectField(handle) {
@@ -87,6 +91,10 @@ export default {
 
         removeField(handle) {
             Vue.delete(this.values, handle);
+        },
+
+        removeAll() {
+            this.values = {};
         }
 
     }

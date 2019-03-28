@@ -56,6 +56,7 @@ export default {
 
     created() {
         this.request();
+        this.$events.$on('filters-reset', this.perPageReset);
     },
 
     watch: {
@@ -120,6 +121,10 @@ export default {
         perPageChanged(perPage) {
             this.perPage = perPage;
             this.page = 1;
+        },
+
+        perPageReset() {
+            this.perPageChanged(this.initialPerPage);
         }
 
     }

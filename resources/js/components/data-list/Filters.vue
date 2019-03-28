@@ -141,6 +141,8 @@ export default {
         },
 
         reset() {
+            this.$events.$emit('filters-reset');
+
             this.saving = true;
 
             this.$preferences.remove(this.preferencesKey)
