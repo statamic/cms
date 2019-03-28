@@ -6,12 +6,16 @@ use Mockery;
 use Statamic\API;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
+use Statamic\API\Collection;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
+use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Contracts\Data\Entries\Entry;
 
 class EntriesStoreTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     function setUp(): void
     {
         parent::setUp();
@@ -24,6 +28,11 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_gets_nested_files()
     {
+        Collection::make('alphabetical')->save();
+        Collection::make('blog')->save();
+        Collection::make('numeric')->save();
+        Collection::make('pages')->save();
+
         $files = Traverser::traverse($this->store);
 
         $this->assertEquals(collect([
