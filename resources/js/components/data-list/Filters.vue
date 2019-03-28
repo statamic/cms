@@ -98,6 +98,13 @@ export default {
             }
 
             return count;
+        },
+
+        preferencesPayload() {
+            return {
+                ...(this.activeFilterCount ? clone(this.activeFilters) : {}),
+                perPage: this.perPage
+            };
         }
 
     },
@@ -117,7 +124,7 @@ export default {
         save() {
             this.saving = true;
 
-            this.$preferences.set(this.preferencesKey, this.activeFilters)
+            this.$preferences.set(this.preferencesKey, this.preferencesPayload)
                 .then(response => {
                     this.saving = false;
                     this.$notify.success(__('Filters saved'));
