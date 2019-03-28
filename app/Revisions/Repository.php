@@ -21,7 +21,7 @@ class Repository
 
         $files = Folder::getFiles($directory);
 
-        return collect($files)->reject(function ($path) {
+        return collect_files($files)->filterByExtension('yaml')->reject(function ($path) {
             return Str::endsWith($path, 'working.yaml');
         })->map(function ($path) use ($key) {
             return $this->makeRevisionFromFile($key, $path);
