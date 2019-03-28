@@ -32,7 +32,7 @@ class RestoreEntryRevisionController extends CpController
             ->action('restore')
             ->save();
 
-        optional($entry->workingCopy())->delete();
+        $restored->deleteWorkingCopy();
 
         session()->flash('success', __('Revision Restored'));
     }
