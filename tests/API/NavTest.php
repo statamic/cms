@@ -30,7 +30,7 @@ class NavTest extends TestCase
             'Content' => ['Collections', 'Structure', 'Taxonomies', 'Assets', 'Globals'],
             'Tools' => ['Forms', 'Updates', 'Utilities'],
             'Users' => ['Users', 'Groups', 'Permissions'],
-            'Site' => ['Addons', 'Preferences', 'Fieldsets', 'Blueprints']
+            'Site' => ['Addons', 'Preferences', 'Blueprints', 'Fieldsets']
         ]);
 
         $this->actingAs(User::make()->makeSuper());
