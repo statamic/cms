@@ -127,9 +127,7 @@ export default {
                     this.saving = false;
                     this.$notify.error(__('Something went wrong'));
                 });
-        },
-
-
+        }
 
     }
 }
