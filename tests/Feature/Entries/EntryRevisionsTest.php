@@ -86,6 +86,7 @@ class EntryRevisionsTest extends TestCase
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
+        $this->assertEquals('publish', $revision->action());
         $this->assertFalse($entry->hasWorkingCopy());
     }
 
@@ -130,6 +131,7 @@ class EntryRevisionsTest extends TestCase
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
+        $this->assertEquals('unpublish', $revision->action());
     }
 
     /** @test */
@@ -183,6 +185,7 @@ class EntryRevisionsTest extends TestCase
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
+        $this->assertEquals('revision', $revision->action());
         $this->assertTrue($entry->hasWorkingCopy());
     }
 
@@ -216,6 +219,7 @@ class EntryRevisionsTest extends TestCase
             ])->create();
 
         $this->assertTrue($entry->published());
+        $this->assertCount(1, $entry->revisions());
 
         $this
             ->actingAs($user)
@@ -228,6 +232,8 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals(['foo' => 'existing foo'], $entry->data());
         $this->assertFalse($entry->published());
         $this->assertFalse($entry->hasWorkingCopy());
+        $this->assertCount(2, $entry->revisions());
+        $this->assertEquals('restore', $entry->latestRevision()->action());
     }
 
     private function publish($entry, $payload)

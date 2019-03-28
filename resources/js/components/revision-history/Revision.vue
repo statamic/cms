@@ -18,7 +18,7 @@
                     {{ revision.user.name || revision.user.email }}
                 </span>
                 <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
-                <span class="badge" v-if="!revision.working && revision.attributes.published" v-text="__('Published')" />
+                <span class="badge" v-else v-text="revision.action" />
             </div>
             <div v-if="revision.message" class="revision-item-note" v-text="revision.message" />
 

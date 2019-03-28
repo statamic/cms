@@ -29,6 +29,7 @@ class RestoreEntryRevisionController extends CpController
             ->makeRevision()
             ->user($request->user())
             ->message($request->message ?? false)
+            ->action('restore')
             ->save();
 
         optional($entry->workingCopy())->delete();

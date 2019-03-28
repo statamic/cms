@@ -20,6 +20,7 @@ class Revision implements Arrayable
     protected $user;
     protected $userId;
     protected $message;
+    protected $action = 'revision';
     protected $attributes = [];
 
     public function user($user = null)
@@ -40,6 +41,11 @@ class Revision implements Arrayable
         $this->userId = $user;
 
         return $this;
+    }
+
+    public function action($action = null)
+    {
+        return $this->fluentlyGetOrSet('action', $action);
     }
 
     public function message($message = null)
@@ -74,6 +80,7 @@ class Revision implements Arrayable
     protected function fileData()
     {
         return [
+            'action' => $this->action,
             'date' => $this->date->timestamp,
             'user' => $this->userId ?: null,
             'message' => $this->message ?: null,
@@ -84,6 +91,7 @@ class Revision implements Arrayable
     public function toArray()
     {
         return [
+            'action' => $this->action,
             'date' => $this->date()->timestamp,
             'user' => Arr::only($this->user()->toArray(), ['id', 'email', 'name']),
             'message' => $this->message,

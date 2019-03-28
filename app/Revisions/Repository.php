@@ -57,6 +57,7 @@ class Repository
 
         return (new Revision)
             ->key($key)
+            ->action($yaml['action'] ?? false)
             ->date(Carbon::createFromTimestamp($yaml['date']))
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)

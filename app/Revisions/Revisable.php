@@ -85,6 +85,7 @@ trait Revisable
             ->makeRevision()
             ->user($options['user'] ?? false)
             ->message($options['message'] ?? false)
+            ->action('publish')
             ->save();
 
         $item->deleteWorkingCopy();
@@ -100,6 +101,7 @@ trait Revisable
             ->makeRevision()
             ->user($options['user'] ?? false)
             ->message($options['message'] ?? false)
+            ->action('unpublish')
             ->save();
 
         $item->deleteWorkingCopy();
