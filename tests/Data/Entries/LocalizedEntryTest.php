@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Statamic\API;
 use Tests\TestCase;
+use Statamic\API\File;
 use Statamic\Sites\Site;
 use Illuminate\Support\Carbon;
 use Statamic\Fields\Blueprint;
@@ -210,15 +211,20 @@ class LocalizedEntryTest extends TestCase
     {
         $entry = (new LocalizedEntry)
             ->locale('en')
+            ->slug('test')
             ->entry((new Entry)->collection(new Collection))
             ->data(['foo' => 'bar', 'bar' => 'baz'])
             ->setSupplement('baz', 'qux')
             ->setSupplement('foo', 'overridden');
 
+        File::shouldReceive('lastModified')->with($entry->path())
+            ->andReturn($lastModified = now()->subDays(1)->timestamp);
+
         $this->assertArraySubset([
             'foo' => 'overridden',
             'bar' => 'baz',
             'baz' => 'qux',
+            'last_modified' => Carbon::createFromTimestamp($lastModified),
         ], $entry->toArray());
     }
 
@@ -548,6 +554,21 @@ EOT;
         $return = $entry->layout('bar');
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->layout());
+    }
+
+    /** @test */
+    function it_gets_the_last_modified_time()
+    {
+        $collection = new Collection;
+        $parent = (new Entry)->collection($collection);
+        $entry = (new LocalizedEntry)->entry($parent)->slug('bar');
+        $path = $entry->path();
+        $date = Carbon::parse('2017-01-02');
+        touch($path, $date->timestamp);
+
+        $this->assertTrue($date->eq($entry->lastModified()));
+
+        @unlink($path);
     }
 }
 

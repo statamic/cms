@@ -3,7 +3,9 @@
 namespace Statamic\Data;
 
 use Statamic\API\Arr;
+use Statamic\API\File;
 use Statamic\API\YAML;
+use Illuminate\Support\Carbon;
 
 trait ExistsAsFile
 {
@@ -40,5 +42,10 @@ trait ExistsAsFile
         $content = array_pull($data, 'content');
 
         return YAML::dump($data, $content);
+    }
+
+    public function lastModified()
+    {
+        return Carbon::createFromTimestamp(File::lastModified($this->path()));
     }
 }

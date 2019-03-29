@@ -56,6 +56,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             'date' => $this->date(),
             'is_entry' => true,
             'collection' => $this->collectionHandle(),
+            'last_modified' => $this->lastModified(),
         ], $this->supplements);
     }
 
