@@ -16,13 +16,13 @@ class Preference {
 
     set(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.storeUrl, {'key': key, 'value': value})
+            this.instance.$axios.post(this.storeUrl, {key, value})
         );
     }
 
     append(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.storeUrl, {'key': key, 'value': value, append: true})
+            this.instance.$axios.post(this.storeUrl, {key, value, append: true})
         );
     }
 
