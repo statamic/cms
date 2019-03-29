@@ -46,6 +46,10 @@ trait ExistsAsFile
 
     public function fileLastModified()
     {
+        if (! File::exists($this->path())) {
+            return Carbon::now();
+        }
+
         return Carbon::createFromTimestamp(File::lastModified($this->path()));
     }
 }
