@@ -4,6 +4,7 @@ namespace Statamic\Data\Entries;
 
 use Statamic\API;
 use Statamic\API\Site;
+use Statamic\API\User;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\Routable;
@@ -56,7 +57,9 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             'date' => $this->date(),
             'is_entry' => true,
             'collection' => $this->collectionHandle(),
-            'last_modified' => $this->lastModified(),
+            'last_modified' => $lastModified = $this->lastModified(),
+            'updated_at' => $lastModified,
+            'updated_by' => optional(User::find($this->get('updated_by')))->toArray(),
         ], $this->supplements);
     }
 

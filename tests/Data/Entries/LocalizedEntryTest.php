@@ -5,6 +5,7 @@ namespace Tests\Data\Entries;
 use Statamic\API;
 use Tests\TestCase;
 use Statamic\API\File;
+use Statamic\API\User;
 use Statamic\Sites\Site;
 use Illuminate\Support\Carbon;
 use Statamic\Fields\Blueprint;
@@ -209,22 +210,28 @@ class LocalizedEntryTest extends TestCase
     /** @test */
     function it_converts_to_array()
     {
+        $user = tap(User::make()->id('user-1'))->save();
+
         $entry = (new LocalizedEntry)
             ->locale('en')
             ->slug('test')
             ->entry((new Entry)->collection(new Collection))
-            ->data(['foo' => 'bar', 'bar' => 'baz'])
+            ->data([
+                'foo' => 'bar',
+                'bar' => 'baz',
+                'updated_at' => $lastModified = now()->subDays(1)->timestamp,
+                'updated_by' => $user->id(),
+            ])
             ->setSupplement('baz', 'qux')
             ->setSupplement('foo', 'overridden');
-
-        File::shouldReceive('lastModified')->with($entry->path())
-            ->andReturn($lastModified = now()->subDays(1)->timestamp);
 
         $this->assertArraySubset([
             'foo' => 'overridden',
             'bar' => 'baz',
             'baz' => 'qux',
-            'last_modified' => Carbon::createFromTimestamp($lastModified),
+            'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
+            'updated_at' => $carbon,
+            'updated_by' => $user->toArray(),
         ], $entry->toArray());
     }
 
