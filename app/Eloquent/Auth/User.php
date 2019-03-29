@@ -280,6 +280,11 @@ class User extends BaseUser
         return $this->set($key, $value);
     }
 
+    public function has($key)
+    {
+        return $this->get($key) !== null;
+    }
+
     public function get($key, $default = null)
     {
         $value = $this->model()->$key;
