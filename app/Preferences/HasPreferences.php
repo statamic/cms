@@ -73,12 +73,12 @@ trait HasPreferences
     }
 
     /**
-     * Remove an array value from a preference.
+     * Remove a specific array value from a preference.
      *
      * @param string $key
      * @param mixed $value
      */
-    public function removePreferenceValue($key, $value)
+    protected function removePreferenceValue($key, $value)
     {
         $values = collect($this->getPreference($key));
 

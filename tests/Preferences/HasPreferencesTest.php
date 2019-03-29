@@ -117,8 +117,8 @@ class HasPreferencesTest extends TestCase
         ]);
 
         $this->person->removePreference('collection.columns', 'date');
-        $this->person->removePreferenceValue('collection.columns', 'slug');
-        $this->person->removePreferenceValue('favorites', [
+        $this->person->removePreference('collection.columns', 'slug');
+        $this->person->removePreference('favorites', [
             'name' => 'Updates',
             'url' => 'https://worldwideweb.com/cp/updater/statamic'
         ]);
