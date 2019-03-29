@@ -497,7 +497,6 @@ class Asset implements AssetContract, Arrayable
     {
         $attributes = [
             'id'             => $this->id(),
-            'title'          => $this->get('title'),
             'path'           => $this->path(),
             'filename'       => $this->filename(),
             'basename'       => $this->basename(),

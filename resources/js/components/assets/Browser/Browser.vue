@@ -130,7 +130,7 @@
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
                                         <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1" />
-                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
+                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.basename }}</label>
                                     </div>
                                 </template>
 

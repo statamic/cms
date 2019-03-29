@@ -1,11 +1,5 @@
 fields:
   -
-    handle: title
-    field:
-      display: Title
-      type: text
-      instructions: The display name of the asset.
-  -
     handle: alt
     field:
       display: Alt Text
