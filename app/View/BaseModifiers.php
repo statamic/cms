@@ -1855,6 +1855,18 @@ class BaseModifiers extends Modifier
     }
 
     /**
+     * Converts a Carbon instance to a timestamp.
+     *
+     * @param  $value
+     * @param  $params
+     * @return int
+     */
+    public function timestamp($value)
+    {
+        return $value->timestamp;
+    }
+
+    /**
      * Applies a timezone to a date
      *
      * Accepts a timezone string as a parameter. If none is provided, then
