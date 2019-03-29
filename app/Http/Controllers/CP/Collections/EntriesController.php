@@ -211,7 +211,10 @@ class EntriesController extends CpController
                 ->user($request->user())
                 ->save();
         } else {
-            $entry->save();
+            $entry
+                ->set('updated_by', $request->user()->id())
+                ->set('updated_at', now()->timestamp)
+                ->save();
         }
 
         return $entry->toArray();

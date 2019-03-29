@@ -19,7 +19,7 @@ class EntryRevisionsController extends CpController
         $revisions = $entry
             ->revisions()
             ->reverse()
-            ->prepend($entry->workingCopy())
+            ->prepend($this->workingCopy($entry))
             ->filter();
 
         // The first non manually created revision would be considered the "current"
@@ -46,5 +46,17 @@ class EntryRevisionsController extends CpController
             'message' => $request->message,
             'user' => $request->user(),
         ]);
+    }
+
+    protected function workingCopy($entry)
+    {
+        if ($entry->published()) {
+            return $entry->workingCopy();
+        }
+
+        return $entry
+            ->makeWorkingCopy()
+            ->date($entry->lastModified())
+            ->user($entry->lastModifiedBy());
     }
 }

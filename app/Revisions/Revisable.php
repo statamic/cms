@@ -79,11 +79,15 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $item->published(true)->save();
+        $item
+            ->published(true)
+            ->set('updated_at', Carbon::now()->timestamp)
+            ->set('updated_by', ($user = $options['user'] ?? false)->id())
+            ->save();
 
         $item
             ->makeRevision()
-            ->user($options['user'] ?? false)
+            ->user($user)
             ->message($options['message'] ?? false)
             ->action('publish')
             ->save();
@@ -95,11 +99,15 @@ trait Revisable
     {
         $item = $this->fromWorkingCopy();
 
-        $item->published(false)->save();
+        $item
+            ->published(false)
+            ->set('updated_at', Carbon::now()->timestamp)
+            ->set('updated_by', ($user = $options['user'] ?? false)->id())
+            ->save();
 
         $item
             ->makeRevision()
-            ->user($options['user'] ?? false)
+            ->user($user)
             ->message($options['message'] ?? false)
             ->action('unpublish')
             ->save();
@@ -109,11 +117,15 @@ trait Revisable
 
     public function store($options = [])
     {
-        $this->published(false)->save();
+        $this
+            ->published(false)
+            ->set('updated_at', Carbon::now()->timestamp)
+            ->set('updated_by', ($user = $options['user'] ?? false)->id())
+            ->save();
 
         $this
             ->makeRevision()
-            ->user($options['user'] ?? false)
+            ->user($user)
             ->message($options['message'] ?? false)
             ->save();
     }

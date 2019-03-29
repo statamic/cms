@@ -11,6 +11,7 @@ use Statamic\API\Folder;
 use Statamic\Fields\Fields;
 use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
+use Illuminate\Support\Carbon;
 use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
@@ -56,6 +57,8 @@ class UpdateEntryTest extends TestCase
     /** @test */
     function published_entry_gets_saved_to_working_copy()
     {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
@@ -67,6 +70,7 @@ class UpdateEntryTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Original title',
                 'foo' => 'bar',
+                'updated_at' => $originalTimestamp = $now->subDays(3)->timestamp
             ])->create();
 
         $this
@@ -84,6 +88,7 @@ class UpdateEntryTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Original title',
             'foo' => 'bar',
+            'updated_at' => $originalTimestamp
         ], $entry->data());
 
         $workingCopy = $entry->fromWorkingCopy();
@@ -98,6 +103,8 @@ class UpdateEntryTest extends TestCase
     /** @test */
     function draft_entry_gets_saved_to_content()
     {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
@@ -110,6 +117,8 @@ class UpdateEntryTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Original title',
                 'foo' => 'bar',
+                'updated_at' => $now->subDays(2)->timestamp,
+                'updated_by' => $user->id(),
             ])->create();
 
         $this
@@ -127,6 +136,8 @@ class UpdateEntryTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Updated title',
             'foo' => 'updated foo',
+            'updated_at' => $now->timestamp,
+            'updated_by' => $user->id(),
         ], $entry->data());
         $this->assertFalse($entry->hasWorkingCopy());
     }

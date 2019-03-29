@@ -3,6 +3,7 @@
 namespace Statamic\Data\Entries;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Site;
 use Statamic\API\User;
 use Statamic\API\Stache;
@@ -59,7 +60,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             'collection' => $this->collectionHandle(),
             'last_modified' => $lastModified = $this->lastModified(),
             'updated_at' => $lastModified,
-            'updated_by' => optional(User::find($this->get('updated_by')))->toArray(),
+            'updated_by' => optional($this->lastModifiedBy())->toArray(),
         ], $this->supplements);
     }
 
@@ -249,7 +250,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return [
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'data' => $this->data(),
+            'data' => Arr::except($this->data(), ['updated_by', 'updated_at']),
         ];
     }
 
@@ -274,5 +275,10 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return $this->has('updated_at')
             ? Carbon::createFromTimestamp($this->get('updated_at'))
             : $this->fileLastModified();
+    }
+
+    public function lastModifiedBy()
+    {
+        return User::find($this->get('updated_by'));
     }
 }

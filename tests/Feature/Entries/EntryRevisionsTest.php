@@ -38,6 +38,8 @@ class EntryRevisionsTest extends TestCase
     /** @test */
     function it_publishes_an_entry()
     {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
@@ -71,6 +73,8 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'foo modified in working copy',
+            'updated_at' => $now->timestamp,
+            'updated_by' => $user->id(),
         ], $entry->data());
         $this->assertTrue($entry->published());
         $this->assertCount(1, $entry->revisions());
@@ -93,7 +97,8 @@ class EntryRevisionsTest extends TestCase
     /** @test */
     function it_unpublishes_an_entry()
     {
-        $this->withoutExceptionHandling();
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
@@ -117,6 +122,13 @@ class EntryRevisionsTest extends TestCase
             ->assertOk();
 
         $entry = Entry::find($entry->id());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Title',
+            'foo' => 'bar',
+            'updated_at' => $now->timestamp,
+            'updated_by' => $user->id(),
+        ], $entry->data());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();

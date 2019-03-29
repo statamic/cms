@@ -10,6 +10,7 @@ use Statamic\API\Entry;
 use Statamic\API\Folder;
 use Statamic\Fields\Fields;
 use Statamic\API\Collection;
+use Illuminate\Support\Carbon;
 use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\BlueprintRepository;
@@ -50,6 +51,8 @@ class StoreEntryTest extends TestCase
     /** @test */
     function entry_gets_created()
     {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['title' => ['type' => 'text'], 'foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'create blog entries']]);
         $user = User::make()->assignRole('test');
@@ -78,6 +81,8 @@ class StoreEntryTest extends TestCase
         $this->assertEquals([
             'title' => 'The title',
             'foo' => 'bar',
+            'updated_at' => $now->timestamp,
+            'updated_by' => $user->id(),
         ], $entry->data());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
