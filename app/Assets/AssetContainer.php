@@ -11,6 +11,7 @@ use Statamic\API\Folder;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Asset as AssetAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
@@ -19,7 +20,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class AssetContainer implements AssetContainerContract, Augmentable
 {
-    use ExistsAsFile;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $title;
     protected $handle;
