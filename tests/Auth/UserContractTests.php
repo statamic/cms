@@ -151,7 +151,9 @@ trait UserContractTests
             'in_group_one' => true,
             'in_group_two' => true,
             'preferences' => [],
-            'supplemented' => 'qux'
+            'supplemented' => 'qux',
+            'avatar' => null,
+            'initials' => 'JS',
         ], $this->user()->toArray());
     }
 
