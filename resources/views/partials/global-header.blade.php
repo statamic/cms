@@ -68,7 +68,7 @@
                 <li class="px-1">
                     <div class="text-base mb-px">{{ my()->email() }}</div>
                     @if (me()->isSuper())
-                        <div class="text-2xs mt-px text-grey-40">{{ __('Super Admin') }}</div>
+                        <div class="text-2xs mt-px text-grey-60">{{ __('Super Admin') }}</div>
                     @endif
                 </li>
                 <li class="divider"></li>
