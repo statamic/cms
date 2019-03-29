@@ -568,6 +568,11 @@ EOT;
 
         $this->assertTrue($date->eq($entry->lastModified()));
 
+        $valueBasedDate = Carbon::parse('2017-01-03');
+        $entry->set('updated_at', $valueBasedDate->timestamp);
+        $this->assertFalse($date->eq($entry->lastModified()));
+        $this->assertTrue($valueBasedDate->eq($entry->lastModified()));
+
         @unlink($path);
     }
 }

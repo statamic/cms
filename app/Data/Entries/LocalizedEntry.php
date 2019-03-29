@@ -265,4 +265,11 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             ->data($attrs['data'])
             ->slug($attrs['slug']);
     }
+
+    public function lastModified()
+    {
+        return $this->has('updated_at')
+            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            : $this->fileLastModified();
+    }
 }

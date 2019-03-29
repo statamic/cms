@@ -44,7 +44,7 @@ trait ExistsAsFile
         return YAML::dump($data, $content);
     }
 
-    public function lastModified()
+    public function fileLastModified()
     {
         return Carbon::createFromTimestamp(File::lastModified($this->path()));
     }
