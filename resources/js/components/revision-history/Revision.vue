@@ -10,7 +10,8 @@
         <div v-if="revision.message" class="revision-item-note text-truncate" v-text="revision.message" />
 
         <div class="flex items-center">
-            <img src="https://pbs.twimg.com/profile_images/1064935675672305665/xB3YuC60_400x400.jpg" height="24" width="24" class="rounded-sm mr-1">
+            <avatar :user="revision.user" class="flex-no-shrink mr-1 w-6" />
+
             <div class="revision-item-content w-full flex">
                 <div class="flex-1">
                     <div class="revision-author text-grey-70 text-2xs">

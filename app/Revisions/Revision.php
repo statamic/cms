@@ -108,7 +108,7 @@ class Revision implements Contract, Arrayable
         return [
             'action' => $this->action,
             'date' => $this->date()->timestamp,
-            'user' => Arr::only($this->user()->toArray(), ['id', 'email', 'name']),
+            'user' => Arr::only($this->user()->toArray(), ['id', 'email', 'name', 'avatar', 'initials']),
             'message' => $this->message,
             'attributes' => $this->attributes,
         ];
