@@ -74,6 +74,7 @@ export default {
 
     props: {
         actions: Object,
+        published: Boolean
     },
 
     data() {
@@ -87,12 +88,18 @@ export default {
     computed: {
 
         options() {
-            return [
+            let options = [
                 { value: 'publish', text: 'Publish Now', },
                 { value: 'schedule', text: 'Schedule', },
-                { value: 'unpublish', text: 'Unpublish', },
+            ];
+
+            if (this.published) {
+                options.push({ value: 'unpublish', text: 'Unpublish' });
+            }
+
+            return options.concat([
                 { value: 'revision', text: 'Create Revision', },
-            ]
+            ]);
         },
 
         actionInfoText() {

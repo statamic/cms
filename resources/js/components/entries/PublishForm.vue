@@ -75,6 +75,7 @@
             <publish-actions
                 v-if="confirmingPublish"
                 :actions="actions"
+                :published="published"
                 @closed="confirmingPublish = false"
                 @saving="saving = true"
                 @saved="publishActionCompleted"
