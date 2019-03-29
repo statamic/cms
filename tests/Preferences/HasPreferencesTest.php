@@ -229,10 +229,15 @@ class HasPreferencesTest extends TestCase
                 'example-four' => [
                     'integer' => 0
                 ],
+                'example-five' => [
+                    'false' => false,
+                ],
                 'columns' => [
                     'title'
                 ]
-            ]
+            ],
+            'filled-top-level' => false,
+            'empty-top-level' => []
         ]);
 
         $expected = [
@@ -243,17 +248,25 @@ class HasPreferencesTest extends TestCase
                 'example-four' => [
                     'integer' => 0
                 ],
+                'example-five' => [
+                    'false' => false
+                ],
                 'columns' => [
                     'title'
                 ],
-            ]
+            ],
+            'filled-top-level' => false
         ];
 
         $this->person
             ->cleanupPreference('collection.example-one.deeply.nested.empty-array')
             ->cleanupPreference('collection.example-two.deeply.nested.empty-string')
             ->cleanupPreference('collection.example-three.deeply.nested.null')
-            ->cleanupPreference('collection.example-four.integer');
+            ->cleanupPreference('collection.example-four.integer')
+            ->cleanupPreference('collection.example-five.false')
+            ->cleanupPreference('some.non.existent.pref.that.was.maybe.previously.deleted')
+            ->cleanupPreference('filled-top-level')
+            ->cleanupPreference('empty-top-level');
 
         $this->assertEquals($expected, $this->person->preferences());
     }

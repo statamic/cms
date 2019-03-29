@@ -110,7 +110,7 @@ trait HasPreferences
      */
     public function hasPreference($key)
     {
-        return (bool) $this->getPreference($key);
+        return Arr::has($this->preferences, $key);
     }
 
     /**
@@ -172,18 +172,16 @@ trait HasPreferences
     {
         $preference = $this->getPreference($key);
 
-        if (is_int($preference) || $preference) {
+        if (is_int($preference) || is_bool($preference) || $preference) {
             return $this;
         }
 
-        $this->removePreference($key);
-
-        if (! Str::contains($key, '.')) {
-            return $this;
+        if ($this->hasPreference($key)) {
+            $this->removePreference($key);
         }
 
-        $key = preg_replace('/\.[^.]+$/', '', $key);
-
-        return $this->cleanupPreference($key);
+        return Str::contains($key, '.')
+            ? $this->cleanupPreference(preg_replace('/\.[^.]+$/', '', $key))
+            : $this;
     }
 }
