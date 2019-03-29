@@ -94,7 +94,7 @@ export default {
                 _(response).each((asset) => {
                     var url = asset.url;
                     var alt = asset.alt || '';
-                    var title = asset.title === asset.filename ? null : asset.title;
+                    var title = asset.filename;
                     var text = title || asset.alt || asset.basename;
 
                     if (assets.length === 1) {
