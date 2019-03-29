@@ -5,7 +5,7 @@ namespace Tests\Revisions;
 use Tests\TestCase;
 use Statamic\Revisions\Revision;
 use Illuminate\Support\Collection;
-use Statamic\Revisions\Repository;
+use Statamic\Revisions\RevisionRepository;
 
 class RepositoryTest extends TestCase
 {
@@ -13,7 +13,7 @@ class RepositoryTest extends TestCase
     {
         parent::setUp();
         config(['statamic.revisions.path' => __DIR__.'/__fixtures__']);
-        $this->repo = (new Repository);
+        $this->repo = (new RevisionRepository);
     }
 
     /** @test */

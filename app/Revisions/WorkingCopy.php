@@ -2,7 +2,7 @@
 
 namespace Statamic\Revisions;
 
-use Facades\Statamic\Revisions\Repository as Revisions;
+use Statamic\API\Revision as Revisions;
 
 class WorkingCopy extends Revision
 {
@@ -17,6 +17,7 @@ class WorkingCopy extends Revision
     public static function fromRevision(Revision $revision)
     {
         return (new self)
+            ->id($revision->id() ?? false)
             ->key($revision->key())
             ->date($revision->date())
             ->user($revision->user() ?? false)

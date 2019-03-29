@@ -7,12 +7,19 @@ use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Folder;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Revisions\Revision as RevisionContract;
+use Statamic\Contracts\Revisions\RevisionRepository as Contract;
 
-class Repository
+class RevisionRepository implements Contract
 {
     public function directory()
     {
         return config('statamic.revisions.path');
+    }
+
+    public function make(): RevisionContract
+    {
+        return new Revision;
     }
 
     public function whereKey($key)
@@ -41,12 +48,14 @@ class Repository
         return $this->makeRevisionFromFile($key, $path);
     }
 
-    public function save(Revision $revision)
+    public function save(RevisionContract $revision)
     {
         File::put($revision->path(), $revision->fileContents());
+
+        $revision->id($revision->date()->timestamp);
     }
 
-    public function delete(Revision $revision)
+    public function delete(RevisionContract $revision)
     {
         File::delete($revision->path());
     }

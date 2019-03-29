@@ -6,15 +6,18 @@ use Statamic\API;
 use Illuminate\Support\Carbon;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Data\ExistsAsFile;
-use Facades\Statamic\Revisions\Repository as Revisions;
+use Statamic\API\Revision as Revisions;
 use Statamic\Contracts\Auth\User;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\API\Arr;
+use Statamic\Contracts\Revisions\Revision as Contract;
 
-class Revision implements Arrayable
+
+class Revision implements Contract, Arrayable
 {
     use FluentlyGetsAndSets, ExistsAsFile;
 
+    protected $id;
     protected $key;
     protected $date;
     protected $user;
@@ -22,6 +25,11 @@ class Revision implements Arrayable
     protected $message;
     protected $action = 'revision';
     protected $attributes = [];
+
+    public function id($id = null)
+    {
+        return $this->fluentlyGetOrSet('id', $id);
+    }
 
     public function user($user = null)
     {
@@ -58,7 +66,7 @@ class Revision implements Arrayable
         return $this->fluentlyGetOrSet('attributes', $attributes);
     }
 
-    public function attribute($key, $value)
+    public function attribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
 

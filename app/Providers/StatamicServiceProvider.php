@@ -27,6 +27,7 @@ class StatamicServiceProvider extends AggregateServiceProvider
         GlideServiceProvider::class,
         \Statamic\Search\ServiceProvider::class,
         \Statamic\StaticCaching\ServiceProvider::class,
+        \Statamic\Revisions\ServiceProvider::class,
         CpServiceProvider::class,
         ValidationServiceProvider::class,
 
