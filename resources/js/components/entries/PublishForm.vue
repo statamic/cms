@@ -6,7 +6,10 @@
                 <small class="subhead block">
                     <a :href="collectionUrl" v-text="collectionTitle" class="text-grey hover:text-blue" />
                 </small>
-                {{ title }}
+                <div class="flex items-center">
+                    <span v-if="! isCreating" class="little-dot mr-1 -ml-2" :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
+                    {{ title }}
+                </div>
             </h1>
 
             <div class="pt-px text-2xs text-grey-60 mr-3" v-if="isDirty" v-text="'Unsaved Changes'" />
