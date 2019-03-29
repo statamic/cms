@@ -18,11 +18,9 @@
                     </div>
                 </div>
 
-                <!-- <div> -->
-                    <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
-                    <span class="badge" :class="revision.action" v-else v-text="revision.action" />
-                    <span class="badge bg-orange" v-if="revision.attributes.current" v-text="'Current'" />
-                <!-- </div> -->
+                <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
+                <span class="badge" :class="revision.action" v-else v-text="revision.action" />
+                <span class="badge bg-orange" v-if="revision.attributes.current" v-text="'Current'" />
 
                 <stack
                     name="revision-details"

@@ -34,11 +34,12 @@
 }
 
 .revision-item .badge {
-    @apply uppercase text-4xs ml-1 text-white;
+    @apply uppercase text-4xs ml-1 text-white rounded-sm;
     height: 16px;
 
     &.publish { @apply bg-green-light; }
     &.revision { @apply text-grey-70; }
+    &.restore { @apply bg-grey-70; }
     &.unpublish { @apply bg-red; }
 }
 
