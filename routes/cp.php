@@ -32,20 +32,26 @@ Route::group([
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
-        Route::get('collections/{collection}/entries', 'EntriesController@index')->name('collections.entries.index');
-        Route::post('collections/{collection}/entries/action', 'EntryActionController')->name('collections.entries.action');
-        Route::get('collections/{collection}/entries/create/{site}', 'EntriesController@create')->name('collections.entries.create');
-        Route::post('collections/{collection}/entries/{site}', 'EntriesController@store')->name('collections.entries.store');
-        Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
-        Route::post('collections/{collection}/entries/{id}/{slug}/{site}', 'PublishedEntriesController@store')->name('collections.entries.published.store');
-        Route::delete('collections/{collection}/entries/{id}/{slug}/{site}', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
-        Route::get('collections/{collection}/entries/{id}/{slug}/{site}/revisions', 'EntryRevisionsController@index')->name('collections.entries.revisions.index');
-        Route::post('collections/{collection}/entries/{id}/{slug}/{site}/revisions', 'EntryRevisionsController@store')->name('collections.entries.revisions.store');
-        Route::post('collections/{collection}/entries/{id}/{slug}/{site}/restore-revision', 'RestoreEntryRevisionController')->name('collections.entries.restore-revision');
-        Route::post('collections/{collection}/entries/{id}/{slug}/{site}/preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
-        Route::get('collections/{collection}/entries/{id}/{slug}/{site}/preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
-        Route::post('collections/{collection}/entries/create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
-        Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
+
+        Route::group(['prefix' => 'collections/{collection}/entries'], function () {
+            Route::get('/', 'EntriesController@index')->name('collections.entries.index');
+            Route::post('action', 'EntryActionController')->name('collections.entries.action');
+            Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
+            Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
+            Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
+
+            Route::group(['prefix' => '{id}/{slug}/{site}'], function () {
+                Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
+                Route::post('/', 'PublishedEntriesController@store')->name('collections.entries.published.store');
+                Route::delete('/', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
+                Route::get('revisions', 'EntryRevisionsController@index')->name('collections.entries.revisions.index');
+                Route::post('revisions', 'EntryRevisionsController@store')->name('collections.entries.revisions.store');
+                Route::post('restore-revision', 'RestoreEntryRevisionController')->name('collections.entries.restore-revision');
+                Route::post('preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
+                Route::get('preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
+                Route::patch('/', 'EntriesController@update')->name('collections.entries.update');
+            });
+        });
     });
 
     Route::group(['namespace' => 'Taxonomies'], function () {
