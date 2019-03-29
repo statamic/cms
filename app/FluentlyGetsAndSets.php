@@ -26,4 +26,27 @@ trait FluentlyGetsAndSets
 
         return $this;
     }
+
+    /**
+     * Fluently get or set property from func_get_args(), for when we want to allow the setting of `null`.
+     *
+     * @param string $property
+     * @param array $funcArgs
+     * @param null|\Closure $additionalSetLogic
+     * @return $this
+     */
+    public function fluentlyGetOrSetFromArgs($property, $funcArgs, $additionalSetLogic = null)
+    {
+        if (count($funcArgs) === 0) {
+            return $this->{$property};
+        }
+
+        $this->{$property} = $funcArgs[0];
+
+        if ($additionalSetLogic) {
+            $additionalSetLogic();
+        }
+
+        return $this;
+    }
 }
