@@ -4,16 +4,18 @@ namespace Statamic\Auth;
 
 use Statamic\API;
 use Statamic\API\Blueprint;
+use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Statamic\Contracts\Auth\User as UserContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract
 {
-    use Authorizable, Notifiable, CanResetPassword;
+    use Authorizable, Notifiable, CanResetPassword, Augmentable;
 
     public function initials()
     {
@@ -27,6 +29,11 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         }
 
         return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
+    }
+
+    protected function augmentedArrayData()
+    {
+        return $this->data();
     }
 
     public function avatar($size = 64)
