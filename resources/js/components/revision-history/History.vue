@@ -2,11 +2,11 @@
 
     <div class="bg-white h-full flex flex-col">
 
-        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+        <div class="bg-grey-20 px-2 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
             {{ __('Revision History') }}
             <button
                 type="button"
-                class="ml-2 p-1 text-xl text-grey-60 hover:text-grey-80"
+                class="btn-close"
                 @click="close"
                 v-html="'&times'" />
         </div>

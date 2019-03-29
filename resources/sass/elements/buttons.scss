@@ -272,3 +272,19 @@ td .btn-icon {
 }
 
 .btn-more:before { line-height: 0; }
+
+.btn-close {
+    @apply ml-2 p-0 text-xl text-grey-60 rounded-full;
+    height: 32px;
+    width: 32px;
+    line-height: 32px;
+    flex-shrink: 0;
+    outline: none;
+    &:hover {
+        background: rgba(0,0,0,.05);
+    }
+    &:active, &:focus:hover {
+        outline: none;
+        background: rgba(0,0,0,.075);
+    }
+}
