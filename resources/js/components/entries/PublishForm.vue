@@ -59,7 +59,7 @@
 
             <button
                 v-if="!canPublish"
-                class="btn btn-primary"
+                class="btn btn-primary min-w-100"
                 :class="{ 'opacity-25': !canSave }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -67,7 +67,7 @@
 
             <button
                 v-if="canPublish"
-                class="btn btn-primary"
+                class="btn btn-primary min-w-100"
                 :class="{ 'opacity-25': !canPublish }"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true"

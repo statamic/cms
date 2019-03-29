@@ -366,7 +366,7 @@ module.exports = {
     minWidth: {
         '0':    '0',
         'xs': '10rem',
-        // 'sm': '20rem',
+        '100': '100px',
         // 'md': '30rem',
         // 'lg': '40rem',
         // 'xl': '50rem',
