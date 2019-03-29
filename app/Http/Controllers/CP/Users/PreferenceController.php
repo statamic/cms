@@ -24,7 +24,9 @@ class PreferenceController extends CpController
 
         $method = $request->has('append') ? 'appendPreference' : 'setPreference';
 
-        auth()->user()->{$method}($request->key, $request->value)->save();
+        auth()->user()
+            ->{$method}($request->key, $request->value)
+            ->save();
 
         return Preference::all();
     }
@@ -38,7 +40,9 @@ class PreferenceController extends CpController
     {
         $this->authorize('access cp');
 
-        auth()->user()->removePreference($key, $request->value)->save();
+        auth()->user()
+            ->removePreference($key, $request->value, $request->input('cleanup', true))
+            ->save();
 
         return Preference::all();
     }

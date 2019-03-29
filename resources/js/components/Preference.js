@@ -26,9 +26,9 @@ class Preference {
         );
     }
 
-    remove(key, value=null) {
+    remove(key, value=null, cleanup=true) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.delete(`${this.storeUrl}/${key}`, {data: {'value': value}})
+            this.instance.$axios.delete(`${this.storeUrl}/${key}`, {data: {value, cleanup}})
         );
     }
 

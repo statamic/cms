@@ -59,14 +59,19 @@ trait HasPreferences
      *
      * @param string $key
      * @param null|mixed $value
+     * @param bool $cleanup
      * @return $this
      */
-    public function removePreference($key, $value = null)
+    public function removePreference($key, $value = null, $cleanup = true)
     {
         if (is_null($value)) {
             Arr::pull($this->preferences, $key);
         } else {
             $this->removePreferenceValue($key, $value);
+        }
+
+        if ($cleanup) {
+            $this->cleanupPreference($key);
         }
 
         return $this;

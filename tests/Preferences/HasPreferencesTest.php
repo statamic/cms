@@ -141,6 +141,50 @@ class HasPreferencesTest extends TestCase
     }
 
     /** @test */
+    function it_cleans_up_by_default_after_removing()
+    {
+        $this->person->preferences([
+            'favorites' => [
+                [
+                    'name' => 'Updates',
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                ]
+            ]
+        ]);
+
+        $this->person->removePreference('favorites', [
+            'name' => 'Updates',
+            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+        ]);
+
+        $this->assertEquals([], $this->person->preferences());
+    }
+
+    /** @test */
+    function it_can_remove_with_cleanup_disabled()
+    {
+        $this->person->preferences([
+            'favorites' => [
+                [
+                    'name' => 'Updates',
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                ]
+            ]
+        ]);
+
+        $this->person->removePreference('favorites', [
+            'name' => 'Updates',
+            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+        ], false);
+
+        $expected = [
+            'favorites' => []
+        ];
+
+        $this->assertEquals($expected, $this->person->preferences());
+    }
+
+    /** @test */
     function it_can_get_a_single_preference()
     {
         $this->person->preferences([
