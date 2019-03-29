@@ -3,7 +3,8 @@
 namespace Statamic\Preferences;
 
 use Closure;
-use Illuminate\Support\Arr;
+use Statamic\API\Arr;
+use Statamic\API\Str;
 
 trait HasPreferences
 {
@@ -159,5 +160,30 @@ trait HasPreferences
 
             return $array;
         });
+    }
+
+    /**
+     * Cleanup preference and it's parents to avoid leaving empty array/object data in yaml.
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function cleanupPreference($key)
+    {
+        $preference = $this->getPreference($key);
+
+        if (is_int($preference) || $preference) {
+            return $this;
+        }
+
+        $this->removePreference($key);
+
+        if (! Str::contains($key, '.')) {
+            return $this;
+        }
+
+        $key = preg_replace('/\.[^.]+$/', '', $key);
+
+        return $this->cleanupPreference($key);
     }
 }

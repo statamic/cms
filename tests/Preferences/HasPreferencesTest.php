@@ -198,6 +198,65 @@ class HasPreferencesTest extends TestCase
 
         $this->assertEquals($expected, $this->person->getPreference('favorite'));
     }
+
+    /** @test */
+    function it_can_cleanup_a_preference()
+    {
+        $this->person->preferences([
+            'collection' => [
+                'example-one' => [
+                    'deeply' => [
+                        'nested' => [
+                            'empty-array' => []
+                        ]
+                    ]
+                ],
+                'example-two' => [
+                    'deeply' => [
+                        'nested' => [
+                            'empty-string' => ''
+                        ]
+                    ]
+                ],
+                'example-three' => [
+                    'keep-example-three',
+                    'deeply' => [
+                        'nested' => [
+                            'null' => null
+                        ]
+                    ]
+                ],
+                'example-four' => [
+                    'integer' => 0
+                ],
+                'columns' => [
+                    'title'
+                ]
+            ]
+        ]);
+
+        $expected = [
+            'collection' => [
+                'example-three' => [
+                    'keep-example-three',
+                ],
+                'example-four' => [
+                    'integer' => 0
+                ],
+                'columns' => [
+                    'title'
+                ],
+            ]
+        ];
+
+        $this->person
+            ->cleanupPreference('collection.example-one.deeply.nested.empty-array')
+            ->cleanupPreference('collection.example-two.deeply.nested.empty-string')
+            ->cleanupPreference('collection.example-three.deeply.nested.null')
+            ->cleanupPreference('collection.example-four.integer');
+
+        $this->assertEquals($expected, $this->person->preferences());
+    }
 }
 
 class Person
