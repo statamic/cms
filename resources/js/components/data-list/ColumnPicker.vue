@@ -12,7 +12,7 @@
                     {{ __('Columns') }}
                     <button
                         type="button"
-                        class="ml-2 p-1 text-xl text-grey-60"
+                        class="ml-2 p-1 text-xl text-grey-60 hover:text-grey-80"
                         @click="customizing = false"
                         v-html="'&times'" />
                 </div>

@@ -7,7 +7,7 @@
                 {{ __('Publish') }}
                 <button
                     type="button"
-                    class="ml-2 p-1 text-xl text-grey-60"
+                    class="ml-2 p-1 text-xl text-grey-60 hover:text-grey-80"
                     @click="close"
                     v-html="'&times'" />
             </div>
@@ -46,15 +46,15 @@
                     />
 
                     <div class="text-grey text-xs flex mb-3">
-                        <div class="pt-px w-4 mr-2">
-                            <svg-icon name="info-circle" />
+                        <div class="pt-px w-4 mr-1">
+                            <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
                     <div class="text-grey text-xs flex mb-3 text-red" v-if="action === 'schedule'">
-                        <div class="pt-px w-4 mr-2">
-                            <svg-icon name="info-circle" />
+                        <div class="pt-px w-4 mr-1">
+                            <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1">
                             Since the current revision is published and you've selected a date in the future, once you submit, the revision will act like a draft until the selected date.

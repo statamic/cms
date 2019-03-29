@@ -6,12 +6,12 @@
             {{ __('Revision History') }}
             <button
                 type="button"
-                class="ml-2 p-1 text-xl text-grey-60"
+                class="ml-2 p-1 text-xl text-grey-60 hover:text-grey-80"
                 @click="close"
                 v-html="'&times'" />
         </div>
 
-        <div class="flex-1 overflow-auto py-3">
+        <div class="flex-1 overflow-auto">
 
             <div class="flex h-full items-center justify-center loading" v-if="loading">
                 <loading-graphic />
