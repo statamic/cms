@@ -74,6 +74,10 @@ export default {
             }
         },
 
+        selections(selections) {
+            this.sharedState.selections = selections;
+        },
+
         'sharedState.selections': function (selections) {
             this.$emit('selections-updated', selections);
         },
