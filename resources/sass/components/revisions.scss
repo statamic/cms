@@ -3,17 +3,20 @@
    ========================================================================== */
 
 .revision-list {
-    @apply pb-2;
+    // @apply pb-2;
 }
 
 .revision-date {
-    @apply px-3 pb-1 pt-2 mb-1 border-b;
+    @apply p-2 pb-1 mt-2;
 }
 
 .revision-item {
-    @apply py-1 px-3 text-sm block flex cursor-pointer;
+    @apply p-1 text-sm block cursor-pointer border-t;
     &:hover {
         @apply bg-grey-20;
+    }
+    &:last-child {
+        @apply border-b;
     }
 }
 
@@ -31,17 +34,21 @@
 }
 
 .revision-item .badge {
-    @apply uppercase text-white text-4xs ml-1
+    @apply uppercase text-4xs ml-1 text-white;
+    height: 16px;
+
+    &.publish { @apply bg-green-light; }
+    &.revision { @apply text-grey-70; }
+    &.unpublish { @apply bg-red; }
 }
 
 .revision-item-note {
-    @apply text-2xs text-grey-60 mt-sm;
+    @apply text-sm text-grey-80 font-medium mb-sm;
+    width: 300px;
 }
 
 .revision-item.status-published {
-    @apply text-green;
     .revision-item-bullet { @apply bg-green; }
-    .badge { @apply bg-green-light; }
 }
 
 .revision-item.status-working-copy {

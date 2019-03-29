@@ -7,53 +7,55 @@
         }"
         @click="showDetails = true"
     >
-        <div class="revision-item-bullet-container">
-            <i class="revision-item-bullet"></i>
-        </div>
-        <div class="revision-item-content">
-            <div class="flex items-center">
-                <span>
-                    {{ date.format('hh:mm A') }}
-                    &mdash;
-                    {{ revision.user.name || revision.user.email }}
-                </span>
-                <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
-                <span class="badge" v-else v-text="revision.action" />
-                <span class="badge bg-orange" v-if="revision.attributes.current" v-text="'Current'" />
-            </div>
-            <div v-if="revision.message" class="revision-item-note" v-text="revision.message" />
+        <div v-if="revision.message" class="revision-item-note text-truncate" v-text="revision.message" />
 
-            <stack
-                name="revision-details"
-                v-if="showDetails"
-                @closed="showDetails = false"
-            >
-                <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
-                    <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                        {{ __('Revision Details') }}
-                        <button
-                            type="button"
-                            class="ml-2 p-1 text-xl text-grey-60"
-                            @click="close"
-                            v-html="'&times'" />
-                    </div>
-                    <div class="bg-white h-full p-3 overflow-auto">
-                        <restore-revision
-                            v-if="!revision.working"
-                            :revision="revision"
-                            :url="restoreUrl" />
-
-                        <button
-                            v-if="revision.working"
-                            class="btn btn-flat"
-                            v-text="__('Discard')" />
-
-                        <pre
-                            class="whitespace-pre-wrap text-xs font-mono mt-3"
-                            v-text="JSON.stringify(revision.attributes, null, 2)" />
+        <div class="flex items-center">
+            <img src="https://pbs.twimg.com/profile_images/1064935675672305665/xB3YuC60_400x400.jpg" height="24" width="24" class="rounded-sm mr-1">
+            <div class="revision-item-content w-full flex">
+                <div class="flex-1">
+                    <div class="revision-author text-grey-70 text-2xs">
+                        {{ revision.user.name || revision.user.email }} &ndash; {{ date.fromNow() }}
                     </div>
                 </div>
-            </stack>
+
+                <!-- <div> -->
+                    <span class="badge" v-if="revision.working" v-text="__('Working Copy')" />
+                    <span class="badge" :class="revision.action" v-else v-text="revision.action" />
+                    <span class="badge bg-orange" v-if="revision.attributes.current" v-text="'Current'" />
+                <!-- </div> -->
+
+                <stack
+                    name="revision-details"
+                    v-if="showDetails"
+                    @closed="showDetails = false"
+                >
+                    <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
+                        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                            {{ __('Revision Details') }}
+                            <button
+                                type="button"
+                                class="ml-2 p-1 text-xl text-grey-60 hover:text-grey-80"
+                                @click="close"
+                                v-html="'&times'" />
+                        </div>
+                        <div class="bg-white h-full p-3 overflow-auto">
+                            <restore-revision
+                                v-if="!revision.working"
+                                :revision="revision"
+                                :url="restoreUrl" />
+
+                            <button
+                                v-if="revision.working"
+                                class="btn btn-flat"
+                                v-text="__('Discard')" />
+
+                            <pre
+                                class="whitespace-pre-wrap text-xs font-mono mt-3"
+                                v-text="JSON.stringify(revision.attributes, null, 2)" />
+                        </div>
+                    </div>
+                </stack>
+            </div>
         </div>
     </div>
 
