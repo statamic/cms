@@ -38,6 +38,10 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function avatar($size = 64)
     {
+        if ($this->has('avatar')) {
+            return $this->augment('avatar')->value()->url();
+        }
+
         return config('statamic.users.avatars') === 'gravatar'
             ? gravatar($this->email(), $size)
             : null;

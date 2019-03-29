@@ -25,3 +25,9 @@ fields:
     field:
       type: textarea
       display: Biography
+  -
+    handle: avatar
+    field:
+      type: assets
+      max_files: 1
+      container: main
