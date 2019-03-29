@@ -12,10 +12,8 @@
                 </div>
             </h1>
 
-            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="isDirty" v-text="'Unsaved Changes'" />
-            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="isWorkingCopy" v-text="'Working Copy'" />
-            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="published" v-text="'Published'" />
-            <div class="pt-px text-2xs text-grey-60 mr-3" v-if="!published" v-text="'Draft'" />
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isDirty" v-text="'Unsaved Changes'" />
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
 
             <div
                 class="mr-3 text-xs flex items-center"
