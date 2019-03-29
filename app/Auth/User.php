@@ -17,6 +17,10 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 {
     use Authorizable, Notifiable, CanResetPassword, Augmentable;
 
+    abstract public function get($key, $fallback = null);
+    abstract public function has($key);
+    abstract public function set($key, $value);
+
     public function initials()
     {
         $surname = '';
