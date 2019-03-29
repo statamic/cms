@@ -107,9 +107,15 @@ trait Revisable
         $item->deleteWorkingCopy();
     }
 
-    public function draft($options = [])
+    public function store($options = [])
     {
-        return $this->unpublish($options);
+        $this->published(false)->save();
+
+        $this
+            ->makeRevision()
+            ->user($options['user'] ?? false)
+            ->message($options['message'] ?? false)
+            ->save();
     }
 
     public function createRevision($options = [])

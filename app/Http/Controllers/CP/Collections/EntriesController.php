@@ -205,10 +205,14 @@ class EntriesController extends CpController
             $entry->order($date);
         }
 
-        $entry
-            ->makeWorkingCopy()
-            ->user($request->user())
-            ->save();
+        if ($entry->published()) {
+            $entry
+                ->makeWorkingCopy()
+                ->user($request->user())
+                ->save();
+        } else {
+            $entry->save();
+        }
 
         return $entry->toArray();
     }
@@ -297,7 +301,7 @@ class EntriesController extends CpController
             $entry->order($values['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
-        $entry->draft([
+        $entry->store([
             'message' => $request->message,
             'user' => $request->user(),
         ]);

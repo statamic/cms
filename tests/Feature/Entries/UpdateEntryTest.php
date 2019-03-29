@@ -54,7 +54,7 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
-    function entry_gets_saved()
+    function published_entry_gets_saved_to_working_copy()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
@@ -78,6 +78,7 @@ class UpdateEntryTest extends TestCase
             ])
             ->assertOk();
 
+        $entry = Entry::find($entry->id());
         $this->assertEquals('test', $entry->slug());
         $this->assertEquals([
             'blueprint' => 'test',
@@ -92,6 +93,42 @@ class UpdateEntryTest extends TestCase
             'title' => 'Updated title',
             'foo' => 'updated foo',
         ], $workingCopy->data());
+    }
+
+    /** @test */
+    function draft_entry_gets_saved_to_content()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->assignRole('test');
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->save($entry, [
+                'title' => 'Updated title',
+                'foo' => 'updated foo',
+                'slug' => 'updated-slug'
+            ])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('updated-slug', $entry->slug());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Updated title',
+            'foo' => 'updated foo',
+        ], $entry->data());
+        $this->assertFalse($entry->hasWorkingCopy());
     }
 
     /** @test */

@@ -81,6 +81,7 @@ class StoreEntryTest extends TestCase
         ], $entry->data());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
+        $this->assertEquals('revision', $entry->latestRevision()->action());
     }
 
     /** @test */
