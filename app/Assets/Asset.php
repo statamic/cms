@@ -17,6 +17,7 @@ use Statamic\API\Blueprint;
 use Illuminate\Support\Carbon;
 use Statamic\Data\ContainsData;
 use League\Flysystem\Filesystem;
+use Statamic\FluentlyGetsAndSets;
 use League\Flysystem\Adapter\Local;
 use Facades\Statamic\Assets\Dimensions;
 use Statamic\Events\Data\AssetReplaced;
@@ -29,7 +30,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class Asset implements AssetContract, Arrayable
 {
-    use ContainsData {
+    use FluentlyGetsAndSets, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -196,13 +197,12 @@ class Asset implements AssetContract, Arrayable
      */
     public function path($path = null)
     {
-        if (func_num_args() === 0) {
-            return $this->path ? ltrim($this->path, '/') : null;
-        }
-
-        $this->path = $path;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('path')
+            ->getter(function ($path) {
+                return $path ? ltrim($path, '/') : null;
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -358,17 +358,12 @@ class Asset implements AssetContract, Arrayable
      */
     public function container($container = null)
     {
-        if (func_num_args() === 0) {
-            return $this->container;
-        }
-
-        if (is_string($container)) {
-            $container = AssetContainerAPI::find($container);
-        }
-
-        $this->container = $container;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('container')
+            ->setter(function ($container) {
+                return is_string($container) ? AssetContainerAPI::find($container) : $container;
+            })
+            ->args(func_get_args());
     }
 
     /**

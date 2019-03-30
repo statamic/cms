@@ -14,6 +14,7 @@ use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Localization;
 use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\Revisions\Revisable;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntrySaving;
@@ -25,7 +26,9 @@ use Statamic\Contracts\Data\Localization as LocalizationContract;
 
 class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Responsable, LocalizationContract
 {
-    use Routable, Localization, ContainsData, ExistsAsFile, Augmentable, Revisable;
+    use Routable, Localization, ContainsData, ExistsAsFile, Augmentable, Revisable, FluentlyGetsAndSets {
+        FluentlyGetsAndSets::fluentlyGetOrSet insteadof Localization;
+    }
 
     protected $order;
 
@@ -154,13 +157,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
 
     public function order($order = null)
     {
-        if (func_num_args() === 0) {
-            return $this->order;
-        }
-
-        $this->order = $order;
-
-        return $this;
+        return $this->fluentlyGetOrSet('order')->args(func_get_args());
     }
 
     public function supplementTaxonomies()
@@ -172,24 +169,22 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
 
     public function template($template = null)
     {
-        if (func_num_args() === 0) {
-            return $this->template ?? $this->collection()->template();
-        }
-
-        $this->template = $template;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                return $template ?? $this->collection()->template();
+            })
+            ->args(func_get_args());
     }
 
     public function layout($layout = null)
     {
-        if (func_num_args() === 0) {
-            return $this->layout ?? $this->collection()->layout();
-        }
-
-        $this->layout = $layout;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? $this->collection()->layout();
+            })
+            ->args(func_get_args());
     }
 
     public function toResponse($request)

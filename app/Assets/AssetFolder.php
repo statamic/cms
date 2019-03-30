@@ -6,6 +6,7 @@ use Statamic\API\Arr;
 use Statamic\API\Path;
 use Statamic\API\YAML;
 use Statamic\Data\DataFolder;
+use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
 use Statamic\API\AssetContainer as AssetContainerAPI;
@@ -13,29 +14,19 @@ use Statamic\Contracts\Assets\AssetFolder as Contract;
 
 class AssetFolder implements Contract, Arrayable
 {
+    use FluentlyGetsAndSets;
+
     protected $container;
     protected $path;
 
     public function container($container = null)
     {
-        if (func_num_args() === 0) {
-            return $this->container;
-        }
-
-        $this->container = $container;
-
-        return $this;
+        return $this->fluentlyGetOrSet('container')->args(func_get_args());
     }
 
     public function path($path = null)
     {
-        if (func_num_args() === 0) {
-            return $this->path;
-        }
-
-        $this->path = $path;
-
-        return $this;
+        return $this->fluentlyGetOrSet('path')->args(func_get_args());
     }
 
     public function basename()
@@ -45,13 +36,12 @@ class AssetFolder implements Contract, Arrayable
 
     public function title($title = null)
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? $this->computedTitle();
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? $this->computedTitle();
+            })
+            ->args(func_get_args());
     }
 
     protected function computedTitle()

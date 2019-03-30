@@ -6,11 +6,12 @@ use Statamic\API;
 use Statamic\API\Search;
 use Statamic\API\Blueprint;
 use Statamic\Data\ContainsData;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Entries\Collection as Contract;
 
 class Collection implements Contract
 {
-    use ContainsData;
+    use ContainsData, FluentlyGetsAndSets;
 
     protected $handle;
     protected $route;
@@ -25,39 +26,33 @@ class Collection implements Contract
 
     public function handle($handle = null)
     {
-        if (func_num_args() === 0) {
-            return $this->handle;
-        }
-
-        $this->handle = $handle;
-
-        return $this;
+        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
     public function route($route = null)
     {
-        if (func_num_args() === 0) {
-            return $this->route;
-        }
-
-        $this->route = $route;
-
-        return $this;
+        return $this->fluentlyGetOrSet('route')->args(func_get_args());
     }
 
     public function order($order = null)
     {
-        if (func_num_args() === 0) {
-            return $this->order ?? 'alphabetical';
-        }
-
-        if (in_array($order, ['numeric', 'numerical', 'numbers', 'numbered'])) {
-            $order = 'number';
-        }
-
-        $this->order = $order;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('order')
+            ->getter(function ($order) {
+                return $order ?? 'alphabetical';
+            })
+            ->setter(function ($order) {
+                switch ($order) {
+                    case 'numeric':
+                    case 'numerical':
+                    case 'numbers':
+                    case 'numbered':
+                        return 'number';
+                    default:
+                        return $order;
+                }
+            })
+            ->args(func_get_args());
     }
 
     public function sortField()
@@ -83,24 +78,22 @@ class Collection implements Contract
 
     public function title($title = null)
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? ucfirst($this->handle());
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
 
     public function ampable($ampable = null)
     {
-        if (func_num_args() === 0) {
-            return config('statamic.amp.enabled') && $this->ampable;
-        }
-
-        $this->ampable = $ampable;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('ampable')
+            ->getter(function ($ampable) {
+                return config('statamic.amp.enabled') && $ampable;
+            })
+            ->args(func_get_args());
     }
 
     public function showUrl()
@@ -125,15 +118,14 @@ class Collection implements Contract
 
     public function entryBlueprints($blueprints = null)
     {
-        if (func_num_args() === 0) {
-            return collect($this->blueprints)->map(function ($blueprint) {
-                return Blueprint::find($blueprint);
-            });
-        }
-
-        $this->blueprints = $blueprints;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('blueprints')
+            ->getter(function ($blueprints) {
+                return collect($blueprints)->map(function ($blueprint) {
+                    return Blueprint::find($blueprint);
+                });
+            })
+            ->args(func_get_args());
     }
 
     public function entryBlueprint()
@@ -159,35 +151,32 @@ class Collection implements Contract
 
     public function sites($sites = null)
     {
-        if (func_num_args() === 0) {
-            return collect($this->sites);
-        }
-
-        $this->sites = $sites;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                return collect($sites);
+            })
+            ->args(func_get_args());
     }
 
     public function template($template = null)
     {
-        if (func_num_args() === 0) {
-            return $this->template ?? config('statamic.theming.views.entry');
-        }
-
-        $this->template = $template;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                return $template ?? config('statamic.theming.views.entry');
+            })
+            ->args(func_get_args());
     }
 
     public function layout($layout = null)
     {
-        if (func_num_args() === 0) {
-            return $this->layout ?? config('statamic.theming.views.layout');
-        }
-
-        $this->layout = $layout;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? config('statamic.theming.views.layout');
+            })
+            ->args(func_get_args());
     }
 
     public function save()
@@ -207,13 +196,12 @@ class Collection implements Contract
 
     public function searchIndex($index = null)
     {
-        if (func_num_args() === 0) {
-            return $this->searchIndex ?  Search::index($this->searchIndex) : null;
-        }
-
-        $this->searchIndex = $index;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('searchIndex')
+            ->getter(function ($index) {
+                return $index ?  Search::index($index) : null;
+            })
+            ->args(func_get_args());
     }
 
     public function hasSearchIndex()

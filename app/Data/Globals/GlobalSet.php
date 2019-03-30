@@ -8,11 +8,12 @@ use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\Localizable;
 use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Globals\GlobalSet as Contract;
 
 class GlobalSet implements Contract
 {
-    use Localizable, ExistsAsFile;
+    use Localizable, ExistsAsFile, FluentlyGetsAndSets;
 
     protected $id;
     protected $title;
@@ -22,61 +23,46 @@ class GlobalSet implements Contract
 
     public function id($id = null)
     {
-        if (func_num_args() === 0) {
-            return $this->id;
-        }
-
-        $this->id = $id;
-
-        $this->localizations()->each->id($id);
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('id')
+            ->afterSetter(function ($id) {
+                $this->localizations()->each->id($id);
+            })
+            ->args(func_get_args());
     }
 
     public function sites($sites = null)
     {
-        if (func_num_args() === 0) {
-            return collect(
-                Site::hasMultiple() ? $this->sites : [Site::default()->handle()]
-            );
-        }
-
-        $this->sites = $sites;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+            })
+            ->args(func_get_args());
     }
 
     public function handle($handle = null)
     {
-        if (func_num_args() === 0) {
-            return $this->handle;
-        }
-
-        $this->handle = $handle;
-
-        return $this;
+        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
     public function title($title = null)
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? ucfirst($this->handle);
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
 
     public function blueprint($blueprint = null)
     {
-        if (func_num_args() === 0) {
-            return Blueprint::find($this->blueprint) ?? $this->fallbackBlueprint();
-        }
-
-        $this->blueprint = $blueprint;
-
-        return $this;
+        return $this->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return Blueprint::find($blueprint) ?? $this->fallbackBlueprint();
+            })
+            ->args(func_get_args());
     }
 
     protected function fallbackBlueprint()

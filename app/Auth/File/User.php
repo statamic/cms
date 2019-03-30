@@ -10,6 +10,7 @@ use Statamic\Data\Data;
 use Statamic\API\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Preferences\HasPreferences;
@@ -21,7 +22,7 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile, HasPreferences, ContainsData {
+    use ExistsAsFile, FluentlyGetsAndSets, HasPreferences, ContainsData {
         data as traitData;
     }
 
@@ -50,13 +51,7 @@ class User extends BaseUser
 
     public function id($id = null)
     {
-        if (func_num_args() === 0) {
-            return $this->id;
-        }
-
-        $this->id = $id;
-
-        return $this;
+        return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
     /**
@@ -67,13 +62,7 @@ class User extends BaseUser
      */
     public function email($email = null)
     {
-        if (func_num_args() === 0) {
-            return $this->email;
-        }
-
-        $this->email = $email;
-
-        return $this;
+        return $this->fluentlyGetOrSet('email')->args(func_get_args());
     }
 
     /**
@@ -84,24 +73,17 @@ class User extends BaseUser
      */
     public function password($password = null)
     {
-        if (func_num_args() === 0) {
-            return $this->password;
-        }
-
-        $this->password = Hash::make($password);
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('password')
+            ->setter(function ($password) {
+                return Hash::make($password);
+            })
+            ->args(func_get_args());
     }
 
     public function passwordHash($hash = null)
     {
-        if (func_num_args() === 0) {
-            return $this->password;
-        }
-
-        $this->password = $hash;
-
-        return $this;
+        return $this->fluentlyGetOrSet('password')->args(func_get_args());
     }
 
     public function path()

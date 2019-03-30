@@ -40,22 +40,25 @@ class Column
      */
     public function field($field = null)
     {
-        return $this->fluentlyGetOrSet('field', $field, function () {
-            if (is_null($this->label)) {
-                $this->label(Str::slugToTitle($this->field), true);
-            }
-        });
+        return $this
+            ->fluentlyGetOrSet('field')
+            ->afterSetter(function ($field) {
+                if (is_null($this->label)) {
+                    $this->label(Str::slugToTitle($field), true);
+                }
+            })
+            ->value($field);
     }
 
     /**
      * Get or set the value field.
      *
-     * @param null|string $field
+     * @param null|string $value
      * @return mixed
      */
-    public function value($field = null)
+    public function value($value = null)
     {
-        return $this->fluentlyGetOrSet('value', $field);
+        return $this->fluentlyGetOrSet('value')->value($value);
     }
 
     /**
@@ -66,7 +69,7 @@ class Column
      */
     public function fieldtype($fieldtype = null)
     {
-        return $this->fluentlyGetOrSet('fieldtype', $fieldtype);
+        return $this->fluentlyGetOrSet('fieldtype')->value($fieldtype);
     }
 
     /**
@@ -77,7 +80,7 @@ class Column
      */
     public function label($label = null)
     {
-        return $this->fluentlyGetOrSet('label', $label);
+        return $this->fluentlyGetOrSet('label')->value($label);
     }
 
     /**
@@ -88,7 +91,7 @@ class Column
      */
     public function visibleDefault($visible = null)
     {
-        return $this->fluentlyGetOrSet('visibleDefault', $visible);
+        return $this->fluentlyGetOrSet('visibleDefault')->value($visible);
     }
 
     /**
@@ -99,7 +102,7 @@ class Column
      */
     public function visible($visible = null)
     {
-        return $this->fluentlyGetOrSet('visible', $visible);
+        return $this->fluentlyGetOrSet('visible')->value($visible);
     }
 
     /**
@@ -110,7 +113,7 @@ class Column
      */
     public function sortable($sortable = null)
     {
-        return $this->fluentlyGetOrSet('sortable', $sortable);
+        return $this->fluentlyGetOrSet('sortable')->value($sortable);
     }
 
     /**

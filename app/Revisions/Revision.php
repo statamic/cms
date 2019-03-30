@@ -12,7 +12,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\API\Arr;
 use Statamic\Contracts\Revisions\Revision as Contract;
 
-
 class Revision implements Contract, Arrayable
 {
     use FluentlyGetsAndSets, ExistsAsFile;
@@ -28,7 +27,7 @@ class Revision implements Contract, Arrayable
 
     public function id($id = null)
     {
-        return $this->fluentlyGetOrSet('id', $id);
+        return $this->fluentlyGetOrSet('id')->value($id);
     }
 
     public function user($user = null)
@@ -53,17 +52,17 @@ class Revision implements Contract, Arrayable
 
     public function action($action = null)
     {
-        return $this->fluentlyGetOrSet('action', $action);
+        return $this->fluentlyGetOrSet('action')->value($action);
     }
 
     public function message($message = null)
     {
-        return $this->fluentlyGetOrSet('message', $message);
+        return $this->fluentlyGetOrSet('message')->value($message);
     }
 
     public function attributes($attributes = null)
     {
-        return $this->fluentlyGetOrSet('attributes', $attributes);
+        return $this->fluentlyGetOrSet('attributes')->value($attributes);
     }
 
     public function attribute(string $key, $value)
@@ -75,12 +74,12 @@ class Revision implements Contract, Arrayable
 
     public function key($key = null)
     {
-        return $this->fluentlyGetOrSet('key', $key);
+        return $this->fluentlyGetOrSet('key')->value($key);
     }
 
     public function date($date = null)
     {
-        return $this->fluentlyGetOrSet('date', $date);
+        return $this->fluentlyGetOrSet('date')->value($date);
     }
 
     public function path()

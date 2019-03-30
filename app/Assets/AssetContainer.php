@@ -36,7 +36,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function handle($handle = null)
     {
-        return $this->fluentlyGetOrSetFromArgs('handle', func_get_args());
+        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
     public function title($title = null)

@@ -28,7 +28,7 @@ class NavItem
      */
     public function name($name = null)
     {
-        return $this->fluentlyGetOrSet('name', $name);
+        return $this->fluentlyGetOrSet('name')->value($name);
     }
 
     /**
@@ -39,7 +39,7 @@ class NavItem
      */
     public function section($section = null)
     {
-        return $this->fluentlyGetOrSet('section', $section);
+        return $this->fluentlyGetOrSet('section')->value($section);
     }
 
     /**
@@ -62,11 +62,14 @@ class NavItem
      */
     public function url($url = null)
     {
-        return $this->fluentlyGetOrSet('url', $url, function () {
-            if (! $this->active) {
-                $this->active = str_replace(url('cp').'/', '', $this->url) . '*';
-            }
-        });
+        return $this
+            ->fluentlyGetOrSet('url')
+            ->afterSetter(function ($url) {
+                if (! $this->active) {
+                    $this->active = str_replace(url('cp').'/', '', $url) . '*';
+                }
+            })
+            ->value($url);
     }
 
     /**
@@ -77,7 +80,7 @@ class NavItem
      */
     public function icon($icon = null)
     {
-        return $this->fluentlyGetOrSet('icon', $icon);
+        return $this->fluentlyGetOrSet('icon')->value($icon);
     }
 
     /**
@@ -153,7 +156,7 @@ class NavItem
      */
     public function active($pattern = null)
     {
-        return $this->fluentlyGetOrSet('active', $pattern);
+        return $this->fluentlyGetOrSet('active')->value($pattern);
     }
 
     /**
@@ -164,6 +167,6 @@ class NavItem
      */
     public function view($view = null)
     {
-        return $this->fluentlyGetOrSet('view', $view);
+        return $this->fluentlyGetOrSet('view')->value($view);
     }
 }
