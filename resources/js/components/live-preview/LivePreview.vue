@@ -43,6 +43,7 @@
                             </div>
 
                             <resizer
+                                v-show="!poppedOut"
                                 @resized="setEditorWidth"
                                 @resize-start="editorResizing = true"
                                 @resize-end="editorResizing = false"
