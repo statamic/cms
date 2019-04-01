@@ -54,7 +54,7 @@
                     </transition>
 
                     <transition name="live-preview-contents-slide">
-                        <div v-show="panesVisible" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
+                        <div v-show="panesVisible" ref="contents" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
                             <iframe ref="iframe" frameborder="0" :class="previewDevice" />
                         </div>
                     </transition>
@@ -247,7 +247,11 @@ export default {
                         break;
                 }
             };
-            this.popoutWindow = window.open(this.url, 'livepreview', 'width=700,height=900');
+
+            const width = this.$refs.contents.clientWidth;
+            const height = this.$refs.contents.clientHeight;
+            const left = screen.width - width;
+            this.popoutWindow = window.open(this.url, 'livepreview', `width=${width},height=${height},top=0,left=${left}`);
         },
 
         closePopout() {
