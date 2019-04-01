@@ -37,7 +37,9 @@ class AssetContainersStore extends BasicStore
         $container = AssetContainer::make($handle)
             ->disk(array_get($data, 'disk'))
             ->title(array_get($data, 'title'))
-            ->blueprint(array_get($data, 'blueprint'));
+            ->blueprint(array_get($data, 'blueprint'))
+            ->allowUploads(array_get($data, 'allow_uploads'))
+            ->createFolders(array_get($data, 'create_folders'));
 
         return $container;
     }

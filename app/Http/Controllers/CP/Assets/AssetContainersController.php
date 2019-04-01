@@ -55,12 +55,16 @@ class AssetContainersController extends CpController
         $request->validate([
             'title' => 'required',
             'disk' => 'required',
+            'allow_uploads' => 'boolean',
+            'create_folders' => 'boolean',
         ]);
 
         $container
             ->title($request->title)
             ->disk($request->disk)
             ->blueprint(Arr::first(json_decode($request->blueprint, true)))
+            ->allowUploads($request->allow_uploads)
+            ->createFolders($request->create_folders)
             ->save();
 
         return back()->with('success', 'Container saved');
@@ -83,6 +87,8 @@ class AssetContainersController extends CpController
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
             'disk' => 'required',
+            'allow_uploads' => 'boolean',
+            'create_folders' => 'boolean',
         ]);
 
         $title = $request->title;
@@ -92,6 +98,8 @@ class AssetContainersController extends CpController
             ->title($title)
             ->disk($request->disk)
             ->blueprint(Arr::first(json_decode($request->blueprint, true)))
+            ->allowUploads($request->allow_uploads)
+            ->createFolders($request->create_folders)
             ->save();
 
         return redirect($container->showUrl())->with('success', 'Container saved');
@@ -113,10 +121,6 @@ class AssetContainersController extends CpController
 
     private function disks()
     {
-        return collect(config('filesystems.disks'))
-            ->keys()
-            ->map(function ($disk) {
-                return ['text' => $disk, 'value' => $disk];
-            });
+        return collect(config('filesystems.disks'))->keys();
     }
 }

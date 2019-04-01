@@ -54,6 +54,24 @@
                 :config="{ max_items: 1 }"
             ></form-group>
 
+            <form-group
+                fieldtype="toggle"
+                handle="allow_uploads"
+                display="{{ __('Allow Uploads') }}"
+                instructions="{{ __('The ability to upload into this container.') }}"
+                :value="{{ json_encode(old('allow_uploads', true)) }}"
+                error="{{ $errors->first('allow_uploads') }}"
+            ></form-group>
+
+            <form-group
+                fieldtype="toggle"
+                handle="create_folders"
+                display="{{ __('Create Folders') }}"
+                instructions="{{ __('The ability to create folders within this container.') }}"
+                :value="{{ json_encode(old('create_folders', true)) }}"
+                error="{{ $errors->first('create_folders') }}"
+            ></form-group>
+
         </div>
     </form>
 

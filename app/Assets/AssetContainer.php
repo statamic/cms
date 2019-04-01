@@ -25,8 +25,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $title;
     protected $handle;
     protected $disk;
-    protected $private;
     protected $blueprint;
+    protected $private;
+    protected $allowUploads;
+    protected $createFolders;
 
     public function id($id = null)
     {
@@ -85,6 +87,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
             'title' => $this->title(),
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
+            'allow_uploads' => $this->allowUploads(),
+            'create_folders' => $this->createFolders(),
         ];
     }
 
@@ -327,8 +331,38 @@ class AssetContainer implements AssetContainerContract, Augmentable
                 return (bool) $private;
             })
             ->args(func_get_args());
+    }
 
+    /**
+     * The ability to upload into this container.
+     *
+     * @param bool|null $allowUploads
+     * @return bool|$this
+     */
+    public function allowUploads($allowUploads = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('allowUploads')
+            ->getter(function ($allowUploads) {
+                return (bool) $allowUploads ?? true;
+            })
+            ->args(func_get_args());
+    }
 
+    /**
+     * The ability to create folders within this container.
+     *
+     * @param bool|null $createFolders
+     * @return bool|$this
+     */
+    public function createFolders($createFolders = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('createFolders')
+            ->getter(function ($createFolders) {
+                return (bool) $createFolders ?? true;
+            })
+            ->args(func_get_args());
     }
 
     protected function fileData()
