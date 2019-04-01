@@ -7,13 +7,16 @@
                     <a :href="collectionUrl" v-text="collectionTitle" class="text-grey hover:text-blue" />
                 </small>
                 <div class="flex items-center">
-                    <span v-if="! isCreating" class="little-dot mr-1 -ml-2" :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
+                    <span v-if="! isCreating"
+                        class="little-dot mr-1 -ml-2"
+                        :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
                     {{ title }}
                 </div>
             </h1>
 
             <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="isDirty" v-text="'Unsaved Changes'" />
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="!published" v-text="'Unpublished Entry'" />
 
             <div
                 class="mr-3 text-xs flex items-center"
