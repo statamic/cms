@@ -47,7 +47,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_and_set_into_the_data_property_with_custom_get_and_set_logic()
+    function it_can_get_and_set_into_the_data_property_through_magic_methods_in_parent()
     {
         $entry = new EntryContainingData;
         $this->assertNull($entry->get('template'));
