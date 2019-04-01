@@ -3,6 +3,7 @@
         <div class="toggle-container" :class="{ 'on': isOn }" @click="toggle">
             <div class="toggle-slider">
                 <div class="toggle-knob" tabindex="0" @keyup.prevent.space.enter="toggle" ref="knob"></div>
+                <input type="hidden" :name="name" :value="state ? 1 : 0">
             </div>
         </div>
     </div>
