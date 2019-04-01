@@ -18,6 +18,8 @@ class AssetContainersController extends CpController
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
+                'allow_uploads' => $container->allowUploads(),
+                'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl()
             ];

@@ -12,12 +12,14 @@ class FoldersController extends CpController
 {
     public function store(Request $request, $container)
     {
+        $container = AssetContainer::find($container);
+
+        abort_unless($container->createFolders(), 403);
+
         $request->validate([
             'path' => 'required',
             'directory' => 'required|alpha_dash',
         ]);
-
-        $container = AssetContainer::find($container);
 
         $path = ltrim(Path::assemble($request->path, $request->directory), '/');
 

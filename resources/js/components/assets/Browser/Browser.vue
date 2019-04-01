@@ -10,6 +10,7 @@
             ref="uploader"
             :container="container.id"
             :path="path"
+            :enabled="canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
@@ -59,12 +60,12 @@
                                 />
 
                                 <template v-if="! hasSelections">
-                                    <button class="btn btn-flat btn-icon-only" @click="creatingFolder = true">
+                                    <button v-if="canCreateFolders" class="btn btn-flat btn-icon-only" @click="creatingFolder = true">
                                         <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                         <span>{{ __('Create Folder') }}</span>
                                     </button>
 
-                                    <button class="btn btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                    <button v-if="canUpload" class="btn btn-flat btn-icon-only ml-2" @click="openFileBrowser">
                                         <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
                                         <span>{{ __('Upload') }}</span>
                                     </button>
@@ -310,6 +311,14 @@ export default {
             return true;
             // TODO
             // return this.can('assets:'+ this.container.id +':edit')
+        },
+
+        canUpload() {
+            return this.container.allow_uploads;
+        },
+
+        canCreateFolders() {
+            return this.container.create_folders;
         },
 
         parameters() {

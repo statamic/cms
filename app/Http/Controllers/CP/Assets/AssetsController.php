@@ -83,15 +83,16 @@ class AssetsController extends CpController
 
     public function store(Request $request)
     {
+        $container = AssetContainer::find($request->container);
+
+        abort_unless($container->allowUploads(), 403);
+
         $request->validate([
             'container' => 'required',
             'folder' => 'required',
         ]);
 
-        $this->authorize('store', [
-            AssetContract::class,
-            $container = AssetContainer::find($request->container)
-        ]);
+        $this->authorize('store', [AssetContract::class, $container]);
 
         $file = $request->file('file');
         $path = ltrim($request->folder . '/' . $file->getClientOriginalName(), '/');
