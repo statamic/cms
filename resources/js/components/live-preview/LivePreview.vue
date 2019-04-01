@@ -15,8 +15,8 @@
                         <div class="text-lg font-medium mr-2">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
-                            <button class="btn mr-2" @click="popout">Pop out</button>
-                            <div class="select-input-container w-32">
+                            <button class="btn" @click="popout">Pop out</button>
+                            <div class="select-input-container w-32 ml-2" v-show="!poppedOut">
                                 <select class="select-input" v-model="previewDevice">
                                     <option :value="device" :key="device" v-text="device" :selected="previewDevice === device" v-for="device in previewDevices"></option>
                                 </select>
