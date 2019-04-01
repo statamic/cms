@@ -41,10 +41,8 @@ class CollectionsController extends CpController
         ]);
     }
 
-    public function show($collectionHandle)
+    public function show($collection)
     {
-        $collection = Collection::whereHandle($collectionHandle);
-
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
                 'handle' => $blueprint->handle(),
@@ -57,7 +55,7 @@ class CollectionsController extends CpController
             'blueprints' => $blueprints,
             'site' => Site::selected(),
             'filters' => Filter::for('entries', $context = [
-                'collection' => $collectionHandle,
+                'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
             'actions' => Action::for('entries', $context),
@@ -73,8 +71,6 @@ class CollectionsController extends CpController
 
     public function edit($collection)
     {
-        $collection = Collection::whereHandle($collection);
-
         $this->authorize('edit', $collection, 'You are not authorized to edit collections.');
 
         return view('statamic::collections.edit', compact('collection'));
@@ -105,8 +101,6 @@ class CollectionsController extends CpController
 
     public function update(Request $request, $collection)
     {
-        $collection = Collection::whereHandle($collection);
-
         $this->authorize('update', $collection, 'You are not authorized to edit collections.');
 
         $data = $request->validate([
@@ -126,8 +120,6 @@ class CollectionsController extends CpController
 
     public function destroy($collection)
     {
-        $collection = Collection::whereHandle($collection);
-
         $this->authorize('delete', $collection, 'You are not authorized to delete collections.');
 
         $collection->delete();

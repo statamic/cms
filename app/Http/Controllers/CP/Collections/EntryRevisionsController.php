@@ -8,14 +8,8 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class EntryRevisionsController extends CpController
 {
-    public function index(Request $request, $collection, $id, $slug, $site)
+    public function index(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->in($site);
-
         $revisions = $entry
             ->revisions()
             ->reverse()
@@ -36,12 +30,8 @@ class EntryRevisionsController extends CpController
             })->reverse()->values();
     }
 
-    public function store(Request $request, $collection, $id, $slug, $site)
+    public function store(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
         $entry->createRevision([
             'message' => $request->message,
             'user' => $request->user(),

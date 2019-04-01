@@ -18,10 +18,8 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $handle)
+    public function index(FilteredSiteRequest $request, $collection)
     {
-        $collection = Collection::whereHandle($handle);
-
         $query = $this->indexQuery($collection);
 
         $this->filter($query, $request->filters);
@@ -50,7 +48,7 @@ class EntriesController extends CpController
 
         $columns = $collection->entryBlueprint()
             ->columns()
-            ->setPreferred("collections.{$handle}.columns")
+            ->setPreferred("collections.{$collection->handle()}.columns")
             ->values();
 
         return Resource::collection($paginator)->additional(['meta' => [
@@ -84,22 +82,8 @@ class EntriesController extends CpController
         return $query;
     }
 
-    public function edit(Request $request, $collection, $id, $slug, $site)
+    public function edit(Request $request, $collection, $entry)
     {
-        if (! Site::get($site)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $entry->collection()->sites()->contains($site)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->inOrClone($site);
-
         $this->authorize('view', $entry);
 
         $entry = $entry->fromWorkingCopy();
@@ -166,15 +150,11 @@ class EntriesController extends CpController
         ]));
     }
 
-    public function update(Request $request, $collection, $id, $slug, $site)
+    public function update(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->inOrClone($site)->fromWorkingCopy();
-
         $this->authorize('edit', $entry);
+
+        $entry = $entry->fromWorkingCopy();
 
         $fields = $entry->blueprint()->fields()->addValues($request->all())->process();
 
@@ -222,14 +202,6 @@ class EntriesController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
-        if (! Site::get($site)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $collection = Collection::whereHandle($collection)) {
-            return $this->pageNotFound();
-        }
-
         $blueprint = $request->blueprint
             ? Blueprint::find($request->blueprint)
             : $collection->entryBlueprint();
@@ -249,7 +221,7 @@ class EntriesController extends CpController
 
         $viewData = [
             'actions' => [
-                'save' => cp_route('collections.entries.store', [$collection->handle(), $site])
+                'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -259,7 +231,7 @@ class EntriesController extends CpController
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
-                    'active' => $handle === $site,
+                    'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
@@ -276,8 +248,6 @@ class EntriesController extends CpController
 
     public function store(Request $request, $collection, $site)
     {
-        $collection = Collection::whereHandle($collection);
-
         $this->authorize('create', [EntryContract::class, $collection]);
 
         $fields = Blueprint::find($request->blueprint)->fields()->addValues($request->all())->process();
@@ -293,7 +263,7 @@ class EntriesController extends CpController
 
         $entry = Entry::create()
             ->collection($collection)
-            ->in($site, function ($localized) use ($values, $request) {
+            ->in($site->handle(), function ($localized) use ($values, $request) {
                 $localized
                     ->published(false)
                     ->slug($request->slug)

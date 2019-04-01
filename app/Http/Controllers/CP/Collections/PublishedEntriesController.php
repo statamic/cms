@@ -8,24 +8,16 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class PublishedEntriesController extends CpController
 {
-    public function store(Request $request, $collection, $id, $slug, $site)
+    public function store(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
         $entry->publish([
             'message' => $request->message,
             'user' => $request->user(),
         ]);
     }
 
-    public function destroy(Request $request, $collection, $id, $slug, $site)
+    public function destroy(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
         $entry->unpublish([
             'message' => $request->message,
             'user' => $request->user(),

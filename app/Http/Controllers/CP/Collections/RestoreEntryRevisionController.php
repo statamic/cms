@@ -8,14 +8,8 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class RestoreEntryRevisionController extends CpController
 {
-    public function __invoke(Request $request, $collection, $id, $slug, $site)
+    public function __invoke(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->in($site);
-
         if (! $target = $entry->revision($request->revision)) {
             dd('no such revision', $request->revision);
             // todo: handle invalid revision reference

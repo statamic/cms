@@ -30,9 +30,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         \Statamic\Revisions\ServiceProvider::class,
         CpServiceProvider::class,
         ValidationServiceProvider::class,
-
-        // AuthServiceProvider::class,
-        // BroadcastServiceProvider::class,
-        // EventServiceProvider::class,
+        RouteServiceProvider::class,
     ];
 }

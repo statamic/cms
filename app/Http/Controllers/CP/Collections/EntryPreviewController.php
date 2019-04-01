@@ -22,22 +22,8 @@ class EntryPreviewController extends CpController
         return view('statamic::entries.preview');
     }
 
-    public function edit(Request $request, $collection, $id, $slug, $site)
+    public function edit(Request $request, $collection, $entry)
     {
-        if (! Site::get($site)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $entry->collection()->sites()->contains($site)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->in($site);
-
         $this->authorize('preview', $entry);
 
         foreach ($request->input('preview', []) as $key => $value) {
@@ -49,8 +35,6 @@ class EntryPreviewController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
-        $collection = Collection::whereHandle($collection);
-
         $fields = Blueprint::find($request->blueprint)
             ->fields()
             ->addValues($preview = $request->preview)
@@ -60,7 +44,7 @@ class EntryPreviewController extends CpController
 
         $entry = Entry::create()
             ->collection($collection)
-            ->in($site, function ($localized) use ($values, $preview) {
+            ->in($site->handle(), function ($localized) use ($values, $preview) {
                 $localized
                     ->slug($preview['slug'] ?? 'slug')
                     ->data($values);

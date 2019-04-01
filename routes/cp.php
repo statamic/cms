@@ -40,7 +40,7 @@ Route::group([
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
-            Route::group(['prefix' => '{id}/{slug}/{site}'], function () {
+            Route::group(['prefix' => '{entry}/{slug}/{site}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
                 Route::post('/', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::delete('/', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
