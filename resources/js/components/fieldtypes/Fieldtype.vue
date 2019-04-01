@@ -21,7 +21,6 @@ export default {
             type: Boolean,
             default: false
         },
-        livePreview: Boolean
     },
 
     methods: {
@@ -29,7 +28,7 @@ export default {
             this.$emit('updated', value);
         }
     },
-    
+
     computed: {
         isReadOnly() {
             return this.readOnly || this.config.read_only || false;

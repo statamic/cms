@@ -10,7 +10,6 @@
             :value="values[field.handle]"
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
-            :live-preview="livePreview"
             @updated="updated"
         />
 
@@ -35,7 +34,6 @@ export default {
             type: Array,
             required: true
         },
-        livePreview: Boolean
     },
 
     computed: {

@@ -37,8 +37,8 @@
                 <div class="live-preview-main flex flex-1">
 
                     <transition name="live-preview-editor-slide">
-                        <div v-show="panesVisible" class="live-preview-editor" :style="{ width: `${editorWidth}px` }">
-                            <div class="live-preview-fields flex-1 h-full overflow-scroll">
+                        <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
+                            <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{ 'p-3 bg-grey-30': poppedOut }">
                                 <portal-target name="live-preview-fields" />
                             </div>
 
@@ -134,6 +134,10 @@ export default {
             handler(payload) {
                 if (this.previewing) this.update();
             }
+        },
+
+        poppedOut() {
+            this.$wait(300).then(() => EQCSS.apply());
         }
 
     },
@@ -200,8 +204,8 @@ export default {
                 })
                 .then(() => {
                     this.panesVisible = true;
-                    EQCSS.apply();
-                });
+                    return this.$wait(300);
+                }).then(() => EQCSS.apply());
         },
 
         animateOut() {

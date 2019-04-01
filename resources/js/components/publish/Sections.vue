@@ -15,21 +15,22 @@
             ></a>
         </div>
 
-        <div :class="{ 'flex justify-between': !livePreview }">
+        <div class="flex justify-between">
             <div class="w-full">
                 <div
-                    :class="{ 'card p-0': !livePreview, 'rounded-tl-none' : mainSections.length > 1 }"
+                    class="publish-section"
+                    :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
                     v-for="section in mainSections"
                     :key="section.handle"
                     v-show="section.handle === active"
                 >
-                    <publish-fields :fields="section.fields" :live-preview="livePreview" />
+                    <publish-fields :fields="section.fields" />
                 </div>
             </div>
 
-            <div class="publish-sidebar" :class="{ 'ml-4': !livePreview }" v-if="shouldShowSidebar">
-                <div :class="{ 'card p-0': !livePreview }">
-                    <publish-fields :fields="sidebarSection.fields" :live-preview="livePreview" />
+            <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
+                <div class="publish-section">
+                    <publish-fields :fields="sidebarSection.fields" />
                 </div>
             </div>
         </div>
@@ -41,10 +42,6 @@
 
 <script>
 export default {
-
-    props: {
-        livePreview: Boolean
-    },
 
     inject: ['storeName'],
 
@@ -79,8 +76,6 @@ export default {
 
         shouldShowSidebar() {
             if (! this.sidebarSection) return false;
-
-            if (this.livePreview) return false;
 
             if (this.sidebarSection.fields.length == 0 || this.containerWidth < 1010) return false;
 

@@ -28,7 +28,6 @@
                 :value="value"
                 :meta="meta"
                 :name="config.handle"
-                :live-preview="livePreview"
                 @updated="updated"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
@@ -57,7 +56,6 @@ export default {
         errors: {
             type: Array
         },
-        livePreview: Boolean,
         readOnly: Boolean
     },
 
@@ -79,7 +77,7 @@ export default {
             return [
                 'form-group publish-field',
                 `${this.config.type}-fieldtype`,
-                !this.livePreview ? tailwind_width_class(this.config.width) : '',
+                `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
