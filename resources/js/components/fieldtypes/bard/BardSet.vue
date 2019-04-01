@@ -11,30 +11,27 @@
             }"
             @dblclick="toggle"
         >
-            <div
-                v-if="!goingSolo"
-                class="bard-drag-handle cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between"
-            >
-                <div class="pt-1">
-                    <label class="mb-1 leading-none" v-text="display" @click="toggle" />
-                    <div
-                        v-if="config.instructions"
-                        v-html="instructions"
-                        class="help-block -mt-1" />
-                </div>
-                <div>
-                    <dropdown-list>
-                        <ul class="dropdown-menu">
-                            <li class="warning"><a @click.prevent="destroy">Delete Set</a></li>
-                        </ul>
-                    </dropdown-list>
-                </div>
-            </div>
 
-            <div
-                v-show="!isHidden || goingSolo"
-                v-if="fields.length"
-            >
+            <div class="replicator-set-header">
+            <div class="item-move sortable-handle bard-drag-handle"></div>
+            <div class="flex-1 ml-1 flex items-center">
+                <label v-text="config.display" class="text-xs"/>
+                <div
+                    v-if="config.instructions"
+                    v-html="instructions"
+                    class="help-block replicator-set-instructions" />
+            </div>
+            <div class="replicator-set-controls">
+                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="values.enabled" />
+                <dropdown-list>
+                    <ul class="dropdown-menu">
+                        <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
+                    </ul>
+                </dropdown-list>
+            </div>
+        </div>
+
+            <div v-show="!isHidden" v-if="fields.length">
                 <div class="publish-fields">
                     <set-field
                         v-for="field in fields"

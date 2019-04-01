@@ -8,7 +8,7 @@
         <div class="bard-set-selector" v-show="hasSets && isShowingOptions" :style="optionStyles">
             <dropdown-list>
                 <button type="button" class="btn btn-round" slot="trigger">
-                    <span class="icon icon-plus"></span>
+                    <span class="icon icon-plus text-grey-80 antialiased"></span>
                 </button>
                 <ul class="dropdown-menu">
                     <li v-for="set in $parent.config.sets">

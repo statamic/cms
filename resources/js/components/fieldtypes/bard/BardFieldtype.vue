@@ -1,12 +1,11 @@
 <template>
-    <div class="bard-fieldtype-wrapper replicator" :class="{'bard-fullscreen': fullScreenMode, 'no-sets': !hasSets }">
+    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode, 'no-sets': !hasSets }">
 
         <div class="bard-toolbar" ref="toolbar" :style="{ top: toolbarCoords.top, left: toolbarCoords.left }" :class="{'bard-toolbar-active': toolbarShowing }" v-if="!config.markdown && buttons.length">
             <button
                 v-for="button in buttons"
                 :key="button.command"
-                v-tip
-                :tip-text="button.text"
+                v-tooltip="button.text"
                 :data-command-name="button.command"
                 v-html="button.html"
             ></button>

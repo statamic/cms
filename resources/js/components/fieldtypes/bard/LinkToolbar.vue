@@ -34,13 +34,13 @@
                 </div>
             </div>
             <div class="bard-link-toolbar-buttons">
-                <button @click="edit" v-show="!isEditing" v-tip :tip-text="__('Edit Link')">
+                <button @click="edit" v-show="!isEditing" v-tooltip="__('Edit Link')">
                     <i class="fa fa-pencil"></i>
                 </button>
-                <button @click="remove" v-show="hasLink && !isEditing" v-tip :tip-text="__('Remove Link')">
+                <button @click="remove" v-show="hasLink && !isEditing" v-tooltip="__('Remove Link')">
                     <i class="fa fa-unlink"></i>
                 </button>
-                <button @click="commit" v-show="isEditing" v-tip :tip-text="__('Done')">
+                <button @click="commit" v-show="isEditing" v-tooltip="__('Done')">
                     <i class="fa fa-check"></i>
                 </button>
             </div>
