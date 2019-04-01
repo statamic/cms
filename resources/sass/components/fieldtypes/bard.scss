@@ -61,8 +61,15 @@
     :first-child {
         padding-top: 0 !important;
     }
-
+    &:hover p:first-child {
+        @apply border-l-2 border-blue;
+    }
 }
+
+.bard-text:focus-within .bard-editor:hover p:first-child {
+    border: none;
+}
+
 
 
 /* The toolbar
