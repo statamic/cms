@@ -41,14 +41,15 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function title($title = null)
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? ucfirst($this->handle());
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
+
+
 
     public function diskPath()
     {
@@ -119,18 +120,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * Get or set the blueprint to be used by assets in this container
      *
      * @param string $blueprint
-     * @return \Statamic\Fields\Blueprint
+     * @return \Statamic\Fields\Blueprint|$this
      */
     public function blueprint($blueprint = null)
     {
-        if (func_num_args() === 0) {
-            return Blueprint::find($this->blueprint ?? config('statamic.theming.blueprints.asset'))
-                ?? Blueprint::find('asset');
-        }
-
-        $this->blueprint = $blueprint;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return Blueprint::find($blueprint ?? config('statamic.theming.blueprints.asset'))
+                    ?? Blueprint::find('asset');
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -163,13 +163,12 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function disk($disk = null)
     {
-        if (func_num_args() === 0) {
-            return $this->disk ? File::disk($this->disk) : null;
-        }
-
-        $this->disk = $disk;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('disk')
+            ->getter(function ($disk) {
+                return $disk ? File::disk($disk) : null;
+            })
+            ->args(func_get_args());
     }
 
     public function diskHandle()
@@ -322,13 +321,14 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function private($private = null)
     {
-        if (func_num_args() === 0) {
-            return (bool) $this->private;
-        }
+        return $this
+            ->fluentlyGetOrSet('private')
+            ->getter(function ($private) {
+                return (bool) $private;
+            })
+            ->args(func_get_args());
 
-        $this->private = $private;
 
-        return $this;
     }
 
     protected function fileData()
