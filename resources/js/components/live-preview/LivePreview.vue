@@ -227,7 +227,7 @@ export default {
 
         popout() {
             this.poppedOut = true;
-            this.channel = new BroadcastChannel('livepreview');
+            this.channel = this.channel || new BroadcastChannel('livepreview');
             this.channel.onmessage = e => {
                 switch (e.data.event) {
                     case 'popout.opened':
