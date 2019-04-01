@@ -4,6 +4,7 @@ namespace Tests;
 
 use Tests\TestCase;
 use Statamic\API\Str;
+use Statamic\Data\ContainsData;
 use Statamic\FluentlyGetsAndSets;
 
 class FluentlyGetsAndSetsTest extends TestCase
@@ -43,6 +44,19 @@ class FluentlyGetsAndSetsTest extends TestCase
         $this->entry->title('lol cat');
 
         $this->assertEquals('Lol Cats', $this->entry->title());
+    }
+
+    /** @test */
+    function it_can_get_and_set_into_the_data_property_with_custom_get_and_set_logic()
+    {
+        $entry = new EntryContainingData;
+        $this->assertNull($entry->get('template'));
+        $this->assertEquals('default', $entry->template());
+
+        $entry->template('foo');
+
+        $this->assertEquals('foo', $entry->get('template'));
+        $this->assertEquals('foo', $entry->template());
     }
 
     /** @test */
@@ -107,5 +121,20 @@ class Entry
                 $this->url = $route;
             })
             ->value($route);
+    }
+}
+
+class EntryContainingData extends Entry
+{
+    use ContainsData;
+
+    public function template($template = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                return $template ?? 'default';
+            })
+            ->args(func_get_args());
     }
 }

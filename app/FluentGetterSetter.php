@@ -109,7 +109,7 @@ class FluentGetterSetter
         try {
             $value = $this->reflectedProperty()->getValue($this->object);
         } catch (ReflectionException $exception) {
-            $value = null;
+            $value = $this->object->{$this->property} ?? null;
         }
 
         if ($getter = $this->getter) {
