@@ -17,15 +17,7 @@
                             <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
                             <button v-if="!poppedOut" class="btn" @click="popout">Pop out</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">Pop in</button>
-                            <div class="select-input-container w-32 ml-2" v-show="!poppedOut">
-                                <select class="select-input" v-model="previewDevice">
-                                    <option :value="device" :key="device" v-text="device" :selected="previewDevice === device" v-for="device in previewDevices"></option>
-                                </select>
-                                <div class="select-input-toggle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                </div>
-                            </div>
-
+                            <select-input :options="deviceSelectOptions" :placeholder="__('Responsive')" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
                             <button
                                 type="button"
                                 class="btn-close"
@@ -55,7 +47,7 @@
 
                     <transition name="live-preview-contents-slide">
                         <div v-show="panesVisible" ref="contents" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
-                            <iframe ref="iframe" frameborder="0" :class="previewDevice" />
+                            <iframe ref="iframe" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: `${previewDeviceWidth}px`, height: `${previewDeviceHeight}px` }" />
                         </div>
                     </transition>
 
@@ -98,9 +90,8 @@ export default {
             editorWidth: null,
             editorResizing: false,
             editorCollapsed: false,
-            previewDevice: 'Responsive',
+            previewDevice: null,
             previewAmp: false,
-            previewDevices: ['Responsive', 'Laptop', 'Tablet', 'Mobile'],
             provides: {
                 storeName: this.name
             },
@@ -120,6 +111,25 @@ export default {
                 preview: this.values
             }
         },
+
+        deviceSelectOptions() {
+            return Object.values(_.mapObject(this.$config.get('livePreviewDevices'), (dimensions, device) => {
+                return { value: device, text: __(device) };
+            }));
+        },
+
+        previewDeviceWidth() {
+            if (this.previewDevice) {
+                return this.$config.get('livePreviewDevices')[this.previewDevice].width;
+            }
+        },
+
+        previewDeviceHeight() {
+            if (this.previewDevice) {
+                return this.$config.get('livePreviewDevices')[this.previewDevice].height;
+            }
+        }
+
     },
 
     watch: {

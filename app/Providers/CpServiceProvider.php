@@ -29,6 +29,7 @@ class CpServiceProvider extends ServiceProvider
             'ampEnabled' => config('statamic.amp.enabled'),
             'bard' => ['plugins' => [], 'buttons' => []],
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
+            'livePreviewDevices' => config('statamic.system.live_preview_devices'),
         ]);
     }
 
