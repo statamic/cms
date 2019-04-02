@@ -14,7 +14,7 @@
         <entry-publish-form
             v-if="blueprint"
             :is-creating="creating"
-            :initial-action="publishUrl"
+            :initial-actions="initialActions"
             :method="method"
             :publish-container="publishContainer"
             :collection-title="collection.title"
@@ -47,13 +47,13 @@ export default {
 
     data() {
         return {
-            publishUrl: null,
             loading: true,
             blueprint: null,
             values: null,
             initialValues: null,
             initialMeta: null,
             initialLocalizations: null,
+            initialActions: null,
             collection: Object,
             readOnly: false,
         }
@@ -80,7 +80,7 @@ export default {
                 this.values = this.initialValues = data.values;
                 this.initialMeta = data.meta;
                 this.initialLocalizations = data.localizations;
-                this.publishUrl = data.actions[this.action];
+                this.initialActions = data.actions;
                 this.collection = data.collection;
                 this.loading = false;
             });
