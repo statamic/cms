@@ -5,7 +5,7 @@
             'status-working-copy': revision.working,
             'status-published': revision.attributes.published
         }"
-        @click="showDetails = true"
+        @click="open"
     >
         <div v-if="revision.message" class="revision-item-note text-truncate" v-text="revision.message" />
 
@@ -65,6 +65,19 @@ export default {
 
         date() {
             return moment.unix(this.revision.date);
+        }
+
+    },
+
+    methods: {
+
+        open() {
+            if (this.revision.working) {
+                this.$emit('working-copy-selected');
+                return;
+            }
+
+            this.showDetails = true;
         }
 
     }

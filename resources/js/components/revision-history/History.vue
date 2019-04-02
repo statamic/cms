@@ -32,6 +32,7 @@
                         :key="revision.date"
                         :revision="revision"
                         :restore-url="restoreUrl"
+                        @working-copy-selected="close"
                     />
                 </div>
             </div>
