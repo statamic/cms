@@ -43,7 +43,7 @@
                 </button>
             </div>
 
-            <button href="" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
+            <button v-if="!isCreating" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
             <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
                 <revision-history
