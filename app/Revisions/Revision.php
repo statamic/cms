@@ -104,10 +104,14 @@ class Revision implements Contract, Arrayable
 
     public function toArray()
     {
+        if ($user = $this->user()) {
+            $user = Arr::only($user->toArray(), ['id', 'email', 'name', 'avatar', 'initials']);
+        }
+
         return [
             'action' => $this->action,
             'date' => $this->date()->timestamp,
-            'user' => Arr::only($this->user()->toArray(), ['id', 'email', 'name', 'avatar', 'initials']),
+            'user' => $user,
             'message' => $this->message,
             'attributes' => $this->attributes,
         ];

@@ -10,12 +10,13 @@
         <div v-if="revision.message" class="revision-item-note text-truncate" v-text="revision.message" />
 
         <div class="flex items-center">
-            <avatar :user="revision.user" class="flex-no-shrink mr-1 w-6" />
+            <avatar v-if="revision.user" :user="revision.user" class="flex-no-shrink mr-1 w-6" />
 
             <div class="revision-item-content w-full flex">
                 <div class="flex-1">
                     <div class="revision-author text-grey-70 text-2xs">
-                        {{ revision.user.name || revision.user.email }} &ndash; {{ date.fromNow() }}
+                        <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
+                        {{ date.fromNow() }}
                     </div>
                 </div>
 
