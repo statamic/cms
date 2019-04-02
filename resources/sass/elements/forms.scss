@@ -94,7 +94,7 @@ select {
 
       select {
           @include button(#fff, $color_gray_dark);
-          @apply block appearance-none pl-1.5 pr-3 bg-white cursor-pointer w-full h-full relative shadow-button;
+          @apply block appearance-none pl-1.5 pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
       }
 
       .select-input-toggle {
