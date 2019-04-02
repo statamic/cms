@@ -35,7 +35,7 @@ export default {
     methods: {
 
         saved(response) {
-            window.location = response.data.redirect + '?created';
+            window.location = response.data.redirect + '?created=true';
         }
 
     }

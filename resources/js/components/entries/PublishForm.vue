@@ -324,6 +324,10 @@ export default {
             if (this.confirmingPublish) return;
             this.canPublish ? this.confirmPublish() : this.save();
         });
+    },
+
+    created() {
+        window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     }
 
 }
