@@ -17,7 +17,12 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class AppServiceProvider extends ServiceProvider
 {
-    private $root = __DIR__.'/../..';
+    protected $root = __DIR__.'/../..';
+
+    protected $configFiles = [
+        'amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'protect', 'revisions',
+        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'
+    ];
 
     public function boot()
     {
@@ -34,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
-        collect(['amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'protect', 'revisions', 'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'])->each(function ($config) {
+        collect($this->configFiles)->each(function ($config) {
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
             $this->publishes(["{$this->root}/config/$config.php" => config_path("statamic/$config.php")], 'statamic');
         });
