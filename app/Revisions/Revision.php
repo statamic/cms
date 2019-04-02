@@ -109,6 +109,7 @@ class Revision implements Contract, Arrayable
         }
 
         return [
+            'id' => $this->id,
             'action' => $this->action,
             'date' => $this->date()->timestamp,
             'user' => $user,

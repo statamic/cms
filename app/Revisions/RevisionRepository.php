@@ -67,7 +67,8 @@ class RevisionRepository implements Contract
         return (new Revision)
             ->key($key)
             ->action($yaml['action'] ?? false)
-            ->date(Carbon::createFromTimestamp($yaml['date']))
+            ->id($date = $yaml['date'])
+            ->date(Carbon::createFromTimestamp($date))
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? false)
             ->attributes($yaml['attributes']);

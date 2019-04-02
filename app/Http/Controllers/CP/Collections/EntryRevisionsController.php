@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\API\Entry;
+use Statamic\API\Site;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -38,6 +38,60 @@ class EntryRevisionsController extends CpController
         ]);
     }
 
+    public function show(Request $request, $collection, $entry, $slug, $site, $revision)
+    {
+        $entry = $entry->makeFromRevision($revision);
+
+        // TODO: Most of this is duplicated with EntriesController@edit. DRY it off.
+
+        $blueprint = $entry->blueprint();
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($entry->data())
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'title' => $entry->get('title'),
+            'slug' => $entry->slug()
+        ]);
+
+        if ($entry->orderType() === 'date') {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
+        return [
+            'editing' => true,
+            'actions' => [
+                'save' => $entry->updateUrl(),
+                'publish' => $entry->publishUrl(),
+                'revisions' => $entry->revisionsUrl(),
+                'restore' => $entry->restoreRevisionUrl(),
+                'createRevision' => $entry->createRevisionUrl(),
+            ],
+            'values' => $values,
+            'meta' => $fields->meta(),
+            'collection' => $this->collectionToArray($entry->collection()),
+            'blueprint' => $blueprint->toPublishArray(),
+            'readOnly' => $request->user()->cant('edit', $entry),
+            'locale' => $entry->locale(),
+            'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
+                $exists = $entry->entry()->existsIn($handle);
+                $localized = $entry->entry()->inOrClone($handle);
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $entry->locale(),
+                    'exists' => $exists,
+                    'published' => $exists ? $localized->published() : false,
+                    'url' => $localized->editUrl(),
+                ];
+            })->all()
+        ];
+    }
+
     protected function workingCopy($entry)
     {
         if ($entry->published()) {
@@ -48,5 +102,13 @@ class EntryRevisionsController extends CpController
             ->makeWorkingCopy()
             ->date($entry->lastModified())
             ->user($entry->lastModifiedBy());
+    }
+
+    protected function collectionToArray($collection)
+    {
+        return [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.show', $collection->handle())
+        ];
     }
 }

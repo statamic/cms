@@ -15,6 +15,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindEntries();
         $this->bindCollections();
         $this->bindSites();
+        $this->bindRevisions();
     }
 
     protected function bindEntries()
@@ -44,6 +45,18 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('site', function ($site) {
             abort_if(! $site = Site::get($site), 404);
             return $site;
+        });
+    }
+
+    protected function bindRevisions()
+    {
+        Route::bind('revision', function ($revision, $route) {
+            abort_if(
+                ! ($entry = $route->parameter('entry'))
+                || ! $revision = $entry->revision($revision)
+            , 404);
+
+            return $revision;
         });
     }
 }

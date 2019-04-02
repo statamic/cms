@@ -24,37 +24,10 @@
                 <span class="badge" :class="revision.action" v-else v-text="revision.action" />
                 <span class="badge bg-orange" v-if="revision.attributes.current" v-text="'Current'" />
 
-                <stack
-                    name="revision-details"
+                <revision-preview
                     v-if="showDetails"
-                    @closed="showDetails = false"
-                >
-                    <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
-                        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                            {{ __('Revision Details') }}
-                            <button
-                                type="button"
-                                class="btn-close"
-                                @click="close"
-                                v-html="'&times'" />
-                        </div>
-                        <div class="bg-white h-full p-3 overflow-auto">
-                            <restore-revision
-                                v-if="!revision.working"
-                                :revision="revision"
-                                :url="restoreUrl" />
-
-                            <button
-                                v-if="revision.working"
-                                class="btn btn-flat"
-                                v-text="__('Discard')" />
-
-                            <pre
-                                class="whitespace-pre-wrap text-xs font-mono mt-3"
-                                v-text="JSON.stringify(revision.attributes, null, 2)" />
-                        </div>
-                    </div>
-                </stack>
+                    :revision="revision"
+                    @closed="showDetails = false" />
             </div>
         </div>
     </div>
@@ -63,10 +36,12 @@
 
 <script>
 import RestoreRevision from './Restore.vue';
+import RevisionPreview from './Preview.vue';
 
 export default {
 
     components: {
+        RevisionPreview,
         RestoreRevision,
     },
 
