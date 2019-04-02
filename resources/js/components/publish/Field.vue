@@ -28,6 +28,7 @@
                 :value="value"
                 :meta="meta"
                 :name="config.handle"
+                :read-only="readOnly"
                 @updated="updated"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>

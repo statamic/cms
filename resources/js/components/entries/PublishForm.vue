@@ -14,6 +14,9 @@
                 </div>
             </h1>
 
+            <div class="pt-px text-2xs text-grey-60 mr-2 flex" v-if="readOnly">
+                <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+            </div>
             <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="isDirty" v-text="'Unsaved Changes'" />
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="!published" v-text="'Unpublished Entry'" />
@@ -61,7 +64,7 @@
                 @click="openLivePreview" />
 
             <button
-                v-if="!canPublish"
+                v-if="!readOnly && !canPublish"
                 class="btn btn-primary min-w-100"
                 :class="{ 'opacity-25': !canSave }"
                 :disabled="!canSave"
@@ -111,7 +114,7 @@
                 @closed="closeLivePreview"
             >
                 <transition name="live-preview-sections-drop">
-                    <publish-sections v-show="sectionsVisible" :live-preview="isPreviewing" />
+                    <publish-sections v-show="sectionsVisible" :live-preview="isPreviewing" :read-only="readOnly" />
                 </transition>
             </live-preview>
         </publish-container>
@@ -147,6 +150,7 @@ export default {
         amp: Boolean,
         initialPublished: Boolean,
         isCreating: Boolean,
+        initialReadOnly: Boolean,
     },
 
     data() {
@@ -170,6 +174,7 @@ export default {
             showRevisionHistory: false,
             published: this.initialPublished,
             confirmingPublish: false,
+            readOnly: this.initialReadOnly,
         }
     },
 
@@ -184,11 +189,11 @@ export default {
         },
 
         canSave() {
-            return this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
         },
 
         canPublish() {
-            return !this.isCreating && !this.canSave && !this.somethingIsLoading;
+            return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading;
         },
 
         livePreviewUrl() {

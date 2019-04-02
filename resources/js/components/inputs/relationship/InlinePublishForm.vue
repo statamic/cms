@@ -24,6 +24,7 @@
             :initial-values="initialValues"
             :initial-meta="initialMeta"
             :initial-localizations="initialLocalizations"
+            :initial-read-only="readOnly"
             @saved="saved"
         >
             <template slot="action-buttons-right">
@@ -53,7 +54,8 @@ export default {
             initialValues: null,
             initialMeta: null,
             initialLocalizations: null,
-            collection: Object
+            collection: Object,
+            readOnly: false,
         }
     },
 

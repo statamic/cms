@@ -10,6 +10,7 @@
             :value="values[field.handle]"
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
+            :read-only="readOnly"
             @updated="updated"
         />
 
@@ -34,6 +35,7 @@ export default {
             type: Array,
             required: true
         },
+        readOnly: Boolean,
     },
 
     computed: {
