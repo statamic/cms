@@ -17,7 +17,7 @@ class RestoreEntryRevisionController extends CpController
         }
 
         if ($entry->published()) {
-            WorkingCopy::fromRevision($target)->save();
+            WorkingCopy::fromRevision($target)->date(now())->save();
         } else {
             $entry->makeFromRevision($target)->published(false)->save();
         }
