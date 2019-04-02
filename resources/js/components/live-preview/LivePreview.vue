@@ -124,25 +124,25 @@ export default {
         },
 
         deviceSelectOptions() {
-            return Object.values(_.mapObject(this.$config.get('livePreviewDevices'), (dimensions, device) => {
+            return Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
                 return { value: device, text: __(device) };
             }));
         },
 
         previewDeviceWidth() {
             if (this.previewDevice) {
-                return this.$config.get('livePreviewDevices')[this.previewDevice].width;
+                return this.$config.get('livePreview.devices')[this.previewDevice].width;
             }
         },
 
         previewDeviceHeight() {
             if (this.previewDevice) {
-                return this.$config.get('livePreviewDevices')[this.previewDevice].height;
+                return this.$config.get('livePreview.devices')[this.previewDevice].height;
             }
         },
 
         inputs() {
-            return this.$config.get('livePreviewInputs', {});
+            return this.$config.get('livePreview.inputs', {});
         }
 
     },
