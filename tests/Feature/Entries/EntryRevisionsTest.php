@@ -202,9 +202,8 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
-    function it_restores_an_entry_to_another_revision()
+    function it_restores_a_published_entrys_working_copy_to_another_revision()
     {
-        $this->withoutExceptionHandling();
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
@@ -230,8 +229,64 @@ class EntryRevisionsTest extends TestCase
                 'foo' => 'bar',
             ])->create();
 
+        $workingCopy = tap($entry->makeWorkingCopy(), function ($copy) {
+            $attrs = $copy->attributes();
+            $attrs['data']['foo'] = 'foo modified in working copy';
+            $copy->attributes($attrs);
+        });
+        $workingCopy->save();
+
         $this->assertTrue($entry->published());
         $this->assertCount(1, $entry->revisions());
+        $this->assertEquals('bar', $entry->get('foo'));
+        $this->assertEquals('foo modified in working copy', $entry->fromWorkingCopy()->get('foo'));
+
+        $this
+            ->actingAs($user)
+            ->restore($entry, ['revision' => '1553546421'])
+            ->assertOk()
+            ->assertSessionHas('success');
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('test', $entry->slug());
+        $this->assertEquals('bar', $entry->get('foo'));
+        $this->assertEquals('existing foo', $entry->fromWorkingCopy()->get('foo'));
+        $this->assertTrue($entry->published());
+        $this->assertTrue($entry->hasWorkingCopy());
+        $this->assertCount(1, $entry->revisions());
+    }
+
+    /** @test */
+    function it_restores_an_unpublished_entrys_contents_to_another_revision()
+    {
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $revision = tap((new Revision)
+            ->key('collections/blog/en/123')
+            ->date(Carbon::createFromTimestamp('1553546421'))
+            ->attributes([
+                'published' => true,
+                'slug' => 'existing-slug',
+                'data' => ['foo' => 'existing foo']
+            ]))->save();
+
+        WorkingCopy::fromRevision($revision)->save();
+
+        $entry = EntryFactory::id('123')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Title',
+                'foo' => 'bar',
+            ])->create();
+
+        $this->assertFalse($entry->published());
+        $this->assertCount(1, $entry->revisions());
+        $this->assertEquals('bar', $entry->get('foo'));
 
         $this
             ->actingAs($user)
@@ -241,11 +296,9 @@ class EntryRevisionsTest extends TestCase
 
         $entry = Entry::find($entry->id());
         $this->assertEquals('existing-slug', $entry->slug());
-        $this->assertEquals(['foo' => 'existing foo'], $entry->data());
-        $this->assertFalse($entry->published());
-        $this->assertFalse($entry->hasWorkingCopy());
-        $this->assertCount(2, $entry->revisions());
-        $this->assertEquals('restore', $entry->latestRevision()->action());
+        $this->assertEquals('existing foo', $entry->get('foo'));
+        $this->assertFalse($entry->published()); // everything except publish state gets restored
+        $this->assertCount(1, $entry->revisions());
     }
 
     private function publish($entry, $payload)

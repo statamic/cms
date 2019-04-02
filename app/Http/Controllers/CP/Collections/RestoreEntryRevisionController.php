@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
+use Statamic\Revisions\WorkingCopy;
 use Statamic\Http\Controllers\CP\CpController;
 
 class RestoreEntryRevisionController extends CpController
@@ -15,18 +16,11 @@ class RestoreEntryRevisionController extends CpController
             // todo: handle invalid revision reference
         }
 
-        $restored = $entry->makeFromRevision($target);
-
-        $restored->save();
-
-        $restored
-            ->makeRevision()
-            ->user($request->user())
-            ->message($request->message ?? false)
-            ->action('restore')
-            ->save();
-
-        $restored->deleteWorkingCopy();
+        if ($entry->published()) {
+            WorkingCopy::fromRevision($target)->save();
+        } else {
+            $entry->makeFromRevision($target)->published(false)->save();
+        }
 
         session()->flash('success', __('Revision Restored'));
     }
