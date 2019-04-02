@@ -18,6 +18,15 @@
                             <button v-if="!poppedOut" class="btn" @click="popout">Pop out</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">Pop in</button>
                             <select-input :options="deviceSelectOptions" :placeholder="__('Responsive')" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
+
+                            <component
+                                v-for="(component, handle) in inputs"
+                                :key="handle"
+                                :is="component"
+                                :value="extras[handle]"
+                                @updated="componentUpdated"
+                                class="ml-2" />
+
                             <button
                                 type="button"
                                 class="btn-close"
@@ -99,6 +108,7 @@ export default {
             poppedOut: false,
             popoutWindow: null,
             popoutResponded: false,
+            extras: {},
         }
     },
 
@@ -108,7 +118,8 @@ export default {
             return {
                 amp: this.previewAmp,
                 blueprint: this.blueprint,
-                preview: this.values
+                preview: this.values,
+                extras: this.extras
             }
         },
 
@@ -128,6 +139,10 @@ export default {
             if (this.previewDevice) {
                 return this.$config.get('livePreviewDevices')[this.previewDevice].height;
             }
+        },
+
+        inputs() {
+            return this.$config.get('livePreviewInputs', {});
         }
 
     },
@@ -284,6 +299,10 @@ export default {
 
                 this.popoutResponded = false;
             }, 200);
+        },
+
+        componentUpdated(handle, value) {
+            Vue.set(this.extras, handle, value);
         }
     }
 

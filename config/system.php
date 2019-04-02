@@ -119,6 +119,10 @@ return [
         'Laptop' => ['width' => 1440, 'height' => 900],
         'Tablet' => ['width' => 1024, 'height' => 786],
         'Mobile' => ['width' => 375, 'height' => 812],
-    ]
+    ],
+
+    'live_preview_inputs' => [
+        'ads' => 'live-preview-ads',
+    ],
 
 ];

@@ -16,6 +16,7 @@ use Statamic\Data\Localization;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Revisions\Revisable;
+use Facades\Statamic\View\Cascade;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Arrayable;
@@ -192,8 +193,10 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
     }
 
-    public function toLivePreviewResponse($request)
+    public function toLivePreviewResponse($request, $extras)
     {
+        Cascade::set('live_preview', $extras);
+
         return $this->toResponse($request);
     }
 

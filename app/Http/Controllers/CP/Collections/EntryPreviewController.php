@@ -67,7 +67,7 @@ class EntryPreviewController extends CpController
         Facade::clearResolvedInstance('request');
 
         try {
-            $response = $entry->toLivePreviewResponse($subrequest);
+            $response = $entry->toLivePreviewResponse($subrequest, $request->extras);
         } catch (Exception $e) {
             app(ExceptionHandler::class)->report($e);
             $response = app(ExceptionHandler::class)->render($subrequest, $e);
