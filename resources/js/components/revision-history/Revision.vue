@@ -27,7 +27,12 @@
                 <revision-preview
                     v-if="showDetails"
                     :revision="revision"
-                    @closed="showDetails = false" />
+                    @closed="showDetails = false"
+                >
+                    <template slot="action-buttons-right">
+                        <restore-revision :revision="revision" :url="restoreUrl" />
+                    </template>
+                </revision-preview>
             </div>
         </div>
     </div>

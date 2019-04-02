@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <button class="btn btn-flat" @click="confirming = true">
+        <button class="btn" @click="confirming = true">
             Restore
         </button>
 

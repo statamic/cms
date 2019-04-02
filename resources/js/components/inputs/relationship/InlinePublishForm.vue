@@ -28,6 +28,7 @@
             @saved="saved"
         >
             <template slot="action-buttons-right">
+                <slot name="action-buttons-right" />
                 <button
                     type="button"
                     class="btn-close"
