@@ -1,6 +1,8 @@
 <template>
 
-    <stack name="asset-editor" @closed="$emit('closed')">
+    <stack name="asset-editor"
+        :before-close="shouldClose"
+        @closed="close">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
 
@@ -120,7 +122,7 @@
 
                 <publish-container
                     v-if="fields"
-                    name="asset"
+                    name="publishContainer"
                     :fieldset="fieldset"
                     :values="values"
                     :meta="meta"
@@ -216,6 +218,7 @@ export default {
             loading: true,
             saving: false,
             asset: null,
+            publishContainer: 'asset',
             values: {},
             meta: {},
             fields: null,
@@ -321,8 +324,9 @@ export default {
          * When the focal point is selected
          */
         selectFocalPoint(point) {
-            point = (point === '50-50') ? null : point;
-            this.$set(this.values, 'focus', point)
+            point = (point === '50-50-1') ? null : point;
+            this.$set(this.values, 'focus', point);
+            this.$dirty.add(this.publishContainer);
         },
 
         /**
@@ -379,6 +383,16 @@ export default {
         close() {
             this.$modal.hide('asset-editor');
             this.$emit('closed');
+        },
+
+        shouldClose() {
+            if (this.$dirty.has(this.publishContainer)) {
+                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                    return false;
+                }
+            }
+
+            return true;
         },
 
         openRenamer() {
