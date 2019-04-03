@@ -1,18 +1,18 @@
 <template>
     <modal name="confirmation-modal" :pivotY="0.1">
-        <div class="flex flex-col h-full">
-            <div class="text-lg font-medium p-3 pb-0">
-                {{ title }}
+        <div class="confirmation-modal flex flex-col h-full">
+            <div class="text-lg font-medium p-2 pb-0">
+                {{ __(title) }}
             </div>
-            <div class="flex-1 overflow-scroll p-3 text-grey">
+            <div class="flex-1 overflow-scroll px-2 py-3 text-grey">
                 <p v-if="bodyText" v-text="bodyText" />
                 <slot v-else>
                     <p>{{ __('Are you sure?') }}</p>
                 </slot>
             </div>
             <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
-                <button class="text-grey hover:text-grey-90 mx-1" @click="$emit('cancel')">{{ __('Cancel') }}</button>
-                <button class="btn mx-1" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
+                <button class="text-grey hover:text-grey-90" @click="$emit('cancel')">{{ __('Cancel') }}</button>
+                <button class="btn ml-2" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
             </div>
         </div>
     </modal>

@@ -5,8 +5,8 @@
         <div class="flex mb-3">
             <h1 class="flex-1">{{ container.title }}</h1>
 
-            <a :href="container.edit_url" class="btn">Edit</a>
-            <a :href="createContainerUrl" class="btn-primary ml-2" v-if="canCreateContainers">Create Container</a>
+            <a :href="container.edit_url" class="btn">{{ __('Edit') }}</a>
+            <a :href="createContainerUrl" class="btn-primary ml-2" v-if="canCreateContainers">{{ __('Create Container') }}</a>
         </div>
 
         <asset-browser
@@ -23,7 +23,7 @@
 
             <template slot="actions" slot-scope="{ ids }">
                 <button class="btn ml-1" @click="openAssetMover">{{ __('Move') }}</button>
-                <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">Delete</button>
+                <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">{{ __('Delete') }}</button>
             </template>
 
         </asset-browser>

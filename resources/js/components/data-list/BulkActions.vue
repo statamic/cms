@@ -17,7 +17,7 @@
                     class="btn-flat ml-1"
                     :class="{'text-red': action.dangerous}"
                     @click="select"
-                    v-text="action.title" />
+                    v-text="__(action.title)" />
             </data-list-action>
 
     </div>
