@@ -7,7 +7,7 @@
                 <small class="help-block">{{ __('focal_point_instructions') }}</small>
                 <div class="focal-point-image">
                     <img ref="image" :src="image" @click="define" />
-                    <div class="focal-point-reticle" :style="{
+                    <div class="focal-point-reticle" :class="{ zoomed: z > 1 }" :style="{
                         top: `${y}%`,
                         left: `${x}%`,
                         width: `${reticleSize}px`,
