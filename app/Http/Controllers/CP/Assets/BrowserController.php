@@ -63,6 +63,27 @@ class BrowserController extends CpController
         ]]);
     }
 
+    public function search(Request $request, $container)
+    {
+        // TODO: Handle invalid $container in url
+        // TODO: Auth
+
+        $container = AssetContainer::find($container);
+
+        $paginator = $container
+            ->queryAssets()
+            ->where('path', 'like', '%'.$request->search.'%')
+            ->paginate(30);
+
+        $this->supplementAssetsForDisplay($paginator->getCollection());
+
+        return Resource::collection($paginator)->additional(['meta' => [
+            'container' => $this->toContainerArray($container),
+            'folders' => [],
+            'folder' => $container->assetFolder('/')->toArray()
+        ]]);
+    }
+
     private function supplementAssetsForDisplay($assets)
     {
         foreach ($assets as &$asset) {

@@ -36,9 +36,9 @@
                     v-if="!initializing"
                     :rows="assets"
                     :columns="columns"
-                    :search-query="searchQuery"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
+                    :search="false"
                     :sort="false"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
@@ -327,6 +327,7 @@ export default {
                 perPage: this.perPage,
                 sort: this.sortColumn,
                 order: this.sortDirection,
+                search: this.searchQuery,
             }
         },
 
@@ -394,7 +395,10 @@ export default {
 
         loadAssets() {
             this.loadingAssets = true;
-            const url = cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
+
+            const url = this.searchQuery
+                ? cp_url(`assets/browse/search/${this.container.id}`)
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
                 this.assets = response.data.data;
