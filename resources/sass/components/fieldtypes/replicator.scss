@@ -37,7 +37,7 @@
 }
 
 // Extra contrast when full width
-.replicator-fieldtype.w-full {
+.replicator-fieldtype {
     @apply py-3 px-0 bg-grey-20 border-t border-b;
 
     > label {

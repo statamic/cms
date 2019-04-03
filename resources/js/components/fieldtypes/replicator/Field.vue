@@ -1,6 +1,6 @@
 <template>
 
-    <div class="form-group p-2 m-0" :class="`${field.type}-fieldtype`">
+    <div class="p-2 m-0" :class="classes">
 
         <label class="block">{{ display }}</label>
 
@@ -74,6 +74,21 @@ export default {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
             return state.errors[this.errorKey] || [];
+        },
+
+        isReadOnly() {
+            return this.field.read_only || false;
+        },
+
+        classes() {
+            return [
+                'form-group publish-field',
+                `${this.field.type}-fieldtype`,
+                `field-${tailwind_width_class(this.field.width)}`,
+                this.isReadOnly ? 'read-only-field' : '',
+                this.field.classes || '',
+                { 'has-error': this.hasError }
+            ];
         }
 
     },
