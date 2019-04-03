@@ -50,7 +50,7 @@ button, .btn, .btn-* {
 }
 
 .btn-danger {
-    @include button(transparent, $color_red);
+    @include button(white, $color_red);
     border: 1px solid $color_red;
     line-height: 36px;
 
