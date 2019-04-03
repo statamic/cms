@@ -25,7 +25,7 @@
                         <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
                     </div>
                     <div>
-                        <input type="range" v-model="z" min="1" max="10" step="1" class="w-full" />
+                        <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full" />
                     </div>
                 </div>
                 <div class="focal-point-coordinates">
