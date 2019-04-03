@@ -70,10 +70,11 @@ class BrowserController extends CpController
 
         $container = AssetContainer::find($container);
 
-        $paginator = $container
-            ->queryAssets()
-            ->where('path', 'like', '%'.$request->search.'%')
-            ->paginate(30);
+        $query = $container->hasSearchIndex()
+            ? $container->searchIndex()->ensureExists()->search($request->search)
+            : $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+
+        $paginator = $query->paginate(30);
 
         $this->supplementAssetsForDisplay($paginator->getCollection());
 

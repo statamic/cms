@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\API\Content;
 use Illuminate\Support\Arr;
@@ -27,6 +28,10 @@ class Searchables
         return $searchables->flatMap(function ($item) {
             if (starts_with($item, 'collection:')) {
                 return Entry::whereCollection(str_after($item, 'collection:'));
+            }
+
+            if (starts_with($item, 'assets:')) {
+                return Asset::whereContainer(str_after($item, 'assets:'));
             }
 
             throw new \LogicException("Unknown searchable [$item].");

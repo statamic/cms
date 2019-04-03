@@ -8,6 +8,7 @@ use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Parse;
 use Statamic\API\Folder;
+use Statamic\API\Search;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
@@ -29,6 +30,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $private;
     protected $allowUploads;
     protected $createFolders;
+    protected $searchIndex;
 
     public function id($id = null)
     {
@@ -89,6 +91,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
             'blueprint' => $this->blueprint,
             'allow_uploads' => $this->allowUploads(),
             'create_folders' => $this->createFolders(),
+            'search_index' => $this->searchIndex,
         ];
     }
 
@@ -378,5 +381,20 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public function queryAssets()
     {
         return API\Asset::query()->where('container', $this);
+    }
+
+    public function hasSearchIndex()
+    {
+        return $this->searchIndex() !== null;
+    }
+
+    public function searchIndex($index = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('searchIndex')
+            ->getter(function ($index) {
+                return $index ? Search::index($index) : null;
+            })
+            ->args(func_get_args());
     }
 }
