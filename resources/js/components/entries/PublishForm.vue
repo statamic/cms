@@ -8,7 +8,7 @@
                 </small>
                 <div class="flex items-center">
                     <span v-if="! isCreating"
-                        class="little-dot mr-1 -ml-2"
+                        class="little-dot mr-1"
                         :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
                     {{ title }}
                 </div>
