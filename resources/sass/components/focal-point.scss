@@ -23,8 +23,6 @@
     max-height: 95vh;
 
     .form-group {
-        margin-bottom: 15px;
-
         label {
             display: block;
             margin-bottom: 5px;
@@ -36,6 +34,7 @@
     display: flex;
     flex-direction: column;
     font-family: $font_monospace;
+    @apply -mt-sm;
 
     .pair {
         display: flex;
@@ -57,8 +56,10 @@
     position: relative;
     cursor: pointer;
     overflow: hidden;
+    @apply my-2;
 
     img {
+        display: block;
         max-width: 100%;
     }
 }
@@ -66,12 +67,9 @@
 .focal-point-reticle {
     border: 1px solid white;
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    margin: -50px 0 0 -50px;
     position: absolute;
     box-shadow: 0 0 5px rgba(0,0,0,.5);
-    transition: all 0.5s ease;
+    transition: top 0.5s ease, left 0.5s ease;
     pointer-events: none;
 
     &:before {
@@ -89,12 +87,18 @@
 }
 
 .focal-point .frame {
-    background-size: cover;
     position: absolute;
     margin: -5px 0 0 -5px;
     border: 10px solid #394045;
     box-sizing: content-box;
-    transition: background-position 0.5s ease;
+    overflow: hidden;
+
+    .frame-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        transition: all 0.5s ease;
+    }
 }
 
 .focal-point {
