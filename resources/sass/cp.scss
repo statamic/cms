@@ -96,7 +96,10 @@
 @import "core/utilities";
 
 
-#statamic { transition: all 0.3s ease; }
+#statamic {
+    transition: all 0.3s ease;
+    min-height: 100vh;
+}
 
 .pane-slide-enter-active,
 .pane-slide-leave-active {
