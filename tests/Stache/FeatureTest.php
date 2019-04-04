@@ -6,7 +6,6 @@ use Mockery;
 use Tests\TestCase;
 use Statamic\API\User;
 use Statamic\API\Entry;
-use Statamic\API\Content;
 use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
 use Statamic\API\Structure;
@@ -160,27 +159,6 @@ class FeatureTest extends TestCase
         $this->app->instance(StructureRepository::class, $repo);
 
         $structure->save();
-    }
-
-    /** @test */
-    function it_gets_content()
-    {
-        $this->assertEquals(
-            14, // 14 entries
-            Content::all()->count()
-        );
-
-        $this->assertEquals('Christmas', Content::find('blog-christmas')->get('title'));
-        // TODO: terms and pages
-
-        $this->assertNull(Content::find('unknown'));
-    }
-
-    /** @test */
-    function it_gets_content_by_uri()
-    {
-        $this->assertEquals('One', Content::whereUri('/numeric/one')->get('title'));
-        $this->assertEquals('Directors', Content::whereUri('/about/board/directors')->get('title'));
     }
 
     /** @test */

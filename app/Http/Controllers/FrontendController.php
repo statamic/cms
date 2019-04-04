@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers;
 use Statamic\API\URL;
 use Statamic\API\Site;
 use Statamic\Statamic;
+use Statamic\API\Entry;
 use Statamic\API\Content;
 use Statamic\Routing\Router;
 use Illuminate\Http\Request;
@@ -78,12 +79,21 @@ class FrontendController extends Controller
         }
 
         // Attempt to get the content at this URI
-        if ($content = Content::whereUri($uri, site_locale())) {
-            return $content->in(site_locale());
+        if ($content = $this->getContentForUri($uri)) {
+            return $content;
         }
 
         // Still nothing?
         return false;
+    }
+
+    private function getContentForUri($uri)
+    {
+        $site = Site::current()->handle();
+
+        if ($entry = Entry::whereUri($uri, $site)) {
+            return $entry->in($site);
+        }
     }
 
     public function removeIgnoredSegments($uri)
