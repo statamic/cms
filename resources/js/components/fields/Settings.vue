@@ -62,7 +62,7 @@
                     - Default value
                 -->
 
-                <field-conditions-builder />
+                <field-conditions-builder :config="config" />
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"

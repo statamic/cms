@@ -6,8 +6,8 @@
         <div class="help-block -mt-1"><p>{{ __('When to show or hide this field.') }}</p></div>
 
         <select-input
-            v-model="showWhen"
-            :options="showWhenOptions"
+            v-model="when"
+            :options="whenOptions"
             :placeholder="false"
             class="inline-block" />
 
@@ -68,6 +68,7 @@
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js'
+import { KEYS } from '../publish/FieldConditions.js'
 
 export default {
 
@@ -77,23 +78,28 @@ export default {
         condition: require('./Condition.vue')
     },
 
-    props: ['data'],
+    props: {
+        config: {
+            required: true
+        }
+    },
 
     data() {
         return {
-            showWhen: 'always',
+            when: 'always',
             type: 'standard',
             customMethod: null,
             conditions: [],
+            any: false,
         }
     },
 
     computed: {
-        showWhenOptions() {
+        whenOptions() {
             return this.normalizeInputOptions({
                 always: __('Always show'),
-                show_when: __('Show when'),
-                hide_when: __('Hide when')
+                if: __('Show when'),
+                unless: __('Hide when')
             });
         },
 
@@ -105,7 +111,7 @@ export default {
         },
 
         hasConditions() {
-            return this.showWhen !== 'always';
+            return this.when !== 'always';
         },
 
         isStandard() {
@@ -114,30 +120,37 @@ export default {
 
         isCustom() {
             return this.type === 'custom';
-        },
-
-        // hasConditions() {
-        //     return this.conditions.length !== 0;
-        // },
-
-        // isStandard() {
-        //     return this.data.style === 'standard';
-        // },
-
-        // isCustom() {
-        //     return this.data.style === 'custom';
-        // },
+        }
     },
 
-    // mounted() {
-    //     if (! this.data) {
-    //         this.data = { type: null, style: 'standard', custom: null, conditions: [] };
-    //     }
-
-    //     this.conditions = this.data.conditions;
-    // },
+    created() {
+        this.getInitialConditions();
+    },
 
     methods: {
+        getInitialConditions() {
+            let key = _.chain(KEYS)
+                .filter(key => this.config[key])
+                .first()
+                .value();
+
+            let conditions = this.config[key];
+
+            if (! conditions) {
+                return;
+            }
+
+            this.when = key.startsWith('unless') || key.startsWith('hide_when') ? 'unless' : 'if';
+            this.any = key.endsWith('_any');
+
+            if (typeof conditions === 'string') {
+                this.type = 'custom';
+                this.customMethod = conditions;
+            } else {
+                this.conditions = conditions;
+            }
+        },
+
         // add() {
         //     this.conditions.push({
         //         handle: null,
