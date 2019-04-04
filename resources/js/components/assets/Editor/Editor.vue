@@ -89,7 +89,7 @@
                         </object>
                     </div>
 
-                    <div class="h-full" v-if="asset.is_previewable">
+                    <div class="h-full" v-if="asset.is_previewable && canUseGoogleDocsViewer">
                         <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
@@ -249,6 +249,11 @@ export default {
         hasErrors: function() {
             return this.error || Object.keys(this.errors).length;
         },
+
+        canUseGoogleDocsViewer()
+        {
+            return Statamic.$config.get('googleDocsViewer');
+        }
 
     },
 
