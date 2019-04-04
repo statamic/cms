@@ -3,9 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\API\Str;
-use Statamic\API\User;
-use Statamic\API\Asset;
-use Statamic\API\Entry;
+use Statamic\API\Data;
 use Statamic\API\Helper;
 use Statamic\API\Content;
 use Statamic\API\Pattern;
@@ -64,7 +62,7 @@ class Relate extends Collection
             return TermAPI::whereSlug(TermAPI::normalizeSlug($value), $taxonomy);
         }
 
-        return Entry::find($value) ?? Asset::find($value) ?? User::find($value);
+        return Data::find($value);
     }
 
     protected function getSortOrder()

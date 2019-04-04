@@ -2,9 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\User;
-use Statamic\API\Asset;
-use Statamic\API\Entry;
+use Statamic\API\Data;
 use Statamic\Data\DataCollection;
 use Statamic\Data\QueryBuilder as BaseQueryBuilder;
 
@@ -49,8 +47,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         }
 
         return $this->collect($results)->map(function ($result) {
-            $id = $result['id'];
-            return Entry::find($id) ?? Asset::find($id) ?? User::find($id);
+            return Data::find($result['id']);
         })->filter()->values();
     }
 

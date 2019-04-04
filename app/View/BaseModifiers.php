@@ -3,6 +3,7 @@
 namespace Statamic\View;
 
 use Statamic\API\Arr;
+use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
@@ -14,7 +15,6 @@ use Statamic\API\Theme;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Str;
-use Statamic\API\Content;
 use Statamic\Extend\Modifier;
 use Statamic\API\Localization;
 use Stringy\StaticStringy as Stringy;
@@ -588,7 +588,7 @@ class BaseModifiers extends Modifier
 
         // If the requested value (it should be an ID) doesn't exist, we'll just
         // spit the value back as-is. This seems like a sensible solution here.
-        $item = Entry::find($value) ?? Asset::find($value) ?? $value;
+        $item = Data::find($value) ?? $value;
 
         // Get the requested variable, which is the first parameter.
         $var = array_get_colon($params, 0);
@@ -1974,13 +1974,7 @@ class BaseModifiers extends Modifier
             $value = array_get_colon($value, 0);
         }
 
-        if ($asset = Asset::find($value)) {
-            return $asset->url();
-        }
-
-        if ($entry = Entry::find($value)) {
-            return $entry->url();
-        }
+        return optional(Data::find($value))->url();
     }
 
     /**

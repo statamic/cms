@@ -2,9 +2,7 @@
 
 namespace Statamic\Search\Commands;
 
-use Statamic\API\User;
-use Statamic\API\Asset;
-use Statamic\API\Entry;
+use Statamic\API\Data;
 use Statamic\API\Search;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
@@ -18,10 +16,7 @@ class Insert extends Command
 
     public function handle()
     {
-        $id = $this->argument('id');
-        $item = Entry::find($id) ?? Asset::find($id) ?? User::find($id);
-
-        if (! $item) {
+        if (! $item = Data::find($id = $this->argument('id'))) {
             throw new \InvalidArgumentException("Item with id of [{$id}] doesn't exist.");
         }
 
