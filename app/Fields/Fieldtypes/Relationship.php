@@ -180,7 +180,9 @@ class Relationship extends Fieldtype
 
     protected function augmentValue($value)
     {
-        return Content::find($value);
+        if ($entry = Entry::find($value)) {
+            return $entry;
+        }
     }
 
     public function getIndexItems($request)
