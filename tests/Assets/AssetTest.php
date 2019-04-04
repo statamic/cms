@@ -491,7 +491,7 @@ class AssetTest extends TestCase
 
         $this->assertArraySubset([
             'id' => 'test_container::path/to/asset.jpg',
-            'title' => 'test',
+            'title' => 'asset.jpg',
             'path' => 'path/to/asset.jpg',
             'filename' => 'asset',
             'basename' => 'asset.jpg',

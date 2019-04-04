@@ -484,6 +484,19 @@ class Asset implements AssetContract, Arrayable
     }
 
     /**
+     * Get the display name of the asset.
+     *
+     * Typically used when an asset could be amongst other
+     * types of objects, like within search results.
+     *
+     * @return string
+     */
+    public function title()
+    {
+        return $this->basename();
+    }
+
+    /**
      * Convert to an array
      *
      * @return array
@@ -492,6 +505,7 @@ class Asset implements AssetContract, Arrayable
     {
         $attributes = [
             'id'             => $this->id(),
+            'title'          => $this->title(),
             'path'           => $this->path(),
             'filename'       => $this->filename(),
             'basename'       => $this->basename(),
