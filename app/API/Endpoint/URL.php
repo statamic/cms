@@ -54,17 +54,6 @@ class URL
     }
 
     /**
-     * Checks whether a URL exists
-     *
-     * @param string       $url     URL to find
-     * @return bool
-     */
-    public function exists($url)
-    {
-        return Content::uriExists($url);
-    }
-
-    /**
      * Get the slug of a URL
      *
      * @param string $url  URL to parse
