@@ -6,6 +6,7 @@ use Statamic\API;
 use Statamic\API\Blueprint;
 use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -13,13 +14,23 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable
 {
     use Authorizable, Notifiable, CanResetPassword, Augmentable;
 
     abstract public function get($key, $fallback = null);
     abstract public function has($key);
     abstract public function set($key, $value);
+
+    public function reference()
+    {
+        return "user::{$this->id()}";
+    }
+
+    public function title()
+    {
+        return $this->email();
+    }
 
     public function initials()
     {
@@ -105,10 +116,12 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
         return array_merge($this->data(), [
             'id' => $this->id(),
+            'title' => $this->title(),
             'email' => $this->email(),
             'avatar' => $this->avatar(),
             'initials' => $this->initials(),
             'preferences' => $this->preferences(),
+            'edit_url' => $this->editUrl(),
         ], $roles, $groups, $this->supplements);
     }
 

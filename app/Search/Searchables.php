@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\API\User;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Illuminate\Support\Arr;
@@ -23,7 +24,8 @@ class Searchables
         if ($searchables->contains('all')) {
             return collect()
                 ->merge(Entry::all())
-                ->merge(Asset::all());
+                ->merge(Asset::all())
+                ->merge(User::all());
         }
 
         return $searchables->flatMap(function ($item) {
