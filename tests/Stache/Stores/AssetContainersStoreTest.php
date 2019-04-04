@@ -147,12 +147,5 @@ EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
 
         $this->store->save($container);
-
-        $expected = <<<EOT
-title: 'New Container'
-blueprint: foo
-
-EOT;
-        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
     }
 }
