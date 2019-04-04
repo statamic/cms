@@ -43,7 +43,7 @@ export default {
 
     data() {
         return {
-            blueprint: JSON.parse(JSON.stringify(this.initialBlueprint)),
+            blueprint: clone(this.initialBlueprint),
             sections: [],
             initialTitle: this.initialBlueprint.title,
             errors: {}
