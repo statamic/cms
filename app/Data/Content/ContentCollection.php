@@ -23,6 +23,10 @@ class ContentCollection extends DataCollection
     public function localize($locale)
     {
         return $this->map(function ($item) use ($locale) {
+            if (!method_exists($item, 'existsIn')) {
+                return $item;
+            }
+
             return $item->existsIn($locale) ? $item->in($locale) : null;
         })->filter();
     }

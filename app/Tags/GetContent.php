@@ -3,8 +3,8 @@
 namespace Statamic\Tags;
 
 use Statamic\API\URL;
+use Statamic\API\Entry;
 use Statamic\API\Helper;
-use Statamic\API\Content;
 
 class GetContent extends Collection
 {
@@ -63,11 +63,11 @@ class GetContent extends Collection
             $from = URL::unlocalize($from, $locale);
         }
 
-        if (Content::uriExists($from)) {
-            return Content::whereUri($from);
+        if ($entry = Entry::find($from)) {
+            return $entry;
         }
 
-        return Content::find($from);
+        return Entry::whereUri($from);
     }
 
     protected function getSortOrder()

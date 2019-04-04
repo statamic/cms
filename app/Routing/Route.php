@@ -4,6 +4,7 @@ namespace Statamic\Routing;
 
 use Statamic\API\URL;
 use Statamic\API\Site;
+use Statamic\API\Entry;
 use Statamic\API\Config;
 use Statamic\Http\Responses\DataResponse;
 use Illuminate\Contracts\Support\Responsable;
@@ -59,11 +60,7 @@ class Route implements Responsable
             return [];
         }
 
-        if ($content = Content::find($load)) {
-            return $content->toArray();
-        }
-
-        if ($content = Content::whereUri($load)) {
+        if ($content = $this->getItem($load)) {
             return $content->toArray();
         }
 
@@ -97,5 +94,16 @@ class Route implements Responsable
     public function site()
     {
         return Site::current();
+    }
+
+    protected function getItem($item)
+    {
+        if ($entry = Entry::find($item)) {
+            return $entry;
+        }
+
+        if ($entry = Entry::whereUri($item)) {
+            return $entry;
+        }
     }
 }

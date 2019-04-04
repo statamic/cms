@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Entry;
 use Statamic\Tags\Tags;
 use Statamic\API\Content;
 use Statamic\Addons\Nav\TreeFactory;
@@ -154,7 +155,7 @@ class Nav extends Tags
         foreach ($segment_urls as $segment_url) {
             $default_segment_uri = URL::getDefaultUri($locale, $segment_url);
 
-            $content = Content::whereUri($default_segment_uri);
+            $content = Entry::whereUri($default_segment_uri);
 
             if (! $content) {
                 $content = app(\Statamic\Routing\Router::class)->getRoute($segment_url);
