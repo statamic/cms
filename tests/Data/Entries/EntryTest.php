@@ -37,6 +37,7 @@ class EntryTest extends TestCase
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('123', $entry->id());
+        $this->assertEquals('entry::123', $entry->reference());
     }
 
     /** @test */

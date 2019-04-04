@@ -50,6 +50,11 @@ class Asset implements AssetContract, Arrayable
         return $this->container->id() . '::' . $this->path();
     }
 
+    public function reference()
+    {
+        return "asset::{$this->id()}";
+    }
+
     public function get($key, $fallback = null)
     {
         return $this->hydrate()->traitGet($key, $fallback);

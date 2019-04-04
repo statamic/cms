@@ -38,6 +38,11 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return call_user_func_array([$this, 'localizable'], func_get_args());
     }
 
+    public function reference()
+    {
+        return "entry::{$this->id()}";
+    }
+
     public function collection()
     {
         return $this->entry()->collection();

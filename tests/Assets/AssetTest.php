@@ -134,6 +134,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg');
 
         $this->assertEquals('123::path/to/asset.jpg', $asset->id());
+        $this->assertEquals('asset::123::path/to/asset.jpg', $asset->reference());
     }
 
     /** @test */
