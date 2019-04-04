@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
+use Statamic\API\Entry;
 use Statamic\Tags\Tags;
-use Statamic\API\Content;
 
 class GetValue extends Tags
 {
@@ -26,7 +26,7 @@ class GetValue extends Tags
 
         // If a URL has been specified, we'll grab that and it as the context.
         if ($from = $this->get('from')) {
-            $context = Content::whereUri($from)->toArray();
+            $context = Entry::whereUri($from)->toArray();
             unset($filters['from']);
         }
 
