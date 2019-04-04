@@ -1,8 +1,8 @@
 <template>
 
     <div class="focal-point">
-        <div class="focal-point-toolbox card">
-            <div class="form-group p-0">
+        <div class="focal-point-toolbox card p-0">
+            <div class="form-group pb-0">
                 <label>{{ __('Focal Point') }}</label>
                 <small class="help-block">{{ __('focal_point_instructions') }}</small>
                 <div class="focal-point-image">
@@ -17,12 +17,12 @@
                     }"></div>
                 </div>
             </div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between px-2">
                 <div>
                     <div class="mb-2">
-                        <button type="button" class="btn btn-default" @click.prevent="close">{{ __('Cancel') }}</button>
+                        <button type="button" class="btn" @click.prevent="close">{{ __('Cancel') }}</button>
                         <button type="button" class="btn btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
-                        <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
+                        <button type="button" class="btn btn-primary" @click="select">{{ __('Save') }}</button>
                     </div>
                     <div>
                         <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full" />
@@ -43,6 +43,7 @@
                     </div>
                 </div>
             </div>
+            <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('Crop previews are for example only') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">

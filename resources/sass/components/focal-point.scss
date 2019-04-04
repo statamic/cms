@@ -77,15 +77,15 @@
 
     &:before {
         content: "";
-        width: 4px;
-        height: 4px;
+        width: 8px;
+        height: 8px;
         position: absolute;
         background: white;
         border-radius: 50%;
         top: 50%;
         left: 50%;
-        margin: -2px 0 0 -2px;
-        box-shadow: 0 0 5px rgba(0,0,0,.5);
+        margin: -4px 0 0 -4px;
+        box-shadow: 0 0 4px rgba(0,0,0,.75);
     }
 }
 
