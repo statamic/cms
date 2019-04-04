@@ -55,6 +55,17 @@ abstract class AggregateStore extends Store
         return $this->stores;
     }
 
+    public function getStoreById($id)
+    {
+        if (! $store = $this->getIdMap()->get($id)) {
+            return null;
+        }
+
+        $store = explode('::', $store)[1];
+
+        return $this->store($store);
+    }
+
     public function setPaths($paths)
     {
         foreach ($paths as $site => $sitePaths) {

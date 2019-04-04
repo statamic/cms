@@ -41,7 +41,7 @@ class EntryRepository implements RepositoryContract
 
     public function find($id): ?Entry
     {
-        if (! $store = $this->stache->getStoreById($id)) {
+        if (! $store = $this->store->getStoreById($id)) {
             return null;
         }
 

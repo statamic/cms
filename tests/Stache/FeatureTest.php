@@ -60,6 +60,9 @@ class FeatureTest extends TestCase
     function it_gets_entry()
     {
         $this->assertEquals('Christmas', Entry::find('blog-christmas')->get('title'));
+
+        // ensure it only gets from the entries' store, not anywhere in the stache.
+        $this->assertNull(Entry::find('users-john'));
     }
 
     /** @test */
