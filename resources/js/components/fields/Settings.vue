@@ -62,7 +62,7 @@
                     - Default value
                 -->
 
-                <field-conditions-builder :config="config" />
+                <field-conditions-builder :config="config" @updated="updateFieldConditions" />
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
@@ -82,6 +82,7 @@
 import PublishField from '../publish/Field.vue';
 import ProvidesFieldtypes from './ProvidesFieldtypes';
 import FieldConditionsBuilder from '../field-conditions-builder/FieldConditionsBuilder.vue';
+import { KEYS as FIELD_CONDITIONS_KEYS } from '../publish/FieldConditions.js'
 
 export default {
 
@@ -184,6 +185,20 @@ export default {
             values[handle] = value;
             this.$emit('input', values);
             this.$emit('updated', handle, value);
+        },
+
+        updateFieldConditions(conditions) {
+            let values = {};
+
+            _.each(this.values, (value, key) => {
+                if (! FIELD_CONDITIONS_KEYS.includes(key)) {
+                    values[key] = value;
+                }
+            });
+
+            values = {...values, ...conditions};
+
+            this.$emit('updated', values.handle, values);
         }
 
     }

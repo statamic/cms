@@ -120,6 +120,19 @@ export default {
 
         isCustom() {
             return this.type === 'custom';
+        },
+
+        normalizedConditions() {
+            var conditions = {};
+            let key = this.any ? `${this.when}_any` : this.when;
+
+            if (this.isStandard && this.conditions.length > 0) {
+                conditions[key] = this.conditions;
+            } else if (this.isCustom && this.customMethod) {
+                conditions[key] = this.customMethod;
+            }
+
+            return conditions;
         }
     },
 
