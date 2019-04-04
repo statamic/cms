@@ -370,7 +370,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     protected function fileData()
     {
-        return $this->toArray();
+        $data = $this->toArray();
+
+        if ($data['allow_uploads'] === true) {
+            unset($data['allow_uploads']);
+        }
+
+        if ($data['create_folders'] === true) {
+            unset($data['create_folders']);
+        }
+
+        return $data;
     }
 
     public function toCacheableArray()

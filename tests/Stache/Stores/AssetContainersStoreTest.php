@@ -146,6 +146,15 @@ blueprint: foo
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
 
-        $this->store->save($container);
+        $container->allowUploads(false)->createFolders(false)->save();
+
+        $expected = <<<EOT
+title: 'New Container'
+blueprint: foo
+allow_uploads: false
+create_folders: false
+
+EOT;
+        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
     }
 }
