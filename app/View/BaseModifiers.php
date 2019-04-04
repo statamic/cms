@@ -3,7 +3,6 @@
 namespace Statamic\View;
 
 use Statamic\API\Arr;
-use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
@@ -589,9 +588,7 @@ class BaseModifiers extends Modifier
 
         // If the requested value (it should be an ID) doesn't exist, we'll just
         // spit the value back as-is. This seems like a sensible solution here.
-        if (! $item = Data::find($value)) {
-            return $value;
-        }
+        $item = Entry::find($value) ?? Asset::find($value) ?? $value;
 
         // Get the requested variable, which is the first parameter.
         $var = array_get_colon($params, 0);
