@@ -60,8 +60,9 @@
                     TODO:
                     - Validation
                     - Default value
-                    - Display conditions
                 -->
+
+                <field-conditions-builder />
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
