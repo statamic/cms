@@ -9,6 +9,7 @@ use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Asset;
+use Statamic\API\Entry;
 use Statamic\API\Parse;
 use Statamic\API\Theme;
 use Statamic\API\Config;
@@ -1976,13 +1977,13 @@ class BaseModifiers extends Modifier
             $value = array_get_colon($value, 0);
         }
 
-        if (! $item = Asset::find($value)) {
-            if (! $item = Content::find($value)) {
-                return $value;
-            }
+        if ($asset = Asset::find($value)) {
+            return $asset->url();
         }
 
-        return $item->url();
+        if ($entry = Entry::find($value)) {
+            return $entry->url();
+        }
     }
 
     /**
