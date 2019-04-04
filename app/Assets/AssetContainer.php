@@ -347,7 +347,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this
             ->fluentlyGetOrSet('allowUploads')
             ->getter(function ($allowUploads) {
-                return (bool) $allowUploads ?? true;
+                return (bool) ($allowUploads ?? true);
             })
             ->args(func_get_args());
     }
@@ -363,7 +363,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this
             ->fluentlyGetOrSet('createFolders')
             ->getter(function ($createFolders) {
-                return (bool) $createFolders ?? true;
+                return (bool) ($createFolders ?? true);
             })
             ->args(func_get_args());
     }

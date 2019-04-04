@@ -134,6 +134,30 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    function it_gets_and_sets_whether_uploads_are_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowUploads());
+
+        $return = $container->allowUploads(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowUploads());
+    }
+
+    /** @test */
+    function it_gets_and_sets_whether_folders_can_be_created()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->createFolders());
+
+        $return = $container->createFolders(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->createFolders());
+    }
+
+    /** @test */
     function it_saves_the_container_through_the_api()
     {
         API\AssetContainer::spy();
