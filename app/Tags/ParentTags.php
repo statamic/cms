@@ -4,8 +4,8 @@ namespace Statamic\Tags;
 
 use Statamic\API\URL;
 use Statamic\API\Parse;
+use Statamic\API\Entry;
 use Statamic\Tags\Tags;
-use Statamic\API\Content;
 use Stringy\StaticStringy as Stringy;
 
 class ParentTags extends Tags
@@ -93,7 +93,7 @@ class ParentTags extends Tags
 
         // Find the parent by stripping away URL segments
         foreach ($segment_urls as $segment_url) {
-            if ($content = Content::whereUri($segment_url)) {
+            if ($content = Entry::whereUri($segment_url)) {
                 return $content->toArray();
             }
         }
