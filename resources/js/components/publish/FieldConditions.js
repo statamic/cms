@@ -1,6 +1,14 @@
-export const KEYS = ['if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'];
-export const OPERATORS = ['==', '!=', '===', '!==', '>', '>=', '<', '<=', 'is', 'equals', 'not', 'includes', 'contains'];
-export const NUMBER_COMPARISONS = ['>', '>=', '<', '<='];
+export const KEYS = [
+    'if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'
+];
+
+export const OPERATORS = [
+    'is', 'equals', 'isnt', 'not', 'includes', 'contains', '==', '!=', '===', '!==', '>', '>=', '<', '<='
+];
+
+export const NUMBER_COMPARISONS = [
+    '>', '>=', '<', '<='
+];
 
 class FieldConditionsValidator {
     constructor(field, values, store, storeName) {
@@ -84,8 +92,8 @@ class FieldConditionsValidator {
             case 'is':
             case 'equals':
                 return '==';
-            case 'not':
             case 'isnt':
+            case 'not':
             case '¯\\_(ツ)_/¯':
                 return '!=';
             case 'includes':

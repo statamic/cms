@@ -159,6 +159,7 @@ test('it can check if value is empty', () => {
 
     expect(showFieldIf({first_name: 'empty'})).toBe(true);
     expect(showFieldIf({last_name: 'is empty'})).toBe(false);
+    expect(showFieldIf({last_name: 'isnt empty'})).toBe(true);
     expect(showFieldIf({last_name: 'not empty'})).toBe(true);
     expect(showFieldIf({user: 'empty'})).toBe(false);
     expect(showFieldIf({favorite_foods: 'empty'})).toBe(false);
