@@ -188,7 +188,7 @@ export default {
 
         updateFieldConditions(conditions) {
             let values = {};
-
+console.log(conditions);
             _.each(this.values, (value, key) => {
                 if (! FIELD_CONDITIONS_KEYS.includes(key)) {
                     values[key] = value;
@@ -196,7 +196,7 @@ export default {
             });
 
             values = {...values, ...conditions};
-
+// console.log(values);
             this.$emit('updated', values.handle, values);
         }
 

@@ -63,6 +63,7 @@
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 
 export default {
@@ -132,7 +133,7 @@ export default {
             let key = this.type === 'any' ? `${this.when}_any` : this.when;
 
             if (this.isStandard && this.conditions.length > 0) {
-                conditions[key] = this.combineOperatorsAndValues(this.conditions);
+                conditions[key] = this.prepareSaveableConditions(this.conditions);
             } else if (this.isCustom && this.customMethod) {
                 conditions[key] = this.customMethod;
             }
@@ -186,56 +187,26 @@ export default {
             if (typeof conditions === 'string') {
                 this.type = 'custom';
                 this.customMethod = conditions;
-            } else {
-                this.conditions = this.splitOperatorsAndValues(conditions);
-            }
-        },
-
-        splitOperatorsAndValues(conditions) {
-            return _.map(conditions, (rhs, field) => {
-                return {
-                    'field': field,
-                    'operator': this.editableOperator(rhs),
-                    'value': this.editableValue(rhs)
-                }
-            });
-        },
-
-        combineOperatorsAndValues(conditions) {
-            let combined = {};
-
-            return conditions.forEach(condition => {
-                let operator = this.saveableOperator(condition.operator);
-                let value = this.saveableValue(condition.value);
-                combined[condition.field] = `${operator} ${value}`.trim();
-            });
-
-            return combined;
-        },
-
-        editableOperator(operator) {
-            return this.normalizeOperator(operator);
-        },
-
-        saveableOperator(operator) {
-            operator = this.normalizeOperator(operator);
-
-            if (operator === 'equals') {
-                operator = '';
+                return;
             }
 
-            return operator;
+            this.conditions = this.prepareEditableConditions(conditions);
         },
 
-        editableValue(value) {
-            return value;
+        prepareEditableConditions(conditions) {
+            let editable = (new Converter).fromBlueprint(conditions);
+
+            return _.mapObject(editable, condition => {
+                condition.operator = this.prepareEditableOperator(condition.operator);
+                return condition;
+            })
         },
 
-        saveableValue(value) {
-            return value;
+        prepareSaveableConditions(conditions) {
+            return (new Converter).toBlueprint(conditions);
         },
 
-        normalizeOperator(operator) {
+        prepareEditableOperator(operator) {
             switch (operator) {
                 case 'is':
                 case '==':
