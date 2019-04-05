@@ -97,10 +97,9 @@ export default {
         update: _.debounce(function () {
             if (!this.query) {
                 this.reset();
+                this.searching = false;
                 return;
             }
-
-            this.searching = true;
 
             let payload = {params: Object.assign({ q:this.query }, this.data) };
 
@@ -154,6 +153,7 @@ export default {
 
     watch: {
         query(query) {
+            this.searching = true;
             this.update();
         },
 
