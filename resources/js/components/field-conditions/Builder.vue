@@ -25,7 +25,7 @@
         <div
             v-if="showConditions && isStandard"
             v-for="(condition, index) in conditions"
-            :key="condition.field"
+            :key="condition._id"
             class="mt-3"
         >
             <select-input
@@ -62,6 +62,7 @@
 
 
 <script>
+import uniqid from 'uniqid';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 import Converter from '../field-conditions/Converter.js';
 import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
@@ -159,6 +160,7 @@ export default {
     methods: {
         add() {
             this.conditions.push({
+                _id: uniqid(),
                 field: null,
                 operator: 'equals',
                 value: null
@@ -200,6 +202,7 @@ export default {
 
         prepareEditableConditions(conditions) {
             return (new Converter).fromBlueprint(conditions).map(condition => {
+                condition._id = uniqid();
                 condition.operator = this.prepareEditableOperator(condition.operator);
                 return condition;
             });
