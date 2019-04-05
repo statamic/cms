@@ -167,7 +167,7 @@ class FieldConditionsValidator {
         let operator = defaultOperator;
 
         _.chain(OPERATORS)
-            .filter(value => new RegExp(`^${value}[^=]`).test(condition.toString()))
+            .filter(value => new RegExp(`^${value} [^=]`).test(condition.toString()))
             .each(value => operator = value);
 
         return operator;
@@ -177,7 +177,7 @@ class FieldConditionsValidator {
         let rhs = condition.toString();
 
         _.chain(OPERATORS)
-            .filter(value => new RegExp(`^${value}[^=]`).test(rhs))
+            .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
             .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
 
         return rhs;
