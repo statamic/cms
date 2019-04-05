@@ -199,15 +199,17 @@ export default {
         },
 
         prepareEditableConditions(conditions) {
-            let editable = (new Converter).fromBlueprint(conditions);
-
-            return _.mapObject(editable, condition => {
+            return (new Converter).fromBlueprint(conditions).map(condition => {
                 condition.operator = this.prepareEditableOperator(condition.operator);
                 return condition;
-            })
+            });
         },
 
         prepareSaveableConditions(conditions) {
+            conditions = _.reject(conditions, condition => {
+                return ! condition.field || ! condition.value;
+            });
+
             return (new Converter).toBlueprint(conditions);
         },
 
