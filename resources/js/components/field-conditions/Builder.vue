@@ -152,7 +152,7 @@ export default {
     },
 
     created() {
-        // this.add();
+        this.add();
         this.getInitial();
     },
 
@@ -181,8 +181,13 @@ export default {
                 return;
             }
 
-            this.when = key.startsWith('unless') || key.startsWith('hide_when') ? 'unless' : 'if';
-            this.type = key.endsWith('_any') ? 'any' : 'all';
+            this.when = key.startsWith('unless') || key.startsWith('hide_when')
+                ? 'unless'
+                : 'if';
+
+            this.type = key.endsWith('_any')
+                ? 'any'
+                : 'all';
 
             if (typeof conditions === 'string') {
                 this.type = 'custom';
