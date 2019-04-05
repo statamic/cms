@@ -21,6 +21,7 @@
                             :type="field.config.type"
                             :root="isRoot"
                             :config="fieldConfig"
+                            :suggestable-condition-fields="suggestableConditionFields"
                             @updated="configFieldUpdated"
                             @input="configUpdated"
                             @closed="editorClosed"
@@ -46,6 +47,10 @@ export default {
         FieldSettings,
         WidthSelector,
     },
+
+    props: [
+        'suggestableConditionFields'
+    ],
 
     computed: {
 

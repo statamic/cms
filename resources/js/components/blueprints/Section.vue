@@ -27,6 +27,7 @@
                         :field="field"
                         :is-editing="editingField === field._id"
                         :is-section-expanded="isEditing"
+                        :suggestable-condition-fields="suggestableConditionFields"
                         @edit="editingField = field._id"
                         @editor-closed="editingField = null"
                         @updated="fieldUpdated(i, $event)"
@@ -70,6 +71,12 @@ export default {
             isEditing: false,
             isAddingField: true,
             editingField: null
+        }
+    },
+
+    computed: {
+        suggestableConditionFields() {
+            return this.section.fields.map(field => field.handle);
         }
     },
 

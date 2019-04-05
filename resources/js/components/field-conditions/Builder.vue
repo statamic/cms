@@ -74,6 +74,9 @@ export default {
     props: {
         config: {
             required: true
+        },
+        suggestableFields: {
+            required: true
         }
     },
 
@@ -104,7 +107,9 @@ export default {
         },
 
         fieldOptions() {
-            return this.normalizeInputOptions(['one', 'two']);
+            return this.normalizeInputOptions(
+                _.reject(this.suggestableFields, field => field === this.config.handle)
+            );
         },
 
         operatorOptions() {

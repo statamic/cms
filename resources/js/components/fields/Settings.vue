@@ -62,7 +62,10 @@
                     - Default value
                 -->
 
-                <field-conditions-builder :config="config" @updated="updateFieldConditions" />
+                <field-conditions-builder
+                    :config="config"
+                    :suggestable-fields="suggestableConditionFields"
+                    @updated="updateFieldConditions" />
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
@@ -92,7 +95,9 @@ export default {
 
     mixins: [ProvidesFieldtypes],
 
-    props: ['config', 'type', 'root'],
+    props: ['config', 'type', 'root', 'suggestableConditionFields'],
+
+    inject: ['section'],
 
     model: {
         prop: 'config',
