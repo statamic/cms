@@ -97,8 +97,6 @@ export default {
 
     props: ['config', 'type', 'root', 'suggestableConditionFields'],
 
-    inject: ['section'],
-
     model: {
         prop: 'config',
         event: 'input'
