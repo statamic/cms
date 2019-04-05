@@ -19,6 +19,7 @@
                 />
 
             <span v-if="! (isDirty || searching)" class="rounded px-sm pb-px text-2xs border text-grey-50">/</span>
+            <loading-graphic v-if="searching" :size="14" :inline="true" text="" />
 
             <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
