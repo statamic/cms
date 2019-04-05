@@ -195,9 +195,7 @@ export default {
                 }
             });
 
-            values = {...values, ...conditions};
-
-            this.$emit('updated', values.handle, values);
+            this.$emit('input', {...values, ...conditions});
         }
 
     }

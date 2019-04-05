@@ -21,7 +21,8 @@
                             :type="field.config.type"
                             :root="isRoot"
                             :config="fieldConfig"
-                            @updated="configUpdated"
+                            @updated="configFieldUpdated"
+                            @input="configUpdated"
                             @closed="editorClosed"
                         />
                     </stack>
@@ -67,7 +68,7 @@ export default {
                 return this.field.config.width;
             },
             set(width) {
-                this.configUpdated('width', width);
+                this.configFieldUpdated('width', width);
             }
         },
 
@@ -80,7 +81,7 @@ export default {
 
     methods: {
 
-        configUpdated(handle, value) {
+        configFieldUpdated(handle, value) {
             if (handle === 'handle') {
                 Vue.set(this.field, handle, value);
             } else {
@@ -90,6 +91,13 @@ export default {
                     this.field.config_overrides.push(handle);
                 }
             }
+
+            this.$emit('updated', this.field);
+        },
+
+        configUpdated(config) {
+            delete config.handle;
+            this.field.config = config;
 
             this.$emit('updated', this.field);
         },
