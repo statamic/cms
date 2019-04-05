@@ -63,15 +63,11 @@
 
 <script>
 import HasInputOptions from '../fieldtypes/HasInputOptions.js'
-import { FieldConditions, KEYS, OPERATORS } from '../publish/FieldConditions.js'
+import { KEYS, OPERATORS } from '../publish/FieldConditions.js'
 
 export default {
 
     mixins: [HasInputOptions],
-
-    components: {
-        condition: require('./Condition.vue')
-    },
 
     props: {
         config: {
@@ -232,10 +228,7 @@ export default {
         },
 
         editableValue(value) {
-            let fieldConditions = new FieldConditions();
-            let wat = fieldConditions.normalizeConditionRhs(value);
-            console.log(wat);
-            return wat;
+            return value;
         },
 
         saveableValue(value) {
