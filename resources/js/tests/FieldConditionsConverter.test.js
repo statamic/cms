@@ -1,7 +1,7 @@
 import Converter from '../components/field-conditions/Converter.js';
 global._ = require('underscore');
 
-const FieldConditionsConverter = new Converter();
+const FieldConditionsConverter = new Converter;
 
 test('it converts from blueprint format', () => {
     let converted = FieldConditionsConverter.fromBlueprint({

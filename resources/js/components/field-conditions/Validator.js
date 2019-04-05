@@ -1,3 +1,4 @@
+import Converter from './Converter.js';
 import { KEYS, OPERATORS } from './Constants.js';
 
 const NUMBER_SPECIFIC_COMPARISONS = [
@@ -13,6 +14,7 @@ export default class {
         this.storeName = storeName;
         this.passOnAny = false;
         this.showOnPass = true;
+        this.converter = new Converter;
     }
 
     passesConditions() {
@@ -23,6 +25,8 @@ export default class {
         } else if (_.isString(conditions)) {
             return this.passesCustomLogicFunction(conditions);
         }
+
+        conditions = this.converter.fromBlueprint(conditions);
 
         let passes = this.passOnAny
             ? this.passesAnyConditions(conditions)
@@ -54,7 +58,7 @@ export default class {
 
     passesAllConditions(conditions) {
         return _.chain(conditions)
-            .map((condition, field) => this.normalizeCondition(field, condition))
+            .map(condition => this.prepareCondition(condition))
             .reject(condition => this.passesCondition(condition))
             .isEmpty()
             .value();
@@ -62,27 +66,24 @@ export default class {
 
     passesAnyConditions(conditions) {
         return ! _.chain(conditions)
-            .map((condition, field) => this.normalizeCondition(field, condition))
+            .map(condition => this.prepareCondition(condition))
             .filter(condition => this.passesCondition(condition))
             .isEmpty()
             .value();
     }
 
-    normalizeCondition(field, condition) {
-        this.operator = this.normalizeConditionOperator(condition);
+    prepareCondition(condition) {
+        let operator = this.prepareOperator(condition.operator);
+        let lhs = this.prepareLhs(condition.field, operator);
+        let rhs = this.prepareRhs(condition.value, operator);
 
-        return {
-            'lhs': this.normalizeConditionLhs(field),
-            'operator': this.operator,
-            'rhs': this.normalizeConditionRhs(condition)
-        };
+        return {lhs, operator, rhs};
     }
 
-    normalizeConditionOperator(condition) {
-        let operator = this.getOperatorFromCondition(condition, '==');
-
-        // Normalize operator aliases.
+    prepareOperator(operator) {
         switch (operator) {
+            case null:
+            case '':
             case 'is':
             case 'equals':
                 return '==';
@@ -98,16 +99,16 @@ export default class {
         return operator;
     }
 
-    normalizeConditionLhs(field) {
+    prepareLhs(field, operator) {
         let lhs = this.getFieldValue(field);
 
         // When performing a number comparison, cast to number.
-        if (NUMBER_SPECIFIC_COMPARISONS.includes(this.operator)) {
+        if (NUMBER_SPECIFIC_COMPARISONS.includes(operator)) {
             return Number(lhs);
         }
 
         // When performing lhs.includes(), if lhs is not an object or array, cast to string.
-        if (this.operator === 'includes' && ! _.isObject(lhs)) {
+        if (operator === 'includes' && ! _.isObject(lhs)) {
             return lhs ? lhs.toString() : '';
         }
 
@@ -122,9 +123,7 @@ export default class {
             : lhs;
     }
 
-    normalizeConditionRhs(condition) {
-        let rhs = this.getRhsFromCondition(condition);
-
+    prepareRhs(rhs, operator) {
         // When comparing against null, true, false, cast to literals.
         switch (rhs) {
             case 'null':
@@ -136,12 +135,12 @@ export default class {
         }
 
         // When performing a number comparison, cast to number.
-        if (NUMBER_SPECIFIC_COMPARISONS.includes(this.operator)) {
+        if (NUMBER_SPECIFIC_COMPARISONS.includes(operator)) {
             return Number(rhs);
         }
 
         // When performing a comparison that cannot be eval()'d, return rhs as is.
-        if (rhs === 'empty' || this.operator === 'includes') {
+        if (rhs === 'empty' || operator === 'includes') {
             return rhs;
         }
 
@@ -155,26 +154,6 @@ export default class {
         return field.startsWith('root.')
             ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
             :  data_get(this.values, field);
-    }
-
-    getOperatorFromCondition(condition, defaultOperator) {
-        let operator = defaultOperator;
-
-        _.chain(OPERATORS)
-            .filter(value => new RegExp(`^${value} [^=]`).test(condition.toString()))
-            .each(value => operator = value);
-
-        return operator;
-    }
-
-    getRhsFromCondition(condition) {
-        let rhs = condition.toString();
-
-        _.chain(OPERATORS)
-            .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
-            .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
-
-        return rhs;
     }
 
     passesCondition(condition) {
