@@ -116,7 +116,6 @@ export default {
             this.results = [];
             this.query = '';
             this.searching = false;
-            this.focused = false;
         },
 
         setActive(index) {
