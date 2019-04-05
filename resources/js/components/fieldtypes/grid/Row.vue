@@ -35,13 +35,13 @@
 
 <script>
 import GridCell from './Cell.vue';
-import FieldConditions from '../../publish/FieldConditions.js';
+import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
 
     components: { GridCell },
 
-    mixins: [FieldConditions],
+    mixins: [ValidatesFieldConditions],
 
     props: {
         index: {

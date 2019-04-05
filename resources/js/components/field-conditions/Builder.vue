@@ -62,8 +62,8 @@
 
 
 <script>
-import HasInputOptions from '../fieldtypes/HasInputOptions.js'
-import { KEYS, OPERATORS } from '../publish/FieldConditions.js'
+import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
 
 export default {
 

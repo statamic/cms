@@ -50,13 +50,13 @@
 
 <script>
 import SetField from './Field.vue';
-import FieldConditions from '../../publish/FieldConditions.js';
+import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
 
     components: { SetField },
 
-    mixins: [FieldConditions],
+    mixins: [ValidatesFieldConditions],
 
     props: {
         config: {

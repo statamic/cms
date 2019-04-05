@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import FieldConditions from '../components/publish/FieldConditions.js';
+import ValidatesFieldConditions from '../components/field-conditions/ValidatorMixin.js';
 require('../bootstrap/globals');
 global._ = require('underscore');
 Vue.use(Vuex);
@@ -25,7 +25,7 @@ const Statamic = {
 };
 
 const Fields = new Vue({
-    mixins: [FieldConditions],
+    mixins: [ValidatesFieldConditions],
     store: Store,
     data() {
         return {

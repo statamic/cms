@@ -1,16 +1,10 @@
-export const KEYS = [
-    'if', 'if_any', 'show_when', 'show_when_any', 'unless', 'unless_any', 'hide_when', 'hide_when_any'
-];
+import { KEYS, OPERATORS } from './Constants.js';
 
-export const OPERATORS = [
-    'is', 'equals', 'isnt', 'not', 'includes', 'contains', '==', '!=', '===', '!==', '>', '>=', '<', '<='
-];
-
-export const NUMBER_COMPARISONS = [
+const NUMBER_SPECIFIC_COMPARISONS = [
     '>', '>=', '<', '<='
 ];
 
-class FieldConditionsValidator {
+export default class {
     constructor(field, values, store, storeName) {
         this.field = field;
         this.values = values;
@@ -108,7 +102,7 @@ class FieldConditionsValidator {
         let lhs = this.getFieldValue(field);
 
         // When performing a number comparison, cast to number.
-        if (NUMBER_COMPARISONS.includes(this.operator)) {
+        if (NUMBER_SPECIFIC_COMPARISONS.includes(this.operator)) {
             return Number(lhs);
         }
 
@@ -142,7 +136,7 @@ class FieldConditionsValidator {
         }
 
         // When performing a number comparison, cast to number.
-        if (NUMBER_COMPARISONS.includes(this.operator)) {
+        if (NUMBER_SPECIFIC_COMPARISONS.includes(this.operator)) {
             return Number(rhs);
         }
 
@@ -212,22 +206,5 @@ class FieldConditionsValidator {
         let passes = customFunction(this.values, this.rootValues, extra);
 
         return this.showOnPass ? passes : ! passes;
-    }
-}
-
-// Export select methods for use as Vue mixin.
-export default {
-    inject: {
-        storeName: {
-            default: 'base'
-        }
-    },
-
-    methods: {
-        showField(field) {
-            let validator = new FieldConditionsValidator(field, this.values, this.$store, this.storeName);
-
-            return validator.passesConditions();
-        }
     }
 }

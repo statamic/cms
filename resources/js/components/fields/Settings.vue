@@ -81,8 +81,7 @@
 <script>
 import PublishField from '../publish/Field.vue';
 import ProvidesFieldtypes from './ProvidesFieldtypes';
-import FieldConditionsBuilder from '../field-conditions-builder/FieldConditionsBuilder.vue';
-import { KEYS as FIELD_CONDITIONS_KEYS } from '../publish/FieldConditions.js'
+import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 
 export default {
 

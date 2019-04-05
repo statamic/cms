@@ -20,13 +20,13 @@
 
 <script>
 import PublishField from './Field.vue';
-import FieldConditions from './FieldConditions.js';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
 
     components: { PublishField },
 
-    mixins: [FieldConditions],
+    mixins: [ValidatesFieldConditions],
 
     inject: ['storeName'],
 
