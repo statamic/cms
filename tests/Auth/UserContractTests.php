@@ -154,6 +154,7 @@ trait UserContractTests
             'supplemented' => 'qux',
             'avatar' => null,
             'initials' => 'JS',
+            'is_user' => true,
         ], $this->user()->toArray());
     }
 

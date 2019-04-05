@@ -122,6 +122,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'initials' => $this->initials(),
             'preferences' => $this->preferences(),
             'edit_url' => $this->editUrl(),
+            'is_user' => true,
         ], $roles, $groups, $this->supplements);
     }
 
