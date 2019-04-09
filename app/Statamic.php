@@ -119,6 +119,7 @@ class Statamic
     {
         $defaults = [
             'version' => static::version(),
+            'laravelVersion' => app()->version(),
             'csrfToken' => csrf_token(),
             'cpRoot' => cp_root(),
             'urlPath' => '/' . request()->path(),
