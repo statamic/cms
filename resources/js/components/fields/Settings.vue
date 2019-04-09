@@ -67,6 +67,10 @@
                     :suggestable-fields="suggestableConditionFields"
                     @updated="updateFieldConditions" />
 
+                <field-validation-builder
+                    :config="config"
+                    @updated="updateFieldValidation" />
+
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
                     :key="configField.handle"
@@ -85,12 +89,14 @@
 import PublishField from '../publish/Field.vue';
 import ProvidesFieldtypes from './ProvidesFieldtypes';
 import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
+import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
 
     components: {
         PublishField,
         FieldConditionsBuilder,
+        FieldValidationBuilder,
     },
 
     mixins: [ProvidesFieldtypes],
@@ -199,6 +205,18 @@ export default {
             });
 
             this.$emit('input', {...values, ...conditions});
+        },
+
+        updateFieldValidation(rules) {
+            const values = this.values;
+
+            if (rules) {
+                values.validate = rules;
+            } else {
+                delete values.validate;
+            }
+
+            this.$emit('input', values);
         }
 
     }
