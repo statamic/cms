@@ -13,7 +13,7 @@ class Tiptap extends Replicator
 
     public function augment($value)
     {
-        return (new Augmentor($this->config()))->augment($value);
+        return (new Augmentor)->augment($value);
     }
 
     public function process($value)
