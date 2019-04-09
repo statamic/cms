@@ -60,4 +60,57 @@ class BardTest extends TestCase
 
         $this->assertEquals($expected, (new Tiptap)->augment($data));
     }
+
+    /** @test */
+    function it_removes_disabled_sets()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [['type' => 'text', 'text' => 'This is a paragraph.']]
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'enabled' => false,
+                    'values' => [
+                        'type' => 'test',
+                        'value' => 'one',
+                    ]
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'values' => [
+                        'type' => 'test',
+                        'value' => 'two',
+                    ]
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Another paragraph.']
+                ]
+            ]
+        ];
+
+        $expected = [
+            [
+                'type' => 'text',
+                'text' => '<p>This is a paragraph.</p>',
+            ],
+            [
+                'type' => 'test',
+                'value' => 'two',
+            ],
+            [
+                'type' => 'text',
+                'text' => '<p>Another paragraph.</p>',
+            ]
+        ];
+
+        $this->assertEquals($expected, (new Tiptap)->augment($data));
+    }
 }

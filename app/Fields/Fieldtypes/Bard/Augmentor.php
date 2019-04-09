@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields\Fieldtypes\Bard;
 
+use Statamic\API\Arr;
 use Scrumpy\ProseMirrorToHtml\Renderer;
 
 class Augmentor
@@ -10,11 +11,20 @@ class Augmentor
 
     public function augment($value)
     {
+        $value = $this->removeDisabledSets($value);
         $value = $this->addSetIndexes($value);
         $value = $this->convertToHtml($value);
         $value = $this->convertToSets($value);
 
         return $value;
+    }
+
+    protected function removeDisabledSets($value)
+    {
+        return collect($value)->reject(function ($value) {
+            return $value['type'] === 'set'
+                && Arr::get($value, 'attrs.enabled', true) === false;
+        });
     }
 
     protected function addSetIndexes($value)
