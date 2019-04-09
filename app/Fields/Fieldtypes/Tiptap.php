@@ -31,14 +31,13 @@ class Tiptap extends Replicator
 
     protected function processRow($row)
     {
-        $processed = parent::processRow($row['attrs']['values']);
+        $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
 
-        return [
-            'type' => 'set',
-            'attrs' => [
-                'values' => $processed
-            ]
-        ];
+        if ($row['attrs']['enabled'] === true) {
+            unset($row['attrs']['enabled']);
+        }
+
+        return $row;
     }
 
     public function preProcess($value)

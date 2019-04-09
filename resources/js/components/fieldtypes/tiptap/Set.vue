@@ -11,7 +11,11 @@
                     class="help-block replicator-set-instructions" />
             </div>
             <div class="replicator-set-controls">
-                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="values.enabled" />
+                <toggle-fieldtype
+                    name="set-enabled"
+                    class="toggle-sm mr-2"
+                    :value="enabled"
+                    @updated="enabled = $event" />
                 <dropdown-list>
                     <ul class="dropdown-menu">
                         <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
@@ -62,6 +66,15 @@ export default {
             return _.findWhere(this.setConfigs, { handle: this.values.type });
         },
 
+        enabled: {
+            get() {
+                return this.node.attrs.enabled;
+            },
+            set(enabled) {
+                return this.updateAttrs({ enabled })
+            }
+        },
+
         parentName() {
             return 'todo';
         },
@@ -73,10 +86,6 @@ export default {
     },
 
     methods: {
-
-        toggleEnabledState() {
-            // todo
-        },
 
         updated(handle, value) {
             let values = Object.assign({}, this.values);
