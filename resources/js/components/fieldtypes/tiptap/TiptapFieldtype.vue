@@ -128,7 +128,7 @@ export default {
                 || null;
             });
 
-            this.editor.commands.set({ values, config });
+            this.editor.commands.set({ values });
             this.$refs.setSelectorDropdown.close();
         },
 
