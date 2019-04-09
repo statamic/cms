@@ -88,6 +88,10 @@ export default {
     },
 
     mounted() {
+        let content = this.value.length
+            ? { type: 'doc', content: this.value }
+            : null;
+
         this.editor = new Editor({
             extensions: [
                 new HardBreak(),
@@ -97,7 +101,7 @@ export default {
                 new Set(),
                 new History(),
             ],
-            content: { type: 'doc', content: this.value },
+            content,
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
