@@ -5,7 +5,7 @@
         <div class="help-block -mt-1">
             <p>
                 {{ __("Has access to all of Laravel's validation rules.") }}
-                <a :href="laravelDocsLink">{{ __('Learn more') }}</a>
+                <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
             </p>
         </div>
 
