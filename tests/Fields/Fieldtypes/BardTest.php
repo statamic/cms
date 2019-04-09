@@ -3,7 +3,7 @@
 namespace Tests\Fields\Fieldtypes;
 
 use Tests\TestCase;
-use Statamic\Fields\Fieldtypes\Tiptap;
+use Statamic\Fields\Fieldtypes\Bard;
 
 class BardTest extends TestCase
 {
@@ -58,7 +58,7 @@ class BardTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, (new Tiptap)->augment($data));
+        $this->assertEquals($expected, (new Bard)->augment($data));
     }
 
     /** @test */
@@ -111,6 +111,6 @@ class BardTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, (new Tiptap)->augment($data));
+        $this->assertEquals($expected, (new Bard)->augment($data));
     }
 }

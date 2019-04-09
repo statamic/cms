@@ -107,7 +107,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Template::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
-        Fieldtypes\Tiptap::class,
         Fieldtypes\UserGroups::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,

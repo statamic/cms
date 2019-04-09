@@ -1,8 +1,0 @@
-{
-    "name": "scribe-editor",
-    "version": "3.3.0",
-    "main": "scribe.js",
-    "dependencies": {
-        "immutable": "~3.8.1"
-    }
-}
