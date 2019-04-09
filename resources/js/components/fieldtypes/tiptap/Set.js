@@ -38,4 +38,19 @@ export default class SetNode extends Node {
         };
     }
 
+    stopEvent(event) {
+        const isPaste = event.type === 'paste'
+        const draggable = !!this.schema.draggable
+
+        if (draggable && (event instanceof DragEvent)) {
+            return false
+        }
+
+        if (isPaste) {
+            return false;
+        }
+
+        return true
+    }
+
 }
