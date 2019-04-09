@@ -268,6 +268,12 @@ export default [
         example: 'size:value'
     },
     {
+        text: 'Starts With',
+        value: 'starts_with:',
+        example: 'starts_with:foo,bar,...',
+        minVersion: '5.7.15'
+    },
+    {
         text: 'String',
         value: 'string'
     },
@@ -283,5 +289,10 @@ export default [
     {
         text: 'URL',
         value: 'url'
+    },
+    {
+        text: 'UUID',
+        value: 'uuid',
+        minVersion: '5.7.10'
     }
 ];
