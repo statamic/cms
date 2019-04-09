@@ -80,7 +80,7 @@ export default {
                 .first()
                 .value();
 
-            return rule.help || false;
+            return rule.example || false;
         },
 
         saveableRules() {
