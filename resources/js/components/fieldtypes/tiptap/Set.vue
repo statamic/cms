@@ -46,6 +46,8 @@ export default {
 
     props: [
         'node', // Prosemirror Node Object
+        'view', // Prosemirror EditorView Object
+        'getPos', // function allowing the view to find its position
         'updateAttrs', // function to update attributes defined in `schema`
         'editable', // global editor prop whether the content can be edited
         'options', // array of extension options
@@ -96,6 +98,13 @@ export default {
 
         showField(field) {
             return true; // todo, send this through fieldconditions mixin
+        },
+
+        destroy() {
+            let tr = this.view.state.tr;
+            let pos = this.getPos();
+            tr.delete(pos, pos + this.node.nodeSize);
+            this.view.dispatch(tr);
         }
 
     }
