@@ -1,8 +1,11 @@
 <template>
 
-    <div class="bard-set  bg-white border my-4 rounded shadow my-3 whitespace-normal">
+    <div class="bard-set  bg-white border my-4 rounded shadow my-3 whitespace-normal"
+        @mousedown="parentMousedown"
+        @dragstart="parentDragStart"
+    >
         <div class="replicator-set-header">
-            <div class="item-move sortable-handle"></div>
+            <div class="item-move sortable-handle" ref="dragHandle"></div>
             <div class="flex-1 ml-1 flex items-center">
                 <label v-text="config.display" class="text-xs"/>
                 <div
@@ -58,6 +61,12 @@ export default {
 
     inject: ['setConfigs'],
 
+    data() {
+        return {
+            lastClicked: null,
+        }
+    },
+
     computed: {
 
         values() {
@@ -105,7 +114,21 @@ export default {
             let pos = this.getPos();
             tr.delete(pos, pos + this.node.nodeSize);
             this.view.dispatch(tr);
-        }
+        },
+
+        parentMousedown(e) {
+            this.lastClicked = e.target;
+        },
+
+        parentDragStart(e) {
+            const handle = this.$refs.dragHandle;
+
+            if (this.lastClicked === handle || handle.contains(this.lastClicked)) {
+                return;
+            }
+
+            e.preventDefault();
+        },
 
     }
 }

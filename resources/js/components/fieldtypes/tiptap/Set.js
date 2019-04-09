@@ -19,6 +19,7 @@ export default class SetNode extends Node {
             },
             group: 'block',
             selectable: false,
+            draggable: true,
             parseDOM: [{
                 tag: 'bard-set',
                 getAttrs: dom => JSON.parse(dom.innerHTML)
