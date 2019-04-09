@@ -11,6 +11,7 @@
         "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
         "ranabd36/laravelcollective": "^5.8",
+        "scrumpy/prosemirror-to-html": "^0.3.0",
         "statamic/stringy": "^3.1",
         "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*",
