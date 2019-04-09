@@ -23,13 +23,13 @@
 
 
 .tiptap-toolbar {
-    @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0;
+    @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
     transform: translateX(-50%) translateY(-10px);
     white-space: nowrap;
     z-index: 1000;
 
     &.active {
-        @apply opacity-100;
+        @apply opacity-100 visible;
     }
 
     &:before {
