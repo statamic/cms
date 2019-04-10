@@ -62,6 +62,8 @@ class Bard extends Replicator
         if (is_string($value)) {
             $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
+        } else if ($this->isLegacyData($value)) {
+            $value = $this->convertLegacyData($value);
         }
 
         return collect($value)->map(function ($row) {
@@ -92,5 +94,33 @@ class Bard extends Replicator
         }
 
         return parent::extraRules();
+    }
+
+    protected function isLegacyData($value)
+    {
+        $hasTextSet = null !== collect($value)->first(function ($set) {
+            return $set['type'] === 'text';
+        });
+
+        return $hasTextSet || !isset($value[0]['attrs']);
+    }
+
+    protected function convertLegacyData($value)
+    {
+        return collect($value)->flatMap(function ($set) {
+            if ($set['type'] === 'text') {
+                $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+                return $doc['content'];
+            }
+
+            return [
+                [
+                    'type' => 'set',
+                    'attrs' => [
+                        'values' => $set,
+                    ]
+                ]
+            ];
+        })->all();
     }
 }

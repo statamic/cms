@@ -138,4 +138,73 @@ class BardTest extends TestCase
 
         $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
     }
+
+    /** @test */
+    function it_transforms_v2_formatted_content_into_prosemirror_structure()
+    {
+        $data = [
+            ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
+            ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
+            ['type' => 'text', 'text' => '<p>Another paragraph.</p>'],
+        ];
+
+        $expected = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is a paragraph with '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+                    ['type' => 'text', 'text' => ' text.'],
+                ]
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Second paragraph.'],
+                ]
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'values' => [
+                        'type' => 'myset',
+                        'foo' => 'bar',
+                        'baz' => 'qux',
+                    ]
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Another paragraph.']
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
+    }
+
+
+    /** @test */
+    function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
+    {
+        $data = [
+            ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
+        ];
+
+        $expected = [
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'values' => [
+                        'type' => 'myset',
+                        'foo' => 'bar',
+                        'baz' => 'qux',
+                    ]
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
+    }
 }
