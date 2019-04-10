@@ -11,20 +11,20 @@
                 :placeholder="false" />
 
             <select-input
-                v-if="showConditions"
+                v-if="hasConditions"
                 v-model="type"
                 :options="typeOptions"
                 :placeholder="false"
                 class="ml-2" />
 
             <text-input
-                v-if="showConditions && isCustom"
+                v-if="hasConditions && isCustom"
                 v-model="customMethod"
                 class="ml-2 flex-1" />
         </div>
 
         <div
-            v-if="showConditions && isStandard"
+            v-if="hasConditions && isStandard"
             v-for="(condition, index) in conditions"
             :key="condition._id"
             class="flex items-center mt-2"
@@ -48,7 +48,7 @@
         </div>
 
         <button
-            v-if="showConditions && isStandard"
+            v-if="hasConditions && isStandard"
             v-text="__('Add Condition')"
             @click="add"
             class="btn mt-3" />
@@ -115,12 +115,12 @@ export default {
             );
         },
 
-        showConditions() {
+        hasConditions() {
             return this.when !== 'always';
         },
 
         isStandard() {
-            return ! this.isCustom;
+            return this.hasConditions && ! this.isCustom;
         },
 
         isCustom() {
