@@ -208,7 +208,7 @@ export default {
         },
 
         updateFieldValidation(rules) {
-            const values = this.values;
+            const values = clone(this.values);
 
             if (rules) {
                 values.validate = rules;
