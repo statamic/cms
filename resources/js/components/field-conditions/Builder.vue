@@ -134,9 +134,10 @@ export default {
         saveableConditions() {
             var conditions = {};
             let key = this.type === 'any' ? `${this.when}_any` : this.when;
+            let saveableConditions = this.prepareSaveableConditions(this.conditions);
 
-            if (this.isStandard && this.conditions.length > 0) {
-                conditions[key] = this.prepareSaveableConditions(this.conditions);
+            if (this.isStandard && ! _.isEmpty(saveableConditions)) {
+                conditions[key] = saveableConditions;
             } else if (this.isCustom && this.customMethod) {
                 conditions[key] = this.customMethod;
             }
