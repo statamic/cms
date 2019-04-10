@@ -65,8 +65,12 @@ class Revision implements Contract, Arrayable
         return $this->fluentlyGetOrSet('attributes')->value($attributes);
     }
 
-    public function attribute(string $key, $value)
+    public function attribute(string $key, $value = null)
     {
+        if (func_num_args() == 1) {
+            return $this->attributes[$key];
+        }
+
         $this->attributes[$key] = $value;
 
         return $this;
