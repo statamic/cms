@@ -116,8 +116,11 @@ export default {
     mounted() {
         this.initToolbarButtons();
 
-        let content = this.value.length
-            ? { type: 'doc', content: this.value }
+        // A json string is passed from PHP since that's what's submitted.
+        const value = JSON.parse(this.value);
+
+        let content = value.length
+            ? { type: 'doc', content: value }
             : null;
 
         this.editor = new Editor({

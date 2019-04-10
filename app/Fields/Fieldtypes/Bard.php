@@ -45,7 +45,7 @@ class Bard extends Replicator
             }
 
             return $this->preProcessRow($row);
-        })->all();
+        })->toJson();
     }
 
     protected function preProcessRow($row)
