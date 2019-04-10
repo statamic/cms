@@ -39,7 +39,7 @@ class Augmentor
         })->all();
     }
 
-    protected function convertToHtml($value)
+    public function convertToHtml($value)
     {
         $renderer = new Renderer;
         $renderer->addNode(SetNode::class);

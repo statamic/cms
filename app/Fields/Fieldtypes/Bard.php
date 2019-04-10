@@ -8,6 +8,11 @@ class Bard extends Replicator
 {
     public $category = ['text', 'structured'];
 
+    protected $configFields = [
+        'sets' => ['type' => 'sets'],
+        'save_html' => ['type' => 'toggle'],
+    ];
+
     public function augment($value)
     {
         return (new Augmentor)->augment($value);
@@ -17,13 +22,28 @@ class Bard extends Replicator
     {
         $value = json_decode($value, true);
 
-        return collect($value)->map(function ($row) {
+        $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
             }
 
             return $this->processRow($row);
         })->all();
+
+        if ($this->shouldSaveHtml()) {
+            return (new Augmentor)->convertToHtml($structure);
+        }
+
+        return $structure;
+    }
+
+    protected function shouldSaveHtml()
+    {
+        if ($this->config('sets')) {
+            return false;
+        }
+
+        return $this->config('save_html');
     }
 
     protected function processRow($row)
@@ -39,6 +59,11 @@ class Bard extends Replicator
 
     public function preProcess($value)
     {
+        if (is_string($value)) {
+            $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
+            $value = $doc['content'];
+        }
+
         return collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -58,5 +83,14 @@ class Bard extends Replicator
                 'values' => $processed,
             ]
         ];
+    }
+
+    public function extraRules(): array
+    {
+        if (! $this->config('sets')) {
+            return [];
+        }
+
+        return parent::extraRules();
     }
 }
