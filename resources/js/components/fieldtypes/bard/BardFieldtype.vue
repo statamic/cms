@@ -3,7 +3,7 @@
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
         <div class="bard-field-options no-select">
-            <a @click="toggleSource" :class="{ active: showSource }" v-if="allowSource"><i class="icon icon-code"></i></a>
+            <a @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></a>
             <a @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></a>
         </div>
 
@@ -48,7 +48,9 @@
                 </div>
             </editor-floating-menu>
 
-            <editor-content :editor="editor" />
+            <editor-content :editor="editor" v-show="!showSource" />
+
+            <bard-source :html="html" v-if="showSource" />
         </div>
     </div>
 
@@ -72,6 +74,7 @@ import {
     History
 } from 'tiptap-extensions';
 import Set from './Set';
+import BardSource from './Source.vue';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 
 export default {
@@ -82,6 +85,7 @@ export default {
         EditorContent,
         EditorFloatingMenu,
         EditorMenuBubble,
+        BardSource,
     },
 
     provide() {
@@ -95,11 +99,18 @@ export default {
             editor: null,
             html: null,
             json: null,
-            allowSource: true, // todo
-            showSource: false, // todo
+            showSource: false,
             fullScreenMode: false, // todo
             buttons: [],
         }
+    },
+
+    computed: {
+
+        allowSource() {
+            return this.config.allow_source === undefined ? true : this.config.allow_source;
+        }
+
     },
 
     mounted() {
@@ -132,8 +143,11 @@ export default {
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
                 value = JSON.stringify(value);
                 this.update(value);
+                this.html = getHTML();
             },
         });
+
+        this.html = this.editor.getHTML();
     },
 
     beforeDestroy() {
@@ -155,10 +169,6 @@ export default {
 
             this.editor.commands.set({ values });
             this.$refs.setSelectorDropdown.close();
-        },
-
-        toggleSource() {
-            // todo
         },
 
         toggleFullscreen() {
