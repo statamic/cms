@@ -113,4 +113,29 @@ class BardTest extends TestCase
 
         $this->assertEquals($expected, (new Bard)->augment($data));
     }
+
+    /** @test */
+    function it_converts_plain_html_into_prosemirror_structure()
+    {
+        $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>';
+
+        $expected = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is a paragraph with '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+                    ['type' => 'text', 'text' => ' text.'],
+                ]
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Second paragraph.'],
+                ]
+            ],
+        ];
+
+        $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
+    }
 }
