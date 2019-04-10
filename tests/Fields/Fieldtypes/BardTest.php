@@ -62,6 +62,12 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    function it_doesnt_augment_when_saved_as_html()
+    {
+        $this->assertEquals('<p>Paragraph</p>', (new Bard)->augment('<p>Paragraph</p>'));
+    }
+
+    /** @test */
     function it_removes_disabled_sets()
     {
         $data = [

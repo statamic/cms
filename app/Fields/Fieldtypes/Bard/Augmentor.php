@@ -11,6 +11,10 @@ class Augmentor
 
     public function augment($value)
     {
+        if (is_string($value)) {
+            return $value;
+        }
+
         $value = $this->removeDisabledSets($value);
         $value = $this->addSetIndexes($value);
         $value = $this->convertToHtml($value);
