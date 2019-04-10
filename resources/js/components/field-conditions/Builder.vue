@@ -4,50 +4,47 @@
         <label class="publish-field-label">{{ __('Conditions') }}</label>
         <div class="help-block -mt-1"><p>{{ __('When to show or hide this field.') }}</p></div>
 
-        <select-input
-            v-model="when"
-            :options="whenOptions"
-            :placeholder="false"
-            class="inline-block" />
+        <div class="flex items-center mb-3">
+            <select-input
+                v-model="when"
+                :options="whenOptions"
+                :placeholder="false" />
 
-        <select-input
-            v-if="showConditions"
-            v-model="type"
-            :options="typeOptions"
-            :placeholder="false"
-            class="inline-block ml-2" />
+            <select-input
+                v-if="showConditions"
+                v-model="type"
+                :options="typeOptions"
+                :placeholder="false"
+                class="ml-2" />
 
-        <text-input
-            v-if="showConditions && isCustom"
-            v-model="customMethod"
-            class="w-1/2 mt-2" />
+            <text-input
+                v-if="showConditions && isCustom"
+                v-model="customMethod"
+                class="ml-2 flex-1" />
+        </div>
 
         <div
             v-if="showConditions && isStandard"
             v-for="(condition, index) in conditions"
             :key="condition._id"
-            class="mt-3"
+            class="flex items-center mt-2"
         >
             <select-input
                 v-model="conditions[index].field"
                 :options="fieldOptions"
-                :placeholder="false"
-                class="inline-block" />
+                :placeholder="false" />
 
             <select-input
                 v-model="conditions[index].operator"
                 :options="operatorOptions"
                 :placeholder="false"
-                class="inline-block ml-2" />
+                class="ml-2" />
 
             <text-input
                 v-model="conditions[index].value"
-                class="w-1/2 mt-2" />
+                class="w-1/2 ml-2" />
 
-            <button
-                v-if="canRemove"
-                @click="remove(index)"
-                v-text="__('Delete')" />
+            <button v-if="canRemove" @click="remove(index)" class="btn-close ml-1">&times;</button>
         </div>
 
         <button
