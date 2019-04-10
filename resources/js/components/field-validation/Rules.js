@@ -109,11 +109,11 @@ export default [
         text: 'E-Mail',
         value: 'email'
     },
-    {
-        text: 'Exists (Database)',
-        value: 'exists:',
-        example: 'exists:table,column'
-    },
+    // {
+    //     text: 'Exists (Database)',
+    //     value: 'exists:',
+    //     example: 'exists:table,column'
+    // },
     {
         text: 'File',
         value: 'file'
@@ -281,11 +281,11 @@ export default [
         text: 'Timezone',
         value: 'timezone'
     },
-    {
-        text: 'Unique (Database)',
-        value: 'unique:',
-        example: 'unique:table,column,except,idColumn'
-    },
+    // {
+    //     text: 'Unique (Database)',
+    //     value: 'unique:',
+    //     example: 'unique:table,column,except,idColumn'
+    // },
     {
         text: 'URL',
         value: 'url'
