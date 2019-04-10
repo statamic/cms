@@ -251,6 +251,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
     protected function revisionAttributes()
     {
         return [
+            'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
             'data' => Arr::except($this->data(), ['updated_by', 'updated_at']),
