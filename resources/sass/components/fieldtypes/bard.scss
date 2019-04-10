@@ -6,6 +6,10 @@
     }
 }
 
+.bard-editor {
+    @apply relative;
+}
+
 .bard-field-options {
     position: absolute;
     top: 16px;
@@ -73,10 +77,54 @@
 }
 
 
-// typography
-//
-// selectors are specific so they don't cascade into the sets, which
-// all sit inline within the rest of the elements.
+/* The set selection options for each text block
+  ========================================================================== */
+
+.bard-set-selector {
+    position: absolute;
+    left: -40px;
+    margin-top: -6px;
+    transition: all .15s ease-in-out;
+
+    .dropdown-menu {
+        left: -5px;
+        right: auto;
+    }
+}
+
+
+/* Fullscreen mode
+   ========================================================================== */
+
+.bard-fullscreen {
+    @apply .fixed .bg-grey-70 .pin .min-h-screen .overflow-scroll;
+    z-index: 2; // to appear over the top of the rest of the stuff on the page.
+                // too high and it'll be over the top of stacks, etc.
+
+    .bard-editor {
+        @apply bg-white shadow-lg max-w-2xl mx-auto mt-6 p-3 rounded relative;
+    }
+
+    .bard-set-selector {
+        @apply ml-3;
+    }
+
+    .bard-field-options {
+        @apply .fixed .pin-t .pin-l .pin-r .bg-grey-70 .p-2 .w-full;
+        text-align: right;
+        z-index: 1; // to appear over the top of .bard-editor
+
+        .icon { font-size: 24px; }
+        a { margin-left: 16px; color: #fff; opacity: 1; }
+    }
+}
+
+
+/* Typography
+   -
+   Selectors are specific so they don't cascade into the sets, which
+   all sit inline within the rest of the elements.
+   ========================================================================== */
 
 .bard-fieldtype .ProseMirror > {
     p {

@@ -1,35 +1,40 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper">
+    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
-        <editor-menu-bubble :editor="editor">
-            <div
-                slot-scope="{ commands, isActive, menu }"
-                class="bard-toolbar"
-                :class="{ 'active': menu.isActive }"
-                :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
-            >
-                <button
-                    v-for="button in buttons"
-                    :key="button.name"
-                    :class="{ 'active': isActive[button.command](button.args) }"
-                    v-tooltip="button.text"
-                    @click="commands[button.command](button.args)"
-                    v-html="button.html" />
-            </div>
-        </editor-menu-bubble>
+        <div class="bard-field-options no-select">
+            <a @click="toggleSource" :class="{ active: showSource }" v-if="allowSource"><i class="icon icon-code"></i></a>
+            <a @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></a>
+        </div>
 
-        <editor-floating-menu :editor="editor">
-            <div
-                slot-scope="{ commands, isActive, menu }"
-                class="absolute text-2xs"
-                :class="{
-                    'invisible': !menu.isActive,
-                    'visible': menu.isActive
-                }"
-                :style="`top: ${menu.top}px`"
-            >
-                <div class="bard-set-selector">
+        <div class="bard-editor">
+            <editor-menu-bubble :editor="editor">
+                <div
+                    slot-scope="{ commands, isActive, menu }"
+                    class="bard-toolbar"
+                    :class="{ 'active': menu.isActive }"
+                    :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
+                >
+                    <button
+                        v-for="button in buttons"
+                        :key="button.name"
+                        :class="{ 'active': isActive[button.command](button.args) }"
+                        v-tooltip="button.text"
+                        @click="commands[button.command](button.args)"
+                        v-html="button.html" />
+                </div>
+            </editor-menu-bubble>
+
+            <editor-floating-menu :editor="editor">
+                <div
+                    slot-scope="{ commands, isActive, menu }"
+                    class="bard-set-selector"
+                    :class="{
+                        'invisible': !menu.isActive,
+                        'visible': menu.isActive
+                    }"
+                    :style="`top: ${menu.top}px`"
+                >
                     <dropdown-list ref="setSelectorDropdown">
                         <button type="button" class="btn btn-round" slot="trigger">
                             <span class="icon icon-plus text-grey-80 antialiased"></span>
@@ -41,19 +46,10 @@
                         </ul>
                     </dropdown-list>
                 </div>
-            </div>
-        </editor-floating-menu>
+            </editor-floating-menu>
 
-        <div class="bard-field-options no-select">
-            <a @click="toggleSource" :class="{ active: showSource }" v-if="allowSource"><i class="icon icon-code"></i></a>
-            <a @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></a>
+            <editor-content :editor="editor" />
         </div>
-
-        <editor-content :editor="editor" />
-
-        {{ html }}
-
-        <pre class="whitespace-pre-wrap">{{ json }}</pre>
     </div>
 
 </template>
@@ -166,7 +162,8 @@ export default {
         },
 
         toggleFullscreen() {
-            // todo
+            this.fullScreenMode = !this.fullScreenMode;
+            this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
         initToolbarButtons() {
