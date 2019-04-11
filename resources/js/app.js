@@ -43,6 +43,7 @@ Vue.prototype.$axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
 require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();
+Vue.prototype.$echo = Statamic.$echo;
 
 window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
@@ -143,6 +144,7 @@ Statamic.app({
             this.toggleNav();
         });
 
+        this.$echo.start();
     },
 
     created() {
