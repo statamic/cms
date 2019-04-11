@@ -8,5 +8,6 @@
         initial-sort-column="title"
         initial-sort-direction="asc"
         :initial-per-page="{{ $limit }}"
+        :use-cancel-token="false"
     ></collection-widget>
 </div>
