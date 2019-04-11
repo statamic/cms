@@ -18,8 +18,7 @@
     padding: 8px 12px;
 
      button {
-        @apply text-grey-80 px-1 ;
-        font-size: 16px;
+        @apply text-grey-80 px-1 flex items-center text-base;
         transition: all .1s ease-in-out;
     }
 
@@ -46,22 +45,6 @@
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
 }
-
-.bard-field-options {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-
-    a {
-        opacity: 0.5;
-        margin-left: 4px;
-
-        &.active {
-            opacity: 1;
-        }
-    }
-}
-
 
 .bard-floating-toolbar {
     @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
@@ -119,9 +102,9 @@
 
 .bard-set-selector {
     position: absolute;
-    left: -40px;
+    left: -20px;
     margin-top: -6px;
-    transition: all .15s ease-in-out;
+    // transition: all .15s ease-in-out;
 
     .dropdown-menu {
         left: -5px;
@@ -168,9 +151,9 @@
 
 .bard-fieldtype .ProseMirror > {
     p {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        @apply text-grey-80;
         word-wrap: break-word;
-        color: #333;
+
         line-height: 1.7;
         text-size-adjust: 100%;
     }
@@ -178,7 +161,7 @@
     b,
     strong { font-weight: 700; }
 
-    em { font-style: italic }
+    em, i { font-style: italic }
 
     blockquote,
     ol,
@@ -189,9 +172,7 @@
     }
 
     a {
-        color: #4183c4;
-        text-decoration: none;
-        text-decoration: underline;
+        @apply text-blue no-underline;
     }
 
     a:active,
@@ -207,11 +188,11 @@
     }
 
     hr {
+        @apply bg-grey-60;
         height: 4px;
         padding: 0;
         margin: 1.7em 0;
         overflow: hidden;
-        background-color: #e7e7e7;
         border: none;
     }
 
@@ -243,7 +224,7 @@
 
     h6 {
         font-size: 1em;
-        color: #777;
+        @apply text-grey-70;
     }
 
     h1:first-child,
@@ -276,11 +257,8 @@
     }
 
     blockquote {
-        margin: 0;
-        margin-bottom: .85em;
-        padding: 0 15px;
-        color: #858585;
-        border-left: 4px solid #e5e5e5;
+        @apply text-grey-80 border-l-4 border-blue px-2;
+        margin: 0 0 .85em;
     }
 
     blockquote:first-child {
