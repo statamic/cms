@@ -17,10 +17,6 @@ export default {
         initialPerPage: {
             type: Number,
             default: 25
-        },
-        useCancelToken: {
-            type: Boolean,
-            default: true
         }
     },
 
@@ -95,15 +91,13 @@ export default {
         request() {
             this.loading = true;
 
-            let params = {params: this.parameters};
+            if (source) source.cancel();
+            source = this.$axios.CancelToken.source();
 
-            if (this.useCancelToken) {
-                if (source) source.cancel();
-                source = this.$axios.CancelToken.source();
-                params.cancelToken = source.token;
-            }
-
-            this.$axios.get(this.requestUrl, params).then(response => {
+            this.$axios.get(this.requestUrl, {
+                params: this.parameters,
+                cancelToken: source.token
+            }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.activeFilters = {...response.data.meta.filters};
