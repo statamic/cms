@@ -2,16 +2,29 @@
 
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
-        <div class="bard-field-options no-select">
-            <a @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></a>
-            <a @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></a>
-        </div>
+        <editor-menu-bar :editor="editor">
+            <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
+                <div class="flex items-center no-select" v-if="toolbarIsFixed">
+                    <button
+                        v-for="button in buttons"
+                        :key="button.name"
+                        :class="{ 'active': isActive[button.command](button.args) }"
+                        v-tooltip="button.text"
+                        @click="commands[button.command](button.args)"
+                        v-html="button.html" />
+                </div>
+                <div class="flex items-center no-select">
+                    <button @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></button>
+                    <button @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></button>
+                </div>
+            </div>
+        </editor-menu-bar>
 
         <div class="bard-editor">
-            <editor-menu-bubble :editor="editor">
+            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating">
                 <div
                     slot-scope="{ commands, isActive, menu }"
-                    class="bard-toolbar"
+                    class="bard-floating-toolbar"
                     :class="{ 'active': menu.isActive }"
                     :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
                 >
@@ -57,7 +70,7 @@
 </template>
 
 <script>
-import { Editor, EditorContent, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
 import {
     Blockquote,
     CodeBlock,
@@ -83,6 +96,7 @@ export default {
 
     components: {
         EditorContent,
+        EditorMenuBar,
         EditorFloatingMenu,
         EditorMenuBubble,
         BardSource,
@@ -109,7 +123,15 @@ export default {
 
         allowSource() {
             return this.config.allow_source === undefined ? true : this.config.allow_source;
-        }
+        },
+
+        toolbarIsFixed() {
+            return this.config.toolbar_mode === 'fixed';
+        },
+
+        toolbarIsFloating() {
+            return this.config.toolbar_mode === 'floating';
+        },
 
     },
 
@@ -141,6 +163,11 @@ export default {
                 new Set(),
             ],
             content,
+            editorProps: {
+                handleClick: () => {
+                    console.log('clicked!')
+                }
+            },
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
@@ -211,10 +238,3 @@ export default {
     }
 }
 </script>
-
-
-<style lang="scss">
-.ProseMirror {
-    outline: 0;
-}
-</style>

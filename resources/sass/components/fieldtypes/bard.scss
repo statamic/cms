@@ -1,5 +1,5 @@
 .bard-fieldtype-wrapper {
-    @apply text-grey-80 border bg-grey-10 rounded shadow-inner p-3;
+    @apply .border .rounded relative;
 
     &:focus-within {
         @apply focus-outline;
@@ -7,7 +7,44 @@
 }
 
 .bard-editor {
-    @apply relative;
+    @apply text-grey-80 bg-grey-10 shadow-inner p-3 relative;
+}
+
+.bard-fixed-toolbar {
+    @apply .bg-white .shadow-none rounded-t .border-b .text-sm .p-1 flex items-center justify-between;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    padding: 8px 12px;
+
+     button {
+        @apply text-grey-80 px-1 ;
+        font-size: 16px;
+        transition: all .1s ease-in-out;
+    }
+
+    button:hover {
+        @apply .text-grey-90;
+    }
+
+    button.active {
+        @apply .text-blue;
+    }
+
+    button:focus {
+        outline: none;
+    }
+
+    button:disabled {
+        @apply .opacity-50;
+        &:hover {
+            @apply .text-grey-80;
+        }
+    }
+
+    button sup {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
 }
 
 .bard-field-options {
@@ -26,7 +63,7 @@
 }
 
 
-.bard-toolbar {
+.bard-floating-toolbar {
     @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
     transform: translateX(-50%) translateY(-10px);
     white-space: nowrap;
@@ -125,6 +162,9 @@
    Selectors are specific so they don't cascade into the sets, which
    all sit inline within the rest of the elements.
    ========================================================================== */
+.bard-fieldtype .ProseMirror {
+    outline: 0;
+}
 
 .bard-fieldtype .ProseMirror > {
     p {
@@ -204,6 +244,15 @@
     h6 {
         font-size: 1em;
         color: #777;
+    }
+
+    h1:first-child,
+    h2:first-child,
+    h3:first-child,
+    h4:first-child,
+    h5:first-child,
+    h6:first-child {
+        margin-top: 0;
     }
 
     ol,

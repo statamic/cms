@@ -11,6 +11,14 @@ class Bard extends Replicator
     protected $configFields = [
         'sets' => ['type' => 'sets'],
         'save_html' => ['type' => 'toggle'],
+        'toolbar_mode' => [
+            'type' => 'select',
+            'default' => 'fixed',
+            'options' => [
+                'fixed' => 'Fixed',
+                'floating' => 'Floating',
+            ],
+        ],
     ];
 
     public function augment($value)
