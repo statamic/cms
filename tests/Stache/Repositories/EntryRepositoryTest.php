@@ -23,16 +23,16 @@ class EntryRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $stache = (new Stache)->sites(['en', 'fr']);
-        $this->app->instance(Stache::class, $stache);
+        $this->stache = (new Stache)->sites(['en', 'fr']);
+        $this->app->instance(Stache::class, $this->stache);
         $this->directory = __DIR__.'/../__fixtures__/content/collections';
-        $stache->registerStores([
-            (new CollectionsStore($stache, app('files')))->directory($this->directory),
-            (new EntriesStore($stache, app('files')))->directory($this->directory),
-            (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+        $this->stache->registerStores([
+            (new CollectionsStore($this->stache, app('files')))->directory($this->directory),
+            (new EntriesStore($this->stache, app('files')))->directory($this->directory),
+            (new StructuresStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
         ]);
 
-        $this->repo = new EntryRepository($stache);
+        $this->repo = new EntryRepository($this->stache);
     }
 
     /** @test */
@@ -288,7 +288,7 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($this->repo->find('test-blog-entry'));
 
         $this->repo->save($localized);
-        $localizedFr->save();
+        $this->repo->save($localizedFr);
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
@@ -299,9 +299,17 @@ class EntryRepositoryTest extends TestCase
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
-        $this->expectException(InvalidLocalizationException::class);
-        $item->in('fr');
         $this->assertFileExists($path);
         $this->assertFileNotExists($frPath);
+
+        try {
+            $item->in('fr');
+            $this->fail('No exception');
+        } catch (InvalidLocalizationException $exception) {
+            //
+        }
+
+        $this->assertEmpty($this->stache->store('entries::blog')->getSitePaths('fr'));
+        $this->assertEmpty($this->stache->store('entries::blog')->getSiteUris('fr'));
     }
 }

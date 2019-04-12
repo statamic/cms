@@ -102,7 +102,7 @@ class EntryRepository implements RepositoryContract
     public function deleteLocalizable($localizable)
     {
         $localizable->localizations()->each(function ($localization) {
-            $this->deleteLocalization($localization);
+            $this->store->delete($localization);
         });
 
         $this->store->remove($localizable->id());
@@ -116,7 +116,9 @@ class EntryRepository implements RepositoryContract
 
         $this->store
             ->store($localizable->collectionHandle())
-            ->insert($localizable);
+            ->insert($localizable)
+            ->removeSiteUri($localization->locale(), $localization->id())
+            ->removeSitePath($localization->locale(), $localization->id());
 
         $this->store->delete($localization);
     }
