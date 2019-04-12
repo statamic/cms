@@ -61,7 +61,8 @@ export default {
     methods: {
 
         updated(handle, value) {
-            this.$store.dispatch(`publish/${this.storeName}/setValue`, { handle, value });
+            const user = Statamic.$config.get('userId');
+            this.$store.dispatch(`publish/${this.storeName}/setValue`, { handle, value, user });
         }
 
     }
