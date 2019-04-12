@@ -13,4 +13,6 @@ interface EntryRepository
     public function make();
     public function query();
     public function save($entry);
+    public function deleteLocalizable($localizableEntry);
+    public function deleteLocalization($localizedEntry);
 }

@@ -2,10 +2,12 @@
 
 namespace Tests\Data\Entries;
 
+use Statamic\API;
 use Tests\TestCase;
 use Statamic\API\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Data\Entries\Entry;
+use Illuminate\Support\Facades\Event;
 use Statamic\Data\Entries\Collection;
 use Statamic\Data\Entries\LocalizedEntry;
 use Facades\Statamic\Fields\BlueprintRepository;
@@ -224,5 +226,17 @@ class EntryTest extends TestCase
         $entry = (new Entry)->collection($collection)->addLocalization((new LocalizedEntry)->locale('en'));
 
         $this->assertEquals($blueprint, $entry->blueprint());
+    }
+
+    /** @test */
+    function it_deletes_through_the_api()
+    {
+        Event::fake();
+        $entry = new Entry;
+        API\Entry::shouldReceive('deleteLocalizable')->with($entry);
+
+        $return = $entry->delete();
+
+        $this->assertTrue($return);
     }
 }

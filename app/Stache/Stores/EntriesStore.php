@@ -140,4 +140,9 @@ class EntriesStore extends AggregateStore
             File::delete($entry->initialPath()); // TODO: Test
         }
     }
+
+    public function delete($entry)
+    {
+        File::delete($entry->path());
+    }
 }

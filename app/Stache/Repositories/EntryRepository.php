@@ -99,6 +99,28 @@ class EntryRepository implements RepositoryContract
         $this->store->save($entry);
     }
 
+    public function deleteLocalizable($localizable)
+    {
+        $localizable->localizations()->each(function ($localization) {
+            $this->deleteLocalization($localization);
+        });
+
+        $this->store->remove($localizable->id());
+    }
+
+    public function deleteLocalization($localization)
+    {
+        $localizable = $localization->entry();
+
+        $localizable->removeLocalization($localization);
+
+        $this->store
+            ->store($localizable->collectionHandle())
+            ->insert($localizable);
+
+        $this->store->delete($localization);
+    }
+
     public function query()
     {
         return new QueryBuilder;

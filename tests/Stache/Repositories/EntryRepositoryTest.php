@@ -13,6 +13,7 @@ use Statamic\Data\Entries\EntryCollection;
 use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Repositories\EntryRepository;
+use Statamic\Exceptions\InvalidLocalizationException;
 
 class EntryRepositoryTest extends TestCase
 {
@@ -185,12 +186,16 @@ class EntryRepositoryTest extends TestCase
                 ->data(['foo' => 'bar']);
         });
 
-        $this->unlinkAfter($entry->path());
+        $this->unlinkAfter(
+            $path = $this->directory.'/blog/2017-07-04.test.md',
+            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
+        );
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
 
         $this->repo->save($localized);
+        $this->repo->save($localizedFr);
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
@@ -198,6 +203,105 @@ class EntryRepositoryTest extends TestCase
         $this->assertNotSame($localized, $item->in('en'));
         $this->assertNotSame($localizedFr, $item->in('fr'));
         $this->assertArraySubset(['foo' => 'bar'], $item->data());
-        $this->assertFileExists($path = $this->directory.'/blog/2017-07-04.test.md');
+        $this->assertFileExists($path);
+        $this->assertFileExists($frPath);
+    }
+
+    /** @test */
+    public function it_can_delete_localizable()
+    {
+        $entry = EntryAPI::make()
+            ->id('test-blog-entry')
+            ->collection(Collection::whereHandle('blog'));
+
+        $localized = $entry->in('en', function ($loc) {
+            $loc
+                ->slug('test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $localizedFr = $entry->in('fr', function ($loc) {
+            $loc
+                ->slug('le-test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $this->unlinkAfter(
+            $path = $this->directory.'/blog/2017-07-04.test.md',
+            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
+        );
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($this->repo->find('test-blog-entry'));
+
+        $this->repo->save($localized);
+        $this->repo->save($localizedFr);
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileExists($path);
+        $this->assertFileExists($frPath);
+
+        $this->repo->deleteLocalizable($item);
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileNotExists($path);
+        $this->assertFileNotExists($frPath);
+    }
+
+    /** @test */
+    public function it_can_delete_localization()
+    {
+        $this->withoutEvents();
+
+        $entry = EntryAPI::make()
+            ->id('test-blog-entry')
+            ->collection(Collection::whereHandle('blog'));
+
+        $localized = $entry->in('en', function ($loc) {
+            $loc
+                ->slug('test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $localizedFr = $entry->in('fr', function ($loc) {
+            $loc
+                ->slug('le-test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $this->unlinkAfter(
+            $path = $this->directory.'/blog/2017-07-04.test.md',
+            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
+        );
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($this->repo->find('test-blog-entry'));
+
+        $this->repo->save($localized);
+        $localizedFr->save();
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileExists($path);
+        $this->assertFileExists($frPath);
+
+        $this->repo->deleteLocalization($item->in('fr'));
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->expectException(InvalidLocalizationException::class);
+        $item->in('fr');
+        $this->assertFileExists($path);
+        $this->assertFileNotExists($frPath);
     }
 }
