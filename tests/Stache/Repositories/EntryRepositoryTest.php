@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Tests\TestCase;
+use Tests\UnlinksPaths;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
 use Statamic\API\Entry as EntryAPI;
@@ -15,6 +16,8 @@ use Statamic\Stache\Repositories\EntryRepository;
 
 class EntryRepositoryTest extends TestCase
 {
+    use UnlinksPaths;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -182,6 +185,8 @@ class EntryRepositoryTest extends TestCase
                 ->data(['foo' => 'bar']);
         });
 
+        $this->unlinkAfter($entry->path());
+
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
 
@@ -194,6 +199,5 @@ class EntryRepositoryTest extends TestCase
         $this->assertNotSame($localizedFr, $item->in('fr'));
         $this->assertArraySubset(['foo' => 'bar'], $item->data());
         $this->assertFileExists($path = $this->directory.'/blog/2017-07-04.test.md');
-        @unlink($path);
     }
 }
