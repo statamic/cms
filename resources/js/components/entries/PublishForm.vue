@@ -97,6 +97,7 @@
             :name="publishContainer"
             :fieldset="fieldset"
             :values="values"
+            :reference="initialReference"
             :meta="meta"
             :errors="errors"
             :site="site"
@@ -136,6 +137,7 @@ export default {
 
     props: {
         publishContainer: String,
+        initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
         initialMeta: Object,

@@ -19,12 +19,14 @@
             :publish-container="publishContainer"
             :collection-title="collection.title"
             :collection-url="collection.url"
+            :initial-reference="initialReference"
             :initial-title="title"
             :initial-fieldset="blueprint"
             :initial-values="initialValues"
             :initial-meta="initialMeta"
             :initial-localizations="initialLocalizations"
             :initial-read-only="readOnly"
+            :initial-site="initialSite"
             @saved="saved"
         >
             <template slot="action-buttons-right">
@@ -51,10 +53,12 @@ export default {
             loading: true,
             blueprint: null,
             values: null,
+            initialReference: null,
             initialValues: null,
             initialMeta: null,
             initialLocalizations: null,
             initialActions: null,
+            initialSite: null,
             collection: Object,
             readOnly: false,
         }
@@ -79,9 +83,11 @@ export default {
                 const data = response.data;
                 this.blueprint = data.blueprint;
                 this.values = this.initialValues = data.values;
+                this.initialReference = data.reference;
                 this.initialMeta = data.meta;
                 this.initialLocalizations = data.localizations;
                 this.initialActions = data.actions;
+                this.initialSite = data.locale;
                 this.collection = data.collection;
                 this.loading = false;
             });
