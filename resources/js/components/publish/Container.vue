@@ -28,11 +28,13 @@ export default {
 
     created() {
         this.registerVuexModule();
+        this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
         this.removeVuexModule();
         this.removeNavigationWarning();
+        this.$events.$emit('publish-container-destroyed', this);
     },
 
     provide() {
