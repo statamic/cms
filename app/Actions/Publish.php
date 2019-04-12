@@ -14,7 +14,7 @@ class Publish extends Action
     public function run($items)
     {
         $items->each(function ($entry) {
-            $entry->publish()->save();
+            $entry->publish(['user' => request()->user()]);
         });
     }
 }

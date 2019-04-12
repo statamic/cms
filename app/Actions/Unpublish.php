@@ -14,7 +14,7 @@ class Unpublish extends Action
     public function run($items)
     {
         $items->each(function ($entry) {
-            $entry->unpublish()->save();
+            $entry->unpublish(['user' => request()->user()]);
         });
     }
 }
