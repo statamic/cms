@@ -22,7 +22,7 @@
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
-                            :actions="actions"
+                            :actions="entryActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -92,6 +92,14 @@ export default {
         return {
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
+        }
+    },
+
+    computed: {
+        entryActions() {
+            this.actions.forEach(action => action.context.site = data_get(this.activeFilters, 'site.value', null));
+
+            return this.actions;
         }
     },
 

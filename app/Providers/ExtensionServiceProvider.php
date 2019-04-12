@@ -280,6 +280,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Unpublish::class,
             Actions\SendActivationEmail::class,
             Actions\MoveAsset::class,
+            Actions\DeleteEntry::class,
         ];
 
         $this->registerParent($parent);
