@@ -18,13 +18,13 @@ class Entries
 
     public function __construct($collection, $parameters)
     {
-        $this->collection = $collection;
+        $this->collection = API\Collection::whereHandle($collection);
         $this->parameters = $this->parseParameters($parameters);
     }
 
     public function get()
     {
-        $query = API\Collection::whereHandle($this->collection)->queryEntries();
+        $query = $this->collection->queryEntries();
 
         // If neither published nor unpublished entries should be shown, we'll just have nothing to show.
         if (! $this->showPublished && ! $this->showUnpublished) {
