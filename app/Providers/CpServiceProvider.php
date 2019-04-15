@@ -30,11 +30,6 @@ class CpServiceProvider extends ServiceProvider
             'bard' => ['plugins' => [], 'buttons' => []],
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
-            'pusher' => [
-                'key' => config('broadcasting.connections.pusher.key'),
-                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-                'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
-            ]
         ]);
     }
 

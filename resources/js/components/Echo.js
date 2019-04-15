@@ -16,9 +16,9 @@ class Echo {
 
         const config = {
             broadcaster: 'pusher',
-            key: Statamic.$config.get('pusher.key'),
-            cluster: Statamic.$config.get('pusher.cluster'),
-            encrypted: Statamic.$config.get('pusher.encrypted'),
+            key: Statamic.$config.get('broadcasting.pusher.key'),
+            cluster: Statamic.$config.get('broadcasting.pusher.cluster'),
+            encrypted: Statamic.$config.get('broadcasting.pusher.encrypted'),
             csrfToken: Statamic.$config.get('csrfToken'),
         };
 

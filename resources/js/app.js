@@ -144,7 +144,9 @@ Statamic.app({
             this.toggleNav();
         });
 
-        this.$echo.start();
+        if (this.$config.get('broadcasting.enabled')) {
+            this.$echo.start();
+        }
     },
 
     created() {

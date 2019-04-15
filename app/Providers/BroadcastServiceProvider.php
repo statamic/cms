@@ -2,20 +2,22 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Broadcast;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
     public function boot()
     {
-        Broadcast::routes();
-
-        require base_path('routes/channels.php');
+        Statamic::provideToScript([
+            'broadcasting' => [
+                'enabled' => in_array(\App\Providers\BroadcastServiceProvider::class, array_keys($this->app->getLoadedProviders())),
+                'pusher' => [
+                    'key' => config('broadcasting.connections.pusher.key'),
+                    'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+                    'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
+                ]
+            ]
+        ]);
     }
 }
