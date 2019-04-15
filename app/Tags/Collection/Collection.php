@@ -7,6 +7,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 
 class Collection extends Tags
 {
+    public static $handle = 'collection_tag';
     /**
      * {{ collection:* }} ... {{ /collection:* }}
      */
