@@ -106,6 +106,8 @@ class Bard extends Replicator
 
     protected function isLegacyData($value)
     {
+        return false; // TODO.
+
         $hasTextSet = null !== collect($value)->first(function ($set) {
             return $set['type'] === 'text';
         });
