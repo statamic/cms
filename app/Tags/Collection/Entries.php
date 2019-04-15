@@ -26,12 +26,12 @@ class Entries
     {
         $query = $this->collection->queryEntries();
 
-        // If neither published nor unpublished entries should be shown, we'll just have nothing to show.
-        if (! $this->showPublished && ! $this->showUnpublished) {
+        try {
+            $this->queryPublished($query);
+        } catch (NoResultsExpected $e) {
             return collect_entries();
         }
 
-        $this->queryPublished($query);
         $this->queryPastFuture($query);
 
         foreach ($this->parameters as $key => $value) {
@@ -66,10 +66,12 @@ class Entries
         if ($this->showPublished && $this->showUnpublished) {
             return;
         } elseif ($this->showPublished && ! $this->showUnpublished) {
-            $query->where('published', true);
+            return $query->where('published', true);
         } elseif (! $this->showPublished && $this->showUnpublished) {
-            $query->where('published', false);
+            return $query->where('published', false);
         }
+
+        throw new NoResultsExpected;
     }
 
     protected function queryPastFuture($query)
