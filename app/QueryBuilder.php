@@ -18,6 +18,8 @@ abstract class QueryBuilder
         '=' => 'Equals',
         '<>' => 'NotEquals',
         'like' => 'Like',
+        '>' => 'GreaterThan',
+        '<' => 'LessThan',
     ];
 
     public function limit($value)

@@ -15,7 +15,7 @@ class EntriesTest extends TestCase
     function setUp(): void
     {
         parent::setUp();
-        $this->collection = API\Collection::make('test')->order('date')->save();
+        $this->collection = API\Collection::make('test')->save();
     }
 
     protected function makeEntry()
@@ -57,12 +57,13 @@ class EntriesTest extends TestCase
     /** @test */
     function it_filters_by_future_and_past()
     {
+        $this->collection->order('date')->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
         $this->makeEntry()->order('2019-03-09')->save(); // definitely in past
         $this->makeEntry()->order('2019-03-10')->save(); // today
-        $this->makeEntry()->order('2019-03-10 12:59')->save(); // today, but before "now"
-        $this->makeEntry()->order('2019-03-10 13:00')->save(); // today, and also "now"
-        $this->makeEntry()->order('2019-03-10 13:01')->save(); // today, but after "now"
+        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
         $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
 
         $this->assertCount(3, $this->getEntries());

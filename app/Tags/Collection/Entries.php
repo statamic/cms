@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Collection;
 
 use Statamic\API;
+use Illuminate\Support\Carbon;
 
 class Entries
 {
@@ -28,11 +29,10 @@ class Entries
 
         try {
             $this->queryPublished($query);
+            $this->queryPastFuture($query);
         } catch (NoResultsExpected $e) {
             return collect_entries();
         }
-
-        $this->queryPastFuture($query);
 
         foreach ($this->parameters as $key => $value) {
             // TODO: any tag parameters that don't translate 1:1 with query methods
@@ -76,6 +76,18 @@ class Entries
 
     protected function queryPastFuture($query)
     {
+        if ($this->collection->order() !== 'date') {
+            return;
+        }
 
+        if ($this->showFuture && $this->showPast) {
+            return;
+        } elseif ($this->showFuture && ! $this->showPast) {
+            return $query->where('date', '>', Carbon::now());
+        } elseif (! $this->showFuture && $this->showPast) {
+            return $query->where('date', '<', Carbon::now());
+        }
+
+        throw new NoResultsExpected;
     }
 }

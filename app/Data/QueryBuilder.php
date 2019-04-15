@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Illuminate\Support\Carbon;
 use Statamic\QueryBuilder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder
@@ -83,6 +84,24 @@ abstract class QueryBuilder extends BaseQueryBuilder
     protected function filterTestNotEquals($item, $value)
     {
         return strtolower($item) !== strtolower($value);
+    }
+
+    protected function filterTestLessThan($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->lt($value);
+        }
+
+        return $item < $value;
+    }
+
+    protected function filterTestGreaterThan($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->gt($value);
+        }
+
+        return $item > $value;
     }
 
     protected function filterTestLike($item, $like)
