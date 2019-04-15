@@ -34,13 +34,6 @@ class Entries
             return collect_entries();
         }
 
-        foreach ($this->parameters as $key => $value) {
-            // TODO: any tag parameters that don't translate 1:1 with query methods
-            // should be accounted for right here.
-
-            $query->$key($value);
-        }
-
         return $this->paginate ? $query->paginate($this->perPage) : $query->get();
     }
 
