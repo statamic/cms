@@ -163,11 +163,6 @@ export default {
                 new Set(),
             ],
             content,
-            editorProps: {
-                handleClick: () => {
-                    console.log('clicked!')
-                }
-            },
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
