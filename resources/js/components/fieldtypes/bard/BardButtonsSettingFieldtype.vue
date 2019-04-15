@@ -1,6 +1,6 @@
 <template>
     <div class="relative">
-        <div class="bard-toolbar bard-toolbar-setting" v-el:buttons>
+        <div class="bard-floating-toolbar bard-toolbar-setting" v-el:buttons>
 
             <button
                 v-for="button in buttons"

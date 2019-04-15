@@ -2,115 +2,133 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\Fields\Fieldtypes\Bard\Augmentor;
+
 class Bard extends Replicator
 {
     public $category = ['text', 'structured'];
 
-    public function preProcess($data)
+    protected $configFields = [
+        'sets' => ['type' => 'sets'],
+        'save_html' => ['type' => 'toggle'],
+        'toolbar_mode' => [
+            'type' => 'select',
+            'default' => 'fixed',
+            'options' => [
+                'fixed' => 'Fixed',
+                'floating' => 'Floating',
+            ],
+        ],
+    ];
+
+    public function augment($value)
     {
-        if (is_string($data)) {
-            if ($data === '') {
-                $data = '<p><br></p>';
-            }
-
-            $data = [['type' => 'text', 'text' => $data]];
-        }
-
-        $data = parent::preProcess($data);
-
-        if (empty($data)) {
-            $data = [['type' => 'text', 'text' => '<p><br></p>']];
-        } else {
-            if ($this->usesMarkdown()) {
-                $data = $this->initializeWithMarkdown($data);
-            }
-        }
-
-        return $data;
+        return (new Augmentor)->augment($value);
     }
 
-    public function process($data)
+    public function process($value)
     {
-        $data = parent::process($data);
+        $value = json_decode($value, true);
 
-        if (empty($this->config('sets'))) {
-            $data = $data[0]['text'];
-
-            if ($data === '<p><br></p>') {
-                $data = null;
-            }
-        }
-
-        // Prevent empty fields from saving an empty paragraph.
-        if ($this->isEmpty($data)) {
-            return null;
-        }
-
-        if (is_array($data) && $this->usesMarkdown()) {
-            foreach ($data as &$block) {
-                if ($block['type'] === 'text') {
-                    $block['text'] = $this->contentEditableHtmlToMarkdown($block['text']);
-                }
-            }
-        }
-
-        return $data;
-    }
-
-    private function usesMarkdown()
-    {
-        return $this->config('markdown');
-    }
-
-    private function isEmpty($data)
-    {
-        if (is_array($data) && count($data) === 1 && $data[0]['type'] === 'text') {
-            // If the "text" key doesn't exist at all, the user may have
-            // manually cleared out the contents using the source view.
-            if (! array_has($data[0], 'text')) {
-                return true;
+        $structure = collect($value)->map(function ($row) {
+            if ($row['type'] !== 'set') {
+                return $row;
             }
 
-            return $data[0]['text'] === '<p><br></p>';
+            return $this->processRow($row);
+        })->all();
+
+        if ($this->shouldSaveHtml()) {
+            return (new Augmentor)->convertToHtml($structure);
         }
 
-        return false;
+        return $structure;
     }
 
-    private function initializeWithMarkdown($data)
+    protected function shouldSaveHtml()
     {
-        foreach ($data as &$block) {
-            if ($block['type'] === 'text') {
-                $block['text'] = $this->markdownToContentEditableHtml($block['text']);
+        if ($this->config('sets')) {
+            return false;
+        }
+
+        return $this->config('save_html');
+    }
+
+    protected function processRow($row)
+    {
+        $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
+
+        if ($row['attrs']['enabled'] === true) {
+            unset($row['attrs']['enabled']);
+        }
+
+        return $row;
+    }
+
+    public function preProcess($value)
+    {
+        if (is_string($value)) {
+            $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
+            $value = $doc['content'];
+        } else if ($this->isLegacyData($value)) {
+            $value = $this->convertLegacyData($value);
+        }
+
+        return collect($value)->map(function ($row) {
+            if ($row['type'] !== 'set') {
+                return $row;
             }
+
+            return $this->preProcessRow($row);
+        })->toJson();
+    }
+
+    protected function preProcessRow($row)
+    {
+        $processed = parent::preProcessRow($row['attrs']['values']);
+
+        return [
+            'type' => 'set',
+            'attrs' => [
+                'values' => $processed,
+            ]
+        ];
+    }
+
+    public function extraRules(): array
+    {
+        if (! $this->config('sets')) {
+            return [];
         }
 
-        return $data;
+        return parent::extraRules();
     }
 
-    private function contentEditableHtmlToMarkdown($text)
+    protected function isLegacyData($value)
     {
-        // In Markdown, a line break is indicated with two trailing spaces at the end of the line. In Bard, you don't
-        // need the spaces, you only need to shift+enter. We'll account for users that add those trailing spaces
-        // anyway. Note that the trailing spaces will get stripped off from the YAML anyway until this issue
-        // is resolved: https://github.com/statamic/v2-hub/issues/1324
-        $text = str_replace('&nbsp;&nbsp;<br>', "  \n", $text);
-        $text = str_replace('<br>', "  \n", $text);
+        $hasTextSet = null !== collect($value)->first(function ($set) {
+            return $set['type'] === 'text';
+        });
 
-        $text = str_replace('</p>', "\n\n", $text);
-        $text = str_replace("\n\n\n", "\n\n", $text);
-        $text = strip_tags($text);
-
-        return ltrim($text, "\n");
+        return $hasTextSet || !isset($value[0]['attrs']);
     }
 
-    private function markdownToContentEditableHtml($text)
+    protected function convertLegacyData($value)
     {
-        return collect(
-            explode("\n\n", $text)
-        )->map(function ($paragraph) {
-            $paragraph = str_replace("\n", '<br>', $paragraph);
-            return '<p>' . $paragraph . '</p>';
-        })->implode("\n");
+        return collect($value)->flatMap(function ($set) {
+            if ($set['type'] === 'text') {
+                $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+                return $doc['content'];
+            }
+
+            return [
+                [
+                    'type' => 'set',
+                    'attrs' => [
+                        'values' => $set,
+                    ]
+                ]
+            ];
+        })->all();
     }
 }
