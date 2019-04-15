@@ -88,6 +88,7 @@ import {
 } from 'tiptap-extensions';
 import Set from './Set';
 import BardSource from './Source.vue';
+import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 
 export default {
@@ -161,6 +162,7 @@ export default {
                 new Underline(),
                 new History(),
                 new Set(),
+                new ConfirmSetDelete(),
             ],
             content,
             onUpdate: ({ getJSON, getHTML }) => {
