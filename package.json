@@ -37,6 +37,7 @@
     "portal-vue": "^1.3.0",
     "qs": "^6.6.0",
     "rangy": "^1.3.0",
+    "read-time-estimate": "0.0.2",
     "redactor": "file:resources/js/vendor/redactor",
     "resize-observer-polyfill": "^1.5.1",
     "selectize": "^0.12.5",

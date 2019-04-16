@@ -72,6 +72,9 @@
 
             <bard-source :html="html" v-if="showSource" />
         </div>
+        <div class="bard-footer-toolbar">
+            {{ readingTime }} {{ __('Reading Time') }}
+        </div>
     </div>
 
 </template>
@@ -99,6 +102,7 @@ import Link from './Link';
 import LinkToolbar from './LinkToolbar.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
+import readTimeEstimate from 'read-time-estimate';
 
 export default {
 
@@ -145,6 +149,15 @@ export default {
         toolbarIsFloating() {
             return this.config.toolbar_mode === 'floating';
         },
+
+        readingTime() {
+            if (this.html) {
+                var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
+                var duration = moment.duration(stats.duration, 'minutes');
+
+                return moment.utc(duration.asMilliseconds()).format("mm:ss");
+            }
+        }
 
     },
 

@@ -96,6 +96,11 @@
     }
 }
 
+.bard-footer-toolbar {
+    @apply .bg-white .shadow-none text-grey-70 rounded-b .border-t .text-xs .p-1 flex items-center justify-between;
+    padding: 8px 12px;
+}
+
 
 /* The set selection options for each text block
   ========================================================================== */
