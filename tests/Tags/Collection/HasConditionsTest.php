@@ -62,4 +62,15 @@ class HasConditionsTest extends TestCase
         $this->assertEquals('Cat', $this->getEntries(['title:aint' => 'Dog'])->first()->get('title'));
         $this->assertEquals('Cat', $this->getEntries(['title:¯\\_(ツ)_/¯' => 'Dog'])->first()->get('title'));
     }
+
+    /** @test */
+    function it_filters_by_contains_condition()
+    {
+        $this->makeEntry()->set('title', 'Dog Stories')->save();
+        $this->makeEntry()->set('title', 'Cat Fables')->save();
+
+        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(1, $this->getEntries(['title:contains' => 'Sto']));
+        $this->assertEquals('Dog Stories', $this->getEntries(['title:contains' => 'Sto'])->first()->get('title'));
+    }
 }
