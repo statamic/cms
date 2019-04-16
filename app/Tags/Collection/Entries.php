@@ -16,6 +16,8 @@ class Entries
     protected $showUnpublished = false;
     protected $showPast = true;
     protected $showFuture = false;
+    protected $since;
+    protected $until;
     protected $ignoredParams = ['from', 'as'];
 
     public function __construct($collection, $parameters)
@@ -31,6 +33,7 @@ class Entries
         try {
             $this->queryPublished($query);
             $this->queryPastFuture($query);
+            $this->querySinceUntil($query);
         } catch (NoResultsExpected $e) {
             return collect_entries();
         }
@@ -51,6 +54,9 @@ class Entries
 
         $this->showPast = Arr::pull($params, 'show_past', $this->showPast);
         $this->showFuture = Arr::pull($params, 'show_future', $this->showFuture);
+
+        $this->since = Arr::pull($params, 'since', $this->since);
+        $this->until = Arr::pull($params, 'until', $this->until);
 
         return $params;
     }
@@ -83,5 +89,20 @@ class Entries
         }
 
         throw new NoResultsExpected;
+    }
+
+    protected function querySinceUntil($query)
+    {
+        if ($this->collection->order() !== 'date') {
+            return;
+        }
+
+        if ($this->since) {
+            $query->where('date', '>', Carbon::parse($this->since));
+        }
+
+        if ($this->until) {
+            $query->where('date', '<', Carbon::parse($this->until));
+        }
     }
 }
