@@ -291,6 +291,23 @@
 }
 
 
+/* Solo Sets
+   -
+   Sets with only a single field, and that single fieldtype
+   supports being displayed by itself.
+  ========================================================================== */
+
+.bard-set-solo {
+
+    .form-group > label { display: none !important; }
+
+    .publish-field {
+        padding: 0 !important;
+    }
+
+}
+
+
 /* Link toolbar
   ========================================================================== */
 

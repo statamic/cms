@@ -1,10 +1,14 @@
 <template>
 
-    <div class="bard-set  bg-white border my-4 rounded shadow my-3 whitespace-normal"
+    <div class="bard-set whitespace-normal my-3 rounded"
+        :class="{
+            'bard-set-solo': goingSolo,
+            'bg-white border shadow': !goingSolo
+        }"
         @mousedown="parentMousedown"
         @dragstart="parentDragStart"
     >
-        <div class="replicator-set-header">
+        <div class="replicator-set-header" v-if="!goingSolo">
             <div class="item-move sortable-handle" ref="dragHandle"></div>
             <div class="flex-1 ml-1 flex items-center">
                 <label v-text="config.display" class="text-xs"/>
@@ -92,6 +96,14 @@ export default {
 
         index() {
             return 0; // todo
+        },
+
+        goingSolo() {
+            const firstFieldtype = _.first(this.config.fields).type;
+            const supportedFieldtypes = ['assets'];
+
+            return this.config.fields.length === 1
+                && _.contains(supportedFieldtypes, firstFieldtype);
         }
 
     },
