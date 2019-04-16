@@ -2,23 +2,9 @@
 
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
-        <link-toolbar
-            v-if="showingLinkToolbar"
-            :link-attrs="linkAttrs"
-            :config="config"
-            @updated="setLink"
-        />
-
         <editor-menu-bar :editor="editor">
             <div slot-scope="{ commands, isActive, menu, getMarkAttrs }" class="bard-fixed-toolbar">
                 <div class="flex items-center no-select" v-if="toolbarIsFixed">
-                    <button
-                        v-for="button in buttons"
-                        :key="button.name"
-                        :class="{ 'active': isActive[button.command](button.args) }"
-                        v-tooltip="button.text"
-                        @click="executeButtonCommand(commands, getMarkAttrs, button)"
-                        v-html="button.html" />
                 </div>
                 <div class="flex items-center no-select">
                     <button @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></button>
@@ -30,18 +16,19 @@
         <div class="bard-editor">
             <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating">
                 <div
-                    slot-scope="{ commands, isActive, menu, getMarkAttrs }"
+                    slot-scope="{ commands, isActive, menu }"
                     class="bard-floating-toolbar"
                     :class="{ 'active': menu.isActive }"
                     :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
                 >
-                    <button
+                    <component
                         v-for="button in buttons"
                         :key="button.name"
-                        :class="{ 'active': isActive[button.command](button.args) }"
-                        v-tooltip="button.text"
-                        @click="executeButtonCommand(commands, getMarkAttrs, button)"
-                        v-html="button.html" />
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="isActive[button.command](button.args)"
+                        :config="config"
+                        :editor="editor" />
                 </div>
             </editor-menu-bubble>
 
@@ -99,7 +86,7 @@ import {
 import Set from './Set';
 import BardSource from './Source.vue';
 import Link from './Link';
-import LinkToolbar from './LinkToolbar.vue';
+import LinkToolbarButton from './LinkToolbarButton.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
@@ -114,7 +101,8 @@ export default {
         EditorFloatingMenu,
         EditorMenuBubble,
         BardSource,
-        LinkToolbar,
+        BardToolbarButton,
+        LinkToolbarButton,
     },
 
     provide() {
@@ -131,8 +119,6 @@ export default {
             showSource: false,
             fullScreenMode: false, // todo
             buttons: [],
-            showingLinkToolbar: false,
-            linkAttrs: null,
         }
     },
 
@@ -257,29 +243,6 @@ export default {
 
             this.buttons = buttons;
         },
-
-        executeButtonCommand(commands, getMarkAttrs, button) {
-            switch (button.command) {
-                case 'link':
-                    this.showLinkToolbar(getMarkAttrs('link'))
-                    break;
-
-                default:
-                    commands[button.command](button.args);
-            }
-        },
-
-        showLinkToolbar(attrs) {
-            this.showingLinkToolbar = true;
-            this.linkAttrs = attrs;
-        },
-
-        setLink(attributes) {
-            this.editor.commands.link(attributes);
-            this.linkAttrs = null;
-            this.showingLinkToolbar = false;
-            this.editor.focus();
-        }
     }
 }
 </script>
