@@ -108,7 +108,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
     {
         $like = strtolower($like);
 
-        $pattern = '/' . str_replace(['%', '_'], ['.*', '.'], $like) . '/';
+        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], $like) . '$/';
 
         return preg_match($pattern, strtolower($item));
     }
