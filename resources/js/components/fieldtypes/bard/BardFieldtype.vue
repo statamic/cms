@@ -3,8 +3,16 @@
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
         <editor-menu-bar :editor="editor">
-            <div slot-scope="{ commands, isActive, menu, getMarkAttrs }" class="bard-fixed-toolbar">
+            <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
                 <div class="flex items-center no-select" v-if="toolbarIsFixed">
+                    <component
+                        v-for="button in buttons"
+                        :key="button.name"
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="isActive[button.command](button.args)"
+                        :config="config"
+                        :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
                     <button @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></button>
