@@ -45,6 +45,7 @@ function backspace(state, dispatch, view) {
         return !confirm('Are you sure? This will delete any selected sets.');
     }
 
+    if (! view.endOfTextblock('backward', state)) return false;
     let cut = findCutBefore(state.selection.$cursor);
     if (! cut) return false;
     let before = cut.nodeBefore;
@@ -61,6 +62,7 @@ function del(state, dispatch, view) {
         return !confirm('Are you sure? This will delete any selected sets.');
     }
 
+    if (! view.endOfTextblock('forward', state)) return false;
     let cut = findCutAfter(state.selection.$cursor);
     if (! cut) return false;
     let after = cut.nodeAfter;
