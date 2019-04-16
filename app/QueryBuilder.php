@@ -19,6 +19,7 @@ abstract class QueryBuilder
         '<>' => 'NotEquals',
         '!=' => 'NotEquals',
         'like' => 'Like',
+        'not like' => 'NotLike',
         '>' => 'GreaterThan',
         '<' => 'LessThan',
     ];

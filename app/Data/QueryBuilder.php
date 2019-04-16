@@ -113,6 +113,11 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return preg_match($pattern, strtolower($item));
     }
 
+    protected function filterTestNotLike($item, $like)
+    {
+        return ! $this->filterTestLike($item, $like);
+    }
+
     protected function getFilterItemValue($item, $column)
     {
         if (is_array($item)) {
