@@ -106,7 +106,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
 
     protected function filterTestLike($item, $like)
     {
-        $like = strtolower($like);
+        $like = preg_quote(strtolower($like));
 
         $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], $like) . '$/';
 
