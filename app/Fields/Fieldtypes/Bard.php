@@ -104,15 +104,13 @@ class Bard extends Replicator
         return parent::extraRules();
     }
 
-    protected function isLegacyData($value)
+    public function isLegacyData($value)
     {
-        return false; // TODO.
+        $configuredTypes = array_keys($this->config('sets'));
+        $configuredTypes[] = 'text';
+        $dataTypes = collect($value)->map->type;
 
-        $hasTextSet = null !== collect($value)->first(function ($set) {
-            return $set['type'] === 'text';
-        });
-
-        return $hasTextSet || !isset($value[0]['attrs']);
+        return $dataTypes->diff($configuredTypes)->count() === 0;
     }
 
     protected function convertLegacyData($value)
