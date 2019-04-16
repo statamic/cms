@@ -3,13 +3,14 @@
 namespace Statamic\Tags\Collection;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Illuminate\Support\Carbon;
 
 class Entries
 {
     protected $collection;
     protected $parameters;
-    protected $paginate;
+    protected $paginate = false;
     protected $perPage;
     protected $showPublished = true;
     protected $showUnpublished = false;
@@ -41,15 +42,15 @@ class Entries
     {
         $params = array_except($params, $this->ignoredParams);
 
-        if ($this->paginate = array_pull($params, 'paginate', false)) {
-            $this->perPage = array_pull($params, 'limit');
+        if ($this->paginate = Arr::pull($params, 'paginate', $this->paginate)) {
+            $this->perPage = Arr::pull($params, 'limit');
         }
 
-        $this->showPublished = array_pull($params, 'show_published', true);
-        $this->showUnpublished = array_pull($params, 'show_unpublished', false);
+        $this->showPublished = Arr::pull($params, 'show_published', $this->showPublished);
+        $this->showUnpublished = Arr::pull($params, 'show_unpublished', $this->showUnpublished);
 
-        $this->showPast = array_pull($params, 'show_past', true);
-        $this->showFuture = array_pull($params, 'show_future', false);
+        $this->showPast = Arr::pull($params, 'show_past', $this->showPast);
+        $this->showFuture = Arr::pull($params, 'show_future', $this->showFuture);
 
         return $params;
     }
