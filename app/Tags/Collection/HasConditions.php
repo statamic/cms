@@ -29,6 +29,8 @@ trait HasConditions
             case 'aint':
             case '¯\\_(ツ)_/¯':
                 return $this->queryNotCondition($query, $field, $value);
+            case 'contains':
+                return $this->queryContainsCondition($query, $field, $value);
         }
     }
 
@@ -40,5 +42,10 @@ trait HasConditions
     public function queryNotCondition($query, $field, $value)
     {
         $query->where($field, '!=', $value);
+    }
+
+    public function queryContainsCondition($query, $field, $value)
+    {
+        $query->where($field, 'like', "%{$value}%");
     }
 }
