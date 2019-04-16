@@ -33,6 +33,12 @@ trait HasConditions
                 return $this->queryContainsCondition($query, $field, $value);
             case 'doesnt_contain':
                 return $this->queryDoesntContainCondition($query, $field, $value);
+            case 'starts_with':
+            case 'begins_with':
+                return $this->queryStartsWithCondition($query, $field, $value);
+            case 'doesnt_start_with':
+            case 'doesnt_begin_with':
+                return $this->queryDoesntStartWithCondition($query, $field, $value);
         }
     }
 
@@ -54,5 +60,15 @@ trait HasConditions
     public function queryDoesntContainCondition($query, $field, $value)
     {
         $query->where($field, 'not like', "%{$value}%");
+    }
+
+    public function queryStartsWithCondition($query, $field, $value)
+    {
+        $query->where($field, 'like', "{$value}%");
+    }
+
+    public function queryDoesntStartWithCondition($query, $field, $value)
+    {
+        $query->where($field, 'not like', "{$value}%");
     }
 }
