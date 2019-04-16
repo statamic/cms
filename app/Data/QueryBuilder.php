@@ -17,7 +17,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $items = $this->getFilteredItems();
 
         if ($this->orderBy) {
-            $items = $items->multisort($this->orderBy . ':' . $this->orderDirection);
+            $items = $items->multisort($this->orderBy . ':' . $this->orderDirection)->values();
         }
 
         return $this->limitItems($items);
