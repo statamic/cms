@@ -17,6 +17,7 @@ abstract class QueryBuilder
     protected $operators = [
         '=' => 'Equals',
         '<>' => 'NotEquals',
+        '!=' => 'NotEquals',
         'like' => 'Like',
         '>' => 'GreaterThan',
         '<' => 'LessThan',
