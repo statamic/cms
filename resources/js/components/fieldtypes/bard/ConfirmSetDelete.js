@@ -46,6 +46,7 @@ function backspace(state, dispatch, view) {
     }
 
     let cut = findCutBefore(state.selection.$cursor);
+    if (! cut) return false;
     let before = cut.nodeBefore;
     if (before.type.name === 'set') {
         return !confirm('Are you sure you want to delete this set?');
@@ -61,6 +62,7 @@ function del(state, dispatch, view) {
     }
 
     let cut = findCutAfter(state.selection.$cursor);
+    if (! cut) return false;
     let after = cut.nodeAfter;
     if (after.type.name === 'set') {
         return !confirm('Are you sure you want to delete this set?');
