@@ -8,6 +8,8 @@ use Illuminate\Support\Carbon;
 
 class Entries
 {
+    use HasConditions;
+
     protected $collection;
     protected $parameters;
     protected $paginate = false;
@@ -34,6 +36,7 @@ class Entries
             $this->queryPublished($query);
             $this->queryPastFuture($query);
             $this->querySinceUntil($query);
+            $this->queryConditions($query);
         } catch (NoResultsExpected $e) {
             return collect_entries();
         }
