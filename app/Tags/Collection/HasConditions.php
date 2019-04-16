@@ -24,11 +24,21 @@ trait HasConditions
             case 'is':
             case 'equals':
                 return $this->queryIsCondition($query, $field, $value);
+            case 'not':
+            case 'isnt':
+            case 'aint':
+            case '¯\\_(ツ)_/¯':
+                return $this->queryNotCondition($query, $field, $value);
         }
     }
 
     public function queryIsCondition($query, $field, $value)
     {
         $query->where($field, $value);
+    }
+
+    public function queryNotCondition($query, $field, $value)
+    {
+        $query->where($field, '!=', $value);
     }
 }
