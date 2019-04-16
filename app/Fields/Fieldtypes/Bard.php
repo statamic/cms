@@ -19,6 +19,21 @@ class Bard extends Replicator
                 'floating' => 'Floating',
             ],
         ],
+        'link_noopener' => [
+            'type' => 'toggle',
+            'default' => false,
+            'width' => 50,
+        ],
+        'link_noreferrer' => [
+            'type' => 'toggle',
+            'default' => false,
+            'width' => 50,
+        ],
+        'target_blank' => [
+            'type' => 'toggle',
+            'default' => false,
+            'width' => 50,
+        ],
     ];
 
     public function augment($value)
