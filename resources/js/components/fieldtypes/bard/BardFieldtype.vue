@@ -15,8 +15,13 @@
                         :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
-                    <button @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></button>
-                    <button @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></button>
+                    <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                        <svg-icon name="file-code" class="w-4 h-4 "/>
+                    </button>
+                    <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')">
+                        <svg-icon name="shrink" class="w-4 h-4" v-if="fullScreenMode" />
+                        <svg-icon name="expand" class="w-4 h-4" v-else />
+                    </button>
                 </div>
             </div>
         </editor-menu-bar>
