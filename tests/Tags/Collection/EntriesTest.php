@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Tags;
+namespace Tests\Tags\Collection;
 
 use Statamic\API;
 use Tests\TestCase;
