@@ -31,6 +31,8 @@ trait HasConditions
                 return $this->queryNotCondition($query, $field, $value);
             case 'contains':
                 return $this->queryContainsCondition($query, $field, $value);
+            case 'doesnt_contain':
+                return $this->queryDoesntContainCondition($query, $field, $value);
         }
     }
 
@@ -47,5 +49,10 @@ trait HasConditions
     public function queryContainsCondition($query, $field, $value)
     {
         $query->where($field, 'like', "%{$value}%");
+    }
+
+    public function queryDoesntContainCondition($query, $field, $value)
+    {
+        $query->where($field, 'not like', "%{$value}%");
     }
 }
