@@ -20,6 +20,7 @@ class Entries
     protected $showFuture = false;
     protected $since;
     protected $until;
+    protected $sort;
     protected $ignoredParams = ['from', 'as'];
 
     public function __construct($collection, $parameters)
@@ -37,6 +38,7 @@ class Entries
             $this->queryPastFuture($query);
             $this->querySinceUntil($query);
             $this->queryConditions($query);
+            $this->querySort($query);
         } catch (NoResultsExpected $e) {
             return collect_entries();
         }
@@ -60,6 +62,8 @@ class Entries
 
         $this->since = Arr::pull($params, 'since', $this->since);
         $this->until = Arr::pull($params, 'until', $this->until);
+
+        $this->sort = Arr::pull($params, 'sort', $this->sort);
 
         return $params;
     }
@@ -107,5 +111,17 @@ class Entries
         if ($this->until) {
             $query->where('date', '<', Carbon::parse($this->until));
         }
+    }
+
+    public function querySort($query)
+    {
+        if (! $this->sort) {
+            return;
+        }
+
+        $sort = explode(':', $this->sort)[0];
+        $direction = explode(':', $this->sort)[1] ?? 'asc';
+
+        $query->orderBy($sort, $direction);
     }
 }

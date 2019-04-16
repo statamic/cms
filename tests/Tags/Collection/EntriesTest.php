@@ -96,4 +96,30 @@ class EntriesTest extends TestCase
         $this->assertCount(4, $this->getEntries(['show_future' => true, 'until' => 'now']));
         $this->assertCount(6, $this->getEntries(['show_future' => true, 'until' => 'tomorrow']));
     }
+
+    /** @test */
+    function it_sorts_entries()
+    {
+        $this->collection->order('date')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry()->order('2019-02-06')->set('title', 'Pear')->save();
+        $this->makeEntry()->order('2019-02-07')->set('title', 'Apple')->save();
+        $this->makeEntry()->order('2019-03-03')->set('title', 'Banana')->save();
+
+        $this->assertEquals(
+            ['2019-03-03', '2019-02-07', '2019-02-06'],
+            $this->getEntries(['sort' => 'date:desc'])->map->date()->map->format('Y-m-d')->all()
+        );
+
+        $this->assertEquals(
+            ['Apple', 'Banana', 'Pear'],
+            $this->getEntries(['sort' => 'title'])->map->get('title')->all()
+        );
+
+        $this->assertEquals(
+            ['Pear', 'Banana', 'Apple'],
+            $this->getEntries(['sort' => 'title:desc'])->map->get('title')->all()
+        );
+    }
 }
