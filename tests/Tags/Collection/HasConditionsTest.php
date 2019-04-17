@@ -217,4 +217,19 @@ class HasConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:match' => 'c.t$']));
         $this->assertCount(1, $this->getEntries(['title:regex' => 'c.t$']));
     }
+
+    /** @test */
+    function it_filters_by_not_regex_condition()
+    {
+        $this->makeEntry()->set('title', 'Dog Stories')->save();
+        $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
+        $this->makeEntry()->set('title', 'Why I love my cat')->save();
+        $this->makeEntry()->set('title', 'Paw Poetry')->save();
+
+        $this->assertCount(5, $this->getEntries());
+        $this->assertCount(3, $this->getEntries(['title:doesnt_match' => 'cat']));
+        $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '^cat']));
+        $this->assertCount(4, $this->getEntries(['title:doesnt_match' => 'c.t$']));
+    }
 }
