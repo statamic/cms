@@ -10,7 +10,7 @@
                         :key="button.name"
                         :is="button.component || 'BardToolbarButton'"
                         :button="button"
-                        :active="isActive[button.command](button.args)"
+                        :active="buttonIsActive(isActive, button)"
                         :config="config"
                         :bard="_self"
                         :editor="editor" />
@@ -40,7 +40,7 @@
                         :key="button.name"
                         :is="button.component || 'BardToolbarButton'"
                         :button="button"
-                        :active="isActive[button.command](button.args)"
+                        :active="buttonIsActive(isActive, button)"
                         :config="config"
                         :editor="editor" />
                 </div>
@@ -100,6 +100,7 @@ import {
 import Set from './Set';
 import BardSource from './Source.vue';
 import Link from './Link';
+import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -189,6 +190,7 @@ export default {
                 new Set(),
                 new ConfirmSetDelete(),
                 new Link({ vm: this }),
+                new RemoveFormat(),
             ],
             content,
             onUpdate: ({ getJSON, getHTML }) => {
@@ -257,6 +259,11 @@ export default {
 
             this.buttons = buttons;
         },
+
+        buttonIsActive(isActive, button) {
+            if (! isActive.hasOwnProperty(button.command)) return false;
+            return isActive[button.command](button.args);
+        }
     }
 }
 </script>

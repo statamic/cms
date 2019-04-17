@@ -11,7 +11,7 @@ const availableButtons = () => [
     { name: 'strikethrough', text: __('Strikethrough'), command: 'strike', icon: 'strikethrough' },
     { name: 'unorderedlist', text: __('Unordered List'), command: 'bullet_list', icon: 'list-ul' },
     { name: 'orderedlist', text: __('Ordered List'), command: 'ordered_list', icon: 'list-ol' },
-    // { name: 'removeformat', text: __('Remove Formatting'), command: 'removeFormat', icon: 'eraser' },
+    { name: 'removeformat', text: __('Remove Formatting'), command: 'remove_format', icon: 'eraser' },
     { name: 'quote', text: __('Blockquote'), command: 'blockquote', icon: 'quote-right' },
     // { name: 'superscript', text: __('Superscript'), command: 'superscript', icon: 'superscript' },
     // { name: 'subscript', text: __('Subscript'), command: 'subscript', icon: 'subscript' },
