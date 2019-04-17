@@ -55,6 +55,10 @@ trait HasConditions
             case 'less_than_or_equal_to':
             case 'lte':
                 return $this->queryLessThanOrEqualToCondition($query, $field, $value);
+            case 'matches':
+            case 'match':
+            case 'regex':
+               return $this->queryMatchesRegexCondition($query, $field, $value);
         }
     }
 
@@ -116,5 +120,10 @@ trait HasConditions
     public function queryLessThanOrEqualToCondition($query, $field, $value)
     {
         $query->where($field, '<=', $value);
+    }
+
+    public function queryMatchesRegexCondition($query, $field, $value)
+    {
+        $query->where($field, 'regexp', $value);
     }
 }
