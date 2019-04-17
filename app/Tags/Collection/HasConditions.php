@@ -52,6 +52,9 @@ trait HasConditions
             case 'greater_than_or_equal_to':
             case 'gte':
                 return $this->queryGreaterThanOrEqualToCondition($query, $field, $value);
+            case 'less_than_or_equal_to':
+            case 'lte':
+                return $this->queryLessThanOrEqualToCondition($query, $field, $value);
         }
     }
 
@@ -108,5 +111,10 @@ trait HasConditions
     public function queryGreaterThanOrEqualToCondition($query, $field, $value)
     {
         $query->where($field, '>=', $value);
+    }
+
+    public function queryLessThanOrEqualToCondition($query, $field, $value)
+    {
+        $query->where($field, '<=', $value);
     }
 }
