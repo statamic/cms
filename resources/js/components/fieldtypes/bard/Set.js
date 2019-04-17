@@ -39,17 +39,13 @@ export default class SetNode extends Node {
     }
 
     stopEvent(event) {
-        const isPaste = event.type === 'paste'
         const draggable = !!this.schema.draggable
-
         if (draggable && (event instanceof DragEvent)) {
             return false
         }
 
-        if (isPaste) {
-            return false;
-        }
-
+        // Any other events (including pastes) should be stopped
+        // which will prevent Prosemirror from handling them.
         return true
     }
 
