@@ -58,7 +58,9 @@ trait HasConditions
             case 'matches':
             case 'match':
             case 'regex':
-               return $this->queryMatchesRegexCondition($query, $field, $value);
+                return $this->queryMatchesRegexCondition($query, $field, $value);
+            case 'doesnt_match':
+                return $this->queryDoesntMatchRegexCondition($query, $field, $value);
         }
     }
 
@@ -125,5 +127,10 @@ trait HasConditions
     public function queryMatchesRegexCondition($query, $field, $value)
     {
         $query->where($field, 'regexp', $value);
+    }
+
+    public function queryDoesntMatchRegexCondition($query, $field, $value)
+    {
+        $query->where($field, 'not regexp', $value);
     }
 }
