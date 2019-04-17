@@ -41,6 +41,7 @@
                         :is="button.component || 'BardToolbarButton'"
                         :button="button"
                         :active="buttonIsActive(isActive, button)"
+                        :bard="_self"
                         :config="config"
                         :editor="editor" />
                 </div>
