@@ -178,10 +178,6 @@
         text-size-adjust: 100%;
     }
 
-    b,
-    strong { font-weight: 700; }
-
-    em, i { font-style: italic }
 
     blockquote,
     ol,
@@ -189,22 +185,34 @@
     ul {
         margin-top: 0;
         margin-bottom: .85em;
+
+        b,
+        strong { font-weight: 700; }
+
+        em, i { font-style: italic }
+
+        a {
+            @apply text-blue no-underline;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
+
+        img {
+            border: 0;
+            max-width: 100%;
+        }
     }
 
-    a {
-        @apply text-blue no-underline;
-    }
-
-    a:active,
-    a:focus,
-    a:hover {
-        outline: 0;
-        text-decoration: underline;
-    }
-
-    img {
-        border: 0;
-        max-width: 100%;
+    blockquote, ol, ul {
+        p {
+            margin-top: 0;
+            margin-bottom: .85em;
+        }
     }
 
     hr {
