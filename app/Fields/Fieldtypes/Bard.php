@@ -10,6 +10,20 @@ class Bard extends Replicator
 
     protected $configFields = [
         'sets' => ['type' => 'sets'],
+        'buttons' => [
+            'type' => 'bard_buttons_setting',
+            'default' => [
+                'h2',
+                'h3',
+                'bold',
+                'italic',
+                'unorderedlist',
+                'orderedlist',
+                'removeformat',
+                'quote',
+                'anchor',
+            ]
+        ],
         'save_html' => ['type' => 'toggle'],
         'toolbar_mode' => [
             'type' => 'select',
