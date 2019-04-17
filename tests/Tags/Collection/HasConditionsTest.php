@@ -196,4 +196,18 @@ class HasConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['age:lte' => '21']));
         $this->assertCount(4, $this->getEntries(['age:lte' => 21]));
     }
+
+    /** @test */
+    function it_filters_by_regex_condition()
+    {
+        $this->makeEntry()->set('title', 'Dog Stories')->save();
+        $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
+        $this->makeEntry()->set('title', 'Why I love my cat')->save();
+
+        $this->assertCount(4, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['title:regex' => 'cat']));
+        $this->assertCount(1, $this->getEntries(['title:regex' => '^cat']));
+        $this->assertCount(1, $this->getEntries(['title:regex' => 'c.t$']));
+    }
 }
