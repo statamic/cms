@@ -140,10 +140,10 @@ class HasConditionsTest extends TestCase
         $this->makeEntry()->set('age', '24')->save();
 
         $this->assertCount(6, $this->getEntries());
-        $this->assertCount(4, $this->getEntries(['age:greater_than' => '18']));
         $this->assertCount(4, $this->getEntries(['age:greater_than' => 18]));
-        $this->assertCount(4, $this->getEntries(['age:gt' => '18']));
         $this->assertCount(4, $this->getEntries(['age:gt' => 18]));
+        $this->assertCount(4, $this->getEntries(['age:greater_than' => '18']));
+        $this->assertCount(4, $this->getEntries(['age:gt' => '18']));
     }
 
     /** @test */
@@ -157,10 +157,10 @@ class HasConditionsTest extends TestCase
         $this->makeEntry()->set('age', '24')->save();
 
         $this->assertCount(6, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['age:less_than' => '18']));
         $this->assertCount(2, $this->getEntries(['age:less_than' => 18]));
-        $this->assertCount(2, $this->getEntries(['age:lt' => '18']));
         $this->assertCount(2, $this->getEntries(['age:lt' => 18]));
+        $this->assertCount(2, $this->getEntries(['age:less_than' => '18']));
+        $this->assertCount(2, $this->getEntries(['age:lt' => '18']));
     }
 
     /** @test */
@@ -174,10 +174,10 @@ class HasConditionsTest extends TestCase
         $this->makeEntry()->set('age', '24')->save();
 
         $this->assertCount(6, $this->getEntries());
-        $this->assertCount(4, $this->getEntries(['age:greater_than_or_equal_to' => '21']));
         $this->assertCount(4, $this->getEntries(['age:greater_than_or_equal_to' => 21]));
-        $this->assertCount(4, $this->getEntries(['age:gte' => '21']));
         $this->assertCount(4, $this->getEntries(['age:gte' => 21]));
+        $this->assertCount(4, $this->getEntries(['age:greater_than_or_equal_to' => '21']));
+        $this->assertCount(4, $this->getEntries(['age:gte' => '21']));
     }
 
     /** @test */
@@ -191,10 +191,10 @@ class HasConditionsTest extends TestCase
         $this->makeEntry()->set('age', '24')->save();
 
         $this->assertCount(6, $this->getEntries());
-        $this->assertCount(4, $this->getEntries(['age:less_than_or_equal_to' => '21']));
         $this->assertCount(4, $this->getEntries(['age:less_than_or_equal_to' => 21]));
-        $this->assertCount(4, $this->getEntries(['age:lte' => '21']));
         $this->assertCount(4, $this->getEntries(['age:lte' => 21]));
+        $this->assertCount(4, $this->getEntries(['age:less_than_or_equal_to' => '21']));
+        $this->assertCount(4, $this->getEntries(['age:lte' => '21']));
     }
 
     /** @test */
@@ -204,10 +204,17 @@ class HasConditionsTest extends TestCase
         $this->makeEntry()->set('title', 'Cat Fables')->save();
         $this->makeEntry()->set('title', 'Tiger Tales')->save();
         $this->makeEntry()->set('title', 'Why I love my cat')->save();
+        $this->makeEntry()->set('title', 'Paw Poetry')->save();
 
-        $this->assertCount(4, $this->getEntries());
+        $this->assertCount(5, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['title:matches' => 'cat']));
+        $this->assertCount(2, $this->getEntries(['title:match' => 'cat']));
         $this->assertCount(2, $this->getEntries(['title:regex' => 'cat']));
+        $this->assertCount(1, $this->getEntries(['title:matches' => '^cat']));
+        $this->assertCount(1, $this->getEntries(['title:match' => '^cat']));
         $this->assertCount(1, $this->getEntries(['title:regex' => '^cat']));
+        $this->assertCount(1, $this->getEntries(['title:matches' => 'c.t$']));
+        $this->assertCount(1, $this->getEntries(['title:match' => 'c.t$']));
         $this->assertCount(1, $this->getEntries(['title:regex' => 'c.t$']));
     }
 }
