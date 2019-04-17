@@ -46,6 +46,9 @@ trait HasConditions
             case 'greater_than':
             case 'gt':
                 return $this->queryGreaterThanCondition($query, $field, $value);
+            case 'less_than':
+            case 'lt':
+                return $this->queryLessThanCondition($query, $field, $value);
         }
     }
 
@@ -92,5 +95,10 @@ trait HasConditions
     public function queryGreaterThanCondition($query, $field, $value)
     {
         $query->where($field, '>', $value);
+    }
+
+    public function queryLessThanCondition($query, $field, $value)
+    {
+        $query->where($field, '<', $value);
     }
 }
