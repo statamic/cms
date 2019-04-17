@@ -134,6 +134,16 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return ! $this->filterTestLike($item, $like);
     }
 
+    protected function filterTestLikeRegex($item, $pattern)
+    {
+        return preg_match("/{$pattern}/i", $item);
+    }
+
+    protected function filterTestNotLikeRegex($item, $pattern)
+    {
+        return ! $this->filterTestLikeRegex($item, $pattern);
+    }
+
     protected function getFilterItemValue($item, $column)
     {
         if (is_array($item)) {

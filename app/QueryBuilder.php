@@ -20,6 +20,8 @@ abstract class QueryBuilder
         '!=' => 'NotEquals',
         'like' => 'Like',
         'not like' => 'NotLike',
+        'regexp' => 'LikeRegex',
+        'not regexp' => 'NotLikeRegex',
         '>' => 'GreaterThan',
         '<' => 'LessThan',
         '>=' => 'GreaterThanOrEqualTo',
