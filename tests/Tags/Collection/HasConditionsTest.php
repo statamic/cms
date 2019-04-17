@@ -179,4 +179,21 @@ class HasConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['age:gte' => '21']));
         $this->assertCount(4, $this->getEntries(['age:gte' => 21]));
     }
+
+    /** @test */
+    function it_filters_by_less_than_or_equal_to_condition()
+    {
+        $this->makeEntry()->set('age', 11)->save();
+        $this->makeEntry()->set('age', '11')->save();
+        $this->makeEntry()->set('age', 21)->save();
+        $this->makeEntry()->set('age', '21')->save();
+        $this->makeEntry()->set('age', 24)->save();
+        $this->makeEntry()->set('age', '24')->save();
+
+        $this->assertCount(6, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['age:less_than_or_equal_to' => '21']));
+        $this->assertCount(4, $this->getEntries(['age:less_than_or_equal_to' => 21]));
+        $this->assertCount(4, $this->getEntries(['age:lte' => '21']));
+        $this->assertCount(4, $this->getEntries(['age:lte' => 21]));
+    }
 }
