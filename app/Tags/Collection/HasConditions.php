@@ -43,6 +43,9 @@ trait HasConditions
                 return $this->queryEndsWithCondition($query, $field, $value);
             case 'doesnt_end_with':
                 return $this->queryDoesntEndWithCondition($query, $field, $value);
+            case 'greater_than':
+            case 'gt':
+                return $this->queryGreaterThanCondition($query, $field, $value);
         }
     }
 
@@ -84,5 +87,10 @@ trait HasConditions
     public function queryDoesntEndWithCondition($query, $field, $value)
     {
         $query->where($field, 'not like', "%{$value}");
+    }
+
+    public function queryGreaterThanCondition($query, $field, $value)
+    {
+        $query->where($field, '>', $value);
     }
 }
