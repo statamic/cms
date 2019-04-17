@@ -140,4 +140,21 @@ class HasConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:doesnt_end_with' => 'Stories']));
         $this->assertEquals('Cat Fables', $this->getEntries(['title:doesnt_end_with' => 'Stories'])->first()->get('title'));
     }
+
+    /** @test */
+    function it_filters_by_greater_than_condition()
+    {
+        $this->makeEntry()->set('age', 11)->save();
+        $this->makeEntry()->set('age', '11')->save();
+        $this->makeEntry()->set('age', 21)->save();
+        $this->makeEntry()->set('age', '21')->save();
+        $this->makeEntry()->set('age', 24)->save();
+        $this->makeEntry()->set('age', '24')->save();
+
+        $this->assertCount(6, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['age:greater_than' => '18']));
+        $this->assertCount(4, $this->getEntries(['age:greater_than' => 18]));
+        $this->assertCount(4, $this->getEntries(['age:gt' => '18']));
+        $this->assertCount(4, $this->getEntries(['age:gt' => 18]));
+    }
 }
