@@ -34,14 +34,11 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog')->save();
         $this->makeEntry()->set('title', 'Cat')->save();
+        $this->makeEntry()->set('title', 'Tiger')->save();
 
-        $this->assertCount(2, $this->getEntries());
-
+        $this->assertCount(3, $this->getEntries());
         $this->assertCount(1, $this->getEntries(['title:is' => 'Dog']));
         $this->assertCount(1, $this->getEntries(['title:equals' => 'Dog']));
-
-        $this->assertEquals('Dog', $this->getEntries(['title:is' => 'Dog'])->first()->get('title'));
-        $this->assertEquals('Dog', $this->getEntries(['title:equals' => 'Dog'])->first()->get('title'));
     }
 
     /** @test */
@@ -49,18 +46,13 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog')->save();
         $this->makeEntry()->set('title', 'Cat')->save();
+        $this->makeEntry()->set('title', 'Tiger')->save();
 
-        $this->assertCount(2, $this->getEntries());
-
-        $this->assertCount(1, $this->getEntries(['title:not' => 'Dog']));
-        $this->assertCount(1, $this->getEntries(['title:isnt' => 'Dog']));
-        $this->assertCount(1, $this->getEntries(['title:aint' => 'Dog']));
-        $this->assertCount(1, $this->getEntries(['title:¯\\_(ツ)_/¯' => 'Dog']));
-
-        $this->assertEquals('Cat', $this->getEntries(['title:not' => 'Dog'])->first()->get('title'));
-        $this->assertEquals('Cat', $this->getEntries(['title:isnt' => 'Dog'])->first()->get('title'));
-        $this->assertEquals('Cat', $this->getEntries(['title:aint' => 'Dog'])->first()->get('title'));
-        $this->assertEquals('Cat', $this->getEntries(['title:¯\\_(ツ)_/¯' => 'Dog'])->first()->get('title'));
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['title:not' => 'Dog']));
+        $this->assertCount(2, $this->getEntries(['title:isnt' => 'Dog']));
+        $this->assertCount(2, $this->getEntries(['title:aint' => 'Dog']));
+        $this->assertCount(2, $this->getEntries(['title:¯\\_(ツ)_/¯' => 'Dog']));
     }
 
     /** @test */
@@ -68,10 +60,10 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog Stories')->save();
         $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
 
-        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(3, $this->getEntries());
         $this->assertCount(1, $this->getEntries(['title:contains' => 'Sto']));
-        $this->assertEquals('Dog Stories', $this->getEntries(['title:contains' => 'Sto'])->first()->get('title'));
     }
 
     /** @test */
@@ -79,10 +71,10 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog Stories')->save();
         $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
 
-        $this->assertCount(2, $this->getEntries());
-        $this->assertCount(1, $this->getEntries(['title:doesnt_contain' => 'Sto']));
-        $this->assertEquals('Cat Fables', $this->getEntries(['title:doesnt_contain' => 'Sto'])->first()->get('title'));
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['title:doesnt_contain' => 'Sto']));
     }
 
     /** @test */
@@ -90,15 +82,13 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog Stories')->save();
         $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
 
-        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(3, $this->getEntries());
         $this->assertCount(0, $this->getEntries(['title:starts_with' => 'Sto']));
         $this->assertCount(0, $this->getEntries(['title:begins_with' => 'Sto']));
         $this->assertCount(1, $this->getEntries(['title:starts_with' => 'Dog']));
         $this->assertCount(1, $this->getEntries(['title:begins_with' => 'Dog']));
-
-        $this->assertEquals('Dog Stories', $this->getEntries(['title:starts_with' => 'Dog'])->first()->get('title'));
-        $this->assertEquals('Dog Stories', $this->getEntries(['title:begins_with' => 'Dog'])->first()->get('title'));
     }
 
     /** @test */
@@ -106,15 +96,13 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog Stories')->save();
         $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
 
-        $this->assertCount(2, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['title:doesnt_start_with' => 'Sto']));
-        $this->assertCount(2, $this->getEntries(['title:doesnt_begin_with' => 'Sto']));
-        $this->assertCount(1, $this->getEntries(['title:doesnt_start_with' => 'Dog']));
-        $this->assertCount(1, $this->getEntries(['title:doesnt_begin_with' => 'Dog']));
-
-        $this->assertEquals('Cat Fables', $this->getEntries(['title:doesnt_start_with' => 'Dog'])->first()->get('title'));
-        $this->assertEquals('Cat Fables', $this->getEntries(['title:doesnt_begin_with' => 'Dog'])->first()->get('title'));
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(3, $this->getEntries(['title:doesnt_start_with' => 'Sto']));
+        $this->assertCount(3, $this->getEntries(['title:doesnt_begin_with' => 'Sto']));
+        $this->assertCount(2, $this->getEntries(['title:doesnt_start_with' => 'Dog']));
+        $this->assertCount(2, $this->getEntries(['title:doesnt_begin_with' => 'Dog']));
     }
 
     /** @test */
@@ -122,11 +110,11 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog Stories')->save();
         $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
 
-        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(3, $this->getEntries());
         $this->assertCount(0, $this->getEntries(['title:ends_with' => 'Sto']));
         $this->assertCount(1, $this->getEntries(['title:ends_with' => 'Stories']));
-        $this->assertEquals('Dog Stories', $this->getEntries(['title:ends_with' => 'Stories'])->first()->get('title'));
     }
 
     /** @test */
@@ -134,11 +122,11 @@ class HasConditionsTest extends TestCase
     {
         $this->makeEntry()->set('title', 'Dog Stories')->save();
         $this->makeEntry()->set('title', 'Cat Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
 
-        $this->assertCount(2, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['title:doesnt_end_with' => 'Sto']));
-        $this->assertCount(1, $this->getEntries(['title:doesnt_end_with' => 'Stories']));
-        $this->assertEquals('Cat Fables', $this->getEntries(['title:doesnt_end_with' => 'Stories'])->first()->get('title'));
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(3, $this->getEntries(['title:doesnt_end_with' => 'Sto']));
+        $this->assertCount(2, $this->getEntries(['title:doesnt_end_with' => 'Stories']));
     }
 
     /** @test */
