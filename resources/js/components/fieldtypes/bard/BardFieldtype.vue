@@ -12,6 +12,7 @@
                         :button="button"
                         :active="isActive[button.command](button.args)"
                         :config="config"
+                        :bard="_self"
                         :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
@@ -187,7 +188,7 @@ export default {
                 new History(),
                 new Set(),
                 new ConfirmSetDelete(),
-                new Link(),
+                new Link({ vm: this }),
             ],
             content,
             onUpdate: ({ getJSON, getHTML }) => {

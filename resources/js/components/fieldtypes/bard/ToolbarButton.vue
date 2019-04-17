@@ -16,6 +16,7 @@ export default {
         button: Object,
         active: Boolean,
         config: Object,
+        bard: {},
         editor: {}
     }
 

@@ -51,6 +51,7 @@ export default class Link extends Mark {
     }
 
     get plugins() {
+        const vm = this.options.vm;
         return [
             new Plugin({
                 props: {
@@ -61,9 +62,13 @@ export default class Link extends Mark {
                         if (range) {
                             const $start = doc.resolve(range.from)
                             const $end = doc.resolve(range.to)
-                            const transaction = tr.setSelection(new TextSelection($start, $end))
+                            const selection = new TextSelection($start, $end)
+                            const transaction = tr.setSelection(selection)
 
                             view.dispatch(transaction)
+                            vm.$emit('link-selected', selection)
+                        } else {
+                            vm.$emit('link-deselected')
                         }
                     },
                 },

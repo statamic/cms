@@ -49,13 +49,15 @@
 export default {
 
     props: {
+        bard: {},
         config: Object,
-        linkAttrs: Object,
+        initialLinkAttrs: Object,
     },
 
     data() {
         return {
-            linkInput: this.linkAttrs.href,
+            linkAttrs: this.initialLinkAttrs,
+            linkInput: this.initialLinkAttrs.href,
             targetBlank: null,
             isEditing: false,
         }
@@ -87,6 +89,16 @@ export default {
         }
 
         this.targetBlank = this.linkAttrs.target == '_blank' ? true : this.config.target_blank;
+
+        this.bard.$on('link-selected', (selection) => {
+            // This can't be a good way to do this.
+            const attrs = selection.content().content.content[0].content.content[0].marks[0].attrs;
+            this.linkAttrs = attrs;
+            this.linkInput = attrs.href;
+            this.targetBlank = attrs.target == '_blank' ? true : this.config.target_blank;
+        });
+
+        this.bard.$on('link-deselected', () => this.$emit('deselected'));
     },
 
     methods: {

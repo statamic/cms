@@ -11,9 +11,11 @@
 
         <link-toolbar
             v-if="showingToolbar"
-            :link-attrs="linkAttrs"
+            :initial-link-attrs="linkAttrs"
             :config="config"
+            :bard="bard"
             @updated="setLink"
+            @deselected="showingToolbar = false"
         />
     </div>
 
