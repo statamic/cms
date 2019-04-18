@@ -29,6 +29,9 @@ trait HasConditions
             case 'aint':
             case '¯\\_(ツ)_/¯':
                 return $this->queryNotCondition($query, $field, $value);
+            case 'exists':
+            case 'isset':
+                return $this->queryExistsCondition($query, $field, $value);
             case 'contains':
                 return $this->queryContainsCondition($query, $field, $value);
             case 'doesnt_contain':
@@ -71,6 +74,7 @@ trait HasConditions
     public function queryBooleanCondition($query, $field, $condition, $value)
     {
         $regexOperator = $value ? 'regexp' : 'not regexp';
+        $comparisonOperator = $value ? '=' : '!=';
 
         switch ($condition) {
             case 'is_alpha':
@@ -85,6 +89,9 @@ trait HasConditions
                 return $this->queryIsEmbeddableCondition($query, $field, $regexOperator);
             case 'is_email':
                 return $this->queryIsEmailCondition($query, $field, $regexOperator);
+            case 'is_empty':
+            case 'is_blank':
+                return $this->queryIsEmptyCondition($query, $field, $comparisonOperator);
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
@@ -202,6 +209,12 @@ trait HasConditions
     public function queryIsEmailCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[^\ ]+@[^\ ]+\.[^\ ]+$');
+    }
+
+    public function queryIsEmptyCondition($query, $field, $comparisonOperator)
+    {
+        // TODO: Add `whereNull()` and `whereNotNull()` to our query builder so that this can be Eloquent compatible.
+        $query->where($field, $comparisonOperator, null);
     }
 
     public function queryIsNumberwangCondition($query, $field, $regexOperator)
