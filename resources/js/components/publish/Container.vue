@@ -30,6 +30,12 @@ export default {
         }
     },
 
+    data() {
+        return {
+            components: [], // extra components to be injected
+        }
+    },
+
     created() {
         this.registerVuexModule();
         this.$events.$emit('publish-container-created', this);
@@ -127,6 +133,10 @@ export default {
 
         removeNavigationWarning() {
             this.$dirty.remove(this.name);
+        },
+
+        pushComponent(component) {
+            this.components.push(component);
         }
 
     },
@@ -160,7 +170,9 @@ export default {
 
     render() {
         return this.$scopedSlots.default({
-            values: this.$store.state.publish[this.name].values
+            values: this.$store.state.publish[this.name].values,
+            container: this._self,
+            components: this.components,
         });
     }
 
