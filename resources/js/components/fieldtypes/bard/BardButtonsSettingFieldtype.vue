@@ -1,11 +1,11 @@
 <template>
     <div class="relative">
-        <div class="bard-toolbar bard-toolbar-setting" v-el:buttons>
+        <div class="bard-fixed-toolbar bard-toolbar-setting border rounded" ref="buttons">
 
             <button
                 v-for="button in buttons"
                 :key="button.name"
-                v-tip :tip-text="button.text"
+                v-tooltip="button.text"
                 :class="{'active': enabled(button.name)}"
                 @click="toggleButton(button.name)"
                 v-html="button.html"
@@ -25,12 +25,13 @@ export default {
 
     data() {
         return {
+            data: this.value,
             buttons: [],
             autoBindChangeWatcher: false,
         };
     },
 
-    ready: function() {
+    mounted() {
         if ( ! this.data) {
             this.data = this.config.default || [];
         }
@@ -48,14 +49,18 @@ export default {
                     .filter(button => button.enabled)
                     .map(button => button.name);
             }
-        }
+        },
+
+        data(data) {
+            this.update(data);
+        },
 
     },
 
     methods: {
 
         initButtons() {
-            let available = addButtonHtml(availableButtons);
+            let available = addButtonHtml(availableButtons());
 
             let buttons = available.map(button => {
                 button.enabled = this.data.includes(button.name);
@@ -86,7 +91,7 @@ export default {
         },
 
         initSortable() {
-            new Sortable(this.$els.buttons, {
+            new Sortable(this.$refs.buttons, {
                 draggable: 'button',
                 delay: 200
             }).on('sortable:stop', e => {

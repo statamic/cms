@@ -1,6 +1,4 @@
 <script>
-let source;
-
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 
@@ -22,6 +20,7 @@ export default {
 
     data() {
         return {
+            source: null,
             initializing: true,
             loading: true,
             items: [],
@@ -91,12 +90,12 @@ export default {
         request() {
             this.loading = true;
 
-            if (source) source.cancel();
-            source = this.$axios.CancelToken.source();
+            if (this.source) this.source.cancel();
+            this.source = this.$axios.CancelToken.source();
 
             this.$axios.get(this.requestUrl, {
                 params: this.parameters,
-                cancelToken: source.token
+                cancelToken: this.source.token
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;

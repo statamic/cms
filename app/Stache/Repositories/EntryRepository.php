@@ -63,6 +63,12 @@ class EntryRepository implements RepositoryContract
             ?? $this->find($this->store->getIdFromUri($uri, $site));
     }
 
+    // TODO: Refactor usages.
+    public function whereUri(string $uri, string $site = null): ?Entry
+    {
+        return $this->findByUri($uri, $site);
+    }
+
     public function save($entry)
     {
         $localizable = $entry->entry();
@@ -93,6 +99,30 @@ class EntryRepository implements RepositoryContract
         $this->store->save($entry);
     }
 
+    public function deleteLocalizable($localizable)
+    {
+        $localizable->localizations()->each(function ($localization) {
+            $this->store->delete($localization);
+        });
+
+        $this->store->remove($localizable->id());
+    }
+
+    public function deleteLocalization($localization)
+    {
+        $localizable = $localization->entry();
+
+        $localizable->removeLocalization($localization);
+
+        $this->store
+            ->store($localizable->collectionHandle())
+            ->insert($localizable)
+            ->removeSiteUri($localization->locale(), $localization->id())
+            ->removeSitePath($localization->locale(), $localization->id());
+
+        $this->store->delete($localization);
+    }
+
     public function query()
     {
         return new QueryBuilder;
@@ -101,5 +131,11 @@ class EntryRepository implements RepositoryContract
     public function make(): Entry
     {
         return new \Statamic\Data\Entries\Entry;
+    }
+
+    // TODO: Remove
+    public function create()
+    {
+        return $this->make();
     }
 }

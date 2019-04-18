@@ -91,6 +91,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\AssetFolder::class,
         Fieldtypes\Assets::class,
         Fieldtypes\Bard::class,
+        Fieldtypes\Bard\Buttons::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
@@ -280,6 +281,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Unpublish::class,
             Actions\SendActivationEmail::class,
             Actions\MoveAsset::class,
+            Actions\DeleteEntry::class,
         ];
 
         $this->registerParent($parent);

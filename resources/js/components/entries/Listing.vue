@@ -22,7 +22,7 @@
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
-                            :actions="actions"
+                            :actions="entryActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -51,8 +51,8 @@
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
                                 <div class="dropdown-menu">
-                                    <div class="li"><a :href="entry.permalink" :v-text="__('View')"></a></div>
-                                    <div class="li"><a :href="entry.edit_url" :v-text="__('Edit')"></a></div>
+                                    <div class="li"><a :href="entry.permalink">{{ __('View') }}</a></div>
+                                    <div class="li"><a :href="entry.edit_url">{{ __('Edit') }}</a></div>
                                     <div class="li divider" />
                                     <data-list-inline-actions
                                         :item="entry.id"
@@ -92,6 +92,14 @@ export default {
         return {
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
+        }
+    },
+
+    computed: {
+        entryActions() {
+            this.actions.forEach(action => action.context.site = data_get(this.activeFilters, 'site.value', null));
+
+            return this.actions;
         }
     },
 

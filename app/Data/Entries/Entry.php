@@ -3,6 +3,7 @@
 namespace Statamic\Data\Entries;
 
 use Closure;
+use Statamic\API;
 use Statamic\API\Site;
 use Statamic\Data\Localizable;
 use Statamic\Contracts\Data\Augmentable;
@@ -84,5 +85,12 @@ class Entry implements Contract, Augmentable
     public function published($published = null)
     {
         return call_user_func_array([$this->forCurrentSite(), 'published'], func_get_args());
+    }
+
+    public function delete()
+    {
+        API\Entry::deleteLocalizable($this);
+
+        return true;
     }
 }

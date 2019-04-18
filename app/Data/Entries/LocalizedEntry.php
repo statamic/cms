@@ -138,6 +138,13 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return true;
     }
 
+    public function delete()
+    {
+        API\Entry::deleteLocalization($this);
+
+        return true;
+    }
+
     public function path()
     {
         $prefix = '';

@@ -138,7 +138,7 @@ class Collection extends Tags
             }
         }
 
-        return Entry::whereCollection($collections);
+        return Entry::whereInCollection($collections);
     }
 
     private function getTaxonomyCollection($collection)

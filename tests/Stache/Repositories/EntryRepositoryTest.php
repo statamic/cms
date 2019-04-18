@@ -3,6 +3,7 @@
 namespace Tests\Stache\Repositories;
 
 use Tests\TestCase;
+use Tests\UnlinksPaths;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
 use Statamic\API\Entry as EntryAPI;
@@ -12,23 +13,26 @@ use Statamic\Data\Entries\EntryCollection;
 use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Repositories\EntryRepository;
+use Statamic\Exceptions\InvalidLocalizationException;
 
 class EntryRepositoryTest extends TestCase
 {
+    use UnlinksPaths;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $stache = (new Stache)->sites(['en', 'fr']);
-        $this->app->instance(Stache::class, $stache);
+        $this->stache = (new Stache)->sites(['en', 'fr']);
+        $this->app->instance(Stache::class, $this->stache);
         $this->directory = __DIR__.'/../__fixtures__/content/collections';
-        $stache->registerStores([
-            (new CollectionsStore($stache, app('files')))->directory($this->directory),
-            (new EntriesStore($stache, app('files')))->directory($this->directory),
-            (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+        $this->stache->registerStores([
+            (new CollectionsStore($this->stache, app('files')))->directory($this->directory),
+            (new EntriesStore($this->stache, app('files')))->directory($this->directory),
+            (new StructuresStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
         ]);
 
-        $this->repo = new EntryRepository($stache);
+        $this->repo = new EntryRepository($this->stache);
     }
 
     /** @test */
@@ -182,10 +186,16 @@ class EntryRepositoryTest extends TestCase
                 ->data(['foo' => 'bar']);
         });
 
+        $this->unlinkAfter(
+            $path = $this->directory.'/blog/2017-07-04.test.md',
+            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
+        );
+
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
 
         $this->repo->save($localized);
+        $this->repo->save($localizedFr);
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
@@ -193,7 +203,113 @@ class EntryRepositoryTest extends TestCase
         $this->assertNotSame($localized, $item->in('en'));
         $this->assertNotSame($localizedFr, $item->in('fr'));
         $this->assertArraySubset(['foo' => 'bar'], $item->data());
-        $this->assertFileExists($path = $this->directory.'/blog/2017-07-04.test.md');
-        @unlink($path);
+        $this->assertFileExists($path);
+        $this->assertFileExists($frPath);
+    }
+
+    /** @test */
+    public function it_can_delete_localizable()
+    {
+        $entry = EntryAPI::make()
+            ->id('test-blog-entry')
+            ->collection(Collection::whereHandle('blog'));
+
+        $localized = $entry->in('en', function ($loc) {
+            $loc
+                ->slug('test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $localizedFr = $entry->in('fr', function ($loc) {
+            $loc
+                ->slug('le-test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $this->unlinkAfter(
+            $path = $this->directory.'/blog/2017-07-04.test.md',
+            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
+        );
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($this->repo->find('test-blog-entry'));
+
+        $this->repo->save($localized);
+        $this->repo->save($localizedFr);
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileExists($path);
+        $this->assertFileExists($frPath);
+
+        $this->repo->deleteLocalizable($item);
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileNotExists($path);
+        $this->assertFileNotExists($frPath);
+    }
+
+    /** @test */
+    public function it_can_delete_localization()
+    {
+        $this->withoutEvents();
+
+        $entry = EntryAPI::make()
+            ->id('test-blog-entry')
+            ->collection(Collection::whereHandle('blog'));
+
+        $localized = $entry->in('en', function ($loc) {
+            $loc
+                ->slug('test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $localizedFr = $entry->in('fr', function ($loc) {
+            $loc
+                ->slug('le-test')
+                ->published(false)
+                ->order('2017-07-04')
+                ->data(['foo' => 'bar']);
+        });
+
+        $this->unlinkAfter(
+            $path = $this->directory.'/blog/2017-07-04.test.md',
+            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
+        );
+
+        $this->assertCount(14, $this->repo->all());
+        $this->assertNull($this->repo->find('test-blog-entry'));
+
+        $this->repo->save($localized);
+        $this->repo->save($localizedFr);
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileExists($path);
+        $this->assertFileExists($frPath);
+
+        $this->repo->deleteLocalization($item->in('fr'));
+
+        $this->assertCount(15, $this->repo->all());
+        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
+        $this->assertFileExists($path);
+        $this->assertFileNotExists($frPath);
+
+        try {
+            $item->in('fr');
+            $this->fail('No exception');
+        } catch (InvalidLocalizationException $exception) {
+            //
+        }
+
+        $this->assertEmpty($this->stache->store('entries::blog')->getSitePaths('fr'));
+        $this->assertEmpty($this->stache->store('entries::blog')->getSiteUris('fr'));
     }
 }

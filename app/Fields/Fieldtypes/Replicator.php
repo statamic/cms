@@ -20,7 +20,7 @@ class Replicator extends Fieldtype
         })->all();
     }
 
-    private function processRow($row)
+    protected function processRow($row)
     {
         $row = array_except($row, '_id');
 
@@ -36,14 +36,14 @@ class Replicator extends Fieldtype
         })->all();
     }
 
-    private function preProcessRow($row)
+    protected function preProcessRow($row)
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values();
 
         return array_merge($row, $fields);
     }
 
-    private function fields($set)
+    protected function fields($set)
     {
         return new Fields($this->config("sets.$set.fields"));
     }
@@ -57,7 +57,7 @@ class Replicator extends Fieldtype
         }, collect())->all();
     }
 
-    private function setRules($handle, $data, $index)
+    protected function setRules($handle, $data, $index)
     {
         $rules = (new Validation)->fields($this->fields($handle))->rules();
 
@@ -66,7 +66,7 @@ class Replicator extends Fieldtype
         })->all();
     }
 
-    private function setConfig($handle)
+    protected function setConfig($handle)
     {
         return array_get($this->getFieldConfig('sets'), $handle);
     }

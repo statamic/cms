@@ -583,6 +583,18 @@ EOT;
 
         @unlink($path);
     }
+
+    /** @test */
+    function it_deletes_through_the_api()
+    {
+        Event::fake();
+        $entry = (new LocalizedEntry)->entry((new Entry)->collection(new Collection));
+        API\Entry::shouldReceive('deleteLocalization')->with($entry);
+
+        $return = $entry->delete();
+
+        $this->assertTrue($return);
+    }
 }
 
 class FixedEventFake extends \Illuminate\Support\Testing\Fakes\EventFake
