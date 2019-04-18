@@ -180,11 +180,13 @@ trait HasConditions
 
     public function queryIsEmbeddableCondition($query, $field, $regexOperator)
     {
-        $this->queryIsUrlCondition($query, $field, $regexOperator);
+        $domainPatterns = collect([
+            'youtube',
+            'vimeo',
+            'youtu.be',
+        ])->implode('|');
 
-        $domainPatterns = collect(['youtube', 'vimeo', 'youtu.be'])->implode('|');
-
-        $query->where($field, $regexOperator, "({$domainPatterns})[^\/]*\/[^\ \/]+");
+        $query->where($field, $regexOperator, "^(https|http):\/\/[^\ ]*({$domainPatterns})[^\/]*\/[^\ ]+$");
     }
 
     public function queryIsNumberwangCondition($query, $field, $regexOperator)
