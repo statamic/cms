@@ -73,7 +73,8 @@ trait HasConditions
         $regexOperator = $value ? 'regexp' : 'not regexp';
 
         switch ($condition) {
-            //
+            case 'is_alpha':
+                return $this->queryIsAlphaCondition($query, $field, $regexOperator);
         }
     }
 
@@ -145,5 +146,10 @@ trait HasConditions
     public function queryDoesntMatchRegexCondition($query, $field, $value)
     {
         $query->where($field, 'not regexp', $value);
+    }
+
+    public function queryIsAlphaCondition($query, $field, $regexOperator)
+    {
+        $query->where($field, $regexOperator, '^[a-z]+$');
     }
 }
