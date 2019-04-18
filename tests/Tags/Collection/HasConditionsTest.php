@@ -239,6 +239,42 @@ class HasConditionsTest extends TestCase
     }
 
     /** @test */
+    function it_filters_by_is_future_condition()
+    {
+        $this->collection->order('date')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry()->order('2019-03-09')->save(); // definitely in past
+        $this->makeEntry()->order('2019-03-10')->save(); // today
+        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
+
+        $this->assertCount(6, $this->getEntries(['show_future' => true]));
+        $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_past' => true]));
+        $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_past' => false]));
+    }
+
+    /** @test */
+    function it_filters_by_is_past_condition()
+    {
+        $this->collection->order('date')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry()->order('2019-03-09')->save(); // definitely in past
+        $this->makeEntry()->order('2019-03-10')->save(); // today
+        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
+
+        $this->assertCount(6, $this->getEntries(['show_future' => true]));
+        $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_future' => true]));
+        $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_future' => false]));
+    }
+
+    /** @test */
     function it_filters_by_is_alpha_condition()
     {
         $this->makeEntry()->set('title', 'Post')->save();
