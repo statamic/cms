@@ -3,7 +3,7 @@
 namespace Statamic\Tags\Collection;
 
 use Statamic\API\Str;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 trait HasConditions
 {
@@ -32,6 +32,16 @@ trait HasConditions
             case 'aint':
             case '¯\\_(ツ)_/¯':
                 return $this->queryNotCondition($query, $field, $value);
+            case 'is_empty':
+            case 'is_blank':
+            case 'doesnt_exist':
+            case 'not_set':
+            case 'isnt_set':
+            case 'null':
+                return $this->queryIsEmptyCondition($query, $field, $value);
+            case 'exists':
+            case 'isset':
+                return $this->queryIsEmptyCondition($query, $field, ! $value);
             case 'contains':
                 return $this->queryContainsCondition($query, $field, $value);
             case 'doesnt_contain':
@@ -76,20 +86,12 @@ trait HasConditions
                 return $this->queryIsEmbeddableCondition($query, $field, $regexOperator);
             case 'is_email':
                 return $this->queryIsEmailCondition($query, $field, $regexOperator);
-            case 'is_empty':
-            case 'is_blank':
-            case 'doesnt_exist':
-            case 'not_set':
-            case 'isnt_set':
-            case 'null':
-                return $this->queryIsEmptyCondition($query, $field, $value);
-            case 'exists':
-            case 'isset':
-                return $this->queryIsEmptyCondition($query, $field, ! $value);
+            case 'is_after':
             case 'is_future':
-                return $this->queryIsFutureCondition($query, $field, $value);
+                return $this->queryIsAfterCondition($query, $field, $value);
+            case 'is_before':
             case 'is_past':
-                return $this->queryIsFutureCondition($query, $field, ! $value);
+                return $this->queryIsBeforeCondition($query, $field, $value);
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
@@ -215,11 +217,24 @@ trait HasConditions
         $query->where($field, $boolean ? '=' : '!=', null);
     }
 
-    protected function queryIsFutureCondition($query, $field, $boolean)
+    protected function queryIsAfterCondition($query, $field, $value)
     {
-        return $boolean
-            ? $this->queryGreaterThanCondition($query, $field, Carbon::now())
-            : $this->queryLessThanCondition($query, $field, Carbon::now());
+        $comparison = is_bool($value) ? $value : true;
+        $date = is_string($value) ? Carbon::parse($value) : Carbon::now();
+
+        return $comparison
+            ? $this->queryGreaterThanCondition($query, $field, $date)
+            : $this->queryLessThanCondition($query, $field, $date);
+    }
+
+    protected function queryIsBeforeCondition($query, $field, $value)
+    {
+        $comparison = is_bool($value) ? $value : true;
+        $date = is_string($value) ? Carbon::parse($value) : Carbon::now();
+
+        return $comparison
+            ? $this->queryLessThanCondition($query, $field, $date)
+            : $this->queryGreaterThanCondition($query, $field, $date);
     }
 
     protected function queryIsNumberwangCondition($query, $field, $regexOperator)

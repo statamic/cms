@@ -238,7 +238,7 @@ class HasConditionsTest extends TestCase
     }
 
     /** @test */
-    function it_filters_by_is_future_condition()
+    function it_filters_by_is_after_or_before_date_conditions()
     {
         $this->collection->order('date')->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
@@ -251,25 +251,19 @@ class HasConditionsTest extends TestCase
         $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
 
         $this->assertCount(6, $this->getEntries(['show_future' => true]));
+
+        $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_before' => true]));
         $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_past' => true]));
+        $this->assertCount(1, $this->getEntries(['show_future' => true, 'date:is_before' => 'today']));
+        $this->assertCount(1, $this->getEntries(['show_future' => true, 'date:is_past' => 'today']));
+        $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_before' => false]));
         $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_past' => false]));
-    }
 
-    /** @test */
-    function it_filters_by_is_past_condition()
-    {
-        $this->collection->order('date')->save();
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
-
-        $this->makeEntry()->order('2019-03-09')->save(); // definitely in past
-        $this->makeEntry()->order('2019-03-10')->save(); // today
-        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
-
-        $this->assertCount(6, $this->getEntries(['show_future' => true]));
+        $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_after' => true]));
         $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_future' => true]));
+        $this->assertCount(4, $this->getEntries(['show_future' => true, 'date:is_after' => 'today']));
+        $this->assertCount(4, $this->getEntries(['show_future' => true, 'date:is_future' => 'today']));
+        $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_after' => false]));
         $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_future' => false]));
     }
 
