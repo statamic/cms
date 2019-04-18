@@ -129,6 +129,8 @@
                             :live-preview="isPreviewing"
                             :read-only="readOnly"
                             @updated="setValue"
+                            @focus="container.$emit('focus', $event)"
+                            @blur="container.$emit('blur', $event)"
                         />
                     </transition>
                 </div>

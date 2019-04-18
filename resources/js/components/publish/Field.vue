@@ -30,6 +30,8 @@
                 :name="config.handle"
                 :read-only="readOnly"
                 @updated="$emit('updated', $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
 

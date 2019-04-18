@@ -12,6 +12,8 @@
             :errors="errors[field.handle]"
             :read-only="readOnly"
             @updated="$emit('updated', field.handle, $event)"
+            @focus="$emit('focus', field.handle)"
+            @blur="$emit('blur', field.handle)"
         />
 
     </div>

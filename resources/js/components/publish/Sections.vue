@@ -28,6 +28,8 @@
                         :fields="section.fields"
                         :read-only="readOnly"
                         @updated="(handle, value) => $emit('updated', handle, value)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
                     />
                 </div>
             </div>
@@ -38,6 +40,8 @@
                         :fields="sidebarSection.fields"
                         :read-only="readOnly"
                         @updated="(handle, value) => $emit('updated', handle, value)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
                     />
                 </div>
             </div>
