@@ -81,6 +81,8 @@ trait HasConditions
                 return $this->queryIsNumericCondition($query, $field, $regexOperator);
             case 'is_url':
                 return $this->queryIsUrlCondition($query, $field, $regexOperator);
+            case 'is_embeddable':
+                return $this->queryIsEmbeddableCondition($query, $field, $regexOperator);
         }
     }
 
@@ -171,6 +173,15 @@ trait HasConditions
 
     public function queryIsUrlCondition($query, $field, $regexOperator)
     {
-        $query->where($field, $regexOperator, '^(https|http):\/\/[^\ \r\n]+$');
+        $query->where($field, $regexOperator, '^(https|http):\/\/[^\ ]+$');
+    }
+
+    public function queryIsEmbeddableCondition($query, $field, $regexOperator)
+    {
+        $this->queryIsUrlCondition($query, $field, $regexOperator);
+
+        $domainPatterns = collect(['youtube', 'vimeo', 'youtu.be'])->implode('|');
+
+        $query->where($field, $regexOperator, "({$domainPatterns})[^\/]*\/[^\ \/]+");
     }
 }
