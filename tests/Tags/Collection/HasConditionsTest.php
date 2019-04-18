@@ -352,6 +352,21 @@ class HasConditionsTest extends TestCase
     }
 
     /** @test */
+    function it_filters_by_is_empty_condition()
+    {
+        $this->makeEntry()->set('sub_title', 'Has sub-title')->save();
+        $this->makeEntry()->set('sub_title', '')->save();
+        $this->makeEntry()->set('sub_title', null)->save();
+        $this->makeEntry()->save();
+
+        $this->assertCount(4, $this->getEntries());
+        $this->assertCount(3, $this->getEntries(['sub_title:is_empty' => true]));
+        $this->assertCount(3, $this->getEntries(['sub_title:is_blank' => true]));
+        $this->assertCount(1, $this->getEntries(['sub_title:is_empty' => false]));
+        $this->assertCount(1, $this->getEntries(['sub_title:is_blank' => false]));
+    }
+
+    /** @test */
     function it_filters_by_is_numberwang_condition()
     {
         $this->makeEntry()->set('age', 22)->save();
