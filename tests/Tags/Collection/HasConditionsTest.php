@@ -260,4 +260,21 @@ class HasConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['title:is_alpha_numeric' => true]));
         $this->assertCount(3, $this->getEntries(['title:is_alpha_numeric' => false]));
     }
+
+    /** @test */
+    function it_filters_by_is_numeric_condition()
+    {
+        $this->makeEntry()->set('title', 'Post')->save();
+        $this->makeEntry()->set('title', 'Post Two')->save();
+        $this->makeEntry()->set('title', 'It\'s a post')->save();
+        $this->makeEntry()->set('title', '1.2.3')->save();
+        $this->makeEntry()->set('title', '1 2')->save();
+        $this->makeEntry()->set('title', '1')->save(); // integer
+        $this->makeEntry()->set('title', '1.2')->save(); // float
+        $this->makeEntry()->set('title', '.2')->save(); // float
+
+        $this->assertCount(8, $this->getEntries());
+        $this->assertCount(3, $this->getEntries(['title:is_numeric' => true]));
+        $this->assertCount(5, $this->getEntries(['title:is_numeric' => false]));
+    }
 }
