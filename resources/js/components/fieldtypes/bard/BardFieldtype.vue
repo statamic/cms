@@ -213,7 +213,7 @@ export default {
             const oldContent = this.editor.getJSON();
             const content = this.valueToContent(value);
 
-            if (JSON.stringify(content) == JSON.stringify(oldContent)) {
+            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
                 this.editor.setContent(content);
             }
         }
