@@ -364,6 +364,20 @@ class HasConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['sub_title:is_blank' => true]));
         $this->assertCount(1, $this->getEntries(['sub_title:is_empty' => false]));
         $this->assertCount(1, $this->getEntries(['sub_title:is_blank' => false]));
+
+        // Non-conventional `is_` conditions for backwards compatibility...
+        $this->assertCount(3, $this->getEntries(['sub_title:doesnt_exist' => true]));
+        $this->assertCount(1, $this->getEntries(['sub_title:doesnt_exist' => false]));
+        $this->assertCount(3, $this->getEntries(['sub_title:not_set' => true]));
+        $this->assertCount(1, $this->getEntries(['sub_title:not_set' => false]));
+        $this->assertCount(3, $this->getEntries(['sub_title:isnt_set' => true]));
+        $this->assertCount(1, $this->getEntries(['sub_title:isnt_set' => false]));
+        $this->assertCount(3, $this->getEntries(['sub_title:null' => true]));
+        $this->assertCount(1, $this->getEntries(['sub_title:null' => false]));
+        $this->assertCount(1, $this->getEntries(['sub_title:exists' => true]));
+        $this->assertCount(3, $this->getEntries(['sub_title:exists' => false]));
+        $this->assertCount(1, $this->getEntries(['sub_title:isset' => true]));
+        $this->assertCount(3, $this->getEntries(['sub_title:isset' => false]));
     }
 
     /** @test */

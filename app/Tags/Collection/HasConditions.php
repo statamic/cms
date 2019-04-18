@@ -20,6 +20,10 @@ trait HasConditions
 
     public function queryCondition($query, $field, $condition, $value)
     {
+        if ($this->isBooleanCondition($condition)) {
+            return $this->queryBooleanCondition($query, $field, $condition, $value);
+        }
+
         switch ($condition) {
             case 'is':
             case 'equals':
@@ -65,10 +69,6 @@ trait HasConditions
             case 'doesnt_match':
                 return $this->queryDoesntMatchRegexCondition($query, $field, $value);
         }
-
-        if (Str::startsWith($condition, 'is_')) {
-            $this->queryBooleanCondition($query, $field, $condition, $value);
-        }
     }
 
     public function queryBooleanCondition($query, $field, $condition, $value)
@@ -91,10 +91,31 @@ trait HasConditions
                 return $this->queryIsEmailCondition($query, $field, $regexOperator);
             case 'is_empty':
             case 'is_blank':
+            case 'doesnt_exist':
+            case 'not_set':
+            case 'isnt_set':
+            case 'null':
                 return $this->queryIsEmptyCondition($query, $field, $comparisonOperator);
+            case 'exists':
+            case 'isset':
+                return $this->queryIsEmptyCondition($query, $field, $value ? '!=' : '=');
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
+    }
+
+    public function isBooleanCondition($condition)
+    {
+        $nonConventionalBooleanConditions = [
+            'exists',
+            'isset',
+            'doesnt_exist',
+            'not_set',
+            'isnt_set',
+            'null',
+        ];
+
+        return Str::startsWith($condition, 'is_') || in_array($condition, $nonConventionalBooleanConditions);
     }
 
     public function queryIsCondition($query, $field, $value)
