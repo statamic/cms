@@ -79,6 +79,8 @@ trait HasConditions
                 return $this->queryIsAlphaNumericCondition($query, $field, $regexOperator);
             case 'is_numeric':
                 return $this->queryIsNumericCondition($query, $field, $regexOperator);
+            case 'is_url':
+                return $this->queryIsUrlCondition($query, $field, $regexOperator);
         }
     }
 
@@ -165,5 +167,10 @@ trait HasConditions
     public function queryIsNumericCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[0-9]*(\.[0-9]+)?$');
+    }
+
+    public function queryIsUrlCondition($query, $field, $regexOperator)
+    {
+        $query->where($field, $regexOperator, '^(https|http):\/\/[^\ \r\n]+$');
     }
 }
