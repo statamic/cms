@@ -235,7 +235,6 @@ class HasConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => 'c.t$']));
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '/^cat/']));  // v2 patterns required delimiters
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '/^cat/i'])); // v2 patterns required delimiters
-
     }
 
     /** @test */

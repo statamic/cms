@@ -21,9 +21,7 @@ trait HasConditions
 
     protected function queryCondition($query, $field, $condition, $value)
     {
-        if ($this->isBooleanCondition($condition)) {
-            return $this->queryBooleanCondition($query, $field, $condition, $value);
-        }
+        $regexOperator = $value ? 'regexp' : 'not regexp';
 
         switch ($condition) {
             case 'is':
@@ -34,9 +32,6 @@ trait HasConditions
             case 'aint':
             case '¯\\_(ツ)_/¯':
                 return $this->queryNotCondition($query, $field, $value);
-            case 'exists':
-            case 'isset':
-                return $this->queryExistsCondition($query, $field, $value);
             case 'contains':
                 return $this->queryContainsCondition($query, $field, $value);
             case 'doesnt_contain':
@@ -69,14 +64,6 @@ trait HasConditions
                 return $this->queryMatchesRegexCondition($query, $field, $value);
             case 'doesnt_match':
                 return $this->queryDoesntMatchRegexCondition($query, $field, $value);
-        }
-    }
-
-    protected function queryBooleanCondition($query, $field, $condition, $value)
-    {
-        $regexOperator = $value ? 'regexp' : 'not regexp';
-
-        switch ($condition) {
             case 'is_alpha':
                 return $this->queryIsAlphaCondition($query, $field, $regexOperator);
             case 'is_alpha_numeric':
@@ -106,20 +93,6 @@ trait HasConditions
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
-    }
-
-    protected function isBooleanCondition($condition)
-    {
-        $nonConventionalBooleanConditions = [
-            'exists',
-            'isset',
-            'doesnt_exist',
-            'not_set',
-            'isnt_set',
-            'null',
-        ];
-
-        return Str::startsWith($condition, 'is_') || in_array($condition, $nonConventionalBooleanConditions);
     }
 
     protected function queryIsCondition($query, $field, $value)
