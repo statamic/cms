@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Collection;
 
 use Statamic\API\Str;
+use Illuminate\Support\Carbon;
 
 trait HasConditions
 {
@@ -74,7 +75,6 @@ trait HasConditions
     protected function queryBooleanCondition($query, $field, $condition, $value)
     {
         $regexOperator = $value ? 'regexp' : 'not regexp';
-        $comparisonOperator = $value ? '=' : '!=';
 
         switch ($condition) {
             case 'is_alpha':
@@ -95,10 +95,14 @@ trait HasConditions
             case 'not_set':
             case 'isnt_set':
             case 'null':
-                return $this->queryIsEmptyCondition($query, $field, $comparisonOperator);
+                return $this->queryIsEmptyCondition($query, $field, $value);
             case 'exists':
             case 'isset':
-                return $this->queryIsEmptyCondition($query, $field, $value ? '!=' : '=');
+                return $this->queryIsEmptyCondition($query, $field, ! $value);
+            case 'is_future':
+                return $this->queryIsFutureCondition($query, $field, $value);
+            case 'is_past':
+                return $this->queryIsFutureCondition($query, $field, ! $value);
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
@@ -232,10 +236,17 @@ trait HasConditions
         $query->where($field, $regexOperator, '^[^\ ]+@[^\ ]+\.[^\ ]+$');
     }
 
-    protected function queryIsEmptyCondition($query, $field, $comparisonOperator)
+    protected function queryIsEmptyCondition($query, $field, $boolean)
     {
         // TODO: Add `whereNull()` and `whereNotNull()` to our query builder so that this can be Eloquent compatible.
-        $query->where($field, $comparisonOperator, null);
+        $query->where($field, $boolean ? '=' : '!=', null);
+    }
+
+    protected function queryIsFutureCondition($query, $field, $boolean)
+    {
+        return $boolean
+            ? $this->queryGreaterThanCondition($query, $field, Carbon::now())
+            : $this->queryLessThanCondition($query, $field, Carbon::now());
     }
 
     protected function queryIsNumberwangCondition($query, $field, $regexOperator)
