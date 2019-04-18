@@ -167,13 +167,6 @@ export default {
     mounted() {
         this.initToolbarButtons();
 
-        // A json string is passed from PHP since that's what's submitted.
-        const value = JSON.parse(this.value);
-
-        let content = value.length
-            ? { type: 'doc', content: value }
-            : null;
-
         this.editor = new Editor({
             extensions: [
                 new Blockquote(),
@@ -195,7 +188,7 @@ export default {
                 new RemoveFormat(),
                 new Image({ bard: this }),
             ],
-            content,
+            content: this.valueToContent(this.value),
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
@@ -210,6 +203,21 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+    },
+
+    watch: {
+
+        value(value, oldValue) {
+            if (value === oldValue) return;
+
+            const oldContent = this.editor.getJSON();
+            const content = this.valueToContent(value);
+
+            if (JSON.stringify(content) == JSON.stringify(oldContent)) {
+                this.editor.setContent(content);
+            }
+        }
+
     },
 
     methods: {
@@ -266,6 +274,15 @@ export default {
         buttonIsActive(isActive, button) {
             if (! isActive.hasOwnProperty(button.command)) return false;
             return isActive[button.command](button.args);
+        },
+
+        valueToContent(value) {
+            // A json string is passed from PHP since that's what's submitted.
+            value = JSON.parse(this.value);
+
+            return value.length
+                ? { type: 'doc', content: value }
+                : null;
         }
     }
 }
