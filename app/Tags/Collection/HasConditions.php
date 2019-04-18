@@ -83,6 +83,8 @@ trait HasConditions
                 return $this->queryIsUrlCondition($query, $field, $regexOperator);
             case 'is_embeddable':
                 return $this->queryIsEmbeddableCondition($query, $field, $regexOperator);
+            case 'is_numberwang':
+                return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
     }
 
@@ -183,5 +185,10 @@ trait HasConditions
         $domainPatterns = collect(['youtube', 'vimeo', 'youtu.be'])->implode('|');
 
         $query->where($field, $regexOperator, "({$domainPatterns})[^\/]*\/[^\ \/]+");
+    }
+
+    public function queryIsNumberwangCondition($query, $field, $regexOperator)
+    {
+        $query->where($field, $regexOperator, "^(1|22|7|9|1002|2\.3|15|109876567|31)$");
     }
 }
