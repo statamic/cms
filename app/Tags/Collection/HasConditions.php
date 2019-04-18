@@ -6,7 +6,7 @@ use Statamic\API\Str;
 
 trait HasConditions
 {
-    public function queryConditions($query)
+    protected function queryConditions($query)
     {
         foreach ($this->parameters as $param => $value) {
             $this->queryCondition(
@@ -18,7 +18,7 @@ trait HasConditions
         }
     }
 
-    public function queryCondition($query, $field, $condition, $value)
+    protected function queryCondition($query, $field, $condition, $value)
     {
         if ($this->isBooleanCondition($condition)) {
             return $this->queryBooleanCondition($query, $field, $condition, $value);
@@ -71,7 +71,7 @@ trait HasConditions
         }
     }
 
-    public function queryBooleanCondition($query, $field, $condition, $value)
+    protected function queryBooleanCondition($query, $field, $condition, $value)
     {
         $regexOperator = $value ? 'regexp' : 'not regexp';
         $comparisonOperator = $value ? '=' : '!=';
@@ -104,7 +104,7 @@ trait HasConditions
         }
     }
 
-    public function isBooleanCondition($condition)
+    protected function isBooleanCondition($condition)
     {
         $nonConventionalBooleanConditions = [
             'exists',
@@ -118,67 +118,67 @@ trait HasConditions
         return Str::startsWith($condition, 'is_') || in_array($condition, $nonConventionalBooleanConditions);
     }
 
-    public function queryIsCondition($query, $field, $value)
+    protected function queryIsCondition($query, $field, $value)
     {
         $query->where($field, $value);
     }
 
-    public function queryNotCondition($query, $field, $value)
+    protected function queryNotCondition($query, $field, $value)
     {
         $query->where($field, '!=', $value);
     }
 
-    public function queryContainsCondition($query, $field, $value)
+    protected function queryContainsCondition($query, $field, $value)
     {
         $query->where($field, 'like', "%{$value}%");
     }
 
-    public function queryDoesntContainCondition($query, $field, $value)
+    protected function queryDoesntContainCondition($query, $field, $value)
     {
         $query->where($field, 'not like', "%{$value}%");
     }
 
-    public function queryStartsWithCondition($query, $field, $value)
+    protected function queryStartsWithCondition($query, $field, $value)
     {
         $query->where($field, 'like', "{$value}%");
     }
 
-    public function queryDoesntStartWithCondition($query, $field, $value)
+    protected function queryDoesntStartWithCondition($query, $field, $value)
     {
         $query->where($field, 'not like', "{$value}%");
     }
 
-    public function queryEndsWithCondition($query, $field, $value)
+    protected function queryEndsWithCondition($query, $field, $value)
     {
         $query->where($field, 'like', "%{$value}");
     }
 
-    public function queryDoesntEndWithCondition($query, $field, $value)
+    protected function queryDoesntEndWithCondition($query, $field, $value)
     {
         $query->where($field, 'not like', "%{$value}");
     }
 
-    public function queryGreaterThanCondition($query, $field, $value)
+    protected function queryGreaterThanCondition($query, $field, $value)
     {
         $query->where($field, '>', $value);
     }
 
-    public function queryLessThanCondition($query, $field, $value)
+    protected function queryLessThanCondition($query, $field, $value)
     {
         $query->where($field, '<', $value);
     }
 
-    public function queryGreaterThanOrEqualToCondition($query, $field, $value)
+    protected function queryGreaterThanOrEqualToCondition($query, $field, $value)
     {
         $query->where($field, '>=', $value);
     }
 
-    public function queryLessThanOrEqualToCondition($query, $field, $value)
+    protected function queryLessThanOrEqualToCondition($query, $field, $value)
     {
         $query->where($field, '<=', $value);
     }
 
-    public function queryMatchesRegexCondition($query, $field, $pattern)
+    protected function queryMatchesRegexCondition($query, $field, $pattern)
     {
         if (Str::startsWith($pattern, '/')) {
             $pattern = $this->removeRegexDelimitersAndModifiers($pattern);
@@ -187,7 +187,7 @@ trait HasConditions
         $query->where($field, 'regexp', $pattern);
     }
 
-    public function queryDoesntMatchRegexCondition($query, $field, $pattern)
+    protected function queryDoesntMatchRegexCondition($query, $field, $pattern)
     {
         if (Str::startsWith($pattern, '/')) {
             $pattern = $this->removeRegexDelimitersAndModifiers($pattern);
@@ -196,27 +196,27 @@ trait HasConditions
         $query->where($field, 'not regexp', $pattern);
     }
 
-    public function queryIsAlphaCondition($query, $field, $regexOperator)
+    protected function queryIsAlphaCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[a-z]+$');
     }
 
-    public function queryIsAlphaNumericCondition($query, $field, $regexOperator)
+    protected function queryIsAlphaNumericCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[a-z0-9]+$');
     }
 
-    public function queryIsNumericCondition($query, $field, $regexOperator)
+    protected function queryIsNumericCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[0-9]*(\.[0-9]+)?$');
     }
 
-    public function queryIsUrlCondition($query, $field, $regexOperator)
+    protected function queryIsUrlCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^(https|http):\/\/[^\ ]+$');
     }
 
-    public function queryIsEmbeddableCondition($query, $field, $regexOperator)
+    protected function queryIsEmbeddableCondition($query, $field, $regexOperator)
     {
         $domainPatterns = collect([
             'youtube',
@@ -227,18 +227,18 @@ trait HasConditions
         $query->where($field, $regexOperator, "^(https|http):\/\/[^\ ]*({$domainPatterns})[^\/]*\/[^\ ]+$");
     }
 
-    public function queryIsEmailCondition($query, $field, $regexOperator)
+    protected function queryIsEmailCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[^\ ]+@[^\ ]+\.[^\ ]+$');
     }
 
-    public function queryIsEmptyCondition($query, $field, $comparisonOperator)
+    protected function queryIsEmptyCondition($query, $field, $comparisonOperator)
     {
         // TODO: Add `whereNull()` and `whereNotNull()` to our query builder so that this can be Eloquent compatible.
         $query->where($field, $comparisonOperator, null);
     }
 
-    public function queryIsNumberwangCondition($query, $field, $regexOperator)
+    protected function queryIsNumberwangCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, "^(1|22|7|9|1002|2\.3|15|109876567|31)$");
     }
