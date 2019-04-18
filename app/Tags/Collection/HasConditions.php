@@ -62,6 +62,19 @@ trait HasConditions
             case 'doesnt_match':
                 return $this->queryDoesntMatchRegexCondition($query, $field, $value);
         }
+
+        if (Str::startsWith($condition, 'is_')) {
+            $this->queryBooleanCondition($query, $field, $condition, $value);
+        }
+    }
+
+    public function queryBooleanCondition($query, $field, $condition, $value)
+    {
+        $regexOperator = $value ? 'regexp' : 'not regexp';
+
+        switch ($condition) {
+            //
+        }
     }
 
     public function queryIsCondition($query, $field, $value)
