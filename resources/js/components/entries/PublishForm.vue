@@ -104,7 +104,7 @@
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{ container, components }"
+                slot-scope="{ container, components, setValue }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -124,7 +124,12 @@
                     />
 
                     <transition name="live-preview-sections-drop">
-                        <publish-sections v-show="sectionsVisible" :live-preview="isPreviewing" :read-only="readOnly" />
+                        <publish-sections
+                            v-show="sectionsVisible"
+                            :live-preview="isPreviewing"
+                            :read-only="readOnly"
+                            @updated="setValue"
+                        />
                     </transition>
                 </div>
             </live-preview>

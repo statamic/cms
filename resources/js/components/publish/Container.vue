@@ -137,6 +137,13 @@ export default {
 
         pushComponent(component) {
             this.components.push(component);
+        },
+
+        setValue(handle, value) {
+            this.$store.dispatch(`publish/${this.name}/setValue`, {
+                handle, value,
+                user: Statamic.$config.get('userId')
+            });
         }
 
     },
@@ -173,6 +180,7 @@ export default {
             values: this.$store.state.publish[this.name].values,
             container: this._self,
             components: this.components,
+            setValue: this.setValue,
         });
     }
 

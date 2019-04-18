@@ -29,7 +29,7 @@
                 :meta="meta"
                 :name="config.handle"
                 :read-only="readOnly"
-                @updated="updated"
+                @updated="$emit('updated', $event)"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
 
@@ -85,12 +85,6 @@ export default {
             ];
         }
 
-    },
-
-    methods: {
-        updated(value) {
-            this.$emit('updated', this.config.handle, value);
-        }
     }
 }
 

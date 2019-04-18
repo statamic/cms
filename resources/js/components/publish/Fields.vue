@@ -11,7 +11,7 @@
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
             :read-only="readOnly"
-            @updated="updated"
+            @updated="$emit('updated', field.handle, $event)"
         />
 
     </div>
@@ -54,15 +54,6 @@ export default {
 
         errors() {
             return this.state.errors;
-        }
-
-    },
-
-    methods: {
-
-        updated(handle, value) {
-            const user = Statamic.$config.get('userId');
-            this.$store.dispatch(`publish/${this.storeName}/setValue`, { handle, value, user });
         }
 
     }
