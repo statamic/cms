@@ -83,6 +83,8 @@ trait HasConditions
                 return $this->queryIsUrlCondition($query, $field, $regexOperator);
             case 'is_embeddable':
                 return $this->queryIsEmbeddableCondition($query, $field, $regexOperator);
+            case 'is_email':
+                return $this->queryIsEmailCondition($query, $field, $regexOperator);
             case 'is_numberwang':
                 return $this->queryIsNumberwangCondition($query, $field, $regexOperator);
         }
@@ -195,6 +197,11 @@ trait HasConditions
         ])->implode('|');
 
         $query->where($field, $regexOperator, "^(https|http):\/\/[^\ ]*({$domainPatterns})[^\/]*\/[^\ ]+$");
+    }
+
+    public function queryIsEmailCondition($query, $field, $regexOperator)
+    {
+        $query->where($field, $regexOperator, '^[^\ ]+@[^\ ]+\.[^\ ]+$');
     }
 
     public function queryIsNumberwangCondition($query, $field, $regexOperator)
