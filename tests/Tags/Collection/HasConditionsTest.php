@@ -277,4 +277,26 @@ class HasConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['title:is_numeric' => true]));
         $this->assertCount(5, $this->getEntries(['title:is_numeric' => false]));
     }
+
+    /** @test */
+    function it_filters_by_is_url_condition()
+    {
+        $this->makeEntry()->set('url', 'https://domain.tld')->save();
+        $this->makeEntry()->set('url', 'http://domain.tld')->save();
+        $this->makeEntry()->set('url', 'https://www.domain.tld/uri/segment.extension?param=one&two=true')->save();
+        $this->makeEntry()->set('url', 'http://www.domain.tld/uri/segment.extension?param=one&two=true')->save();
+        $this->makeEntry()->set('url', 'http://')->save();
+        $this->makeEntry()->set('url', ' http://')->save();
+        $this->makeEntry()->set('url', 'http://domain with space.tld')->save();
+        $this->makeEntry()->set('url', 'domain-only.tld')->save();
+        $this->makeEntry()->set('url', 'definitely not a url')->save();
+
+        $this->assertCount(9, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['url:is_url' => true]));
+        $this->assertCount(5, $this->getEntries(['url:is_url' => false]));
+
+        $this->getEntries(['url:is_url' => true])->map->get('url')->each(function ($url) {
+            $this->assertContains('domain.tld', $url);
+        });
+    }
 }
