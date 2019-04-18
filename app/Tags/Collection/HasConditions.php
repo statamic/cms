@@ -148,14 +148,22 @@ trait HasConditions
         $query->where($field, '<=', $value);
     }
 
-    public function queryMatchesRegexCondition($query, $field, $value)
+    public function queryMatchesRegexCondition($query, $field, $pattern)
     {
-        $query->where($field, 'regexp', $value);
+        if (Str::startsWith($pattern, '/')) {
+            $pattern = $this->removeRegexDelimitersAndModifiers($pattern);
+        }
+
+        $query->where($field, 'regexp', $pattern);
     }
 
-    public function queryDoesntMatchRegexCondition($query, $field, $value)
+    public function queryDoesntMatchRegexCondition($query, $field, $pattern)
     {
-        $query->where($field, 'not regexp', $value);
+        if (Str::startsWith($pattern, '/')) {
+            $pattern = $this->removeRegexDelimitersAndModifiers($pattern);
+        }
+
+        $query->where($field, 'not regexp', $pattern);
     }
 
     public function queryIsAlphaCondition($query, $field, $regexOperator)
@@ -192,5 +200,18 @@ trait HasConditions
     public function queryIsNumberwangCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, "^(1|22|7|9|1002|2\.3|15|109876567|31)$");
+    }
+
+    /**
+     * This is for backwards compatibility, because v2's regex conditions required delimiters.
+     * Passing delimiters doesn't work with Eloquent and `regexp`, so we remove them from
+     * the user's pattern if passed, so that regex conditions will work as expected.
+     *
+     * @param string $pattern
+     * @return string
+     */
+    protected function removeRegexDelimitersAndModifiers($pattern)
+    {
+        return preg_replace(['/^\//', '/\/\w*$/'], ['', ''], $pattern);
     }
 }

@@ -216,6 +216,8 @@ class HasConditionsTest extends TestCase
         $this->assertCount(1, $this->getEntries(['title:matches' => 'c.t$']));
         $this->assertCount(1, $this->getEntries(['title:match' => 'c.t$']));
         $this->assertCount(1, $this->getEntries(['title:regex' => 'c.t$']));
+        $this->assertCount(1, $this->getEntries(['title:matches' => '/^cat/']));  // v2 patterns required delimiters
+        $this->assertCount(1, $this->getEntries(['title:matches' => '/^cat/i'])); // v2 patterns required delimiters
     }
 
     /** @test */
@@ -231,6 +233,9 @@ class HasConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['title:doesnt_match' => 'cat']));
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '^cat']));
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => 'c.t$']));
+        $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '/^cat/']));  // v2 patterns required delimiters
+        $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '/^cat/i'])); // v2 patterns required delimiters
+
     }
 
     /** @test */
