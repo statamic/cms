@@ -334,6 +334,24 @@ class HasConditionsTest extends TestCase
     }
 
     /** @test */
+    function it_filters_by_is_email_condition()
+    {
+        $this->makeEntry()->set('email', 'han@solo.com')->save();
+        $this->makeEntry()->set('email', 'darth.jar-jar@sith.gov.naboo.com')->save();
+        $this->makeEntry()->set('email', 'not@email')->save();
+        $this->makeEntry()->set('email', 'not.email')->save();
+        $this->makeEntry()->set('email', 'definitely not email')->save();
+
+        $this->assertCount(5, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['email:is_email' => true]));
+        $this->assertCount(3, $this->getEntries(['email:is_email' => false]));
+
+        $this->getEntries(['email:is_email' => true])->map->get('email')->each(function ($email) {
+            $this->assertContains('.com', $email);
+        });
+    }
+
+    /** @test */
     function it_filters_by_is_numberwang_condition()
     {
         $this->makeEntry()->set('age', 22)->save();
