@@ -101,6 +101,7 @@ import {
 import Set from './Set';
 import BardSource from './Source.vue';
 import Link from './Link';
+import Image from './Image';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
@@ -192,6 +193,7 @@ export default {
                 new ConfirmSetDelete(),
                 new Link({ vm: this }),
                 new RemoveFormat(),
+                new Image({ bard: this }),
             ],
             content,
             onUpdate: ({ getJSON, getHTML }) => {

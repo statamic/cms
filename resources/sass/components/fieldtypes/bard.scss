@@ -297,32 +297,14 @@
     }
 }
 
-
-/* Solo Sets
-   -
-   Sets with only a single field, and that single fieldtype
-   supports being displayed by itself.
-  ========================================================================== */
-
-.bard-set-solo {
-
-    .form-group > label { display: none !important; }
-
-    .publish-field {
-        padding: 0 !important;
-    }
-
-}
-
-
 /* Link toolbar
   ========================================================================== */
 
   .bard-link-toolbar {
-    @apply bg-black rounded absolute leading-none shadow;
-    z-index: 1100;
+    @apply bg-black rounded absolute leading-none shadow mt-1;
+    z-index: 100;
     width: 300px;
-    top: 130%;
+    top: 100%;
 
     &:before {
         content: '';

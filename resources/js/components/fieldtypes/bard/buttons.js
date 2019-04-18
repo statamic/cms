@@ -16,7 +16,7 @@ const availableButtons = () => [
     // { name: 'superscript', text: __('Superscript'), command: 'superscript', icon: 'superscript' },
     // { name: 'subscript', text: __('Subscript'), command: 'subscript', icon: 'subscript' },
     { name: 'anchor', text: __('Link'), command: 'link', icon: 'link', component: 'LinkToolbarButton' },
-    // { name: 'assets', text: __('Link to Asset'), command: 'insertAsset', icon: 'picture-o', condition: (config) => config.container },
+    { name: 'image', text: __('Image'), command: 'image', args: { src: '' }, icon: 'picture-o', condition: (config) => config.container },
     { name: 'code', text: __('Code'), command: 'code', icon: 'code' },
     { name: 'codeblock', text: __('Code Block'), command: 'code_block', icon: 'code' },
 ];
