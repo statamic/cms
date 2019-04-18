@@ -77,6 +77,8 @@ trait HasConditions
                 return $this->queryIsAlphaCondition($query, $field, $regexOperator);
             case 'is_alpha_numeric':
                 return $this->queryIsAlphaNumericCondition($query, $field, $regexOperator);
+            case 'is_numeric':
+                return $this->queryIsNumericCondition($query, $field, $regexOperator);
         }
     }
 
@@ -158,5 +160,10 @@ trait HasConditions
     public function queryIsAlphaNumericCondition($query, $field, $regexOperator)
     {
         $query->where($field, $regexOperator, '^[a-z0-9]+$');
+    }
+
+    public function queryIsNumericCondition($query, $field, $regexOperator)
+    {
+        $query->where($field, $regexOperator, '^[0-9]*(\.[0-9]+)?$');
     }
 }
