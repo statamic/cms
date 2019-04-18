@@ -232,4 +232,18 @@ class HasConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => '^cat']));
         $this->assertCount(4, $this->getEntries(['title:doesnt_match' => 'c.t$']));
     }
+
+    /** @test */
+    function it_filters_by_is_alpha_condition()
+    {
+        $this->makeEntry()->set('title', 'Post')->save();
+        $this->makeEntry()->set('title', 'Post Two')->save();
+        $this->makeEntry()->set('title', 'It\'s a post')->save();
+        $this->makeEntry()->set('title', 'Post1')->save();
+        $this->makeEntry()->set('title', 'Post 2')->save();
+
+        $this->assertCount(5, $this->getEntries());
+        $this->assertCount(1, $this->getEntries(['title:is_alpha' => true]));
+        $this->assertCount(4, $this->getEntries(['title:is_alpha' => false]));
+    }
 }
