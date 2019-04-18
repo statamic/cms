@@ -327,4 +327,16 @@ class HasConditionsTest extends TestCase
             $this->assertContains('/id', $url);
         });
     }
+
+    /** @test */
+    function it_filters_by_is_numberwang_condition()
+    {
+        $this->makeEntry()->set('age', 22)->save();
+        $this->makeEntry()->set('age', 57)->save();
+        $this->makeEntry()->set('age', 2.3)->save();
+
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['age:is_numberwang' => true]));
+        $this->assertCount(1, $this->getEntries(['age:is_numberwang' => false]));
+    }
 }
