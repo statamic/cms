@@ -299,4 +299,32 @@ class HasConditionsTest extends TestCase
             $this->assertContains('domain.tld', $url);
         });
     }
+
+    /** @test */
+    function it_filters_by_is_embeddable_condition()
+    {
+        $this->makeEntry()->set('url', 'https://youtube.com/id')->save(); // valid
+        $this->makeEntry()->set('url', 'http://youtube.com/id')->save(); // valid
+        $this->makeEntry()->set('url', 'youtube.com/id')->save(); // not url
+        $this->makeEntry()->set('url', 'http://youtube.com/')->save(); // no id
+
+        $this->makeEntry()->set('url', 'https://vimeo.com/id')->save();
+        $this->makeEntry()->set('url', 'http://vimeo.com/id')->save();
+        $this->makeEntry()->set('url', 'vimeo.com/id')->save();
+        $this->makeEntry()->set('url', 'http://vimeo.com/')->save();
+
+        $this->makeEntry()->set('url', 'https://youtu.be/id')->save();
+        $this->makeEntry()->set('url', 'http://youtu.be/id')->save();
+        $this->makeEntry()->set('url', 'youtu.be/id')->save();
+        $this->makeEntry()->set('url', 'http://youtu.be/')->save();
+
+        $this->assertCount(12, $this->getEntries());
+        $this->assertCount(6, $this->getEntries(['url:is_embeddable' => true]));
+        $this->assertCount(6, $this->getEntries(['url:is_embeddable' => false]));
+
+        $this->getEntries(['url:is_embeddable' => true])->map->get('url')->each(function ($url) {
+            $this->assertContains('http', $url);
+            $this->assertContains('/id', $url);
+        });
+    }
 }
