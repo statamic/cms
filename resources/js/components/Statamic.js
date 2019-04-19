@@ -21,6 +21,10 @@ export default new Vue({
             return echo;
         },
 
+        user() {
+            return this.$config.get('user');
+        }
+
     },
 
     methods: {

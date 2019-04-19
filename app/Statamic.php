@@ -133,6 +133,7 @@ class Statamic
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'preferences' => Preference::all(), // TODO: Move to CpServiceProvider
             'userId' => optional(user())->id(),
+            'user' => optional(user())->toJavascriptArray(),
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);
