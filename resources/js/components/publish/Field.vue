@@ -10,8 +10,9 @@
             <template v-if="config.display">{{ config.display }}</template>
             <template v-else>{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
+            <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
-                ({{ __(isLocked ? `Locked by ${lockingUser}` : 'Read Only') }})
+                {{ isLocked ? __('Locked') : __('Read Only') }}
             </span>
             <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
         </label>
@@ -102,7 +103,7 @@ export default {
         lockingUser() {
             if (this.isLocked) {
                 let user = this.locks[this.config.handle];
-                if (typeof user === 'string') return user;
+                if (typeof user === 'object') return user;
             }
         }
 
