@@ -12,6 +12,8 @@ class Entries
 
     protected $collection;
     protected $parameters;
+    protected $limit = false;
+    protected $offset = false;
     protected $paginate = false;
     protected $showPublished = true;
     protected $showUnpublished = false;
@@ -42,17 +44,31 @@ class Entries
             return collect_entries();
         }
 
-        return $this->paginate ? $query->paginate($this->paginate) : $query->get();
+        if ($perPage = $this->paginate) {
+            return $query->paginate($perPage);
+        }
+
+        if ($limit = $this->limit) {
+            $query->limit($limit);
+        }
+
+        if ($offset = $this->offset) {
+            $query->offset($offset);
+        }
+
+        return $query->get();
     }
 
     protected function parseParameters($params)
     {
         $params = array_except($params, $this->ignoredParams);
 
+        $this->limit = Arr::pull($params, 'limit', $this->limit);
+        $this->offset = Arr::pull($params, 'offset', $this->offset);
         $this->paginate = Arr::pull($params, 'paginate', $this->paginate);
 
         if ($this->paginate === true) {
-            $this->paginate = Arr::pull($params, 'limit', false);
+            $this->paginate = $this->limit;
         }
 
         $this->showPublished = Arr::pull($params, 'show_published', $this->showPublished);
