@@ -79,6 +79,7 @@ export default {
                     values: initial.values,
                     meta: initial.meta,
                     site: initial.site,
+                    fieldLocks: {},
                     errors: {},
                 },
                 mutations: {
@@ -97,6 +98,12 @@ export default {
                     },
                     setSite(state, site) {
                         state.site = site;
+                    },
+                    lockField(state, { handle, user }) {
+                        Vue.set(state.fieldLocks, handle, user || true);
+                    },
+                    unlockField(state, handle) {
+                        Vue.delete(state.fieldLocks, handle);
                     },
                     initialize(state, payload) {
                         state.fieldset = payload.fieldset;

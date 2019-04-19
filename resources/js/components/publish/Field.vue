@@ -10,7 +10,9 @@
             <template v-if="config.display">{{ config.display }}</template>
             <template v-else>{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
-            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">({{ __('Read Only') }})</span>
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
+                ({{ __(isLocked ? `Locked by ${lockingUser}` : 'Read Only') }})
+            </span>
             <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
         </label>
 
@@ -28,10 +30,10 @@
                 :value="value"
                 :meta="meta"
                 :name="config.handle"
-                :read-only="readOnly"
+                :read-only="isReadOnly"
                 @updated="$emit('updated', $event)"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
+                @focus="focused"
+                @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
 
@@ -62,6 +64,8 @@ export default {
         readOnly: Boolean
     },
 
+    inject: ['storeName'],
+
     computed: {
 
         fieldtypeComponent() {
@@ -73,7 +77,7 @@ export default {
         },
 
         isReadOnly() {
-            return this.config.read_only || false;
+            return this.isLocked || this.config.read_only || false;
         },
 
         classes() {
@@ -85,6 +89,37 @@ export default {
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];
+        },
+
+        locks() {
+            return this.$store.state.publish[this.storeName].fieldLocks;
+        },
+
+        isLocked() {
+            return Object.keys(this.locks).includes(this.config.handle);
+        },
+
+        lockingUser() {
+            if (this.isLocked) {
+                let user = this.locks[this.config.handle];
+                if (typeof user === 'string') return user;
+            }
+        }
+
+    },
+
+    methods: {
+
+        focused() {
+            if (!this.isLocked) {
+                this.$emit('focus', this.config.handle);
+            }
+        },
+
+        blurred() {
+            if (!this.isLocked) {
+                this.$emit('blur', this.config.handle);
+            }
         }
 
     }
