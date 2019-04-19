@@ -40,6 +40,22 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    function it_gets_paginated_entries_in_a_collection()
+    {
+        $this->makeEntry()->save();
+        $this->makeEntry()->save();
+        $this->makeEntry()->save();
+        $this->makeEntry()->save();
+        $this->makeEntry()->save();
+
+        $this->assertCount(5, $this->getEntries());
+        $this->assertCount(3, $this->getEntries(['paginate' => 3]));
+        $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence
+        $this->assertCount(5, $this->getEntries(['paginate' => true])); // ignore if no perPage set
+    }
+
+    /** @test */
     function it_filters_by_publish_status()
     {
         $this->makeEntry()->published(true)->save();
