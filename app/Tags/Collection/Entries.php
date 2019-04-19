@@ -13,7 +13,6 @@ class Entries
     protected $collection;
     protected $parameters;
     protected $paginate = false;
-    protected $perPage;
     protected $showPublished = true;
     protected $showUnpublished = false;
     protected $showPast = true;
@@ -43,15 +42,17 @@ class Entries
             return collect_entries();
         }
 
-        return $this->paginate ? $query->paginate($this->perPage) : $query->get();
+        return $this->paginate ? $query->paginate($this->paginate) : $query->get();
     }
 
     protected function parseParameters($params)
     {
         $params = array_except($params, $this->ignoredParams);
 
-        if ($this->paginate = Arr::pull($params, 'paginate', $this->paginate)) {
-            $this->perPage = Arr::pull($params, 'limit');
+        $this->paginate = Arr::pull($params, 'paginate', $this->paginate);
+
+        if ($this->paginate === true) {
+            $this->paginate = Arr::pull($params, 'limit', false);
         }
 
         $this->showPublished = Arr::pull($params, 'show_published', $this->showPublished);
