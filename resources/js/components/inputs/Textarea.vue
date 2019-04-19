@@ -7,6 +7,8 @@
             :readonly="isReadOnly"
             :placeholder="placeholder"
             @input="$emit('input', $event.target.value)"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
             v-elastic
         />
         <div class="text-right text-xs" :class="limitIndicatorColor" v-if="limit">
