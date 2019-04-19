@@ -78,7 +78,7 @@ export default {
         },
 
         isReadOnly() {
-            return this.isLocked || this.config.read_only || false;
+            return this.isLocked || this.readOnly || this.config.read_only || false;
         },
 
         classes() {
