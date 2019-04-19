@@ -12,8 +12,6 @@ class Echo {
     }
 
     start() {
-        // todo: if echo isnt needed, bail here.
-
         const config = {
             broadcaster: 'pusher',
             key: Statamic.$config.get('broadcasting.pusher.key'),
