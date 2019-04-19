@@ -113,13 +113,13 @@ export default {
 
         focused() {
             if (!this.isLocked) {
-                this.$emit('focus', this.config.handle);
+                this.$emit('focus');
             }
         },
 
         blurred() {
             if (!this.isLocked) {
-                this.$emit('blur', this.config.handle);
+                this.$emit('blur');
             }
         }
 
