@@ -149,7 +149,7 @@ export default {
         setValue(handle, value) {
             this.$store.dispatch(`publish/${this.name}/setValue`, {
                 handle, value,
-                user: Statamic.$config.get('userId')
+                user: Statamic.user.id
             });
         }
 
