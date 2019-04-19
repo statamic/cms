@@ -2,7 +2,7 @@
 
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
-        <editor-menu-bar :editor="editor">
+        <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
                 <div class="flex items-center no-select" v-if="toolbarIsFixed">
                     <component
@@ -27,8 +27,8 @@
             </div>
         </editor-menu-bar>
 
-        <div class="bard-editor">
-            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating">
+        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }">
+            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
                 <div
                     slot-scope="{ commands, isActive, menu }"
                     class="bard-floating-toolbar"
@@ -189,6 +189,9 @@ export default {
                 new Image({ bard: this }),
             ],
             content: this.valueToContent(this.value),
+            editable: !this.readOnly,
+            onFocus: () => this.$emit('focus'),
+            onBlur: () => this.$emit('blur'),
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
@@ -216,6 +219,10 @@ export default {
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
                 this.editor.setContent(content);
             }
+        },
+
+        readOnly(readOnly) {
+            this.editor.setOptions({ editable: !this.readOnly });
         }
 
     },
