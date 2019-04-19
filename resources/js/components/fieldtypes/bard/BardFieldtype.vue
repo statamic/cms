@@ -182,7 +182,7 @@ export default {
                 new Strike(),
                 new Underline(),
                 new History(),
-                new Set(),
+                new Set({ bard: this }),
                 new ConfirmSetDelete(),
                 new Link({ vm: this }),
                 new RemoveFormat(),
@@ -191,7 +191,14 @@ export default {
             content: this.valueToContent(this.value),
             editable: !this.readOnly,
             onFocus: () => this.$emit('focus'),
-            onBlur: () => this.$emit('blur'),
+            onBlur: () => {
+                // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                // blur event immediately. We need to make sure that the newly focused element is outside
+                // of Bard. We use a timeout because activeElement only exists after the blur event.
+                setTimeout(() => {
+                    if (!this.$el.contains(document.activeElement)) this.$emit('blur');
+                }, 1);
+            },
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.

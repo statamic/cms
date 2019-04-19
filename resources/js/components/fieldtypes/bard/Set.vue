@@ -36,6 +36,8 @@
                 :parent-name="parentName"
                 :set-index="index"
                 @updated="updated"
+                @focus="focused"
+                @blur="blurred"
             />
         </div>
     </div>
@@ -129,6 +131,19 @@ export default {
 
             e.preventDefault();
         },
+
+        focused() {
+            this.options.bard.$emit('focus');
+        },
+
+        blurred() {
+            // Bard should only blur if we focus somewhere outside of Bard entirely.
+            // We use a timeout because activeElement only exists after the blur event.
+            setTimeout(() => {
+                const bard = this.options.bard;
+                if (!bard.$el.contains(document.activeElement)) bard.$emit('blur');
+            }, 1);
+        }
 
     }
 }
