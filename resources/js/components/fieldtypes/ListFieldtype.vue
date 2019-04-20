@@ -14,6 +14,7 @@
                 <span v-if="editing === index">
                     <input
                         type="text"
+                        class="w-full"
                         v-model="data[index].value"
                         @keydown.enter.prevent="saveAndAddNewItem"
                         @keyup.up="previousItem"
@@ -29,6 +30,7 @@
             <li>
                 <input
                     type="text"
+                    class="w-full"
                     v-model="newItem"
                     ref="newItem"
                     :placeholder="`${__('Add an item')}...`"
