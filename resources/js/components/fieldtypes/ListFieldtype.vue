@@ -36,6 +36,7 @@
                     :placeholder="`${__('Add an item')}...`"
                     @keydown.enter.prevent="addItem"
                     @blur="addItem"
+                    @focus="editItem(data.length)"
                     @keyup.up="previousItem"
                 />
             </li>
