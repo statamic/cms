@@ -547,29 +547,29 @@ EOT;
         ];
 
 $template = <<<EOT
-{{ test:some_parsing }}{{ content_for_single_tag | noparse }}{{ /test:some_parsing }}
+{{ scope:foo }}
+{{ test:some_parsing }}{{ foo:content_for_single_tag | noparse }}{{ /test:some_parsing }}
 {{ test:some_loop_parsing }}
-    {{ index }} {{ content_for_tag_pair | noparse }} {{ string }}
+    {{ index }} {{ foo:content_for_tag_pair | noparse }} {{ string }}
 {{ /test:some_loop_parsing }}
+{{ /scope:foo }}
 EOT;
 
 $expectedBeforeInjection = <<<EOT
 noparse_0548be789865a16ab6e495f84a3080c0
     1 noparse_aa4a7fa8e2faf61751b68038fee92c4d hello
     2 noparse_aa4a7fa8e2faf61751b68038fee92c4d hello
-
 EOT;
 
 $expectedAfterInjection = <<<EOT
 beforesingle {{ string }} aftersingle
     1 beforepair {{ string }} afterpair hello
     2 beforepair {{ string }} afterpair hello
-
 EOT;
 
         $parsed = $parser->parse($template, $variables);
-        $this->assertEquals($expectedBeforeInjection, $parsed);
-        $this->assertEquals($expectedAfterInjection, $parser->injectNoparse($parsed));
+        $this->assertEquals($expectedBeforeInjection, trim($parsed));
+        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
     }
 
     /** @test */
