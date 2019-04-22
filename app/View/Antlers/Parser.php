@@ -17,6 +17,7 @@ use Illuminate\Contracts\Support\Arrayable;
 class Parser
 {
     // Instance state
+    protected $cascade;
     protected $allowPhp = false;
     protected $inCondition = false;
     protected $data = null;
@@ -100,6 +101,13 @@ class Parser
         return $this;
     }
 
+    public function cascade($cascade)
+    {
+        $this->cascade = $cascade;
+
+        return $this;
+    }
+
     /**
      * Kick off the Antlers parse process
      *
@@ -110,10 +118,6 @@ class Parser
     public function parse($text, $data = [])
     {
         $data = $this->normalizeData($data);
-
-        // Let's store the current callback data with the the local data
-        // so we can use it straight after a callback is called.
-        $this->callbackData = $data;
 
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
@@ -253,9 +257,8 @@ class Parser
             // so it can be parsed over like the other cases, and then we'll pick out the first one after.
             $value = ($associative = Arr::assoc($value)) ? [$value] : $this->addLoopIterationVariables($value);
 
-            $parses = collect($value)->map(function ($iteration) use ($contents, $data) {
-                $data = $iteration + $data;
-                return $this->parseLoopInstance($contents, $data);
+            $parses = collect($value)->map(function ($iteration) use ($contents) {
+                return $this->parseLoopInstance($contents, $iteration);
             });
 
             // Again, associative arrays just need the single iteration, so we'll grab
@@ -1074,6 +1077,11 @@ class Parser
         list($first, $rest) = explode(':', $key, 2);
 
         if (! array_has_colon($context, $first)) {
+            // If it's not found in the context, we'll try looking for it in the cascade.
+            if ($cascading = $this->cascade->get($first)) {
+                return $this->getVariableExistenceAndValue($rest, $cascading);
+            }
+
             return [false, null];
         }
 

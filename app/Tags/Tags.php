@@ -133,7 +133,7 @@ abstract class Tags
             $this->content = trim($this->content);
         }
 
-        $variables = array_merge($this->context, $this->addScope($data));
+        $variables = $this->addScope($data); // todo: get rid of scope, but its not under test yet.
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($variables) {
             return $antlers->parse($this->content, $variables);

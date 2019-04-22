@@ -3,6 +3,7 @@
 namespace Tests\View\Antlers;
 
 use Tests\TestCase;
+use Statamic\Tags\Tags;
 use Statamic\API\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
@@ -921,6 +922,133 @@ EOT;
                 'object' => $augmentable
             ])
         );
+    }
+
+    /** @test */
+    function callback_tag_pair_context_is_limited_to_its_own_variables()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['drink' => 'juice'];
+            }
+        })::register();
+
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ tag }}{{ drink }} {{ food }}{{ /tag }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>juice <
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function variable_tag_pair_context_is_limited_to_its_own_variables()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => ['drink' => 'juice']
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ array }}{{ drink }} {{ food }}{{ /array }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>juice <
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function tags_can_access_context()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [
+                    'parameter' => $this->context['food'],
+                    'drink' => 'juice',
+                ];
+            }
+        })::register();
+
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ tag }}{{ parameter }} {{ drink }} {{ food }}{{ /tag }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>burger juice <
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function it_can_reach_into_the_cascade()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $m->shouldReceive('get')->with('page')->once()->andReturn(['drink' => 'juice']);
+            $m->shouldReceive('get')->with('global')->once()->andReturn(['drink' => 'water']);
+            $m->shouldReceive('get')->with('menu')->once()->andReturn(['drink' => 'vodka']);
+            $m->shouldNotReceive('get')->with('nested');
+            $m->shouldNotReceive('get')->with('augmented');
+        });
+
+        $parser = Antlers::parser()->cascade($cascade);
+
+        $fieldtype = new class extends Fieldtype {};
+        $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
+
+        $context = [
+            'drink' => 'whisky',
+            'augmented' => $augmented,
+            'nested' => [
+                'drink' => 'coke',
+                'augmented' => $augmented,
+            ]
+        ];
+
+        $template = <<<EOT
+var: {{ drink }}
+page: {{ page:drink }}
+global: {{ global:drink }}
+menu: {{ menu:drink }}
+nested: {{ nested:drink }}
+augmented: {{ augmented:drink }}
+nested augmented: {{ nested:augmented:drink }}
+EOT;
+
+        $expected = <<<EOT
+var: whisky
+page: juice
+global: water
+menu: vodka
+nested: coke
+augmented: la croix
+nested augmented: la croix
+EOT;
+
+        $this->assertEquals($expected, $parser->parse($template, $context));
     }
 }
 
