@@ -408,7 +408,7 @@ export default {
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {
-                this.$notify.error(e.response.data.message, { dismissible: false });
+                this.$notify.error(e.response.data.message, { action: null, duration: null });
                 this.assets = [];
                 this.folders = [];
                 this.loadingAssets = false;

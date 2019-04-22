@@ -37,8 +37,6 @@
 
             <tooltip :pointer="true"></tooltip>
 
-            <vue-toast ref="toast"></vue-toast>
-
             <portal-target name="live-preview"></portal-target>
 
             <stacks v-if="stacks.length"></stacks>
