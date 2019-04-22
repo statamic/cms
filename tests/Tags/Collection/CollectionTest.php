@@ -83,4 +83,19 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['use' => 'music|art', 'title:contains' => 'love'];
         $this->assertCount(4, $this->collectionTag->index());
     }
+
+    /** @test */
+    function it_gets_entries_from_all_collections_using_params()
+    {
+        $this->makePosts();
+
+        $this->collectionTag->parameters = ['from' => '*', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['folder' => '*', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['use' => '*', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+    }
 }
