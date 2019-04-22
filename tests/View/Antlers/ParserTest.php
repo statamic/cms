@@ -1050,6 +1050,42 @@ EOT;
 
         $this->assertEquals($expected, $parser->parse($template, $context));
     }
+
+    /** @test */
+    function it_can_create_scopes()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => ['drink' => 'juice']
+        ];
+
+        $template = <<<EOT
+{{ scope:test }}
+drink: {{ drink }}
+food: {{ food }}
+
+{{ array }}
+    array:drink: {{ drink }}
+    array:food: >{{ food }}<
+    array:test:drink: {{ test:drink }}
+    array:test:food: {{ test:food }}
+{{ /array }}
+{{ /scope:test }}
+EOT;
+
+        $expected = <<<EOT
+drink: whisky
+food: burger
+
+    array:drink: juice
+    array:food: ><
+    array:test:drink: whisky
+    array:test:food: burger
+EOT;
+
+        $this->assertEquals($expected, trim(Antlers::parse($template, $context)));
+    }
 }
 
 class NonArrayableObject

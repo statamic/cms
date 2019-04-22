@@ -155,7 +155,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Tags\Routes::class, Tags\Section::class, Tags\Taxonomy::class, Tags\Theme::class, Tags\Trans::class,
             Tags\TransChoice::class, Tags\Users::class, Tags\Widont::class, Tags\Yields::class,
             \Statamic\Forms\Tags::class, \Statamic\Auth\UserTags::class, \Statamic\Auth\Protect\Tags::class,
-            \Statamic\Search\Tags::class
+            \Statamic\Search\Tags::class, Tags\Scope::class,
         ];
 
         $this->registerParent($parent);
