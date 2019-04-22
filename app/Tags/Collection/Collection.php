@@ -8,7 +8,9 @@ use Illuminate\Contracts\Pagination\Paginator;
 
 class Collection extends Tags
 {
+    // TODO: Figure out how to deal with `collection` conflict in data/cascade.
     public static $handle = 'collection_tag';
+
     /**
      * {{ collection:* }} ... {{ /collection:* }}
      */
