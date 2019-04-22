@@ -38,8 +38,12 @@
                 :errors="errors"
                 @updated="values = $event"
             >
-                <div slot-scope="{ }">
-                    <publish-sections></publish-sections>
+                <div slot-scope="{ container, setValue }">
+                    <publish-sections
+                        @updated="setValue"
+                        @focus="container.$emit('focus', $event)"
+                        @blur="container.$emit('blur', $event)"
+                    ></publish-sections>
                 </div>
             </publish-container>
         </div>
