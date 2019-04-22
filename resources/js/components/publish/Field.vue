@@ -65,7 +65,9 @@ export default {
         readOnly: Boolean
     },
 
-    inject: ['storeName'],
+    inject: {
+        storeName: { default: null }
+    },
 
     computed: {
 
@@ -93,7 +95,9 @@ export default {
         },
 
         locks() {
-            return this.$store.state.publish[this.storeName].fieldLocks;
+            let state = this.$store.state.publish[this.storeName];
+            if (!state) return {};
+            return state.fieldLocks;
         },
 
         isLocked() {
