@@ -27,11 +27,7 @@ class Collection extends Tags
      */
     public function index()
     {
-        $from = $this->get('from') ?? $this->get('folder') ?? $this->get('use');
-
-        if ($from === '*') {
-            $from = API\Collection::all()->map->handle()->implode('|');
-        }
+        $from = $this->fromCollections();
 
         $entries = collect(explode('|', $from))
             ->map(function ($from) {
@@ -43,6 +39,24 @@ class Collection extends Tags
         $this->entries = new EntryCollection($entries);
 
         return $this->output();
+    }
+
+    protected function fromCollections()
+    {
+        $from = $this->get('from') ?? $this->get('folder') ?? $this->get('use');
+        $not = $this->get('not_from') ?? $this->get('not_folder') ?? $this->get('dont_use') ?? false;
+
+        $collections = $from === '*'
+            ? API\Collection::all()->map->handle()
+            : collect(explode('|', $from));
+
+        $excludedCollections = collect(explode('|', $not))->filter();
+
+        return $collections
+            ->reject(function ($collection) use ($excludedCollections) {
+                return $excludedCollections->contains($collection);
+            })
+            ->implode('|');
     }
 
     protected function output()
