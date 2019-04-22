@@ -155,6 +155,25 @@ EOT;
     }
 
     /** @test */
+    function accessing_strings_as_arrays_returns_null()
+    {
+        $this->assertEquals('bar, ><', Antlers::parse('{{ foo }}, >{{ foo:test }}<', ['foo' => 'bar']));
+    }
+
+    /** @test */
+    function accessing_string_as_array_which_exists_as_callback_calls_the_callback()
+    {
+        (new class extends Tags {
+            public static $handle = 'foo';
+            public function test() {
+                return 'callback';
+            }
+        })::register();
+
+        $this->assertEquals('bar, callback', Antlers::parse('{{ foo }}, {{ foo:test }}', ['foo' => 'bar']));
+    }
+
+    /** @test */
     function non_arrays_cannot_be_looped()
     {
         Log::shouldReceive('debug')->once()

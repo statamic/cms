@@ -1094,7 +1094,11 @@ class Parser
         }
 
         // It will do this recursively until it's out of colon delimiters or values.
-        return $this->getVariableExistenceAndValue($rest, $context);
+        if (is_array($context)) {
+            return $this->getVariableExistenceAndValue($rest, $context);
+        }
+
+        return [false, null];
     }
 
     /**
