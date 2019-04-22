@@ -530,7 +530,9 @@ class Parser
 
             $replacement = call_user_func_array($this->callback, [$this, $name, $parameters, $content, $data]);
 
-            $replacement = $this->parseRecursives($replacement, $content);
+            // Commenting out this line makes no change to parser test coverage.
+            // TODO: Work out what it's supposed to be doing and write a test.
+            // $replacement = $this->parseRecursives($replacement, $content);
 
             // look for tag pairs and (plugin) callbacks
             if ($name != "content" && !$replacement) {
@@ -583,7 +585,7 @@ class Parser
         }
 
         // parse for recursives, as they may not have been parsed yet
-        $text = $this->parseRecursives($text, $this->original_text);
+        $text = $this->parseRecursives($text, $this->original_text, $data);
 
         // re-inject any extractions
         $text = $this->injectExtractions($text, '__variables_not_callbacks');
@@ -755,7 +757,7 @@ class Parser
      * @param  string $orig_text  The original text, before a callback is called.
      * @return string $text
      */
-    public function parseRecursives($text, $orig_text)
+    public function parseRecursives($text, $orig_text, $data)
     {
         // Is there a {{ *recursive [array_key]* }} tag here, let's loop through it.
         if (preg_match($this->recursiveRegex, $text, $match)) {
@@ -765,12 +767,12 @@ class Parser
             // check to see if the recursive variable we're looking for is set
             // within the current data for this run-through, if it isn't, just
             // abort and return the text
-            if (!array_get_colon($this->callbackData, $array_key)) {
+            if (!array_get_colon($data, $array_key)) {
                 return $text;
             }
 
             $next_tag = null;
-            $children = array_get_colon($this->callbackData, $array_key);
+            $children = array_get_colon($data, $array_key);
 
             // if the array key is scoped, we'll add a scope to the array
             if (strpos($array_key, ':') !== false) {
@@ -813,7 +815,7 @@ class Parser
                 $text = str_replace($current_tag, $replacement . $next_tag, $text);
 
                 if ($has_children) {
-                    $text = $this->parseRecursives($text, $orig_text);
+                    $text = $this->parseRecursives($text, $orig_text, $data);
                 }
 
                 $count++;
