@@ -815,15 +815,13 @@ EOT;
         $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
 
         $template = <<<EOT
-{{ string }}
 {{ test:return_simple_array }}
-    {{ one }} {{ two }} {{ string }}
+    {{ one }} {{ two }}
 {{ /test:return_simple_array }}
 EOT;
 
         $expected = <<<EOT
-Hello wilderness
-    a b Hello wilderness
+    a b
 
 EOT;
 
