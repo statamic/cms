@@ -17,9 +17,9 @@ class Collection extends Tags
      */
     public function __call($method, $args)
     {
-        $this->entries = (new Entries($this->method, $this->parameters))->get();
+        $this->parameters['from'] = $this->method;
 
-        return $this->output();
+        return $this->index();
     }
 
     /**
