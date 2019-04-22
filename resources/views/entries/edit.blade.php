@@ -9,6 +9,7 @@
         collection-title="{{ $collection['title'] }}"
         collection-url="{{ $collection['url'] }}"
         initial-title="{{ $entry->get('title') }}"
+        initial-reference="{{ $reference }}"
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"

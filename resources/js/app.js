@@ -17,7 +17,6 @@ require('./bootstrap/globals');
 require('./bootstrap/polyfills');
 require('./bootstrap/underscore-mixins');
 require('./bootstrap/jquery-plugins');
-require('./bootstrap/redactor-plugins');
 require('./bootstrap/plugins');
 require('./bootstrap/filters');
 require('./bootstrap/mixins');
@@ -43,6 +42,7 @@ Vue.prototype.$axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
 require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();
+Vue.prototype.$echo = Statamic.$echo;
 
 window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
@@ -143,6 +143,9 @@ Statamic.app({
             this.toggleNav();
         });
 
+        if (this.$config.get('broadcasting.enabled')) {
+            this.$echo.start();
+        }
     },
 
     created() {

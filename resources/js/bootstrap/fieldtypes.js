@@ -12,7 +12,6 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 // Fieldtypes
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import LocaleSettingsFieldtype from '../components/fieldtypes/LocaleSettingsFieldtype.vue'
-import RedactorSettingsFieldtype from '../components/fieldtypes/redactor/RedactorSettingsFieldtype.vue'
 import RelateFieldtype from '../components/fieldtypes/relate/RelateFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
@@ -24,6 +23,7 @@ Vue.component('assets-fieldtype', require('../components/fieldtypes/assets/Asset
 Vue.component('assets-fieldtype-index', require('../components/fieldtypes/assets/AssetsIndexFieldtype.vue'));
 Vue.component('asset_folder-fieldtype', require('../components/fieldtypes/AssetFolderFieldtype.vue'));
 Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardFieldtype.vue'));
+Vue.component('bard_buttons_setting-fieldtype', require('../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue'));
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue'));
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue'));
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue'));
@@ -35,8 +35,6 @@ Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.
 Vue.component('locale_settings-fieldtype', LocaleSettingsFieldtype);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue'));
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue'));
-Vue.component('redactor-fieldtype', require('../components/fieldtypes/redactor/RedactorFieldtype.vue'));
-Vue.component('redactor_settings-fieldtype', RedactorSettingsFieldtype);
 Vue.component('relate-fieldtype', RelateFieldtype);
 Vue.component('relationship-fieldtype', require('../components/fieldtypes/relationship/RelationshipFieldtype.vue'));
 Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue'));

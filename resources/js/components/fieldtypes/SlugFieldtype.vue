@@ -11,6 +11,7 @@
             name="slug"
             :config="config"
             :value="slug"
+            :read-only="isReadOnly"
             @updated="slug = $event" />
     </slugify>
 

@@ -3,6 +3,7 @@
 namespace Tests\Fields\Fieldtypes;
 
 use Tests\TestCase;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtypes\Bard;
 
 class BardTest extends TestCase
@@ -146,6 +147,60 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    function it_detects_v2_formatted_content()
+    {
+        $textOnly = [
+            ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
+        ];
+
+        $setsOnly = [
+            ['type' => 'one', 'foo' => 'bar', 'baz' => 'qux'],
+            ['type' => 'two', 'foo' => 'bar', 'baz' => 'qux'],
+        ];
+
+        $mixed = [
+            ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
+            ['type' => 'one', 'foo' => 'bar', 'baz' => 'qux'],
+            ['type' => 'text', 'text' => '<p>Another paragraph.</p>'],
+        ];
+
+        $invalidSets = [
+            ['type' => 'unknown', 'foo' => 'bar', 'baz' => 'qux'],
+            ['type' => 'unknown_two', 'foo' => 'bar', 'baz' => 'qux'],
+        ];
+
+        $prosemirrorMixed = [
+            ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'This is a paragraph with ']]],
+            ['type' => 'set', 'attrs' => ['values' => ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux']]],
+        ];
+
+        $prosemirrorTextOnly = [
+            ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'This is a paragraph with ']]],
+        ];
+
+        $prosemirrorSetsOnly = [
+            ['type' => 'set', 'attrs' => ['values' => ['type' => 'one', 'foo' => 'bar', 'baz' => 'qux']]],
+            ['type' => 'set', 'attrs' => ['values' => ['type' => 'two', 'foo' => 'bar', 'baz' => 'qux']]],
+        ];
+
+        $bard = new Bard;
+        $bard->setField(new Field('test', [
+            'sets' => [
+                'one' => [],
+                'two' => [],
+            ]
+        ]));
+
+        $this->assertTrue($bard->isLegacyData($textOnly));
+        $this->assertTrue($bard->isLegacyData($setsOnly));
+        $this->assertTrue($bard->isLegacyData($mixed));
+        $this->assertFalse($bard->isLegacyData($invalidSets));
+        $this->assertFalse($bard->isLegacyData($prosemirrorMixed));
+        $this->assertFalse($bard->isLegacyData($prosemirrorTextOnly));
+        $this->assertFalse($bard->isLegacyData($prosemirrorSetsOnly));
+    }
+
+    /** @test */
     function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
         $data = [
@@ -187,9 +242,15 @@ class BardTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
-    }
+        $bard = new Bard;
+        $bard->setField(new Field('test', [
+            'sets' => [
+                'myset' => [],
+            ]
+        ]));
 
+        $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
+    }
 
     /** @test */
     function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
@@ -211,6 +272,13 @@ class BardTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
+        $bard = new Bard;
+        $bard->setField(new Field('test', [
+            'sets' => [
+                'myset' => [],
+            ]
+        ]));
+
+        $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
     }
 }

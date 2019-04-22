@@ -109,6 +109,7 @@ class EntriesController extends CpController
         }
 
         $viewData = [
+            'reference' => $entry->reference(),
             'editing' => true,
             'actions' => [
                 'save' => $entry->updateUrl(),

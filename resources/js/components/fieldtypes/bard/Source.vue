@@ -7,7 +7,7 @@
             class="my-2"
         >
             <pre
-                class="whitespace-pre-line text-xs font-mono"
+                class="whitespace-pre-wrap leading-normal text-xs font-mono"
                 v-if="block.type === 'text'"
                 v-text="block.text" />
 
@@ -21,6 +21,8 @@
 </template>
 
 <script>
+const pretty = require('pretty');
+
 export default {
 
     props: ['html'],
@@ -37,7 +39,7 @@ export default {
                         let json = text.match(/^<bard-set>(.*)<\/bard-set>$/)[1];
                         return { type: 'set', set: JSON.parse(json).values.type };
                     }
-                    return { type: 'text', text };
+                    return { type: 'text', text: pretty(text) };
                 });
         }
 

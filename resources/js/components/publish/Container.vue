@@ -2,6 +2,10 @@
 export default {
 
     props: {
+        reference: {
+            type: String,
+            required: true
+        },
         name: {
             type: String,
             required: true
@@ -26,13 +30,21 @@ export default {
         }
     },
 
+    data() {
+        return {
+            components: [], // extra components to be injected
+        }
+    },
+
     created() {
         this.registerVuexModule();
+        this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
         this.removeVuexModule();
         this.removeNavigationWarning();
+        this.$events.$emit('publish-container-destroyed', this);
     },
 
     provide() {
@@ -67,6 +79,7 @@ export default {
                     values: initial.values,
                     meta: initial.meta,
                     site: initial.site,
+                    fieldLocks: {},
                     errors: {},
                 },
                 mutations: {
@@ -85,6 +98,12 @@ export default {
                     },
                     setSite(state, site) {
                         state.site = site;
+                    },
+                    lockField(state, { handle, user }) {
+                        Vue.set(state.fieldLocks, handle, user || true);
+                    },
+                    unlockField(state, handle) {
+                        Vue.delete(state.fieldLocks, handle);
                     },
                     initialize(state, payload) {
                         state.fieldset = payload.fieldset;
@@ -121,6 +140,17 @@ export default {
 
         removeNavigationWarning() {
             this.$dirty.remove(this.name);
+        },
+
+        pushComponent(component) {
+            this.components.push(component);
+        },
+
+        setValue(handle, value) {
+            this.$store.dispatch(`publish/${this.name}/setValue`, {
+                handle, value,
+                user: Statamic.user.id
+            });
         }
 
     },
@@ -154,7 +184,10 @@ export default {
 
     render() {
         return this.$scopedSlots.default({
-            values: this.$store.state.publish[this.name].values
+            values: this.$store.state.publish[this.name].values,
+            container: this._self,
+            components: this.components,
+            setValue: this.setValue,
         });
     }
 

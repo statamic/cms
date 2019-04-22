@@ -28,7 +28,6 @@ mix.extract([
     'marked-plaintext',
     'moment',
     'mousetrap',
-    'redactor',
     'selectize',
     'sweetalert',
     '@shopify/draggable',

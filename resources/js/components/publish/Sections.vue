@@ -24,13 +24,25 @@
                     :key="section.handle"
                     v-show="section.handle === active"
                 >
-                    <publish-fields :fields="section.fields" :read-only="readOnly" />
+                    <publish-fields
+                        :fields="section.fields"
+                        :read-only="readOnly"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
                 </div>
             </div>
 
             <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
                 <div class="publish-section">
-                    <publish-fields :fields="sidebarSection.fields" :read-only="readOnly" />
+                    <publish-fields
+                        :fields="sidebarSection.fields"
+                        :read-only="readOnly"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
                 </div>
             </div>
         </div>
@@ -113,7 +125,6 @@ export default {
     },
 
     methods: {
-
 
         sectionHasError(handle) {
             return _.chain(this.sectionErrors).values().contains(handle).value();

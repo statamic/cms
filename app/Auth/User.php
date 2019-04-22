@@ -3,6 +3,7 @@
 namespace Statamic\Auth;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Blueprint;
 use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
@@ -124,6 +125,11 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'edit_url' => $this->editUrl(),
             'is_user' => true,
         ], $roles, $groups, $this->supplements);
+    }
+
+    public function toJavascriptArray()
+    {
+        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name']);
     }
 
     public function getAuthIdentifierName()

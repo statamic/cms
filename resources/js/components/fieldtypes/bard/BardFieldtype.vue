@@ -2,39 +2,48 @@
 
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
-        <editor-menu-bar :editor="editor">
+        <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
                 <div class="flex items-center no-select" v-if="toolbarIsFixed">
-                    <button
+                    <component
                         v-for="button in buttons"
                         :key="button.name"
-                        :class="{ 'active': isActive[button.command](button.args) }"
-                        v-tooltip="button.text"
-                        @click="commands[button.command](button.args)"
-                        v-html="button.html" />
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(isActive, button)"
+                        :config="config"
+                        :bard="_self"
+                        :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
-                    <button @click="showSource = !showSource" v-if="allowSource"><i class="icon icon-code"></i></button>
-                    <button @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></button>
+                    <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                        <svg-icon name="file-code" class="w-4 h-4 "/>
+                    </button>
+                    <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')">
+                        <svg-icon name="shrink" class="w-4 h-4" v-if="fullScreenMode" />
+                        <svg-icon name="expand" class="w-4 h-4" v-else />
+                    </button>
                 </div>
             </div>
         </editor-menu-bar>
 
-        <div class="bard-editor">
-            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating">
+        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }">
+            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
                 <div
                     slot-scope="{ commands, isActive, menu }"
                     class="bard-floating-toolbar"
                     :class="{ 'active': menu.isActive }"
                     :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
                 >
-                    <button
+                    <component
                         v-for="button in buttons"
                         :key="button.name"
-                        :class="{ 'active': isActive[button.command](button.args) }"
-                        v-tooltip="button.text"
-                        @click="commands[button.command](button.args)"
-                        v-html="button.html" />
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(isActive, button)"
+                        :bard="_self"
+                        :config="config"
+                        :editor="editor" />
                 </div>
             </editor-menu-bubble>
 
@@ -65,6 +74,9 @@
 
             <bard-source :html="html" v-if="showSource" />
         </div>
+        <div class="bard-footer-toolbar">
+            {{ readingTime }} {{ __('Reading Time') }}
+        </div>
     </div>
 
 </template>
@@ -88,7 +100,13 @@ import {
 } from 'tiptap-extensions';
 import Set from './Set';
 import BardSource from './Source.vue';
+import Link from './Link';
+import Image from './Image';
+import RemoveFormat from './RemoveFormat';
+import LinkToolbarButton from './LinkToolbarButton.vue';
+import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
+import readTimeEstimate from 'read-time-estimate';
 
 export default {
 
@@ -100,6 +118,8 @@ export default {
         EditorFloatingMenu,
         EditorMenuBubble,
         BardSource,
+        BardToolbarButton,
+        LinkToolbarButton,
     },
 
     provide() {
@@ -133,17 +153,19 @@ export default {
             return this.config.toolbar_mode === 'floating';
         },
 
+        readingTime() {
+            if (this.html) {
+                var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
+                var duration = moment.duration(stats.duration, 'minutes');
+
+                return moment.utc(duration.asMilliseconds()).format("mm:ss");
+            }
+        }
+
     },
 
     mounted() {
         this.initToolbarButtons();
-
-        // A json string is passed from PHP since that's what's submitted.
-        const value = JSON.parse(this.value);
-
-        let content = value.length
-            ? { type: 'doc', content: value }
-            : null;
 
         this.editor = new Editor({
             extensions: [
@@ -160,9 +182,23 @@ export default {
                 new Strike(),
                 new Underline(),
                 new History(),
-                new Set(),
+                new Set({ bard: this }),
+                new ConfirmSetDelete(),
+                new Link({ vm: this }),
+                new RemoveFormat(),
+                new Image({ bard: this }),
             ],
-            content,
+            content: this.valueToContent(this.value),
+            editable: !this.readOnly,
+            onFocus: () => this.$emit('focus'),
+            onBlur: () => {
+                // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                // blur event immediately. We need to make sure that the newly focused element is outside
+                // of Bard. We use a timeout because activeElement only exists after the blur event.
+                setTimeout(() => {
+                    if (!this.$el.contains(document.activeElement)) this.$emit('blur');
+                }, 1);
+            },
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
@@ -177,6 +213,25 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+    },
+
+    watch: {
+
+        value(value, oldValue) {
+            if (value === oldValue) return;
+
+            const oldContent = this.editor.getJSON();
+            const content = this.valueToContent(value);
+
+            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.setContent(content);
+            }
+        },
+
+        readOnly(readOnly) {
+            this.editor.setOptions({ editable: !this.readOnly });
+        }
+
     },
 
     methods: {
@@ -228,8 +283,21 @@ export default {
             });
 
             this.buttons = buttons;
-        }
+        },
 
+        buttonIsActive(isActive, button) {
+            if (! isActive.hasOwnProperty(button.command)) return false;
+            return isActive[button.command](button.args);
+        },
+
+        valueToContent(value) {
+            // A json string is passed from PHP since that's what's submitted.
+            value = JSON.parse(this.value);
+
+            return value.length
+                ? { type: 'doc', content: value }
+                : null;
+        }
     }
 }
 </script>

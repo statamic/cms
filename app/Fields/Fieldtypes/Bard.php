@@ -10,6 +10,20 @@ class Bard extends Replicator
 
     protected $configFields = [
         'sets' => ['type' => 'sets'],
+        'buttons' => [
+            'type' => 'bard_buttons_setting',
+            'default' => [
+                'h2',
+                'h3',
+                'bold',
+                'italic',
+                'unorderedlist',
+                'orderedlist',
+                'removeformat',
+                'quote',
+                'anchor',
+            ]
+        ],
         'save_html' => ['type' => 'toggle'],
         'toolbar_mode' => [
             'type' => 'select',
@@ -18,6 +32,21 @@ class Bard extends Replicator
                 'fixed' => 'Fixed',
                 'floating' => 'Floating',
             ],
+        ],
+        'link_noopener' => [
+            'type' => 'toggle',
+            'default' => false,
+            'width' => 50,
+        ],
+        'link_noreferrer' => [
+            'type' => 'toggle',
+            'default' => false,
+            'width' => 50,
+        ],
+        'target_blank' => [
+            'type' => 'toggle',
+            'default' => false,
+            'width' => 50,
         ],
     ];
 
@@ -58,7 +87,7 @@ class Bard extends Replicator
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
 
-        if ($row['attrs']['enabled'] === true) {
+        if (array_get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
         }
 
@@ -104,15 +133,13 @@ class Bard extends Replicator
         return parent::extraRules();
     }
 
-    protected function isLegacyData($value)
+    public function isLegacyData($value)
     {
-        return false; // TODO.
+        $configuredTypes = array_keys($this->config('sets'));
+        $configuredTypes[] = 'text';
+        $dataTypes = collect($value)->map->type;
 
-        $hasTextSet = null !== collect($value)->first(function ($set) {
-            return $set['type'] === 'text';
-        });
-
-        return $hasTextSet || !isset($value[0]['attrs']);
+        return $dataTypes->diff($configuredTypes)->count() === 0;
     }
 
     protected function convertLegacyData($value)

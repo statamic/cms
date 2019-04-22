@@ -11,19 +11,18 @@
 }
 
 .bard-fixed-toolbar {
-    @apply .bg-white .shadow-none rounded-t .border-b .text-sm .p-1 flex items-center justify-between;
+    @apply .bg-white .shadow-none rounded-t .border-b .text-sm .p-1 flex items-center justify-between h-10;
     position: sticky;
     top: 0;
-    z-index: 9999;
+    z-index: 10;
     padding: 8px 12px;
 
      button {
         @apply text-grey-80 px-1 flex items-center text-base;
-        transition: all .1s ease-in-out;
     }
 
     button:hover {
-        @apply .text-grey-90;
+        @apply .text-black;
     }
 
     button.active {
@@ -96,6 +95,17 @@
     }
 }
 
+.bard-footer-toolbar {
+    @apply .bg-white .shadow-none text-grey-70 rounded-b .border-t .text-xs .p-1 flex items-center justify-between;
+    padding: 8px 12px;
+
+    .bard-fullscreen & {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+    }
+}
+
 
 /* The set selection options for each text block
   ========================================================================== */
@@ -117,12 +127,21 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply .fixed .bg-grey-70 .pin .min-h-screen .overflow-scroll;
+    @apply .fixed .bg-white .pin .min-h-screen .overflow-scroll rounded-none;
     z-index: 2; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
-        @apply bg-white shadow-lg max-w-2xl mx-auto mt-6 p-3 rounded relative;
+        @apply bg-white shadow-none max-w-xl mx-auto rounded relative;
+    }
+
+    .bard-fixed-toolbar {
+        @apply shadow-sm;
+    }
+
+    .ProseMirror {
+        @apply .px-3 py-6 flex flex-col justify-center;
+        min-height: calc(100vh - 40px);
     }
 
     .bard-set-selector {
@@ -158,10 +177,6 @@
         text-size-adjust: 100%;
     }
 
-    b,
-    strong { font-weight: 700; }
-
-    em, i { font-style: italic }
 
     blockquote,
     ol,
@@ -169,22 +184,34 @@
     ul {
         margin-top: 0;
         margin-bottom: .85em;
+
+        b,
+        strong { font-weight: 700; }
+
+        em, i { font-style: italic }
+
+        a {
+            @apply text-blue no-underline;
+        }
+
+        a:active,
+        a:focus,
+        a:hover {
+            outline: 0;
+            text-decoration: underline;
+        }
+
+        img {
+            border: 0;
+            max-width: 100%;
+        }
     }
 
-    a {
-        @apply text-blue no-underline;
-    }
-
-    a:active,
-    a:focus,
-    a:hover {
-        outline: 0;
-        text-decoration: underline;
-    }
-
-    img {
-        border: 0;
-        max-width: 100%;
+    blockquote, ol, ul {
+        p {
+            margin-top: 0;
+            margin-bottom: .85em;
+        }
     }
 
     hr {
@@ -267,5 +294,61 @@
 
     blockquote:last-child {
         margin-bottom: 0;
+    }
+}
+
+/* Link toolbar
+  ========================================================================== */
+
+  .bard-link-toolbar {
+    @apply bg-black rounded absolute leading-none shadow mt-1;
+    z-index: 100;
+    width: 300px;
+    top: 100%;
+
+    &:before {
+        content: '';
+        border: 6px solid transparent;
+        border-bottom-color: black;
+        position: absolute;
+        bottom: 100%;
+        left: 10px;
+    }
+
+    .link-container {
+        @apply w-full overflow-hidden text-white leading-normal;
+        text-overflow: ellipsis;
+    }
+
+    .link {
+        @apply text-xs text-white whitespace-no-wrap;
+
+        &:hover { @apply text-blue }
+    }
+
+    .input {
+        @apply p-0 text-xs text-white h-8 bg-transparent shadow-none border-none;
+        width: 240px;
+        outline: none;
+    }
+
+    .bard-link-toolbar-buttons {
+        @apply ml-1 flex items-center;
+    }
+
+    button {
+        @apply p-0 text-grey-20 h-10 ml-1;
+        font-size: 16px;
+
+        &:hover {
+            @apply text-white;
+        }
+    }
+
+    .checkbox {
+        opacity: 1;
+        position: relative;
+        left: auto;
+        margin: 0 0 0 8px;
     }
 }

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bard-set  bg-white border my-4 rounded shadow my-3 whitespace-normal"
+    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
         @mousedown="parentMousedown"
         @dragstart="parentDragStart"
     >
@@ -36,6 +36,8 @@
                 :parent-name="parentName"
                 :set-index="index"
                 @updated="updated"
+                @focus="focused"
+                @blur="blurred"
             />
         </div>
     </div>
@@ -92,7 +94,7 @@ export default {
 
         index() {
             return 0; // todo
-        }
+        },
 
     },
 
@@ -129,6 +131,19 @@ export default {
 
             e.preventDefault();
         },
+
+        focused() {
+            this.options.bard.$emit('focus');
+        },
+
+        blurred() {
+            // Bard should only blur if we focus somewhere outside of Bard entirely.
+            // We use a timeout because activeElement only exists after the blur event.
+            setTimeout(() => {
+                const bard = this.options.bard;
+                if (!bard.$el.contains(document.activeElement)) bard.$emit('blur');
+            }, 1);
+        }
 
     }
 }

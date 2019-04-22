@@ -28,7 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $bundledFieldtypes = [
         'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'partial', 'radio', 'redactor', 'redactor_settings', 'time', 'title', 'toggle', 'video', 'yaml',
+        'radio', 'time', 'title', 'toggle', 'video', 'yaml',
         'revealer', 'section', 'slug', 'table', 'tags', 'template', 'text', 'textarea',
     ];
 
@@ -91,6 +91,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\AssetFolder::class,
         Fieldtypes\Assets::class,
         Fieldtypes\Bard::class,
+        Fieldtypes\Bard\Buttons::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,

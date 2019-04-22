@@ -31,5 +31,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         CpServiceProvider::class,
         ValidationServiceProvider::class,
         RouteServiceProvider::class,
+        BroadcastServiceProvider::class,
     ];
 }
