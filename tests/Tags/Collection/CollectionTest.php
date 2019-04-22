@@ -55,6 +55,21 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    function it_gets_entries_from_all_collections()
+    {
+        $this->makePosts();
+
+        $this->collectionTag->parameters = ['from' => '*'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['folder' => '*'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['use' => '*'];
+        $this->assertCount(6, $this->collectionTag->index());
+    }
+
+    /** @test */
     function it_gets_entries_from_multiple_collections_using_params()
     {
         $this->makePosts();

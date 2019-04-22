@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags\Collection;
 
+use Statamic\API;
 use Statamic\Tags\Tags;
 use Statamic\Data\Entries\EntryCollection;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -27,6 +28,10 @@ class Collection extends Tags
     public function index()
     {
         $from = $this->get('from') ?? $this->get('folder') ?? $this->get('use');
+
+        if ($from === '*') {
+            $from = API\Collection::all()->map->handle()->implode('|');
+        }
 
         $entries = collect(explode('|', $from))
             ->map(function ($from) {
