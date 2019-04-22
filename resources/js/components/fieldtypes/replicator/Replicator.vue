@@ -127,6 +127,10 @@ export default {
 
     watch: {
 
+        value(value, oldValue) {
+            this.values = value;
+        },
+
         values: {
             deep: true,
             handler(values) {

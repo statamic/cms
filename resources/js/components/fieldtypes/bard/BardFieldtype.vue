@@ -2,7 +2,7 @@
 
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
-        <editor-menu-bar :editor="editor">
+        <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
                 <div class="flex items-center no-select" v-if="toolbarIsFixed">
                     <component
@@ -27,8 +27,8 @@
             </div>
         </editor-menu-bar>
 
-        <div class="bard-editor">
-            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating">
+        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }">
+            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
                 <div
                     slot-scope="{ commands, isActive, menu }"
                     class="bard-floating-toolbar"
@@ -167,13 +167,6 @@ export default {
     mounted() {
         this.initToolbarButtons();
 
-        // A json string is passed from PHP since that's what's submitted.
-        const value = JSON.parse(this.value);
-
-        let content = value.length
-            ? { type: 'doc', content: value }
-            : null;
-
         this.editor = new Editor({
             extensions: [
                 new Blockquote(),
@@ -189,13 +182,23 @@ export default {
                 new Strike(),
                 new Underline(),
                 new History(),
-                new Set(),
+                new Set({ bard: this }),
                 new ConfirmSetDelete(),
                 new Link({ vm: this }),
                 new RemoveFormat(),
                 new Image({ bard: this }),
             ],
-            content,
+            content: this.valueToContent(this.value),
+            editable: !this.readOnly,
+            onFocus: () => this.$emit('focus'),
+            onBlur: () => {
+                // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                // blur event immediately. We need to make sure that the newly focused element is outside
+                // of Bard. We use a timeout because activeElement only exists after the blur event.
+                setTimeout(() => {
+                    if (!this.$el.contains(document.activeElement)) this.$emit('blur');
+                }, 1);
+            },
             onUpdate: ({ getJSON, getHTML }) => {
                 let value = getJSON().content;
                 // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
@@ -210,6 +213,25 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+    },
+
+    watch: {
+
+        value(value, oldValue) {
+            if (value === oldValue) return;
+
+            const oldContent = this.editor.getJSON();
+            const content = this.valueToContent(value);
+
+            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.setContent(content);
+            }
+        },
+
+        readOnly(readOnly) {
+            this.editor.setOptions({ editable: !this.readOnly });
+        }
+
     },
 
     methods: {
@@ -266,6 +288,15 @@ export default {
         buttonIsActive(isActive, button) {
             if (! isActive.hasOwnProperty(button.command)) return false;
             return isActive[button.command](button.args);
+        },
+
+        valueToContent(value) {
+            // A json string is passed from PHP since that's what's submitted.
+            value = JSON.parse(this.value);
+
+            return value.length
+                ? { type: 'doc', content: value }
+                : null;
         }
     }
 }

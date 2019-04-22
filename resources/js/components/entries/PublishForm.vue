@@ -97,13 +97,14 @@
             :name="publishContainer"
             :fieldset="fieldset"
             :values="values"
+            :reference="initialReference"
             :meta="meta"
             :errors="errors"
             :site="site"
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{}"
+                slot-scope="{ container, components, setValue }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -113,9 +114,26 @@
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
-                <transition name="live-preview-sections-drop">
-                    <publish-sections v-show="sectionsVisible" :live-preview="isPreviewing" :read-only="readOnly" />
-                </transition>
+                <div>
+                    <component
+                        v-for="component in components"
+                        :key="component.name"
+                        :is="component.name"
+                        :container="container"
+                        v-bind="component.props"
+                    />
+
+                    <transition name="live-preview-sections-drop">
+                        <publish-sections
+                            v-show="sectionsVisible"
+                            :live-preview="isPreviewing"
+                            :read-only="readOnly"
+                            @updated="setValue"
+                            @focus="container.$emit('focus', $event)"
+                            @blur="container.$emit('blur', $event)"
+                        />
+                    </transition>
+                </div>
             </live-preview>
         </publish-container>
     </div>
@@ -136,6 +154,7 @@ export default {
 
     props: {
         publishContainer: String,
+        initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
         initialMeta: Object,

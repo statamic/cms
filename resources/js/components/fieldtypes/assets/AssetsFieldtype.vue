@@ -458,6 +458,12 @@ export default {
 
         loading(loading) {
             this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+        },
+
+        value(value, oldValue) {
+            if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
+                this.loadAssets(value);
+            }
         }
 
     },

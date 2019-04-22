@@ -18,7 +18,9 @@
             :config="field"
             :value="value"
             :name="name"
-            @updated="updated"
+            @updated="$emit('updated', $event)"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
         />
 
     </div>
@@ -89,14 +91,6 @@ export default {
                 this.field.classes || '',
                 { 'has-error': this.hasError }
             ];
-        }
-
-    },
-
-    methods: {
-
-        updated(value) {
-            this.$emit('updated', this.field.handle, value);
         }
 
     }

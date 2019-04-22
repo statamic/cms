@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import Echo from './Echo';
+const echo = new Echo;
 
 export default new Vue({
     data() {
@@ -9,10 +11,20 @@ export default new Vue({
     },
 
     computed: {
+
         $request() {
             // TODO: Custom $request error handling, etc?  For now, we'll just alias directly to $axios.
             return this.$axios;
         },
+
+        $echo() {
+            return echo;
+        },
+
+        user() {
+            return this.$config.get('user');
+        }
+
     },
 
     methods: {

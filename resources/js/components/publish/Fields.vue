@@ -11,7 +11,9 @@
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
             :read-only="readOnly"
-            @updated="updated"
+            @updated="$emit('updated', field.handle, $event)"
+            @focus="$emit('focus', field.handle)"
+            @blur="$emit('blur', field.handle)"
         />
 
     </div>
@@ -54,14 +56,6 @@ export default {
 
         errors() {
             return this.state.errors;
-        }
-
-    },
-
-    methods: {
-
-        updated(handle, value) {
-            this.$store.dispatch(`publish/${this.storeName}/setValue`, { handle, value });
         }
 
     }

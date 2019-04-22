@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Illuminate\Support\Carbon;
 use Statamic\QueryBuilder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder
@@ -16,7 +17,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $items = $this->getFilteredItems();
 
         if ($this->orderBy) {
-            $items = $items->multisort($this->orderBy . ':' . $this->orderDirection);
+            $items = $items->multisort($this->orderBy . ':' . $this->orderDirection)->values();
         }
 
         return $this->limitItems($items);
@@ -85,13 +86,62 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return strtolower($item) !== strtolower($value);
     }
 
+    protected function filterTestLessThan($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->lt($value);
+        }
+
+        return $item < $value;
+    }
+
+    protected function filterTestGreaterThan($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->gt($value);
+        }
+
+        return $item > $value;
+    }
+
+    protected function filterTestLessThanOrEqualTo($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->lte($value);
+        }
+
+        return $item <= $value;
+    }
+
+    protected function filterTestGreaterThanOrEqualTo($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->gte($value);
+        }
+
+        return $item >= $value;
+    }
+
     protected function filterTestLike($item, $like)
     {
-        $like = strtolower($like);
+        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/i';
 
-        $pattern = '/' . str_replace(['%', '_'], ['.*', '.'], $like) . '/';
+        return preg_match($pattern, $item);
+    }
 
-        return preg_match($pattern, strtolower($item));
+    protected function filterTestNotLike($item, $like)
+    {
+        return ! $this->filterTestLike($item, $like);
+    }
+
+    protected function filterTestLikeRegex($item, $pattern)
+    {
+        return preg_match("/{$pattern}/i", $item);
+    }
+
+    protected function filterTestNotLikeRegex($item, $pattern)
+    {
+        return ! $this->filterTestLikeRegex($item, $pattern);
     }
 
     protected function getFilterItemValue($item, $column)

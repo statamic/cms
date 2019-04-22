@@ -28,7 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $bundledFieldtypes = [
         'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'partial', 'radio', 'redactor', 'redactor_settings', 'time', 'title', 'toggle', 'video', 'yaml',
+        'radio', 'time', 'title', 'toggle', 'video', 'yaml',
         'revealer', 'section', 'slug', 'table', 'tags', 'template', 'text', 'textarea',
     ];
 
@@ -146,16 +146,15 @@ class ExtensionServiceProvider extends ServiceProvider
         $parent = 'statamic.tags';
 
         $tags = [
-            Tags\Asset::class, Tags\Assets::class, Tags\Cache::class, Tags\Can::class, Tags\Collection::class,
+            Tags\Asset::class, Tags\Assets::class, Tags\Cache::class, Tags\Can::class, Tags\Collection\Collection::class,
             Tags\Dump::class, Tags\Entries::class, Tags\Env::class, Tags\GetContent::class, Tags\GetFiles::class,
-            Tags\GetValue::class, Tags\Glide::class, Tags\In::class, Tags\Is::class, Tags\Link::class,
-            Tags\Locales::class, Tags\Markdown::class, Tags\Member::class, Tags\Mix::class, Tags\Nav::class,
-            Tags\NotFound::class, Tags\OAuth::class, Tags\Obfuscate::class, Tags\Pages::class, Tags\ParentTags::class,
-            Tags\Partial::class, Tags\Path::class, Tags\Redirect::class, Tags\Relate::class, Tags\Rotate::class,
-            Tags\Routes::class, Tags\Section::class, Tags\Taxonomy::class, Tags\Theme::class, Tags\Trans::class,
-            Tags\TransChoice::class, Tags\Users::class, Tags\Widont::class, Tags\Yields::class,
-            \Statamic\Forms\Tags::class, \Statamic\Auth\UserTags::class, \Statamic\Auth\Protect\Tags::class,
-            \Statamic\Search\Tags::class
+            Tags\Glide::class, Tags\In::class, Tags\Is::class, Tags\Link::class, Tags\Locales::class,
+            Tags\Markdown::class, Tags\Member::class, Tags\Mix::class, Tags\Nav::class, Tags\NotFound::class,
+            Tags\OAuth::class, Tags\Obfuscate::class, Tags\Pages::class, Tags\ParentTags::class, Tags\Partial::class,
+            Tags\Path::class, Tags\Redirect::class, Tags\Relate::class, Tags\Rotate::class, Tags\Routes::class,
+            Tags\Section::class, Tags\Taxonomy::class, Tags\Theme::class, Tags\Trans::class, Tags\TransChoice::class,
+            Tags\Users::class, Tags\Widont::class, Tags\Yields::class, \Statamic\Forms\Tags::class,
+            \Statamic\Auth\UserTags::class, \Statamic\Auth\Protect\Tags::class, \Statamic\Search\Tags::class
         ];
 
         $this->registerParent($parent);
