@@ -3,8 +3,7 @@ export default {
 
     props: {
         reference: {
-            type: String,
-            required: true
+            type: String
         },
         name: {
             type: String,
