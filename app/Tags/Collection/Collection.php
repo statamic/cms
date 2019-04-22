@@ -26,7 +26,9 @@ class Collection extends Tags
      */
     public function index()
     {
-        $entries = collect(explode('|', $this->get('from')))
+        $from = $this->get('from') ?? $this->get('folder') ?? $this->get('use');
+
+        $entries = collect(explode('|', $from))
             ->map(function ($from) {
                 return (new Entries($from, $this->parameters))->get();
             })

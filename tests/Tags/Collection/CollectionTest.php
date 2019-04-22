@@ -29,21 +29,7 @@ class CollectionTest extends TestCase
         return $entry->makeAndAddLocalization('en', function ($loc) { });
     }
 
-    /** @test */
-    function it_gets_entries_from_multiple_collections()
-    {
-        $this->makeEntry($this->music)->save();
-        $this->makeEntry($this->art)->save();
-
-        $this->collectionTag->parameters = [
-            'from' => 'music|art'
-        ];
-
-        $this->assertCount(2, $this->collectionTag->index());
-    }
-
-    /** @test */
-    function it_gets_entries_from_multiple_collections_using_params()
+    protected function makePosts()
     {
         $this->makeEntry($this->music)->set('title', 'I Love Guitars')->save();
         $this->makeEntry($this->music)->set('title', 'I Love Drums')->save();
@@ -51,12 +37,35 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->art)->set('title', 'I Love Drawing')->save();
         $this->makeEntry($this->art)->set('title', 'I Love Painting')->save();
         $this->makeEntry($this->art)->set('title', 'I Hate Sculpting')->save();
+    }
 
-        $this->collectionTag->parameters = [
-            'from' => 'music|art',
-            'title:contains' => 'love'
-        ];
+    /** @test */
+    function it_gets_entries_from_multiple_collections()
+    {
+        $this->makePosts();
 
+        $this->collectionTag->parameters = ['from' => 'music|art'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['folder' => 'music|art'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['use' => 'music|art'];
+        $this->assertCount(6, $this->collectionTag->index());
+    }
+
+    /** @test */
+    function it_gets_entries_from_multiple_collections_using_params()
+    {
+        $this->makePosts();
+
+        $this->collectionTag->parameters = ['from' => 'music|art', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['folder' => 'music|art', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['use' => 'music|art', 'title:contains' => 'love'];
         $this->assertCount(4, $this->collectionTag->index());
     }
 }
