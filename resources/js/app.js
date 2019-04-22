@@ -17,7 +17,6 @@ require('./bootstrap/globals');
 require('./bootstrap/polyfills');
 require('./bootstrap/underscore-mixins');
 require('./bootstrap/jquery-plugins');
-require('./bootstrap/redactor-plugins');
 require('./bootstrap/plugins');
 require('./bootstrap/filters');
 require('./bootstrap/mixins');
