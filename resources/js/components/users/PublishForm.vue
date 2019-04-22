@@ -11,6 +11,7 @@ export default {
         initialFieldset: Object,
         initialValues: Object,
         initialMeta: Object,
+        initialReference: String,
         action: String,
         method: String
     },

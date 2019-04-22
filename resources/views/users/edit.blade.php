@@ -5,6 +5,7 @@
     <user-publish-form
         action="{{ cp_route('users.update', $user->id()) }}"
         method="patch"
+        initial-reference="{{ $user->reference() }}"
         :initial-fieldset="{{ json_encode($user->blueprint()->toPublishArray()) }}"
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
@@ -32,6 +33,7 @@
                 name="base"
                 :fieldset="fieldset"
                 :values="values"
+                :reference="initialReference"
                 :meta="meta"
                 :errors="errors"
                 @updated="values = $event"
