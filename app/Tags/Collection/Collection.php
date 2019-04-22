@@ -3,6 +3,7 @@
 namespace Statamic\Tags\Collection;
 
 use Statamic\Tags\Tags;
+use Statamic\Data\Entries\EntryCollection;
 use Illuminate\Contracts\Pagination\Paginator;
 
 class Collection extends Tags
@@ -23,7 +24,14 @@ class Collection extends Tags
      */
     public function index()
     {
-        $this->entries = (new Entries($this->get('from'), $this->parameters))->get();
+        $entries = collect(explode('|', $this->get('from')))
+            ->map(function ($from) {
+                return (new Entries($from, $this->parameters))->get();
+            })
+            ->flatten(1)
+            ->all();
+
+        $this->entries = new EntryCollection($entries);
 
         return $this->output();
     }
