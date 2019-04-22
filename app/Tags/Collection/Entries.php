@@ -28,6 +28,10 @@ class Entries
     {
         $this->collection = API\Collection::whereHandle($collection);
         $this->parameters = $this->parseParameters($parameters);
+
+        if (! $this->collection) {
+            throw new \Exception("Cannot find [{$collection}] collection");
+        }
     }
 
     public function get()
