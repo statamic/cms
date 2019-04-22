@@ -1,4 +1,8 @@
 import Vue from 'vue'
+import vSelect from 'vue-select'
+
+// Third Party
+Vue.component('v-select', vSelect)
 
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));

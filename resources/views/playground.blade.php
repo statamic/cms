@@ -1,80 +1,5 @@
 @extends('statamic::layout')
 
-@section('content')
-
-    <h1 class="mb-3">Revisions Prototype</h1>
-    <div class="card w-2/3 p-0">
-        <div>
-            <h2 class="p-3">Entry History</h2>
-
-            {{-- Today --}}
-            <h6 class="revision-date">Today</h6>
-            <div class="revision-list">
-                <div class="revision-item status-working-copy">
-                    <div class="revision-item-bullet-container">
-                        <i class="revision-item-bullet"></i>
-                    </div>
-                    <div class="revision-item-content">
-                        <div class="flex items-center">
-                            <span>08:34 AM &mdash; André Basse</span>
-                            <span class="badge">Working Copy</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="revision-item status-published">
-                    <div class="revision-item-bullet-container">
-                        <i class="revision-item-bullet"></i>
-                    </div>
-                    <div class="revision-item-content">
-                        <div class="flex items-center">
-                            <span>07:25 AM &mdash; Jason Varga</span>
-                            <span class="badge">Published</span>
-                        </div>
-                        <div class="revision-item-note">Pushed the article live.</div>
-                    </div>
-                </div>
-                <div class="revision-item">
-                    <div class="revision-item-bullet-container">
-                        <i class="revision-item-bullet"></i>
-                    </div>
-                    <div class="revision-item-content">
-                        <div class="flex items-center">
-                            <span>06:58 AM &mdash; André Basse</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Different Day --}}
-            <h6 class="revision-date">March 19, 2019</h6>
-            <div class="revision-list">
-                <div class="revision-item">
-                    <div class="revision-item-bullet-container">
-                        <i class="revision-item-bullet"></i>
-                    </div>
-                    <div class="revision-item-content">
-                        <div class="flex items-center">
-                            <span>05:30 PM &mdash; Jack McDade</span>
-                        </div>
-                        <div class="revision-item-note">Added images.</div>
-                    </div>
-                </div>
-                <div class="revision-item">
-                    <div class="revision-item-bullet-container">
-                        <i class="revision-item-bullet"></i>
-                    </div>
-                    <div class="revision-item-content">
-                        <div class="flex items-center">
-                            <span>03:21 PM &mdash; Jack McDade</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-@stop
 @section('nontent')
 
     <collection-wizard
@@ -83,7 +8,7 @@
 
 @stop
 
-@section('nontent')
+@section('content')
 
     <div class="flex mb-5">
         <h1>{{ __('The Statamic Playground') }}</h1>
@@ -96,9 +21,6 @@
     <div class="shadow bg-white p-4 rounded-lg mb-6">
         <div class="mb-2">
             <input type="text" placeholder="unstyled">
-        </div>
-        <div class="mb-2">
-            <input type="text" class="form-control" placeholder="v2 style">
         </div>
         <div class="mb-2 flex">
             <input type="text" class="input-text" placeholder="v3 style">
@@ -125,8 +47,10 @@
                  </div>
             </div>
         </div>
+        <div class="mb-2">
+            <v-select :multiple="true" :options="['Nintendo 64', 'Super Nintendo', 'Nintendo Gameboy', 'Sega Genesis', 'Sega Game Gear', 'Atari 2600']"></v-select>
+        </div>
     </div>
-
 
     <h2 class="mb-1">Typography</h2>
     <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-6">
