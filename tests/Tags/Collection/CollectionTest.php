@@ -46,6 +46,19 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    function it_throws_an_exception_for_an_invalid_collection()
+    {
+        $this->makePosts();
+
+        $this->collectionTag->parameters = ['from' => 'music|unknown'];
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Collection [unknown] does not exist.');
+
+        $this->collectionTag->index();
+    }
+
+    /** @test */
     function it_gets_entries_from_multiple_collections()
     {
         $this->makePosts();

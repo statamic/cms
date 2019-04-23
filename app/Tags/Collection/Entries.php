@@ -4,13 +4,15 @@ namespace Statamic\Tags\Collection;
 
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\Entry;
+use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 
 class Entries
 {
     use HasConditions;
 
-    protected $collection;
+    protected $collections;
     protected $parameters;
     protected $limit = false;
     protected $offset = false;
@@ -22,21 +24,17 @@ class Entries
     protected $since;
     protected $until;
     protected $sort;
-    protected $ignoredParams = ['from', 'as'];
+    protected $ignoredParams = ['as'];
 
-    public function __construct($collection, $parameters)
+    public function __construct($parameters)
     {
-        $this->collection = API\Collection::whereHandle($collection);
         $this->parameters = $this->parseParameters($parameters);
-
-        if (! $this->collection) {
-            throw new \Exception("Cannot find [{$collection}] collection");
-        }
     }
 
     public function get()
     {
-        $query = $this->collection->queryEntries();
+        $query = Entry::query()
+            ->whereIn('collection', $this->collections->map->handle()->all());
 
         try {
             $this->queryPublished($query);
@@ -67,6 +65,8 @@ class Entries
     {
         $params = array_except($params, $this->ignoredParams);
 
+        $this->collections = $this->parseCollections($params);
+
         $this->limit = Arr::pull($params, 'limit', $this->limit);
         $this->offset = Arr::pull($params, 'offset', $this->offset);
         $this->paginate = Arr::pull($params, 'paginate', $this->paginate);
@@ -89,6 +89,27 @@ class Entries
         return $params;
     }
 
+    protected function parseCollections($params)
+    {
+        $from = $params['from'] ?? $params['folder'] ?? $params['use'] ?? null;
+        $not = $params['not_from'] ?? $params['not_folder'] ?? $params['dont_use'] ?? false;
+
+        $collections = $from === '*'
+            ? Collection::all()->map->handle()
+            : collect(explode('|', $from));
+
+        $excludedCollections = collect(explode('|', $not))->filter();
+
+        return $collections
+            ->reject(function ($collection) use ($excludedCollections) {
+                return $excludedCollections->contains($collection);
+            })->values()->map(function ($handle) {
+                $collection = Collection::whereHandle($handle);
+                throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
+                return $collection;
+            });
+    }
+
     protected function queryPublished($query)
     {
         if ($this->showPublished && $this->showUnpublished) {
@@ -104,7 +125,7 @@ class Entries
 
     protected function queryPastFuture($query)
     {
-        if ($this->collection->order() !== 'date') {
+        if (!$this->allCollectionsAreDates()) {
             return;
         }
 
@@ -121,7 +142,7 @@ class Entries
 
     protected function querySinceUntil($query)
     {
-        if ($this->collection->order() !== 'date') {
+        if (!$this->allCollectionsAreDates()) {
             return;
         }
 
@@ -144,5 +165,23 @@ class Entries
         $direction = explode(':', $this->sort)[1] ?? 'asc';
 
         $query->orderBy($sort, $direction);
+    }
+
+    protected function allCollectionsAreDates()
+    {
+        return $this->allCollectionsAre(function ($collection) {
+            return $collection->order() === 'date';
+        });
+    }
+
+    protected function allCollectionsAre($condition)
+    {
+        foreach ($this->collections as $collection) {
+            if (! $condition($collection)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

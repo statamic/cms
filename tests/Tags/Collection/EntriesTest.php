@@ -26,7 +26,8 @@ class EntriesTest extends TestCase
 
     protected function getEntries($params = [])
     {
-        return (new Entries('test', $params))->get();
+        $params['from'] = 'test';
+        return (new Entries($params))->get();
     }
 
     /** @test */
