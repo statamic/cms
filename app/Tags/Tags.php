@@ -154,7 +154,7 @@ abstract class Tags
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
-            return $antlers->parseLoop($this->content, $this->addScope($data), $supplement, $this->context);
+            return $antlers->parseLoop($this->content, $this->addScope($data), $supplement);
         });
     }
 
