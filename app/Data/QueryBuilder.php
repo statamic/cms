@@ -3,7 +3,7 @@
 namespace Statamic\Data;
 
 use Illuminate\Support\Carbon;
-use Statamic\QueryBuilder as BaseQueryBuilder;
+use Statamic\Query\Builder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder
 {

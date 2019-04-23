@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic;
+namespace Statamic\Query;
 
 use Exception;
 use InvalidArgumentException;
 use Illuminate\Pagination\Paginator;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
-abstract class QueryBuilder
+abstract class Builder
 {
     protected $limit;
     protected $offset = 0;
