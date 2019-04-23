@@ -39,6 +39,7 @@ class Entries
             ->whereIn('collection', $this->collections->map->handle()->all());
 
         try {
+            $this->querySite($query);
             $this->queryPublished($query);
             $this->queryPastFuture($query);
             $this->querySinceUntil($query);
@@ -68,6 +69,7 @@ class Entries
         $params = Arr::except($params, $this->ignoredParams);
 
         $this->collections = $this->parseCollections($params);
+        $this->site = Arr::get($params, 'site') ?? Arr::get($params, 'locale');
 
         $this->limit = Arr::get($params, 'limit');
         $this->offset = Arr::get($params, 'offset');
@@ -107,6 +109,17 @@ class Entries
                 throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
                 return $collection;
             });
+    }
+
+    protected function querySite($query)
+    {
+        if (! $this->site) {
+            return;
+        } elseif ($this->collection->sites()->contains($this->site)) {
+            return $query->where('site', $this->site);
+        }
+
+        throw new NoResultsExpected;
     }
 
     protected function queryPublished($query)

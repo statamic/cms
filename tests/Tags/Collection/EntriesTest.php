@@ -15,7 +15,10 @@ class EntriesTest extends TestCase
     function setUp(): void
     {
         parent::setUp();
-        $this->collection = API\Collection::make('test')->save();
+
+        $this->collection = API\Collection::make('test')
+            ->sites(['en', 'fr'])
+            ->save();
     }
 
     protected function makeEntry()
@@ -54,6 +57,28 @@ class EntriesTest extends TestCase
         $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style
         $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence
         $this->assertCount(5, $this->getEntries(['paginate' => true])); // ignore if no perPage set
+    }
+
+    /** @test */
+    function it_gets_localized_site_entries_in_a_collection()
+    {
+        $this->withoutEvents();
+
+        $this->makeEntry()->set('title', 'One')->save();
+        $this->makeEntry()->set('title', 'Two')->save();
+        $this->makeEntry()->set('title', 'Three')->save();
+
+        $entry = API\Entry::make()->collection($this->collection);
+        $entry->makeAndAddLocalization('fr', function ($loc) { })->set('title', 'Quatre')->save();
+
+        $entry = API\Entry::make()->collection($this->collection);
+        $entry->makeAndAddLocalization('fr', function ($loc) { })->set('title', 'Cinq')->save();
+
+        $this->assertCount(5, $this->getEntries());
+
+        // TODO: Come back and finish these assertions when we finish multi-site propagation stuff...
+        // $this->assertCount(3, $this->getEntries(['site' => 'en']));
+        // $this->assertCount(2, $this->getEntries(['site' => 'fr']));
     }
 
     /** @test */
