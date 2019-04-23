@@ -1,6 +1,13 @@
 @extends('statamic::layout')
 
 @section('content')
+    <collection-wizard
+        :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Route']"
+        route="{{ cp_route('collections.store') }}">
+    </collection-wizard>
+@stop
+
+@section('nontent')
 
     <form method="POST" action="{{ cp_route('collections.store') }}">
         @csrf

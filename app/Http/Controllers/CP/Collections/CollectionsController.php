@@ -95,8 +95,11 @@ class CollectionsController extends CpController
             ->data(array_except($data, 'handle'))
             ->save();
 
-        return redirect($collection->editUrl())
-            ->with('success', 'Collection created.');
+        session()->flash('message', __('Collection created'));
+
+        return [
+            'redirect' => $collection->showUrl()
+        ];
     }
 
     public function update(Request $request, $collection)
