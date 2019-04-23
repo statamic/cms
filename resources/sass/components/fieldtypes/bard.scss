@@ -7,7 +7,11 @@
 }
 
 .bard-editor {
-    @apply text-grey-80 bg-grey-10 shadow-inner p-3 relative;
+    @apply text-grey-80 bg-grey-10 shadow-inner p-0 relative;
+}
+
+.bard-editor .ProseMirror {
+    @apply p-3 min-h-48;
 }
 
 .bard-fixed-toolbar {
