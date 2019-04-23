@@ -16,9 +16,7 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        $this->collection = API\Collection::make('test')
-            ->sites(['en', 'fr'])
-            ->save();
+        $this->collection = API\Collection::make('test')->save();
     }
 
     protected function makeEntry()
@@ -63,6 +61,8 @@ class EntriesTest extends TestCase
     function it_gets_localized_site_entries_in_a_collection()
     {
         $this->withoutEvents();
+
+        $this->collection->sites(['en', 'fr'])->save();
 
         $this->makeEntry()->set('title', 'One')->save();
         $this->makeEntry()->set('title', 'Two')->save();
