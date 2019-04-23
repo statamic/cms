@@ -11,6 +11,12 @@
                 </small>
                 {{ $collection->title() }}
             </h1>
+            <dropdown-list class="mr-2">
+                <ul class="dropdown-menu">
+                    <li><a href="{{ $collection->editUrl() }}">{{ __('Edit Collection') }}</a></li>
+                    <li class="warning"><a href="#">{{ __('Delete Collection') }}</a></li>
+                </ul>
+            </dropdown-list>
             @can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
                 <create-entry-button
                     url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
