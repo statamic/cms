@@ -18,6 +18,7 @@ class Parser
 {
     // Instance state
     protected $cascade;
+    protected $view;
     protected $allowPhp = false;
     protected $inCondition = false;
     protected $data = null;
@@ -106,6 +107,19 @@ class Parser
         $this->cascade = $cascade;
 
         return $this;
+    }
+
+    public function parseView($view, $text, $data = [])
+    {
+        $existingView = $this->view;
+
+        $this->view = $view;
+
+        $parsed = $this->parse($text, $data);
+
+        $this->view = $existingView;
+
+        return $parsed;
     }
 
     /**
@@ -1082,6 +1096,14 @@ class Parser
             // If it's not found in the context, we'll try looking for it in the cascade.
             if ($cascading = $this->cascade->get($first)) {
                 return $this->getVariableExistenceAndValue($rest, $cascading);
+            }
+
+            // If the first part of the variable is "view", we'll try to get the value from
+            // the front-matter, which is stored in the cascade organized by the view paths.
+            if ($first == 'view') {
+                if ($cascading = $this->cascade->get("views.{$this->view}")) {
+                    return $this->getVariableExistenceAndValue($rest, $cascading);
+                }
             }
 
             return [false, null];
