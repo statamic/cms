@@ -108,4 +108,24 @@ class Arr extends IlluminateArr
                 : !in_array($item, [null, ''], true);
         });
     }
+
+    /**
+     * Get the first item from an array using a list of keys.
+     *
+     * @param \ArrayAccess|array $array
+     * @param array $keys
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function getFirst($array, $keys, $default = null)
+    {
+        $value = collect($keys)
+            ->map(function ($key) use ($array) {
+                return static::get($array, $key);
+            })
+            ->filter()
+            ->first();
+
+        return $value ?? $default;
+    }
 }
