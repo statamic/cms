@@ -8,6 +8,7 @@ use Statamic\API\Path;
 use Statamic\API\Parse;
 use Statamic\Exceptions;
 use Illuminate\Support\Collection;
+use Facades\Statamic\View\Cascade;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Extend\Management\TagLoader;
 use Illuminate\Contracts\View\Engine as EngineInterface;
@@ -89,9 +90,13 @@ class Engine implements EngineInterface
         // If the data has provided front matter with this special key, it will override
         // front matter defined in the view itself. This is typically used by partials.
         // ie. data defined in the partial tag parameters will win the array merge.
-        $frontMatter = array_merge($frontMatter, $data['__frontmatter'] ?? []);
+        $frontMatter = array_merge($frontMatter, Arr::pull($data, '__frontmatter', []));
 
-        $contents = $parser->parse($contents, array_merge($data, $frontMatter));
+        $views = Cascade::get('views', []);
+        $views[$path] = $frontMatter;
+        Cascade::set('views', $views);
+
+        $contents = $parser->parseView($path, $contents, $data);
 
         if ($this->injectExtractions) {
             $contents = $parser->injectNoparse($contents);

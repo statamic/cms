@@ -3,6 +3,7 @@
 namespace Tests\View\Antlers;
 
 use Tests\TestCase;
+use Statamic\Tags\Tags;
 use Statamic\API\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
@@ -151,6 +152,25 @@ EOT;
         $template = "{{ missing }}";
 
         $this->assertEquals('', Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
+    function accessing_strings_as_arrays_returns_null()
+    {
+        $this->assertEquals('bar, ><', Antlers::parse('{{ foo }}, >{{ foo:test }}<', ['foo' => 'bar']));
+    }
+
+    /** @test */
+    function accessing_string_as_array_which_exists_as_callback_calls_the_callback()
+    {
+        (new class extends Tags {
+            public static $handle = 'foo';
+            public function test() {
+                return 'callback';
+            }
+        })::register();
+
+        $this->assertEquals('bar, callback', Antlers::parse('{{ foo }}, {{ foo:test }}', ['foo' => 'bar']));
     }
 
     /** @test */
@@ -502,34 +522,44 @@ EOT;
     /** @test */
     function it_doesnt_parse_noparse_tags_inside_callbacks_and_requires_extractions_to_be_reinjected()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function array() {
+                return [];
+            }
+            public function loop()
+            {
+                return [
+                    ['string' => 'One'],
+                    ['string' => 'Two'],
+                ];
+            }
+        })::register();
 
         $parser = Antlers::parser();
 
 $template = <<<EOT
-{{ test:some_parsing }}{{ noparse }}{{ string }}{{ /noparse }}{{ /test:some_parsing }}
-{{ test:some_loop_parsing }}
+{{ tag:array }}{{ noparse }}{{ string }}{{ /noparse }}{{ /tag:array }}
+{{ tag:loop }}
     {{ index }} {{ noparse }}{{ string }}{{ /noparse }} {{ string }}
-{{ /test:some_loop_parsing }}
+{{ /tag:loop }}
 EOT;
 
 $expectedBeforeInjection = <<<EOT
 noparse_ac3458695912d204af897d3c67f93cbe
-    1 noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness
-    2 noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness
-
+    1 noparse_ac3458695912d204af897d3c67f93cbe One
+    2 noparse_ac3458695912d204af897d3c67f93cbe Two
 EOT;
 
 $expectedAfterInjection = <<<EOT
 {{ string }}
-    1 {{ string }} Hello wilderness
-    2 {{ string }} Hello wilderness
-
+    1 {{ string }} One
+    2 {{ string }} Two
 EOT;
 
         $parsed = $parser->parse($template, $this->variables);
-        $this->assertEquals($expectedBeforeInjection, $parsed);
-        $this->assertEquals($expectedAfterInjection, $parser->injectNoparse($parsed));
+        $this->assertEquals($expectedBeforeInjection, trim($parsed));
+        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
     }
 
     /** @test */
@@ -537,38 +567,53 @@ EOT;
     {
         $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
 
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function array() {
+                return [
+                    'string' => 'hello',
+                    'content' => 'beforesingle {{ string }} aftersingle',
+                ];
+            }
+            public function loop()
+            {
+                return [
+                    [
+                        'string' => 'One',
+                        'content' => 'beforepair {{ string }} afterpair',
+                    ],
+                    [
+                        'string' => 'Two',
+                        'content' => 'beforepair {{ string }} afterpair',
+                    ],
+                ];
+            }
+        })::register();
+
         $parser = Antlers::parser();
 
-        $variables = [
-            'string' => 'hello',
-            'content_for_single_tag' => 'beforesingle {{ string }} aftersingle',
-            'content_for_tag_pair' => 'beforepair {{ string }} afterpair',
-        ];
-
 $template = <<<EOT
-{{ test:some_parsing }}{{ content_for_single_tag | noparse }}{{ /test:some_parsing }}
-{{ test:some_loop_parsing }}
-    {{ index }} {{ content_for_tag_pair | noparse }} {{ string }}
-{{ /test:some_loop_parsing }}
+{{ tag:array }}{{ content | noparse }}{{ /tag:array }}
+{{ tag:loop }}
+    {{ index }} {{ content | noparse }} {{ string }}
+{{ /tag:loop }}
 EOT;
 
 $expectedBeforeInjection = <<<EOT
 noparse_0548be789865a16ab6e495f84a3080c0
-    1 noparse_aa4a7fa8e2faf61751b68038fee92c4d hello
-    2 noparse_aa4a7fa8e2faf61751b68038fee92c4d hello
-
+    1 noparse_aa4a7fa8e2faf61751b68038fee92c4d One
+    2 noparse_aa4a7fa8e2faf61751b68038fee92c4d Two
 EOT;
 
 $expectedAfterInjection = <<<EOT
 beforesingle {{ string }} aftersingle
-    1 beforepair {{ string }} afterpair hello
-    2 beforepair {{ string }} afterpair hello
-
+    1 beforepair {{ string }} afterpair One
+    2 beforepair {{ string }} afterpair Two
 EOT;
 
-        $parsed = $parser->parse($template, $variables);
-        $this->assertEquals($expectedBeforeInjection, $parsed);
-        $this->assertEquals($expectedAfterInjection, $parser->injectNoparse($parsed));
+        $parsed = $parser->parse($template);
+        $this->assertEquals($expectedBeforeInjection, trim($parsed));
+        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
     }
 
     /** @test */
@@ -811,55 +856,71 @@ EOT;
     /** @test */
     function callback_tags_that_return_unparsed_simple_arrays_get_parsed()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['one' => 'a', 'two' => 'b'];
+            }
+        })::register();
 
         $template = <<<EOT
-{{ string }}
-{{ test:return_simple_array }}
-    {{ one }} {{ two }} {{ string }}
-{{ /test:return_simple_array }}
+{{ tag }}
+    {{ one }} {{ two }}
+{{ /tag }}
 EOT;
 
         $expected = <<<EOT
-Hello wilderness
-    a b Hello wilderness
+    a b
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, Antlers::parse($template));
     }
 
     /** @test */
     function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [
+                    ['one' => 'a', 'two' => 'b'],
+                    ['one' => 'c', 'two' => 'd'],
+                ];
+            }
+        })::register();
 
         $template = <<<EOT
 {{ string }}
-{{ test:return_multidimensional_array }}
-    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
-{{ /test:return_multidimensional_array }}
+{{ tag }}
+    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+{{ /tag }}
 EOT;
 
         $expected = <<<EOT
 Hello wilderness
-    1 first not-last a b Hello wilderness
-    2 not-first last c d Hello wilderness
+    1 first not-last a b ><
+    2 not-first last c d ><
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, Antlers::parse($template, ['string' => 'Hello wilderness']));
     }
 
     /** @test */
     function callback_tags_that_return_empty_arrays_get_parsed_with_no_results()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [];
+            }
+        })::register();
 
         $template = <<<EOT
-{{ test:return_empty_array }}
+{{ tag }}
     {{ if no_results }}no results{{ else }}there are results{{ /if }}
-{{ /test:return_empty_array }}
+{{ /tag }}
 EOT;
 
         $expected = <<<EOT
@@ -872,19 +933,27 @@ EOT;
     /** @test */
     function callback_tags_that_return_collections_get_parsed()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return collect([
+                    ['one' => 'a', 'two' => 'b'],
+                    ['one' => 'c', 'two' => 'd'],
+                ]);
+            }
+        })::register();
 
         $template = <<<EOT
 {{ string }}
-{{ test:return_collection }}
-    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
-{{ /test:return_collection }}
+{{ tag }}
+    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+{{ /tag }}
 EOT;
 
         $expected = <<<EOT
 Hello wilderness
-    1 first not-last a b Hello wilderness
-    2 not-first last c d Hello wilderness
+    1 first not-last a b ><
+    2 not-first last c d ><
 
 EOT;
 
@@ -921,6 +990,169 @@ EOT;
                 'object' => $augmentable
             ])
         );
+    }
+
+    /** @test */
+    function callback_tag_pair_context_is_limited_to_its_own_variables()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['drink' => 'juice'];
+            }
+        })::register();
+
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ tag }}{{ drink }} {{ food }}{{ /tag }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>juice <
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function variable_tag_pair_context_is_limited_to_its_own_variables()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => ['drink' => 'juice']
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ array }}{{ drink }} {{ food }}{{ /array }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>juice <
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function tags_can_access_context()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [
+                    'parameter' => $this->context['food'],
+                    'drink' => 'juice',
+                ];
+            }
+        })::register();
+
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ tag }}{{ parameter }} {{ drink }} {{ food }}{{ /tag }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>burger juice <
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function it_can_reach_into_the_cascade()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $m->shouldReceive('get')->with('page')->once()->andReturn(['drink' => 'juice']);
+            $m->shouldReceive('get')->with('global')->once()->andReturn(['drink' => 'water']);
+            $m->shouldReceive('get')->with('menu')->once()->andReturn(['drink' => 'vodka']);
+            $m->shouldNotReceive('get')->with('nested');
+            $m->shouldNotReceive('get')->with('augmented');
+        });
+
+        $parser = Antlers::parser()->cascade($cascade);
+
+        $fieldtype = new class extends Fieldtype {};
+        $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
+
+        $context = [
+            'drink' => 'whisky',
+            'augmented' => $augmented,
+            'nested' => [
+                'drink' => 'coke',
+                'augmented' => $augmented,
+            ]
+        ];
+
+        $template = <<<EOT
+var: {{ drink }}
+page: {{ page:drink }}
+global: {{ global:drink }}
+menu: {{ menu:drink }}
+nested: {{ nested:drink }}
+augmented: {{ augmented:drink }}
+nested augmented: {{ nested:augmented:drink }}
+EOT;
+
+        $expected = <<<EOT
+var: whisky
+page: juice
+global: water
+menu: vodka
+nested: coke
+augmented: la croix
+nested augmented: la croix
+EOT;
+
+        $this->assertEquals($expected, $parser->parse($template, $context));
+    }
+
+    /** @test */
+    function it_can_create_scopes()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => ['drink' => 'juice']
+        ];
+
+        $template = <<<EOT
+{{ scope:test }}
+drink: {{ drink }}
+food: {{ food }}
+
+{{ array }}
+    array:drink: {{ drink }}
+    array:food: >{{ food }}<
+    array:test:drink: {{ test:drink }}
+    array:test:food: {{ test:food }}
+{{ /array }}
+{{ /scope:test }}
+EOT;
+
+        $expected = <<<EOT
+drink: whisky
+food: burger
+
+    array:drink: juice
+    array:food: ><
+    array:test:drink: whisky
+    array:test:food: burger
+EOT;
+
+        $this->assertEquals($expected, trim(Antlers::parse($template, $context)));
     }
 }
 

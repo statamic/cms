@@ -35,10 +35,9 @@ class Antlers
      * @param string  $content
      * @param array   $data
      * @param bool    $supplement
-     * @param array   $context
      * @return string
      */
-    public function parseLoop($content, $data, $supplement, $context)
+    public function parseLoop($content, $data, $supplement)
     {
         $output = '';
         $i      = 1;
@@ -54,7 +53,7 @@ class Antlers
                 $item['total_results'] = $total;
             }
 
-            $output .= $this->parse($content, array_merge($context, $item));
+            $output .= $this->parse($content, $item);
             $i++;
         }
 

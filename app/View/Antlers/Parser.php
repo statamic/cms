@@ -17,6 +17,8 @@ use Illuminate\Contracts\Support\Arrayable;
 class Parser
 {
     // Instance state
+    protected $cascade;
+    protected $view;
     protected $allowPhp = false;
     protected $inCondition = false;
     protected $data = null;
@@ -100,6 +102,26 @@ class Parser
         return $this;
     }
 
+    public function cascade($cascade)
+    {
+        $this->cascade = $cascade;
+
+        return $this;
+    }
+
+    public function parseView($view, $text, $data = [])
+    {
+        $existingView = $this->view;
+
+        $this->view = $view;
+
+        $parsed = $this->parse($text, $data);
+
+        $this->view = $existingView;
+
+        return $parsed;
+    }
+
     /**
      * Kick off the Antlers parse process
      *
@@ -110,10 +132,6 @@ class Parser
     public function parse($text, $data = [])
     {
         $data = $this->normalizeData($data);
-
-        // Let's store the current callback data with the the local data
-        // so we can use it straight after a callback is called.
-        $this->callbackData = $data;
 
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
@@ -253,9 +271,8 @@ class Parser
             // so it can be parsed over like the other cases, and then we'll pick out the first one after.
             $value = ($associative = Arr::assoc($value)) ? [$value] : $this->addLoopIterationVariables($value);
 
-            $parses = collect($value)->map(function ($iteration) use ($contents, $data) {
-                $data = $iteration + $data;
-                return $this->parseLoopInstance($contents, $data);
+            $parses = collect($value)->map(function ($iteration) use ($contents) {
+                return $this->parseLoopInstance($contents, $iteration);
             });
 
             // Again, associative arrays just need the single iteration, so we'll grab
@@ -527,7 +544,9 @@ class Parser
 
             $replacement = call_user_func_array($this->callback, [$this, $name, $parameters, $content, $data]);
 
-            $replacement = $this->parseRecursives($replacement, $content);
+            // Commenting out this line makes no change to parser test coverage.
+            // TODO: Work out what it's supposed to be doing and write a test.
+            // $replacement = $this->parseRecursives($replacement, $content);
 
             // look for tag pairs and (plugin) callbacks
             if ($name != "content" && !$replacement) {
@@ -580,7 +599,7 @@ class Parser
         }
 
         // parse for recursives, as they may not have been parsed yet
-        $text = $this->parseRecursives($text, $this->original_text);
+        $text = $this->parseRecursives($text, $this->original_text, $data);
 
         // re-inject any extractions
         $text = $this->injectExtractions($text, '__variables_not_callbacks');
@@ -752,7 +771,7 @@ class Parser
      * @param  string $orig_text  The original text, before a callback is called.
      * @return string $text
      */
-    public function parseRecursives($text, $orig_text)
+    public function parseRecursives($text, $orig_text, $data)
     {
         // Is there a {{ *recursive [array_key]* }} tag here, let's loop through it.
         if (preg_match($this->recursiveRegex, $text, $match)) {
@@ -762,12 +781,12 @@ class Parser
             // check to see if the recursive variable we're looking for is set
             // within the current data for this run-through, if it isn't, just
             // abort and return the text
-            if (!array_get_colon($this->callbackData, $array_key)) {
+            if (!array_get_colon($data, $array_key)) {
                 return $text;
             }
 
             $next_tag = null;
-            $children = array_get_colon($this->callbackData, $array_key);
+            $children = array_get_colon($data, $array_key);
 
             // if the array key is scoped, we'll add a scope to the array
             if (strpos($array_key, ':') !== false) {
@@ -810,7 +829,7 @@ class Parser
                 $text = str_replace($current_tag, $replacement . $next_tag, $text);
 
                 if ($has_children) {
-                    $text = $this->parseRecursives($text, $orig_text);
+                    $text = $this->parseRecursives($text, $orig_text, $data);
                 }
 
                 $count++;
@@ -1074,6 +1093,19 @@ class Parser
         list($first, $rest) = explode(':', $key, 2);
 
         if (! array_has_colon($context, $first)) {
+            // If it's not found in the context, we'll try looking for it in the cascade.
+            if ($cascading = $this->cascade->get($first)) {
+                return $this->getVariableExistenceAndValue($rest, $cascading);
+            }
+
+            // If the first part of the variable is "view", we'll try to get the value from
+            // the front-matter, which is stored in the cascade organized by the view paths.
+            if ($first == 'view') {
+                if ($cascading = $this->cascade->get("views.{$this->view}")) {
+                    return $this->getVariableExistenceAndValue($rest, $cascading);
+                }
+            }
+
             return [false, null];
         }
 
@@ -1084,7 +1116,11 @@ class Parser
         }
 
         // It will do this recursively until it's out of colon delimiters or values.
-        return $this->getVariableExistenceAndValue($rest, $context);
+        if (is_array($context)) {
+            return $this->getVariableExistenceAndValue($rest, $context);
+        }
+
+        return [false, null];
     }
 
     /**

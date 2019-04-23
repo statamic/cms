@@ -27,7 +27,9 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(Parser::class, function ($app) {
-            return (new Parser)->callback([Engine::class, 'renderTag']);
+            return (new Parser)
+                ->callback([Engine::class, 'renderTag'])
+                ->cascade($app[Cascade::class]);
         });
 
         $this->app->singleton(Engine::class, function ($app) {
