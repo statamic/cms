@@ -69,7 +69,7 @@ class Entries
         $params = Arr::except($params, $this->ignoredParams);
 
         $this->collections = $this->parseCollections($params);
-        $this->site = Arr::get($params, 'site') ?? Arr::get($params, 'locale');
+        $this->site = Arr::getFirst($params, ['site', 'locale']);
 
         $this->limit = Arr::get($params, 'limit');
         $this->offset = Arr::get($params, 'offset');
