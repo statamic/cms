@@ -15,18 +15,22 @@ class HasConditionsTest extends TestCase
     function setUp(): void
     {
         parent::setUp();
+
         $this->collection = API\Collection::make('test')->save();
     }
 
     protected function makeEntry()
     {
         $entry = API\Entry::make()->collection($this->collection);
+
         return $entry->makeAndAddLocalization('en', function ($loc) { });
     }
 
     protected function getEntries($params = [])
     {
-        return (new Entries('test', $params))->get();
+        $params['from'] = 'test';
+
+        return (new Entries($params))->get();
     }
 
     /** @test */

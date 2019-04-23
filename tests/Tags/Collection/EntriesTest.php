@@ -22,12 +22,14 @@ class EntriesTest extends TestCase
     protected function makeEntry()
     {
         $entry = API\Entry::make()->collection($this->collection);
+
         return $entry->makeAndAddLocalization('en', function ($loc) { });
     }
 
     protected function getEntries($params = [])
     {
         $params['from'] = 'test';
+
         return (new Entries($params))->get();
     }
 
