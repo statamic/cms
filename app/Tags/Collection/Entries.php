@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags\Collection;
 
+use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Entry;
@@ -13,18 +14,19 @@ class Entries
     use HasConditions;
 
     protected $collections;
+    protected $ignoredParams = ['as'];
     protected $parameters;
-    protected $limit = false;
-    protected $offset = false;
-    protected $paginate = false;
-    protected $showPublished = true;
-    protected $showUnpublished = false;
-    protected $showPast = true;
-    protected $showFuture = false;
+    protected $site;
+    protected $limit;
+    protected $offset;
+    protected $paginate;
+    protected $showPublished;
+    protected $showUnpublished;
+    protected $showPast;
+    protected $showFuture;
     protected $since;
     protected $until;
     protected $sort;
-    protected $ignoredParams = ['as'];
 
     public function __construct($parameters)
     {
@@ -63,47 +65,44 @@ class Entries
 
     protected function parseParameters($params)
     {
-        $params = array_except($params, $this->ignoredParams);
+        $params = Arr::except($params, $this->ignoredParams);
 
         $this->collections = $this->parseCollections($params);
 
-        $this->limit = Arr::pull($params, 'limit', $this->limit);
-        $this->offset = Arr::pull($params, 'offset', $this->offset);
-        $this->paginate = Arr::pull($params, 'paginate', $this->paginate);
+        $this->limit = Arr::get($params, 'limit');
+        $this->offset = Arr::get($params, 'offset');
+        $this->paginate = Arr::get($params, 'paginate');
 
         if ($this->paginate === true) {
             $this->paginate = $this->limit;
         }
 
-        $this->showPublished = Arr::pull($params, 'show_published', $this->showPublished);
-        $this->showUnpublished = Arr::pull($params, 'show_unpublished', $this->showUnpublished);
+        $this->showPublished = Arr::get($params, 'show_published', true);
+        $this->showUnpublished = Arr::get($params, 'show_unpublished', false);
+        $this->showPast = Arr::get($params, 'show_past', true);
+        $this->showFuture = Arr::get($params, 'show_future', false);
+        $this->since = Arr::get($params, 'since');
+        $this->until = Arr::get($params, 'until');
 
-        $this->showPast = Arr::pull($params, 'show_past', $this->showPast);
-        $this->showFuture = Arr::pull($params, 'show_future', $this->showFuture);
-
-        $this->since = Arr::pull($params, 'since', $this->since);
-        $this->until = Arr::pull($params, 'until', $this->until);
-
-        $this->sort = Arr::pull($params, 'sort', $this->sort);
+        $this->sort = Arr::get($params, 'sort');
 
         return $params;
     }
 
     protected function parseCollections($params)
     {
-        $from = $params['from'] ?? $params['folder'] ?? $params['use'] ?? null;
-        $not = $params['not_from'] ?? $params['not_folder'] ?? $params['dont_use'] ?? false;
+        $from = Arr::getFirst($params, ['from', 'folder', 'use']);
+        $not = Arr::getFirst($params, ['not_from', 'not_folder', 'dont_use']);
 
         $collections = $from === '*'
-            ? Collection::all()->map->handle()
+            ? collect(Collection::handles())
             : collect(explode('|', $from));
 
         $excludedCollections = collect(explode('|', $not))->filter();
 
         return $collections
-            ->reject(function ($collection) use ($excludedCollections) {
-                return $excludedCollections->contains($collection);
-            })->values()->map(function ($handle) {
+            ->diff($excludedCollections)
+            ->map(function ($handle) {
                 $collection = Collection::whereHandle($handle);
                 throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
                 return $collection;
@@ -125,7 +124,7 @@ class Entries
 
     protected function queryPastFuture($query)
     {
-        if (!$this->allCollectionsAreDates()) {
+        if (! $this->allCollectionsAreDates()) {
             return;
         }
 
@@ -142,7 +141,7 @@ class Entries
 
     protected function querySinceUntil($query)
     {
-        if (!$this->allCollectionsAreDates()) {
+        if (! $this->allCollectionsAreDates()) {
             return;
         }
 
@@ -174,14 +173,10 @@ class Entries
         });
     }
 
-    protected function allCollectionsAre($condition)
+    protected function allCollectionsAre(Closure $condition)
     {
-        foreach ($this->collections as $collection) {
-            if (! $condition($collection)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->collections->reject(function ($collection) use ($condition) {
+            return $condition($collection);
+        })->isEmpty();
     }
 }
