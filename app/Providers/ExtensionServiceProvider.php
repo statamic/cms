@@ -115,6 +115,52 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Fieldtype::class,
     ];
 
+    protected $tags = [
+        Tags\Asset::class,
+        Tags\Assets::class,
+        Tags\Cache::class,
+        Tags\Can::class,
+        Tags\Collection\Collection::class,
+        Tags\Dump::class,
+        Tags\Entries::class,
+        Tags\Env::class,
+        Tags\GetContent::class,
+        Tags\GetFiles::class,
+        Tags\Glide::class,
+        Tags\In::class,
+        Tags\Is::class,
+        Tags\Link::class,
+        Tags\Locales::class,
+        Tags\Markdown::class,
+        Tags\Member::class,
+        Tags\Mix::class,
+        Tags\Nav::class,
+        Tags\NotFound::class,
+        Tags\OAuth::class,
+        Tags\Obfuscate::class,
+        Tags\Pages::class,
+        Tags\ParentTags::class,
+        Tags\Partial::class,
+        Tags\Path::class,
+        Tags\Redirect::class,
+        Tags\Relate::class,
+        Tags\Rotate::class,
+        Tags\Routes::class,
+        Tags\Scope::class,
+        Tags\Section::class,
+        Tags\Taxonomy::class,
+        Tags\Theme::class,
+        Tags\Trans::class,
+        Tags\TransChoice::class,
+        Tags\Users::class,
+        Tags\Widont::class,
+        Tags\Yields::class,
+        \Statamic\Forms\Tags::class,
+        \Statamic\Auth\UserTags::class,
+        \Statamic\Auth\Protect\Tags::class,
+        \Statamic\Search\Tags::class,
+    ];
+
     /**
      * Register any application services.
      *
@@ -145,22 +191,9 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $parent = 'statamic.tags';
 
-        $tags = [
-            Tags\Asset::class, Tags\Assets::class, Tags\Cache::class, Tags\Can::class, Tags\Collection\Collection::class,
-            Tags\Dump::class, Tags\Entries::class, Tags\Env::class, Tags\GetContent::class, Tags\GetFiles::class,
-            Tags\Glide::class, Tags\In::class, Tags\Is::class, Tags\Link::class, Tags\Locales::class,
-            Tags\Markdown::class, Tags\Member::class, Tags\Mix::class, Tags\Nav::class, Tags\NotFound::class,
-            Tags\OAuth::class, Tags\Obfuscate::class, Tags\Pages::class, Tags\ParentTags::class, Tags\Partial::class,
-            Tags\Path::class, Tags\Redirect::class, Tags\Relate::class, Tags\Rotate::class, Tags\Routes::class,
-            Tags\Section::class, Tags\Taxonomy::class, Tags\Theme::class, Tags\Trans::class, Tags\TransChoice::class,
-            Tags\Users::class, Tags\Widont::class, Tags\Yields::class, \Statamic\Forms\Tags::class,
-            \Statamic\Auth\UserTags::class, \Statamic\Auth\Protect\Tags::class, \Statamic\Search\Tags::class,
-            Tags\Scope::class,
-        ];
-
         $this->registerParent($parent);
 
-        foreach ($tags as $tag) {
+        foreach ($this->tags as $tag) {
             $this->registerExtension($tag, $parent);
             $this->registerAliases($tag, $parent);
         }
