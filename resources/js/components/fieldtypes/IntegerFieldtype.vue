@@ -5,7 +5,10 @@
         :name="name"
         :autofocus="autofocus"
         :value="value"
+        :is-read-only="isReadOnly"
         @input="update"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
     />
 </template>
 
