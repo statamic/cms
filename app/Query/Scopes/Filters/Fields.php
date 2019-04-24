@@ -1,10 +1,9 @@
 <?php
 
-namespace Statamic\Filters;
+namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\API;
 use Statamic\API\Blueprint;
-use Statamic\Filters\Filter;
 
 class Fields extends Filter
 {

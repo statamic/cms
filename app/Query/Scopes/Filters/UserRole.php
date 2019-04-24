@@ -1,9 +1,8 @@
 <?php
 
-namespace Statamic\Filters;
+namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\API\Role;
-use Statamic\Filters\Filter;
 
 class UserRole extends Filter
 {
