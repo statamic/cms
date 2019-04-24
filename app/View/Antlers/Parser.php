@@ -679,29 +679,32 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match($this->variableTagRegex, $text, $matches)) {
+        if (preg_match_all($this->variableTagRegex, $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
 
-            // Check for the basic components of a ternary evaluation
-            if (strpos($matches[1], ' ? ') && strpos($matches[1], ' : ')) {
+                // Check for the basic components of a ternary evaluation
+                if (strpos($match[1], ' ? ') && strpos($match[1], ' : ')) {
 
-                // Split the tag up
-                $bits = explode(' ? ', $matches[1]);
+                    // Split the tag up
+                    $bits = explode(' ? ', $match[1]);
 
-                // Parse the condition side of the statement
-                $condition = $this->processCondition(trim($bits[0]), $data);
+                    // Parse the condition side of the statement
+                    $condition = $this->processCondition(trim($bits[0]), $data);
 
-                // Collect the rest of the data
-                list($if_true, $if_false) = explode(' : ', $bits[1]);
+                    // Collect the rest of the data
+                    list($if_true, $if_false) = explode(' : ', $bits[1]);
 
-                // Build a PHP string to evaluate
-                $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
+                    // Build a PHP string to evaluate
+                    $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
 
-                // Do the evaluation
-                $output = $this->parsePhp($conditional);
+                    // Do the evaluation
+                    $output = $this->parsePhp($conditional);
 
-                // Slide it on back into the template
-                $text = str_replace($matches[0], $output, $text);
+                    // Slide it on back into the template
+                    $text = str_replace($match[0], $output, $text);
+                }
             }
+
         }
 
         return $text;
