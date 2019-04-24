@@ -55,6 +55,10 @@ class Bard extends Replicator
         'fullscreen' => [
             'type' => 'toggle',
             'default' => true,
+        ],
+        'allow_source' => [
+            'type' => 'toggle',
+            'default' => true,
         ]
     ];
 
