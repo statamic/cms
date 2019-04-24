@@ -4,8 +4,8 @@ namespace Statamic\Providers;
 
 use Statamic\Tags;
 use Statamic\Actions;
-use Statamic\Filters;
 use Statamic\DataStore;
+use Statamic\Query\Scopes;
 use Statamic\Extend\Modifier;
 use Statamic\Fields\Fieldtypes;
 use Statamic\View\BaseModifiers;
@@ -283,12 +283,11 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $parent = 'statamic.scopes';
 
-        // TODO
         $scopes = [
-            // Filters\Fields::class,
-            // Filters\Site::class,
-            // Filters\UserRole::class,
-            // Filters\UserGroup::class,
+            Scopes\Filters\Fields::class,
+            Scopes\Filters\Site::class,
+            Scopes\Filters\UserRole::class,
+            Scopes\Filters\UserGroup::class,
         ];
 
         $this->registerParent($parent);
