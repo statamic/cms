@@ -2,6 +2,8 @@
 
 namespace Statamic\Query\Scopes;
 
+use Statamic\Query\Scopes\Filters\Filter;
+
 class Repository
 {
     public function all()
@@ -11,9 +13,12 @@ class Repository
         })->values();
     }
 
-    public function for($key, $context = [])
+    public function filters($key, $context = [])
     {
         return $this->all()
+            ->filter(function ($filter) {
+                return $filter instanceof Filter;
+            })
             ->each->context($context)
             ->filter->visibleTo($key)
             ->values();
