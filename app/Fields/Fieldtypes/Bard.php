@@ -51,6 +51,10 @@ class Bard extends Replicator
         'reading_time' => [
             'type' => 'toggle',
             'default' => false,
+        ],
+        'fullscreen' => [
+            'type' => 'toggle',
+            'default' => true,
         ]
     ];
 
