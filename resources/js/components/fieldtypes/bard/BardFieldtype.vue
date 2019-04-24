@@ -134,7 +134,7 @@ export default {
             html: null,
             json: null,
             showSource: false,
-            fullScreenMode: false, // todo
+            fullScreenMode: false,
             buttons: [],
         }
     },
