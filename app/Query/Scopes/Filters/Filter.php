@@ -1,18 +1,16 @@
 <?php
 
-namespace Statamic\Filters;
+namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Fields\Fields;
 use Statamic\Extend\HasTitle;
-use Statamic\Extend\HasHandle;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
 
-abstract class Filter implements Arrayable
+abstract class Filter extends Scope implements Arrayable
 {
-    use HasTitle, HasHandle, RegistersItself;
-
-    protected static $binding = 'filters';
+    use HasTitle;
 
     protected $context = [];
     protected $field;
