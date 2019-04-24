@@ -1,5 +1,5 @@
 <template>
-    <select-input :name="name" :value="value" @input="update" :options="options" />
+    <select-input :name="name" :value="value" @input="update" :options="options" :is-read-only="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
     <!-- <v-select :options="['foo', 'bar']"></v-select> -->
 </template>
 
