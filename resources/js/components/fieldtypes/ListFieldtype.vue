@@ -4,38 +4,48 @@
         :vertical="true"
         item-class="sortable-row"
         handle-class="sortable-handle"
+        @dragstart="$emit('focus')"
+        @dragend="$emit('blur')"
     >
-        <ul ref="list">
-            <li class="sortable-row"
+        <ul ref="list" class="outline-none">
+            <li class="sortable-row outline-none"
                 v-for="(item, index) in data"
                 :key="item._id"
                 :class="{ editing: (editing === index) }"
             >
-                <span v-if="editing === index">
-                    <input
-                        type="text"
-                        class="w-full"
-                        v-model="data[index].value"
-                        @keydown.enter.prevent="saveAndAddNewItem"
-                        @keyup.up="previousItem"
-                        @keyup.down="nextItem"
-                        @focus="editItem(index)"
-                    />
+                <span v-if="isReadOnly">
+                    {{ data[index].value }}
                 </span>
-                <span v-else @click.prevent="editItem(index)">
-                    <span class="sortable-handle">{{ item.value }}</span>
-                    <i class="delete" @click="deleteItem(index)"></i>
-                </span>
+                <template v-if="!isReadOnly">
+                    <span v-if="editing === index">
+                        <input
+                            type="text"
+                            class="w-full"
+                            v-model="data[index].value"
+                            :readonly="isReadOnly"
+                            @keydown.enter.prevent="saveAndAddNewItem"
+                            @keyup.up="previousItem"
+                            @keyup.down="nextItem"
+                            @focus="editItem(index)"
+                            @blur="focused = false"
+                        />
+                    </span>
+                    <span v-else @click.prevent="editItem(index)">
+                        <span class="sortable-handle">{{ item.value }}</span>
+                        <i class="delete" @click="deleteItem(index)"></i>
+                    </span>
+                </template>
             </li>
             <li>
                 <input
+                    v-if="!isReadOnly"
                     type="text"
                     class="w-full"
                     v-model="newItem"
                     ref="newItem"
                     :placeholder="`${__('Add an item')}...`"
                     @keydown.enter.prevent="addItem"
-                    @blur="addItem"
+                    @blur="newItemInputBlurred"
                     @focus="editItem(data.length)"
                     @keyup.up="previousItem"
                 />
@@ -61,6 +71,7 @@ export default {
             data: [],
             newItem: '',
             editing: null,
+            focused: false,
         }
     },
 
@@ -76,9 +87,22 @@ export default {
             }
         },
 
-        value(value, oldValue) {
-            if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
             this.data = this.arrayToSortable(value);
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                    this.editing = null;
+                }
+            }, 1);
         }
     },
 
@@ -101,7 +125,14 @@ export default {
             });
         },
 
+        newItemInputBlurred() {
+            this.addItem();
+            this.focused = false;
+        },
+
         focusItem() {
+            this.focused = true;
+
             return this.editing === this.data.length
                 ? this.$refs.newItem.focus()
                 : this.$refs.list.querySelector('.editing input').select();
