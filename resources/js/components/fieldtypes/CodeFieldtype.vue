@@ -5,7 +5,7 @@
     </div>
 </template>
 
-<style src="codemirror/theme/material.css" />
+<style src="codemirror/theme/material.css"></style>
 
 <script>
 import CodeMirror from 'codemirror'
