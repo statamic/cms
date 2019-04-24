@@ -139,7 +139,7 @@ class Bard extends Replicator
 
     public function isLegacyData($value)
     {
-        $configuredTypes = array_keys($this->config('sets'));
+        $configuredTypes = array_keys($this->config('sets', []));
         $configuredTypes[] = 'text';
         $dataTypes = collect($value)->map->type;
 
