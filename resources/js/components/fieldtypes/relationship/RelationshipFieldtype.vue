@@ -92,7 +92,7 @@ export default {
         },
 
         canReorder() {
-            return this.config.max_items > 1;
+            return this.maxItems > 1;
         },
 
         statusIcons() {
