@@ -56,10 +56,10 @@ class Parser
     public function __construct()
     {
         // expand allowed characters in variable regex
-        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\<>.=!'\":]*";
+        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
 
         // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\<>.=(\s.*)?!'\":]*";
+        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
 
         // Different from variable regex somehow.
         $this->callbackNameRegex = '(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
@@ -679,7 +679,7 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match_all($this->variableTagRegex, $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/{{\s*(.+(?=\s\?)(.*)(?=\:\s)(.*))\s*}}/m', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
 
                 // Check for the basic components of a ternary evaluation
