@@ -177,7 +177,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerTags();
         $this->registerModifiers();
         $this->registerFieldtypes();
-        $this->registerFilters();
+        $this->registerScopes();
         $this->registerActions();
         $this->registerWidgets();
     }
@@ -279,24 +279,25 @@ class ExtensionServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerFilters()
+    protected function registerScopes()
     {
-        $parent = 'statamic.filters';
+        $parent = 'statamic.scopes';
 
-        $filters = [
-            Filters\Fields::class,
-            Filters\Site::class,
-            Filters\UserRole::class,
-            Filters\UserGroup::class,
+        // TODO
+        $scopes = [
+            // Filters\Fields::class,
+            // Filters\Site::class,
+            // Filters\UserRole::class,
+            // Filters\UserGroup::class,
         ];
 
         $this->registerParent($parent);
 
-        foreach ($filters as $filter) {
-            $this->registerExtension($filter, $parent);
+        foreach ($scopes as $scope) {
+            $this->registerExtension($scope, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Filters', $parent);
+        $this->registerExtensionsInAppFolder('Scopes', $parent);
     }
 
     /**
