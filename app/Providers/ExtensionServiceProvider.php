@@ -275,7 +275,7 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register filters.
+     * Register scopes.
      *
      * @return void
      */
