@@ -3,12 +3,12 @@
 namespace Statamic\API;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Filters\FilterRepository;
+use Statamic\Query\Scopes\Repository as ScopeRepository;
 
-class Filter extends Facade
+class Scope extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return FilterRepository::class;
+        return ScopeRepository::class;
     }
 }
