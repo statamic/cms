@@ -22,9 +22,9 @@ class Fields extends Filter
         })->values()->all();
     }
 
-    public function apply($query, $value)
+    public function apply($query, $values)
     {
-        collect($value)->reject(function ($where) {
+        collect($values)->reject(function ($where) {
             return empty($where['value']);
         })->map(function ($where, $column) use ($query) {
             $query->where($column, $where['operator'], $where['value']);

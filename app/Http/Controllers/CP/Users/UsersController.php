@@ -73,10 +73,10 @@ class UsersController extends CpController
 
     protected function filter($query, $filters)
     {
-        foreach ($filters as $handle => $value) {
+        foreach ($filters as $handle => $values) {
             $class = app('statamic.scopes')->get($handle);
             $filter = app($class);
-            $filter->apply($query, $value);
+            $filter->apply($query, $values);
         }
     }
 
