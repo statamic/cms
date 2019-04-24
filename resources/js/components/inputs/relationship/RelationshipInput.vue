@@ -145,6 +145,11 @@ export default {
             this.$emit('input', this.selections);
         },
 
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
+            this.selectionsUpdated(value);
+        },
+
         loading: {
             immediate: true,
             handler(loading) {

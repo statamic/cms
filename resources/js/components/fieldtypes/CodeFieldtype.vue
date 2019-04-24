@@ -81,6 +81,13 @@ export default {
         });
     },
 
+    watch: {
+        value(value, oldValue) {
+            if (value == this.codemirror.doc.getValue()) return;
+            this.codemirror.doc.setValue(value);
+        }
+    },
+
     methods: {
         focus() {
             this.codemirror.focus();

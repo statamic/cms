@@ -105,6 +105,11 @@ export default {
 
         selections(selections) {
             this.update(this.selections);
+        },
+
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
+            this.selections = value;
         }
 
     }

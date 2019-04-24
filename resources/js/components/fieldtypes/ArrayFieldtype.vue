@@ -95,6 +95,11 @@ export default {
             handler (data) {
                 this.update(this.sortableToObject(data));
             }
+        },
+
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
+            this.data = this.objectToSortable(value);
         }
     },
 

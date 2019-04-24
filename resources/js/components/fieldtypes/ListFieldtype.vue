@@ -74,6 +74,11 @@ export default {
             handler (data) {
                 this.update(this.sortableToArray(data));
             }
+        },
+
+        value(value, oldValue) {
+            if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+            this.data = this.arrayToSortable(value);
         }
     },
 
