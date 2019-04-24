@@ -128,11 +128,11 @@ export default {
         },
 
         keyHeader() {
-            return __(this.config.field.key_header || 'Key');
+            return __(this.config.key_header || 'Key');
         },
 
         valueHeader() {
-            return __(this.config.field.value_header || 'Value');
+            return __(this.config.value_header || 'Value');
         }
     },
 
