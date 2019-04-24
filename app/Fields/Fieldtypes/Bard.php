@@ -48,6 +48,10 @@ class Bard extends Replicator
             'default' => false,
             'width' => 50,
         ],
+        'reading_time' => [
+            'type' => 'toggle',
+            'default' => false,
+        ]
     ];
 
     public function augment($value)

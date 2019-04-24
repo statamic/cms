@@ -74,7 +74,7 @@
 
             <bard-source :html="html" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar">
+        <div class="bard-footer-toolbar" v-if="config.reading_time">
             {{ readingTime }} {{ __('Reading Time') }}
         </div>
     </div>
