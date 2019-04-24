@@ -10,6 +10,7 @@
                 @input="update($event.target.value)"
                 :value="option.value"
                 :id="name + $index"
+                :checked="value === option.value"
             />
             <label :for="name + $index">{{ option.text }}</label>
         </div>

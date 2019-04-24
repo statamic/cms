@@ -35,6 +35,10 @@ export default {
 
         values(values) {
             this.update(values);
+        },
+
+        value(value) {
+            this.values = value;
         }
 
     },
