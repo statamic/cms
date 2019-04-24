@@ -56,10 +56,10 @@ class Parser
     public function __construct()
     {
         // expand allowed characters in variable regex
-        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
+        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\<>.=!'\":]*";
 
         // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
+        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\<>.=(\s.*)?!'\":]*";
 
         // Different from variable regex somehow.
         $this->callbackNameRegex = '(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
@@ -136,7 +136,6 @@ class Parser
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
         $this->original_text = $text;
-
         // Prevent the parsing of PHP by b0rking the PHP open tag
         if (! $this->allowPhp) {
             $text = str_replace(['<?php'], ['&lt;?php'], $text);
@@ -151,7 +150,8 @@ class Parser
         $text = $this->extractLoopedTags($text, $data);
 
         // Parse conditionals first to avoid parsing and execution.
-        $text = $this->parseConditionals($text, $data);
+        $text = $this->parseConditionPairs($text, $data);
+        $text = $this->parseTernaries($text, $data);
         $text = $this->injectExtractions($text, 'looped_tags');
         $text = $this->parseVariables($text, $data);
         $text = $this->injectExtractions($text, 'callback_blocks');
@@ -317,7 +317,7 @@ class Parser
     protected function parseLoopInstance($str, $data)
     {
         $str = $this->extractLoopedTags($str, $data);
-        $str = $this->parseConditionals($str, $data);
+        $str = $this->parseConditionPairs($str, $data);
         $str = $this->injectExtractions($str, 'looped_tags');
         $str = $this->parseVariables($str, $data);
         $str = $this->injectExtractions($str, 'callback_blocks');
@@ -630,7 +630,7 @@ class Parser
      * @param  mixed  $data     Data to use when executing conditionals
      * @return string
      */
-    public function parseConditionals($text, $data)
+    public function parseConditionPairs($text, $data)
     {
         preg_match_all($this->conditionalRegex, $text, $matches, PREG_SET_ORDER);
 
@@ -644,101 +644,7 @@ class Parser
         foreach ($matches as $match) {
             $this->inCondition = true;
 
-            $condition = $match[2];
-
-            if (strpos($condition, ' | ') !== false) {
-                $condition = str_replace(' | ', '|', $condition);
-            }
-
-            // check for and extract callbacks
-            if (preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
-                foreach ($cb_matches[0] as $m) {
-                    $condition = $this->createExtraction('__cond_callbacks', $m, "{$m}", $condition);
-                }
-            }
-
-            // Extract all literal strings in the conditional to simplify
-            if (preg_match_all('/(["\']).*?(?<!\\\\)\1/', $condition, $str_matches)) {
-                foreach ($str_matches[0] as $m) {
-                    $condition = $this->createExtraction('__cond_str', $m, $m, $condition);
-                }
-            }
-
-            $condition = preg_replace($this->conditionalNotRegex, '$1!$2', $condition);
-
-            if (preg_match_all($this->conditionalExistsRegex, $condition, $existsMatches, PREG_SET_ORDER)) {
-                foreach ($existsMatches as $m) {
-                    $exists = 'true';
-                    if ($this->getVariable($m[2], $data, '__doesnt_exist__') === '__doesnt_exist__') {
-                        $exists = 'false';
-                    }
-                    $condition = $this->createExtraction('__cond_exists', $m[0], $m[1] . $exists . $m[3], $condition);
-                }
-            }
-
-            // replaced a static-ish call to a callback with an anonymous function so that we could
-            // also pass in the current callback (for later processing callback tags); also setting
-            // $ref so that we can use it within the anonymous function
-            $ref = $this;
-            $condition = preg_replace_callback('/\b(' . $this->variableRegex . ')\b/', function ($match) use ($ref) {
-                return $ref->processConditionVar($match);
-            }, $condition);
-
-            // inject and parse any callbacks
-            $condition = $this->injectExtractions($condition, '__cond_callbacks');
-            $condition = $this->parseCallbackTags($condition, $data);
-
-            // Re-extract the strings that have may have been added.
-            if (preg_match_all('/(["\']).*?(?<!\\\\)\1/s', $condition, $str_matches)) {
-                foreach ($str_matches[0] as $m) {
-                    $condition = $this->createExtraction('__cond_str', $m, $m, $condition);
-                }
-            }
-
-            // Re-process variables by tricking processConditionVar
-            $this->inCondition = false;
-
-            // replacements -- the preg_replace_callback below is using word boundaries, which
-            // will break when one of your original variables gets replaced with a URL path
-            // (because word boundaries think slashes are boundaries) -- to fix this, we replace
-            // all instances of a literal string in single quotes with a temporary replacement
-            $replacements = [];
-
-            // Literally replace literal strings
-            while (preg_match("/('[^']+'|\"[^\"]+\")/", $condition, $replacement_matches)) {
-                $replacement_match = $replacement_matches[1];
-                $replacement_hash = md5($replacement_match);
-
-                $replacements[$replacement_hash] = $replacement_match;
-                $condition = str_replace($replacement_match, "__temp_replacement_" . $replacement_hash, $condition);
-            }
-
-            // next, the original re-processing callback
-            $correct_regex = (strpos($condition, '(') === 0) ? $this->looseVariableRegex : $this->variableRegex;
-
-            $condition = preg_replace_callback('/\b(' . $correct_regex . ')\b/', [$this, 'processConditionVar'], $condition);
-
-            // finally, replacing our placeholders with the original values
-            foreach ($replacements as $replace_key => $replace_value) {
-                $condition = str_replace('__temp_replacement_' . $replace_key, $replace_value, $condition);
-            }
-
-            $this->inCondition = true;
-
-            // evaluate special comparisons
-            if (strpos($condition, ' ~ ') !== false) {
-                $new_condition = preg_replace_callback('/(.*?)\s*~\s*(__cond_str_[a-f0-9]{32})/', function ($cond_matches) {
-                    return 'preg_match(' . $cond_matches[2] . ', ' . $cond_matches[1] . ', $temp_matches)';
-                }, $condition);
-
-                if ($new_condition !== false) {
-                    $condition = $new_condition;
-                }
-            }
-
-            // Re-inject any strings we extracted
-            $condition = $this->injectExtractions($condition, '__cond_str');
-            $condition = $this->injectExtractions($condition, '__cond_exists');
+            $condition = $this->processCondition($match[2], $data);
 
             $conditional = '<?php ';
 
@@ -762,6 +668,149 @@ class Parser
         $this->inCondition = false;
 
         return $text;
+    }
+
+    /**
+     * Parses simple ternary conditional strings.
+     *
+     * @param  string $text     Text to parse
+     * @param  mixed  $data     Data to use when executing conditionals
+     * @return string
+     */
+    public function parseTernaries($text, $data)
+    {
+        if (preg_match($this->variableTagRegex, $text, $matches)) {
+
+            // Check for the basic components of a ternary evaluation
+            if (strpos($matches[1], ' ? ') && strpos($matches[1], ' : ')) {
+
+                // Split the tag up
+                $bits = explode(' ? ', $matches[1]);
+
+                // Parse the condition side of the statement
+                $condition = $this->processCondition(trim($bits[0]), $data);
+
+                // Collect the rest of the data
+                list($if_true, $if_false) = explode(' : ', $bits[1]);
+
+                // Build a PHP string to evaluate
+                $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
+
+                // Do the evaluation
+                $output = $this->parsePhp($conditional);
+
+                // Slide it on back into the template
+                $text = str_replace($matches[0], $output, $text);
+            }
+        }
+
+        return $text;
+    }
+
+    /**
+     * Parses and assembles a condition string
+     *
+     * @param  string $condition  Text to parse
+     * @param  mixed  $data       Data to use when executing conditionals
+     * @return string
+     */
+    public function processCondition($condition, $data)
+    {
+        if (strpos($condition, ' | ') !== false) {
+            $condition = str_replace(' | ', '|', $condition);
+        }
+
+        // check for and extract callbacks
+        if (preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
+            foreach ($cb_matches[0] as $m) {
+                $condition = $this->createExtraction('__cond_callbacks', $m, "{$m}", $condition);
+            }
+        }
+
+        // Extract all literal strings in the conditional to simplify
+        if (preg_match_all('/(["\']).*?(?<!\\\\)\1/', $condition, $str_matches)) {
+            foreach ($str_matches[0] as $m) {
+                $condition = $this->createExtraction('__cond_str', $m, $m, $condition);
+            }
+        }
+
+        $condition = preg_replace($this->conditionalNotRegex, '$1!$2', $condition);
+
+        if (preg_match_all($this->conditionalExistsRegex, $condition, $existsMatches, PREG_SET_ORDER)) {
+            foreach ($existsMatches as $m) {
+                $exists = 'true';
+                if ($this->getVariable($m[2], $data, '__doesnt_exist__') === '__doesnt_exist__') {
+                    $exists = 'false';
+                }
+                $condition = $this->createExtraction('__cond_exists', $m[0], $m[1] . $exists . $m[3], $condition);
+            }
+        }
+
+        // replaced a static-ish call to a callback with an anonymous function so that we could
+        // also pass in the current callback (for later processing callback tags); also setting
+        // $ref so that we can use it within the anonymous function
+        $ref = $this;
+        $condition = preg_replace_callback('/\b(' . $this->variableRegex . ')\b/', function ($match) use ($ref) {
+            return $ref->processConditionVar($match);
+        }, $condition);
+
+        // inject and parse any callbacks
+        $condition = $this->injectExtractions($condition, '__cond_callbacks');
+        $condition = $this->parseCallbackTags($condition, $data);
+
+        // Re-extract the strings that have may have been added.
+        if (preg_match_all('/(["\']).*?(?<!\\\\)\1/s', $condition, $str_matches)) {
+            foreach ($str_matches[0] as $m) {
+                $condition = $this->createExtraction('__cond_str', $m, $m, $condition);
+            }
+        }
+
+        // Re-process variables by tricking processConditionVar
+        $this->inCondition = false;
+
+        // replacements -- the preg_replace_callback below is using word boundaries, which
+        // will break when one of your original variables gets replaced with a URL path
+        // (because word boundaries think slashes are boundaries) -- to fix this, we replace
+        // all instances of a literal string in single quotes with a temporary replacement
+        $replacements = [];
+
+        // Literally replace literal strings
+        while (preg_match("/('[^']+'|\"[^\"]+\")/", $condition, $replacement_matches)) {
+            $replacement_match = $replacement_matches[1];
+            $replacement_hash = md5($replacement_match);
+
+            $replacements[$replacement_hash] = $replacement_match;
+            $condition = str_replace($replacement_match, "__temp_replacement_" . $replacement_hash, $condition);
+        }
+
+        // next, the original re-processing callback
+        $correct_regex = (strpos($condition, '(') === 0) ? $this->looseVariableRegex : $this->variableRegex;
+
+        $condition = preg_replace_callback('/\b(' . $correct_regex . ')\b/', [$this, 'processConditionVar'], $condition);
+
+        // finally, replacing our placeholders with the original values
+        foreach ($replacements as $replace_key => $replace_value) {
+            $condition = str_replace('__temp_replacement_' . $replace_key, $replace_value, $condition);
+        }
+
+        $this->inCondition = true;
+
+        // evaluate special comparisons
+        if (strpos($condition, ' ~ ') !== false) {
+            $new_condition = preg_replace_callback('/(.*?)\s*~\s*(__cond_str_[a-f0-9]{32})/', function ($cond_matches) {
+                return 'preg_match(' . $cond_matches[2] . ', ' . $cond_matches[1] . ', $temp_matches)';
+            }, $condition);
+
+            if ($new_condition !== false) {
+                $condition = $new_condition;
+            }
+        }
+
+        // Re-inject any strings we extracted
+        $condition = $this->injectExtractions($condition, '__cond_str');
+        $condition = $this->injectExtractions($condition, '__cond_exists');
+
+        return $condition;
     }
 
     /**
@@ -1160,7 +1209,7 @@ class Parser
         $result = eval('?>' . $text . '<?php ');
 
         if ($result === false) {
-            $output = 'You have a syntax error in your Lex tags. The offending code: ';
+            $output = 'You have a syntax error in your Antler tags. The offending code: ';
             throw new ParsingException($output . str_replace(array('?>', '<?php '), '', $text));
         }
 
