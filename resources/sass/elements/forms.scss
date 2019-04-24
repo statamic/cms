@@ -51,8 +51,50 @@ select {
 }
 
 
+/* Input Groups
+  ========================================================================== */
+
+.input-group {
+    @apply appearance-none bg-grey-10 text-grey-80 w-full p-0 rounded flex items-center;
+    height: 38px;
+
+    &:focus, &:focus-within {
+        @apply focus-outline;
+    }
+
+    .input-text {
+        @apply .flex-1;
+
+        &:focus, &:focus-within {
+            @apply focus-none;
+        }
+    }
+
+    .input-text:not(:first-child) {
+        @apply rounded-l-none border-l-0;
+    }
+
+    .input-text:not(:last-child) {
+        @apply rounded-r-none border-r-0;
+    }
+
+    .input-group-prepend {
+        @apply rounded-l bg-grey-30 px-1 border border-grey-50 text-sm;
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .input-group-append {
+        @apply rounded-r bg-grey-30 px-1 border border-grey-50 text-sm;
+        height: 38px;
+        line-height: 38px;
+    }
+}
+
+
 /* Radio and Checkbox Fields
   ========================================================================== */
+
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
     @apply mb-1 flex items-center;

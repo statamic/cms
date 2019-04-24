@@ -1,8 +1,10 @@
 <template>
     <div class="video-fieldtype-container">
         <div class="flex items-center">
-            <div class="mr-1 text-sm">{{ __('Enter video URL') }}:</div>
-            <input type="text" v-model="data" class="input-text bg-white flex-1" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"/>
+            <div class="input-group">
+                <div class="input-group-prepend">{{ __('URL') }}</div>
+                <input type="text" v-model="data" class="input-text bg-white flex-1" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"/>
+            </div>
         </div>
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
