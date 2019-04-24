@@ -3,7 +3,14 @@
         <div class="flex items-center">
             <div class="input-group">
                 <div class="input-group-prepend">{{ __('URL') }}</div>
-                <input type="text" v-model="data" class="input-text bg-white flex-1" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"/>
+                <input type="text"
+                    v-model="data"
+                    class="input-text flex-1"
+                    :class="{ 'bg-white': !isReadOnly }"
+                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    :readonly="isReadOnly"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')" />
             </div>
         </div>
 
@@ -31,6 +38,10 @@ export default {
 
         data(value) {
             this.update(value);
+        },
+
+        value(value) {
+            this.data = value;
         }
 
     },

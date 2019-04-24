@@ -36,9 +36,12 @@ select {
         @apply focus-outline;
     }
 
-    &:read-only {
-        @apply bg-grey-30 text-grey-70;
-    }
+}
+
+// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
+input.input-text:read-only,
+.input-text.read-only {
+    @apply bg-grey-30 text-grey-70;
 }
 
 // Used inside tables, grids, and so on

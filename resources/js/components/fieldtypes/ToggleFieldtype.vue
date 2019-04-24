@@ -33,6 +33,13 @@ export default {
             return this.state === match;
         }
     },
+
+    watch: {
+        value(value) {
+            this.state = this.value;
+        }
+    },
+
     methods: {
         toggle() {
             this.state = !this.state;

@@ -5,7 +5,7 @@
     </div>
 </template>
 
-<style src="codemirror/theme/material.css" />
+<style src="codemirror/theme/material.css"></style>
 
 <script>
 import CodeMirror from 'codemirror'
@@ -79,6 +79,13 @@ export default {
         this.codemirror.on('change', (cm) => {
             this.$emit('updated', cm.doc.getValue());
         });
+    },
+
+    watch: {
+        value(value, oldValue) {
+            if (value == this.codemirror.doc.getValue()) return;
+            this.codemirror.doc.setValue(value);
+        }
     },
 
     methods: {

@@ -1,6 +1,6 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-text block-inline px-sm w-auto">
+        <div class="input-text block-inline px-sm w-auto" :class="{ 'read-only': isReadOnly }">
             <input class="input-time input-hour"
                 type="number" min="00" max="23" v-model="hour" ref="hour"
                 placeholder="00"
@@ -9,6 +9,9 @@
                 @keydown.esc="clear"
                 @keydown.186.prevent="focusMinute"
                 @keydown.190.prevent="focusMinute"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+                :readonly="isReadOnly"
                 tabindex="0"
             />
             <span class="colon">:</span>
@@ -18,11 +21,14 @@
                 @keydown.up.prevent="incrementMinute(1)"
                 @keydown.down.prevent="incrementMinute(-1)"
                 @keydown.esc="clear"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+                :readonly="isReadOnly"
                 tabindex="0"
             />
         </div>
         <button class="text-blue text-xs ml-1" tabindex="0"
-              v-if="! required"
+              v-if="! required && ! isReadOnly"
               @click="clear" @keyup.enter.space="clear">
               {{ __('clear') }}
         </button>
