@@ -4,7 +4,7 @@
         <table class="table-fieldtype-table" v-if="rowCount">
             <thead>
                 <tr>
-                    <th class="grid-drag-handle-header"></th>
+                    <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                     <th v-for="(column, index) in columnCount" :key="index">
                         <div class="flex items-center justify-between h-6">
                             <span class="column-count">{{ index + 1 }}</span>
@@ -13,7 +13,7 @@
                             </a>
                         </div>
                     </th>
-                    <th class="row-controls"></th>
+                    <th class="row-controls" v-if="canDeleteColumns"></th>
                 </tr>
             </thead>
 
@@ -22,14 +22,16 @@
                 :vertical="true"
                 item-class="sortable-row"
                 handle-class="table-drag-handle"
+                @dragstart="$emit('focus')"
+                @dragend="$emit('blur')"
             >
                 <tbody>
                     <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
-                        <td class="table-drag-handle"></td>
+                        <td class="table-drag-handle" v-if="!isReadOnly"></td>
                         <td v-for="(cell, cellIndex) in row.value.cells">
-                            <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" />
+                            <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
                         </td>
-                        <td class="row-controls">
+                        <td class="row-controls" v-if="canDeleteColumns">
                             <a @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
                         </td>
                     </tr>
@@ -37,7 +39,7 @@
             </sortable-list>
         </table>
 
-        <button class="btn" @click="addRow" :disabled="atRowMax">
+        <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
             {{ __('Add Row') }}
         </button>
 
@@ -133,12 +135,16 @@ export default {
             return this.maxColumns ? this.columnCount >= this.maxColumns : false;
         },
 
+        canAddRows() {
+            return !this.isReadOnly;
+        },
+
         canAddColumns() {
-            return this.rowCount > 0;
+            return !this.isReadOnly && this.rowCount > 0;
         },
 
         canDeleteColumns() {
-            return this.columnCount > 1;
+            return !this.isReadOnly && this.columnCount > 1;
         }
     },
 
