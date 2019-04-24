@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Filters;
+namespace Statamic\Query\Scopes;
 
-class FilterRepository
+class Repository
 {
     public function all()
     {
-        return app('statamic.filters')->map(function ($class) {
+        return app('statamic.scopes')->map(function ($class) {
             return app($class);
         })->values();
     }
