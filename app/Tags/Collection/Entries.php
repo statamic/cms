@@ -115,11 +115,9 @@ class Entries
     {
         if (! $this->site) {
             return;
-        } elseif ($this->collection->sites()->contains($this->site)) {
-            return $query->where('site', $this->site);
         }
 
-        throw new NoResultsExpected;
+        return $query->where('site', $this->site);
     }
 
     protected function queryPublished($query)
