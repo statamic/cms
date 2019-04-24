@@ -5,9 +5,9 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Email;
+use Statamic\API\Scope;
 use Statamic\API\Action;
 use Statamic\API\Config;
-use Statamic\API\Filter;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
 use Statamic\API\Blueprint;
@@ -36,8 +36,7 @@ class UsersController extends CpController
         }
 
         return view('statamic::users.index', [
-            'filters' => Filter::for('users'),
-            'filters' => Filter::for('users', $context = [
+            'filters' => Scope::filters('users', $context = [
                 'blueprints' => ['user'],
             ]),
             'actions' => Action::for('users', $context),
@@ -75,7 +74,7 @@ class UsersController extends CpController
     protected function filter($query, $filters)
     {
         foreach ($filters as $handle => $value) {
-            $class = app('statamic.filters')->get($handle);
+            $class = app('statamic.scopes')->get($handle);
             $filter = app($class);
             $filter->apply($query, $value);
         }

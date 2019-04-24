@@ -5,9 +5,9 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Statamic\API\Str;
 use Statamic\API\Site;
 use Statamic\API\User;
+use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
-use Statamic\API\Filter;
 use Statamic\API\Helper;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
@@ -54,7 +54,7 @@ class CollectionsController extends CpController
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => Filter::for('entries', $context = [
+            'filters' => Scope::filters('entries', $context = [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),

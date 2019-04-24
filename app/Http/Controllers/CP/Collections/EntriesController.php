@@ -61,7 +61,7 @@ class EntriesController extends CpController
     protected function filter($query, $filters)
     {
         foreach ($filters as $handle => $value) {
-            $class = app('statamic.filters')->get($handle);
+            $class = app('statamic.scopes')->get($handle);
             $filter = app($class);
             $filter->apply($query, $value);
         }

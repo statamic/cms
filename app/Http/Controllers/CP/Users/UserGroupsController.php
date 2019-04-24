@@ -4,8 +4,8 @@ namespace Statamic\Http\Controllers\CP\Users;
 
 use Statamic\API\Role;
 use Statamic\API\User;
+use Statamic\API\Scope;
 use Statamic\API\Action;
-use Statamic\API\Filter;
 use Statamic\API\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
@@ -47,7 +47,7 @@ class UserGroupsController extends CpController
         return view('statamic::usergroups.edit', [
             'group' => $group,
             'roles' => $group->roles()->map->handle()->values()->all(),
-            'filters' => Filter::for('usergroup-users'),
+            'filters' => Scope::filters('usergroup-users'),
             'actions' => Action::for('usergroup-users'),
         ]);
     }
