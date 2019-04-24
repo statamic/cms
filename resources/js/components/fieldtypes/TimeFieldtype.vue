@@ -11,6 +11,7 @@
                 @keydown.190.prevent="focusMinute"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
+                :readonly="isReadOnly"
                 tabindex="0"
             />
             <span class="colon">:</span>
@@ -22,11 +23,12 @@
                 @keydown.esc="clear"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
+                :readonly="isReadOnly"
                 tabindex="0"
             />
         </div>
         <button class="text-blue text-xs ml-1" tabindex="0"
-              v-if="! required"
+              v-if="! required && ! isReadOnly"
               @click="clear" @keyup.enter.space="clear">
               {{ __('clear') }}
         </button>
