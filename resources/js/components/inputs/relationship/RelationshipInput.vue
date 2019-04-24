@@ -13,7 +13,7 @@
                     :config="config"
                     :status-icon="statusIcons"
                     :editable="canEdit"
-                    :sortable="canReorder"
+                    :sortable="!readOnly && canReorder"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -23,7 +23,7 @@
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
+            <div v-if="canSelectOrCreate" class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
                         <button v-if="canCreate" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
@@ -95,6 +95,7 @@ export default {
         canEdit: Boolean,
         canCreate: Boolean,
         canReorder: Boolean,
+        readOnly: Boolean,
     },
 
     components: {
@@ -132,6 +133,10 @@ export default {
             return this.selections.length >= this.maxItems;
         },
 
+        canSelectOrCreate() {
+            return !this.readOnly && !this.maxItemsReached;
+        }
+
     },
 
     mounted() {
@@ -156,6 +161,10 @@ export default {
                 this.$progress.loading(`relationship-fieldtype-${this._uid}`, loading);
             }
         },
+
+        isSelecting(selecting) {
+            this.$emit(selecting ? 'focus' : 'blur');
+        }
 
     },
 
@@ -204,10 +213,12 @@ export default {
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
             }).on('drag:start', e => {
-                if (this.selections.length === 1) e.cancel();
+                this.selections.length === 1 ? e.cancel() : this.$emit('focus');
+            }).on('drag:stop', e => {
+                this.$emit('blur');
             }).on('sortable:stop', e => {
                 this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
-            });
+            })
         },
 
         itemCreated(item) {

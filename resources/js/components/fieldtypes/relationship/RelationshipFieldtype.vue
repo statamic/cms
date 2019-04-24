@@ -16,6 +16,9 @@
         :status-icons="statusIcons"
         :columns="columns"
         :search="canSearch"
+        :read-only="isReadOnly"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
     />
 
 </template>
