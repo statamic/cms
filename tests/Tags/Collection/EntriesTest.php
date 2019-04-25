@@ -181,7 +181,7 @@ class EntriesTest extends TestCase
         $this->assertCount(3, $this->getEntries(['query' => 'post_animal', 'post_animal' => 'tiger']));
         $this->assertCount(3, $this->getEntries(['filter' => 'post_animal', 'post_animal' => 'tiger']));
 
-       $this->assertCount(1, $this->getEntries([
+        $this->assertCount(1, $this->getEntries([
             'query' => 'post_type|post_animal',
             'post_type' => 'stories',
             'post_animal' => 'tiger'
