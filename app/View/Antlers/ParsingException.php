@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Exceptions;
+namespace Statamic\View\Antlers;
 
 class ParsingException extends \Exception
 {
+    //
 }

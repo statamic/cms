@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Exceptions\ParsingException;
 use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -116,7 +115,14 @@ class Parser
 
         $this->view = $view;
 
-        $parsed = $this->parse($text, $data);
+        try {
+            $parsed = $this->parse($text, $data);
+        } catch (ParsingException $e) {
+            throw $e; // Thrown in a sub-parse.
+        } catch (\Exception | \Error $e) {
+            $message = "Error parsing view [{$this->view}]\n{$e->getMessage()}";
+            throw new ParsingException($message, 0, $e);
+        }
 
         $this->view = $existingView;
 
@@ -1227,11 +1233,10 @@ class Parser
     {
         ob_start();
 
-        $result = eval('?>' . $text . '<?php ');
-
-        if ($result === false) {
-            $output = 'You have a syntax error in your Antler tags. The offending code: ';
-            throw new ParsingException($output . str_replace(array('?>', '<?php '), '', $text));
+        try {
+            eval('?>' . $text . '<?php ');
+        } catch (\ParseError $e) {
+            throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$text}");
         }
 
         return ob_get_clean();
