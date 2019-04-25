@@ -46,7 +46,7 @@ class Augmentor
     public function convertToHtml($value)
     {
         $renderer = new Renderer;
-        $renderer->addNodes([SetNode::class, ImageNode::class]);
+        $renderer->addNodes([ImageNode::class, SetNode::class]);
 
         return $renderer->render([
             'type' => 'doc',
