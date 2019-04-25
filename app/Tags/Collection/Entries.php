@@ -26,6 +26,7 @@ class Entries
     protected $showFuture;
     protected $since;
     protected $until;
+    protected $scopes;
     protected $sort;
 
     public function __construct($parameters)
@@ -44,6 +45,7 @@ class Entries
             $this->queryPastFuture($query);
             $this->querySinceUntil($query);
             $this->queryConditions($query);
+            $this->queryScopes($query);
             $this->querySort($query);
         } catch (NoResultsExpected $e) {
             return collect_entries();
@@ -86,6 +88,8 @@ class Entries
         $this->since = Arr::get($params, 'since');
         $this->until = Arr::get($params, 'until');
 
+        $this->scopes = $this->parseQueryScopes($params);
+
         $this->sort = Arr::get($params, 'sort');
 
         return $params;
@@ -109,6 +113,13 @@ class Entries
                 throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
                 return $collection;
             });
+    }
+
+    protected function parseQueryScopes($params)
+    {
+        $scopes = Arr::getFirst($params, ['query', 'filter']);
+
+        return collect(explode('|', $scopes));
     }
 
     protected function querySite($query)
@@ -163,6 +174,19 @@ class Entries
         if ($this->until) {
             $query->where('date', '<', Carbon::parse($this->until));
         }
+    }
+
+    public function queryScopes($query)
+    {
+        $this->scopes
+            ->map(function ($handle) {
+                return app('statamic.scopes')->get($handle);
+            })
+            ->filter()
+            ->each(function ($class) use ($query) {
+                $scope = app($class);
+                $scope->apply($query, $this->parameters);
+            });
     }
 
     public function querySort($query)
