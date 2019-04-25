@@ -7,6 +7,7 @@ use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\View\Modify;
 use Statamic\Fields\Value;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
@@ -679,26 +680,44 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match_all('/{{\s*(.+\s\?.*\:.*)\s*}}/m', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/{{\s*(.+\s\?.*\:.*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
 
-                // Split the tag up
-                $bits = explode(' ? ', $match[1]);
+                // The Elvis operator
+                if (Str::contains($match[1], ' ?: ')) {
+                    $bits = explode(' ?: ', $match[1]);
 
-                // Parse the condition side of the statement
-                $condition = $this->processCondition(trim($bits[0]), $data);
+                    $condition = $this->processCondition($bits[0], $data);
+                    $if_true = trim($bits[1]);
 
-                // Collect the rest of the data
-                list($if_true, $if_false) = explode(' : ', $bits[1]);
+                    $conditional = '<?php if (' .$condition. '): ?>' . $this->getVariable($if_true, $data) . '<?php endif ?>';
 
-                // Build a PHP string to evaluate
-                $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
+                    // Do the evaluation
+                    $output = $this->parsePhp($conditional);
 
-                // Do the evaluation
-                $output = $this->parsePhp($conditional);
+                    // Slide it on back into the template
+                    $text = str_replace($match[0], $output, $text);
 
-                // Slide it on back into the template
-                $text = str_replace($match[0], $output, $text);
+                // Regular old ternary
+                } else {
+
+                    // Split the tag up
+                    $bits = explode('? ', $match[1]);
+
+                    // Parse the condition side of the statement
+                    $condition = $this->processCondition(trim($bits[0]), $data);
+                    // Collect the rest of the data
+                    list($if_true, $if_false) = explode(': ', $bits[1]);
+
+                    // Build a PHP string to evaluate
+                    $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
+
+                    // Do the evaluation
+                    $output = $this->parsePhp($conditional);
+
+                    // Slide it on back into the template
+                    $text = str_replace($match[0], $output, $text);
+                }
             }
         }
 
@@ -1093,7 +1112,6 @@ class Parser
             $data = trim($key, '"\'');
         } else {
             list($exists, $data) = $this->getVariableExistenceAndValue($key, $context);
-
             if (! $exists) {
                 return $default;
             }
@@ -1278,11 +1296,10 @@ class Parser
     protected function parseModifiers($key)
     {
         $parts = explode("|", $key);
+        $key = trim(array_get_colon($parts, 0));
+        $modifiers = array_map('trim', (array) array_slice($parts, 1));
 
-        return [
-            array_get_colon($parts, 0),
-            (array) array_slice($parts, 1)
-        ];
+        return [$key, $modifiers];
     }
 
     /**
