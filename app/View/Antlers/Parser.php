@@ -353,9 +353,9 @@ class Parser
                     $var = str_replace(' | ', '|', $var);
                 }
 
-                // check for `or` options
-                if (strpos($var, ' or ') !== false) {
-                    $vars = preg_split('/\s+or\s+/ms', $var, null, PREG_SPLIT_NO_EMPTY);
+                // Null coalescence through "or", "??" or "?:"
+                if (Str::contains($var, [' or ', ' ?? ', ' ?: ']) !== false) {
+                    $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
                 } else {
                     $vars = [$var];
                 }
@@ -680,12 +680,12 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match_all('/{{\s*(.+\s\?.*\:.*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/{{\s*(.+\s(\?.*\s\:|\?\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
 
-                // The Elvis operator
-                if (Str::contains($match[1], ' ?: ')) {
-                    $bits = explode(' ?: ', $match[1]);
+                // Null coalescence assignment
+                if ($match[2] === '??=') {
+                    $bits = explode(' ??= ', $match[1]);
 
                     $condition = $this->processCondition($bits[0], $data);
                     $if_true = trim($bits[1]);
