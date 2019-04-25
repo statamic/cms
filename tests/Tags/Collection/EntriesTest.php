@@ -168,6 +168,27 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    function it_filters_by_custom_query_scopes()
+    {
+        $this->makeEntry()->set('title', 'Cat Stories')->save();
+        $this->makeEntry()->set('title', 'Tiger Stories')->save();
+        $this->makeEntry()->set('title', 'Tiger Fables')->save();
+        $this->makeEntry()->set('title', 'Tiger Tales')->save();
+
+        $this->assertCount(4, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['query' => 'post_type', 'post_type' => 'stories']));
+        $this->assertCount(2, $this->getEntries(['filter' => 'post_type', 'post_type' => 'stories']));
+        $this->assertCount(3, $this->getEntries(['query' => 'post_animal', 'post_animal' => 'tiger']));
+        $this->assertCount(3, $this->getEntries(['filter' => 'post_animal', 'post_animal' => 'tiger']));
+
+       $this->assertCount(1, $this->getEntries([
+            'query' => 'post_type|post_animal',
+            'post_type' => 'stories',
+            'post_animal' => 'tiger'
+        ]));
+    }
+
+    /** @test */
     function it_sorts_entries()
     {
         $this->collection->order('date')->save();
