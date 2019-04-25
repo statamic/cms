@@ -29,7 +29,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
         'radio', 'time', 'title', 'toggle', 'video', 'yaml',
-        'revealer', 'section', 'slug', 'table', 'tags', 'template', 'text', 'textarea',
+        'revealer', 'section', 'table', 'tags', 'template', 'textarea',
     ];
 
     /**
@@ -105,7 +105,9 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Replicator::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
+        Fieldtypes\Slug::class,
         Fieldtypes\Template::class,
+        Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
         Fieldtypes\UserGroups::class,

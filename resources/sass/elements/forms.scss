@@ -59,7 +59,7 @@ textarea.input-text:read-only,
   ========================================================================== */
 
 .input-group {
-    @apply appearance-none bg-grey-10 text-grey-80 w-full p-0 rounded flex items-center;
+    @apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
     height: 38px;
 
     &:focus, &:focus-within {

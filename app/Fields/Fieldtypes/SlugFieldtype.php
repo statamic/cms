@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Addons\Slug;
+namespace Statamic\Fields\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
-use Statamic\Addons\Text\TextFieldtype;
+use Statamic\Fields\Fieldtypes\Text;
 
-class SlugFieldtype extends TextFieldtype
+class Slug extends Text
 {
     protected $configFields = [
         'generate' => ['type' => 'toggle', 'default' => true],
