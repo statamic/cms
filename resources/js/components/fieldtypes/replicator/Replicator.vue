@@ -7,6 +7,8 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            @dragstart="$emit('focus')"
+            @dragend="$emit('blur')"
         >
             <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
@@ -18,13 +20,15 @@
                     :parent-name="name"
                     :sortable-item-class="sortableItemClass"
                     :sortable-handle-class="sortableHandleClass"
+                    :is-read-only="isReadOnly"
                     @updated="updated"
-                    @removed="removed"
+                    @focus="focused = true"
+                    @blur="blurred"
                 />
             </div>
         </sortable-list>
 
-        <div class="set-buttons">
+        <div class="set-buttons" v-if="!isReadOnly">
             <button
                 v-for="set in setConfigs"
                 :key="set.handle"
@@ -55,7 +59,8 @@ export default {
 
     data() {
         return {
-            values: null
+            values: null,
+            focused: false,
         }
     },
 
@@ -123,6 +128,14 @@ export default {
         collapseAll() { },
         expandAll() { },
 
+        blurred() {
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.focused = false;
+                }
+            }, 1);
+        }
+
     },
 
     watch: {
@@ -136,6 +149,18 @@ export default {
             handler(values) {
                 this.$emit('updated', values);
             }
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                }
+            }, 1);
         }
 
     }

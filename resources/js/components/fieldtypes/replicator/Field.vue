@@ -2,7 +2,10 @@
 
     <div class="p-2 m-0" :class="classes">
 
-        <label class="block">{{ display }}</label>
+        <label class="block">
+            {{ display }}
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
+        </label>
 
         <div
             class="help-block"
@@ -18,6 +21,7 @@
             :config="field"
             :value="value"
             :name="name"
+            :read-only="isReadOnly"
             @updated="$emit('updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -45,7 +49,8 @@ export default {
         setIndex: {
             type: Number,
             required: true
-        }
+        },
+        readOnly: Boolean,
     },
 
     inject: ['storeName'],
@@ -79,7 +84,7 @@ export default {
         },
 
         isReadOnly() {
-            return this.field.read_only || false;
+            return this.readOnly || this.field.read_only || false;
         },
 
         classes() {

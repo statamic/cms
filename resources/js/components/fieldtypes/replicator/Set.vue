@@ -2,8 +2,8 @@
 
     <div :class="sortableItemClass" class="replicator-set">
 
-        <div class="replicator-set-header">
-            <div class="item-move sortable-handle" :class="sortableHandleClass"></div>
+        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly }">
+            <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
             <div class="flex-1 ml-1 flex items-center">
                 <label v-text="config.display" class="text-xs"/>
                 <div
@@ -11,7 +11,7 @@
                     v-html="instructions"
                     class="help-block replicator-set-instructions" />
             </div>
-            <div class="replicator-set-controls">
+            <div class="replicator-set-controls" v-if="!isReadOnly">
                 <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
                     <ul class="dropdown-menu">
@@ -30,7 +30,10 @@
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                @updated="updated"
+                :read-only="isReadOnly"
+                @updated="updated(field.handle, $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             />
         </div>
 
@@ -80,7 +83,8 @@ export default {
         },
         sortableHandleClass: {
             type: String
-        }
+        },
+        isReadOnly: Boolean,
     },
 
     computed: {
