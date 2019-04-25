@@ -5,6 +5,7 @@
                    :name="name + '[]'"
                    :id="name + $index"
                    :value="option.value"
+                   :disabled="isReadOnly"
                    v-model="values"
             />
             <label :for="name + $index">{{ option.text }}</label>
