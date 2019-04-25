@@ -32,6 +32,7 @@ import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 import VTooltip from 'v-tooltip'
+import ReactiveProvide from 'vue-reactive-provide';
 
 Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -51,6 +52,7 @@ Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(VTooltip)
 Vue.use(Vuex);
+Vue.use(ReactiveProvide);
 
 Statamic.$store = new Vuex.Store({
     modules: {
