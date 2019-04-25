@@ -8,6 +8,7 @@ use Scrumpy\ProseMirrorToHtml\Renderer;
 class Augmentor
 {
     protected $sets = [];
+    protected $includeDisabledSets = false;
 
     public function augment($value)
     {
@@ -15,12 +16,22 @@ class Augmentor
             return $value;
         }
 
-        $value = $this->removeDisabledSets($value);
+        if (!$this->includeDisabledSets) {
+            $value = $this->removeDisabledSets($value);
+        }
+
         $value = $this->addSetIndexes($value);
         $value = $this->convertToHtml($value);
         $value = $this->convertToSets($value);
 
         return $value;
+    }
+
+    public function withDisabledSets()
+    {
+        $this->includeDisabledSets = true;
+
+        return $this;
     }
 
     protected function removeDisabledSets($value)
