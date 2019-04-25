@@ -279,6 +279,13 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
 
+    public function testTernaryConditionIsntTooGreedy()
+    {
+        $template = '{{ content }} {{ string ? "Pass" : "Fail" }} {{ content }}';
+
+        $this->assertEquals('Paragraph Pass Paragraph', Antlers::parse($template, $this->variables));
+    }
+
     public function testTernaryConditionWithAVariable()
     {
         $template = '{{ string ? string : "Fail" }}';
