@@ -687,9 +687,13 @@ class Parser
                 if ($match[2] === '??=') {
                     $bits = explode(' ??= ', $match[1]);
 
+                    // Parse the condition side of the statement
                     $condition = $this->processCondition($bits[0], $data);
+
+                    // Grab the desired output if true
                     $if_true = trim($bits[1]);
 
+                    // Build a PHP string to evaluate
                     $conditional = '<?php if (' .$condition. '): ?>' . $this->getVariable($if_true, $data) . '<?php endif ?>';
 
                     // Do the evaluation
@@ -706,6 +710,7 @@ class Parser
 
                     // Parse the condition side of the statement
                     $condition = $this->processCondition(trim($bits[0]), $data);
+
                     // Collect the rest of the data
                     list($if_true, $if_false) = explode(': ', $bits[1]);
 
