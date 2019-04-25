@@ -309,6 +309,24 @@ EOT;
         $template = '{{ string ?: "Pass" }}';
         $template2 = '{{ missing ?: "Pass" }}';
 
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+    }
+
+    public function testNullCoalescence()
+    {
+        $template = '{{ string ?? "Pass" }}';
+        $template2 = '{{ missing ?? "Pass" }}';
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+    }
+
+    public function testNullCoalescenceAssignment()
+    {
+        $template = '{{ string ??= "Pass" }}';
+        $template2 = '{{ missing ??= "Pass" }}';
+
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
         $this->assertEquals(null, Antlers::parse($template2, $this->variables));
     }
