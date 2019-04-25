@@ -686,7 +686,7 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match_all('/{{\s*(.+\s(\?.*\s\:|\?\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
 
                 // Null coalescence assignment
