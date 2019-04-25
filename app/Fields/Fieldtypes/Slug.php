@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
-use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Fieldtypes\Text;
 
 class Slug extends Text
