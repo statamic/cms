@@ -272,6 +272,47 @@ EOT;
         $this->assertEquals(null, Antlers::parse($should_also_fail, $this->variables));
     }
 
+    public function testTernaryCondition()
+    {
+        $template = '{{ string ? "Pass" : "Fail" }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithAVariable()
+    {
+        $template = '{{ string ? string : "Fail" }}';
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithModifiers()
+    {
+        $template = '{{ string ? string | upper : "Fail" }}';
+
+        $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithMultipleLines()
+    {
+        $template = <<<EOT
+{{ string
+    ? "Pass"
+    : "Fail" }}
+EOT;
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
+    public function testElvisCondition()
+    {
+        $template = '{{ string ?: "Pass" }}';
+        $template2 = '{{ missing ?: "Pass" }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+        $this->assertEquals(null, Antlers::parse($template2, $this->variables));
+    }
+
     public function testSingleStandardStringModifierTight()
     {
         $template = "{{ string|upper }}";
