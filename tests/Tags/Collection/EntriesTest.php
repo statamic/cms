@@ -4,9 +4,10 @@ namespace Tests\Tags\Collection;
 
 use Statamic\API;
 use Tests\TestCase;
+use Illuminate\Support\Carbon;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Tags\Collection\Entries;
 use Tests\PreventSavingStacheItemsToDisk;
-use Illuminate\Support\Carbon;
 
 class EntriesTest extends TestCase
 {
@@ -17,6 +18,9 @@ class EntriesTest extends TestCase
         parent::setUp();
 
         $this->collection = API\Collection::make('test')->save();
+
+        app('statamic.scopes')[PostType::handle()] = PostType::class;
+        app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;
     }
 
     protected function makeEntry()
@@ -187,5 +191,21 @@ class EntriesTest extends TestCase
             ['Pear', 'Banana', 'Apple'],
             $this->getEntries(['sort' => 'title:desc'])->map->get('title')->all()
         );
+    }
+}
+
+class PostType extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', 'like', "%{$params['post_type']}%");
+    }
+}
+
+class PostAnimal extends Scope
+{
+    public function apply($query, $params)
+    {
+        $query->where('title', 'like', "%{$params['post_animal']}%");
     }
 }
