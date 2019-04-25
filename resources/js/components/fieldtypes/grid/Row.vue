@@ -12,7 +12,7 @@
             :index="i"
             :row-index="index"
             :grid-name="name"
-            @updated="updated"
+            @updated="updated(field.handle, $event)"
         />
 
         <td class="row-controls">

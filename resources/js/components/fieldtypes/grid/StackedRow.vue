@@ -19,7 +19,7 @@
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 class="p-2"
-                @updated="updated"
+                @updated="updated(field.handle, $event)"
             />
         </div>
     </div>
