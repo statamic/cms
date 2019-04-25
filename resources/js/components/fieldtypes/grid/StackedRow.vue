@@ -5,8 +5,8 @@
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div
-            class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between"
-            :class="sortableHandleClass"
+            class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between outline-none"
+            :class="{ [sortableHandleClass]: grid.isReorderable }"
         >
             {{ index }}
             <span class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
@@ -18,8 +18,11 @@
                 :config="field"
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
+                :read-only="grid.isReadOnly"
                 class="p-2"
                 @updated="updated(field.handle, $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             />
         </div>
     </div>

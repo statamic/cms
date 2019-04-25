@@ -8,7 +8,10 @@
                 :value="value"
                 :meta="meta"
                 :name="name"
-                @updated="updated"
+                :read-only="grid.isReadOnly"
+                @updated="$emit('updated', $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             />
         </div>
 
@@ -51,7 +54,7 @@ export default {
         }
     },
 
-    inject: ['storeName'],
+    inject: ['storeName', 'grid'],
 
     computed: {
 
@@ -75,14 +78,6 @@ export default {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
             return state.errors[this.errorKey] || [];
-        }
-
-    },
-
-    methods: {
-
-        updated(value) {
-            this.$emit('updated', this.field.handle, value);
         }
 
     }

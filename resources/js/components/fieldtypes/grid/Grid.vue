@@ -17,6 +17,8 @@
             @removed="removed"
             @duplicate="duplicate"
             @sorted="sorted"
+            @focus="focused = true"
+            @blur="blurred"
         />
 
         <button
@@ -48,6 +50,7 @@ export default {
         return {
             rows: null,
             containerWidth: null,
+            focused: false,
         }
     },
 
@@ -70,7 +73,7 @@ export default {
         },
 
         canAddRows() {
-            return this.rows.length < this.maxRows;
+            return !this.isReadOnly && this.rows.length < this.maxRows;
         },
 
         hasMaxRows() {
@@ -83,16 +86,14 @@ export default {
         },
 
         isReorderable() {
-            return this.config.reorderable && this.maxRows > 1
-        }
+            return !this.isReadOnly && this.config.reorderable && this.maxRows > 1
+        },
 
     },
 
-    provide() {
-        return {
-            gridConfig: this.config,
-            reorderable: this.isReorderable
-        }
+    reactiveProvide: {
+        name: 'grid',
+        include: ['config', 'isReorderable', 'isReadOnly']
     },
 
     created() {
@@ -109,6 +110,33 @@ export default {
 
         // Add watcher manually after initial data wangjangling to prevent a premature dirty state.
         this.$watch('rows', rows => this.update(rows));
+    },
+
+    watch: {
+
+        value(value) {
+            this.rows = value;
+        },
+
+        isReorderable: {
+            immediate: true,
+            handler(reorderable) {
+                this.reorderable = reorderable;
+            }
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                }
+            }, 1);
+        }
+
     },
 
     methods: {
@@ -152,6 +180,14 @@ export default {
 
         focus() {
             // TODO
+        },
+
+        blurred() {
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.focused = false;
+                }
+            }, 1);
         }
 
     }

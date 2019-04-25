@@ -3,13 +3,13 @@
     <table class="grid-table" v-if="rows.length > 0">
         <thead>
             <tr>
-                <th class="grid-drag-handle-header" v-if="reorderable"></th>
+                <th class="grid-drag-handle-header" v-if="grid.isReorderable"></th>
                 <grid-header-cell
                     v-for="field in fields"
                     :key="field.handle"
                     :field="field"
                 />
-                <th class="row-controls"></th>
+                <th class="row-controls" v-if="!grid.isReadOnly"></th>
             </tr>
         </thead>
         <sortable-list
@@ -17,6 +17,8 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            @dragstart="$emit('focus')"
+            @dragend="$emit('blur')"
         >
             <tbody slot-scope="{}">
                 <grid-row
@@ -30,6 +32,8 @@
                     @updated="(row, value) => $emit('updated', row, value)"
                     @duplicate="(row) => $emit('duplicate', row)"
                     @removed="(row) => $emit('removed', row)"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')"
                 />
             </tbody>
         </sortable-list>
@@ -47,7 +51,7 @@ export default {
 
     mixins: [View],
 
-    inject: ['reorderable'],
+    inject: ['grid'],
 
     components: {
         GridRow,

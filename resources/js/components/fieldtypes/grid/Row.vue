@@ -1,7 +1,7 @@
 <template>
 
     <tr :class="[sortableItemClass, { 'opacity-50': isExcessive }]">
-        <td :class="sortableHandleClass" v-if="reorderable"></td>
+        <td :class="sortableHandleClass" v-if="grid.isReorderable"></td>
         <grid-cell
             v-for="(field, i) in fields"
             :show-inner="showField(field)"
@@ -13,9 +13,11 @@
             :row-index="index"
             :grid-name="name"
             @updated="updated(field.handle, $event)"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
         />
 
-        <td class="row-controls">
+        <td class="row-controls" v-if="!grid.isReadOnly">
             <dropdown-list ref="dropdown">
                 <ul class="dropdown-menu">
                     <li><a @click="duplicate(index)" v-text="__('Duplicate Row')"></a></li>
@@ -67,8 +69,7 @@ export default {
     },
 
     inject: [
-        'gridConfig',
-        'reorderable',
+        'grid',
         'sortableItemClass',
         'sortableHandleClass',
     ],
@@ -76,7 +77,7 @@ export default {
     computed: {
 
         isExcessive() {
-            const max = this.gridConfig.max_rows;
+            const max = this.grid.config.max_rows;
             if (! max) return false;
             return this.index >= max;
         }
