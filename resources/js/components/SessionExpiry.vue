@@ -60,7 +60,8 @@ export default {
             errors: {},
             password: null,
             pinging: false,
-            lastCount: Vue.moment()
+            lastCount: Vue.moment(),
+            isPageHidden: false,
         }
     },
 
@@ -80,6 +81,8 @@ export default {
 
     created() {
         this.startCountdown();
+
+        document.addEventListener('visibilitychange', () => this.isPageHidden = document.hidden, false);
     },
 
     watch: {
@@ -121,7 +124,7 @@ export default {
         },
 
         ping() {
-            if (this.pinging) return Promise.resolve();
+            if (this.pinging || this.isPageHidden) return Promise.resolve();
 
             this.pinging = true;
 
