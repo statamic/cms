@@ -94,8 +94,8 @@ class Entries
 
     protected function parseCollections($params)
     {
-        $from = Arr::getFirst($params, ['from', 'folder', 'use']);
-        $not = Arr::getFirst($params, ['not_from', 'not_folder', 'dont_use']);
+        $from = Arr::getFirst($params, ['from', 'in', 'folder', 'use', 'collection']);
+        $not = Arr::getFirst($params, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         $collections = $from === '*'
             ? collect(Collection::handles())

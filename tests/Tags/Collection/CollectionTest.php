@@ -66,10 +66,16 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['from' => 'music|art'];
         $this->assertCount(6, $this->collectionTag->index());
 
+        $this->collectionTag->parameters = ['in' => 'music|art'];
+        $this->assertCount(6, $this->collectionTag->index());
+
         $this->collectionTag->parameters = ['folder' => 'music|art'];
         $this->assertCount(6, $this->collectionTag->index());
 
         $this->collectionTag->parameters = ['use' => 'music|art'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['collection' => 'music|art'];
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -81,10 +87,16 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['from' => '*'];
         $this->assertCount(9, $this->collectionTag->index());
 
+        $this->collectionTag->parameters = ['in' => '*'];
+        $this->assertCount(9, $this->collectionTag->index());
+
         $this->collectionTag->parameters = ['folder' => '*'];
         $this->assertCount(9, $this->collectionTag->index());
 
         $this->collectionTag->parameters = ['use' => '*'];
+        $this->assertCount(9, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['collection' => '*'];
         $this->assertCount(9, $this->collectionTag->index());
     }
 
@@ -96,10 +108,16 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['from' => '*', 'not_from' => 'art'];
         $this->assertCount(6, $this->collectionTag->index());
 
+        $this->collectionTag->parameters = ['in' => '*', 'not_in' => 'art'];
+        $this->assertCount(6, $this->collectionTag->index());
+
         $this->collectionTag->parameters = ['folder' => '*', 'not_folder' => 'art'];
         $this->assertCount(6, $this->collectionTag->index());
 
         $this->collectionTag->parameters = ['use' => '*', 'dont_use' => 'art'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['collection' => '*', 'dont_use' => 'art'];
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -111,10 +129,16 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['from' => 'music|art', 'title:contains' => 'love'];
         $this->assertCount(4, $this->collectionTag->index());
 
+        $this->collectionTag->parameters = ['in' => 'music|art', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+
         $this->collectionTag->parameters = ['folder' => 'music|art', 'title:contains' => 'love'];
         $this->assertCount(4, $this->collectionTag->index());
 
         $this->collectionTag->parameters = ['use' => 'music|art', 'title:contains' => 'love'];
+        $this->assertCount(4, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['collection' => 'music|art', 'title:contains' => 'love'];
         $this->assertCount(4, $this->collectionTag->index());
     }
 
@@ -126,10 +150,16 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['from' => '*', 'title:contains' => 'love'];
         $this->assertCount(6, $this->collectionTag->index());
 
+        $this->collectionTag->parameters = ['in' => '*', 'title:contains' => 'love'];
+        $this->assertCount(6, $this->collectionTag->index());
+
         $this->collectionTag->parameters = ['folder' => '*', 'title:contains' => 'love'];
         $this->assertCount(6, $this->collectionTag->index());
 
         $this->collectionTag->parameters = ['use' => '*', 'title:contains' => 'love'];
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['collection' => '*', 'title:contains' => 'love'];
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -141,10 +171,16 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['from' => '*', 'not_from' => 'art|music', 'title:contains' => 'love'];
         $this->assertCount(2, $this->collectionTag->index());
 
+        $this->collectionTag->parameters = ['in' => '*', 'not_in' => 'art|music', 'title:contains' => 'love'];
+        $this->assertCount(2, $this->collectionTag->index());
+
         $this->collectionTag->parameters = ['folder' => '*', 'not_folder' => 'art|music', 'title:contains' => 'love'];
         $this->assertCount(2, $this->collectionTag->index());
 
         $this->collectionTag->parameters = ['use' => '*', 'dont_use' => 'art|music', 'title:contains' => 'love'];
+        $this->assertCount(2, $this->collectionTag->index());
+
+        $this->collectionTag->parameters = ['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love'];
         $this->assertCount(2, $this->collectionTag->index());
     }
 }
