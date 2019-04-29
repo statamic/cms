@@ -26,7 +26,12 @@ class EntryPreviewController extends CpController
     {
         $this->authorize('preview', $entry);
 
-        foreach ($request->input('preview', []) as $key => $value) {
+        $fields = $entry->blueprint()
+            ->fields()
+            ->addValues($request->input('preview', []))
+            ->process();
+
+        foreach (array_except($fields->values(), ['slug']) as $key => $value) {
             $entry->setSupplement($key, $value);
         }
 
