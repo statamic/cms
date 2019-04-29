@@ -8,10 +8,12 @@ use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
 use Statamic\Data\Structures\Structure;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class EditStructureTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     function it_shows_the_edit_form_if_user_has_edit_permission()
@@ -21,7 +23,7 @@ class EditStructureTest extends TestCase
         API\Structure::shouldReceive('find')->andReturn($structure);
 
         $this->setTestRoles(['test' => ['access cp', 'edit foo structure']]);
-        $user = API\User::make()->assignRole('test');
+        $user = API\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
