@@ -32,6 +32,7 @@ class DataResponse implements Responsable
         $this
             ->protect()
             ->handleDraft()
+            ->handlePrivateEntries()
             ->adjustResponseType()
             ->addContentHeaders()
             ->addViewPaths()
@@ -110,6 +111,22 @@ class DataResponse implements Responsable
         }
 
         $this->headers['X-Statamic-Draft'] = true;
+
+        return $this;
+    }
+
+    protected function handlePrivateEntries()
+    {
+        if (! ($collection = $this->data->collection())->dated()) {
+            return $this;
+        }
+
+        if (
+            ($collection->futureDateBehavior() === 'private' && $this->data->date()->isFuture())
+            || ($collection->pastDateBehavior() === 'private' && $this->data->date()->isPast())
+        ) {
+            throw new NotFoundHttpException;
+        }
 
         return $this;
     }

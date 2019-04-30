@@ -8,6 +8,7 @@ use Statamic\API\Entry;
 use Statamic\API\Blueprint;
 use Statamic\API\Collection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 
 class FrontendTest extends TestCase
@@ -112,6 +113,52 @@ class FrontendTest extends TestCase
     function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function future_private_entries_are_not_viewable()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        $page = tap($this->createPage('/about')->date('2019-01-02'))->save();
+        $collection = $page->collection()->dated(true);
+
+        $this
+            ->get('/about')
+            ->assertStatus(200)
+            ->assertSee('The template contents');
+
+        $collection->futureDateBehavior('private');
+
+        $this
+            ->get('/about')
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    function past_private_entries_are_not_viewable()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        $page = tap($this->createPage('/about')->date('2018-01-01'))->save();
+        $collection = $page->collection()->dated(true);
+
+        $this
+            ->get('/about')
+            ->assertStatus(200)
+            ->assertSee('The template contents');
+
+        $collection->pastDateBehavior('private');
+
+        $this
+            ->get('/about')
+            ->assertStatus(404);
     }
 
     /** @test */
