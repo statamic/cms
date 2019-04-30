@@ -147,11 +147,7 @@ class Entries
             return;
         }
 
-        // Defaults
-        $showFuture = true;
-        $showPast = true;
-
-        // Override defaults with the collection date behaviors
+        // Collection date behaviors
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
         $showFuture = $collection->futureDateBehavior() === 'public';
