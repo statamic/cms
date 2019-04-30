@@ -205,4 +205,34 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->getEntryPosition('unknown'));
         $this->assertNull($collection->getEntryOrder('unknown'));
     }
+
+    /** @test */
+    function it_sets_future_date_behavior()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertEquals('public', $collection->futureDateBehavior());
+
+        $return = $collection->futureDateBehavior('private');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('private', $collection->futureDateBehavior());
+
+        $return = $collection->futureDateBehavior(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('public', $collection->futureDateBehavior());
+    }
+
+    /** @test */
+    function it_sets_past_date_behavior()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertEquals('public', $collection->pastDateBehavior());
+
+        $return = $collection->pastDateBehavior('private');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('private', $collection->pastDateBehavior());
+
+        $return = $collection->pastDateBehavior(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('public', $collection->pastDateBehavior());
+    }
 }

@@ -28,6 +28,8 @@ class Collection implements Contract
     protected $orderable = false;
     protected $ampable = false;
     protected $positions = [];
+    protected $futureDateBehavior = 'public';
+    protected $pastDateBehavior = 'public';
 
     public function handle($handle = null)
     {
@@ -245,5 +247,25 @@ class Collection implements Contract
         return array_merge($this->data(), [
             'entry_order' => $this->getEntryOrder()
         ]);
+    }
+
+    public function futureDateBehavior($behavior = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('futureDateBehavior')
+            ->getter(function ($behavior) {
+                return $behavior ?? 'public';
+            })
+            ->args(func_get_args());
+    }
+
+    public function pastDateBehavior($behavior = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('pastDateBehavior')
+            ->getter(function ($behavior) {
+                return $behavior ?? 'public';
+            })
+            ->args(func_get_args());
     }
 }

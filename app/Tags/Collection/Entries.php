@@ -23,7 +23,6 @@ class Entries
     protected $showPublished;
     protected $showUnpublished;
     protected $showPast;
-    protected $showFuture;
     protected $since;
     protected $until;
     protected $scopes;
@@ -83,8 +82,6 @@ class Entries
 
         $this->showPublished = Arr::get($params, 'show_published', true);
         $this->showUnpublished = Arr::get($params, 'show_unpublished', false);
-        $this->showPast = Arr::get($params, 'show_past', true);
-        $this->showFuture = Arr::get($params, 'show_future', false);
         $this->since = Arr::get($params, 'since');
         $this->until = Arr::get($params, 'until');
 
@@ -150,11 +147,25 @@ class Entries
             return;
         }
 
-        if ($this->showFuture && $this->showPast) {
+        // Defaults
+        $showFuture = true;
+        $showPast = true;
+
+        // Override defaults with the collection date behaviors
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+        $showFuture = $collection->futureDateBehavior() === 'public';
+        $showPast = $collection->pastDateBehavior() === 'public';
+
+        // Override by tag parameters.
+        $showFuture = $this->parameters['show_future'] ?? $showFuture;
+        $showPast = $this->parameters['show_past'] ?? $showPast;
+
+        if ($showFuture && $showPast) {
             return;
-        } elseif ($this->showFuture && ! $this->showPast) {
+        } elseif ($showFuture && ! $showPast) {
             return $query->where('date', '>', Carbon::now());
-        } elseif (! $this->showFuture && $this->showPast) {
+        } elseif (! $showFuture && $showPast) {
             return $query->where('date', '<', Carbon::now());
         }
 

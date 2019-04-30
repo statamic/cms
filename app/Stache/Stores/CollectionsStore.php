@@ -42,6 +42,12 @@ class CollectionsStore extends BasicStore
                 ->setEntryPositions($positions);
         }
 
+        if ($dateBehavior = array_get($data, 'date_behavior')) {
+            $collection
+                ->futureDateBehavior($dateBehavior['future'] ?? null)
+                ->pastDateBehavior($dateBehavior['past'] ?? null);
+        }
+
         return $collection;
     }
 
