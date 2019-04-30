@@ -35,18 +35,9 @@ class Entries
 
     public function get()
     {
-        $query = Entry::query()
-            ->whereIn('collection', $this->collections->map->handle()->all());
-
         try {
-            $this->querySite($query);
-            $this->queryPublished($query);
-            $this->queryPastFuture($query);
-            $this->querySinceUntil($query);
-            $this->queryConditions($query);
-            $this->queryScopes($query);
-            $this->querySort($query);
-        } catch (NoResultsExpected $e) {
+            $query = $this->query();
+        } catch (NoResultsExpected $exception) {
             return collect_entries();
         }
 
@@ -63,6 +54,22 @@ class Entries
         }
 
         return $query->get();
+    }
+
+    protected function query()
+    {
+        $query = Entry::query()
+            ->whereIn('collection', $this->collections->map->handle()->all());
+
+        $this->querySite($query);
+        $this->queryPublished($query);
+        $this->queryPastFuture($query);
+        $this->querySinceUntil($query);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->querySort($query);
+
+        return $query;
     }
 
     protected function parseParameters($params)
