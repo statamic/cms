@@ -127,15 +127,15 @@ class EntriesTest extends TestCase
     /** @test */
     function it_filters_by_future_and_past()
     {
-        $this->collection->order('date')->save();
+        $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->order('2019-03-09')->save(); // definitely in past
-        $this->makeEntry()->order('2019-03-10')->save(); // today
-        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
+        $this->makeEntry()->date('2019-03-09')->save(); // definitely in past
+        $this->makeEntry()->date('2019-03-10')->save(); // today
+        $this->makeEntry()->date('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry()->date('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry()->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry()->date('2019-03-11')->save(); // definitely in future
 
         $this->assertCount(3, $this->getEntries());
         $this->assertCount(3, $this->getEntries(['show_future' => false]));
@@ -148,17 +148,17 @@ class EntriesTest extends TestCase
     /** @test */
     function it_filters_by_since_and_until()
     {
-        $this->collection->order('date')->save();
+        $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->order('2019-03-06')->save(); // further in past
-        $this->makeEntry()->order('2019-03-09')->save(); // yesterday
-        $this->makeEntry()->order('2019-03-10')->save(); // today
-        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry()->order('2019-03-11')->save(); // tomorrow
-        $this->makeEntry()->order('2019-03-13')->save(); // further in future
+        $this->makeEntry()->date('2019-03-06')->save(); // further in past
+        $this->makeEntry()->date('2019-03-09')->save(); // yesterday
+        $this->makeEntry()->date('2019-03-10')->save(); // today
+        $this->makeEntry()->date('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry()->date('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry()->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry()->date('2019-03-11')->save(); // tomorrow
+        $this->makeEntry()->date('2019-03-13')->save(); // further in future
 
         $this->assertCount(8, $this->getEntries(['show_future' => true]));
         $this->assertCount(6, $this->getEntries(['show_future' => true, 'since' => 'yesterday']));
@@ -191,12 +191,12 @@ class EntriesTest extends TestCase
     /** @test */
     function it_sorts_entries()
     {
-        $this->collection->order('date')->save();
+        $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->order('2019-02-06')->set('title', 'Pear')->save();
-        $this->makeEntry()->order('2019-02-07')->set('title', 'Apple')->save();
-        $this->makeEntry()->order('2019-03-03')->set('title', 'Banana')->save();
+        $this->makeEntry()->date('2019-02-06')->set('title', 'Pear')->save();
+        $this->makeEntry()->date('2019-02-07')->set('title', 'Apple')->save();
+        $this->makeEntry()->date('2019-03-03')->set('title', 'Banana')->save();
 
         $this->assertEquals(
             ['2019-03-03', '2019-02-07', '2019-02-06'],

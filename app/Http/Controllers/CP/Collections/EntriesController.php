@@ -40,7 +40,7 @@ class EntriesController extends CpController
             return ['deleteable' => me()->can('delete', $entry)];
         })->preProcessForIndex();
 
-        if ($collection->order() === 'date') {
+        if ($collection->dated()) {
             $entries->supplement('date', function ($entry) {
                 return $entry->date()->inPreferredFormat();
             });
@@ -102,7 +102,7 @@ class EntriesController extends CpController
             'slug' => $entry->slug()
         ]);
 
-        if ($entry->orderType() === 'date') {
+        if ($entry->collection()->dated()) {
             $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
             $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
             $values['date'] = $datetime;
@@ -176,7 +176,7 @@ class EntriesController extends CpController
             ->set('title', $request->title)
             ->slug($request->slug);
 
-        if ($entry->orderType() === 'date') {
+        if ($entry->collection()->dated()) {
             // If there's a time, adjust the format into a datetime order string.
             if (strlen($date = $request->date) > 10) {
                 $date = str_replace(':', '', $date);
@@ -271,7 +271,7 @@ class EntriesController extends CpController
                     ->data($values);
             });
 
-        if ($collection->order() === 'date') {
+        if ($collection->dated()) {
             $entry->order($values['date'] ?? now()->format('Y-m-d-Hi'));
         }
 

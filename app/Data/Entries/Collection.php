@@ -3,26 +3,31 @@
 namespace Statamic\Data\Entries;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Search;
+use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ContainsData;
+use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Entries\Collection as Contract;
 
 class Collection implements Contract
 {
-    use ContainsData, FluentlyGetsAndSets;
+    use ContainsData, FluentlyGetsAndSets, ExistsAsFile;
 
     protected $handle;
     protected $route;
-    protected $order;
     protected $title;
     protected $template;
     protected $layout;
     protected $sites = [];
     protected $blueprints = [];
     protected $searchIndex;
+    protected $dated = false;
+    protected $orderable = false;
     protected $ampable = false;
+    protected $positions = [];
 
     public function handle($handle = null)
     {
@@ -34,42 +39,32 @@ class Collection implements Contract
         return $this->fluentlyGetOrSet('route')->args(func_get_args());
     }
 
-    public function order($order = null)
+    public function dated($dated = null)
     {
-        return $this
-            ->fluentlyGetOrSet('order')
-            ->getter(function ($order) {
-                return $order ?? 'alphabetical';
-            })
-            ->setter(function ($order) {
-                switch ($order) {
-                    case 'numeric':
-                    case 'numerical':
-                    case 'numbers':
-                    case 'numbered':
-                        return 'number';
-                    default:
-                        return $order;
-                }
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('dated')->args(func_get_args());
+    }
+
+    public function orderable($orderable = null)
+    {
+        return $this->fluentlyGetOrSet('orderable')->args(func_get_args());
     }
 
     public function sortField()
     {
-        switch ($this->order()) {
-            case 'date':
-                return 'date';
-            case 'number':
-                return 'order';
-            default:
-                return 'title';
+        if ($this->orderable()) {
+            return 'order';
+        } elseif ($this->dated()) {
+            return 'date';
         }
+
+        return 'title';
     }
 
     public function sortDirection()
     {
-        if ($this->order() === 'date') {
+        if ($this->orderable()) {
+            return 'asc';
+        } elseif ($this->dated()) {
             return 'desc';
         }
 
@@ -142,7 +137,7 @@ class Collection implements Contract
             ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
             ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
 
-        if ($this->order() === 'date') {
+        if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
         }
 
@@ -189,7 +184,7 @@ class Collection implements Contract
     public function path()
     {
         return vsprintf('%s/%s.yaml', [
-            rtrim(config('statamic.stache.stores.collections.directory'), '/'),
+            rtrim(Stache::store('collections')->directory(), '/'),
             $this->handle
         ]);
     }
@@ -207,5 +202,48 @@ class Collection implements Contract
     public function hasSearchIndex()
     {
         return $this->searchIndex() !== null;
+    }
+
+    public function getEntryPositions()
+    {
+        return $this->positions;
+    }
+
+    public function setEntryPositions($positions)
+    {
+        $this->positions = $positions;
+
+        return $this;
+    }
+
+    public function setEntryPosition($id, $position)
+    {
+        Arr::set($this->positions, $position, $id);
+        ksort($this->positions);
+    }
+
+    public function getEntryPosition($id)
+    {
+        return array_flip($this->positions)[$id] ?? null;
+    }
+
+    public function getEntryOrder($id = null)
+    {
+        $order = array_values($this->positions);
+
+        if (func_num_args() === 0) {
+            return $order;
+        }
+
+        $index = array_flip($order)[$id] ?? null;
+
+        return $index === null ? null : $index + 1;
+    }
+
+    protected function fileData()
+    {
+        return array_merge($this->data(), [
+            'entry_order' => $this->getEntryOrder()
+        ]);
     }
 }

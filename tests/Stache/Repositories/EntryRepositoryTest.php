@@ -174,7 +174,7 @@ class EntryRepositoryTest extends TestCase
             $loc
                 ->slug('test')
                 ->published(false)
-                ->order('2017-07-04')
+                ->date('2017-07-04')
                 ->data(['foo' => 'bar']);
         });
 
@@ -182,7 +182,7 @@ class EntryRepositoryTest extends TestCase
             $loc
                 ->slug('le-test')
                 ->published(false)
-                ->order('2017-07-04')
+                ->date('2017-07-04')
                 ->data(['foo' => 'bar']);
         });
 
@@ -218,7 +218,7 @@ class EntryRepositoryTest extends TestCase
             $loc
                 ->slug('test')
                 ->published(false)
-                ->order('2017-07-04')
+                ->date('2017-07-04')
                 ->data(['foo' => 'bar']);
         });
 
@@ -226,7 +226,7 @@ class EntryRepositoryTest extends TestCase
             $loc
                 ->slug('le-test')
                 ->published(false)
-                ->order('2017-07-04')
+                ->date('2017-07-04')
                 ->data(['foo' => 'bar']);
         });
 
@@ -267,7 +267,7 @@ class EntryRepositoryTest extends TestCase
             $loc
                 ->slug('test')
                 ->published(false)
-                ->order('2017-07-04')
+                ->date('2017-07-04')
                 ->data(['foo' => 'bar']);
         });
 
@@ -275,7 +275,7 @@ class EntryRepositoryTest extends TestCase
             $loc
                 ->slug('le-test')
                 ->published(false)
-                ->order('2017-07-04')
+                ->date('2017-07-04')
                 ->data(['foo' => 'bar']);
         });
 

@@ -31,7 +31,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         FluentlyGetsAndSets::fluentlyGetOrSet insteadof Localization;
     }
 
-    protected $order;
+    protected $date;
 
     public function entry($entry = null)
     {
@@ -149,8 +149,8 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
     {
         $prefix = '';
 
-        if ($order = $this->order()) {
-            $prefix = $order . '.';
+        if ($this->hasDate()) {
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d') . '.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -163,14 +163,15 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         ]);
     }
 
-    public function orderType()
-    {
-        return $this->collection()->order();
-    }
-
     public function order($order = null)
     {
-        return $this->fluentlyGetOrSet('order')->args(func_get_args());
+        if (func_num_args() === 0) {
+            return $this->collection()->getEntryOrder($this->id());
+        }
+
+        $this->collection()->setEntryPosition($this->id(), $order);
+
+        return $this;
     }
 
     public function supplementTaxonomies()
@@ -212,20 +213,32 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return $this->toResponse($request);
     }
 
-    public function date()
+    public function date($date = null)
     {
-        if ($this->orderType() === 'date') {
-            return $this->hasTime()
-                ? Carbon::createFromFormat('Y-m-d-Hi', $this->order())
-                : Carbon::createFromFormat('Y-m-d', $this->order())->startOfDay();
-        }
+        return $this
+            ->fluentlyGetOrSet('date')
+            ->setter(function ($date) {
+                if ($date instanceof Carbon) {
+                    return $date;
+                }
 
-        return null;
+                if (strlen($date) === 10) {
+                    return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+                }
+
+                return Carbon::createFromFormat('Y-m-d-Hi', $date);
+            })
+            ->args(func_get_args());
+    }
+
+    public function hasDate()
+    {
+        return $this->date !== null;
     }
 
     public function hasTime()
     {
-        return $this->orderType() === 'date' && strlen($this->order()) === 15;
+        return $this->hasDate() && !$this->date()->isMidnight();
     }
 
     public function sites()

@@ -244,15 +244,15 @@ class HasConditionsTest extends TestCase
     /** @test */
     function it_filters_by_is_after_or_before_date_conditions()
     {
-        $this->collection->order('date')->save();
+        $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->order('2019-03-09')->save(); // definitely in past
-        $this->makeEntry()->order('2019-03-10')->save(); // today
-        $this->makeEntry()->order('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry()->order('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry()->order('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry()->order('2019-03-11')->save(); // definitely in future
+        $this->makeEntry()->date('2019-03-09')->save(); // definitely in past
+        $this->makeEntry()->date('2019-03-10')->save(); // today
+        $this->makeEntry()->date('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry()->date('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry()->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry()->date('2019-03-11')->save(); // definitely in future
 
         $this->assertCount(6, $this->getEntries(['show_future' => true]));
 

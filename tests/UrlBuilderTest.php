@@ -24,7 +24,7 @@ class UrlBuilderTest extends TestCase
         $this->entry = \Statamic\API\Entry::make()
             ->id('post')
             ->collection(
-                \Statamic\API\Collection::create('example')->order('date')
+                \Statamic\API\Collection::create('example')->dated(true)
             );
 
         $this->entry->in('en', function ($loc) {

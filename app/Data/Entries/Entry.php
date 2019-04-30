@@ -53,7 +53,7 @@ class Entry implements Contract, Augmentable
             'localizations' => $this->localizations()->map(function ($entry) {
                 return [
                     'slug' => $entry->slug(),
-                    'order' => $entry->order(),
+                    'date' => optional($entry->date())->format('Y-m-d-Hi'),
                     'published' => $entry->published(),
                     'path' => $entry->initialPath() ?? $entry->path(),
                     'data' => $entry->data()
@@ -85,6 +85,11 @@ class Entry implements Contract, Augmentable
     public function published($published = null)
     {
         return call_user_func_array([$this->forCurrentSite(), 'published'], func_get_args());
+    }
+
+    public function order($order = null)
+    {
+        return call_user_func_array([$this->forCurrentSite(), 'order'], func_get_args());
     }
 
     public function delete()

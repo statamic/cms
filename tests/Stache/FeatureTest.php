@@ -246,7 +246,7 @@ class FeatureTest extends TestCase
             ->in('en', function ($loc) {
                 $loc
                     ->slug('test-entry')
-                    ->order('2017-07-04')
+                    ->date('2017-07-04')
                     ->data(['title' => 'Test Entry', 'foo' => 'bar']);
             })
             ->save();

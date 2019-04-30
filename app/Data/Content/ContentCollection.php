@@ -123,7 +123,7 @@ class ContentCollection extends DataCollection
     public function removeFuture()
     {
         return $this->reject(function ($item) {
-            if ($item instanceof Entry && $item->orderType() === 'date') {
+            if ($item instanceof Entry && $item->hasDate()) {
                 return Carbon::now()->lt($item->date());
             }
 
@@ -139,7 +139,7 @@ class ContentCollection extends DataCollection
     public function removePast()
     {
         return $this->reject(function ($item) {
-            if ($item instanceof Entry && $item->orderType() === 'date') {
+            if ($item instanceof Entry && $item->hasDate()) {
                 return Carbon::now()->gt($item->date());
             }
 
@@ -158,7 +158,7 @@ class ContentCollection extends DataCollection
         $before = Carbon::parse($before);
 
         return $this->reject(function ($item) use ($before) {
-            if ($item instanceof Entry && $item->orderType() === 'date') {
+            if ($item instanceof Entry && $item->hasDate()) {
                 return $item->date()->lt($before);
             }
 
@@ -177,7 +177,7 @@ class ContentCollection extends DataCollection
         $after = Carbon::parse($after);
 
         return $this->reject(function ($item) use ($after) {
-            if ($item instanceof Entry && $item->orderType() === 'date') {
+            if ($item instanceof Entry && $item->hasDate()) {
                 return $item->date()->gt($after);
             }
 

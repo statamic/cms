@@ -430,11 +430,11 @@ class Collection extends Tags
 
         // If no sort order has been specified, we'll need to get a sensible default.
         // For date based entries it'll be by date. For number based it'll be by order, etc.
-        $type = $this->collection->first()->collection()->order();
+        $collection = $this->collection->first()->collection();
 
-        if ($type === 'date') {
+        if ($collection->dated()) {
             $sort = 'date:desc|title:asc';
-        } elseif ($type === 'number') {
+        } elseif ($collection->ordered()) {
             $sort = 'order:asc';
         } else {
             $sort = 'title:asc';

@@ -38,13 +38,16 @@ class EntriesStore extends AggregateStore
                 ->collection($collection);
 
             foreach ($item['localizations'] as $site => $attributes) {
-                $entry->in($site, function ($localized) use ($attributes) {
+                $entry->in($site, function ($localized) use ($attributes, $collection) {
                     $localized
                         ->slug($attributes['slug'])
                         ->initialPath($attributes['path'])
                         ->published($attributes['published'])
-                        ->order($attributes['order'])
                         ->data($attributes['data']);
+
+                    if ($collection->dated()) {
+                        $localized->date($attributes['date']);
+                    }
                 });
             }
 
@@ -87,21 +90,27 @@ class EntriesStore extends AggregateStore
             $id = $this->stache->generateId();
         }
 
-        if (! $entry = $this->store($collection)->getItem($id)) {
+        $collectionHandle = $collection;
+        $collection = Collection::whereHandle($collection);
+
+        if (! $entry = $this->store($collectionHandle)->getItem($id)) {
             $entry = Entry::make()
                 ->id($id)
-                ->collection(Collection::whereHandle($collection));
+                ->collection($collection);
         }
 
-        $localized = $entry->in($site, function ($localized) use ($data, $path) {
+        $localized = $entry->in($site, function ($localized) use ($data, $path, $collection) {
             $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
             $localized
                 ->slug($slug)
                 ->initialPath($path)
                 ->published(array_pull($data, 'published', true))
-                ->order(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path))
                 ->data($data);
+
+            if ($collection->dated()) {
+                $localized->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
+            }
         });
 
         if (isset($idGenerated)) {

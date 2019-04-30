@@ -260,8 +260,7 @@ class LocalizedEntryTest extends TestCase
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/blog/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/2018-01-02.post.md', $entry->order('2018-01-02')->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/2.post.md', $entry->order('2')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
@@ -277,60 +276,103 @@ class LocalizedEntryTest extends TestCase
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/blog/en/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2018-01-02.post.md', $entry->order('2018-01-02')->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2.post.md', $entry->order('2')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
-    function it_gets_the_order_type_from_the_collection()
+    function it_gets_and_sets_the_date()
     {
-        $collection = (new Collection)->handle('blog');
-        $parent = (new Entry)->collection($collection);
-        $entry = (new LocalizedEntry)->entry($parent);
+        $entry = new Localizedentry;
+        $this->assertNull($entry->date());
 
-        $this->assertEquals('alphabetical', $entry->orderType());
+        // Date can be provided as string without time
+        $return = $entry->date('2015-03-05');
+        $this->assertEquals($entry, $return);
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 00:00')->eq($entry->date()));
 
-        $collection->order('number');
+        // Date can be provided as string with time
+        $entry->date('2015-03-05-1325');
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 13:25')->eq($entry->date()));
 
-        $this->assertEquals('number', $entry->orderType());
+        // Date can be provided as carbon instance
+        $carbon = Carbon::createFromFormat('Y-m-d H:i', '2018-05-02 17:32');
+        $entry->date($carbon);
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue($carbon->eq($entry->date()));
     }
 
     /** @test */
     function it_gets_and_sets_the_order()
     {
-        $entry = new LocalizedEntry;
-        $this->assertNull($entry->order());
+        $collection = new Collection;
+        $one = (new Entry)->id('one')->collection($collection)->in('en', function ($loc) {});
+        $this->assertNull($one->order());
 
-        $return = $entry->order('123');
+        $return = $one->order(5);
+        $this->assertEquals($one, $return);
+        $this->assertEquals(1, $one->order());
 
-        $this->assertEquals($entry, $return);
-        $this->assertEquals('123', $entry->order());
+        $two = (new Entry)->id('two')->collection($collection)->in('en', function ($loc) {});
+        $two->order(10);
+        $this->assertEquals(1, $one->order());
+        $this->assertEquals(2, $two->order());
+
+        $three = (new Entry)->id('three')->collection($collection)->in('en', function ($loc) {});
+        $three->order(2);
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(3, $two->order());
+        $this->assertEquals(1, $three->order());
+    }
+
+    /** @test */
+    function it_sets_the_order_on_the_collection_when_dealing_with_numeric_collections()
+    {
+        $collection = (new Collection)->orderable(true);
+
+        $one = (new Entry)->id('one')->collection($collection)->in('en', function ($loc) {
+            //
+        });
+
+        $two = (new Entry)->id('two')->collection($collection)->in('en', function ($loc) {
+            //
+        });
+
+        $one->order('3');
+        $two->order('2');
+
+        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions());
+        $this->assertEquals(['two', 'one'], $collection->getEntryOrder());
+
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(1, $two->order());
     }
 
     /** @test */
     function it_gets_and_sets_the_date_for_date_collections()
     {
         $dateEntry = with('', function() {
-            $collection = (new Collection)->order('date');
+            $collection = (new Collection)->dated(true);
             $parent = (new Entry)->collection($collection);
             return (new LocalizedEntry)->entry($parent);
         });
         $numberEntry = with('', function() {
-            $collection = (new Collection)->order('number');
+            $collection = (new Collection)->orderable(true);
             $parent = (new Entry)->collection($collection);
             return (new LocalizedEntry)->entry($parent);
         });
         $this->assertNull($dateEntry->order());
         $this->assertNull($numberEntry->order());
 
-        $dateEntry->order('2017-01-02');
+        $dateEntry->date('2017-01-02');
         $numberEntry->order('2017-01-02');
 
         $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
         $this->assertFalse($dateEntry->hasTime());
         $this->assertNull($numberEntry->date());
 
-        $dateEntry->order('2017-01-02-1523');
+        $dateEntry->date('2017-01-02-1523');
         $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
         $this->assertTrue($dateEntry->hasTime());
     }
@@ -421,7 +463,7 @@ class LocalizedEntryTest extends TestCase
         $entry = (new LocalizedEntry)
             ->id('123')
             ->slug('test')
-            ->order('2018-01-01')
+            ->date('2018-01-01')
             ->published(false)
             ->data([
                 'title' => 'The title',

@@ -204,7 +204,7 @@ class Entries
     protected function allCollectionsAreDates()
     {
         return $this->allCollectionsAre(function ($collection) {
-            return $collection->order() === 'date';
+            return $collection->dated();
         });
     }
 

@@ -56,7 +56,7 @@ class EntryRevisionsController extends CpController
             'slug' => $entry->slug()
         ]);
 
-        if ($entry->orderType() === 'date') {
+        if ($entry->collection()->dated()) {
             $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
             $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
             $values['date'] = $datetime;
