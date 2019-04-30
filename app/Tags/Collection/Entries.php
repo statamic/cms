@@ -56,6 +56,15 @@ class Entries
         return $query->get();
     }
 
+    public function count()
+    {
+        try {
+            return $this->query()->count();
+        } catch (NoResultsExpected $exception) {
+            return 0;
+        }
+    }
+
     protected function query()
     {
         $query = Entry::query()

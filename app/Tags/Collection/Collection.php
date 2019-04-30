@@ -29,6 +29,11 @@ class Collection extends Tags
         return $this->output();
     }
 
+    public function count()
+    {
+        return (new Entries($this->parameters))->count();
+    }
+
     protected function output()
     {
         if ($this->entries instanceof Paginator) {
