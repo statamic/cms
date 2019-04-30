@@ -183,4 +183,46 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = ['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love'];
         $this->assertCount(2, $this->collectionTag->index());
     }
+
+    /** @test */
+    function it_counts_entries_in_a_collection()
+    {
+        $this->makePosts();
+
+        $this->collectionTag->parameters = ['from' => '*'];
+        $this->assertEquals(9, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['in' => '*'];
+        $this->assertEquals(9, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['folder' => '*'];
+        $this->assertEquals(9, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['use' => '*'];
+        $this->assertEquals(9, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['collection' => '*'];
+        $this->assertEquals(9, $this->collectionTag->count());
+    }
+
+    /** @test */
+    function it_counts_entries_in_a_collection_with_params()
+    {
+        $this->makePosts();
+
+        $this->collectionTag->parameters = ['from' => '*', 'not_from' => 'art|music', 'title:contains' => 'love'];
+        $this->assertEquals(2, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['in' => '*', 'not_in' => 'art|music', 'title:contains' => 'love'];
+        $this->assertEquals(2, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['folder' => '*', 'not_folder' => 'art|music', 'title:contains' => 'love'];
+        $this->assertEquals(2, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['use' => '*', 'dont_use' => 'art|music', 'title:contains' => 'love'];
+        $this->assertEquals(2, $this->collectionTag->count());
+
+        $this->collectionTag->parameters = ['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love'];
+        $this->assertEquals(2, $this->collectionTag->count());
+    }
 }
