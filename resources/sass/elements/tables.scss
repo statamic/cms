@@ -77,6 +77,13 @@
     }
 }
 
+td.table-drag-handle {
+	@apply w-3 border-r h-full p-1;
+	cursor: grab;
+	background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+	&:hover { @apply .bg-grey-30; }
+}
+
 table.table-legacy {
 	margin-top: 25px;
 	margin-bottom: 40px;

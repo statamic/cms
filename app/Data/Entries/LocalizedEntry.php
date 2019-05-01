@@ -169,7 +169,7 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
             return $this->collection()->getEntryOrder($this->id());
         }
 
-        $this->collection()->setEntryPosition($this->id(), $order);
+        $this->collection()->setEntryPosition($this->id(), $order)->save();
 
         return $this;
     }

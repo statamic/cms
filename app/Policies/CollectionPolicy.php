@@ -53,4 +53,9 @@ class CollectionPolicy
     {
         //
     }
+
+    public function reorder($user, $collection)
+    {
+        return $collection->orderable() && $user->hasPermission("reorder {$collection->handle()} entries");
+    }
 }

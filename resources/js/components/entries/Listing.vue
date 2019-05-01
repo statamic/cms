@@ -20,6 +20,15 @@
                     <div class="data-list-header">
                         <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
+                        <button class="btn btn-flat"
+                            v-if="showReorderButton"
+                            @click="reorder"
+                            v-text="__('Reorder')"
+                        />
+                        <template v-if="reordering">
+                            <button class="btn btn-flat mr-1" @click="saveOrder">Save Order</button>
+                            <button class="btn btn-flat" @click="cancelReordering">Cancel</button>
+                        </template>
                         <data-list-bulk-actions
                             :url="actionUrl"
                             :actions="entryActions"
@@ -38,7 +47,15 @@
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
-                    <data-list-table v-show="items.length" :loading="loading" :allow-bulk-actions="true" @sorted="sorted">
+                    <data-list-table
+                        v-show="items.length"
+                        :loading="loading"
+                        :allow-bulk-actions="true"
+                        :sortable="!reordering"
+                        :reorderable="reordering"
+                        @sorted="sorted"
+                        @reordered="reordered"
+                    >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
@@ -86,12 +103,17 @@ export default {
 
     props: {
         collection: String,
+        reorderable: Boolean,
+        reorderUrl: String,
     },
 
     data() {
         return {
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
+            reordering: false,
+            reorderingRequested: false,
+            initialOrder: null,
         }
     },
 
@@ -100,12 +122,55 @@ export default {
             this.actions.forEach(action => action.context.site = data_get(this.activeFilters, 'site.value', null));
 
             return this.actions;
+        },
+
+        showReorderButton() {
+            return this.reorderable && !this.reordering;
+        },
+
+        reorderingDisabled() {
+            return this.sortColumn !== 'order';
         }
     },
 
     methods: {
         preferencesKey(type) {
             return `collections.${this.collection}.${type}`;
+        },
+
+        afterRequestCompleted(response) {
+            if (this.reorderingRequested) this.reorder();
+        },
+
+        reorder() {
+            // If the listing isn't in order when attempting to reorder, things would get
+            // all jumbled up. We'll change the sort order, which triggers an async
+            // request. Once it's completed, reordering will be re-triggered.
+            if (this.sortColumn !== 'order') {
+                this.reorderingRequested = true;
+                this.sortColumn = 'order';
+                return;
+            }
+
+            this.reordering = true;
+            this.initialOrder = this.items.map(item => item.id);
+            this.reorderingRequested = false;
+        },
+
+        saveOrder() {
+            const ids = this.items.map(item => item.id);
+            this.$axios.post(this.reorderUrl, { ids });
+            this.reordering = false;
+        },
+
+        cancelReordering() {
+            this.reordering = false;
+            this.items = this.initialOrder.map(id => _.findWhere(this.items, { id }));
+            this.initialOrder = null;
+        },
+
+        reordered(items) {
+            this.items = items;
         }
     }
 

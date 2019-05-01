@@ -38,6 +38,7 @@ Route::group([
             Route::post('action', 'EntryActionController')->name('collections.entries.action');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
+            Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
             Route::group(['prefix' => '{entry}/{slug}/{site}'], function () {

@@ -32,6 +32,8 @@
             :filters="{{ $filters->toJson() }}"
             :actions="{{ $actions->toJson() }}"
             action-url="{{ cp_route('collections.entries.action', $collection->handle()) }}"
+            :reorderable="true"
+            reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         ></entry-list>
 
     @else

@@ -104,12 +104,17 @@ export default {
                 this.meta = response.data.meta;
                 this.loading = false;
                 this.initializing = false;
+                this.afterRequestCompleted();
             }).catch(e => {
                 if (this.$axios.isCancel(e)) return;
                 this.loading = false;
                 this.initializing = false;
                 this.$notify.error(e.response ? e.response.data.message : __('Something went wrong'));
             })
+        },
+
+        afterRequestCompleted(response) {
+            //
         },
 
         sorted(column, direction) {
