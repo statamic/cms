@@ -34,6 +34,18 @@ class OrderBy
     }
 
     /**
+     * Reverse order by direction.
+     *
+     * @return $this
+     */
+    public function reverse()
+    {
+        $this->direction = $this->direction === 'asc' ? 'desc' : 'asc';
+
+        return $this;
+    }
+
+    /**
      * Convert order by to string, ie) 'title:desc'
      *
      * @return string

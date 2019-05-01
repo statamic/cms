@@ -54,6 +54,46 @@ class Entries
         }
     }
 
+    public function next($currentEntry)
+    {
+        throw_if($this->paginate, new \Exception('collection:next is not compatible with [paginate] parameter'));
+        throw_if($this->offset, new \Exception('collection:next is not compatible with [offset] parameter'));
+
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+
+        if ($collection->orderable()) {
+            $query = $this->query()->where('order', '>', $currentEntry->order());
+        } elseif ($collection->dated()) {
+            $query = $this->query()->where('date', '>', $currentEntry->date());
+        } else {
+            throw new \Exception('collection:next requires ordered or dated collection');
+        }
+
+        return $this->results($query);
+    }
+
+    public function previous($currentEntry)
+    {
+        throw_if($this->paginate, new \Exception('collection:previous is not compatible with [paginate] parameter'));
+        throw_if($this->offset, new \Exception('collection:previous is not compatible with [offset] parameter'));
+
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+
+        $this->orderBys = $this->orderBys->map->reverse();
+
+        if ($collection->orderable()) {
+            $query = $this->query()->where('order', '<', $currentEntry->order());
+        } elseif ($collection->dated()) {
+            $query = $this->query()->where('date', '<', $currentEntry->date());
+        } else {
+            throw new \Exception('collection:previous requires ordered or dated collection');
+        }
+
+        return $this->results($query)->reverse()->values();
+    }
+
     protected function query()
     {
         $query = Entry::query()

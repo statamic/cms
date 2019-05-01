@@ -2,7 +2,8 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\API;
+use Statamic\API\URL;
+use Statamic\API\Entry;
 use Statamic\Tags\Tags;
 use Statamic\Data\Entries\EntryCollection;
 use Illuminate\Contracts\Pagination\Paginator;
@@ -24,14 +25,47 @@ class Collection extends Tags
      */
     public function index()
     {
-        $this->entries = (new Entries($this->parameters))->get();
+        $this->entries = $this->entries()->get();
 
         return $this->output();
     }
 
+    /**
+     * {{ collection:count from="" }} ... {{ /collection:count }}
+     */
     public function count()
     {
-        return (new Entries($this->parameters))->count();
+        return $this->entries()->count();
+    }
+
+    /**
+     * {{ collection:next from="" }} ... {{ /collection:next }}
+     */
+    public function next()
+    {
+        $this->entries = $this->entries()->next($this->currentEntry());
+
+        return $this->output();
+    }
+
+    /**
+     * {{ collection:previous from="" }} ... {{ /collection:previous }}
+     */
+    public function previous()
+    {
+        $this->entries = $this->entries()->previous($this->currentEntry());
+
+        return $this->output();
+    }
+
+    protected function entries()
+    {
+        return new Entries($this->parameters);
+    }
+
+    protected function currentEntry()
+    {
+        return Entry::find($this->get('current', $this->getContext('id')));
     }
 
     protected function output()
