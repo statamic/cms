@@ -245,7 +245,7 @@ class EntriesTest extends TestCase
 
         $this->assertEquals(
             ['Pear', 'Banana', 'Apple'],
-            $this->getEntries(['sort' => 'title:desc'])->map->get('title')->all()
+            $this->getEntries(['order_by' => 'title:desc'])->map->get('title')->all()
         );
     }
 }
