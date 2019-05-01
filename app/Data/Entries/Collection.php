@@ -222,6 +222,8 @@ class Collection implements Contract
     {
         Arr::set($this->positions, $position, $id);
         ksort($this->positions);
+
+        return $this;
     }
 
     public function getEntryPosition($id)

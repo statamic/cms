@@ -176,7 +176,8 @@ class CollectionTest extends TestCase
     {
         $collection = (new Collection)->handle('test')->setEntryPositions([]);
 
-        $collection->setEntryPosition('one', 3);
+        $return = $collection->setEntryPosition('one', 3);
+        $this->assertEquals($collection, $return);
         $this->assertSame([3 => 'one'], $collection->getEntryPositions());
         $this->assertSame(['one'], $collection->getEntryOrder());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
