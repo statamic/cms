@@ -36,65 +36,87 @@
         <!-- Step 2 -->
         <div v-if="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Ordering</h1>
-                <p class="text-grey">Each Collection can behave differently based on way you prefer your Entries to be ordered and grouped.</p>
+                <h1 class="mb-3">Dates</h1>
+                <p class="text-grey">You can select different date behaviors.</p>
             </div>
-            <div class="max-w-lg px-4 mx-auto pb-6 text-center">
-                <div class="-mx-2 flex flex-wrap">
-                    <div class="w-full md:w-1/3 px-2 mb-2">
-                        <label for="order-date" class="radio-box" :class="{selected: collection.order === 'date'}">
-                            <input id="order-date" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.order" value="date" />
-                            <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
-                            <h3 class="my-2 font-bold">Date</h3>
-                            <p class="text-2xs text-grey">Entries are ordered by date and can be automatically published and expired.</p>
-                        </label>
-                    </div>
-                    <div class="w-full md:w-1/3 px-2 mb-2">
-                        <label for="order-alpha" class="radio-box" :class="{selected: collection.order === 'alphabetical'}">
-                            <input id="order-alpha" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.order" value="alphabetical" />
-                            <svg-icon name="arrange-letter" class="w-8 h-8 mx-auto"></svg-icon>
-                            <h3 class="my-2 font-bold">Alphabetical</h3>
-                            <p class="text-2xs text-grey">Entries are ordered alphabetically by title and can be grouped by letter.</p>
-                        </label>
-                    </div>
-                    <div class="w-full md:w-1/3 px-2 mb-2">
-                        <label for="order-numerical" class="radio-box" :class="{selected: collection.order === 'numerical'}">
-                            <input id="order-numerical" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.order" value="numerical" />
-                            <svg-icon name="arrange-number" class="w-8 h-8 mx-auto"></svg-icon>
-                            <h3 class="my-2 font-bold">Numerical</h3>
-                            <p class="text-2xs text-grey">Entries are ordered sequentally and can be manually reordered.</p>
-                        </label>
-                    </div>
-                </div>
+
+            <div class="max-w-md mx-auto px-2 pb-6">
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
+                    <input type="radio" v-model="collection.dateBehavior" :value="null" />
+                    <p><strong class="text-md ml-2 font-bold">No dates</strong> &ndash; Entries will not have any dates.</p>
+                </label>
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
+                    <input type="radio" v-model="collection.dateBehavior" value="articles" />
+                    <p><strong class="text-md ml-2 font-bold">Articles</strong> &ndash; Entries with dates in the future will be private.</p>
+                </label>
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
+                    <input type="radio" v-model="collection.dateBehavior" value="events" />
+                    <p><strong class="text-md ml-2 font-bold">Events</strong> &ndash; Entries with dates in the past will be private.</p>
+                </label>
             </div>
         </div>
 
         <!-- Step 3 -->
         <div v-if="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Behavior</h1>
-                <p class="text-grey">Each Collection can behave differently based on way you prefer your Entries to be ordered and grouped.</p>
+                <h1 class="mb-3">Order</h1>
+                <p class="text-grey">Choose how you want your Collection to be ordered.</p>
             </div>
-            <!-- Date Collection -->
-            <div class="max-w-md mx-auto px-2 pb-6" v-if="collection.order == 'date'">
-                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="behavior-scheduled">
-                    <input type="checkbox" v-model="collection.behavior.scheduled" id="behavior-scheduled">
-                    <p><strong class="text-md ml-2 font-bold">Scheduled</strong> &ndash; Entries with publish dates in the future will be private.</p>
-                </label>
-                <label class="border-2 cursor-pointer border-grey-30 p-2 mt-4 rounded flex items-center" for="behavior-expirable">
-                    <input type="checkbox" v-model="collection.behavior.expirable" id="behavior-expirable">
-                    <p><strong class="text-md ml-2 font-bold">Expirable</strong> &ndash; Entries can be expired and made private after a specified date.</p>
-                </label>
+            <div class="max-w-lg px-4 mx-auto pb-6 text-center">
+                <div class="-mx-2 flex flex-wrap justify-center">
+                    <div class="w-full md:w-1/3 px-2 mb-2">
+                        <label for="order-date" class="radio-box" :class="{selected: !collection.orderable}">
+                            <input id="order-date" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.orderable" :value="false" />
+                            <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
+                            <h3 class="my-2 font-bold">
+                                <template v-if="collection.dated">Date</template>
+                                <template v-else>Alphabetical</template>
+                            </h3>
+                            <p class="text-2xs text-grey">
+                                <template v-if="collection.dated">Entries are ordered by date.</template>
+                                <template v-else>Entries are ordered alphabetically by title.</template>
+                            </p>
+                        </label>
+                    </div>
+                    <div class="w-full md:w-1/3 px-2 mb-2">
+                        <label for="order-numerical" class="radio-box" :class="{selected: collection.orderable}">
+                            <input id="order-numerical" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.orderable" :value="true" />
+                            <svg-icon name="arrange-number" class="w-8 h-8 mx-auto"></svg-icon>
+                            <h3 class="my-2 font-bold">Ordered</h3>
+                            <p class="text-2xs text-grey">Entries are ordered sequentially and can be manually reordered.</p>
+                        </label>
+                    </div>
+                </div>
             </div>
-            <!-- Alphabetical Collection -->
-            <div class="max-w-md mx-auto px-2 pb-6" v-if="collection.order == 'alphabetical'">
+
+            <div class="max-w-md mx-auto pb-4">
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-asc">
-                    <input type="radio" v-model="collection.behavior.direction" value="asc" id="direction-asc">
-                    <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash; Entries will be sorted in ascending order, from A to Z.</p>
+                    <input type="radio" v-model="collection.sortDirection" value="asc" id="direction-asc">
+                    <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash;
+                        <template v-if="collection.orderable">
+                            Entries will be sorted from lowest to highest.
+                        </template>
+                        <template v-else-if="collection.dated">
+                            Entries will be sorted from newest to oldest.
+                        </template>
+                        <template v-else>
+                            Entries will be sorted from A to Z.
+                        </template>
+                    </p>
                 </label>
                 <label class="border-2 mt-4 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-desc">
-                    <input type="radio" v-model="collection.behavior.direction" value="desc" id="direction-desc">
-                    <p><strong class="text-md ml-2 font-bold">Descending</strong> &ndash; Entries will be sorted in descending order, from Z to A.</p>
+                    <input type="radio" v-model="collection.sortDirection" value="desc" id="direction-desc">
+                    <p><strong class="text-md ml-2 font-bold">Descending</strong> &ndash;
+                        <template v-if="collection.orderable">
+                            Entries will be sorted from highest to lowest.
+                        </template>
+                        <template v-else-if="collection.dated">
+                            Entries will be sorted from oldest to newest.
+                        </template>
+                        <template v-else>
+                            Entries will be sorted from Z to A.
+                        </template>
+                    </p>
                 </label>
             </div>
         </div>
@@ -165,9 +187,6 @@
 // Yer a wizard Harry
 export default {
     props: {
-        steps: {
-            type: Array
-        },
         route: {
             type: String
         }
@@ -175,16 +194,18 @@ export default {
 
     data() {
         return {
+            steps: ['Naming', 'Dates', 'Order', 'Content Model', 'Route'],
             currentStep: 0,
             collection: {
                 title: null,
                 handle: null,
-                order: null,
-                fieldset: null,
-                blueprint: null,
+                orderable: false,
+                dated: false,
+                dateBehavior: null,
+                sortDirection: 'asc',
+                blueprints: [],
                 template: null,
                 route: null,
-                behavior: {}
             }
         }
     },
@@ -204,6 +225,10 @@ export default {
     watch: {
         'collection.title': function(val) {
             this.collection.handle = this.$slugify(val, '_');
+        },
+
+        'collection.dateBehavior': function (behavior) {
+            this.collection.dated = behavior === null ? false : true;
         }
     },
 
@@ -224,21 +249,11 @@ export default {
             }
         },
         canGoToStep(step) {
-            if (step === 0) {
-                return true;
-            } else if (step === 1) {
+            if (step === 1) {
                 return Boolean(this.collection.title && this.collection.handle);
-            } else if (step === 2) {
-                return Boolean(this.canGoToStep(1) && this.collection.order);
-            } else if (step === 3) {
-                return Boolean(this.canGoToStep(2)
-                    && (this.collection.order == "date") || this.collection.order == "numerical" || this.collection.behavior.hasOwnProperty('direction')
-                );
-            } else if (step === 4) {
-                return Boolean(this.canGoToStep(3));
             }
 
-            return false;
+            return true;
         },
         submit() {
             this.$axios.post(this.route, this.collection).then(response => {

@@ -84,18 +84,40 @@ class CollectionsController extends CpController
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
             'template' => 'nullable',
-            'fieldset' => 'nullable',
+            'blueprints' => 'array',
             'route' => 'nullable',
-            'order' => 'nullable',
+            'orderable' => 'boolean',
+            'dated' => 'boolean',
+            'dateBehavior' => 'nullable',
+            'sortDirection' => 'in:asc,desc'
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $collection = tap(Collection::create($handle))
-            ->data(array_except($data, 'handle'))
-            ->save();
+        $collection = Collection::create($handle)
+            ->title($data['title'])
+            ->route($data['route'])
+            ->dated($data['dated'])
+            ->template($data['template'])
+            ->orderable($data['orderable']);
 
-        session()->flash('message', __('Collection created'));
+        switch ($data['dateBehavior']) {
+            case 'articles':
+                $collection
+                    ->pastDateBehavior('public')
+                    ->futureDateBehavior('private');
+                break;
+
+            case 'events':
+                $collection
+                    ->pastDateBehavior('public')
+                    ->futureDateBehavior('private');
+                break;
+        }
+
+        $collection->save();
+
+        session()->flash('success', __('Collection created'));
 
         return [
             'redirect' => $collection->showUrl()
