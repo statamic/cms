@@ -75,10 +75,23 @@ class Collection extends Tags
         }
 
         if ($as = $this->get('as')) {
-            return [$as => $this->entries];
+            return array_merge([$as => $this->entries], $this->extraOutput());
         }
 
         return $this->entries;
+    }
+
+    protected function extraOutput()
+    {
+        $extra = [];
+
+        $extra['total_results'] = $this->entries->count();
+
+        if ($this->entries->isEmpty()) {
+            $extra['no_results'] = true;
+        }
+
+        return $extra;
     }
 
     protected function paginatedOutput()
@@ -87,11 +100,10 @@ class Collection extends Tags
         $paginator = $this->entries;
         $entries = $paginator->getCollection()->supplement('total_results', $paginator->total());
 
-        return [
+        return array_merge([
             $as => $entries,
-            'paginate' => $this->getPaginationData($paginator),
-            'total_results' => 10,
-        ];
+            'paginate' => $this->getPaginationData($paginator)
+        ], $this->extraOutput());
     }
 
     protected function getPaginationData($paginator)
