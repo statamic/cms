@@ -154,7 +154,7 @@
 
         <div v-if="currentStep === 4">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Route</h1>
+                <h1 class="mb-3">Routing</h1>
                 <p class="text-grey">Route rules determine the URL pattern of your collection's entries.</p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
@@ -163,6 +163,14 @@
                 <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Routes are optional. If you don't need a URL, you don't need a route.
+                </div>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm">Accelerated Mobile Pages (AMP)</label>
+                <label><input type="checkbox" v-model="collection.ampable" /> Enable AMP</label>
+                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    The AMP version of an entry will be routed to <code>{site url}/amp/{entry url}</code>
                 </div>
             </div>
         </div>
@@ -194,7 +202,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Dates', 'Order', 'Content Model', 'Route'],
+            steps: ['Naming', 'Dates', 'Order', 'Content Model', 'Routing'],
             currentStep: 0,
             collection: {
                 title: null,
@@ -206,6 +214,7 @@ export default {
                 blueprints: [],
                 template: null,
                 route: null,
+                ampable: false,
             }
         }
     },

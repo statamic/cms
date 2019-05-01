@@ -89,7 +89,8 @@ class CollectionsController extends CpController
             'orderable' => 'boolean',
             'dated' => 'boolean',
             'dateBehavior' => 'nullable',
-            'sortDirection' => 'in:asc,desc'
+            'sortDirection' => 'in:asc,desc',
+            'ampable' => 'boolean',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -99,7 +100,8 @@ class CollectionsController extends CpController
             ->route($data['route'])
             ->dated($data['dated'])
             ->template($data['template'])
-            ->orderable($data['orderable']);
+            ->orderable($data['orderable'])
+            ->ampable($data['ampable']);
 
         switch ($data['dateBehavior']) {
             case 'articles':
