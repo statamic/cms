@@ -6,6 +6,7 @@ use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Entry;
+use Statamic\Query\OrderBy;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 
@@ -26,7 +27,7 @@ class Entries
     protected $since;
     protected $until;
     protected $scopes;
-    protected $sort;
+    protected $orderBys;
 
     public function __construct($parameters)
     {
@@ -102,8 +103,7 @@ class Entries
         $this->until = Arr::get($params, 'until');
 
         $this->scopes = $this->parseQueryScopes($params);
-
-        $this->sort = Arr::get($params, 'sort');
+        $this->orderBys = $this->parseOrderBys($params);
 
         return $params;
     }
@@ -133,6 +133,15 @@ class Entries
         $scopes = Arr::getFirst($params, ['query', 'filter']);
 
         return collect(explode('|', $scopes));
+    }
+
+    protected function parseOrderBys($params)
+    {
+        $piped = Arr::getFirst($params, ['order_by', 'sort']);
+
+        return collect(explode('|', $piped))->map(function ($orderBy) {
+            return OrderBy::parse($orderBy);
+        });
     }
 
     protected function querySite($query)
@@ -212,16 +221,11 @@ class Entries
             });
     }
 
-    public function querySort($query)
+    public function queryOrderBys($query)
     {
-        if (! $this->sort) {
-            return;
-        }
-
-        $sort = explode(':', $this->sort)[0];
-        $direction = explode(':', $this->sort)[1] ?? 'asc';
-
-        $query->orderBy($sort, $direction);
+        $this->orderBys->each(function ($orderBy) use ($query) {
+            $query->orderBy($orderBy->sort, $orderBy->direction);
+        });
     }
 
     protected function allCollectionsAreDates()
