@@ -20,7 +20,16 @@ class Date extends Fieldtype
             'type' => 'text',
             'default' => '1900-01-01'
         ],
-        'format' => ['type' => 'text']
+        'format' => ['type' => 'text'],
+        'mode' => [
+            'type' => 'select',
+            'default' => 'single',
+            'options' => [
+                ['text' => 'Single', 'value' => 'single'],
+                ['text' => 'Multiple', 'value' => 'multiple'],
+                ['text' => 'Range', 'value' => 'range'],
+            ]
+        ]
     ];
 
     public function preProcess($data)
