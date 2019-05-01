@@ -246,7 +246,18 @@ class Collection implements Contract
 
     protected function fileData()
     {
-        return array_merge($this->data(), [
+        return Arr::removeNullValues([
+            'title' => $this->title,
+            'route' => $this->route,
+            'dated' => $this->dated ? true : null,
+            'amp' => $this->ampable ? true : null,
+            'sites' => $this->sites,
+            'template' => $this->template,
+            'layout' => $this->layout,
+            'data' => $this->data,
+            'blueprints' => $this->blueprints,
+            'search_index' => $this->searchIndex,
+            'orderable' => $this->orderable,
             'entry_order' => $this->getEntryOrder()
         ]);
     }
