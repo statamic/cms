@@ -12,8 +12,7 @@ abstract class Builder
     protected $limit;
     protected $offset = 0;
     protected $wheres = [];
-    protected $orderBy;
-    protected $orderDirection;
+    protected $orderBys = [];
     protected $operators = [
         '=' => 'Equals',
         '<>' => 'NotEquals',
@@ -56,8 +55,7 @@ abstract class Builder
 
     public function orderBy($column, $direction = 'asc')
     {
-        $this->orderBy = $column;
-        $this->orderDirection = $direction;
+        $this->orderBys[] = new OrderBy($column, $direction);
 
         return $this;
     }
