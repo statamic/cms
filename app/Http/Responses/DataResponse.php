@@ -117,16 +117,7 @@ class DataResponse implements Responsable
 
     protected function handlePrivateEntries()
     {
-        if (! ($collection = $this->data->collection())->dated()) {
-            return $this;
-        }
-
-        if (
-            ($collection->futureDateBehavior() === 'private' && $this->data->date()->isFuture())
-            || ($collection->pastDateBehavior() === 'private' && $this->data->date()->isPast())
-        ) {
-            throw new NotFoundHttpException;
-        }
+        throw_if($this->data->private(), new NotFoundHttpException);
 
         return $this;
     }

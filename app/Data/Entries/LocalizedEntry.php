@@ -305,4 +305,23 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
     {
         return User::find($this->get('updated_by'));
     }
+
+    public function private()
+    {
+        $collection = $this->collection();
+
+        if (! $collection->dated()) {
+            return false;
+        }
+
+        if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
+            return true;
+        }
+
+        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+            return true;
+        }
+
+        return false;
+    }
 }

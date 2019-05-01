@@ -378,6 +378,36 @@ class LocalizedEntryTest extends TestCase
     }
 
     /** @test */
+    function future_dated_entries_are_private_when_configured_in_the_collection()
+    {
+        Carbon::setTestNow('2019-01-01');
+        $collection = (new Collection)->dated(true)->futureDateBehavior('private');
+        $entry = (new LocalizedEntry)
+            ->entry((new Entry)->collection($collection));
+
+        $entry->date('2018-01-01');
+        $this->assertFalse($entry->private());
+
+        $entry->date('2019-01-02');
+        $this->assertTrue($entry->private());
+    }
+
+    /** @test */
+    function past_dated_entries_are_private_when_configured_in_the_collection()
+    {
+        Carbon::setTestNow('2019-01-01');
+        $collection = (new Collection)->dated(true)->pastDateBehavior('private');
+        $entry = (new LocalizedEntry)
+            ->entry((new Entry)->collection($collection));
+
+        $entry->date('2019-01-02');
+        $this->assertFalse($entry->private());
+
+        $entry->date('2018-01-02');
+        $this->assertTrue($entry->private());
+    }
+
+    /** @test */
     function it_gets_and_sets_the_published_state()
     {
         $entry = new LocalizedEntry;
