@@ -248,6 +248,28 @@ class EntriesTest extends TestCase
             $this->getEntries(['order_by' => 'title:desc'])->map->get('title')->all()
         );
     }
+
+    /** @test */
+    function it_sorts_entries_by_multiple_columns()
+    {
+        $this->collection->dated(true)->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry()->date('2019-02-06')->set('title', 'Pear')->save();
+        $this->makeEntry()->date('2019-02-06')->set('title', 'Apple')->save();
+        $this->makeEntry()->date('2019-03-03')->set('title', 'Apricot')->save();
+        $this->makeEntry()->date('2019-03-03')->set('title', 'Banana')->save();
+
+        $this->assertEquals(
+            ['Apricot', 'Banana', 'Apple', 'Pear'],
+            $this->getEntries(['sort' => 'date:desc|title'])->map->get('title')->all()
+        );
+
+        $this->assertEquals(
+            ['Banana', 'Apricot', 'Pear', 'Apple'],
+            $this->getEntries(['sort' => 'date:desc|title:desc'])->map->get('title')->all()
+        );
+    }
 }
 
 class PostType extends Scope
