@@ -42,19 +42,7 @@ class Entries
             return collect_entries();
         }
 
-        if ($perPage = $this->paginate) {
-            return $query->paginate($perPage);
-        }
-
-        if ($limit = $this->limit) {
-            $query->limit($limit);
-        }
-
-        if ($offset = $this->offset) {
-            $query->offset($offset);
-        }
-
-        return $query->get();
+        return $this->results($query);
     }
 
     public function count()
@@ -80,6 +68,23 @@ class Entries
         $this->querySort($query);
 
         return $query;
+    }
+
+    protected function results($query)
+    {
+        if ($perPage = $this->paginate) {
+            return $query->paginate($perPage);
+        }
+
+        if ($limit = $this->limit) {
+            $query->limit($limit);
+        }
+
+        if ($offset = $this->offset) {
+            $query->offset($offset);
+        }
+
+        return $query->get();
     }
 
     protected function parseParameters($params)
