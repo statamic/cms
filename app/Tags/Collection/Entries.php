@@ -65,7 +65,7 @@ class Entries
         $this->querySinceUntil($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
-        $this->querySort($query);
+        $this->queryOrderBys($query);
 
         return $query;
     }
