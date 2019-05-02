@@ -7,6 +7,8 @@ use Statamic\Stache\Stache;
 
 class UrlBuilderTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /**
      * @var \Statamic\Contracts\Data\Content\UrlBuilder
      */
