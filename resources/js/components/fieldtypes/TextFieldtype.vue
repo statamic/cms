@@ -1,8 +1,7 @@
 <template>
     <text-input
-        :name="name"
+        ref="input"
         :value="value"
-        @input="update"
         :autofocus="config.autofocus"
         :type="config.input"
         :isReadOnly="isReadOnly"
@@ -10,6 +9,7 @@
         :append="config.append"
         :limit="config.character_limit"
         :placeholder="config.placeholder"
+        @input="update"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />

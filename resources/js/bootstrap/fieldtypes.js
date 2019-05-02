@@ -35,6 +35,7 @@ Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.
 Vue.component('locale_settings-fieldtype', LocaleSettingsFieldtype);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue'));
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue'));
+Vue.component('range-fieldtype', require('../components/fieldtypes/RangeFieldtype.vue'));
 Vue.component('relate-fieldtype', RelateFieldtype);
 Vue.component('relationship-fieldtype', require('../components/fieldtypes/relationship/RelationshipFieldtype.vue'));
 Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue'));

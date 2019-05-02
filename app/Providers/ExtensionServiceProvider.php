@@ -101,6 +101,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Range::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Replicator::class,
         Fieldtypes\Select::class,
