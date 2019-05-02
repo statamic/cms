@@ -174,7 +174,7 @@
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm">Accelerated Mobile Pages (AMP)</label>
-                <label><input type="checkbox" v-model="collection.ampable" /> Enable AMP</label>
+                <label><input type="checkbox" v-model="collection.amp" /> Enable AMP</label>
                 <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     The AMP version of an entry will be routed to <code>{site url}/amp/{entry url}</code>
@@ -221,7 +221,7 @@ export default {
                 blueprints: [],
                 template: null,
                 route: null,
-                ampable: false,
+                amp: false,
             }
         }
     },

@@ -124,6 +124,7 @@ Statamic.app({
         UserGroupListing: require('./components/user-groups/Listing.vue'),
         UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
         CollectionWizard: require('./components/collections/Wizard.vue'),
+        CollectionEditForm: require('./components/collections/EditForm.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
         Stacks: require('./components/stacks/Stacks.vue'),
