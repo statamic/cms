@@ -38,7 +38,7 @@ class UpdateCollectionTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->patch(cp_route('collections.update', $collection->handle()), $this->validParams())
-            ->assertRedirect(cp_route('collections.edit', $collection->handle()))
+            ->assertJson(['redirect' => cp_route('collections.edit', $collection->handle())])
             ->assertSessionHas('success');
 
         $this->assertCount(1, Collection::all());
