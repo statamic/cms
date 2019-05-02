@@ -244,22 +244,23 @@ class Collection implements Contract
         return $index === null ? null : $index + 1;
     }
 
-    protected function fileData()
+    public function fileData()
     {
-        return Arr::removeNullValues([
-            'title' => $this->title,
-            'route' => $this->route,
-            'dated' => $this->dated ? true : null,
-            'amp' => $this->ampable ? true : null,
-            'sites' => $this->sites,
-            'template' => $this->template,
-            'layout' => $this->layout,
-            'data' => $this->data,
-            'blueprints' => $this->blueprints,
-            'search_index' => $this->searchIndex,
-            'orderable' => $this->orderable,
-            'entry_order' => $this->getEntryOrder()
+        $array = Arr::except($this->toArray(), [
+            'handle',
+            'past_date_behavior',
+            'future_date_behavior'
         ]);
+
+        return Arr::removeNullValues(array_merge($array, [
+            'entry_order' => $this->getEntryOrder(),
+            'amp' => $array['amp'] ?: null,
+            'dated' => $array['dated'] ?: null,
+            'date_behavior' => [
+                'past' => $this->pastDateBehavior,
+                'future' => $this->futureDateBehavior,
+            ],
+        ]));
     }
 
     public function futureDateBehavior($behavior = null)
@@ -270,6 +271,26 @@ class Collection implements Contract
                 return $behavior ?? 'public';
             })
             ->args(func_get_args());
+    }
+
+    public function toArray()
+    {
+        return [
+            'title' => $this->title,
+            'handle' => $this->handle,
+            'route' => $this->route,
+            'dated' => $this->dated,
+            'past_date_behavior' => $this->pastDateBehavior(),
+            'future_date_behavior' => $this->futureDateBehavior(),
+            'amp' => $this->ampable,
+            'sites' => $this->sites,
+            'template' => $this->template,
+            'layout' => $this->layout,
+            'data' => $this->data,
+            'blueprints' => $this->blueprints,
+            'search_index' => $this->searchIndex,
+            'orderable' => $this->orderable,
+        ];
     }
 
     public function pastDateBehavior($behavior = null)
