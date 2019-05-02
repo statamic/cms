@@ -126,19 +126,26 @@
                 <h1 class="mb-3">Content Model</h1>
                 <p class="text-grey">Your content model determines what field and data are stored in this collection.</p>
             </div>
-            <!-- <div class="max-w-md mx-auto px-2 pb-7">
+            <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
-                <blueprints-fieldtype
-                    name="blueprint"
-                    :config="{ max_items: 1 }"
-                    :value="blueprint ? [blueprint] : null"
-                    @updated="blueprint = $event[0]"
-                ></blueprints-fieldtype>
+                <publish-field-meta
+                    :config="{ handle: 'blueprints', type: 'blueprints' }"
+                    :initial-value="collection.blueprints">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            :config="{ handle: 'blueprints', type: 'blueprints' }"
+                            :value="value"
+                            :meta="meta"
+                            name="blueprints"
+                            @updated="collection.blueprints = $event" />
+                    </div>
+                </publish-field-meta>
                 <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     You can pick an existing Blueprint or creates a new one.
                 </div>
-            </div> -->
+            </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Template</label>
                 <select v-model="collection.template">
@@ -260,6 +267,10 @@ export default {
         canGoToStep(step) {
             if (step === 1) {
                 return Boolean(this.collection.title && this.collection.handle);
+            }
+
+            if (step === 4) {
+                return this.collection.blueprints.length > 0;
             }
 
             return true;

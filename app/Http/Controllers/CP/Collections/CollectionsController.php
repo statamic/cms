@@ -101,7 +101,8 @@ class CollectionsController extends CpController
             ->dated($data['dated'])
             ->template($data['template'])
             ->orderable($data['orderable'])
-            ->ampable($data['ampable']);
+            ->ampable($data['ampable'])
+            ->entryBlueprints($data['blueprints']);
 
         switch ($data['dateBehavior']) {
             case 'articles':
