@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\CP\Column;
 use Statamic\API\Blueprint;
 
 class Blueprints extends Relationship
@@ -35,5 +36,12 @@ class Blueprints extends Relationship
     public function augmentValue($value)
     {
         return Blueprint::find($value);
+    }
+
+    protected function getColumns()
+    {
+        return [
+            Column::make('title'),
+        ];
     }
 }
