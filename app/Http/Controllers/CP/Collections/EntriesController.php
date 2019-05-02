@@ -183,7 +183,7 @@ class EntriesController extends CpController
                 $date = str_replace(' ', '-', $date);
             }
 
-            $entry->order($date);
+            $entry->date($date);
         }
 
         if ($entry->published()) {
@@ -272,7 +272,7 @@ class EntriesController extends CpController
             });
 
         if ($collection->dated()) {
-            $entry->order($values['date'] ?? now()->format('Y-m-d-Hi'));
+            $entry->date($values['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
         $entry->store([
