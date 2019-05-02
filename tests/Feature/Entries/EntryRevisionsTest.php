@@ -82,6 +82,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals([
             'published' => true,
             'slug' => 'test',
+            'id' => '1',
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -135,6 +136,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals([
             'published' => false,
             'slug' => 'test',
+            'id' => '1',
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',
@@ -189,6 +191,7 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals([
             'published' => false,
             'slug' => 'test',
+            'id' => '1',
             'data' => [
                 'blueprint' => 'test',
                 'title' => 'Title',

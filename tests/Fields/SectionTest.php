@@ -140,6 +140,10 @@ class SectionTest extends TestCase
                     'required' => true,
                     'validate' => 'required|min:2',
                     'component' => 'text',
+                    'placeholder' => null,
+                    'character_limit' => 0,
+                    'prepend' => null,
+                    'append' => null,
                 ],
                 [
                     'handle' => 'two',
