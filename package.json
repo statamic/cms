@@ -58,6 +58,7 @@
     "vue-popperjs": "^1.5.3",
     "vue-reactive-provide": "^0.3.0",
     "vue-toasted": "^1.1.26",
+    "vue-select": "^3.1.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
