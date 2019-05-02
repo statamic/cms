@@ -33,6 +33,22 @@ import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 import VTooltip from 'v-tooltip'
+import vSelect from 'vue-select'
+
+// Customize vSelect UI components
+vSelect.props.components.default = () => ({
+    Deselect: {
+        render: createElement => createElement('span', __('×')),
+    },
+    OpenIndicator: {
+        render: createElement => createElement('span', {
+            class: { 'toggle': true },
+            domProps: {
+                innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 20 20"><path fill="currentColor" d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>'
+            }
+        })
+    }
+});
 
 Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -51,6 +67,8 @@ Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(VTooltip)
 Vue.use(Vuex);
+
+Vue.component(vSelect)
 
 Statamic.$store = new Vuex.Store({
     modules: {
