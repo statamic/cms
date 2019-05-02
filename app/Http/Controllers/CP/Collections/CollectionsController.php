@@ -225,7 +225,7 @@ class CollectionsController extends CpController
             ],
             'sort_direction' => [
                 'type' => 'select',
-                'instructions' => __('he default sort direction.'),
+                'instructions' => __('The default sort direction.'),
                 'width' => 50,
                 'options' => [
                     'asc' => 'Ascending',
