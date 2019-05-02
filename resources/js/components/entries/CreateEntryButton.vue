@@ -1,6 +1,6 @@
 <template>
 
-    <dropdown-list>
+    <dropdown-list class="inline-block">
         <button
             slot="trigger"
             class="btn btn-primary"
