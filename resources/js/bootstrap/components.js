@@ -18,6 +18,7 @@ Vue.component('publish-field-meta', require('../components/publish/FieldMeta.vue
 Vue.component('publish-sections', require('../components/publish/Sections.vue'));
 Vue.component('publish-validation-errors', require('../components/publish/ValidationErrors'));
 Vue.component('form-group', require('../components/publish/FormGroup.vue'));
+Vue.component('site-switcher', require('../components/publish/SiteSwitcher.vue'));
 
 Vue.component('live-preview', require('../components/live-preview/LivePreview.vue'));
 Vue.component('live-preview-popout', require('../components/live-preview/Popout.vue'));
