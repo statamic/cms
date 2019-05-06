@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
+            <div class="publish-sidebar" v-if="shouldShowSidebar">
                 <div class="publish-section">
                     <publish-fields
                         :fields="sidebarSection.fields"
