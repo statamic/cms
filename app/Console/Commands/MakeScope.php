@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
 
-class MakeFilter extends GeneratorCommand
+class MakeScope extends GeneratorCommand
 {
     use RunsInPlease;
 
@@ -13,26 +13,26 @@ class MakeFilter extends GeneratorCommand
      *
      * @var string
      */
-    protected $name = 'statamic:make:filter';
+    protected $name = 'statamic:make:scope';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new filter addon';
+    protected $description = 'Create a new query scope addon';
 
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'Filter';
+    protected $type = 'Scope';
 
     /**
      * The stub to be used for generating the class.
      *
      * @var string
      */
-    protected $stub = 'filter.php.stub';
+    protected $stub = 'scope.php.stub';
 }
