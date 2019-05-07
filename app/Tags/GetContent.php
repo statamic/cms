@@ -2,76 +2,28 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
-use Statamic\API\Entry;
-use Statamic\API\Helper;
+use Statamic\Tags\Collection\Collection;
 
 class GetContent extends Collection
 {
     /**
-     * The {{ get_content:[foo] }} tag
-     *
-     * @param string $method
-     * @param array $args
+     * {{ get_content:* }} ... {{ /get_content:* }}
      */
     public function __call($method, $args)
     {
-        $from = array_get_colon($this->context, $this->method);
+        $this->parameters['from'] = $this->method;
 
-        return $this->index($from);
+        return $this->index();
     }
 
     /**
-     * The {{ get_content }} tag
-     *
-     * @param string|null $locations  Optional requested location(s) to retrieve content from.
-     * @return string
+     * {{ get_content from="" }} ... {{ /get_content }}
      */
-    public function index($locations = null)
+    public function index()
     {
-        if (! $locale = $this->get('locale')) {
-            $locale = site_locale();
-        }
+        $this->parameters['id:matches'] = $this->get(['from', 'id']);
+        $this->parameters['from'] = '*';
 
-        if (! $locations) {
-            $locations = $this->get(['from', 'id']);
-        }
-
-        $this->collection = collect_content(
-            Helper::explodeOptions($locations)
-        )->map(function ($from) use ($locale) {
-            return ($content = $this->getContent($from, $locale)) ? $content->in($locale) : null;
-        })->filter();
-
-        $this->filter();
-
-        return $this->output();
-    }
-
-    /**
-     * Get content from somewhere
-     *
-     * @param string $from  Either an ID or URI
-     * @param string $locale  Locale to get the content from
-     * @return \Statamic\Contracts\Data\Content\Content
-     */
-    protected function getContent($from, $locale)
-    {
-        // If a secondary locale is specified, get the default URI
-        // since that's how they are referenced internally.
-        if ($locale !== default_locale()) {
-            $from = URL::unlocalize($from, $locale);
-        }
-
-        if ($entry = Entry::find($from)) {
-            return $entry;
-        }
-
-        return Entry::whereUri($from);
-    }
-
-    protected function getSortOrder()
-    {
-        return $this->get('sort');
+        return parent::index();
     }
 }
