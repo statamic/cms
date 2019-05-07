@@ -144,7 +144,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function blueprint()
     {
-        if ($blueprint = $this->get('blueprint')) {
+        if ($blueprint = $this->value('blueprint')) {
             return $this->collection()->ensureEntryBlueprintFields(
                 Blueprint::find($blueprint)
             );
