@@ -1,7 +1,7 @@
 <template>
     <div class="select-input-container">
         <select class="select-input" :name="name" @change="change" :value="value" :disabled="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')">
-            <option v-if="placeholder" v-text="placeholder" value="" :selected="! value"></option>
+            <option v-if="placeholder" v-text="placeholder" value="" disabled :selected="! value"></option>
             <option
                 v-for="option in options"
                 :key="option.value"
@@ -26,7 +26,7 @@ export default {
         options: { default: []},
         placeholder: {
             required: false,
-            default: 'Please select...'
+            default: 'Choose...'
         },
         value: { required: true },
         isReadOnly: { type: Boolean }

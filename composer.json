@@ -4,11 +4,12 @@
     "keywords": ["statamic", "cms", "flat file", "laravel"],
     "require": {
         "composer/composer": "^1.7",
+        "erusev/parsedown": "^1.7",
+        "erusev/parsedown-extra": "^0.7.1",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*|5.7.*|5.8.*",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
-        "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
         "ranabd36/laravelcollective": "^5.8",
         "scrumpy/html-to-prosemirror": "^0.4.0",

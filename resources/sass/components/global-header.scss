@@ -3,14 +3,14 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center justify-between hidden relative w-full;
+    @apply bg-white shadow h-12 items-center justify-between hidden relative w-full px-2;
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
 @screen md {
-    .global-header { @apply flex; }
+    .global-header { @apply flex px-4; }
 }
 
 /* Search

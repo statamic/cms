@@ -20,7 +20,7 @@ class Select extends Fieldtype
         ],
         'clearable' => [
             'type' => 'toggle',
-            'default' => true
+            'default' => false
         ],
         'multiple' => [
             'type' => 'toggle',

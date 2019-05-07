@@ -1,5 +1,5 @@
 <div class="global-header">
-    <div class="w-54 pl-3 flex items-center">
+    <div class="w-54 flex items-center">
         <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version">
@@ -11,7 +11,7 @@
     <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
     </global-search>
 
-    <div class="head-link h-full px-3 flex items-center">
+    <div class="head-link h-full pl-3 flex items-center">
 
         @if (Statamic\API\Site::hasMultiple())
             <site-selector>
