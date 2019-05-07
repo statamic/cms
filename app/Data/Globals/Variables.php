@@ -12,10 +12,11 @@ use Statamic\Data\Localization;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Localization as LocalizationContract;
 use Statamic\Contracts\Data\Globals\LocalizedGlobalSet as Contract;
+use Statamic\Data\HasOrigin;
 
-class LocalizedGlobalSet implements Contract, LocalizationContract, AugmentableContract
+class Variables implements Contract, LocalizationContract, AugmentableContract
 {
-    use Localization, ExistsAsFile, ContainsData, Augmentable;
+    use Localization, ExistsAsFile, ContainsData, Augmentable, HasOrigin;
 
     public function handle()
     {
@@ -83,7 +84,7 @@ class LocalizedGlobalSet implements Contract, LocalizationContract, AugmentableC
 
     public function toArray()
     {
-        return array_merge($this->data, [
+        return array_merge($this->values(), [
             'id' => $this->id(),
             'handle' => $this->handle(),
         ], $this->supplements);
@@ -96,6 +97,6 @@ class LocalizedGlobalSet implements Contract, LocalizationContract, AugmentableC
 
     protected function augmentedArrayData()
     {
-        return $this->data();
+        return $this->values();
     }
 }

@@ -2,16 +2,19 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\Arr;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
-use Statamic\Data\Globals\LocalizedGlobalSet;
+use Statamic\Data\Globals\Variables;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalsContract;
 
 class GlobalsStore extends BasicStore
 {
+    protected $localizationQueue = [];
+
     public function key()
     {
         return 'globals';
@@ -31,6 +34,7 @@ class GlobalsStore extends BasicStore
         $globals = collect();
 
         foreach ($cache as $id => $item) {
+            throw new \Exception('handle globals from cache');
             $set = $globals->get($id) ?? GlobalSet::make()
                 ->id($id)
                 ->handle($item['handle'])
@@ -70,7 +74,7 @@ class GlobalsStore extends BasicStore
     {
         $set = $this->createBaseGlobalFromFile($handle, $path, $data);
 
-        $localized = (new LocalizedGlobalSet)
+        $localized = (new Variables)
             ->id($set->id())
             ->locale(Site::default()->handle())
             ->initialPath($path)
@@ -120,13 +124,21 @@ class GlobalsStore extends BasicStore
             return $global->handle() === $handle;
         });
 
-        $localized = (new LocalizedGlobalSet)
+        $variables = (new Variables)
             ->id($set->id())
             ->locale($site)
             ->initialPath($path)
-            ->data($data);
+            ->data(Arr::except($data, 'origin'));
 
-        return $set->addLocalization($localized);
+        if ($origin = Arr::get($data, 'origin')) {
+            $this->localizationQueue[] = [
+                'set' => $set,
+                'origin' => $origin,
+                'localization' => $variables,
+            ];
+        }
+
+        return $set->addLocalization($variables);
     }
 
     public function getItemKey($item, $path)
@@ -174,5 +186,18 @@ class GlobalsStore extends BasicStore
         // if (($initial = $global->initialPath()) && $path !== $initial) {
         //     File::delete($global->initialPath());
         // }
+    }
+
+
+    public function loadingComplete()
+    {
+        foreach ($this->localizationQueue as $item) {
+            $set = $item['set'];
+            $origin = $set->in($item['origin']);
+            $set->addLocalization(
+                $item['localization']->origin($origin)
+            );
+            $this->setItem($this->getItemKey($set, ''), $set);
+        }
     }
 }

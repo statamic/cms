@@ -96,7 +96,7 @@ class GlobalSet implements Contract
 
     protected function makeLocalization()
     {
-        return new LocalizedGlobalSet;
+        return new Variables;
     }
 
     public function toCacheableArray()
