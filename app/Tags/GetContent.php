@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\API\Arr;
 use Statamic\Tags\Collection\Collection;
 
 class GetContent extends Collection
@@ -11,7 +12,13 @@ class GetContent extends Collection
      */
     public function __call($method, $args)
     {
-        $this->parameters['from'] = $this->method;
+        $from = Arr::get($this->context, $method)->raw();
+
+        if (is_array($from)) {
+            $from = implode('|', $from);
+        }
+
+        $this->parameters['from'] = $from;
 
         return $this->index();
     }
