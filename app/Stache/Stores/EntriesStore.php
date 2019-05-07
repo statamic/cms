@@ -14,6 +14,8 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesStore extends AggregateStore
 {
+    protected $localizationQueue = [];
+
     public function key()
     {
         return 'entries';
@@ -99,22 +101,28 @@ class EntriesStore extends AggregateStore
                 ->collection($collection);
         }
 
-        $localized = $entry->in($site, function ($localized) use ($data, $path, $collection) {
-            $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
+        $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
-            $localized
-                ->slug($slug)
-                ->initialPath($path)
-                ->published(array_pull($data, 'published', true))
-                ->data($data);
+        if ($origin = array_get($data, 'origin')) {
+            $this->localizationQueue[] = [
+                'origin' => $origin,
+                'localization' => $entry,
+            ];
+        }
 
-            if ($collection->dated()) {
-                $localized->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
-            }
-        });
+        $entry
+            ->locale($site)
+            ->slug($slug)
+            ->initialPath($path)
+            ->published(array_pull($data, 'published', true))
+            ->data($data);
+
+        if ($collection->dated()) {
+            $entry->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
+        }
 
         if (isset($idGenerated)) {
-            $localized->save();
+            $entry->save();
         }
 
         return $entry;
@@ -153,5 +161,13 @@ class EntriesStore extends AggregateStore
     public function delete($entry)
     {
         File::delete($entry->path());
+    }
+
+    public function loadingComplete()
+    {
+        foreach ($this->localizationQueue as $item) {
+            $origin = Entry::find($item['origin'])->addLocalization($item['localization']);
+            $this->setItem($this->getItemKey($origin, ''), $origin);
+        }
     }
 }
