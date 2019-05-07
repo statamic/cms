@@ -5,6 +5,7 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\Query\OrderBy;
 use Statamic\API\Collection;
@@ -132,7 +133,6 @@ class Entries
         $params = Arr::except($params, $this->ignoredParams);
 
         $this->collections = $this->parseCollections($params);
-        $this->site = Arr::getFirst($params, ['site', 'locale']);
 
         $this->limit = Arr::get($params, 'limit');
         $this->offset = Arr::get($params, 'offset');
@@ -191,11 +191,15 @@ class Entries
 
     protected function querySite($query)
     {
-        if (! $this->site) {
+        $site = Arr::getFirst($this->parameters, ['site', 'locale']);
+
+        if ($site === '*') {
             return;
         }
 
-        return $query->where('site', $this->site);
+        $site = Site::current()->handle();
+
+        return $query->where('site', $site);
     }
 
     protected function queryPublished($query)
