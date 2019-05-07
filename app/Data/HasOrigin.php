@@ -13,6 +13,11 @@ trait HasOrigin
         return array_merge($originValues, $this->data);
     }
 
+    public function value($key)
+    {
+        return $this->origin ? $this->origin->value($key) : $this->get($key);
+    }
+
     public function origin($origin = null)
     {
         return $this->fluentlyGetOrSet('origin')->args(func_get_args());
