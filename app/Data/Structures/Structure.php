@@ -2,16 +2,27 @@
 
 namespace Statamic\Data\Structures;
 
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Stache;
+use Statamic\Data\Localizable;
+use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Structure as StructureAPI;
 use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
 class Structure implements StructureContract
 {
+    use Localizable, FluentlyGetsAndSets, ExistsAsFile;
+
+    protected $title;
     protected $handle;
-    protected $data = [];
-    protected $withParent = true;
+    protected $sites;
+
+    public function id()
+    {
+        return $this->handle();
+    }
 
     public function handle($handle = null)
     {
@@ -24,26 +35,19 @@ class Structure implements StructureContract
         return $this;
     }
 
-    public function data($data = null)
-    {
-        if (is_null($data)) {
-            return $this->data;
-        }
-
-        $this->data = $data;
-
-        return $this;
-    }
-
     public function title($title = null)
     {
-        if (is_null($title)) {
-            return array_get($this->data, 'title', ucfirst($this->handle()));
-        }
+        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+    }
 
-        $this->data['title'] = $title;
-
-        return $this;
+    public function sites($sites = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+            })
+            ->args(func_get_args());
     }
 
     public function showUrl()
@@ -56,66 +60,14 @@ class Structure implements StructureContract
         return cp_route('structures.edit', $this->handle());
     }
 
-    public function route($route = null)
-    {
-        if (func_num_args() === 0) {
-            return array_get($this->data, 'route');
-        }
-
-        $this->data['route'] = $route;
-
-        return $this;
-    }
-
-    public function parent()
-    {
-        return (new Page)
-            ->setEntry($this->data['root'])
-            ->setRoute($this->route())
-            ->setRoot(true);
-    }
-
     public function save()
     {
         StructureAPI::save($this);
     }
 
-    public function pages()
-    {
-        $tree = $this->data['tree'];
-
-        return (new Pages)
-            ->setTree($tree)
-            ->setParent($this->parent())
-            ->setRoute($this->route())
-            ->prependParent($this->withParent);
-    }
-
-    public function flattenedPages()
-    {
-        return $this->pages()->flattenedPages();
-    }
-
-    public function uris()
-    {
-        return $this->flattenedPages()->map->uri();
-    }
-
     public function toCacheableArray()
     {
         return $this->data;
-    }
-
-    public function page(string $id): ?Page
-    {
-        return $this->flattenedPages()->get($id);
-    }
-
-    public function withoutParent()
-    {
-        $this->withParent = false;
-
-        return $this;
     }
 
     public function path()
@@ -124,5 +76,15 @@ class Structure implements StructureContract
             rtrim(Stache::store('structures')->directory(), '/'),
             $this->handle
         ]);
+    }
+
+    public function makeTree()
+    {
+        return (new Tree)->structure($this);
+    }
+
+    public function makeLocalization()
+    {
+        return $this->makeTree();
     }
 }

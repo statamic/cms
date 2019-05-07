@@ -33,11 +33,11 @@ class StructureRepository implements RepositoryContract
         return $this->store->getItem($handle);
     }
 
-    public function findEntryByUri(string $uri, string $site = null): ?Entry
+    public function findEntryByUri(string $uri, string $site): ?Entry
     {
         $uri = str_start($uri, '/');
 
-        if (! $key = $this->store->getKeyFromUri($uri)) {
+        if (! $key = $this->store->getKeyFromUri($uri, $site)) {
             return null;
         }
 
@@ -51,5 +51,10 @@ class StructureRepository implements RepositoryContract
         $this->store->setItem($structure->handle(), $structure);
 
         $this->store->save($structure);
+    }
+
+    public function make()
+    {
+        return new \Statamic\Data\Structures\Structure;
     }
 }

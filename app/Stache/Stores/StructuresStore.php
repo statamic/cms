@@ -2,6 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API;
+use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
@@ -10,6 +12,7 @@ use Statamic\Contracts\Data\Structures\Structure;
 class StructuresStore extends BasicStore
 {
     protected $entryUris;
+    protected $treeQueue = [];
 
     public function __construct(Stache $stache, Filesystem $files)
     {
@@ -29,6 +32,7 @@ class StructuresStore extends BasicStore
     public function getItemsFromCache($cache)
     {
         return $cache->map(function ($item, $handle) {
+            throw new \Exception('handle builing a structure from the cache');
             return app(Structure::class)
                 ->handle($handle)
                 ->data($item);
@@ -37,9 +41,68 @@ class StructuresStore extends BasicStore
 
     public function createItemFromFile($path, $contents)
     {
-        return app(Structure::class)
-            ->handle(pathinfo($path, PATHINFO_FILENAME))
-            ->data(YAML::parse($contents));
+        $data = YAML::parse($contents);
+        $relative = str_after($path, $this->directory);
+        $handle = str_before($relative, '.yaml');
+
+        return Site::hasMultiple()
+            ? $this->createMultiSiteStructureFromFile($handle, $path, $data)
+            : $this->createSingleSiteStructureFromFile($handle, $path, $data);
+    }
+
+    protected function createSingleSiteStructureFromFile($handle, $path, $data)
+    {
+        throw new \Exception('createSingleSiteStructureFromFile');
+    }
+
+    protected function createMultiSiteStructureFromFile($handle, $path, $data)
+    {
+        return substr_count($handle, '/') === 0
+            ? $this->createBaseStructureFromFile($handle, $path, $data)
+            : $this->createStructureTreeFromFile($handle, $path, $data);
+    }
+
+    protected function createBaseStructureFromFile($handle, $path, $data)
+    {
+        $structure = API\Structure::make()
+            ->handle($handle)
+            ->title($data['title'] ?? null)
+            ->sites($data['sites'] ?? null)
+            ->initialPath($path);
+
+        // // If the base set file was modified, its localizations will already exist in the Stache.
+        // // We should get those existing localizations and add it to this newly created set.
+        // // Otherwise, the localizations would just disappear since they'd no longer be linked.
+        // $existing = $this->items->first(function ($global) use ($handle) {
+        //     return $global->handle() === $handle;
+        // });
+
+        // if ($existing) {
+        //     $existing->localizations()->each(function ($localization) use ($structure) {
+        //         $structure->addLocalization($localization);
+        //     });
+        // }
+
+        return $structure;
+    }
+
+    protected function createStructureTreeFromFile($handle, $path, $data)
+    {
+        list($site, $handle) = explode('/', $handle);
+
+        $structure = $this->items->first(function ($structure) use ($handle) {
+            return $structure->handle() === $handle;
+        });
+
+        $variables = $structure
+            ->makeTree()
+            ->id($structure->id())
+            ->locale($site)
+            ->route($data['route'] ?? null)
+            ->root($data['root'] ?? null)
+            ->tree($data['tree'] ?? []);
+
+        return $structure->addLocalization($variables);
     }
 
     public function getItemKey($item, $path)
@@ -49,15 +112,7 @@ class StructuresStore extends BasicStore
 
     public function filter($file)
     {
-        $relative = $file->getPathname();
-
-        $dir = str_finish($this->directory, '/');
-
-        if (substr($relative, 0, strlen($dir)) == $dir) {
-            $relative = substr($relative, strlen($dir));
-        }
-
-        return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
+        return $file->getExtension() === 'yaml';
     }
 
     public function save(Structure $structure)
@@ -90,7 +145,7 @@ class StructuresStore extends BasicStore
         })->all();
     }
 
-    public function getKeyFromUri(string $uri, string $site = null): ?string
+    public function getKeyFromUri(string $uri, string $site): ?string
     {
         if ($key = $this->getEntryUris($site)->flip()->get($uri)) {
             return $key;
@@ -131,13 +186,7 @@ class StructuresStore extends BasicStore
     {
         parent::setItem($key, $item);
 
-        $this->flushStructureEntryUris($key);
-
-        foreach ($this->stache->sites() as $site) {
-            foreach ($item->uris() as $key => $uri) {
-                $this->entryUris->get($site)->put($item->handle() . '::' . $key, $uri);
-            }
-        }
+        $this->treeQueue[] = $item;
 
         return $this;
     }
@@ -158,5 +207,20 @@ class StructuresStore extends BasicStore
                 return str_before($key, '::') === $handle;
             }));
         }
+    }
+
+    public function loadingComplete()
+    {
+        collect($this->treeQueue)->unique()->each(function ($structure) {
+            $this->flushStructureEntryUris($structure->handle());
+
+            foreach ($structure->localizations() as $tree) {
+                foreach ($tree->uris() as $key => $uri) {
+                    $this->entryUris
+                        ->get($tree->locale())
+                        ->put($tree->handle() . '::' . $key, $uri);
+                }
+            }
+        });
     }
 }
