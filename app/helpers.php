@@ -6,7 +6,6 @@ use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\Config;
 use Statamic\Extend\Addon;
-use Michelf\MarkdownExtra;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
@@ -174,13 +173,9 @@ function cp_route($route, $params = [])
  */
 function markdown($content)
 {
-    $parser = new MarkdownExtra;
+    $markdown = new \ParsedownExtra();
 
-    if (Config::get('statamic.theming.markdown_hard_wrap')) {
-        $parser->hard_wrap = true;
-    }
-
-    return $parser->transform($content);
+    return $markdown->text($content);
 }
 
 /**

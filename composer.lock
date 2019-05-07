@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc782a1ac583938822f71648dd068f27",
+    "content-hash": "b7d38bb88d1bca79f7a511509f58bc01",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -616,6 +616,50 @@
                 "parser"
             ],
             "time": "2019-03-17T18:48:37+00:00"
+        },
+        {
+            "name": "erusev/parsedown-extra",
+            "version": "0.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/erusev/parsedown-extra.git",
+                "reference": "0db5cce7354e4b76f155d092ab5eb3981c21258c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/erusev/parsedown-extra/zipball/0db5cce7354e4b76f155d092ab5eb3981c21258c",
+                "reference": "0db5cce7354e4b76f155d092ab5eb3981c21258c",
+                "shasum": ""
+            },
+            "require": {
+                "erusev/parsedown": "~1.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "ParsedownExtra": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Emanuil Rusev",
+                    "email": "hello@erusev.com",
+                    "homepage": "http://erusev.com"
+                }
+            ],
+            "description": "An extension of Parsedown that adds support for Markdown Extra.",
+            "homepage": "https://github.com/erusev/parsedown-extra",
+            "keywords": [
+                "markdown",
+                "markdown extra",
+                "parsedown",
+                "parser"
+            ],
+            "time": "2015-11-01T10:19:22+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
