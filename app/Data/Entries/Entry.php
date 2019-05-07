@@ -355,7 +355,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
             return $this;
         }
 
-        return $this->localizations[$locale];
+        return $this->localizations[$locale] ?? null;
     }
 
     public function existsIn($locale)
