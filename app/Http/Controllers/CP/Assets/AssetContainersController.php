@@ -93,9 +93,13 @@ class AssetContainersController extends CpController
             ->fields()
             ->preProcess();
 
+        $values = array_merge($fields->values(), [
+            'disk' => $this->disks()->first(),
+        ]);
+
         return view('statamic::assets.containers.create', [
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
+            'values' => $values,
             'meta' => $fields->meta(),
         ]);
     }
