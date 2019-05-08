@@ -64,6 +64,10 @@ class Bard extends Replicator
 
     public function augment($value)
     {
+        if ($this->isLegacyData($value)) {
+            $value = $this->convertLegacyData($value);
+        }
+
         return (new Augmentor($this))->augment($value);
     }
 
