@@ -166,7 +166,7 @@ class AssetContainersController extends CpController
                 'type' => 'select',
                 'display' => __('Disk'),
                 'instructions' => __('The filesystem disk this container will use.'),
-                'options' => collect(config('filesystems.disks'))->keys()->all(),
+                'options' => $this->disks()->all(),
             ],
             'blueprint' => [
                 'type' => 'blueprints',
