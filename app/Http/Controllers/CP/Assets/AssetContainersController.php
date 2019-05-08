@@ -167,11 +167,13 @@ class AssetContainersController extends CpController
                 'display' => __('Disk'),
                 'instructions' => __('The filesystem disk this container will use.'),
                 'options' => $this->disks()->all(),
+                'width' => 50,
             ],
             'blueprint' => [
                 'type' => 'blueprints',
                 'instructions' => __('The blueprint that assets in this container will use.'),
                 'max_items' => 1,
+                'width' => 50,
             ],
             'allow_uploads' => [
                 'type' => 'toggle',
