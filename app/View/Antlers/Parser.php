@@ -1177,7 +1177,7 @@ class Parser
             // If the first part of the variable is "view", we'll try to get the value from
             // the front-matter, which is stored in the cascade organized by the view paths.
             if ($first == 'view') {
-                if ($cascading = $this->cascade->get("views.{$this->view}")) {
+                if ($cascading = $this->cascade->get('views')[$this->view] ?? null) {
                     return $this->getVariableExistenceAndValue($rest, $cascading);
                 }
             }
