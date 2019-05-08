@@ -325,6 +325,7 @@ class Parser
     {
         $str = $this->extractLoopedTags($str, $data);
         $str = $this->parseConditionPairs($str, $data);
+        $str = $this->parseTernaries($str, $data);
         $str = $this->injectExtractions($str, 'looped_tags');
         $str = $this->parseVariables($str, $data);
         $str = $this->injectExtractions($str, 'callback_blocks');
@@ -688,7 +689,6 @@ class Parser
     {
         if (preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-
                 // Null coalescence assignment
                 if ($match[2] === '??=') {
                     $bits = explode(' ??= ', $match[1]);
@@ -1177,7 +1177,7 @@ class Parser
             // If the first part of the variable is "view", we'll try to get the value from
             // the front-matter, which is stored in the cascade organized by the view paths.
             if ($first == 'view') {
-                if ($cascading = $this->cascade->get("views.{$this->view}")) {
+                if ($cascading = $this->cascade->get('views')[$this->view] ?? null) {
                     return $this->getVariableExistenceAndValue($rest, $cascading);
                 }
             }

@@ -128,6 +128,8 @@ Statamic.app({
         SessionExpiry: require('./components/SessionExpiry.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
         Stacks: require('./components/stacks/Stacks.vue'),
+        AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue'),
+        AssetContainerEditForm: require('./components/asset-containers/EditForm.vue'),
     },
 
     data: {

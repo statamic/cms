@@ -2,6 +2,7 @@
 
 namespace Statamic\Extend;
 
+use Statamic\API\Arr;
 use Statamic\API\Helper;
 
 trait HasParameters
@@ -73,17 +74,7 @@ trait HasParameters
      */
     public function getParam($keys, $default = null)
     {
-        if (! is_array($keys)) {
-            $keys = [$keys];
-        }
-
-        foreach ($keys as $key) {
-            if (isset($this->parameters[$key])) {
-                return $this->parameters[$key];
-            }
-        }
-
-        return $default;
+        return Arr::getFirst($this->parameters, Arr::wrap($keys), $default);
     }
 
     /**
