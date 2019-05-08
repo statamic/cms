@@ -338,6 +338,13 @@ EOT;
         $this->assertEquals(null, Antlers::parse($template2, $this->variables));
     }
 
+    public function testNullCoalescenceAssignmentInsideLoop()
+    {
+        $template = '{{ complex }}{{ first ??= "Pass" }}{{ /complex }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
     public function testSingleStandardStringModifierTight()
     {
         $template = "{{ string|upper }}";
