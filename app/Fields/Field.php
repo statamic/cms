@@ -165,6 +165,13 @@ class Field implements Arrayable
         return $this;
     }
 
+    public function augment()
+    {
+        $this->value = $this->fieldtype()->augment($this->value);
+
+        return $this;
+    }
+
     public function toArray()
     {
         return array_merge($this->config, [

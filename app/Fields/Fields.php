@@ -107,6 +107,13 @@ class Fields
         return $this;
     }
 
+    public function augment()
+    {
+        $this->fields->each->augment();
+
+        return $this;
+    }
+
     public function createFields(array $config): array
     {
         if (isset($config['import'])) {

@@ -64,7 +64,7 @@ class Bard extends Replicator
 
     public function augment($value)
     {
-        return (new Augmentor)->augment($value);
+        return (new Augmentor($this))->augment($value);
     }
 
     public function process($value)
@@ -80,7 +80,7 @@ class Bard extends Replicator
         })->all();
 
         if ($this->shouldSaveHtml()) {
-            return (new Augmentor)->convertToHtml($structure);
+            return (new Augmentor($this))->convertToHtml($structure);
         }
 
         return $structure;

@@ -3,12 +3,19 @@
 namespace Statamic\Fields\Fieldtypes\Bard;
 
 use Statamic\API\Arr;
+use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
 
 class Augmentor
 {
+    protected $fieldtype;
     protected $sets = [];
     protected $includeDisabledSets = false;
+
+    public function __construct($fieldtype)
+    {
+        $this->fieldtype = $fieldtype;
+    }
 
     public function augment($value)
     {
@@ -23,6 +30,7 @@ class Augmentor
         $value = $this->addSetIndexes($value);
         $value = $this->convertToHtml($value);
         $value = $this->convertToSets($value);
+        $value = $this->augmentSets($value);
 
         return $value;
     }
@@ -75,6 +83,19 @@ class Augmentor
             }
 
             return ['type' => 'text', 'text' => $html];
+        });
+    }
+
+    protected function augmentSets($value)
+    {
+        return $value->map(function ($set) {
+            if (! $config = $this->fieldtype->config("sets.{$set['type']}.fields")) {
+                return $set;
+            }
+
+            $values = (new Fields($config))->addValues($set)->augment()->values();
+
+            return array_merge($values, ['type' => $set['type']]);
         })->all();
     }
 }
