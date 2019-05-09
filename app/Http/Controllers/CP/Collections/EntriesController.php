@@ -118,7 +118,7 @@ class EntriesController extends CpController
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
             ],
-            'values' => $values,
+            'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
@@ -157,7 +157,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $entry->blueprint()->fields()->addValues($request->except('id'))->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
