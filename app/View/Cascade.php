@@ -177,6 +177,7 @@ class Cascade
             'locale_name' => $siteName,
             'locale_full' => $siteLocale,
             'locale_url' => $siteUrl,
+            'cp_url' => cp_route('index'),
         ];
     }
 
