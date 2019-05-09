@@ -21,31 +21,31 @@
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="isDirty" v-text="'Unsaved Changes'" />
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="!published" v-text="'Unpublished Entry'" />
 
-            <div
-                class="mr-3 text-xs flex items-center"
+            <v-select
                 v-if="localizations.length > 1"
+                :value="activeLocalization"
+                label="name"
+                :clearable="false"
+                :options="localizations"
+                :searchable="false"
+                :multiple="false"
+                @input="localizationSelected"
+                class="w-32 mr-2"
             >
-                <button
-                    v-for="loc in localizations"
-                    :key="loc.handle"
-                    class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
-                    :class="{ 'bg-grey-20': loc.active }"
-                    @click="localizationSelected(loc)"
-                    v-tooltip.top="localizationStatusText(loc)"
-                >
-                    <div class="w-4 text-right flex items-center">
-                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === loc.handle" />
-                        <span v-if="localizing != loc.handle" class="little-dot"
-                            :class="{
-                                'bg-green': loc.published,
-                                'bg-grey-40': !loc.published,
-                                'bg-red': !loc.exists
-                            }" />
+                <template slot="option" slot-scope="option">
+                    <div class="flex items-center" v-tooltip="localizationStatusText(option)">
+                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
+                        <span class="little-dot mr-1" :class="{
+                            'bg-green': option.published,
+                            'bg-grey-50': !option.published,
+                            'bg-red': !option.exists
+                        }" />
+                        {{ option.name }}
+                        <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
+                        <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
                     </div>
-                    {{ loc.name }}
-                    <svg-icon name="flag" class="h-4 ml-sm w-4 text-grey-60" v-if="loc.origin" />
-                </button>
-            </div>
+                </template>
+            </v-select>
 
             <button v-if="!isCreating" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
@@ -236,6 +236,10 @@ export default {
 
         isDirty() {
             return this.$dirty.has(this.publishContainer);
+        },
+
+        activeLocalization() {
+            return _.findWhere(this.localizations, { active: true });
         }
 
     },
@@ -333,7 +337,7 @@ export default {
         },
 
         createLocalization(localization) {
-            const url = _.findWhere(this.localizations, { active: true }).url + '/localize';
+            const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
                 this.editLocalization(response.data);
             });
