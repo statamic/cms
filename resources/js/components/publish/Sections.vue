@@ -27,7 +27,10 @@
                     <publish-fields
                         :fields="section.fields"
                         :read-only="readOnly"
+                        :syncable="syncable"
                         @updated="(handle, value) => $emit('updated', handle, value)"
+                        @synced="$emit('synced', $event)"
+                        @desynced="$emit('desynced', $event)"
                         @focus="$emit('focus', $event)"
                         @blur="$emit('blur', $event)"
                     />
@@ -39,7 +42,10 @@
                     <publish-fields
                         :fields="sidebarSection.fields"
                         :read-only="readOnly"
+                        :syncable="syncable"
                         @updated="(handle, value) => $emit('updated', handle, value)"
+                        @synced="$emit('synced', $event)"
+                        @desynced="$emit('desynced', $event)"
                         @focus="$emit('focus', $event)"
                         @blur="$emit('blur', $event)"
                     />
@@ -59,6 +65,7 @@ export default {
 
     props: {
         readOnly: Boolean,
+        syncable: Boolean,
     },
 
     data() {

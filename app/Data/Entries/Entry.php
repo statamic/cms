@@ -3,6 +3,7 @@
 namespace Statamic\Data\Entries;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Site;
 use Statamic\API\User;
 use Statamic\API\Stache;
@@ -134,7 +135,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     protected function cpUrl($route)
     {
-        return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug(), $this->locale()]);
+        return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug()]);
     }
 
     public function reference()
@@ -232,6 +233,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         return $this
             ->fluentlyGetOrSet('date')
             ->setter(function ($date) {
+                if ($date === null) {
+                    return null;
+                }
+
                 if ($date instanceof Carbon) {
                     return $date;
                 }
@@ -264,6 +269,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         return array_merge($this->data(), [
             'id' => $this->id(),
+            'origin' => optional($this->origin)->id(),
             'published' => $this->published === false ? false : null
         ]);
     }
@@ -355,6 +361,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
             return $this;
         }
 
+        if ($this->origin && $this->origin->locale() === $locale) {
+            return $this->origin;
+        }
+
         return $this->localizations[$locale] ?? null;
     }
 
@@ -370,6 +380,16 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         $this->localizations[$entry->locale()] = $entry;
 
         return $this;
+    }
+
+    public function makeLocalization($site)
+    {
+        return API\Entry::make()
+            ->collection($this->collection)
+            ->origin($this)
+            ->locale($site)
+            ->slug($this->slug())
+            ->date($this->date());
     }
 
     public function supplementTaxonomies()

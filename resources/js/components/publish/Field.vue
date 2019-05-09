@@ -15,6 +15,24 @@
                 {{ isLocked ? __('Locked') : __('Read Only') }}
             </span>
             <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
+
+            <button
+                v-show="syncable && isSynced"
+                class="outline-none"
+                @click="$emit('desynced')"
+            >
+                <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
+                    v-tooltip.top="__('Synced with origin. Click or edit the field to desync.')" />
+            </button>
+
+            <button
+                v-show="syncable && !isSynced"
+                class="outline-none"
+                @click="$emit('synced')"
+            >
+                <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
+                    v-tooltip.top="__('Desynced from origin. Click to sync and revert to the origin\'s value.')" />
+            </button>
         </label>
 
         <div
@@ -62,7 +80,8 @@ export default {
         errors: {
             type: Array
         },
-        readOnly: Boolean
+        readOnly: Boolean,
+        syncable: Boolean,
     },
 
     inject: {
@@ -109,6 +128,12 @@ export default {
                 let user = this.locks[this.config.handle];
                 if (typeof user === 'object') return user;
             }
+        },
+
+        isSynced() {
+            if (!this.syncable) return;
+            let state = this.$store.state.publish[this.storeName];
+            return !state.localizedFields.includes(this.config.handle);
         }
 
     },

@@ -71,30 +71,15 @@ class EntryRepository implements RepositoryContract
 
     public function save($entry)
     {
-        $localizable = $entry->entry();
-
-        if (! $localizable->id()) {
-            // Put the new ID on the newly cloned item, as well as the one that was saved.
-            $localizable->id($id = $this->stache->generateId());
-            $entry->id($id);
+        if (! $entry->id()) {
+            $entry->id($this->stache->generateId());
         }
 
-        // Clone the entry and all of its localizations so that any modifications to the
-        // original objects aren't reflected in the cache until explicitly saved again.
-        $localizable = clone $localizable;
-        $localizable
-            ->localizations()
-            ->except($entry->locale())
-            ->each(function ($localization) use ($localizable) {
-                $localizable->addLocalization(clone $localization);
-            });
-
-        // Make sure the version we're saving is re-added to the entry.
-        $localizable->addLocalization(clone $entry);
+        // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
 
         $this->store
             ->store($entry->collectionHandle())
-            ->insert($localizable);
+            ->insert($entry);
 
         $this->store->save($entry);
     }

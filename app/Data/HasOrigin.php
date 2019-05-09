@@ -15,11 +15,17 @@ trait HasOrigin
 
     public function value($key)
     {
-        return $this->origin ? $this->origin->value($key) : $this->get($key);
+        return $this->get($key)
+            ?? ($this->origin ? $this->origin->value($key) : null);
     }
 
     public function origin($origin = null)
     {
         return $this->fluentlyGetOrSet('origin')->args(func_get_args());
+    }
+
+    public function hasOrigin()
+    {
+        return $this->origin !== null;
     }
 }

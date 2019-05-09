@@ -41,10 +41,11 @@ Route::group([
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
-            Route::group(['prefix' => '{entry}/{slug}/{site}'], function () {
+            Route::group(['prefix' => '{entry}/{slug}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
                 Route::post('/', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::delete('/', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
+                Route::post('localize', 'LocalizeEntryController')->name('collections.entries.localize');
 
                 Route::resource('revisions', 'EntryRevisionsController', [
                     'as' => 'collections.entries',

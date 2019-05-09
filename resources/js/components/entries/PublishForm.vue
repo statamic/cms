@@ -43,6 +43,7 @@
                             }" />
                     </div>
                     {{ loc.name }}
+                    <svg-icon name="flag" class="h-4 ml-sm w-4 text-grey-60" v-if="loc.origin" />
                 </button>
             </div>
 
@@ -101,10 +102,11 @@
             :meta="meta"
             :errors="errors"
             :site="site"
+            :localized-fields="localizedFields"
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{ container, components, setValue }"
+                slot-scope="{ container, components }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -128,7 +130,10 @@
                             v-show="sectionsVisible"
                             :live-preview="isPreviewing"
                             :read-only="readOnly"
+                            :syncable="hasOrigin"
                             @updated="setValue"
+                            @synced="syncField"
+                            @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
                             @blur="container.$emit('blur', $event)"
                         />
@@ -160,6 +165,9 @@ export default {
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
+        initialLocalizedFields: Array,
+        initialHasOrigin: Boolean,
+        initialOriginValues: Object,
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionTitle: String,
@@ -182,6 +190,9 @@ export default {
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
             localizations: _.clone(this.initialLocalizations),
+            localizedFields: this.initialLocalizedFields,
+            hasOrigin: this.initialHasOrigin,
+            originValues: this.initialOriginValues,
             site: this.initialSite,
             isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
@@ -251,7 +262,8 @@ export default {
             this.clearErrors();
 
             const payload = { ...this.values, ...{
-                blueprint: this.fieldset.handle
+                blueprint: this.fieldset.handle,
+                _localized: this.localizedFields,
             }};
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
@@ -292,11 +304,23 @@ export default {
             }
 
             this.localizing = localization.handle;
+
+            if (localization.exists) {
+                this.editLocalization(localization);
+            } else {
+                this.createLocalization(localization);
+            }
+        },
+
+        editLocalization(localization) {
             this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
+                this.originValues = data.originValues;
                 this.meta = data.meta;
                 this.localizations = data.localizations;
+                this.localizedFields = data.localizedFields;
+                this.hasOrigin = data.hasOrigin;
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
@@ -306,6 +330,13 @@ export default {
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.removeNavigationWarning());
             })
+        },
+
+        createLocalization(localization) {
+            const url = _.findWhere(this.localizations, { active: true }).url + '/localize';
+            this.$axios.post(url, { site: localization.handle }).then(response => {
+                this.editLocalization(response.data);
+            });
         },
 
         localizationStatusText(localization) {
@@ -338,7 +369,28 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.$nextTick(() => this.$emit('saved', response));
-        }
+        },
+
+        setValue(handle, value) {
+            if (this.hasOrigin) this.desyncField(handle);
+
+            this.$refs.container.setValue(handle, value);
+        },
+
+        syncField(handle) {
+            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+                return;
+
+            this.localizedFields = this.localizedFields.filter(field => field !== handle);
+            this.$refs.container.setValue(handle, this.originValues[handle]);
+        },
+
+        desyncField(handle) {
+            if (!this.localizedFields.includes(handle))
+                this.localizedFields.push(handle);
+
+            this.$refs.container.dirty();
+        },
 
     },
 
