@@ -148,10 +148,19 @@
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Template</label>
-                <select v-model="collection.template">
-                    <option value="" selected>Choose a template</option>
-                    <option value="simple">Simple Page</option>
-                </select>
+                <!-- <template-fieldtype v-model="collection.template" name="collection.template" /> -->
+                <publish-field-meta
+                    :config="{ handle: 'template', type: 'template' }"
+                    :initial-value="collection.template">
+                    <div slot-scope="{ meta, value, loading }">
+                        <template-fieldtype
+                            :config="{ handle: 'template', type: 'template' }"
+                            :value="value"
+                            :meta="meta"
+                            name="template"
+                            @updated="collection.template = $event" />
+                    </div>
+                </publish-field-meta>
                 <div class="text-2xs text-grey-40 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default template.
