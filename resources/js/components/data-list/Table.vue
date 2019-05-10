@@ -30,7 +30,7 @@
         >
         <tbody>
             <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)" class="sortable-row">
+            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)" class="sortable-row outline-none">
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
                     <input
