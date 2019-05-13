@@ -65,6 +65,10 @@ class Entries
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
 
+        if ($this->orderBys->first()->direction === 'desc') {
+            $this->orderBys = $this->orderBys->map->reverse();
+        }
+
         if ($collection->orderable()) {
             $query = $this->query()->where('order', '>', $currentEntry->order());
         } elseif ($collection->dated()) {
@@ -86,7 +90,9 @@ class Entries
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
 
-        $this->orderBys = $this->orderBys->map->reverse();
+        if ($this->orderBys->first()->direction === 'asc') {
+            $this->orderBys = $this->orderBys->map->reverse();
+        }
 
         if ($collection->orderable()) {
             $query = $this->query()->where('order', '<', $currentEntry->order());
