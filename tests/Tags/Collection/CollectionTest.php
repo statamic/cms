@@ -283,7 +283,7 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = [
             'in' => 'foods',
             'current' => $currentId,
-            'order_by' => 'date:desc|title',
+            // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
             'limit' => 2
         ];
 
@@ -349,7 +349,7 @@ class CollectionTest extends TestCase
         $this->collectionTag->parameters = [
             'in' => 'foods',
             'current' => $currentId,
-            'order_by' => 'date:desc|title',
+            // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
             'limit' => 2
         ];
 
