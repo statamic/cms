@@ -7,8 +7,6 @@ use Statamic\API\UserGroup;
 
 class Users extends Tags
 {
-
-    protected $defaultAsKey = 'users';
     use GetsQueryResults, OutputsItems;
 
     /**
