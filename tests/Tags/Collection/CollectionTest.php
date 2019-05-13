@@ -233,16 +233,18 @@ class CollectionTest extends TestCase
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
 
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods)->date('2019-02-01')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Fig')->save();
         $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods)->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
         $currentId = API\Entry::all()->first(function ($entry) {
-            return $entry->get('title') === 'Danish';
+            return $entry->get('title') === 'Egg';
         })->id();
 
         $this->collectionTag->parameters = [
@@ -253,7 +255,7 @@ class CollectionTest extends TestCase
         ];
 
         $this->assertEquals(
-            ['Egg', 'Grape'],
+            ['Fig', 'Hummus'],
             $this->collectionTag->next()->map->get('title')->all()
         );
     }
@@ -264,16 +266,18 @@ class CollectionTest extends TestCase
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
 
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods)->date('2019-02-01')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Fig')->save();
         $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods)->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
         $currentId = API\Entry::all()->first(function ($entry) {
-            return $entry->get('title') === 'Danish';
+            return $entry->get('title') === 'Egg';
         })->id();
 
         $this->collectionTag->parameters = [
@@ -284,7 +288,7 @@ class CollectionTest extends TestCase
         ];
 
         $this->assertEquals(
-            ['Apple', 'Carrot'],
+            ['Banana', 'Danish'],
             $this->collectionTag->previous()->map->get('title')->all()
         );
     }
