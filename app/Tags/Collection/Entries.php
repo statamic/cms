@@ -9,10 +9,11 @@ use Statamic\API\Entry;
 use Statamic\Query\OrderBy;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
+use Statamic\Tags\GetsQueryResults;
 
 class Entries
 {
-    use HasConditions;
+    use GetsQueryResults, HasConditions;
 
     protected $collections;
     protected $ignoredParams = ['as'];
@@ -56,8 +57,10 @@ class Entries
 
     public function next($currentEntry)
     {
-        throw_if($this->paginate, new \Exception('collection:next is not compatible with [paginate] parameter'));
-        throw_if($this->offset, new \Exception('collection:next is not compatible with [offset] parameter'));
+        $pagination = $this->parsePaginationParameters($this->parameters);
+
+        throw_if($pagination['paginate'], new \Exception('collection:next is not compatible with [paginate] parameter'));
+        throw_if($pagination['offset'], new \Exception('collection:next is not compatible with [offset] parameter'));
 
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
@@ -75,8 +78,10 @@ class Entries
 
     public function previous($currentEntry)
     {
-        throw_if($this->paginate, new \Exception('collection:previous is not compatible with [paginate] parameter'));
-        throw_if($this->offset, new \Exception('collection:previous is not compatible with [offset] parameter'));
+        $pagination = $this->parsePaginationParameters($this->parameters);
+
+        throw_if($pagination['paginate'], new \Exception('collection:previous is not compatible with [paginate] parameter'));
+        throw_if($pagination['offset'], new \Exception('collection:previous is not compatible with [offset] parameter'));
 
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
@@ -110,37 +115,12 @@ class Entries
         return $query;
     }
 
-    protected function results($query)
-    {
-        if ($perPage = $this->paginate) {
-            return $query->paginate($perPage);
-        }
-
-        if ($limit = $this->limit) {
-            $query->limit($limit);
-        }
-
-        if ($offset = $this->offset) {
-            $query->offset($offset);
-        }
-
-        return $query->get();
-    }
-
     protected function parseParameters($params)
     {
         $params = Arr::except($params, $this->ignoredParams);
 
         $this->collections = $this->parseCollections($params);
         $this->site = Arr::getFirst($params, ['site', 'locale']);
-
-        $this->limit = Arr::get($params, 'limit');
-        $this->offset = Arr::get($params, 'offset');
-        $this->paginate = Arr::get($params, 'paginate');
-
-        if ($this->paginate === true) {
-            $this->paginate = $this->limit;
-        }
 
         $this->showPublished = Arr::get($params, 'show_published', true);
         $this->showUnpublished = Arr::get($params, 'show_unpublished', false);
