@@ -288,6 +288,18 @@ class CollectionTest extends TestCase
         ];
 
         $this->assertEquals(
+            ['Hummus', 'Fig'],
+            $this->collectionTag->next()->map->get('title')->all()
+        );
+
+        $this->collectionTag->parameters = [
+            'in' => 'foods',
+            'current' => $currentId,
+            'order_by' => 'date:asc|title:desc', // Intentionally reverse order.
+            'limit' => 2
+        ];
+
+        $this->assertEquals(
             ['Fig', 'Hummus'],
             $this->collectionTag->next()->map->get('title')->all()
         );
@@ -350,6 +362,18 @@ class CollectionTest extends TestCase
             'in' => 'foods',
             'current' => $currentId,
             // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
+            'limit' => 2
+        ];
+
+        $this->assertEquals(
+            ['Danish', 'Banana'],
+            $this->collectionTag->previous()->map->get('title')->all()
+        );
+
+        $this->collectionTag->parameters = [
+            'in' => 'foods',
+            'current' => $currentId,
+            'order_by' => 'date:asc|title:desc', // Intentionally reverse order.
             'limit' => 2
         ];
 
