@@ -218,6 +218,10 @@ class LocalizedEntry implements Contract, Arrayable, AugmentableContract, Respon
         return $this
             ->fluentlyGetOrSet('date')
             ->setter(function ($date) {
+                if ($date === null) {
+                    return null;
+                }
+
                 if ($date instanceof Carbon) {
                     return $date;
                 }

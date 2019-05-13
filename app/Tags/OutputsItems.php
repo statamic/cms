@@ -13,7 +13,7 @@ trait OutputsItems
         }
 
         if ($as = $this->get('as')) {
-            return array_merge([$as => $items], $this->extraOutput());
+            return array_merge([$as => $items], $this->extraOutput($items));
         }
 
         return $items;
