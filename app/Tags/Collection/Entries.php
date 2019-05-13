@@ -156,7 +156,8 @@ class Entries
                 $collection = Collection::whereHandle($handle);
                 throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
                 return $collection;
-            });
+            })
+            ->values();
     }
 
     protected function parseQueryScopes($params)
@@ -168,11 +169,25 @@ class Entries
 
     protected function parseOrderBys($params)
     {
-        $piped = Arr::getFirst($params, ['order_by', 'sort']);
+        $piped = Arr::getFirst($params, ['order_by', 'sort']) ?? $this->parseDefaultOrderBy();
 
-        return collect(explode('|', $piped))->map(function ($orderBy) {
+        return collect(explode('|', $piped))->filter()->map(function ($orderBy) {
             return OrderBy::parse($orderBy);
         });
+    }
+
+    protected function parseDefaultOrderBy()
+    {
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+
+        if ($collection->orderable()) {
+            return 'order:asc';
+        } elseif ($collection->dated()) {
+            return 'date:desc|title:asc';
+        }
+
+        return 'title:asc';
     }
 
     protected function querySite($query)
