@@ -17,6 +17,7 @@ class NestedFieldsTest extends TestCase
         FieldtypeRepository::shouldReceive('find')
             ->with('assets')
             ->andReturn(new class extends Fieldtype {
+                protected $component = 'assets';
                 protected $configFields = [
                     'max_files' => ['type' => 'integer'],
                     'container' => ['type' => 'plain']
@@ -71,6 +72,7 @@ class NestedFieldsTest extends TestCase
                 'display' => 'Test Image Field',
                 'instructions' => 'Some instructions',
                 'validate' => 'required',
+                'component' => 'assets',
                 'handle' => 'image',
                 'required' => true,
             ]

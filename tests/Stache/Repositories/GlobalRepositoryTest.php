@@ -13,7 +13,7 @@ use Illuminate\Support\Collection as IlluminateCollection;
 
 class GlobalRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

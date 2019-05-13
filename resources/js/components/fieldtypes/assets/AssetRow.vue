@@ -14,10 +14,7 @@
             </template>
         </td>
         <td>
-            <span @dblclick="edit">
-                <span v-if="asset.title !== asset.filename" :title="asset.basename">{{ asset.title || asset.filename }}</span>
-                <span v-else>{{ asset.basename }}</span>
-            </span>
+            <span @dblclick="edit">{{ asset.basename }}</span>
         </td>
         <td class="pr-8" style="width: 32px;">
 

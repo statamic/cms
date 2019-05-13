@@ -16,7 +16,7 @@
         @apply w-6 border-r;
         cursor: grab;
         background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
-        &:hover { @apply .bg-grey-lighter; }
+        &:hover { @apply .bg-grey-30; }
     }
 
     .page-root {

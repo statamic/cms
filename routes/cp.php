@@ -32,25 +32,51 @@ Route::group([
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
-        Route::get('collections/{collection}/entries', 'EntriesController@index')->name('collections.entries.index');
-        Route::post('collections/{collection}/entries/action', 'EntryActionController')->name('collections.entries.action');
-        Route::post('collections/{collection}/entries/columns', 'EntryColumnController')->name('collections.entries.columns');
-        Route::get('collections/{collection}/entries/create/{site}', 'EntriesController@create')->name('collections.entries.create');
-        Route::post('collections/{collection}/entries/{site}', 'EntriesController@store')->name('collections.entries.store');
-        Route::get('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@edit')->name('collections.entries.edit');
-        Route::patch('collections/{collection}/entries/{id}/{slug}/{site}', 'EntriesController@update')->name('collections.entries.update');
+
+        Route::group(['prefix' => 'collections/{collection}/entries'], function () {
+            Route::get('/', 'EntriesController@index')->name('collections.entries.index');
+            Route::post('action', 'EntryActionController')->name('collections.entries.action');
+            Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
+            Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
+            Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
+            Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
+
+            Route::group(['prefix' => '{entry}/{slug}/{site}'], function () {
+                Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
+                Route::post('/', 'PublishedEntriesController@store')->name('collections.entries.published.store');
+                Route::delete('/', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
+
+                Route::resource('revisions', 'EntryRevisionsController', [
+                    'as' => 'collections.entries',
+                    'only' => ['index', 'store', 'show'],
+                ]);
+
+                Route::post('restore-revision', 'RestoreEntryRevisionController')->name('collections.entries.restore-revision');
+                Route::post('preview', 'EntryPreviewController@edit')->name('collections.entries.preview.edit');
+                Route::get('preview', 'EntryPreviewController@show')->name('collections.entries.preview.popout');
+                Route::patch('/', 'EntriesController@update')->name('collections.entries.update');
+            });
+        });
+    });
+
+    Route::group(['namespace' => 'Taxonomies'], function () {
+        Route::resource('taxonomies', 'TaxonomiesController');
     });
 
     Route::get('globals', 'GlobalsController@index')->name('globals.index');
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
+    Route::post('globals', 'GlobalsController@store')->name('globals.store');
     Route::get('globals/{id}/{handle}/{site}', 'GlobalsController@edit')->name('globals.edit');
     Route::patch('globals/{id}/{handle}/{site}', 'GlobalsController@update')->name('globals.update');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');
+        Route::post('asset-containers/{container}/folders', 'FoldersController@store');
+        Route::patch('asset-containers/{container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
         Route::post('assets/action', 'ActionController')->name('assets.action');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
+        Route::get('assets/browse/search/{container}', 'BrowserController@search');
         Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');
         Route::get('assets/browse/{container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
         Route::get('assets-fieldtype', 'FieldtypeController@index');
@@ -60,6 +86,7 @@ Route::group([
     });
 
     Route::group(['namespace' => 'Fields'], function () {
+        Route::get('field-meta', 'MetaController@show');
         Route::resource('fieldsets', 'FieldsetController');
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');
         Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
@@ -111,17 +138,11 @@ Route::group([
     });
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
-        Route::get('relationship', 'RelationshipFieldtypeController@index');
-        Route::get('relationship/data', 'RelationshipFieldtypeController@data');
-        Route::get('collections', 'CollectionsFieldtypeController@index');
-        Route::get('collections/data', 'CollectionsFieldtypeController@data');
-        Route::get('form', 'FormFieldtypeController@index');
-        Route::get('form/data', 'FormFieldtypeController@data');
-        Route::get('blueprints', 'BlueprintsFieldtypeController@index');
-        Route::get('blueprints/data', 'BlueprintsFieldtypeController@data');
+        Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
+        Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
     });
 
-    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'Api'], function () {
+    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'API'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');
     });

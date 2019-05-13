@@ -1,11 +1,20 @@
 <template>
 
-    <div :class="classes">
-        <label class="block" :class="{'bold': config.bold}">
+    <publish-field-meta
+        :config="config"
+        :initial-value="value"
+        :initial-meta="meta"
+    >
+    <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
+        <label class="publish-field-label" :class="{'font-bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
-            <template v-if="!config.display">{{ config.handle | deslugify | titleize }}</template>
+            <template v-else>{{ config.handle | deslugify | titleize }}</template>
             <i class="required" v-if="config.required">*</i>
-            <i class="icon icon-chat text-xs text-grey-lighten-2" v-if="config.localizable" v-popover:tooltip.top="__('This field will be localized.')" />
+            <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
+                {{ isLocked ? __('Locked') : __('Read Only') }}
+            </span>
+            <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
         </label>
 
         <div
@@ -13,21 +22,27 @@
             v-if="config.instructions"
             v-html="$options.filters.markdown(config.instructions)" />
 
-        <div v-if="hasError">
-            <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
-        </div>
+        <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
-        <slot name="fieldtype">
+        <slot name="fieldtype" v-if="!loadingMeta">
             <component
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
                 :meta="meta"
                 :name="config.handle"
-                @updated="updated"
+                :read-only="isReadOnly"
+                @updated="$emit('updated', $event)"
+                @focus="focused"
+                @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
+
+        <div v-if="hasError">
+            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+        </div>
     </div>
+    </publish-field-meta>
 
 </template>
 
@@ -46,38 +61,73 @@ export default {
         },
         errors: {
             type: Array
-        }
+        },
+        readOnly: Boolean
+    },
+
+    inject: {
+        storeName: { default: null }
     },
 
     computed: {
 
         fieldtypeComponent() {
-            return `${this.config.type}-fieldtype`;
+            return `${this.config.component || this.config.type}-fieldtype`;
         },
 
         hasError() {
             return this.errors && this.errors.length > 0;
         },
 
+        isReadOnly() {
+            return this.isLocked || this.readOnly || this.config.read_only || false;
+        },
+
         classes() {
             return [
-                'form-group',
+                'form-group publish-field',
                 `${this.config.type}-fieldtype`,
-                tailwind_width_class(this.config.width),
+                `field-${tailwind_width_class(this.config.width)}`,
+                this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError }
             ];
+        },
+
+        locks() {
+            let state = this.$store.state.publish[this.storeName];
+            if (!state) return {};
+            return state.fieldLocks;
+        },
+
+        isLocked() {
+            return Object.keys(this.locks).includes(this.config.handle);
+        },
+
+        lockingUser() {
+            if (this.isLocked) {
+                let user = this.locks[this.config.handle];
+                if (typeof user === 'object') return user;
+            }
         }
 
     },
 
     methods: {
 
-        updated(value) {
-            this.$emit('updated', this.config.handle, value);
+        focused() {
+            if (!this.isLocked) {
+                this.$emit('focus');
+            }
+        },
+
+        blurred() {
+            if (!this.isLocked) {
+                this.$emit('blur');
+            }
         }
 
     }
-
 }
+
 </script>

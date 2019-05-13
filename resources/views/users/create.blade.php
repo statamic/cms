@@ -63,6 +63,7 @@
         method="post"
         :initial-fieldset="{{ json_encode($blueprint->toPublishArray()) }}"
         :initial-values="{{ json_encode($values) }}"
+        :initial-meta="{{ json_encode($meta) }}"
         inline-template
     >
         <div>
@@ -79,12 +80,12 @@
                 v-if="fieldset"
                 name="base"
                 :fieldset="fieldset"
-                :values="initialValues"
+                :values="values"
+                :meta="meta"
                 :errors="errors"
                 @updated="values = $event"
             >
                 <div slot-scope="{ }">
-                    <div class="alert alert-danger mb-2" v-if="error" v-text="error" v-cloak></div>
                     <publish-sections></publish-sections>
                 </div>
             </publish-container>

@@ -4,6 +4,7 @@ namespace Tests\Tags;
 
 use Tests\TestCase;
 use Statamic\Tags\Tags;
+use Statamic\API\Antlers;
 use Tests\TestDependency;
 
 class TagsTest extends TestCase
@@ -14,6 +15,7 @@ class TagsTest extends TestCase
         $class = app(TestTags::class);
 
         $class->setProperties([
+            'parser' => $parser = Antlers::parser(),
             'content' => 'This is the tag content',
             'context' => ['foo' => 'bar'],
             'parameters' => ['limit' => 3],
@@ -25,7 +27,8 @@ class TagsTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $class->context);
         $this->assertEquals(['limit' => 3], $class->parameters);
         $this->assertEquals('test:listing', $class->tag);
-        $this->assertEquals('listing', $class->tag_method);
+        $this->assertEquals('listing', $class->method);
+        $this->assertEquals($parser, $class->parser);
         $this->assertInstanceOf(TestDependency::class, $class->dependency);
     }
 }

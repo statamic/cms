@@ -3,7 +3,7 @@
         <div class="flex mb-3">
             <h1 class="flex-1">
                 Updates
-                <span v-if="currentVersion" class="text-sm text-grey-light italic ml-3">
+                <span v-if="currentVersion" class="text-sm text-grey-40 italic ml-3">
                     Current Version: {{ currentVersion }}
                 </span>
             </h1>
@@ -21,7 +21,7 @@
             <loading-graphic  />
         </div>
 
-        <div class="card mb-5 text-grey-light flex items-center" v-if="onLatestVersion">
+        <div class="card mb-5 text-grey-40 flex items-center" v-if="onLatestVersion">
             <svg version="1.0"
                 class="fill-current mr-2"
                  xmlns="http://www.w3.org/2000/svg" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
@@ -86,8 +86,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
-
     export default {
         props: [
             'slug',
@@ -107,7 +105,7 @@
 
         computed: {
             toEleven() {
-                return {timeout: window.Statamic.ajaxTimeout};
+                return {timeout: Statamic.$config.get('ajaxTimeout')};
             },
 
             composer() {
@@ -131,7 +129,7 @@
             getChangelog() {
                 this.gettingChangelog = true;
 
-                axios.get(`/cp/updater/${this.slug}/changelog`).then(response => {
+                this.$axios.get(`/cp/updater/${this.slug}/changelog`).then(response => {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
@@ -140,7 +138,7 @@
             },
 
             update() {
-                axios.post(`/cp/updater/${this.slug}/update`, {}, this.toEleven);
+                this.$axios.post(`/cp/updater/${this.slug}/update`, {}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -152,7 +150,7 @@
             },
 
             updateToLatest() {
-                axios.post(`/cp/updater/${this.slug}/update-to-latest`, {}, this.toEleven);
+                this.$axios.post(`/cp/updater/${this.slug}/update-to-latest`, {}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -164,7 +162,7 @@
             },
 
             installExplicitVersion(version) {
-                axios.post(`/cp/updater/${this.slug}/install-explicit-version`, {'version': version}, this.toEleven);
+                this.$axios.post(`/cp/updater/${this.slug}/install-explicit-version`, {'version': version}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,

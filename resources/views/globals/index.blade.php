@@ -2,20 +2,8 @@
 
 @section('content')
 
-    @if(count($globals) == 0)
-        <div class="text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
-            @svg('empty/global')
-            <h1 class="my-3">{{ __('Create your first Global Set now') }}</h1>
-            <p class="text-grey mb-3">
-                {{ __('Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.') }}
-            </p>
-            @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
-                <a href="{{ cp_route('globals.create') }}" class="btn-primary btn-lg">{{ __('Create Global Set') }}</a>
-            @endcan
-        </div>
-    @endif
+    @unless($globals->isEmpty())
 
-    @if(count($globals) > 0)
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Globals') }}</h1>
             @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
@@ -24,6 +12,17 @@
         </div>
 
         <global-listing :globals="{{ json_encode($globals) }}"></global-listing>
-    @endif
+
+    @else
+
+        @include('statamic::partials.create-first', [
+            'resource' => 'Global Set',
+            'description' => 'Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.',
+            'svg' => 'empty/global',
+            'route' => cp_route('globals.create'),
+            'can' => user()->can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
+        ])
+
+    @endunless
 
 @endsection

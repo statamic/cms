@@ -3,17 +3,17 @@
     <portal :to="portal" :order="depth">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering }"
-            :style="{ zIndex: (depth + 1) * 1000, left: `${offset * depth}px` }"
+            :style="{ zIndex: (depth + 1) * 1000, left: `${leftOffset}px` }"
         >
-            <transition name="stack-overlay">
-                <div class="stack-overlay" v-if="visible" :style="{ left: `-${offset * depth}px` }" />
+            <transition name="stack-overlay-fade">
+                <div class="stack-overlay" v-if="visible" :style="{ left: `-${leftOffset}px` }" />
             </transition>
 
             <div class="stack-hit-area" :style="{ left: `-${offset}px` }" @click="clickedHitArea" @mouseenter="mouseEnterHitArea" @mouseout="mouseOutHitArea" />
 
             <transition name="stack-slide">
                 <div class="stack-content" v-if="visible">
-                    <slot name="default" :depth="depth" />
+                    <slot name="default" :depth="depth" :close="close" />
                 </div>
             </transition>
         </div>
@@ -32,6 +32,9 @@ export default {
         beforeClose: {
             type: Function,
             default: () => true
+        },
+        narrow: {
+            type: Boolean
         }
     },
 
@@ -51,8 +54,20 @@ export default {
         },
 
         offset() {
+            if (this.isTopStack && this.narrow) {
+                return window.innerWidth - 400;
+            }
+
             // max of 200px, min of 80px
             return Math.max(400 / (this.$stacks.count() + 1), 80)
+        },
+
+        leftOffset() {
+            if (this.isTopStack && this.narrow) {
+                return this.offset;
+            }
+
+            return this.offset * this.depth;
         },
 
         hasChild() {
@@ -110,12 +125,17 @@ export default {
         },
 
         close() {
-            this.$emit('closed');
+            this.visible = false;
+            this.$wait(300).then(() => { this.$emit('closed') });
         },
     },
 
     mounted() {
         this.visible = true;
+
+        this.$mousetrap.bindGlobal(['esc'], e => {
+            this.close();
+        });
     }
 
 }

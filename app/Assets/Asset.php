@@ -2,18 +2,22 @@
 
 namespace Statamic\Assets;
 
+use Statamic\API;
 use Stringy\Stringy;
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Arr;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
+use Statamic\API\YAML;
 use Statamic\API\Image;
 use Statamic\Data\Data;
 use Statamic\API\Blueprint;
 use Illuminate\Support\Carbon;
 use Statamic\Data\ContainsData;
 use League\Flysystem\Filesystem;
+use Statamic\FluentlyGetsAndSets;
 use League\Flysystem\Adapter\Local;
 use Facades\Statamic\Assets\Dimensions;
 use Statamic\Events\Data\AssetReplaced;
@@ -26,14 +30,66 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class Asset implements AssetContract, Arrayable
 {
-    use ContainsData;
+    use FluentlyGetsAndSets, ContainsData {
+        set as traitSet;
+        get as traitGet;
+        remove as traitRemove;
+        data as traitData;
+    }
 
     protected $container;
     protected $path;
+    protected $meta;
 
-    public function id()
+    public function id($id = null)
     {
+        if ($id) {
+            throw new \Exception('Asset IDs cannot be set directly.');
+        }
+
         return $this->container->id() . '::' . $this->path();
+    }
+
+    public function reference()
+    {
+        return "asset::{$this->id()}";
+    }
+
+    public function get($key, $fallback = null)
+    {
+        return $this->hydrate()->traitGet($key, $fallback);
+    }
+
+    public function set($key, $value)
+    {
+        return $this->hydrate()->traitSet($key, $value);
+    }
+
+    public function remove($key)
+    {
+        unset($this->meta['data'][$key]);
+
+        return $this;
+    }
+
+    public function data($data = null)
+    {
+        $this->hydrate();
+
+        return call_user_func_array([$this, 'traitData'], func_get_args());
+    }
+
+    public function hydrate()
+    {
+        if ($this->meta) {
+            return $this;
+        }
+
+        $this->meta = $this->meta();
+
+        $this->data = $this->meta['data'];
+
+        return $this;
     }
 
     /**
@@ -44,6 +100,62 @@ class Asset implements AssetContract, Arrayable
     public function disk()
     {
         return $this->container()->disk();
+    }
+
+    public function exists()
+    {
+        if (! $path = $this->path()) {
+            return false;
+        }
+
+        return $this->disk()->exists($path);
+    }
+
+    public function meta()
+    {
+        if ($this->meta) {
+            return array_merge($this->meta, ['data' => $this->data]);
+        }
+
+        if ($this->disk()->exists($path = $this->metaPath())) {
+            return YAML::parse($this->disk()->get($path));
+        }
+
+        $this->writeMeta($this->meta = $this->generateMeta());
+
+        return $this->meta;
+    }
+
+    public function generateMeta()
+    {
+        $meta = ['data' => $this->data];
+
+        if ($this->exists()) {
+            $dimensions = Dimensions::asset($this)->get();
+
+            $meta = array_merge($meta, [
+                'size' => $this->disk()->size($this->path()),
+                'last_modified' => $this->disk()->lastModified($this->path()),
+                'width' => $dimensions[0],
+                'height' => $dimensions[1],
+            ]);
+        }
+
+        return $meta;
+    }
+
+    public function metaPath()
+    {
+        return dirname($this->path()) . '/.meta/' . $this->basename() . '.yaml';
+    }
+
+    public function writeMeta($meta)
+    {
+        $meta['data'] = Arr::removeNullValues($meta['data']);
+
+        $contents = YAML::dump($meta);
+
+        $this->disk()->put($this->metaPath(), $contents);
     }
 
     /**
@@ -90,13 +202,12 @@ class Asset implements AssetContract, Arrayable
      */
     public function path($path = null)
     {
-        if (func_num_args() === 0) {
-            return $this->path ? ltrim($this->path, '/') : null;
-        }
-
-        $this->path = $path;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('path')
+            ->getter(function ($path) {
+                return $path ? ltrim($path, '/') : null;
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -124,6 +235,14 @@ class Asset implements AssetContract, Arrayable
         }
 
         return URL::assemble($this->container()->url(), $this->path());
+    }
+
+    public function thumbnailUrl($preset = null)
+    {
+        return cp_route('assets.thumbnails.show', [
+            'asset' => base64_encode($this->id()),
+            'size' => $preset
+        ]);
     }
 
     /**
@@ -207,7 +326,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->disk()->lastModified($this->path()));
+        return Carbon::createFromTimestamp($this->meta()['last_modified']);
     }
 
     /**
@@ -217,11 +336,11 @@ class Asset implements AssetContract, Arrayable
      */
     public function save()
     {
-        $this->container()->addAsset($this)->save();
+        API\Asset::save($this);
 
         event('asset.saved', $this);
 
-        return $this;
+        return true;
     }
 
     /**
@@ -231,10 +350,6 @@ class Asset implements AssetContract, Arrayable
      */
     public function delete()
     {
-        // Delete the data from the container, if any is in there.
-        $this->container()->removeAsset($this)->save();
-
-        // Also, delete the actual file
         $this->disk()->delete($this->path());
 
         return $this;
@@ -248,17 +363,12 @@ class Asset implements AssetContract, Arrayable
      */
     public function container($container = null)
     {
-        if (func_num_args() === 0) {
-            return $this->container;
-        }
-
-        if (is_string($container)) {
-            $container = AssetContainerAPI::find($container);
-        }
-
-        $this->container = $container;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('container')
+            ->setter(function ($container) {
+                return is_string($container) ? AssetContainerAPI::find($container) : $container;
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -292,20 +402,15 @@ class Asset implements AssetContract, Arrayable
     public function move($folder, $filename = null)
     {
         $filename = $filename ?: $this->filename();
-
-        // Remove the asset definition from the container.
-        // It'll be re-added in a moment under its new path.
-        $this->container()->removeAsset($this);
-
         $oldPath = $this->path();
-
+        $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder . '/' . $filename . '.' . pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
 
         if ($oldPath !== $newPath) {
-            // Actually rename the file.
             $this->disk()->rename($oldPath, $newPath);
-
-            $this->path($newPath)->save();
+            $this->path($newPath);
+            $this->disk()->rename($oldMetaPath, $this->metaPath());
+            $this->save();
         }
 
         return $this;
@@ -318,7 +423,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function dimensions()
     {
-        return Dimensions::asset($this)->get();
+        return [$this->meta()['width'], $this->meta()['height']];
     }
 
     /**
@@ -342,13 +447,58 @@ class Asset implements AssetContract, Arrayable
     }
 
     /**
+     * Get the asset's orientation
+     *
+     * @return string|null
+     */
+    public function orientation()
+    {
+        if ($this->height() > $this->width()) {
+            return 'portrait';
+        } elseif ($this->height() < $this->width()) {
+            return 'landscape';
+        } elseif ($this->height() === $this->width()) {
+            return 'square';
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the asset's ratio
+     *
+     * @return
+     */
+    public function ratio()
+    {
+        if (! $this->isImage()) {
+            return null;
+        }
+
+        return $this->width() / $this->height();
+    }
+
+    /**
      * Get the asset's file size
      *
      * @return int
      */
     public function size()
     {
-        return $this->disk()->size($this->path());
+        return $this->meta()['size'];
+    }
+
+    /**
+     * Get the display name of the asset.
+     *
+     * Typically used when an asset could be amongst other
+     * types of objects, like within search results.
+     *
+     * @return string
+     */
+    public function title()
+    {
+        return $this->basename();
     }
 
     /**
@@ -360,7 +510,7 @@ class Asset implements AssetContract, Arrayable
     {
         $attributes = [
             'id'             => $this->id(),
-            'title'          => $this->get('title'),
+            'title'          => $this->title(),
             'path'           => $this->path(),
             'filename'       => $this->filename(),
             'basename'       => $this->basename(),
@@ -377,14 +527,14 @@ class Asset implements AssetContract, Arrayable
             'url'            => $this->url(),
         ];
 
-        if ($this->disk() && $this->disk()->exists($this->path())) {
+        if ($this->exists()) {
             $size = $this->size();
             $kb = number_format($size / 1024, 2);
             $mb = number_format($size / 1048576, 2);
             $gb = number_format($size / 1073741824, 2);
 
             $attributes = array_merge($attributes, [
-                'size'           => $this->disk()->sizeHuman($this->path()),
+                'size'           => Str::fileSizeForHumans($this->size()),
                 'size_bytes'     => $size,
                 'size_kilobytes' => $kb,
                 'size_megabytes' => $mb,
@@ -397,6 +547,10 @@ class Asset implements AssetContract, Arrayable
                 'last_modified_timestamp' => $this->lastModified()->timestamp,
                 'last_modified_instance'  => $this->lastModified(),
                 'focus_css' => \Statamic\View\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
+                'height' => $this->height(),
+                'width' => $this->width(),
+                'orientation' => $this->orientation(),
+                'ratio' => $this->ratio()
             ]);
         }
 

@@ -7,7 +7,6 @@
         <div id="statamic">
             @yield('content')
         </div>
-        {{-- <script>Statamic.translations = {!! $translations !!};</script> --}}
         @include('statamic::partials.scripts')
         @yield('scripts')
     </body>

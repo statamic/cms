@@ -1,6 +1,8 @@
 <template>
 
-    <stack name="asset-editor" @closed="$emit('closed')">
+    <stack name="asset-editor"
+        :before-close="shouldClose"
+        @closed="close">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
 
@@ -12,7 +14,7 @@
 
             <div class="editor-meta">
                 <div class="asset-editor-meta-items">
-                    <div class="meta-item one-line">
+                    <div class="meta-item one-line text-xs border-none">
                         <file-icon :extension="asset.extension"></file-icon>
                         {{ asset.path }}
                     </div>
@@ -87,7 +89,7 @@
                         </object>
                     </div>
 
-                    <div class="h-full" v-if="asset.is_previewable">
+                    <div class="h-full" v-if="asset.is_previewable && canUseGoogleDocsViewer">
                         <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
@@ -120,7 +122,7 @@
 
                 <publish-container
                     v-if="fields"
-                    name="asset"
+                    name="publishContainer"
                     :fieldset="fieldset"
                     :values="values"
                     :meta="meta"
@@ -139,10 +141,10 @@
                         </div>
 
                         <div class="editor-form-actions text-right">
-                            <button type="button" class="btn btn-danger" @click="destroy" v-if="allowDeleting">
+                            <button type="button" class="btn-danger mr-1" @click="destroy" v-if="allowDeleting">
                                 {{ __('Delete') }}
                             </button>
-                            <button type="button" class="btn btn-primary" @click="save">
+                            <button type="button" class="btn-primary" @click="save">
                                 {{ __('Save') }}
                             </button>
                         </div>
@@ -188,9 +190,6 @@
 
 
 <script>
-import axios from 'axios';
-import Fieldset from '../../publish/Fieldset';
-
 export default {
 
     components: {
@@ -202,7 +201,9 @@ export default {
 
 
     props: {
-        id: String,
+        id: {
+            required: true
+        },
         allowDeleting: {
             type: Boolean,
             default() {
@@ -217,6 +218,7 @@ export default {
             loading: true,
             saving: false,
             asset: null,
+            publishContainer: 'asset',
             values: {},
             meta: {},
             fields: null,
@@ -248,6 +250,11 @@ export default {
             return this.error || Object.keys(this.errors).length;
         },
 
+        canUseGoogleDocsViewer()
+        {
+            return Statamic.$config.get('googleDocsViewer');
+        }
+
     },
 
 
@@ -277,7 +284,7 @@ export default {
 
             const url = cp_url(`assets/${btoa(this.id)}`);
 
-            axios.get(url).then(response => {
+            this.$axios.get(url).then(response => {
                 this.asset = response.data.asset;
                 this.values = response.data.values;
                 this.meta = response.data.meta;
@@ -291,13 +298,11 @@ export default {
         getFieldset() {
             const url = cp_url(`publish-blueprints/${this.asset.blueprint}`);
 
-            axios.get(url).then(response => {
-                const fieldset = new Fieldset(response.data);
-
-                this.fieldset = fieldset.fieldset;
+            this.$axios.get(url).then(response => {
+                this.fieldset = response.data;
 
                 // Flatten fields from all sections into one array.
-                this.fields = _.chain(fieldset.sections)
+                this.fields = _.chain(this.fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)
                     .value();
@@ -324,8 +329,9 @@ export default {
          * When the focal point is selected
          */
         selectFocalPoint(point) {
-            point = (point === '50-50') ? null : point;
-            this.$set(this.values, 'focus', point)
+            point = (point === '50-50-1') ? null : point;
+            this.$set(this.values, 'focus', point);
+            this.$dirty.add(this.publishContainer);
         },
 
         /**
@@ -335,7 +341,7 @@ export default {
             this.saving = true;
             const url = cp_url(`assets/${btoa(this.id)}`);
 
-            axios.patch(url, this.values).then(response => {
+            this.$axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);
                 this.$notify.success('Saved');
                 this.saving = false;
@@ -370,7 +376,7 @@ export default {
 
             const url = cp_url(`assets/${btoa(this.id)}`);
 
-            axios.delete(url).then(response => {
+            this.$axios.delete(url).then(response => {
                 this.$emit('deleted', this.asset.id);
                 this.saving = false;
             });
@@ -382,6 +388,16 @@ export default {
         close() {
             this.$modal.hide('asset-editor');
             this.$emit('closed');
+        },
+
+        shouldClose() {
+            if (this.$dirty.has(this.publishContainer)) {
+                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                    return false;
+                }
+            }
+
+            return true;
         },
 
         openRenamer() {

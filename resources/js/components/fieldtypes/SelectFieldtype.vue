@@ -1,32 +1,44 @@
 <template>
-    <select-input :name="name" :value="value" @input="update" :options="config.options" />
+    <v-select
+        ref="input"
+        @input="update"
+        :name="name"
+        :clearable="config.clearable"
+        :disabled="config.disabled"
+        :options="options"
+        :placeholder="config.placeholder"
+        :reduce="selection => selection.value"
+        :searchable="config.searchable"
+        :taggable="config.taggable"
+        :push-tags="config.push_tags"
+        :multiple="config.multiple"
+        :value="value" />
 </template>
 
 <script>
+import HasInputOptions from './HasInputOptions.js'
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, HasInputOptions],
 
     computed: {
-        label: function() {
-            // type juggle to make sure integers are treated as thus.
-            const parsed = parseInt(this.data);
-            const val = isNaN(parsed) ? this.data : parsed;
-
-            var option = _.findWhere(this.selectOptions, {value: val});
-
-            return (option) ? option.text : this.data;
+        options() {
+            return this.normalizeInputOptions(this.config.options);
         }
     },
 
     methods: {
+        handleUpdate(value) {
+            this.update(value.value)
+        },
+
         focus() {
             this.$refs.input.focus();
         },
 
         getReplicatorPreviewText() {
-            return this.label;
+            // @TODO
         },
     }
 };

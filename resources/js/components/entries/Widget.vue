@@ -18,13 +18,13 @@
                 <data-list-table :loading="loading">
                     <template slot="cell-title" slot-scope="{ row: entry }">
                         <div class="flex items-center">
-                            <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-light']" />
+                            <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>
                 </data-list-table>
                 <data-list-pagination
-                    class="py-1 border-t bg-grey-lightest rounded-b-lg text-sm"
+                    class="py-1 border-t bg-grey-20 rounded-b-lg text-sm"
                     :resource-meta="meta"
                     @page-selected="page = $event"
                 />
@@ -50,7 +50,6 @@ export default {
             cols: [{ label: "Title", field: "title", visible: true }],
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
-            saveColumnsUrl: cp_url(`collections/${this.collection}/entries/columns`),
         }
     }
 

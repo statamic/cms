@@ -5,14 +5,21 @@ export default {
 
     mixins: [InlinePublishForm],
 
+    props: {
+        site: String,
+    },
+
     data() {
         return {
+            creating: true,
             method: 'post',
             action: 'store',
             title: __('Create'),
-            itemUrl: cp_url('collections/blog/entries/create')
+            itemUrl: cp_url(`collections/blog/entries/create/${this.site}`)
         }
     },
+
+    inject: ['storeName'],
 
     methods: {
 

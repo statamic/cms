@@ -13,7 +13,7 @@ class ViewCollectionListingTest extends TestCase
 {
     use FakesRoles;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->markTestIncomplete(); // TODO. It's changed since we moved to a vue component.

@@ -12,7 +12,6 @@ mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     ],
 });
 
-mix.js(`${src}/js/bootstrap.js`, `${dest}/js`);
 mix.js(`${src}/js/app.js`, `${dest}/js`);
 mix.extract([
     'autosize',
@@ -23,25 +22,21 @@ mix.extract([
     'dmuploader',
     'jquery',
     'jquery-ui',
+    'lazysizes',
     'luminous-lightbox',
     'marked',
     'marked-plaintext',
-    'medium-editor',
-    'medium-editor-autohr',
     'moment',
     'mousetrap',
-    'redactor',
     'selectize',
     'sweetalert',
     '@shopify/draggable',
-    'tippy.js',
     'transliterations',
     'underscore',
     'vue',
     'vue-clickaway',
     'vue-js-modal',
     'vue-js-popover',
-    'vue-typeahead',
 ]);
 
 mix.copyDirectory(`${src}/img`, `${dest}/img`);

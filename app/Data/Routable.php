@@ -41,4 +41,13 @@ trait Routable
             ltrim($this->uri(), '/')
         ]);
     }
+
+    public function ampUrl()
+    {
+        return !$this->ampable() ? null : vsprintf('%s/%s/%s', [
+            rtrim($this->site()->absoluteUrl(), '/'),
+            config('statamic.amp.route'),
+            ltrim($this->uri(), '/')
+        ]);
+    }
 }

@@ -2,10 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\API\Site;
 use Statamic\API\Helper;
 use Statamic\API\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
+use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalSetContract;
 
 class GlobalsController extends CpController
@@ -47,7 +49,7 @@ class GlobalsController extends CpController
 
         $blueprint = $set->blueprint();
 
-        // event(new PublishBlueprintFound($blueprint, 'globals', $set)); // TODO
+        event(new PublishBlueprintFound($blueprint, 'globals', $set));
 
         $fields = $blueprint
             ->fields()
@@ -131,10 +133,15 @@ class GlobalsController extends CpController
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $global = GlobalSet::create($handle)
-            ->with(array_except($data, 'handle'))
-            ->ensureId() // TODO: Shouldn't need to do this.
-            ->save();
+        $global = GlobalSet::make()
+            ->handle($handle)
+            ->title($data['title'])
+            ->blueprint($data['blueprint'] ?? null)
+            ->sites([
+                $site = Site::default()->handle() // TODO: site picker
+            ])->in($site, function () {
+                //
+            })->save();
 
         session()->flash('message', __('Global Set created'));
 

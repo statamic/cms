@@ -3,9 +3,10 @@
 namespace Statamic\Tags;
 
 use Statamic\API\Str;
+use Statamic\API\Site;
+use Statamic\API\Entry;
 use Statamic\Tags\Tags;
 use Statamic\API\Config;
-use Statamic\API\Content;
 use Illuminate\Support\Collection;
 
 class Locales extends Tags
@@ -34,7 +35,7 @@ class Locales extends Tags
      */
     public function __call($method, $args)
     {
-        $data = $this->getLocalizedData($key = $this->tag_method);
+        $data = $this->getLocalizedData($key = $this->method);
 
         $data['locale'] = $this->getLocale($key);
 
@@ -48,7 +49,7 @@ class Locales extends Tags
      */
     private function getLocales()
     {
-        return collect(Config::get('statamic.system.locales'))->map(function ($locale, $key) {
+        return Site::all()->map(function ($locale, $key) {
             return $this->getLocale($key);
         })->pipe(function ($locales) {
             return $this->sort($locales);
@@ -65,9 +66,15 @@ class Locales extends Tags
      */
     private function getLocale($key)
     {
-        $locale = Config::get("statamic.system.locales.{$key}");
-        $locale['key'] = $key;
-        return $locale;
+        $site = $key instanceof \Statamic\Sites\Site ? $key : Site::get($key);
+
+        return [
+            'key' => $site->handle(),
+            'handle' => $site->handle(),
+            'name' => $site->name(),
+            'full' => $site->locale(),
+            'short' => $site->shortLocale(),
+        ];
     }
 
     /**
@@ -108,9 +115,9 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', array_get($this->context, 'id'));
+        $id = $this->get('id', array_get($this->context, 'id')->value());
 
-        return $this->data = Content::find($id);
+        return $this->data = Entry::find($id);
     }
 
     /**

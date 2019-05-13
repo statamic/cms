@@ -1,13 +1,19 @@
 <template>
 
-    <td class="border">
-        <component
-            :is="fieldtypeComponent"
-            :config="field"
-            :value="value"
-            :name="name"
-            @updated="updated"
-        />
+    <td class="grid-cell" :class="fieldtypeComponent">
+        <div v-show="showInner">
+            <component
+                :is="fieldtypeComponent"
+                :config="field"
+                :value="value"
+                :meta="meta"
+                :name="name"
+                :read-only="grid.isReadOnly"
+                @updated="$emit('updated', $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+            />
+        </div>
 
         <div v-if="hasError">
             <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
@@ -27,6 +33,9 @@ export default {
         value: {
             required: true
         },
+        meta: {
+            required: true
+        },
         index: {
             type: Number,
             required: true
@@ -38,10 +47,14 @@ export default {
         gridName: {
             type: String,
             required: true
+        },
+        showInner: {
+            type: Boolean,
+            required: true
         }
     },
 
-    inject: ['storeName'],
+    inject: ['storeName', 'grid'],
 
     computed: {
 
@@ -65,14 +78,6 @@ export default {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
             return state.errors[this.errorKey] || [];
-        }
-
-    },
-
-    methods: {
-
-        updated(value) {
-            this.$emit('updated', this.field.handle, value);
         }
 
     }

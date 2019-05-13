@@ -20,7 +20,7 @@
                         </li>
                     </ul>
 
-                    <ul class="markdown-buttons">
+                    <ul class="markdown-buttons" v-if="! isReadOnly">
                         <li><a @click="bold" tabindex="-1"><b>B</b></a></li>
                         <li><a @click="italic" tabindex="-1"><i>i</i></a></li>
                         <li><a @click="insertLink('')" tabindex="-1">
@@ -39,8 +39,8 @@
                 </div>
 
                 <div class="drag-notification" v-show="dragging">
-                    <i class="icon icon-download" />
-                    Drop to upload.
+                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    {{ __('Drop File to Upload') }}
                 </div>
 
                 <uploads
@@ -63,19 +63,23 @@
                         <div class="helpers">
                             <!-- TODO: Fix modal -->
                             <div class="markdown-cheatsheet-helper">
-                                <button @click="showCheatsheet = true">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" mask="url(#a)"/></svg>
-                                    {{ __('Markdown Cheatsheet') }}
+                                <button class="btn-link" @click="showCheatsheet = true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" fill="currentColor" mask="url(#a)"/></svg>
+                                    <span>{{ __('Markdown Cheatsheet') }}</span>
                                 </button>
                             </div>
-                            <div class="markdown-asset-helper" v-if="assetsEnabled">
-                                <a href="" @click.prevent="addAsset"><span class="icon icon-image"></span> {{ __('Add Asset') }}</a> (or drag &amp; drop)
+                            <div class="markdown-asset-helper flex items-center" v-if="assetsEnabled">
+                                <button class="btn-link flex items-center mr-1" @click.prevent="addAsset">
+                                    <svg-icon name="folder-image" class='w-4 h-4 mr-sm' />
+                                    {{ __('Insert Asset') }}
+                                </button>
+                                <span class="text-2xs text-grey-60">(or drag &amp; drop)</span>
                             </div>
                         </div>
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                            <i class="icon icon-download"></i>
-                            <h3>{{ __('Drop to Upload') }}</h3>
+                            <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                            {{ __('Drop File to Upload') }}
                         </div>
                     </div>
 
@@ -84,7 +88,7 @@
             </div>
         </uploader>
 
-        <stack v-if="showAssetSelector" name="markdown-asset-selector" @closed="closeAssetSelector">
+        <stack v-if="showAssetSelector && ! isReadOnly" name="markdown-asset-selector" @closed="closeAssetSelector">
             <selector
                   :container="container"
                   :folder="folder"
@@ -109,7 +113,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 var CodeMirror = require('codemirror');
 var marked = require('marked');
 var PlainTextRenderer = require('marked-plaintext');
@@ -419,7 +422,7 @@ export default {
             // We don't want to maintain the asset selections
             this.selectedAssets = [];
 
-            axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
+            this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.alt || '';
                     var url = encodeURI(asset.url);
@@ -513,12 +516,16 @@ export default {
             viewportMargin: Infinity,
             tabindex: 0,
             autoRefresh: true,
+            readOnly: this.isReadOnly ? 'nocursor' : false,
             extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
         });
 
         self.codemirror.on('change', function (cm) {
             self.data = cm.doc.getValue();
         });
+
+        self.codemirror.on('focus', () => self.$emit('focus'));
+        self.codemirror.on('blur', () => self.$emit('blur'));
 
         // Expose the array of selections to the Vue instance
         self.codemirror.on('beforeSelectionChange', function (cm, obj) {

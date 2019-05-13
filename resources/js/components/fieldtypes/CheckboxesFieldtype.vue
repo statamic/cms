@@ -1,10 +1,11 @@
 <template>
     <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
-        <div class="option" v-for="(option, $index) in config.options" :key="$index">
+        <div class="option" v-for="(option, $index) in options" :key="$index">
             <input type="checkbox"
                    :name="name + '[]'"
                    :id="name + $index"
                    :value="option.value"
+                   :disabled="isReadOnly"
                    v-model="values"
             />
             <label :for="name + $index">{{ option.text }}</label>
@@ -13,9 +14,11 @@
 </template>
 
 <script>
+import HasInputOptions from './HasInputOptions.js'
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, HasInputOptions],
 
     data() {
         return {
@@ -23,10 +26,20 @@ export default {
         }
     },
 
+    computed: {
+        options() {
+            return this.normalizeInputOptions(this.config.options);
+        }
+    },
+
     watch: {
 
         values(values) {
             this.update(values);
+        },
+
+        value(value) {
+            this.values = value;
         }
 
     },

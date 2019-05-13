@@ -9,12 +9,12 @@ use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Asset;
+use Statamic\API\Entry;
 use Statamic\API\Parse;
 use Statamic\API\Theme;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\API\Str;
-use Statamic\API\Content;
 use Statamic\Extend\Modifier;
 use Statamic\API\Localization;
 use Stringy\StaticStringy as Stringy;
@@ -1581,16 +1581,6 @@ class BaseModifiers extends Modifier
     }
 
     /**
-     * If you don't get it, it wasn't for you.
-     *
-     * @return string
-     */
-    public function slackEasterEgg()
-    {
-        return "Bigfoot was here.";
-    }
-
-    /**
      * Converts the string into an URL slug. This includes replacing non-ASCII
      * characters with their closest ASCII equivalents, removing remaining non-ASCII
      * and non-alphanumeric characters, and replacing whitespace with $replacement.
@@ -1865,6 +1855,18 @@ class BaseModifiers extends Modifier
     }
 
     /**
+     * Converts a Carbon instance to a timestamp.
+     *
+     * @param  $value
+     * @param  $params
+     * @return int
+     */
+    public function timestamp($value)
+    {
+        return $value->timestamp;
+    }
+
+    /**
      * Applies a timezone to a date
      *
      * Accepts a timezone string as a parameter. If none is provided, then
@@ -1974,13 +1976,7 @@ class BaseModifiers extends Modifier
             $value = array_get_colon($value, 0);
         }
 
-        if (! $item = Asset::find($value)) {
-            if (! $item = Content::find($value)) {
-                return $value;
-            }
-        }
-
-        return $item->url();
+        return optional(Data::find($value))->url();
     }
 
     /**

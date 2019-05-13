@@ -34,7 +34,9 @@ const vm = new Vue({
         },
 
         enableWarning() {
-            window.onbeforeunload = () => '';
+            if (Statamic.$preferences.get('confirm_dirty_navigation', true)) {
+                window.onbeforeunload = () => '';
+            }
         },
 
         disableWarning() {

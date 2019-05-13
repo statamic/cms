@@ -52,7 +52,7 @@ trait Localizable
 
     abstract protected function makeLocalization();
 
-    protected function makeAndAddLocalization($site, $callback = null)
+    public function makeAndAddLocalization($site, $callback = null)
     {
         if (! $callback) {
             $callback = $site;

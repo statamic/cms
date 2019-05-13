@@ -2,6 +2,8 @@
 
 namespace Statamic\Stache;
 
+use Statamic\Stache\Exceptions\EmptyStacheException;
+
 class Bootstrapper
 {
     const CONFIG_UPDATE_EVERY_REQUEST_KEY = 'statamic.stache.update_every_request';

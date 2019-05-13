@@ -7,7 +7,7 @@ use Statamic\Preferences\HasPreferences;
 
 class HasPreferencesTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -94,6 +94,97 @@ class HasPreferencesTest extends TestCase
     }
 
     /** @test */
+    function it_can_remove_a_single_preference_array_value()
+    {
+        $this->person->preferences([
+            'collection' => [
+                'columns' => [
+                    'date',
+                    'title',
+                    'slug'
+                ],
+            ],
+            'favorites' => [
+                [
+                    'name' => 'Updates',
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                ],
+                [
+                    'name' => 'Blog',
+                    'url' => 'https://worldwideweb.com/cp/collections/blog'
+                ]
+            ]
+        ]);
+
+        $this->person->removePreference('collection.columns', 'date');
+        $this->person->removePreference('collection.columns', 'slug');
+        $this->person->removePreference('favorites', [
+            'name' => 'Updates',
+            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+        ]);
+
+        $expected = [
+            'collection' => [
+                'columns' => [
+                    'title'
+                ],
+            ],
+            'favorites' => [
+                [
+                    'name' => 'Blog',
+                    'url' => 'https://worldwideweb.com/cp/collections/blog'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $this->person->preferences());
+    }
+
+    /** @test */
+    function it_cleans_up_by_default_after_removing()
+    {
+        $this->person->preferences([
+            'favorites' => [
+                [
+                    'name' => 'Updates',
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                ]
+            ]
+        ]);
+
+        $this->person->removePreference('favorites', [
+            'name' => 'Updates',
+            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+        ]);
+
+        $this->assertEquals([], $this->person->preferences());
+    }
+
+    /** @test */
+    function it_can_remove_with_cleanup_disabled()
+    {
+        $this->person->preferences([
+            'favorites' => [
+                [
+                    'name' => 'Updates',
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                ]
+            ]
+        ]);
+
+        $this->person->removePreference('favorites', [
+            'name' => 'Updates',
+            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+        ], false);
+
+        $expected = [
+            'favorites' => []
+        ];
+
+        $this->assertEquals($expected, $this->person->preferences());
+    }
+
+    /** @test */
     function it_can_get_a_single_preference()
     {
         $this->person->preferences([
@@ -150,6 +241,78 @@ class HasPreferencesTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->person->getPreference('favorite'));
+    }
+
+    /** @test */
+    function it_can_cleanup_a_preference()
+    {
+        $this->person->preferences([
+            'collection' => [
+                'example-one' => [
+                    'deeply' => [
+                        'nested' => [
+                            'empty-array' => []
+                        ]
+                    ]
+                ],
+                'example-two' => [
+                    'deeply' => [
+                        'nested' => [
+                            'empty-string' => ''
+                        ]
+                    ]
+                ],
+                'example-three' => [
+                    'keep-example-three',
+                    'deeply' => [
+                        'nested' => [
+                            'null' => null
+                        ]
+                    ]
+                ],
+                'example-four' => [
+                    'integer' => 0
+                ],
+                'example-five' => [
+                    'false' => false,
+                ],
+                'columns' => [
+                    'title'
+                ]
+            ],
+            'filled-top-level' => false,
+            'empty-top-level' => []
+        ]);
+
+        $expected = [
+            'collection' => [
+                'example-three' => [
+                    'keep-example-three',
+                ],
+                'example-four' => [
+                    'integer' => 0
+                ],
+                'example-five' => [
+                    'false' => false
+                ],
+                'columns' => [
+                    'title'
+                ],
+            ],
+            'filled-top-level' => false
+        ];
+
+        $this->person
+            ->cleanupPreference('collection.example-one.deeply.nested.empty-array')
+            ->cleanupPreference('collection.example-two.deeply.nested.empty-string')
+            ->cleanupPreference('collection.example-three.deeply.nested.null')
+            ->cleanupPreference('collection.example-four.integer')
+            ->cleanupPreference('collection.example-five.false')
+            ->cleanupPreference('some.non.existent.pref.that.was.maybe.previously.deleted')
+            ->cleanupPreference('filled-top-level')
+            ->cleanupPreference('empty-top-level');
+
+        $this->assertEquals($expected, $this->person->preferences());
     }
 }
 

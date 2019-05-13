@@ -1,21 +1,29 @@
 <template>
 
-    <li>
-        <h6>{{ filter.title }}</h6>
-        <select class="w-full" v-model="value">
-            <option value="" :disabled="filter.required">--</option>
-            <option
-                v-for="option in filter.options"
-                :key="option.value"
-                :value="option.value"
-                v-text="option.text" />
-        </select>
-    </li>
+    <div>
+        <publish-container
+            v-if="filter.fields.length"
+            :name="`filter-${filter.handle}`"
+            :fieldset="fieldset"
+            :values="values"
+            :meta="filter.meta"
+            :errors="errors"
+            @updated="$emit('changed', $event)"
+        >
+            <publish-fields :fields="filter.fields" />
+        </publish-container>
+    </div>
 
 </template>
 
 <script>
+import PublishFields from '../publish/Fields.vue';
+
 export default {
+
+    components: {
+        PublishFields,
+    },
 
     props: {
         filter: Object,
@@ -24,7 +32,10 @@ export default {
 
     data() {
         return {
-            value: this.initialValue
+            value: this.initialValue,
+            fieldset: {sections:[{fields:this.filter.fields}]},
+            values: {},
+            errors: {},
         }
     },
 

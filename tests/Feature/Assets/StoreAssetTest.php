@@ -15,7 +15,7 @@ class StoreAssetTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -55,6 +55,17 @@ class StoreAssetTest extends TestCase
     {
         $this
             ->actingAs($this->userWithoutPermission())
+            ->submit()
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function it_denies_access_if_uploads_are_disabled()
+    {
+        $this->container->allowUploads(false);
+
+        $this
+            ->actingAs($this->userWithPermission())
             ->submit()
             ->assertStatus(403);
     }

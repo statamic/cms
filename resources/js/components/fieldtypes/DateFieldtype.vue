@@ -44,7 +44,7 @@ export default {
     data() {
         return {
             calendar: null,
-            data: null,
+            data: this.value,
             time: null
         }
     },

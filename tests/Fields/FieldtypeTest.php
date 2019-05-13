@@ -7,6 +7,7 @@ use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\ConfigFields;
 use Statamic\Addons\Text\TextFieldtype;
 
 class FieldtypeTest extends TestCase
@@ -246,7 +247,7 @@ class FieldtypeTest extends TestCase
         };
 
         $fields = $fieldtype->configFields();
-        $this->assertInstanceOf(Fields::class, $fields);
+        $this->assertInstanceOf(ConfigFields::class, $fields);
         $this->assertCount(2, $all = $fields->all());
         tap($all['foo'], function ($field) {
             $this->assertEquals('textarea', $field->type());

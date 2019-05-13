@@ -20,13 +20,13 @@
             <div class="form-group" v-if="create">
                 <label class="block">{{ __('Name') }}</label>
                 <small class="help-block">{{ __('cp.folder_directory_instructions') }}</small>
-                <input type="text" class="form-control" v-model="form.basename" @keyup.esc="close" v-focus="create">
+                <input type="text" class="input-text" v-model="form.basename" @keyup.esc="close" v-focus="create">
             </div>
 
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('cp.folder_title_instructions') }}</small>
-                <input type="text" class="form-control" v-model="form.title" @keyup.esc="close" v-focus="! create">
+                <input type="text" class="input-text" v-model="form.title" @keyup.esc="close" v-focus="! create">
             </div>
 
         </template>

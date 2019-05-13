@@ -1,19 +1,24 @@
 <template>
 
-    <div>
+    <element-container @resized="containerWidth = $event.width">
+    <div class="grid-fieldtype-container">
 
         <small v-if="hasExcessRows" class="help-block text-red">
-            Only {{ maxRows }} rows are allowed.
+            {{ __('Max Rows') }}: {{ maxRows }}
         </small>
 
         <component
             :is="component"
             :fields="fields"
             :rows="rows"
+            :meta="meta.fields"
             :name="name"
             @updated="updated"
             @removed="removed"
+            @duplicate="duplicate"
             @sorted="sorted"
+            @focus="focused = true"
+            @blur="blurred"
         />
 
         <button
@@ -23,6 +28,7 @@
             @click.prevent="addRow" />
 
     </div>
+    </element-container>
 
 </template>
 
@@ -42,15 +48,20 @@ export default {
 
     data() {
         return {
-            rows: null
+            rows: null,
+            containerWidth: null,
+            focused: false,
         }
     },
 
     computed: {
 
         component() {
-            // TODO: Should become stacked at <600px
-            return this.config.mode === 'stacked' ? 'GridStacked' : 'GridTable';
+            const isNarrow = this.fields.length > 1 && this.containerWidth < 600;
+
+            return this.config.mode === 'stacked' || isNarrow
+                ? 'GridStacked'
+                : 'GridTable';
         },
 
         fields() {
@@ -62,7 +73,7 @@ export default {
         },
 
         canAddRows() {
-            return this.rows.length < this.maxRows;
+            return !this.isReadOnly && this.rows.length < this.maxRows;
         },
 
         hasMaxRows() {
@@ -72,14 +83,17 @@ export default {
         hasExcessRows() {
             if (! this.hasMaxRows) return false;
             return (this.rows.length - this.maxRows) > 0;
-        }
+        },
+
+        isReorderable() {
+            return !this.isReadOnly && this.config.reorderable && this.maxRows > 1
+        },
 
     },
 
-    provide() {
-        return {
-            gridConfig: this.config
-        }
+    reactiveProvide: {
+        name: 'grid',
+        include: ['config', 'isReorderable', 'isReadOnly']
     },
 
     created() {
@@ -93,6 +107,36 @@ export default {
             const rowsToAdd = this.config.min_rows - this.rows.length;
             for (var i = 1; i <= rowsToAdd; i++) this.addRow();
         }
+
+        // Add watcher manually after initial data wangjangling to prevent a premature dirty state.
+        this.$watch('rows', rows => this.update(rows));
+    },
+
+    watch: {
+
+        value(value) {
+            this.rows = value;
+        },
+
+        isReorderable: {
+            immediate: true,
+            handler(reorderable) {
+                this.reorderable = reorderable;
+            }
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                }
+            }, 1);
+        }
+
     },
 
     methods: {
@@ -100,7 +144,7 @@ export default {
         addRow() {
             const row = _.chain(this.fields)
                 .indexBy('handle')
-                .mapObject(field => null)
+                .mapObject(field => this.meta.defaults[field.handle])
                 .value();
 
             row._id = uniqid(); // Assign a unique id that Vue can use as a v-for key.
@@ -118,6 +162,14 @@ export default {
             }
         },
 
+        duplicate(index) {
+            const row = _.clone(this.rows[index]);
+
+            row._id = uniqid();
+
+            this.rows.push(row);
+        },
+
         sorted(rows) {
             this.rows = rows;
         },
@@ -128,14 +180,14 @@ export default {
 
         focus() {
             // TODO
-        }
+        },
 
-    },
-
-    watch: {
-
-        rows(rows) {
-            this.$emit('updated', rows);
+        blurred() {
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.focused = false;
+                }
+            }, 1);
         }
 
     }

@@ -11,7 +11,7 @@ use Statamic\Contracts\Auth\RoleRepository;
 
 class FeatureTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -138,26 +138,25 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_order_and_defaults_to_alphabetical()
+    function it_gets_sort_field_and_direction()
     {
-        $collection = new Collection;
-        $this->assertEquals('alphabetical', $collection->order());
+        $alpha = new Collection;
+        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('asc', $alpha->sortDirection());
 
-        $return = $collection->order('number');
+        $dated = (new Collection)->dated(true);
+        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('desc', $dated->sortDirection());
 
-        $this->assertEquals($collection, $return);
-        $this->assertEquals('number', $collection->order());
-    }
+        $ordered = (new Collection)->orderable(true);
+        $this->assertEquals('order', $ordered->sortField());
+        $this->assertEquals('asc', $ordered->sortDirection());
 
-    /** @test */
-    function it_corrects_numericish_order_values_for_convenience___youre_welcome()
-    {
-        $collection = new Collection;
+        $datedAndOrdered = (new Collection)->dated(true)->orderable(true);
+        $this->assertEquals('order', $datedAndOrdered->sortField());
+        $this->assertEquals('asc', $datedAndOrdered->sortDirection());
 
-        foreach (['number', 'numeric', 'numerical', 'numbers', 'numbered'] as $order) {
-            $collection->order($order);
-            $this->assertEquals('number', $collection->order());
-        }
+        // TODO: Ability to control sort direction
     }
 
     /** @test */
@@ -173,12 +172,68 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_path()
+    function entry_can_be_ordered()
     {
-        config(['statamic.stache.stores.collections.directory' => '/path/to/collections']);
+        $collection = (new Collection)->handle('test')->setEntryPositions([]);
 
+        $return = $collection->setEntryPosition('one', 3);
+        $this->assertEquals($collection, $return);
+        $this->assertSame([3 => 'one'], $collection->getEntryPositions());
+        $this->assertSame(['one'], $collection->getEntryOrder());
+        $this->assertEquals(1, $collection->getEntryOrder('one'));
+
+        $collection->setEntryPosition('two', 7);
+        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions());
+        $this->assertSame(['one', 'two'], $collection->getEntryOrder());
+        $this->assertEquals(1, $collection->getEntryOrder('one'));
+        $this->assertEquals(2, $collection->getEntryOrder('two'));
+
+        $collection->setEntryPosition('three', 5);
+        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions());
+        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder());
+        $this->assertEquals(1, $collection->getEntryOrder('one'));
+        $this->assertEquals(3, $collection->getEntryOrder('two'));
+        $this->assertEquals(2, $collection->getEntryOrder('three'));
+
+        $collection->setEntryPosition('four', 1);
+        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions());
+        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder());
+        $this->assertEquals(2, $collection->getEntryOrder('one'));
+        $this->assertEquals(4, $collection->getEntryOrder('two'));
+        $this->assertEquals(3, $collection->getEntryOrder('three'));
+        $this->assertEquals(1, $collection->getEntryOrder('four'));
+
+        $this->assertNull($collection->getEntryPosition('unknown'));
+        $this->assertNull($collection->getEntryOrder('unknown'));
+    }
+
+    /** @test */
+    function it_sets_future_date_behavior()
+    {
         $collection = (new Collection)->handle('test');
+        $this->assertEquals('public', $collection->futureDateBehavior());
 
-        $this->assertEquals('/path/to/collections/test.yaml', $collection->path());
+        $return = $collection->futureDateBehavior('private');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('private', $collection->futureDateBehavior());
+
+        $return = $collection->futureDateBehavior(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('public', $collection->futureDateBehavior());
+    }
+
+    /** @test */
+    function it_sets_past_date_behavior()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertEquals('public', $collection->pastDateBehavior());
+
+        $return = $collection->pastDateBehavior('private');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('private', $collection->pastDateBehavior());
+
+        $return = $collection->pastDateBehavior(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('public', $collection->pastDateBehavior());
     }
 }

@@ -12,53 +12,58 @@ use Statamic\API\Preference;
 use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $handle)
+    public function index(FilteredSiteRequest $request, $collection)
     {
-        $collection = Collection::whereHandle($handle);
-
         $query = $this->indexQuery($collection);
 
         $this->filter($query, $request->filters);
 
-        $entries = $query
-            ->orderBy($sort = request('sort', 'title'), request('order', 'asc'))
-            ->paginate(request('perPage'))
-            ->supplement(function ($entry) {
-                return [
-                    'deleteable' => me()->can('delete', $entry)
-                ];
-            })->preProcessForIndex();
+        $sortField = request('sort');
+        $sortDirection = request('order');
 
-        $columns = $collection
-            ->entryBlueprint()
-            ->columns()
-            ->ensurePrepended(Column::make('title'));
+        if (!$sortField && !request('search')) {
+            $sortField = $collection->sortField();
+            $sortDirection = $collection->sortDirection();
+        }
 
-        if ($collection->order() === 'date') {
-            $columns->ensureHas(Column::make('date'));
+        $paginator = $query
+            ->orderBy($sortField, $sortDirection)
+            ->paginate(request('perPage'));
+
+        $entries = $paginator->supplement(function ($entry) {
+            return ['deleteable' => me()->can('delete', $entry)];
+        })->preProcessForIndex();
+
+        if ($collection->dated()) {
             $entries->supplement('date', function ($entry) {
                 return $entry->date()->inPreferredFormat();
             });
         }
 
-        return Resource::collection($entries)->additional(['meta' => [
+        $columns = $collection->entryBlueprint()
+            ->columns()
+            ->setPreferred("collections.{$collection->handle()}.columns")
+            ->values();
+
+        return Resource::collection($paginator)->additional(['meta' => [
             'filters' => $request->filters,
-            'sortColumn' => $sort,
-            'columns' => $columns->setPreferred("collections.{$handle}.columns")->values(),
+            'sortColumn' => $sortField,
+            'columns' => $columns,
         ]]);
     }
 
     protected function filter($query, $filters)
     {
-        foreach ($filters as $handle => $value) {
-            $class = app('statamic.filters')->get($handle);
+        foreach ($filters as $handle => $values) {
+            $class = app('statamic.scopes')->get($handle);
             $filter = app($class);
-            $filter->apply($query, $value);
+            $filter->apply($query, $values);
         }
     }
 
@@ -77,27 +82,15 @@ class EntriesController extends CpController
         return $query;
     }
 
-    public function edit(Request $request, $collection, $id, $slug, $site)
+    public function edit(Request $request, $collection, $entry)
     {
-        if (! Site::get($site)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $entry->collection()->sites()->contains($site)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->inOrClone($site);
-
         $this->authorize('view', $entry);
+
+        $entry = $entry->fromWorkingCopy();
 
         $blueprint = $entry->blueprint();
 
-        // event(new PublishBlueprintFound($blueprint, 'entry', $entry)); // TODO
+        event(new PublishBlueprintFound($blueprint, 'entry', $entry));
 
         $fields = $blueprint
             ->fields()
@@ -109,16 +102,28 @@ class EntriesController extends CpController
             'slug' => $entry->slug()
         ]);
 
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
         $viewData = [
+            'reference' => $entry->reference(),
             'editing' => true,
             'actions' => [
-                'update' => $entry->updateUrl()
+                'save' => $entry->updateUrl(),
+                'publish' => $entry->publishUrl(),
+                'revisions' => $entry->revisionsUrl(),
+                'restore' => $entry->restoreRevisionUrl(),
+                'createRevision' => $entry->createRevisionUrl(),
             ],
-            'values' => $values,
+            'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
+            'locale' => $entry->locale(),
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
                 $exists = $entry->entry()->existsIn($handle);
                 $localized = $entry->entry()->inOrClone($handle);
@@ -137,31 +142,31 @@ class EntriesController extends CpController
             return $viewData;
         }
 
+        if ($request->has('created')) {
+            session()->now('success', __('Entry created'));
+        }
+
         return view('statamic::entries.edit', array_merge($viewData, [
             'entry' => $entry
         ]));
     }
 
-    public function update(Request $request, $collection, $id, $slug, $site)
+    public function update(Request $request, $collection, $entry)
     {
-        if (! $entry = Entry::find($id)) {
-            return $this->pageNotFound();
-        }
-
-        $entry = $entry->inOrClone($site);
-
         $this->authorize('edit', $entry);
 
-        $fields = $entry->blueprint()->fields()->addValues($request->all())->process();
+        $entry = $entry->fromWorkingCopy();
+
+        $fields = $entry->blueprint()->fields()->addValues($request->except('id'))->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
-            'slug' => 'required',
+            'slug' => 'required|alpha_dash',
         ]);
 
         $request->validate($validation->rules());
 
-        $values = array_except($fields->values(), ['slug']);
+        $values = array_except($fields->values(), ['slug', 'date']);
 
         foreach ($values as $key => $value) {
             $entry->set($key, $value);
@@ -169,22 +174,35 @@ class EntriesController extends CpController
 
         $entry
             ->set('title', $request->title)
-            ->slug($request->slug)
-            ->save();
+            ->slug($request->slug);
+
+        if ($entry->collection()->dated()) {
+            // If there's a time, adjust the format into a datetime order string.
+            if (strlen($date = $request->date) > 10) {
+                $date = str_replace(':', '', $date);
+                $date = str_replace(' ', '-', $date);
+            }
+
+            $entry->date($date);
+        }
+
+        if ($entry->published()) {
+            $entry
+                ->makeWorkingCopy()
+                ->user($request->user())
+                ->save();
+        } else {
+            $entry
+                ->set('updated_by', $request->user()->id())
+                ->set('updated_at', now()->timestamp)
+                ->save();
+        }
 
         return $entry->toArray();
     }
 
     public function create(Request $request, $collection, $site)
     {
-        if (! Site::get($site)) {
-            return $this->pageNotFound();
-        }
-
-        if (! $collection = Collection::whereHandle($collection)) {
-            return $this->pageNotFound();
-        }
-
         $blueprint = $request->blueprint
             ? Blueprint::find($request->blueprint)
             : $collection->entryBlueprint();
@@ -204,7 +222,7 @@ class EntriesController extends CpController
 
         $viewData = [
             'actions' => [
-                'store' => cp_route('collections.entries.store', [$collection->handle(), $site])
+                'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -214,7 +232,7 @@ class EntriesController extends CpController
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
-                    'active' => $handle === $site,
+                    'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
@@ -231,8 +249,6 @@ class EntriesController extends CpController
 
     public function store(Request $request, $collection, $site)
     {
-        $collection = Collection::whereHandle($collection);
-
         $this->authorize('create', [EntryContract::class, $collection]);
 
         $fields = Blueprint::find($request->blueprint)->fields()->addValues($request->all())->process();
@@ -248,18 +264,21 @@ class EntriesController extends CpController
 
         $entry = Entry::create()
             ->collection($collection)
-            ->in($site, function ($localized) use ($values, $request) {
+            ->in($site->handle(), function ($localized) use ($values, $request) {
                 $localized
+                    ->published(false)
                     ->slug($request->slug)
                     ->data($values);
             });
 
-        // TODO: Date handling
-        // if ($collection->order() === 'date') {
-        //     $entry->date($request->date ?? now());
-        // }
+        if ($collection->dated()) {
+            $entry->date($values['date'] ?? now()->format('Y-m-d-Hi'));
+        }
 
-        $entry->save();
+        $entry->store([
+            'message' => $request->message,
+            'user' => $request->user(),
+        ]);
 
         return [
             'redirect' => $entry->editUrl(),

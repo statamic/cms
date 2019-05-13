@@ -6,8 +6,20 @@
                 <small class="subhead block">
                     <a :href="collectionUrl" v-text="collectionTitle" class="text-grey hover:text-blue" />
                 </small>
-                {{ title }}
+                <div class="flex items-center">
+                    <span v-if="! isCreating"
+                        class="little-dot mr-1"
+                        :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
+                    {{ title }}
+                </div>
             </h1>
+
+            <div class="pt-px text-2xs text-grey-60 mr-2 flex" v-if="readOnly">
+                <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+            </div>
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="isDirty" v-text="'Unsaved Changes'" />
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="!published" v-text="'Unpublished Entry'" />
 
             <div
                 class="mr-3 text-xs flex items-center"
@@ -17,16 +29,16 @@
                     v-for="loc in localizations"
                     :key="loc.handle"
                     class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
-                    :class="{ 'bg-grey-lightest': loc.active }"
+                    :class="{ 'bg-grey-20': loc.active }"
                     @click="localizationSelected(loc)"
-                    v-popover:tooltip.top="localizationStatusText(loc)"
+                    v-tooltip.top="localizationStatusText(loc)"
                 >
                     <div class="w-4 text-right flex items-center">
                         <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === loc.handle" />
                         <span v-if="localizing != loc.handle" class="little-dot"
                             :class="{
                                 'bg-green': loc.published,
-                                'bg-grey-light': !loc.published,
+                                'bg-grey-40': !loc.published,
                                 'bg-red': !loc.exists
                             }" />
                     </div>
@@ -34,13 +46,48 @@
                 </button>
             </div>
 
+            <button v-if="!isCreating" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
+
+            <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
+                <revision-history
+                    slot-scope="{ close }"
+                    :index-url="actions.revisions"
+                    :restore-url="actions.restore"
+                    @closed="close"
+                />
+            </stack>
+
             <button
-                class="btn btn-primary"
-                :class="{ disabled: !canSave }"
+                class="btn mr-2"
+                v-if="isBase"
+                v-text="__('Live Preview')"
+                @click="openLivePreview" />
+
+            <button
+                v-if="!readOnly && !canPublish"
+                class="btn btn-primary min-w-100"
+                :class="{ 'opacity-25': !canSave }"
                 :disabled="!canSave"
                 @click.prevent="save"
-                v-text="__('Save')"
-            ></button>
+                v-text="__('Save')" />
+
+            <button
+                v-if="canPublish"
+                class="btn btn-primary min-w-100"
+                :class="{ 'opacity-25': !canPublish }"
+                :disabled="!canPublish"
+                @click="confirmingPublish = true"
+                v-text="`${__('Publish')}...`" />
+
+            <publish-actions
+                v-if="confirmingPublish"
+                :actions="actions"
+                :published="published"
+                @closed="confirmingPublish = false"
+                @saving="saving = true"
+                @saved="publishActionCompleted"
+            />
+
             <slot name="action-buttons-right" />
         </div>
 
@@ -50,11 +97,44 @@
             :name="publishContainer"
             :fieldset="fieldset"
             :values="values"
+            :reference="initialReference"
             :meta="meta"
             :errors="errors"
+            :site="site"
             @updated="values = $event"
         >
-            <publish-sections slot-scope="{ }" />
+            <live-preview
+                slot-scope="{ container, components, setValue }"
+                :name="publishContainer"
+                :url="livePreviewUrl"
+                :previewing="isPreviewing"
+                :values="values"
+                :blueprint="fieldset.handle"
+                :amp="amp"
+                @opened-via-keyboard="openLivePreview"
+                @closed="closeLivePreview"
+            >
+                <div>
+                    <component
+                        v-for="component in components"
+                        :key="component.name"
+                        :is="component.name"
+                        :container="container"
+                        v-bind="component.props"
+                    />
+
+                    <transition name="live-preview-sections-drop">
+                        <publish-sections
+                            v-show="sectionsVisible"
+                            :live-preview="isPreviewing"
+                            :read-only="readOnly"
+                            @updated="setValue"
+                            @focus="container.$emit('focus', $event)"
+                            @blur="container.$emit('blur', $event)"
+                        />
+                    </transition>
+                </div>
+            </live-preview>
         </publish-container>
     </div>
 
@@ -62,36 +142,58 @@
 
 
 <script>
-import axios from 'axios';
-import Fieldset from '../publish/Fieldset';
+import PublishActions from './PublishActions.vue';
+import RevisionHistory from '../revision-history/History.vue';
 
 export default {
 
+    components: {
+        PublishActions,
+        RevisionHistory,
+    },
+
     props: {
         publishContainer: String,
+        initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
+        initialSite: String,
+        initialIsWorkingCopy: Boolean,
         collectionTitle: String,
         collectionUrl: String,
-        initialAction: String,
-        method: String
+        initialActions: Object,
+        method: String,
+        amp: Boolean,
+        initialPublished: Boolean,
+        isCreating: Boolean,
+        initialReadOnly: Boolean,
     },
 
     data() {
         return {
-            action: this.initialAction,
+            actions: this.initialActions,
             saving: false,
             localizing: false,
-            fieldset: null,
+            fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
             localizations: _.clone(this.initialLocalizations),
+            site: this.initialSite,
+            isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
-            errors: {}
+            errors: {},
+            isPreviewing: false,
+            sectionsVisible: true,
+            state: 'new',
+            revisionMessage: null,
+            showRevisionHistory: false,
+            published: this.initialPublished,
+            confirmingPublish: false,
+            readOnly: this.initialReadOnly,
         }
     },
 
@@ -101,14 +203,30 @@ export default {
             return this.error || Object.keys(this.errors).length;
         },
 
+        somethingIsLoading() {
+            return ! this.$progress.isComplete();
+        },
+
         canSave() {
-            return this.$progress.isComplete();
+            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+        },
+
+        canPublish() {
+            return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading;
+        },
+
+        livePreviewUrl() {
+            return _.findWhere(this.localizations, { active: true }).url + '/preview';
+        },
+
+        isBase() {
+            return this.publishContainer === 'base';
+        },
+
+        isDirty() {
+            return this.$dirty.has(this.publishContainer);
         }
 
-    },
-
-    created() {
-        this.initializeFieldset(this.initialFieldset);
     },
 
     watch: {
@@ -127,6 +245,8 @@ export default {
         },
 
         save() {
+            if (!this.canSave) return;
+
             this.saving = true;
             this.clearErrors();
 
@@ -134,36 +254,45 @@ export default {
                 blueprint: this.fieldset.handle
             }};
 
-            axios[this.method](this.action, payload).then(response => {
+            this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
-                this.$notify.success('Saved');
+                this.isWorkingCopy = true;
+                if (!this.isCreating) this.$notify.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => {
-                this.saving = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$notify.error(message, { timeout: 2000 });
-                } else {
-                    this.$notify.error('Something went wrong');
-                }
-            })
+            }).catch(e => this.handleAxiosError(e));
+        },
+
+        confirmPublish() {
+            if (this.canPublish) {
+                this.confirmingPublish = true;
+            }
+        },
+
+        handleAxiosError(e) {
+            this.saving = false;
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                this.errors = errors;
+                this.$notify.error(message);
+            } else {
+                this.$notify.error('Something went wrong');
+            }
         },
 
         localizationSelected(localization) {
             if (localization.active) return;
 
-            if (this.$dirty.has(this.publishContainer)) {
+            if (this.isDirty) {
                 if (! confirm('Are you sure? Unsaved changes will be lost.')) {
                     return;
                 }
             }
 
             this.localizing = localization.handle;
-            axios.get(localization.url).then(response => {
+            this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
                 this.meta = data.meta;
@@ -171,19 +300,12 @@ export default {
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
-                this.action = data.actions.update;
-                this.initializeFieldset(data.blueprint);
+                this.actions = data.actions;
+                this.fieldset = data.blueprint;
+                this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.removeNavigationWarning());
             })
-        },
-
-        initializeFieldset(fieldset) {
-            this.fieldset = new Fieldset(this.initialFieldset)
-                .showSlug(true)
-                .prependTitle()
-                .prependMeta()
-                .getFieldset();
         },
 
         localizationStatusText(localization) {
@@ -192,8 +314,44 @@ export default {
             return localization.published
                 ? 'This entry exists in this site, and is published.'
                 : 'This entry exists in this site, but is not published.';
+        },
+
+        openLivePreview() {
+            this.sectionsVisible = false;
+            this.$wait(200)
+                .then(() => {
+                    this.isPreviewing = true;
+                    return this.$wait(300);
+                })
+                .then(() => this.sectionsVisible = true);
+        },
+
+        closeLivePreview() {
+            this.isPreviewing = false;
+            this.sectionsVisible = true;
+        },
+
+        publishActionCompleted({ published, isWorkingCopy, response }) {
+            this.saving = false;
+            this.$refs.container.saved();
+            if (published !== undefined) this.published = published;
+            this.isWorkingCopy = isWorkingCopy;
+            this.confirmingPublish = false;
+            this.$nextTick(() => this.$emit('saved', response));
         }
 
+    },
+
+    mounted() {
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            if (this.confirmingPublish) return;
+            this.canPublish ? this.confirmPublish() : this.save();
+        });
+    },
+
+    created() {
+        window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
     }
 
 }

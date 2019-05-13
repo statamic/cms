@@ -17,7 +17,7 @@ class EditCollectionTest extends TestCase
     function it_shows_the_edit_page_if_you_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = User::make()->assignRole('test');
+        $user = User::make()->assignRole('test')->save();
 
         $collection = Collection::create('test')->save();
 

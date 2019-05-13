@@ -58,8 +58,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
     protected function bootTags()
     {
-        foreach ($this->tags as $handle => $class) {
-            $this->registerTags($handle, $class);
+        foreach ($this->tags as $class) {
+            $class::register();
         }
 
         return $this;
@@ -67,8 +67,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
     protected function bootFieldtypes()
     {
-        foreach ($this->fieldtypes as $handle => $class) {
-            $this->registerFieldtype($handle, $class);
+        foreach ($this->fieldtypes as $class) {
+            $class::register();
         }
 
         return $this;
@@ -76,8 +76,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
 
     protected function bootModifiers()
     {
-        foreach ($this->fieldtypes as $handle => $class) {
-            $this->registerFieldtype($handle, $class);
+        foreach ($this->modifiers as $class) {
+            $class::register();
         }
 
         return $this;
@@ -228,42 +228,6 @@ abstract class ServiceProvider extends LaravelServiceProvider
         ]);
     }
 
-    /**
-     * Register a tags class.
-     *
-     * @param string $tag    The name of the tag. (eg. "foo" would handle {{ foo }}, {{ foo:bar }}, etc)
-     * @param string $class  The name of the class.
-     * @return void
-     */
-    public function registerTags(string $tag, string $class)
-    {
-        $this->app['statamic.tags'][$tag] = $class;
-    }
-
-    /**
-     * Register a modifier class.
-     *
-     * @param string $modifier  The name of the modifier. (eg. "foo" would handle {{ x | foo }})
-     * @param string $class     The name of the class.
-     * @return void
-     */
-    public function registerModifier(string $modifier, string $class)
-    {
-        $this->app['statamic.modifiers'][$modifier] = $class;
-    }
-
-    /**
-     * Register a fieldtype class.
-     *
-     * @param string $fieldtype  The name of the fieldtype. (eg. "foo" would handle `type: foo`)
-     * @param string $class      The name of the class.
-     * @return void
-     */
-    public function registerFieldtype(string $fieldtype, string $class)
-    {
-        $this->app['statamic.fieldtypes'][$fieldtype] = $class;
-    }
-
     public function registerScript(string $path)
     {
         if (! $this->addonDiscovered()) {
@@ -274,7 +238,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
-            $path => public_path("resources/vendor/{$name}/{$filename}.js"),
+            $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ]);
 
         Statamic::script($name, $filename);
@@ -290,7 +254,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
-            $path => public_path("resources/vendor/{$name}/{$filename}.css"),
+            $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ]);
 
         Statamic::style($name, $filename);

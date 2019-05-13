@@ -2,9 +2,11 @@
 
 namespace Statamic\Assets;
 
+use Statamic\API\Arr;
 use Statamic\API\Path;
 use Statamic\API\YAML;
 use Statamic\Data\DataFolder;
+use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
 use Statamic\API\AssetContainer as AssetContainerAPI;
@@ -12,40 +14,34 @@ use Statamic\Contracts\Assets\AssetFolder as Contract;
 
 class AssetFolder implements Contract, Arrayable
 {
+    use FluentlyGetsAndSets;
+
     protected $container;
     protected $path;
 
     public function container($container = null)
     {
-        if (func_num_args() === 0) {
-            return $this->container;
-        }
-
-        $this->container = $container;
-
-        return $this;
+        return $this->fluentlyGetOrSet('container')->args(func_get_args());
     }
 
     public function path($path = null)
     {
-        if (func_num_args() === 0) {
-            return $this->path;
-        }
+        return $this->fluentlyGetOrSet('path')->args(func_get_args());
+    }
 
-        $this->path = $path;
-
-        return $this;
+    public function basename()
+    {
+        return pathinfo($this->path(), PATHINFO_BASENAME);
     }
 
     public function title($title = null)
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? $this->computedTitle();
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? $this->computedTitle();
+            })
+            ->args(func_get_args());
     }
 
     protected function computedTitle()
@@ -102,7 +98,12 @@ class AssetFolder implements Contract, Arrayable
         }
 
         $this->disk()->makeDirectory($this->path());
-        $this->disk()->put($path, YAML::dump(['title' => $this->title]));
+
+        $arr = Arr::removeNullValues(['title' => $this->title]);
+
+        if (! empty($arr)) {
+            $this->disk()->put($path, YAML::dump($arr));
+        }
 
         return $this;
     }
@@ -154,6 +155,7 @@ class AssetFolder implements Contract, Arrayable
             'title' => $this->title(),
             'path' => $this->path(),
             'parent_path' => optional($this->parent())->path(),
+            'basename' => $this->basename()
         ];
     }
 }

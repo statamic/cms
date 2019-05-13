@@ -12,7 +12,7 @@ use Statamic\Stache\Repositories\AssetContainerRepository;
 
 class AssetContainerRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

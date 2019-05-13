@@ -2,7 +2,8 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\Content;
+use Statamic\API\Data;
+use Statamic\Data\DataCollection;
 use Statamic\Data\QueryBuilder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder
@@ -46,12 +47,12 @@ abstract class QueryBuilder extends BaseQueryBuilder
         }
 
         return $this->collect($results)->map(function ($result) {
-            return Content::find($result['id']);
-        })->filter();
+            return Data::find($result['id']);
+        })->filter()->values();
     }
 
     protected function collect($items = [])
     {
-        return collect_entries($items);
+        return new DataCollection($items);
     }
 }

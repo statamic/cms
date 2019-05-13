@@ -21,16 +21,34 @@ class CollectionsStore extends BasicStore
 
         $sites = array_get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
 
-        return Collection::create($handle)
+        $collection = Collection::create($handle)
             ->title(array_get($data, 'title'))
             ->route(array_get($data, 'route'))
-            ->order(array_get($data, 'order'))
+            ->dated(array_get($data, 'date', false))
+            ->ampable(array_get($data, 'amp', false))
             ->sites($sites)
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
             ->data(array_get($data, 'data'))
             ->entryBlueprints(array_get($data, 'blueprints'))
             ->searchIndex(array_get($data, 'search_index'));
+
+        if (array_get($data, 'orderable', false)) {
+            $positions = array_get($data, 'entry_order', []);
+            array_unshift($positions, null);
+            unset($positions[0]);
+            $collection
+                ->orderable(true)
+                ->setEntryPositions($positions);
+        }
+
+        if ($dateBehavior = array_get($data, 'date_behavior')) {
+            $collection
+                ->futureDateBehavior($dateBehavior['future'] ?? null)
+                ->pastDateBehavior($dateBehavior['past'] ?? null);
+        }
+
+        return $collection;
     }
 
     public function getItemKey($item, $path)
@@ -53,9 +71,17 @@ class CollectionsStore extends BasicStore
 
     public function save(CollectionContract $collection)
     {
-        $path = $this->directory . '/' . $collection->handle() . '.yaml';
-        $contents = YAML::dump($collection->data());
+        $this->files->put($collection->path(), $collection->fileContents());
+    }
 
-        $this->files->put($path, $contents);
+    public function removeByPath($path)
+    {
+        parent::removeByPath($path);
+
+        $collection = $this->getItemKey(null, $path);
+
+        $this->stache->store('entries::'.$collection)->markAsExpired();
+
+        return $this;
     }
 }

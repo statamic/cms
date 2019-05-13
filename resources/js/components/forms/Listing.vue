@@ -25,7 +25,10 @@ export default {
 
     data() {
         return {
-            columns: ['title', 'submissions']
+            columns: [
+                { field: 'title', label: __('Title') },
+                { field: 'submissions', label: __('Submissions') },
+            ]
         }
     },
 

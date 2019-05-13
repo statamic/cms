@@ -1,0 +1,121 @@
+/* ==========================================================================
+   ASSETS FIELDTYPE
+   ========================================================================== */
+
+.assets-fieldtype .assets-fieldtype-drag-container {
+    position: relative;
+}
+
+.assets-fieldtype .assets-fieldtype-picker {
+    @apply flex items-center p-2 bg-grey-20 border rounded;
+
+    &.is-expanded {
+        @apply border-b-0 rounded-b-none;
+    }
+}
+
+
+
+/* Inside a Grid
+  ========================================================================== */
+
+.grid-fieldtype .assets-fieldtype-picker {
+    @apply border-none rounded-none bg-transparent p-0;
+}
+
+
+
+/* Leftover bits for reference
+  ========================================================================== */
+
+// .assets-fieldtype .asset-grid-listing .asset-tile {
+//
+//     &.draggable-source--is-dragging {
+//         visibility: hidden;
+//     }
+//
+//     .asset-thumb-container {
+//         position: relative;
+//     }
+//
+//     .asset-filename {
+//         flex-grow: 1;
+//         text-align: center;
+//         text-overflow: ellipsis;
+//         overflow: hidden;
+//         white-space: nowrap;
+//     }
+//
+//     .asset-filesize {
+//         display: none;
+//     }
+// }
+
+
+
+/* In a Replicator fieldtype
+  ========================================================================== */
+
+// .replicator-fieldtype .assets-fieldtype,
+// .grid-fieldtype .grid-stacked .assets-fieldtype {
+//     .manage-assets {
+//         background: rgba(0,0,0,.03);
+//     }
+// }
+//
+
+
+
+/* In a Grid fieldtype
+  ========================================================================== */
+
+// .grid-fieldtype .grid-table .assets-fieldtype {
+//     .manage-assets {
+//         background: #fff;
+//         border: none;
+//         text-align: center;
+//         padding: 0 8px 16px;
+//
+//         p { display: none; }
+//         .btn { margin-top: 16px; }
+//     }
+//     .asset-table-listing {
+//         border: 0;
+//         padding: 0;
+//     }
+// }
+
+
+
+
+/* In a Bard fieldtype
+  ========================================================================== */
+
+.bard-set-solo .asset-tile {
+    max-width: none;
+    padding: 0;
+}
+
+.bard-set-solo .assets-fieldtype label {
+    display: none;
+}
+
+// Only show the trash button when its a solo field.
+// Probably better as a template condition but difficult at the moment.
+.assets-fieldtype .delete-bard-set {
+    display: none;
+    .bard-set-solo & { display: block; }
+}
+
+
+
+/* Responsive Wangjangling
+  ========================================================================== */
+
+@element .assets-fieldtype and (max-width: 500px) {
+    :self .assets-fieldtype-picker {
+        @apply block;
+        .btn { @apply w-full mb-1 justify-center }
+        p { @apply ml-0 text-center }
+    }
+}

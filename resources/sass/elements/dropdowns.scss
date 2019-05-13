@@ -9,7 +9,7 @@
 .dropdown .dropdown-icon {
     @apply text-grey;
     &:hover {
-        @apply text-grey-darker;
+        @apply text-grey-90;
     }
 }
 
@@ -44,6 +44,9 @@
     transition: all .08s ease-in;
     will-change: transform, opacity;
     background-clip: padding-box;
+    text-shadow: none;
+
+    li { line-height: 1.4; }
 
     li > a,
     .li > a {

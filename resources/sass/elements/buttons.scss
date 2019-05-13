@@ -1,6 +1,9 @@
 /* ==========================================================================
    BUTTONS
    ========================================================================== */
+button, .btn, .btn-* {
+    cursor: pointer;
+}
 
 .selectize-control.single .selectize-input,
 .btn,
@@ -17,7 +20,7 @@
     @include button($brand-primary, rgba(255,255,255,.9));
     text-shadow: 0 1px 0 rgba(0,0,0,.15);
     box-shadow:
-        #3282b3 0 0 0 1px,
+        config('colors.blue-dark') 0 0 0 1px,
         rgba(#3282b3, .05) 0 2px 5px 0,
         rgba(0,0,0,.1) 0 2px 2px 0,
         rgba(0,0,0,.15) 0 1px 3px 0;
@@ -39,16 +42,17 @@
 
 .btn-flat {
     @include button(white, black);
-    @apply shadow-none text-grey-dark bg-grey-lightest;
+    @apply shadow-none text-grey-80 bg-grey-30;
     &:hover {
-        @apply bg-grey-lighter;
+        @apply bg-grey-40;
         box-shadow: none !important;
     }
 }
 
 .btn-danger {
-    @include button(transparent, $color_red);
+    @include button(white, $color_red);
     border: 1px solid $color_red;
+    line-height: 36px;
 
     box-shadow:
         rgba($color_red, .05) 0 2px 5px 0,
@@ -68,6 +72,13 @@
 
     &:focus {
         @apply focus-outline;
+    }
+}
+
+.btn-link {
+    @apply text-grey-80;
+    &:hover {
+        @apply text-blue;
     }
 }
 
@@ -102,6 +113,38 @@
     }
 }
 
+/* Button Group
+  ========================================================================== */
+
+.btn-group-flat {
+    @apply flex items-center p-0;
+    height: 37px;
+
+    button {
+        @include button(white, black);
+        @apply shadow-none text-grey-80 bg-grey-30 flex items-center h-full;
+
+        &:hover, &.active, &:focus {
+            @apply bg-grey-40 text-grey-80;
+            box-shadow: none !important;
+            bottom: 0;
+        }
+
+        &:active, &:active:focus {
+            @apply bg-grey-50;
+            box-shadow: none !important;
+            bottom: 0;
+        }
+    }
+
+    button:first-child {
+        @apply rounded-r-none;
+    }
+
+    button:last-child {
+        @apply rounded-l-none;
+    }
+}
 
 /* With Icons
   ========================================================================== */
@@ -165,148 +208,56 @@ td .btn-icon {
     }
 }
 
-.btn i.icon {
-    color: #d0d4d7;
-}
-.btn:hover i.icon {
-    color: darken(#d0d4d7, 10%);
-}
-
-
-/* Button Groups
+/* Button with Dropdown
   ========================================================================== */
 
-.btn-group {
-    border-radius: 3px;
-    box-shadow: 0 0 0 1px rgba(50,50,93,.1), 0 2px 5px 0 rgba(50,50,93,.08), 0 1px 1.5px 0 rgba(0,0,0,.07), 0 1px 2px 0 rgba(0,0,0,.08), 0 0 0 0 transparent;
-    background: #fff;
-    cursor: pointer;
-    white-space: nowrap;
-
-    .btn, .select {
-        box-shadow: none;
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
-        display: flex;
-        align-items: center;
-
-        &:hover, &.depressed {
-            background: rgba(0,0,0,.02);
-            box-shadow: inset 0 0 2px rgba(0,0,0,.06);
-            z-index: 2;
-        }
-    }
-
-    .btn:first-child:active { border-left: 1px solid transparent; }
-    .btn:last-child:active { border-right: 1px solid transparent; }
-
-    .btn:not(:first-child), {
-        border-left: 1px solid rgba(0,0,0,.06);
-    }
-
-    .btn:not(:last-of-type) {
-        border-right: 1px solid rgba(0,0,0,.06);
-    }
-
-    .btn.btn-primary:hover {
-        background: mix(black, $brand-primary, 5%);
-    }
-
-    .btn.btn-danger:hover,
-    .btn.btn-danger.depressed {
-        background-color: #ac2925;
-    }
-
-    > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-        border-radius: 3px 0 0 3px;
-    }
-
-    > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child) {
-        border-radius: 0 3px 3px 0;
-    }
+.btn-dropdown {
+    @extend .btn;
 }
 
-.btn-group.open .dropdown-toggle.btn-more {
-    box-shadow: none;
-    transform: rotate(90deg);
-}
+.btn-dropdown-primary {
+    @extend .btn-primary;
+    @apply flex items-center p-0;
 
-.btn-group.open .dropdown-toggle {
-    box-shadow: inset 0 0 2px rgba(0,0,0,.06);
-}
+    &:hover .trigger {
+        @apply border-blue-darker;
+    }
 
-.btn-group.action-more {
-    background: transparent;
-    box-shadow: none;
-}
+    &:active, &:focus:active {
+        bottom: 0;
+    }
 
-.btn-group.btn-group-primary {
-    background-color: $brand-primary;
-    box-shadow:
-        0 2px 5px 0 rgba($brand-primary,.05),
-        0 1px 2px 0 rgba(0,0,0,.07),
-        0 1px 3px 0 rgba(0,0,0,.08);
-    border-bottom: 1px solid #2090d5;
+    &:focus-within {
+        @apply focus-outline;
+    }
 
-    .btn.btn-primary {
-        border-top: none;
-        border-bottom: none;
+    .cta {
+        height: 100%;
+        padding: 0 16px;
+    }
+
+    .trigger {
+        @apply h-full border-l border-blue-dark;
+        padding: 0 12px;
+    }
+
+    button:focus, button:active, button:focus:active {
+        @apply outline-none;
+        box-shadow: inset 1px 3px 5px rgba(0, 0, 0, .15);
+    }
+
+    button:hover {
+        @apply bg-blue-dark;
+    }
+
+    div {
+        height: 100%;
     }
 }
 
 
 /* Specialty Buttons
   ========================================================================== */
-
-.btn-upload {
-    @apply .shadow-inner;
-    border: dashed 1px $color_gray_upload;
-    color: $color_gray_upload;
-    font-size: 11px;
-    padding: 6px 20px;
-
-    strong {
-        color: $color_gray_upload_alt;
-        font-weight: normal;
-        text-transform: uppercase;
-    }
-
-    &.btn-upload-full {
-        border: none;
-        display: block;
-        font-size: 16px;
-        min-height: 400px;
-        padding-top: 40%;
-        width: 100%;
-
-        strong {
-            color: $color_gray_dark;
-            display: block;
-            font-size: 18px;
-            margin-top: -30%;
-            padding-top: 120px;
-
-            @include background('../img/arrow-drop.png', 12px 101px, transparent, top center);
-        }
-    }
-    &.btn-upload-small {
-        border: none;
-        font-size: 13px;
-        padding:30px 0;
-        width: 20%;
-
-        a {
-            font-weight: bold;
-        }
-        strong {
-            color: $color_gray_dark;
-            display: block;
-            padding-top: 35px;
-
-            @include background('../img/arrow-drop-small.png', 9px 31px, transparent, top center);
-        }
-    }
-}
 
 .btn-more,
 .btn-more:active {
@@ -321,3 +272,19 @@ td .btn-icon {
 }
 
 .btn-more:before { line-height: 0; }
+
+.btn-close {
+    @apply ml-2 p-0 text-xl text-grey-60 rounded-full;
+    height: 32px;
+    width: 32px;
+    line-height: 32px;
+    flex-shrink: 0;
+    outline: none;
+    &:hover {
+        background: rgba(0,0,0,.05);
+    }
+    &:active, &:focus:hover {
+        outline: none;
+        background: rgba(0,0,0,.075);
+    }
+}

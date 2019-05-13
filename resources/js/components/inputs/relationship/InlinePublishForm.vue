@@ -5,7 +5,7 @@
         :before-close="shouldClose"
         @closed="close"
     >
-    <div class="h-full overflow-auto p-3 bg-grey-lighter">
+    <div class="h-full overflow-auto p-3 bg-grey-30">
 
         <div v-if="loading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
@@ -13,20 +13,29 @@
 
         <entry-publish-form
             v-if="blueprint"
-            :initial-action="publishUrl"
+            :is-creating="creating"
+            :initial-actions="initialActions"
             :method="method"
             :publish-container="publishContainer"
             :collection-title="collection.title"
             :collection-url="collection.url"
+            :initial-reference="initialReference"
             :initial-title="title"
             :initial-fieldset="blueprint"
             :initial-values="initialValues"
             :initial-meta="initialMeta"
             :initial-localizations="initialLocalizations"
+            :initial-read-only="readOnly"
+            :initial-site="initialSite"
             @saved="saved"
         >
             <template slot="action-buttons-right">
-                <button class="btn ml-1" v-text="__('Cancel')" @click="confirmClose" />
+                <slot name="action-buttons-right" />
+                <button
+                    type="button"
+                    class="btn-close"
+                    @click="confirmClose"
+                    v-html="'&times'" />
             </template>
         </entry-publish-form>
 
@@ -37,20 +46,21 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     data() {
         return {
-            publishUrl: null,
             loading: true,
             blueprint: null,
             values: null,
+            initialReference: null,
             initialValues: null,
             initialMeta: null,
             initialLocalizations: null,
-            collection: Object
+            initialActions: null,
+            initialSite: null,
+            collection: Object,
+            readOnly: false,
         }
     },
 
@@ -69,13 +79,15 @@ export default {
     methods: {
 
         getItem() {
-            axios.get(this.itemUrl).then(response => {
+            this.$axios.get(this.itemUrl).then(response => {
                 const data = response.data;
                 this.blueprint = data.blueprint;
                 this.values = this.initialValues = data.values;
+                this.initialReference = data.reference;
                 this.initialMeta = data.meta;
                 this.initialLocalizations = data.localizations;
-                this.publishUrl = data.actions[this.action];
+                this.initialActions = data.actions;
+                this.initialSite = data.locale;
                 this.collection = data.collection;
                 this.loading = false;
             });

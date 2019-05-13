@@ -4,8 +4,9 @@ namespace Statamic\Data;
 
 trait ContainsData
 {
+    use SupplementsData;
+
     protected $data = [];
-    protected $supplements = [];
 
     public function get($key, $fallback = null)
     {
@@ -53,7 +54,7 @@ trait ContainsData
 
     public function merge($data)
     {
-        $this->data = array_merge($this->data, $data);
+        $this->data(array_merge($this->data(), $data));
 
         return $this;
     }
@@ -66,22 +67,5 @@ trait ContainsData
     public function __set($key, $value)
     {
         $this->set($key, $value);
-    }
-
-    public function supplements()
-    {
-        return $this->supplements;
-    }
-
-    public function setSupplement($key, $value)
-    {
-        $this->supplements[$key] = $value;
-
-        return $this;
-    }
-
-    public function getSupplement($key)
-    {
-        return $this->supplements[$key];
     }
 }

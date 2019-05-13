@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <div id="statamic">
+    <div id="statamic" :style="{ marginRight: pane ? `24rem` : null }">
 
       <session-expiry
           email="{{ my()->email() }}"
@@ -37,7 +37,9 @@
 
             <tooltip :pointer="true"></tooltip>
 
-            <vue-toast ref="toast"></vue-toast>
+            <portal-target name="live-preview"></portal-target>
+
+            <stacks v-if="stacks.length"></stacks>
 
             <portal-target
                   v-for="(modal, i) in modals"
@@ -45,7 +47,7 @@
                   :name="`modal-${i}`"
             ></portal-target>
 
-            <stacks v-if="stacks.length"></stacks>
+            <portal-target name="pane" :slim="true"></portal-target>
 
             <portal-target name="outside"></portal-target>
       </div>

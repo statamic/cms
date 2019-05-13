@@ -88,10 +88,11 @@ class AssetsController extends CpController
             'folder' => 'required',
         ]);
 
-        $this->authorize('store', [
-            AssetContract::class,
-            $container = AssetContainer::find($request->container)
-        ]);
+        $container = AssetContainer::find($request->container);
+
+        abort_unless($container->allowUploads(), 403);
+
+        $this->authorize('store', [AssetContract::class, $container]);
 
         $file = $request->file('file');
         $path = ltrim($request->folder . '/' . $file->getClientOriginalName(), '/');

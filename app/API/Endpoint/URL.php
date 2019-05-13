@@ -54,17 +54,6 @@ class URL
     }
 
     /**
-     * Checks whether a URL exists
-     *
-     * @param string       $url     URL to find
-     * @return bool
-     */
-    public function exists($url)
-    {
-        return Content::uriExists($url);
-    }
-
-    /**
      * Get the slug of a URL
      *
      * @param string $url  URL to parse
@@ -177,18 +166,6 @@ class URL
         $prepend = Str::ensureRight($prepend, '/');
 
         return Str::ensureLeft(ltrim($url, '/'), $prepend);
-    }
-
-    /**
-     * Remove the site root from the start of a URL
-     *
-     * @param string      $url
-     * @param string|null $locale
-     * @return string
-     */
-    public function removeSiteRoot($url, $locale = null)
-    {
-        return self::tidy('/' . Str::removeLeft($url, site_root()));
     }
 
     /**

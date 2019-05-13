@@ -7,9 +7,11 @@ use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\API\User;
 use Statamic\API\Entry;
+use Statamic\API\Folder;
 use Statamic\Fields\Fields;
 use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
+use Illuminate\Support\Carbon;
 use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
@@ -18,6 +20,19 @@ class UpdateEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->dir = __DIR__.'/tmp';
+        config(['statamic.revisions.path' => $this->dir]);
+    }
+
+    public function tearDown(): void
+    {
+        Folder::delete($this->dir);
+        parent::tearDown();
+    }
 
     /** @test */
     function it_denies_access_if_you_dont_have_permission()
@@ -34,14 +49,16 @@ class UpdateEntryTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($entry, [])
+            ->save($entry, [])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
 
     /** @test */
-    function entry_gets_saved()
+    function published_entry_gets_saved_to_working_copy()
     {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
         $user = User::make()->assignRole('test');
@@ -53,23 +70,76 @@ class UpdateEntryTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Original title',
                 'foo' => 'bar',
+                'updated_at' => $originalTimestamp = $now->subDays(3)->timestamp
             ])->create();
 
         $this
             ->actingAs($user)
-            ->submit($entry, [
+            ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => 'updated foo',
                 'slug' => 'updated-slug'
             ])
             ->assertOk();
 
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('test', $entry->slug());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Original title',
+            'foo' => 'bar',
+            'updated_at' => $originalTimestamp
+        ], $entry->data());
+
+        $workingCopy = $entry->fromWorkingCopy();
+        $this->assertEquals('updated-slug', $workingCopy->slug());
+        $this->assertEquals([
+            'blueprint' => 'test',
+            'title' => 'Updated title',
+            'foo' => 'updated foo',
+        ], $workingCopy->data());
+    }
+
+    /** @test */
+    function draft_entry_gets_saved_to_content()
+    {
+        $now = Carbon::parse('2017-02-03');
+        Carbon::setTestNow($now);
+        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->assignRole('test');
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'title' => 'Original title',
+                'foo' => 'bar',
+                'updated_at' => $now->subDays(2)->timestamp,
+                'updated_by' => $user->id(),
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->save($entry, [
+                'title' => 'Updated title',
+                'foo' => 'updated foo',
+                'slug' => 'updated-slug'
+            ])
+            ->assertOk();
+
+        $entry = Entry::find($entry->id());
         $this->assertEquals('updated-slug', $entry->slug());
         $this->assertEquals([
             'blueprint' => 'test',
             'title' => 'Updated title',
             'foo' => 'updated foo',
+            'updated_at' => $now->timestamp,
+            'updated_by' => $user->id(),
         ], $entry->data());
+        $this->assertFalse($entry->hasWorkingCopy());
     }
 
     /** @test */
@@ -91,7 +161,7 @@ class UpdateEntryTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($entry, [
+            ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => '',
                 'slug' => 'updated-slug'
@@ -107,12 +177,9 @@ class UpdateEntryTest extends TestCase
         ], $entry->data());
     }
 
-    private function submit($entry, $payload)
+    private function save($entry, $payload)
     {
-        return $this->patch(
-            cp_route('collections.entries.update', [$entry->collectionHandle(), $entry->id(), $entry->slug(), 'en']),
-            $payload
-        );
+        return $this->patch($entry->updateUrl(), $payload);
     }
 
     private function setTestBlueprint($handle, $fields)
@@ -123,6 +190,9 @@ class UpdateEntryTest extends TestCase
 
         $blueprint = Mockery::mock(Blueprint::class);
         $blueprint->shouldReceive('fields')->andReturn(new Fields($fields));
+
+        $blueprint->shouldReceive('ensureField')->andReturnSelf();
+        $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
 
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
     }

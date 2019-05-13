@@ -134,6 +134,30 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    function it_gets_and_sets_whether_uploads_are_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowUploads());
+
+        $return = $container->allowUploads(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowUploads());
+    }
+
+    /** @test */
+    function it_gets_and_sets_whether_folders_can_be_created()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->createFolders());
+
+        $return = $container->createFolders(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->createFolders());
+    }
+
+    /** @test */
     function it_saves_the_container_through_the_api()
     {
         API\AssetContainer::spy();
@@ -236,34 +260,6 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_adds_an_asset_in_memory()
-    {
-        $container = (new AssetContainer)->handle('test');
-        $this->assertCount(0, $container->pendingAssets());
-
-        $return = $container->addAsset($asset = (new Asset)->path('one.txt'));
-
-        $this->assertEquals($container, $return);
-        $this->assertEquals($container, $asset->container());
-        $this->assertEquals(['one.txt' => $asset], $container->pendingAssets()->all());
-    }
-
-    /** @test */
-    function it_removes_an_asset_from_memory()
-    {
-        $container = (new AssetContainer)
-            ->handle('test')
-            ->addAsset($first = (new Asset)->path('one.txt'))
-            ->addAsset($second = (new Asset)->path('two.txt'))
-            ->addAsset($third = (new Asset)->path('three.txt'));
-
-        $return = $container->removeAsset($second);
-
-        $this->assertEquals($container, $return);
-        $this->assertEquals(['one.txt', 'three.txt'], $container->pendingAssets()->keys()->all());
-    }
-
-    /** @test */
     function it_gets_an_asset()
     {
         $asset = $this->containerWithDisk()->asset('a.txt');
@@ -274,16 +270,14 @@ class AssetContainerTest extends TestCase
     /** @test */
     function it_gets_an_asset_with_data()
     {
-        $container = $this->containerWithDisk()
-            ->addAsset((new Asset)->path($existentPath = 'a.txt')->data(['foo' => 'bar']))
-            ->addAsset((new Asset)->path($nonExistentPath = 'non-existent.txt')->data(['foo' => 'bar']));
+        $container = $this->containerWithDisk();
 
-        tap($container->asset($existentPath), function ($asset) {
+        tap($container->asset('a.txt'), function ($asset) {
             $this->assertInstanceOf(AssetContract::class, $asset);
-            $this->assertEquals('bar', $asset->get('foo'));
+            $this->assertEquals('File A', $asset->get('title'));
         });
 
-        $this->assertNull($container->asset($nonExistentPath));
+        $this->assertNull($container->asset('non-existent.txt'));
     }
 
     /** @test */
@@ -331,6 +325,7 @@ class AssetContainerTest extends TestCase
         });
     }
 
+    /** @test */
     function it_gets_assets_in_a_folder_recursively()
     {
         tap($this->containerWithDisk()->assets('/', true), function ($assets) {
@@ -372,6 +367,6 @@ class AssetContainerTest extends TestCase
             'root' => __DIR__.'/__fixtures__/container',
         ]]);
 
-        return (new AssetContainer)->disk('test');
+        return (new AssetContainer)->handle('test')->disk('test');
     }
 }

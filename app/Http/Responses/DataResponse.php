@@ -2,7 +2,8 @@
 
 namespace Statamic\Http\Responses;
 
-use Statamic\View\Antlers\View;
+use Statamic\Statamic;
+use Statamic\View\View;
 use Facades\Statamic\View\Cascade;
 use Statamic\Events\ResponseCreated;
 use Statamic\Auth\Protect\Protection;
@@ -31,9 +32,11 @@ class DataResponse implements Responsable
         $this
             ->protect()
             ->handleDraft()
-            ->handleLivePreview()
+            ->handlePrivateEntries()
             ->adjustResponseType()
-            ->addContentHeaders();
+            ->addContentHeaders()
+            ->addViewPaths()
+            ->handleAmp();
 
         $response = response()
             ->make($this->contents())
@@ -42,6 +45,35 @@ class DataResponse implements Responsable
         ResponseCreated::dispatch($response);
 
         return $response;
+    }
+
+    protected function addViewPaths()
+    {
+        $finder = view()->getFinder();
+        $amp = Statamic::isAmpRequest();
+        $site = $this->data->site()->handle();
+
+        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+            return [
+                $amp ? $path . '/' . $site . '/amp' : null,
+                $path . '/' . $site,
+                $amp ? $path . '/amp' : null,
+                $path,
+            ];
+        })->filter()->values()->all();
+
+        $finder->setPaths($paths);
+
+        return $this;
+    }
+
+    protected function handleAmp()
+    {
+        if (Statamic::isAmpRequest() && ! $this->data->ampable()) {
+            abort(404);
+        }
+
+        return $this;
     }
 
     protected function getRedirect()
@@ -83,9 +115,9 @@ class DataResponse implements Responsable
         return $this;
     }
 
-    protected function handleLivePreview()
+    protected function handlePrivateEntries()
     {
-        // todo
+        throw_if($this->data->private(), new NotFoundHttpException);
 
         return $this;
     }

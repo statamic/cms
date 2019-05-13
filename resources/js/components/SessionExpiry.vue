@@ -8,7 +8,7 @@
         </button>
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
-            <div class="flex items-center p-3 bg-grey-lightest border-b text-center">
+            <div class="flex items-center p-3 bg-grey-20 border-b text-center">
                 {{ __('Resume Your Session') }}
             </div>
             <div class="publish-fields">
@@ -42,8 +42,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 var counter;
 
 export default {
@@ -62,7 +60,8 @@ export default {
             errors: {},
             password: null,
             pinging: false,
-            lastCount: Vue.moment()
+            lastCount: Vue.moment(),
+            isPageHidden: false,
         }
     },
 
@@ -82,16 +81,14 @@ export default {
 
     created() {
         this.startCountdown();
+
+        document.addEventListener('visibilitychange', () => this.isPageHidden = document.hidden, false);
     },
 
     watch: {
 
         count(count) {
-            if (this.remaining === 0) {
-                this.stopCountdown();
-                this.showLogin();
-                return;
-            }
+            this.isShowingLogin = this.remaining <= 0;
 
             // While we're in the warning period, we'll check every second so that any
             // activity in another tab is picked up and the count will get restarted.
@@ -121,21 +118,17 @@ export default {
             }, 1000);
         },
 
-        stopCountdown() {
-            clearInterval(counter);
-        },
-
         restartCountdown() {
             this.count = this.remaining = this.lifetime;
             this.startCountdown();
         },
 
         ping() {
-            if (this.pinging) return Promise.resolve();
+            if (this.pinging || this.isPageHidden) return Promise.resolve();
 
             this.pinging = true;
 
-            return axios.get(cp_url('session-timeout')).then(response => {
+            return this.$axios.get(cp_url('session-timeout')).then(response => {
                 this.count = this.remaining = response.data;
             }).catch(e => {
                 if (e.response.status === 401) this.remaining = 0;
@@ -145,15 +138,11 @@ export default {
             });
         },
 
-        showLogin() {
-            this.isShowingLogin = true;
-        },
-
         updateCsrfToken() {
-            return axios.get(cp_url('auth/token')).then(response => {
+            return this.$axios.get(cp_url('auth/token')).then(response => {
                 const csrf = response.data;
-                axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
-                Statamic.csrfToken = csrf;
+                this.$axios.defaults.headers.common['X-CSRF-TOKEN'] = csrf;
+                this.$config.set('csrfToken', csrf);
             });
         },
 
@@ -164,7 +153,7 @@ export default {
         },
 
         login() {
-            axios.post(cp_url('auth/login'), {
+            this.$axios.post(cp_url('auth/login'), {
                 email: this.email,
                 password: this.password
             }).then(response => {
@@ -179,13 +168,13 @@ export default {
                     this.errors = e.response.data.errors;
                     this.$notify.error(e.response.data.message);
                 } else {
-                    this.$notify.error(__('Something went wrong'), { timeout: 3000 })
+                    this.$notify.error(__('Something went wrong'))
                 }
             });
         },
 
         extend() {
-            axios.get(cp_url('auth/extend')).then(response => {
+            this.$axios.get(cp_url('auth/extend')).then(response => {
                 this.remaining = this.lifetime;
             });
         }

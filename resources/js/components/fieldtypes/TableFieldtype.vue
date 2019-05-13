@@ -1,216 +1,204 @@
 <template>
-    <div class="table-field">
-    	<table class="bordered-table" v-if="rowCount || columnCount">
-    		<thead>
-    			<tr>
-    				<th v-for="(column, $index) in columnCount" :key="$index">
-    					<span class="column-count">{{ $index + 1 }}</span>
-    					<span class="icon icon-cross delete-column" @click="deleteColumn($index)"></span>
-    				</th>
-    				<th class="row-controls"></th>
-    			</tr>
-    		</thead>
-    		<tbody>
-    			<tr v-for="(row, rowIndex) in data" :key="rowIndex">
-    				<td v-for="(cell, cellIndex) in row.cells" :key="cellIndex">
-    					<input type="text" v-model="row['cells'][cellIndex]" class="form-control" />
-    				</td>
-    				<td class="row-controls">
-    					<span class="icon icon-menu move drag-handle"></span>
-    					<span class="icon icon-cross delete" v-on:click="deleteRow(cellIndex)"></span>
-    				</td>
-    			</tr>
-    		</tbody>
-    	</table>
 
-    	<div class="btn-group">
-    		<a class="btn btn-default" @click="addRow" v-if="canAddRows">
-    			{{ __('Row') }} <i class="icon icon-plus icon-right"></i>
-    		</a>
-    		<a class="btn btn-default" @click="addColumn" v-if="canAddColumns">
-    			{{ __('Column') }} <i class="icon icon-plus icon-right"></i>
-    		</a>
-    	</div>
+    <div class="table-fieldtype-container">
+        <table class="table-fieldtype-table" v-if="rowCount">
+            <thead>
+                <tr>
+                    <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                    <th v-for="(column, index) in columnCount" :key="index">
+                        <div class="flex items-center justify-between h-6">
+                            <span class="column-count">{{ index + 1 }}</span>
+                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)">
+                                &times;
+                            </a>
+                        </div>
+                    </th>
+                    <th class="row-controls" v-if="canDeleteColumns"></th>
+                </tr>
+            </thead>
+
+            <sortable-list
+                v-model="data"
+                :vertical="true"
+                item-class="sortable-row"
+                handle-class="table-drag-handle"
+                @dragstart="$emit('focus')"
+                @dragend="$emit('blur')"
+            >
+                <tbody>
+                    <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
+                        <td class="table-drag-handle" v-if="!isReadOnly"></td>
+                        <td v-for="(cell, cellIndex) in row.value.cells">
+                            <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
+                        </td>
+                        <td class="row-controls" v-if="canDeleteColumns">
+                            <a @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </sortable-list>
+        </table>
+
+        <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
+            {{ __('Add Row') }}
+        </button>
+
+        <button class="btn ml-1" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+            {{ __('Add Column') }}
+        </button>
+
+        <confirmation-modal
+            v-if="deletingRow !== false"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteRow(deletingRow)"
+            @cancel="deleteCancelled"
+        >
+        </confirmation-modal>
+
+        <confirmation-modal
+            v-if="deletingColumn !== false"
+            :title="__('Delete Column')"
+            :bodyText="__('Are you sure you want to delete this column?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteColumn(deletingColumn)"
+            @cancel="deleteCancelled"
+        >
+        </confirmation-modal>
     </div>
 
 </template>
 
 <script>
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SortableHelpers],
+
+    components: {
+        SortableList,
+        SortableItem
+    },
 
     data: function () {
         return {
-            data: JSON.parse(JSON.stringify(this.value || [])),
-            max_rows: this.config.max_rows || null,
-            max_columns: this.config.max_columns || null,
-            sortableInitialized: false
+            data: [],
+            deletingRow: false,
+            deletingColumn: false,
+        }
+    },
+
+    created() {
+        this.data = this.arrayToSortable(this.value || []);
+    },
+
+    watch: {
+        data: {
+            deep: true,
+            handler (data) {
+                this.update(this.sortableToArray(data));
+            }
+        },
+
+        value(value, oldValue) {
+            if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+            this.data = this.arrayToSortable(value);
         }
     },
 
     computed: {
-    	columnCount: function() {
-            if (! this.data) {
-                return 0;
-            }
-
-            if (this.data[0]) {
-                return this.data[0].cells.length;
-            }
-
-            return 0;
-    	},
-
-        rowCount: function() {
-            if (! this.data) {
-                return 0;
-            }
-
-            if (this.data.length) {
-                return this.data.length;
-            }
-
-            return 0;
+        maxRows() {
+            return this.config.max_rows || null;
         },
 
-        canAddRows: function() {
-            if (this.max_rows) {
-                return this.rowCount < this.max_rows;
-            }
-
-            return true;
+        maxColumns() {
+            return this.config.max_columns || null;
         },
 
-        canAddColumns: function() {
-            if (this.rowCount || this.columnCount) {
+        rowCount() {
+            return this.data.length;
+        },
 
-                if (this.max_columns) {
-                    return this.columnCount < this.max_columns;
-                }
+        columnCount() {
+            return data_get(this, 'data.0.value.cells.length', 0);
+        },
 
-                return true;
-            }
+        atRowMax() {
+            return this.maxRows ? this.rowCount >= this.maxRows : false;
+        },
 
-            return false;
+        atColumnMax() {
+            return this.maxColumns ? this.columnCount >= this.maxColumns : false;
+        },
+
+        canAddRows() {
+            return !this.isReadOnly;
+        },
+
+        canAddColumns() {
+            return !this.isReadOnly && this.rowCount > 0;
+        },
+
+        canDeleteColumns() {
+            return !this.isReadOnly && this.columnCount > 1;
         }
     },
 
     methods: {
-
-        sortable() {
-            if (this.sortableInitialized || this.data.length === 0) return;
-
-            var self = this,
-                start = '';
-
-            $(this.$el).find('tbody').sortable({
-                axis: "y",
-                revert: 175,
-                handle: '.drag-handle',
-                placeholder: "table-row-placeholder",
-                forcePlaceholderSize: true,
-
-                start: function(e, ui) {
-                    start = ui.item.index();
-                    ui.placeholder.height(ui.item.height());
-                },
-
-                update: function(e, ui) {
-                    var end  = ui.item.index(),
-                        swap = self.data.splice(start, 1)[0];
-
-                    self.data.splice(end, 0, swap);
-                }
-            });
-
-            this.sortableInitialized = true;
+        addRow() {
+            this.data.push(this.newSortableValue({
+                'cells': new Array(this.columnCount || 1)
+            }));
         },
 
-        destroySortable() {
-            $(this.$el).find('tbody').sortable('destroy');
-            this.sortableInitialized = false;
-        },
-
-    	addRow: function() {
-            // If there are no columns, we will add one when we add a row.
-            var count = (this.columnCount === 0) ? 1 : this.columnCount;
-
-            this.data.push({
-                cells: new Array(count)
-            });
-    	},
-
-    	addColumn: function() {
+        addColumn() {
             var rows = this.data.length;
 
             for (var i = 0; i < rows; i++) {
-                this.data[i].cells.push('');
+                this.data[i].value.cells.push('');
             }
-    	},
-
-        deleteRow: function(index) {
-            var self = this;
-
-            swal({
-                type: 'warning',
-                title: __('Are you sure?'),
-                confirmButtonText: __('Yes, I\'m sure'),
-                cancelButtonText: __('Cancel'),
-                showCancelButton: true
-            }, function() {
-                self.data.splice(index, 1);
-            });
         },
 
-        deleteColumn: function(index) {
-            var self = this;
+        confirmDeleteRow(index) {
+            this.deletingRow = index;
+        },
 
-            swal({
-                type: 'warning',
-                title: __('Are you sure?'),
-                text: __n('cp.confirm_delete_items', 1),
-                confirmButtonText: __('Yes I\'m sure'),
-                cancelButtonText: __('Cancel'),
-                showCancelButton: true
-            }, function() {
-                var rows = self.data.length;
+        confirmDeleteColumn(index) {
+            this.deletingColumn = index;
+        },
 
-                for (var i = 0; i < rows; i++) {
-                    self.data[i].cells.splice(index, 1);
-                }
-            });
+        deleteRow(index) {
+            this.deletingRow = false;
+
+            this.data.splice(index, 1);
+        },
+
+        deleteColumn(index) {
+            this.deletingColumn = false;
+
+            var rows = this.data.length;
+
+            for (var i = 0; i < rows; i++) {
+                this.data[i].value.cells.splice(index, 1);
+            }
+        },
+
+        deleteCancelled() {
+            this.deletingRow = false;
+            this.deletingColumn = false;
         },
 
         getReplicatorPreviewText() {
             // Join all values with commas. Exclude any empties.
             return _(this.data)
-                .map(row => row.cells.filter(cell => !!cell).join(', '))
+                .map(row => row.value.cells.filter(cell => !!cell).join(', '))
                 .filter(row => !!row).join(', ');
         }
-    },
-
-    mounted() {
-        this.sortable();
-    },
-
-    watch: {
-
-        data: {
-            deep: true,
-            handler (data) {
-                this.update(data);
-
-                this.$nextTick(() => {
-                    if (this.data.length) {
-                        this.sortable();
-                    } else {
-                        this.destroySortable();
-                    }
-                });
-            }
-        }
-
     }
+
 }
 </script>

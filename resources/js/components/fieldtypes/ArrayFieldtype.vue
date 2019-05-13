@@ -1,148 +1,174 @@
 <template>
     <div class="array-fieldtype-container">
 
-        <table class="array-table" v-if="componentType === 'keyed'">
+        <table v-if="isKeyed" class="array-table">
             <tbody>
-                <tr v-if="data" v-for="(key, index) in config.keys" :key="index">
-                    <th>{{ key.text }}</th>
+                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                    <th>{{ config.keys[element.key] }}</th>
                     <td>
-                        <input type="text" class="input-text-minimal" v-model="data[key.value]" />
+                        <input type="text" class="input-text-minimal" v-model="data[index].value" />
                     </td>
                 </tr>
             </tbody>
         </table>
 
-
-        <template v-if="componentType === 'dynamic'">
-            <div class="grid-field array-dynamic">
-                <table class="grid-table grid-mode-table" v-if="hasRows">
+        <template v-else-if="isDynamic">
+            <div class="table-field">
+                <table class="table-fieldtype-table" v-if="valueCount">
                     <thead>
                         <tr>
-                            <th>{{ valueHeader }}</th>
-                            <th>{{ textHeader }}</th>
+                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                            <th class="w-1/4">{{ keyHeader }}</th>
+                            <th class="">{{ valueHeader }}</th>
                             <th class="row-controls"></th>
                         </tr>
                     </thead>
-                    <tbody ref="tbody">
-                        <tr v-for="(row, rowIndex) in data" :key="rowIndex">
-                            <td>
-                                <input type="text" class="form-control" v-model="row.value" />
-                            </td>
-                            <td>
-                                <input type="text" class="form-control" v-model="row.text" />
-                            </td>
-                            <td class="row-controls">
-                                <span class="icon icon-menu move drag-handle"></span>
-                                <span class="icon icon-cross delete" v-on:click="deleteRow(rowIndex)"></span>
-                            </td>
-                        </tr>
-                    </tbody>
+
+                    <sortable-list
+                        v-model="data"
+                        :vertical="true"
+                        item-class="sortable-row"
+                        handle-class="sortable-handle"
+                    >
+                        <tbody>
+                            <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
+                                <td class="table-drag-handle" v-if="!isReadOnly"></td>
+                                <td>
+                                    <input type="text" class="input-text font-bold" v-model="element.key" />
+                                </td>
+                                <td>
+                                    <input type="text" class="input-text" v-model="element.value" />
+                                </td>
+                                <td class="row-controls">
+                                    <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </sortable-list>
                 </table>
 
-                <button type="button" class="btn btn-default" @click="addRow">
-                    {{ addRowButton }} <i class="icon icon-plus"></i>
+                <button class="btn" @click="addValue" :disabled="atMax">
+                    {{ addButton }}
                 </button>
+
+                <confirmation-modal
+                    v-if="deleting !== false"
+                    :title="__('Delete Value')"
+                    :bodyText="__('Are you sure you want to delete this value?')"
+                    :buttonText="__('Delete')"
+                    :danger="true"
+                    @confirm="deleteValue(deleting)"
+                    @cancel="deleteCancelled"
+                >
+                </confirmation-modal>
             </div>
         </template>
 
     </div>
-
 </template>
 
 <script>
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SortableHelpers],
+
+    components: {
+        SortableList,
+        SortableItem
+    },
 
     data() {
         return {
-            data: null
+            data: [],
+            deleting: false,
         }
     },
 
     created() {
-        this.data = this.value || [];
-
-        if (this.componentType === 'keyed') {
-            this.data = (this.data.length === 0) ? {} : this.data;
-        }
+        this.data = this.objectToSortable(this.value || []);
     },
 
-    mounted() {
-        if (this.componentType === 'dynamic') {
-            this.initSortable();
+    watch: {
+        data: {
+            deep: true,
+            handler (data) {
+                this.update(this.sortableToObject(data));
+            }
+        },
+
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
+            this.data = this.objectToSortable(value);
         }
     },
 
     computed: {
-        componentType: function() {
-            return (this.config.keys) ? 'keyed' : 'dynamic';
+        isKeyed() {
+            return Boolean(Object.keys(this.config.keys).length);
         },
 
-        hasRows: function() {
-            return this.data && this.data.length > 0;
+        isDynamic() {
+            return ! this.isKeyed;
         },
 
-        addRowButton: function() {
-            return this.config.add_row || __('Row');
+        keyedData() {
+            return _.filter(this.data, element => this.config.keys[element.key]);
         },
 
-        valueHeader: function() {
-            return this.config.value_header || __('Value');
+        maxItems() {
+            return this.config.max_items || null;
         },
 
-        textHeader: function() {
-            return this.config.text_header || __('Text');
+        valueCount() {
+            return this.data.length;
+        },
+
+        atMax() {
+            return this.maxItems ? this.valueCount >= this.maxItems : false;
+        },
+
+        addButton() {
+            return __(this.config.add_button || 'Add Value');
+        },
+
+        keyHeader() {
+            return __(this.config.key_header || 'Key');
+        },
+
+        valueHeader() {
+            return __(this.config.value_header || 'Value');
         }
-    },
-
-    watch: {
-
-        data: {
-            deep: true,
-            handler(value) {
-                this.update(value);
-            }
-        }
-
     },
 
     methods: {
-        addRow: function() {
-            this.data.push({ value: '', text: '' });
-            this.initSortable();
+        addValue() {
+            this.data.push(this.newSortableValue());
         },
 
-        deleteRow: function(index) {
+        confirmDeleteValue(index) {
+            this.deleting = index;
+        },
+
+        deleteOrConfirm(index) {
+            if (this.data[index].key === null && this.data[index].value === null) {
+                this.deleteValue(index);
+            } else {
+                this.confirmDeleteValue(index);
+            }
+        },
+
+        deleteValue(index) {
+            this.deleting = false;
+
             this.data.splice(index, 1);
         },
 
-        initSortable: function() {
-            var self = this;
-            var start = '';
-
-            $(this.$refs.tbody).sortable({
-                axis: "y",
-                revert: 175,
-                handle: '.drag-handle',
-                placeholder: 'table-row-placeholder',
-                forcePlaceholderSize: true,
-
-                start: function(e, ui) {
-                    start = ui.item.index();
-                    ui.placeholder.height(ui.item.height());
-                },
-
-                update: function(e, ui) {
-                    var end  = ui.item.index(),
-                        swap = self.data.splice(start, 1)[0];
-
-                    self.data.splice(end, 0, swap);
-                }
-            });
+        deleteCancelled() {
+            this.deleting = false;
         }
     }
 
-};
-
+}
 </script>

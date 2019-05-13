@@ -14,7 +14,7 @@ use Statamic\Stache\Stores\AssetContainersStore;
 
 class AssetContainersStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +24,7 @@ class AssetContainersStoreTest extends TestCase
         $this->store = (new AssetContainersStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown()
+    function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
@@ -86,7 +86,7 @@ class AssetContainersStoreTest extends TestCase
     /** @test */
     function it_makes_asset_container_instances_from_files()
     {
-        config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__]]);
+        config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
 
         API\Blueprint::shouldReceive('find')
             ->with('test')->once()
@@ -96,13 +96,6 @@ $contents = <<<EOL
 disk: test
 title: Example
 blueprint: test
-assets:
-  one.txt:
-    foo: bar
-    baz: qux
-  sub/two.txt:
-    foo: qux
-    baz: bar
 EOL;
         $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', $contents);
 
@@ -111,12 +104,16 @@ EOL;
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
         $this->assertEquals($blueprint, $item->blueprint());
-        tap($item->pendingAssets(), function ($assets) {
+        tap($item->assets(), function ($assets) {
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
             $this->assertEquals([
-                'one.txt' => ['foo' => 'bar', 'baz' => 'qux'],
-                'sub/two.txt' => ['foo' => 'qux', 'baz' => 'bar'],
-            ], $assets->map->data()->all());
+                'a.txt' => ['title' => 'File A'],
+                'b.txt' => ['title' => 'File B'],
+                'nested/nested-a.txt' => ['title' => 'Nested File A'],
+                'nested/nested-b.txt' => ['title' => 'Nested File B'],
+                'nested/double-nested/double-nested-a.txt' => ['title' => 'Double Nested File A'],
+                'nested/double-nested/double-nested-b.txt' => ['title' => 'Double Nested File B'],
+            ], $assets->keyBy->path()->map->data()->all());
         });
     }
 
@@ -149,22 +146,13 @@ blueprint: foo
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
 
-        $container
-            ->addAsset((new Asset)->path('foo.txt')->set('a', 'b')->set('b', 'c'))
-            ->addAsset((new Asset)->path('bar.txt')->set('d', 'e')->set('e', 'f'));
-
-        $this->store->save($container);
+        $container->allowUploads(false)->createFolders(false)->save();
 
         $expected = <<<EOT
 title: 'New Container'
 blueprint: foo
-assets:
-  foo.txt:
-    a: b
-    b: c
-  bar.txt:
-    d: e
-    e: f
+allow_uploads: false
+create_folders: false
 
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);

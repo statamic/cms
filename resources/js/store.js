@@ -6,7 +6,8 @@ export default {
         windowWidth: null,
         fieldtypes: null,
         composer: {},
-        preferences: Statamic.preferences,
+        config: {},
+        conditions: {},
     },
 
     mutations: {
@@ -23,9 +24,21 @@ export default {
             state.composer = composer;
         },
 
-        preferences(state, preferences) {
-            state.preferences = preferences;
+        config(state, config) {
+            state.config = config;
         },
+
+        configValue(state, payload) {
+            state.config[payload.key] = payload.value;
+        },
+
+        preferences(state, preferences) {
+            state.config.preferences = preferences;
+        },
+
+        condition(state, payload) {
+            state.conditions[payload.name] = payload.condition;
+        }
 
     }
 

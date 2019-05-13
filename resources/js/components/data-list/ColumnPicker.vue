@@ -1,36 +1,56 @@
 <template>
-    <dropdown-list>
-        <button class="btn btn-icon-only antialiased ml-2 dropdown-toggle" slot="trigger">
-            <svg-icon name="picker" class="h-4 w-4 mr-1 text-current"></svg-icon>
+    <div>
+        <button class="btn btn-flat btn-icon-only ml-1 dropdown-toggle" @click="customizing = !customizing">
+            <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
             <span>{{ __('Columns') }}</span>
         </button>
-        <div class="dropdown-menu">
-            <h6 class="text-center">{{ __('Customize Columns') }}</h6>
-            <div class="li divider"></div>
 
-            <sortable-list
-                v-model="columns"
-                :vertical="true"
-                item-class="column-picker-item"
-                handle-class="column-picker-item"
-            >
-                <div>
-                    <div class="column-picker-item column" v-for="column in sharedState.columns" :key="column.field">
-                        <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
-                    </div>
+        <pane name="columns" v-if="customizing">
+            <div>
+
+                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                    {{ __('Columns') }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        @click="customizing = false"
+                        v-html="'&times'" />
                 </div>
-            </sortable-list>
-            <div class="li divider"></div>
-            <div class="">
-                <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                <button v-else class="btn-flat w-full block btn-sm" @click="save">Save</button>
+
+                <div class="p-2">
+
+                    <sortable-list
+                        v-model="columns"
+                        :vertical="true"
+                        item-class="column-picker-item"
+                        handle-class="column-picker-item"
+                    >
+                        <div>
+                            <div class="column-picker-item column" v-for="column in sharedState.columns" :key="column.field">
+                                <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
+                            </div>
+                        </div>
+                    </sortable-list>
+
+                    <div v-if="preferencesKey">
+                        <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                        <template v-else>
+                            <div class="flex justify-center mt-3">
+                                <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
+                            </div>
+                            <div class="flex justify-center mt-2">
+                                <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
             </div>
-        </div>
-    </dropdown-list>
+        </pane>
+    </div>
 </template>
 
 <script>
-import axios from 'axios';
 import { SortableList } from '../sortable/Sortable';
 
 export default {
@@ -40,11 +60,12 @@ export default {
     },
 
     props: {
-        saveUrl: String,
+        preferencesKey: String
     },
 
     data() {
         return {
+            customizing: false,
             saving: false,
         }
     },
@@ -73,18 +94,39 @@ export default {
     methods: {
 
         save() {
+            if (! this.selectedColumns.length) {
+                return this.$notify.error(__('At least 1 column is required'));
+            }
+
             this.saving = true;
-            axios.post(this.saveUrl, { columns: this.selectedColumns }).then(response => {
-                this.saving = false;
-                this.$notify.success(__('Columns saved'), { timeout: 3000 });
-            }).catch(e => {
-                this.saving = false;
-                if (e.response) {
-                    this.$notify.error(e.response.data.message);
-                } else {
+
+            this.$preferences.set(this.preferencesKey, this.selectedColumns)
+                .then(response => {
+                    this.saving = false;
+                    this.customizing = false;
+                    this.$notify.success(__('Columns saved'));
+                })
+                .catch(error => {
+                    this.saving = false;
                     this.$notify.error(__('Something went wrong'));
-                }
-            });
+                });
+        },
+
+        reset() {
+            this.sharedState.columns.forEach(column => column.visible = column.visibleDefault);
+
+            this.saving = true;
+
+            this.$preferences.remove(this.preferencesKey)
+                .then(response => {
+                    this.saving = false;
+                    this.customizing = false;
+                    this.$notify.success(__('Columns reset'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
         }
 
     }

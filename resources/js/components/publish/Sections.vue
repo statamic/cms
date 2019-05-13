@@ -1,10 +1,10 @@
 <template>
 
+    <element-container @resized="containerWidth = $event.width">
     <div>
 
-        <div class="publish-tabs tabs mb-2" v-show="mainSections.length > 1">
-            <a href=""
-                v-for="section in mainSections"
+        <div class="publish-tabs tabs" v-show="mainSections.length > 1">
+            <a v-for="section in mainSections"
                 :key="section.handle"
                 :class="{
                     'active': section.handle == active,
@@ -18,23 +18,37 @@
         <div class="flex justify-between">
             <div class="w-full">
                 <div
-                    class="card p-0"
+                    class="publish-section"
+                    :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
                     v-for="section in mainSections"
                     :key="section.handle"
                     v-show="section.handle === active"
                 >
-                    <publish-fields :fields="section.fields" />
+                    <publish-fields
+                        :fields="section.fields"
+                        :read-only="readOnly"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
                 </div>
             </div>
 
-            <div class="publish-sidebar ml-4" v-if="shouldShowSidebar">
-                <div class="card p-0">
-                    <publish-fields :fields="sidebarSection.fields" />
+            <div class="publish-sidebar" v-if="shouldShowSidebar">
+                <div class="publish-section">
+                    <publish-fields
+                        :fields="sidebarSection.fields"
+                        :read-only="readOnly"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
                 </div>
             </div>
         </div>
 
     </div>
+    </element-container>
 
 </template>
 
@@ -43,11 +57,16 @@ export default {
 
     inject: ['storeName'],
 
+    props: {
+        readOnly: Boolean,
+    },
+
     data() {
         const state = this.$store.state.publish[this.storeName];
 
         return {
-            active: state.fieldset.sections[0].handle
+            active: state.fieldset.sections[0].handle,
+            containerWidth: null
         }
     },
 
@@ -74,10 +93,7 @@ export default {
         shouldShowSidebar() {
             if (! this.sidebarSection) return false;
 
-            const width = this.$store.state.statamic.windowWidth;
-
-            // TODO: or is live previewing
-            if (this.sidebarSection.fields.length == 0 || width < 1366) return false;
+            if (this.sidebarSection.fields.length == 0 || this.containerWidth < 1010) return false;
 
             return true;
         },
@@ -104,12 +120,11 @@ export default {
                 errors[field] = this.sectionFields[field];
             });
             return errors;
-        },
+        }
 
     },
 
     methods: {
-
 
         sectionHasError(handle) {
             return _.chain(this.sectionErrors).values().contains(handle).value();

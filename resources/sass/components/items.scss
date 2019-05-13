@@ -1,15 +1,15 @@
 .item {
-    @apply text-sm outline-none flex items-center rounded cursor-pointer border bg-white shadow-sm select-none;
+    @apply text-sm outline-none flex rounded border bg-white shadow-sm;
 
     .item-move {
-        @apply w-4 border-r h-full p-1;
+        @apply w-4 border-r rounded-l p-1;
         cursor: grab;
-        background: rgba($bg, .5) url('../img/drag-dots.svg') center center no-repeat;
-        &:hover { @apply .bg-grey-lighter; }
+        background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+        &:hover { @apply .bg-grey-30; }
     }
 
     .item-inner {
-        @apply w-full flex items-center px-1;
+        @apply w-full flex items-center p-1;
     }
 
     &.published {
@@ -20,7 +20,7 @@
 
     &.unpublished {
         .little-dot {
-            @apply bg-grey-light;
+            @apply bg-grey-40;
         }
     }
 
@@ -34,7 +34,7 @@
     }
 
     // Drag interaction
-    .draggable-source--is-dragging {
+    &.draggable-source--is-dragging {
         opacity: 0.5;
     }
 }

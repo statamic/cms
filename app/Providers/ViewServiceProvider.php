@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\API\Site;
+use Statamic\Statamic;
 use Statamic\View\Store;
 use Illuminate\View\View;
 use Statamic\View\Cascade;
@@ -26,7 +27,9 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(Parser::class, function ($app) {
-            return (new Parser)->callback([Engine::class, 'renderTag']);
+            return (new Parser)
+                ->callback([Engine::class, 'renderTag'])
+                ->cascade($app[Cascade::class]);
         });
 
         $this->app->singleton(Engine::class, function ($app) {
@@ -37,7 +40,10 @@ class ViewServiceProvider extends ServiceProvider
     public function boot()
     {
         View::macro('withoutExtractions', function () {
-            $this->engine->withoutExtractions();
+            if ($this->engine instanceof Engine) {
+                $this->engine->withoutExtractions();
+            }
+
             return $this;
         });
 

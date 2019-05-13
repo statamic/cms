@@ -3,13 +3,22 @@
     <relationship-input
         :name="name"
         v-model="selections"
+        :can-edit="canEdit"
+        :config="config"
+        :can-create="canCreate"
+        :can-reorder="canReorder"
+        :site="site"
         :initial-data="initialData"
         :max-items="maxItems"
+        :item-component="itemComponent"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
-        :status-icons="true"
-        :editable-items="true"
-        :columns="[{ field: 'title', label: 'Title', visible: true }, { field: 'url', label: 'URL', visible: true }]"
+        :status-icons="statusIcons"
+        :columns="columns"
+        :search="canSearch"
+        :read-only="isReadOnly"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
     />
 
 </template>
@@ -28,32 +37,69 @@ export default {
         }
     },
 
+    inject: {
+        storeName: {
+            default: null
+        }
+    },
+
     computed: {
 
         maxItems() {
             return this.config.max_items || Infinity;
         },
 
+        columns() {
+            return this.meta.columns;
+        },
+
+        itemComponent() {
+            return this.meta.itemComponent;
+        },
+
         itemDataUrl() {
-            return cp_url(`fieldtypes/relationship/data`);
+            return this.meta.itemDataUrl + '?' + qs.stringify({ config: this.configParameter });
         },
 
         selectionsUrl() {
-            return this.baseSelectionsUrl + '?' + qs.stringify(this.selectionsUrlParameters);
+            return this.baseSelectionsUrl + '?' + qs.stringify({
+                config: this.configParameter,
+                ...this.meta.getBaseSelectionsUrlParameters,
+            });
         },
 
         baseSelectionsUrl() {
-            return cp_url(`fieldtypes/relationship`);
+            return this.meta.baseSelectionsUrl;
         },
 
-        selectionsUrlParameters() {
-            let params = {};
+        configParameter() {
+            return btoa(JSON.stringify(this.config));
+        },
 
-            if (this.config.collections) {
-                params.collections = this.config.collections;
-            }
+        site() {
+            if (! this.storeName) return this.$config.get('selectedSite');
 
-            return params;
+            return this.$store.state.publish[this.storeName].site;
+        },
+
+        canEdit() {
+            return this.meta.canEdit;
+        },
+
+        canCreate() {
+            return this.meta.canCreate;
+        },
+
+        canSearch() {
+            return this.meta.canSearch;
+        },
+
+        canReorder() {
+            return this.maxItems > 1;
+        },
+
+        statusIcons() {
+            return this.meta.statusIcons;
         }
 
     },
@@ -62,6 +108,11 @@ export default {
 
         selections(selections) {
             this.update(this.selections);
+        },
+
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
+            this.selections = value;
         }
 
     }

@@ -2,7 +2,6 @@
    TOGGLE
    ========================================================================== */
 
-$toggle_green: #64BD63;
 $toggle_radius: 20px;
 
 .toggle-fieldtype-wrapper {
@@ -17,6 +16,7 @@ $toggle_radius: 20px;
 }
 
 .toggle-container {
+    background: #fff;
     height: 22px;
     width: 46px;
     border-radius: $toggle_radius;
@@ -54,22 +54,42 @@ $toggle_radius: 20px;
     box-shadow: 0 1px 3px rgba($brand-primary, .9);
 }
 
-.toggle-knob:focus {
-    background-color: #efefef;
-}
-
 .toggle-container.on {
     .toggle-slider {
+        @apply bg-green-light;
         width: 44px;
-        background: $toggle_green;
     }
 
     .toggle-knob:focus {
-        background-color: darken($toggle_green, 20%);
-        box-shadow: 0 0 10px rgba($toggle_green, .7);
+        box-shadow: 0 0 10px rgba(#64BD63, .7);
     }
 }
 
+/* Size Variants
+  ========================================================================== */
+.toggle-sm.toggle-fieldtype-wrapper {
+    height: 16px;
+
+    .toggle-container {
+        height: 12px;
+        width: 21px;
+    }
+
+    .toggle-knob {
+        width: 10px;
+        height: 10px;
+    }
+
+    .toggle-slider {
+        box-shadow: inset 0px 1px rgba(0,0,0,.25);
+        height: 12px;
+        width: 10px;
+    }
+
+    .toggle-container.on .toggle-slider {
+        width: 22px;
+    }
+}
 
 /* Inside a Grid field
   ========================================================================== */

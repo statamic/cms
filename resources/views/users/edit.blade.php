@@ -5,8 +5,10 @@
     <user-publish-form
         action="{{ cp_route('users.update', $user->id()) }}"
         method="patch"
+        initial-reference="{{ $user->reference() }}"
         :initial-fieldset="{{ json_encode($user->blueprint()->toPublishArray()) }}"
         :initial-values="{{ json_encode($values) }}"
+        :initial-meta="{{ json_encode($meta) }}"
         inline-template
     >
         <div>
@@ -14,7 +16,7 @@
                 <h1 class="flex-1">
                     <a href="{{ cp_route('users.index')}}">{{ __('Users') }}</a>
                     @svg('chevron-right')
-                    {{ $user->username() }}
+                    {{ $user->email() }}
                 </h1>
 
                 @can('editPassword', $user)
@@ -30,13 +32,18 @@
                 v-if="fieldset"
                 name="base"
                 :fieldset="fieldset"
-                :values="initialValues"
+                :values="values"
+                :reference="initialReference"
+                :meta="meta"
                 :errors="errors"
                 @updated="values = $event"
             >
-                <div slot-scope="{ }">
-                    <div class="alert alert-danger mb-2" v-if="error" v-text="error" v-cloak></div>
-                    <publish-sections></publish-sections>
+                <div slot-scope="{ container, setValue }">
+                    <publish-sections
+                        @updated="setValue"
+                        @focus="container.$emit('focus', $event)"
+                        @blur="container.$emit('blur', $event)"
+                    ></publish-sections>
                 </div>
             </publish-container>
         </div>

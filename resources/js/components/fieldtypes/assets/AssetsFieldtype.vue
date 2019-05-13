@@ -1,8 +1,7 @@
 <template>
-    <div class="assets-fieldtype">
+    <div>
 
-        <div v-if="!containerSpecified">
-            <i class="icon icon-warning"></i>
+        <div v-if="!containerSpecified" class="error-container">
             {{ __('No asset container specified') }}
         </div>
 
@@ -15,47 +14,44 @@
             @upload-complete="uploadComplete"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="relative">
+            <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div v-if="loading" class="loading loading-basic">
                     <loading-graphic :inline="true" />
                 </div>
 
                 <div class="drag-notification" v-show="containerSpecified && dragging && !showSelector">
-                    <i class="icon icon-download"></i>
-                    <h3>{{ __('Drop to Upload') }}</h3>
+                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    {{ __('Drop File to Upload') }}
                 </div>
 
                 <template v-if="!loading">
 
                     <div
-                        v-if="!maxFilesReached"
-                        class="flex items-center p-2 bg-grey-lightest border rounded"
+                        v-if="!maxFilesReached && !isReadOnly"
+                        class="assets-fieldtype-picker"
                         :class="{
-                            'border-b-0 rounded-b-none': expanded,
+                            'is-expanded': expanded,
                             'bard-drag-handle': isInBardField
                         }"
                     >
 
                         <button
                             type="button"
-                            class="btn btn-with-icon mr-1"
+                            class="btn btn-with-icon"
                             @click="openSelector"
                             @keyup.space.enter="openSelector"
                             tabindex="0">
-                            <span class="icon icon-folder-images"></span>
-                            {{ __('Browse Assets') }}
+                            <svg-icon name="folder-image" class="w-6 h-6 text-grey-80"></svg-icon>
+                            {{ __('Assets') }}
                         </button>
 
-                        <button
-                            type="button"
-                            class="btn btn-with-icon"
-                            @click.prevent="uploadFile">
-                            <span class="icon icon-upload-to-cloud"></span>
-                            {{ __('Upload') }}
-                        </button>
-
-                        <p class="ml-3 text-sm text-grey-light">{{ __('or drag and drop files') }}</p>
+                        <p class="ml-2 text-xs text-grey-60">
+                            <button type="button" class="text-blue underline hover:text-blue-dark" @click.prevent="uploadFile">
+                                {{ __('Select file') }}
+                            </button>
+                            <span v-text="__('or drag & drop to upload.')"></span>
+                        </p>
 
                         <button
                             type="button"
@@ -79,6 +75,8 @@
                             v-model="assets"
                             item-class="asset-tile"
                             handle-class="asset-thumb-container"
+                            @dragstart="$emit('focus')"
+                            @dragend="$emit('blur')"
                         >
                             <div
                                 class="asset-grid-listing border rounded overflow-hidden"
@@ -182,8 +180,6 @@
 
 
 <script>
-import axios from 'axios';
-
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
 import Selector from '../../assets/Selector.vue';
@@ -353,15 +349,15 @@ export default {
          * Accepts an array of asset URLs and/or IDs.
          */
         loadAssets(assets) {
-            this.loading = true;
-
             if (! assets || ! assets.length) {
                 this.loading = false;
                 this.assets = [];
                 return;
             }
 
-            axios.get(cp_url('assets-fieldtype'), {
+            this.loading = true;
+
+            this.$axios.get(cp_url('assets-fieldtype'), {
                 params: { assets }
             }).then(response => {
                 this.assets = response.data;
@@ -462,11 +458,18 @@ export default {
             this.update(_.pluck(this.assets, 'id'));
         },
 
-        loading: {
-            immediate: true,
-            handler(loading) {
-                this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+        loading(loading) {
+            this.$progress.loading(`assets-fieldtype-${this._uid}`, loading);
+        },
+
+        value(value, oldValue) {
+            if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
+                this.loadAssets(value);
             }
+        },
+
+        showSelector(selecting) {
+            this.$emit(selecting ? 'focus' : 'blur');
         }
 
     },

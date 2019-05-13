@@ -2,10 +2,13 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\Parse;
 use Statamic\Exceptions;
+use Illuminate\Support\Collection;
+use Facades\Statamic\View\Cascade;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Extend\Management\TagLoader;
 use Illuminate\Contracts\View\Engine as EngineInterface;
@@ -78,13 +81,22 @@ class Engine implements EngineInterface
      */
     public function get($path, array $data = [])
     {
-        $contents = $this->getContents($path);
-
-        list($frontMatter, $contents) = $this->extractFrontMatter($contents);
-
         $parser = $this->parser->allowPhp(Str::endsWith($path, '.php'));
 
-        $contents = $parser->parse($contents, array_merge($data, $frontMatter));
+        $contents = $this->getContents($path);
+
+        [$frontMatter, $contents] = $this->extractFrontMatter($contents);
+
+        // If the data has provided front matter with this special key, it will override
+        // front matter defined in the view itself. This is typically used by partials.
+        // ie. data defined in the partial tag parameters will win the array merge.
+        $frontMatter = array_merge($frontMatter, Arr::pull($data, '__frontmatter', []));
+
+        $views = Cascade::get('views', []);
+        $views[$path] = $frontMatter;
+        Cascade::set('views', $views);
+
+        $contents = $parser->parseView($path, $contents, $data);
 
         if ($this->injectExtractions) {
             $contents = $parser->injectNoparse($contents);
@@ -125,7 +137,7 @@ class Engine implements EngineInterface
      * @throws Exceptions\FatalException
      * @throws \Exception
      */
-    public static function renderTag($name, $parameters = [], $content = '', $context = [])
+    public static function renderTag(Parser $parser, $name, $parameters = [], $content = '', $context = [])
     {
         $tag_measure = 'tag_' . $name . microtime();
         start_measure($tag_measure, 'Tag: ' . $name);
@@ -141,6 +153,7 @@ class Engine implements EngineInterface
 
         try {
             $tag = app(TagLoader::class)->load($name, [
+                'parser'     => $parser,
                 'parameters' => $parameters,
                 'content'    => $content,
                 'context'    => $context,
@@ -150,8 +163,17 @@ class Engine implements EngineInterface
 
             $output = call_user_func([$tag, $method]);
 
+            if ($output instanceof Collection) {
+                $output = $output->toAugmentedArray();
+            }
+
+            // Allow tags to return an array. We'll parse it for them.
             if (is_array($output)) {
-                $output = Parse::template($content, $output, $context);
+                if (empty($output)) {
+                    $output = $tag->parseNoResults();
+                } else {
+                    $output = Arr::assoc($output) ? $tag->parse($output) : $tag->parseLoop($output);
+                }
             }
 
             return $output;

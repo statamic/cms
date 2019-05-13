@@ -7,13 +7,15 @@ use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
+use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\FieldsetRepository;
 
 class EditFieldsetTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +41,7 @@ class EditFieldsetTest extends TestCase
     function it_provides_the_fieldset()
     {
         $this->withoutExceptionHandling();
-        $user = API\User::make()->makeSuper();
+        $user = API\User::make()->makeSuper()->save();
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this

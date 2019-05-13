@@ -2,40 +2,42 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Parse;
-use Statamic\Tags\Tags;
-use Statamic\API\Config;
-use Statamic\API\Antlers;
-
 class Partial extends Tags
 {
     public function __call($method, $arguments)
     {
         // We pass the original non-studly case value in as
         // an argument, but fall back to the studly version just in case.
-        $src = $this->get('src', array_get_colon($arguments, 0, $this->tag_method));
+        $partial = $this->get('src', array_get_colon($arguments, 0, $this->method));
 
-        $partialPath = config('statamic.theming.dedicated_view_directories')
-            ? resource_path("partials/{$src}.antlers")
-            : resource_path("views/{$src}.antlers");
+        $variables = array_merge($this->context, $this->parameters, [
+            '__frontmatter' => $this->parameters
+        ]);
 
-        if (! $partial = File::get($partialPath.'.html')) {
-            if ($partial = File::get($partialPath.'.php')) {
-                $php = true;
-            }
+        return view($this->viewName($partial), $variables)->render();
+    }
+
+    protected function viewName($partial)
+    {
+        $partial = str_replace('/', '.', $partial);
+
+        if (view()->exists($underscored = $this->underscoredViewName($partial))) {
+            return $underscored;
         }
 
-        // Allow front matter in these suckers
-        $parsed = Parse::frontMatter($partial);
-        $variables = array_get($parsed, 'data', []);
-        $template = array_get($parsed, 'content');
+        if (view()->exists($subdirectoried = 'partials.'.$partial)) {
+            return $subdirectoried;
+        }
 
-        // Front-matter, tag parameters, and the context is all passed through to the partial.
-        // Since 2.5, parameters need to be prefixed with a colon in order to read from the field.
-        $variables = array_merge($this->context, $variables, $this->parameters);
+        return $partial;
+    }
 
-        return Antlers::parser()->allowPhp($php ?? false)->parse($template, $variables);
+    protected function underscoredViewName($partial)
+    {
+        $bits = collect(explode('.', $partial));
+
+        $last = $bits->pull($bits->count()-1);
+
+        return $bits->implode('.') . '._' . $last;
     }
 }

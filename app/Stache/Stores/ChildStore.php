@@ -47,4 +47,11 @@ class ChildStore extends BasicStore
 
         $this->parent->cacheMetaKeys();
     }
+
+    public function uncache()
+    {
+        parent::uncache();
+
+        $this->parent->cacheMetaKeys();
+    }
 }

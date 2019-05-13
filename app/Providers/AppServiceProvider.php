@@ -17,7 +17,12 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class AppServiceProvider extends ServiceProvider
 {
-    private $root = __DIR__.'/../..';
+    protected $root = __DIR__.'/../..';
+
+    protected $configFiles = [
+        'amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'protect', 'revisions',
+        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'
+    ];
 
     public function boot()
     {
@@ -34,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
-        collect(['api', 'assets', 'cp', 'forms', 'protect', 'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'])->each(function ($config) {
+        collect($this->configFiles)->each(function ($config) {
             $this->mergeConfigFrom("{$this->root}/config/$config.php", "statamic.$config");
             $this->publishes(["{$this->root}/config/$config.php" => config_path("statamic/$config.php")], 'statamic');
         });
@@ -45,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/dist" => public_path('resources/cp')
+            "{$this->root}/resources/dist" => public_path('vendor/statamic/cp')
         ], 'statamic-cp');
 
         $this->loadTranslationsFrom("{$this->root}/resources/lang", 'statamic');
@@ -62,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
         });
+
+        Carbon::setToStringFormat(config('statamic.system.date_format'));
 
         Carbon::macro('inPreferredFormat', function () {
             return $this->format(
@@ -94,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Data\Repositories\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
             \Statamic\Contracts\Data\Repositories\ContentRepository::class => \Statamic\Stache\Repositories\ContentRepository::class,
             \Statamic\Contracts\Data\Repositories\StructureRepository::class => \Statamic\Stache\Repositories\StructureRepository::class,
+            \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->singleton($abstract, $concrete);
         });
@@ -112,9 +120,10 @@ class AppServiceProvider extends ServiceProvider
 
     protected function swapSessionMiddleware()
     {
-        $this->app->singleton(
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Statamic\Http\Middleware\CP\StartSession::class
-        );
+        $middleware = version_compare($this->app->version(), '5.8.0', '<')
+            ? \Statamic\Http\Middleware\CP\StartSession57::class
+            : \Statamic\Http\Middleware\CP\StartSession::class;
+
+        $this->app->singleton(\Illuminate\Session\Middleware\StartSession::class, $middleware);
     }
 }

@@ -7,6 +7,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\ChildStore;
+use Statamic\Stache\Exceptions\StoreExpiredException;
 
 abstract class AggregateStore extends Store
 {
@@ -52,6 +53,17 @@ abstract class AggregateStore extends Store
     public function stores()
     {
         return $this->stores;
+    }
+
+    public function getStoreById($id)
+    {
+        if (! $store = $this->getIdMap()->get($id)) {
+            return null;
+        }
+
+        $store = explode('::', $store)[1];
+
+        return $this->store($store);
     }
 
     public function setPaths($paths)
@@ -200,7 +212,7 @@ abstract class AggregateStore extends Store
 
     public function cacheMetaKeys()
     {
-        Cache::forever($this->getMetaKeysCacheKey(), $this->stores->keys()->all());
+        Cache::forever($this->getMetaKeysCacheKey(), $this->stores->reject->isExpired()->keys()->all());
     }
 
     public function cacheHasMeta()
@@ -249,7 +261,11 @@ abstract class AggregateStore extends Store
     // There's an equivalent test for the BasicStore.
     public function removeByPath($path)
     {
-        $id = $this->getIdFromPath($path);
+        if (! $id = $this->getIdFromPath($path)) {
+            // If there's no ID, the deleted path may actually have been a renamed
+            // one, which would have already been updated in the Stache.
+            return $this;
+        }
 
         list(, $store) = $this->extractKeys($this->getIdMap()->get($id));
 

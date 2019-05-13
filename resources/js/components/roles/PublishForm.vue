@@ -46,7 +46,6 @@
 
 
 <script>
-import axios from 'axios';
 import RolePermissions from './Permissions.vue';
 
 const checked = function (permissions) {
@@ -113,7 +112,7 @@ export default {
         save() {
             this.clearErrors();
 
-            axios[this.method](this.action, this.payload).then(response => {
+            this.$axios[this.method](this.action, this.payload).then(response => {
                 this.$notify.success('Saved');
                 if (!this.initialHandle || (this.initialHandle !== this.handle)) {
                     window.location = response.data.redirect;
@@ -123,13 +122,20 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message, { timeout: 2000 });
+                    this.$notify.error(message);
                 } else {
                     this.$notify.error('Something went wrong');
                 }
             });
         }
 
+    },
+
+    mounted() {
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     }
 
 }

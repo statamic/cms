@@ -6,22 +6,9 @@ use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\Config;
 use Statamic\Extend\Addon;
-use Michelf\MarkdownExtra;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
-
-$GLOBALS['statamictodos'] = [];
-function log_todo()
-{
-    $backtrace = debug_backtrace()[1];
-    $str = array_get($backtrace, 'class', '') . '::' . $backtrace['function'];
-
-    if (!array_has($GLOBALS['statamictodos'], $str)) {
-        \Log::debug('Todo: ' . $str);
-        $GLOBALS['statamictodos'][$str] = true;
-    }
-}
 
 if (! function_exists('array_get_colon')) {
     /**
@@ -186,13 +173,9 @@ function cp_route($route, $params = [])
  */
 function markdown($content)
 {
-    $parser = new MarkdownExtra;
+    $markdown = new \ParsedownExtra();
 
-    if (Config::get('statamic.theming.markdown_hard_wrap')) {
-        $parser->hard_wrap = true;
-    }
-
-    return $parser->transform($content);
+    return $markdown->text($content);
 }
 
 /**
@@ -410,29 +393,6 @@ function bool_str($bool)
     return ((bool) $bool) ? 'true' : 'false';
 }
 
-function cp_resource_url($url)
-{
-    return resource_url('cp/' . $url);
-}
-
-function resource_url($url)
-{
-    log_todo();
-    return '/resources/' . $url;
-}
-
-function site_root()
-{
-    log_todo();
-    return '/';
-}
-
-function resources_root()
-{
-    log_todo();
-    return '_resources';
-}
-
 function cp_root()
 {
     return str_start(config('statamic.cp.route'), '/');
@@ -523,22 +483,6 @@ function current_class($pattern)
 {
     return is_current($pattern) ? 'current' : '';
 }
-
-function format_input_options($options)
-{
-    $formatted_options = [];
-
-    foreach ($options as $key => $text) {
-        if ($options === array_values($options)) {
-            $formatted_options[] = ['value' => $text, 'text' => $text];
-        } else {
-            $formatted_options[] = ['value' => $key, 'text' => $text];
-        }
-    }
-
-    return $formatted_options;
-}
-
 
 /**
  * @param array $value

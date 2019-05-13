@@ -1,13 +1,13 @@
 <template>
     <div class="select-input-container">
-        <select class="select-input" :name="name" @change="change" :value="value">
-            <option v-text="placeholder" value="" :selected="! value"></option>
+        <select class="select-input" :name="name" @change="change" :value="value" :disabled="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')">
+            <option v-if="placeholder" v-text="placeholder" value="" disabled :selected="! value"></option>
             <option
                 v-for="option in options"
                 :key="option.value"
                 v-text="option.text"
                 :value="option.value"
-                :selected="option.value == value"
+                :selected="isOptionSelected(option)"
             ></option>
         </select>
         <div class="select-input-toggle">
@@ -26,11 +26,19 @@ export default {
         options: { default: []},
         placeholder: {
             required: false,
-            default: 'Please select...'
+            default: 'Choose...'
         },
         value: { required: true },
+        isReadOnly: { type: Boolean }
     },
+
     methods: {
+        isOptionSelected(option) {
+            return this.placeholder === false && this.value === undefined
+                ? option.value == this.options[0].value
+                : option.value == this.value;
+        },
+
         change(event) {
             this.$emit('input', event.target.value)
         }

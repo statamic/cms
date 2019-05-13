@@ -13,7 +13,7 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class PagesTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -8,13 +8,14 @@ use Statamic\API\Parse;
 use Statamic\API\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
+use Statamic\Extend\HasContext;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters, RegistersItself;
+    use HasHandle, HasAliases, HasParameters, HasContext, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -48,7 +49,7 @@ abstract class Tags
      *
      * @var string
      */
-    public $tag_method;
+    public $method;
 
     /**
      * If is a tag pair
@@ -62,14 +63,21 @@ abstract class Tags
      */
     protected $trim = false;
 
+    /**
+     * The parser instance that executed this tag.
+     * @var \Statamic\View\Antlers\Parser
+     */
+    public $parser;
+
     public function setProperties($properties)
     {
+        $this->parser      = $properties['parser'];
         $this->content     = $properties['content'];
         $this->context     = $properties['context'];
         $this->parameters  = $this->setUpParameters($properties['parameters']);
         $this->isPair      = $this->content !== '';
         $this->tag         = array_get($properties, 'tag');
-        $this->tag_method  = array_get($properties, 'tag_method');
+        $this->method      = array_get($properties, 'tag_method');
     }
 
     /**
@@ -119,15 +127,17 @@ abstract class Tags
      * @param array $data     Data to be parsed into template
      * @return string
      */
-    protected function parse($data = [])
+    public function parse($data = [])
     {
         if ($this->trim) {
             $this->content = trim($this->content);
         }
 
-        $variables = array_merge($this->context, $this->addScope($data));
+        $variables = $this->addScope($data); // todo: get rid of scope, but its not under test yet.
 
-        return Antlers::parse($this->content, $variables);
+        return Antlers::usingParser($this->parser, function ($antlers) use ($variables) {
+            return $antlers->parse($this->content, $variables);
+        });
     }
 
     /**
@@ -137,13 +147,15 @@ abstract class Tags
      * @param bool                                $supplement  Whether to supplement with contextual values
      * @return string
      */
-    protected function parseLoop($data, $supplement = true)
+    public function parseLoop($data, $supplement = true)
     {
         if ($this->trim) {
             $this->content = trim($this->content);
         }
 
-        return Antlers::parseLoop($this->content, $this->addScope($data), $supplement, $this->context);
+        return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
+            return $antlers->parseLoop($this->content, $this->addScope($data), $supplement);
+        });
     }
 
     /**
@@ -152,7 +164,7 @@ abstract class Tags
      * @param array $data Extra data to merge
      * @return string
      */
-    protected function parseNoResults($data = [])
+    public function parseNoResults($data = [])
     {
         return $this->parse(array_merge($data, [
             'no_results' => true,

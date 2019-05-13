@@ -18,7 +18,7 @@ class GlideImageManipulatorTest extends TestCase
      */
     protected $builder;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -85,8 +85,8 @@ class GlideImageManipulatorTest extends TestCase
 
     public function testFocalCropUsesAssetValue()
     {
-        $asset = new Asset;
-        $asset->set('focus', '60-40');
+        $asset = $this->mock(Asset::class);
+        $asset->shouldReceive('get')->with('focus')->andReturn('60-40');
         $this->man->item($asset);
         $this->man->fit('crop_focal');
 
@@ -96,7 +96,8 @@ class GlideImageManipulatorTest extends TestCase
 
     public function testFocalCropJustUsesCropIfNoValueExists()
     {
-        $asset = new Asset;
+        $asset = $this->mock(Asset::class);
+        $asset->shouldReceive('get')->with('focus')->andReturnNull();
         $this->man->item($asset);
         $this->man->fit('crop_focal');
 

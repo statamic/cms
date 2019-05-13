@@ -2,7 +2,7 @@
 
     <div class="flex flex-col h-full">
 
-        <div class="flex items-center p-3 bg-grey-lightest border-b text-center">
+        <div class="flex items-center p-3 bg-grey-20 border-b text-center">
             <svg-icon class="h-6 w-6 mr-2 inline-block opacity-50" name="template"></svg-icon>
             <span>Import</span>
         </div>

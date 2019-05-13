@@ -1,8 +1,9 @@
 <template>
 
     <entry-publish-form
+        :is-creating="true"
         publish-container="base"
-        :initial-action="action"
+        :initial-actions="actions"
         method="post"
         :initial-title="__('Create')"
         :collection-title="collectionTitle"
@@ -10,6 +11,7 @@
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
+        :initial-published="published"
         :initial-localizations="localizations"
         @saved="saved"
     ></entry-publish-form>
@@ -20,19 +22,20 @@
 export default {
 
     props: [
-        'action',
+        'actions',
         'collectionTitle',
         'collectionUrl',
         'fieldset',
         'values',
         'meta',
+        'published',
         'localizations',
     ],
 
     methods: {
 
         saved(response) {
-            window.location = response.data.redirect;
+            window.location = response.data.redirect + '?created=true';
         }
 
     }

@@ -1,9 +1,10 @@
 <script>
-import _ from 'lodash';
-
 export default {
 
     props: {
+        reference: {
+            type: String
+        },
         name: {
             type: String,
             required: true
@@ -22,16 +23,27 @@ export default {
         },
         errors: {
             type: Object
+        },
+        site: {
+            type: String
+        }
+    },
+
+    data() {
+        return {
+            components: [], // extra components to be injected
         }
     },
 
     created() {
         this.registerVuexModule();
+        this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
         this.removeVuexModule();
         this.removeNavigationWarning();
+        this.$events.$emit('publish-container-destroyed', this);
     },
 
     provide() {
@@ -49,6 +61,7 @@ export default {
                 fieldset: _.clone(this.fieldset),
                 values: _.clone(this.values),
                 meta: _.clone(this.meta),
+                site: this.site,
             };
 
             // If the store already exists, just reinitialize the state.
@@ -64,7 +77,9 @@ export default {
                     fieldset: initial.fieldset,
                     values: initial.values,
                     meta: initial.meta,
-                    errors: {}
+                    site: initial.site,
+                    fieldLocks: {},
+                    errors: {},
                 },
                 mutations: {
                     setValue(state, payload) {
@@ -80,10 +95,20 @@ export default {
                     setErrors(state, errors) {
                         state.errors = errors;
                     },
+                    setSite(state, site) {
+                        state.site = site;
+                    },
+                    lockField(state, { handle, user }) {
+                        Vue.set(state.fieldLocks, handle, user || true);
+                    },
+                    unlockField(state, handle) {
+                        Vue.delete(state.fieldLocks, handle);
+                    },
                     initialize(state, payload) {
                         state.fieldset = payload.fieldset;
                         state.values = payload.values;
                         state.meta = payload.meta;
+                        state.site = payload.site;
                     }
                 },
                 actions: {
@@ -114,6 +139,17 @@ export default {
 
         removeNavigationWarning() {
             this.$dirty.remove(this.name);
+        },
+
+        pushComponent(component) {
+            this.components.push(component);
+        },
+
+        setValue(handle, value) {
+            this.$store.dispatch(`publish/${this.name}/setValue`, {
+                handle, value,
+                user: Statamic.user.id
+            });
         }
 
     },
@@ -135,6 +171,10 @@ export default {
             }
         },
 
+        site(site) {
+            this.$store.commit(`publish/${this.name}/setSite`, site);
+        },
+
         errors(errors) {
             this.$store.commit(`publish/${this.name}/setErrors`, errors);
         }
@@ -143,7 +183,10 @@ export default {
 
     render() {
         return this.$scopedSlots.default({
-            values: this.$store.state.publish[this.name].values
+            values: this.$store.state.publish[this.name].values,
+            container: this._self,
+            components: this.components,
+            setValue: this.setValue,
         });
     }
 

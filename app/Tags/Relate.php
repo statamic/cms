@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use Statamic\API\Str;
 use Statamic\API\Data;
-use Statamic\API\User;
 use Statamic\API\Helper;
 use Statamic\API\Content;
 use Statamic\API\Pattern;

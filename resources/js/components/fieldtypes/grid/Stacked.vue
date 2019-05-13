@@ -5,6 +5,8 @@
         :vertical="true"
         :item-class="sortableItemClass"
         :handle-class="sortableHandleClass"
+        @dragstart="$emit('focus')"
+        @dragend="$emit('blur')"
     >
         <div class="grid-stacked" slot-scope="{}">
             <stacked-row
@@ -13,9 +15,12 @@
                 :index="index"
                 :fields="fields"
                 :values="row"
+                :meta="meta"
                 :name="name"
                 @updated="(row, value) => $emit('updated', row, value)"
                 @removed="(row) => $emit('removed', row)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             />
         </div>
     </sortable-list>

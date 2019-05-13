@@ -1,6 +1,4 @@
 <script>
-import axios from 'axios';
-import Fieldset from '../publish/Fieldset';
 import ChangePassword from './ChangePassword.vue';
 
 export default {
@@ -12,14 +10,17 @@ export default {
     props: {
         initialFieldset: Object,
         initialValues: Object,
+        initialMeta: Object,
+        initialReference: String,
         action: String,
         method: String
     },
 
     data() {
         return {
-            fieldset: null,
+            fieldset: _.clone(this.initialFieldset),
             values: _.clone(this.initialValues),
+            meta: _.clone(this.initialMeta),
             error: null,
             errors: {}
         }
@@ -33,10 +34,6 @@ export default {
 
     },
 
-    created() {
-        this.fieldset = new Fieldset(this.initialFieldset).getFieldset();
-    },
-
     methods: {
 
         clearErrors() {
@@ -47,7 +44,7 @@ export default {
         save() {
             this.clearErrors();
 
-            axios[this.method](this.action, this.values).then(response => {
+            this.$axios[this.method](this.action, this.values).then(response => {
                 this.$notify.success('Saved');
                 const redirect = response.data.redirect;
                 if (redirect) window.location = redirect;
@@ -56,13 +53,20 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message, { timeout: 2000 });
+                    this.$notify.error(message);
                 } else {
                     this.$notify.error('Something went wrong');
                 }
             });
         }
 
+    },
+
+    mounted() {
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     }
 
 }

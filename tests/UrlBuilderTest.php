@@ -7,6 +7,8 @@ use Statamic\Stache\Stache;
 
 class UrlBuilderTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /**
      * @var \Statamic\Contracts\Data\Content\UrlBuilder
      */
@@ -17,14 +19,14 @@ class UrlBuilderTest extends TestCase
      */
     protected $entry;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->entry = \Statamic\API\Entry::make()
             ->id('post')
             ->collection(
-                \Statamic\API\Collection::create('example')->order('date')
+                \Statamic\API\Collection::create('example')->dated(true)
             );
 
         $this->entry->in('en', function ($loc) {

@@ -12,7 +12,7 @@ use Statamic\Fields\FieldsetRepository;
 
 class FieldsetRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -22,7 +22,7 @@ class FieldsetRepositoryTest extends TestCase
         $this->repo = app(FieldsetRepository::class)->setDirectory($this->tempDir);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         (new Filesystem)->deleteDirectory($this->tempDir);
 

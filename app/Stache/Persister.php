@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Stores\AggregateStore;
 
 class Persister
@@ -15,6 +16,8 @@ class Persister
 
     public function persist()
     {
+        $stores = $this->stores();
+
         // TODO: Locking
         // In v2, we split this persistence method into two steps.
         // 1. Compile the arrays that'll be saved to the cache.
@@ -22,19 +25,25 @@ class Persister
         // We lock the second (cache) step, but keep the first one unlocked (which is
         // doing all the work) so other requests aren't delayed. Right now, both the
         // steps are combined within `$store->cache()`. We need to split that out.
-        $this->updatedStores()->each(function ($store) {
+        $stores->filter->isUpdated()->each(function ($store) {
             $store->load()->cache();
+        });
+
+        $stores->filter->isExpired()->each->uncache();
+
+        $this->stache->queuedTimestampCaches()->each(function ($timestamps, $key) {
+            Cache::forever($key, $timestamps);
         });
 
         $this->stache->stopTimer();
     }
 
-    protected function updatedStores()
+    protected function stores()
     {
         return $this->stache->stores()->flatMap(function ($store) {
             // We are interested in updating individual stores. eg. If a "blog" collection entry was
             // updated, we only want to update the "blog" store, and not the whole "entries" store.
             return ($store instanceof AggregateStore) ? $store->stores() : [$store];
-        })->filter->isUpdated();
+        });
     }
 }

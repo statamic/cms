@@ -5,9 +5,9 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Email;
+use Statamic\API\Scope;
 use Statamic\API\Action;
 use Statamic\API\Config;
-use Statamic\API\Filter;
 use Statamic\API\Helper;
 use Statamic\API\Fieldset;
 use Statamic\API\Blueprint;
@@ -36,8 +36,10 @@ class UsersController extends CpController
         }
 
         return view('statamic::users.index', [
-            'filters' => Filter::for('users'),
-            'actions' => Action::for('users'),
+            'filters' => Scope::filters('users', $context = [
+                'blueprints' => ['user'],
+            ]),
+            'actions' => Action::for('users', $context),
         ]);
     }
 
@@ -51,13 +53,16 @@ class UsersController extends CpController
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'));
-
-        $users->setCollection($users->getCollection()->supplement(function ($user) use ($request) {
-            return ['deleteable' => $request->user()->can('delete', $user)];
-        }));
+            ->paginate(request('perPage'))
+            ->supplement(function ($user) use ($request) {
+                return [
+                    'edit_url' => $user->editUrl(),
+                    'deleteable' => $request->user()->can('delete', $user)
+                ];
+            });
 
         return Resource::collection($users)->additional(['meta' => [
+            'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
                 ['label' => __('Name'), 'field' => 'name'],
@@ -68,10 +73,10 @@ class UsersController extends CpController
 
     protected function filter($query, $filters)
     {
-        foreach ($filters as $handle => $value) {
-            $class = app('statamic.filters')->get($handle);
+        foreach ($filters as $handle => $values) {
+            $class = app('statamic.scopes')->get($handle);
             $filter = app($class);
-            $filter->apply($query, $value);
+            $filter->apply($query, $values);
         }
     }
 
@@ -86,9 +91,12 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
+        $fields = $blueprint->fields()->preProcess();
+
         return view('statamic::users.create', [
             'blueprint' => $blueprint,
-            'values' => $blueprint->fields()->values()
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
         ]);
     }
 
@@ -125,20 +133,15 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $values = $user->blueprint()
+        $fields = $user->blueprint()
             ->fields()
-            ->addValues($user->data())
-            ->preProcess()
-            ->values();
-
-        $values['email'] = $user->email();
-        $values['roles'] = $user->roles()->map->id()->values()->all();
-        $values['groups'] = $user->groups()->map->id()->values()->all();
-        $values['status'] = $user->status();
+            ->addValues(array_merge($user->data(), ['email' => $user->email()]))
+            ->preProcess();
 
         return view('statamic::users.edit', [
             'user' => $user,
-            'values' => $values
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
         ]);
     }
 

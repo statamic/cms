@@ -4,12 +4,16 @@
 
         <publish-field
             v-for="field in fields"
+            v-show="showField(field)"
             :key="field.handle"
             :config="field"
             :value="values[field.handle]"
             :meta="meta[field.handle]"
             :errors="errors[field.handle]"
-            @updated="updated"
+            :read-only="readOnly"
+            @updated="$emit('updated', field.handle, $event)"
+            @focus="$emit('focus', field.handle)"
+            @blur="$emit('blur', field.handle)"
         />
 
     </div>
@@ -18,10 +22,13 @@
 
 <script>
 import PublishField from './Field.vue';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
 
     components: { PublishField },
+
+    mixins: [ValidatesFieldConditions],
 
     inject: ['storeName'],
 
@@ -29,7 +36,8 @@ export default {
         fields: {
             type: Array,
             required: true
-        }
+        },
+        readOnly: Boolean,
     },
 
     computed: {
@@ -48,14 +56,6 @@ export default {
 
         errors() {
             return this.state.errors;
-        }
-
-    },
-
-    methods: {
-
-        updated(handle, value) {
-            this.$store.dispatch(`publish/${this.storeName}/setValue`, { handle, value });
         }
 
     }

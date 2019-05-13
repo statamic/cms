@@ -22,7 +22,7 @@
         </template>
 
         <template slot="footer">
-            <button class="btn btn-primary" :disabled="!hasChanged" @click="save">Save</button>
+            <button class="btn btn-primary" :disabled="!hasChanged" @click="save">{{ __('Save') }}</button>
             <button type="button" class="btn" @click="cancel">{{ __('Cancel') }}</button>
         </template>
     </modal>

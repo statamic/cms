@@ -33,4 +33,19 @@ class ColumnTest extends TestCase
         $this->assertEquals('Ripped', $json->label);
         $this->assertFalse($json->visible);
     }
+
+    /** @test */
+    function it_can_set_a_value_field()
+    {
+        $column = Column::make()->field('date');
+
+        $json = json_decode(json_encode($column));
+        $this->assertEquals('date', $json->field);
+        $this->assertNull($json->value);
+
+        $column->value('date_formatted');
+        $json = json_decode(json_encode($column));
+        $this->assertEquals('date', $json->field);
+        $this->assertEquals('date_formatted', $json->value);
+    }
 }

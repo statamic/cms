@@ -41,7 +41,7 @@
             <form-group
                 handle="blueprint"
                 fieldtype="blueprints"
-                :config="{ max_items: 1 }"
+                :config="{ component: 'relationship', max_items: 1 }"
                 :display="__('Blueprint')"
                 :instructions="__('global_set_blueprint_instructions')"
                 v-model="blueprint"
@@ -55,8 +55,6 @@
 
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: {
@@ -97,7 +95,7 @@ export default {
             this.saving = true;
             this.clearErrors();
 
-            axios.post(this.action, this.values).then(response => {
+            this.$axios.post(this.action, this.values).then(response => {
                 this.saving = false;
                 window.location = response.data.redirect;
             }).catch(e => {
@@ -106,7 +104,7 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message, { timeout: 2000 });
+                    this.$notify.error(message);
                 } else {
                     this.$notify.error('Something went wrong');
                 }

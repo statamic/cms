@@ -36,6 +36,11 @@ class Search
         return $this->index($index)->exists();
     }
 
+    public function extend($driver, $callback)
+    {
+        app(IndexManager::class)->extend($driver, $callback);
+    }
+
     public function __call($method, $parameters)
     {
         return $this->index()->$method(...$parameters);

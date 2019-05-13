@@ -16,7 +16,7 @@ class UpdaterTest extends TestCase
 {
     protected $shouldFakeVersion = false;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

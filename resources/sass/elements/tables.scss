@@ -18,7 +18,7 @@
     @apply w-full text-left text-grey;
 
     thead {
-        @apply bg-grey-lightest text-grey-darker uppercase text-2xs tracking-wide;
+        @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
 
         th {
             @apply font-medium px-2 py-1.5;
@@ -31,7 +31,7 @@
             @apply border-t text-sm;
 
             &:hover {
-                @apply bg-grey-lightest;
+                @apply bg-grey-10;
             }
 
             td:first-child { @apply .rounded-bl; }
@@ -51,7 +51,7 @@
         @apply cursor-pointer select-none;
 
         &:hover {
-            @apply bg-grey-lighter;
+            @apply bg-grey-30;
         }
 
         &.current-column {
@@ -75,6 +75,13 @@
     thead th {
         border-radius: 0;
     }
+}
+
+td.table-drag-handle {
+	@apply w-3 border-r h-full p-1;
+	cursor: grab;
+	background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+	&:hover { @apply .bg-grey-30; }
 }
 
 table.table-legacy {
@@ -201,16 +208,6 @@ table.table-legacy {
 	}
 }
 
-.table-field {
-	th {
-		padding: 5px;
-	}
-	.column-count {
-		display: inline-block;
-		padding: 2px 0 0 0;
-	}
-}
-
 .column-sortable {
 	cursor: pointer;
 	position: relative;
@@ -254,18 +251,6 @@ table.table-legacy {
 
 table.control {
     @apply select-none;
-}
-
-.table-fieldtype table {
-    .form-control,
-    textarea,
-    input {
-        background-color: #fff;
-        box-shadow: none;
-        padding: 10px;
-        height: auto;
-        &:hover { background-color: #fafafa; }
-    }
 }
 
 .flush table.control {

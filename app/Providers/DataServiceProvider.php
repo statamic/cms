@@ -54,6 +54,16 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Assets\AssetContainer::class
         );
 
+        $this->app->bind(
+            \Statamic\Contracts\Assets\Asset::class,
+            \Statamic\Assets\Asset::class
+        );
+
+        $this->app->bind(
+            \Statamic\Contracts\Assets\QueryBuilder::class,
+            \Statamic\Assets\QueryBuilder::class
+        );
+
         $this->app->singleton(
             \Statamic\CP\Navigation\Nav::class,
             \Statamic\CP\Navigation\Nav::class

@@ -5,15 +5,17 @@ namespace Statamic\Data\Globals;
 use Statamic\API\Site;
 use Statamic\API\Stache;
 use Statamic\API\GlobalSet;
+use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\Localization;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Localization as LocalizationContract;
 use Statamic\Contracts\Data\Globals\LocalizedGlobalSet as Contract;
 
-class LocalizedGlobalSet implements Contract, LocalizationContract
+class LocalizedGlobalSet implements Contract, LocalizationContract, AugmentableContract
 {
-    use Localization, ExistsAsFile, ContainsData;
+    use Localization, ExistsAsFile, ContainsData, Augmentable;
 
     public function handle()
     {
@@ -88,6 +90,11 @@ class LocalizedGlobalSet implements Contract, LocalizationContract
     }
 
     protected function fileData()
+    {
+        return $this->data();
+    }
+
+    protected function augmentedArrayData()
     {
         return $this->data();
     }

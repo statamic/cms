@@ -1,10 +1,22 @@
 <template>
-    <div>
-        <input type="text" v-model="data" class="form-control" />
+    <div class="video-fieldtype-container">
+        <div class="flex items-center">
+            <div class="input-group">
+                <div class="input-group-prepend">{{ __('URL') }}</div>
+                <input type="text"
+                    v-model="data"
+                    class="input-text flex-1"
+                    :class="{ 'bg-white': !isReadOnly }"
+                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    :readonly="isReadOnly"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')" />
+            </div>
+        </div>
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
             <div class="video-preview">
-                <iframe v-if="isEmbeddable" width="560" height="315" :src="embed" frameborder="0" allowfullscreen></iframe>
+                <iframe v-if="isEmbeddable" width="560" height="315" :src="embed" frameborder="0"></iframe>
                 <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
             </div>
         </div>
@@ -12,6 +24,7 @@
 </template>
 
 <script>
+
 export default {
     mixins: [Fieldtype],
 
@@ -25,6 +38,10 @@ export default {
 
         data(value) {
             this.update(value);
+        },
+
+        value(value) {
+            this.data = value;
         }
 
     },
@@ -47,7 +64,13 @@ export default {
         },
 
         isEmbeddable() {
-            return this.data.includes('youtube') || this.data.includes('vimeo') || this.data.includes('youtu.be');
+            return this.isUrl && this.data.includes('youtube') || this.data.includes('vimeo') || this.data.includes('youtu.be');
+        },
+
+        isUrl() {
+            let regex = new RegExp('^(https?|ftp)://[^\s/$.?#].[^\s]*$', 'i')
+
+            return regex.test(this.data);
         },
 
         isVideo() {
@@ -61,31 +84,3 @@ export default {
     },
 };
 </script>
-
-<style>
-    .video-fieldtype .video-preview-wrapper {
-        padding: 16px;
-        background: #f6f9fc;
-		border-top: 1px solid #e0e0e0;
-		border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
-    }
-    .video-fieldtype .video-preview {
-        position: relative;
-        padding: 25px 0 56.25%;
-        height: 0;
-    }
-
-    .video-fieldtype .video-preview iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-
-    .video-fieldtype .video-preview video {
-        width: 100% !important;
-        height: auto !important;
-    }
-</style>

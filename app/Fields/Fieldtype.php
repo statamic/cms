@@ -45,6 +45,16 @@ abstract class Fieldtype implements Arrayable
         return Str::removeRight(static::traitHandle(), '_fieldtype');
     }
 
+    public function component(): string
+    {
+        return $this->component ?? static::handle();
+    }
+
+    public function indexComponent(): string
+    {
+        return $this->indexComponent ?? static::handle();
+    }
+
     public function localizable(): bool
     {
         return $this->localizable;
@@ -111,7 +121,7 @@ abstract class Fieldtype implements Arrayable
             return compact('handle', 'field');
         });
 
-        return new Fields($fields);
+        return new ConfigFields($fields);
     }
 
     protected function configFieldItems(): array
@@ -134,6 +144,11 @@ abstract class Fieldtype implements Arrayable
         return $data;
     }
 
+    public function preProcessConfig($data)
+    {
+        return $this->preProcess($data);
+    }
+
     public function preProcessIndex($data)
     {
         return $data;
@@ -141,6 +156,10 @@ abstract class Fieldtype implements Arrayable
 
     public function config(string $key = null, $fallback = null)
     {
+        if (!$this->field) {
+            return $fallback;
+        }
+
         return $key
             ? $this->field->get($key, $fallback)
             : $this->field->config();
@@ -149,5 +168,10 @@ abstract class Fieldtype implements Arrayable
     public function preload()
     {
         //
+    }
+
+    public static function preloadable()
+    {
+        return static::$preloadable ?? (new \ReflectionClass(static::class))->getMethod('preload')->class === static::class;
     }
 }

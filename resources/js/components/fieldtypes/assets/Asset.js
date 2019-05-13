@@ -36,7 +36,7 @@ export default {
         },
 
         label() {
-            return this.asset.title || this.asset.basename;
+            return this.asset.basename;
         }
     },
 

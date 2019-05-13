@@ -7,4 +7,5 @@ use Statamic\Fields\Fieldtype;
 
 class TableFieldtype extends Fieldtype
 {
+    //
 }

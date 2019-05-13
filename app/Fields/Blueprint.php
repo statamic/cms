@@ -12,6 +12,7 @@ class Blueprint
 {
     protected $handle;
     protected $contents = [];
+    protected $extraFields = [];
 
     public function setHandle(string $handle)
     {
@@ -46,10 +47,19 @@ class Blueprint
     public function sections(): Collection
     {
         $sections = array_get($this->contents, 'sections', []);
+        $extra = $this->extraFields ?? [];
 
-        return collect($sections)->map(function ($contents, $handle) {
-            return (new Section($handle))->setContents($contents);
+        $sections = collect($sections)->map(function ($contents, $handle) use (&$extra) {
+            return (new Section($handle))
+                ->setContents($contents)
+                ->extraFields(array_pull($extra, $handle) ?? []);
         });
+
+        foreach ($extra as $section => $fields) {
+            $sections->put($section, (new Section($section))->extraFields($fields));
+        }
+
+        return $sections;
     }
 
     public function fields(): Fields
@@ -74,9 +84,11 @@ class Blueprint
         return new Columns($this->fields()->all()->map(function ($field) {
             return Column::make()
                 ->field($field->handle())
-                ->fieldtype($field->fieldtype()->handle())
+                ->fieldtype($field->fieldtype()->indexComponent())
                 ->label(__($field->display()))
-                ->visible($field->isListable());
+                ->visibleDefault($field->isListable())
+                ->visible($field->isListable())
+                ->sortable($field->isSortable());
         }));
     }
 
@@ -109,5 +121,26 @@ class Blueprint
         BlueprintRepository::save($this);
 
         return $this;
+    }
+
+    public function ensureField($handle, $field, $section = null, $prepend = false)
+    {
+        if ($this->hasField($handle)) {
+            return $this;
+        }
+
+        // If a section hasn't been provided we'll just use the first section.
+        if (! $section) {
+            $section = array_keys($this->contents['sections'] ?? [])[0] ?? 'main';
+        }
+
+        $this->extraFields[$section][$handle] = compact('prepend', 'field');
+
+        return $this;
+    }
+
+    public function ensureFieldPrepended($handle, $field, $section = null)
+    {
+        return $this->ensureField($handle, $field, $section, true);
     }
 }

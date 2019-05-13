@@ -2,10 +2,12 @@
 
 namespace Tests\Data\Entries;
 
+use Statamic\API;
 use Tests\TestCase;
 use Statamic\API\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Data\Entries\Entry;
+use Illuminate\Support\Facades\Event;
 use Statamic\Data\Entries\Collection;
 use Statamic\Data\Entries\LocalizedEntry;
 use Facades\Statamic\Fields\BlueprintRepository;
@@ -37,6 +39,7 @@ class EntryTest extends TestCase
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('123', $entry->id());
+        // $this->assertEquals('entry::123', $entry->reference()); // TODO, implementation works but test needs to be adjusted
     }
 
     /** @test */
@@ -180,15 +183,14 @@ class EntryTest extends TestCase
         ]]);
 
         $entry = (new Entry)
-            ->addLocalization((new LocalizedEntry)->locale('en')->slug('test')->order('123')->data(['foo' => 'bar', 'enOnly' => 'yup']))
-            ->addLocalization((new LocalizedEntry)->locale('fr')->slug('le-test')->order('456')->data(['foo' => 'le bar', 'frOnly' => 'yup']));
+            ->addLocalization((new LocalizedEntry)->locale('en')->slug('test')->data(['foo' => 'bar', 'enOnly' => 'yup']))
+            ->addLocalization((new LocalizedEntry)->locale('fr')->slug('le-test')->data(['foo' => 'le bar', 'frOnly' => 'yup']));
 
         Site::setCurrent('en');
         $this->assertEquals('test', $entry->slug());
         $this->assertEquals('bar', $entry->get('foo'));
         $this->assertTrue($entry->has('enOnly'));
         $this->assertFalse($entry->has('frOnly'));
-        $this->assertEquals('123', $entry->order());
         $this->assertTrue($entry->published());
         $this->assertEquals(['foo' => 'bar', 'enOnly' => 'yup'], $entry->data());
 
@@ -197,7 +199,6 @@ class EntryTest extends TestCase
         $this->assertEquals('le bar', $entry->get('foo'));
         $this->assertFalse($entry->has('enOnly'));
         $this->assertTrue($entry->has('frOnly'));
-        $this->assertEquals('456', $entry->order());
         $this->assertTrue($entry->published());
         $this->assertEquals(['foo' => 'le bar', 'frOnly' => 'yup'], $entry->data());
     }
@@ -207,7 +208,9 @@ class EntryTest extends TestCase
     {
         $blueprint = new Blueprint;
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
-        $entry = (new Entry)->addLocalization((new LocalizedEntry)->locale('en')->set('blueprint', 'test'));
+        $entry = (new Entry)
+            ->collection(new Collection)
+            ->addLocalization((new LocalizedEntry)->locale('en')->set('blueprint', 'test'));
 
         $this->assertEquals($blueprint, $entry->blueprint());
     }
@@ -221,5 +224,17 @@ class EntryTest extends TestCase
         $entry = (new Entry)->collection($collection)->addLocalization((new LocalizedEntry)->locale('en'));
 
         $this->assertEquals($blueprint, $entry->blueprint());
+    }
+
+    /** @test */
+    function it_deletes_through_the_api()
+    {
+        Event::fake();
+        $entry = new Entry;
+        API\Entry::shouldReceive('deleteLocalizable')->with($entry);
+
+        $return = $entry->delete();
+
+        $this->assertTrue($return);
     }
 }

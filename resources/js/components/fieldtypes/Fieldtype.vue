@@ -16,15 +16,23 @@ export default {
         meta: {
             type: Object,
             default: () => { return {}; }
-        }
+        },
+        readOnly: {
+            type: Boolean,
+            default: false
+        },
     },
 
     methods: {
-
         update(value) {
             this.$emit('updated', value);
         }
+    },
 
+    computed: {
+        isReadOnly() {
+            return this.readOnly || this.config.read_only || false;
+        }
     }
 
 }

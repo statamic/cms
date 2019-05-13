@@ -3,7 +3,8 @@
 namespace Statamic\Preferences;
 
 use Closure;
-use Illuminate\Support\Arr;
+use Statamic\API\Arr;
+use Statamic\API\Str;
 
 trait HasPreferences
 {
@@ -57,11 +58,40 @@ trait HasPreferences
      * Remove preference (dot notation in key supported).
      *
      * @param string $key
+     * @param null|mixed $value
+     * @param bool $cleanup
      * @return $this
      */
-    public function removePreference($key)
+    public function removePreference($key, $value = null, $cleanup = true)
     {
-        Arr::pull($this->preferences, $key);
+        if (is_null($value)) {
+            Arr::pull($this->preferences, $key);
+        } else {
+            $this->removePreferenceValue($key, $value);
+        }
+
+        if ($cleanup) {
+            $this->cleanupPreference($key);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a specific array value from a preference.
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    protected function removePreferenceValue($key, $value)
+    {
+        $values = collect($this->getPreference($key));
+
+        $removableKey = $values->search($value);
+
+        if ($removableKey !== false) {
+            $this->setPreference($key, $values->forget($removableKey)->values()->all());
+        }
 
         return $this;
     }
@@ -85,7 +115,7 @@ trait HasPreferences
      */
     public function hasPreference($key)
     {
-        return (bool) $this->getPreference($key);
+        return Arr::has($this->preferences, $key);
     }
 
     /**
@@ -135,5 +165,28 @@ trait HasPreferences
 
             return $array;
         });
+    }
+
+    /**
+     * Cleanup preference and it's parents to avoid leaving empty array/object data in yaml.
+     *
+     * @param string $key
+     * @return $this
+     */
+    public function cleanupPreference($key)
+    {
+        $preference = $this->getPreference($key);
+
+        if (is_int($preference) || is_bool($preference) || $preference) {
+            return $this;
+        }
+
+        if ($this->hasPreference($key)) {
+            $this->removePreference($key);
+        }
+
+        return Str::contains($key, '.')
+            ? $this->cleanupPreference(preg_replace('/\.[^.]+$/', '', $key))
+            : $this;
     }
 }

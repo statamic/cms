@@ -107,6 +107,13 @@ class Fields
         return $this;
     }
 
+    public function augment()
+    {
+        $this->fields->each->augment();
+
+        return $this;
+    }
+
     public function createFields(array $config): array
     {
         if (isset($config['import'])) {
@@ -124,7 +131,12 @@ class Fields
         }
 
         // Otherwise, the field has been configured inline.
-        return new Field($config['handle'], $config['field']);
+        return $this->newField($config['handle'], $config['field']);
+    }
+
+    protected function newField($handle, $config)
+    {
+        return new Field($handle, $config);
     }
 
     private function getReferencedField(array $config): Field

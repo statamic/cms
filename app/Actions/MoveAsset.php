@@ -24,7 +24,7 @@ class MoveAsset extends Action
         $options = AssetContainer::find($this->context['container'])
             ->assetFolders()
             ->mapWithKeys(function ($folder) {
-                return [$folder->path() => $folder->title()];
+                return [$folder->path() => $folder->path()];
             })
             ->prepend('/', '/')
             ->all();

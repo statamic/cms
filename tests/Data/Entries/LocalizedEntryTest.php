@@ -4,6 +4,8 @@ namespace Tests\Data\Entries;
 
 use Statamic\API;
 use Tests\TestCase;
+use Statamic\API\File;
+use Statamic\API\User;
 use Statamic\Sites\Site;
 use Illuminate\Support\Carbon;
 use Statamic\Fields\Blueprint;
@@ -129,6 +131,7 @@ class LocalizedEntryTest extends TestCase
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('123', $entry->id());
+        $this->assertEquals('entry::123', $entry->reference());
     }
 
     /** @test */
@@ -158,13 +161,15 @@ class LocalizedEntryTest extends TestCase
     /** @test */
     function it_gets_the_url_from_the_collection()
     {
+        config(['statamic.amp.enabled' => true]);
+
         API\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
         ]]);
 
-        $collection = (new Collection)->route([
+        $collection = (new Collection)->ampable(true)->route([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
@@ -177,14 +182,17 @@ class LocalizedEntryTest extends TestCase
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
+        $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->url());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
+        $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
         $this->assertEquals('/das-blog/das-foo', $entryDe->url());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
+        $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
     }
 
     /** @test */
@@ -203,10 +211,18 @@ class LocalizedEntryTest extends TestCase
     /** @test */
     function it_converts_to_array()
     {
+        $user = tap(User::make()->id('user-1'))->save();
+
         $entry = (new LocalizedEntry)
             ->locale('en')
+            ->slug('test')
             ->entry((new Entry)->collection(new Collection))
-            ->data(['foo' => 'bar', 'bar' => 'baz'])
+            ->data([
+                'foo' => 'bar',
+                'bar' => 'baz',
+                'updated_at' => $lastModified = now()->subDays(1)->timestamp,
+                'updated_by' => $user->id(),
+            ])
             ->setSupplement('baz', 'qux')
             ->setSupplement('foo', 'overridden');
 
@@ -214,6 +230,9 @@ class LocalizedEntryTest extends TestCase
             'foo' => 'overridden',
             'bar' => 'baz',
             'baz' => 'qux',
+            'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
+            'updated_at' => $carbon,
+            'updated_by' => $user->toArray(),
         ], $entry->toArray());
     }
 
@@ -241,8 +260,7 @@ class LocalizedEntryTest extends TestCase
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/blog/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/2018-01-02.post.md', $entry->order('2018-01-02')->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/2.post.md', $entry->order('2')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
@@ -258,43 +276,135 @@ class LocalizedEntryTest extends TestCase
         $entry = (new LocalizedEntry)->entry($parent)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/blog/en/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2018-01-02.post.md', $entry->order('2018-01-02')->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2.post.md', $entry->order('2')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
+    }
+
+    /** @test */
+    function it_gets_and_sets_the_date()
+    {
+        $entry = new Localizedentry;
+        $this->assertNull($entry->date());
+
+        // Date can be provided as string without time
+        $return = $entry->date('2015-03-05');
+        $this->assertEquals($entry, $return);
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 00:00')->eq($entry->date()));
+
+        // Date can be provided as string with time
+        $entry->date('2015-03-05-1325');
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 13:25')->eq($entry->date()));
+
+        // Date can be provided as carbon instance
+        $carbon = Carbon::createFromFormat('Y-m-d H:i', '2018-05-02 17:32');
+        $entry->date($carbon);
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue($carbon->eq($entry->date()));
     }
 
     /** @test */
     function it_gets_and_sets_the_order()
     {
-        $entry = new LocalizedEntry;
-        $this->assertNull($entry->order());
+        $collection = new Collection;
+        $one = (new Entry)->id('one')->collection($collection)->in('en', function ($loc) {});
+        $this->assertNull($one->order());
 
-        $return = $entry->order('123');
+        $return = $one->order(5);
+        $this->assertEquals($one, $return);
+        $this->assertEquals(1, $one->order());
 
-        $this->assertEquals($entry, $return);
-        $this->assertEquals('123', $entry->order());
+        $two = (new Entry)->id('two')->collection($collection)->in('en', function ($loc) {});
+        $two->order(10);
+        $this->assertEquals(1, $one->order());
+        $this->assertEquals(2, $two->order());
+
+        $three = (new Entry)->id('three')->collection($collection)->in('en', function ($loc) {});
+        $three->order(2);
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(3, $two->order());
+        $this->assertEquals(1, $three->order());
+    }
+
+    /** @test */
+    function it_sets_the_order_on_the_collection_when_dealing_with_numeric_collections()
+    {
+        $collection = (new Collection)->orderable(true);
+
+        $one = (new Entry)->id('one')->collection($collection)->in('en', function ($loc) {
+            //
+        });
+
+        $two = (new Entry)->id('two')->collection($collection)->in('en', function ($loc) {
+            //
+        });
+
+        $one->order('3');
+        $two->order('2');
+
+        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions());
+        $this->assertEquals(['two', 'one'], $collection->getEntryOrder());
+
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(1, $two->order());
     }
 
     /** @test */
     function it_gets_and_sets_the_date_for_date_collections()
     {
         $dateEntry = with('', function() {
-            $collection = (new Collection)->order('date');
+            $collection = (new Collection)->dated(true);
             $parent = (new Entry)->collection($collection);
             return (new LocalizedEntry)->entry($parent);
         });
         $numberEntry = with('', function() {
-            $collection = (new Collection)->order('number');
+            $collection = (new Collection)->orderable(true);
             $parent = (new Entry)->collection($collection);
             return (new LocalizedEntry)->entry($parent);
         });
         $this->assertNull($dateEntry->order());
         $this->assertNull($numberEntry->order());
 
-        $dateEntry->order('2017-01-02');
+        $dateEntry->date('2017-01-02');
         $numberEntry->order('2017-01-02');
 
-        $this->assertEquals(Carbon::parse('2017-01-02'), $dateEntry->date());
+        $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertFalse($dateEntry->hasTime());
         $this->assertNull($numberEntry->date());
+
+        $dateEntry->date('2017-01-02-1523');
+        $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertTrue($dateEntry->hasTime());
+    }
+
+    /** @test */
+    function future_dated_entries_are_private_when_configured_in_the_collection()
+    {
+        Carbon::setTestNow('2019-01-01');
+        $collection = (new Collection)->dated(true)->futureDateBehavior('private');
+        $entry = (new LocalizedEntry)
+            ->entry((new Entry)->collection($collection));
+
+        $entry->date('2018-01-01');
+        $this->assertFalse($entry->private());
+
+        $entry->date('2019-01-02');
+        $this->assertTrue($entry->private());
+    }
+
+    /** @test */
+    function past_dated_entries_are_private_when_configured_in_the_collection()
+    {
+        Carbon::setTestNow('2019-01-01');
+        $collection = (new Collection)->dated(true)->pastDateBehavior('private');
+        $entry = (new LocalizedEntry)
+            ->entry((new Entry)->collection($collection));
+
+        $entry->date('2019-01-02');
+        $this->assertFalse($entry->private());
+
+        $entry->date('2018-01-02');
+        $this->assertTrue($entry->private());
     }
 
     /** @test */
@@ -310,33 +420,13 @@ class LocalizedEntryTest extends TestCase
     }
 
     /** @test */
-    function it_can_be_published()
-    {
-        $entry = (new LocalizedEntry)->published(false);
-
-        $return = $entry->publish();
-
-        $this->assertEquals($entry, $return);
-        $this->assertTrue($entry->published());
-    }
-
-    /** @test */
-    function it_can_be_unpublished()
-    {
-        $entry = (new LocalizedEntry)->published(true);
-
-        $return = $entry->unpublish();
-
-        $this->assertEquals($entry, $return);
-        $this->assertFalse($entry->published());
-    }
-
-    /** @test */
     function it_gets_the_blueprint_based_on_the_data()
     {
         $blueprint = new Blueprint;
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
-        $entry = (new LocalizedEntry)->set('blueprint', 'test');
+        $entry = (new LocalizedEntry)
+            ->entry((new Entry)->collection(new Collection))
+            ->set('blueprint', 'test');
 
         $this->assertEquals($blueprint, $entry->blueprint());
     }
@@ -403,7 +493,7 @@ class LocalizedEntryTest extends TestCase
         $entry = (new LocalizedEntry)
             ->id('123')
             ->slug('test')
-            ->order('2018-01-01')
+            ->date('2018-01-01')
             ->published(false)
             ->data([
                 'title' => 'The title',
@@ -544,6 +634,38 @@ EOT;
         $return = $entry->layout('bar');
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->layout());
+    }
+
+    /** @test */
+    function it_gets_the_last_modified_time()
+    {
+        $collection = new Collection;
+        $parent = (new Entry)->collection($collection);
+        $entry = (new LocalizedEntry)->entry($parent)->slug('bar');
+        $path = $entry->path();
+        $date = Carbon::parse('2017-01-02');
+        touch($path, $date->timestamp);
+
+        $this->assertTrue($date->eq($entry->lastModified()));
+
+        $valueBasedDate = Carbon::parse('2017-01-03');
+        $entry->set('updated_at', $valueBasedDate->timestamp);
+        $this->assertFalse($date->eq($entry->lastModified()));
+        $this->assertTrue($valueBasedDate->eq($entry->lastModified()));
+
+        @unlink($path);
+    }
+
+    /** @test */
+    function it_deletes_through_the_api()
+    {
+        Event::fake();
+        $entry = (new LocalizedEntry)->entry((new Entry)->collection(new Collection));
+        API\Entry::shouldReceive('deleteLocalization')->with($entry);
+
+        $return = $entry->delete();
+
+        $this->assertTrue($return);
     }
 }
 

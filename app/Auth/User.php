@@ -3,17 +3,35 @@
 namespace Statamic\Auth;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Blueprint;
+use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Statamic\Contracts\Auth\User as UserContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable
 {
-    use Authorizable, Notifiable, CanResetPassword;
+    use Authorizable, Notifiable, CanResetPassword, Augmentable;
+
+    abstract public function get($key, $fallback = null);
+    abstract public function has($key);
+    abstract public function set($key, $value);
+
+    public function reference()
+    {
+        return "user::{$this->id()}";
+    }
+
+    public function title()
+    {
+        return $this->email();
+    }
 
     public function initials()
     {
@@ -29,8 +47,17 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
     }
 
+    protected function augmentedArrayData()
+    {
+        return $this->data();
+    }
+
     public function avatar($size = 64)
     {
+        if ($this->has('avatar')) {
+            return $this->augment('avatar')->value()->url();
+        }
+
         return config('statamic.users.avatars') === 'gravatar'
             ? gravatar($this->email(), $size)
             : null;
@@ -90,9 +117,19 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
         return array_merge($this->data(), [
             'id' => $this->id(),
+            'title' => $this->title(),
             'email' => $this->email(),
+            'avatar' => $this->avatar(),
+            'initials' => $this->initials(),
             'preferences' => $this->preferences(),
-        ], $roles, $groups);
+            'edit_url' => $this->editUrl(),
+            'is_user' => true,
+        ], $roles, $groups, $this->supplements);
+    }
+
+    public function toJavascriptArray()
+    {
+        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name']);
     }
 
     public function getAuthIdentifierName()

@@ -23,6 +23,7 @@ class Stache
     protected $config;
     protected $stores;
     protected $startTime;
+    protected $timestamps = [];
 
     public function __construct()
     {
@@ -312,5 +313,15 @@ class Stache
         }
 
         return $paths;
+    }
+
+    public function queuedTimestampCaches()
+    {
+        return collect($this->timestamps);
+    }
+
+    public function queueTimestampCache($key, $timestamps)
+    {
+        $this->timestamps[$key] = $timestamps;
     }
 }

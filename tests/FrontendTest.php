@@ -8,6 +8,7 @@ use Statamic\API\Entry;
 use Statamic\API\Blueprint;
 use Statamic\API\Collection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 
 class FrontendTest extends TestCase
@@ -16,9 +17,12 @@ class FrontendTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
+
+        Blueprint::shouldReceive('find')->with('empty')->andReturn(new \Statamic\Fields\Blueprint);
+        $this->addToAssertionCount(-1);
 
         $this->withStandardFakeViews();
     }
@@ -83,8 +87,7 @@ class FrontendTest extends TestCase
     function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
-        $page = $this->createPage('/about');
-        $page->published(false);
+        $this->createPage('/about')->published(false)->save();
 
         $this->get('/about')->assertStatus(404);
     }
@@ -95,9 +98,7 @@ class FrontendTest extends TestCase
         $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
         $user = User::make()->assignRole('draft_viewer');
 
-        $page = $this->createPage('/about');
-        $page->published(false);
-        $page->set('content', 'Testing 123');
+        $this->createPage('/about')->published(false)->set('content', 'Testing 123')->save();
 
         $response = $this
             ->actingAs($user)
@@ -115,22 +116,49 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
-    function live_preview_overrides_data()
+    function future_private_entries_are_not_viewable()
     {
-        $this->markTestIncomplete(); // todo: live preview
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
 
-        $this->fakeRoles(['cp_accessor' => ['permissions' => ['cp:access']]]);
-        $user = User::make()->data(['roles' => ['cp_accessor']]);
-
-        $page = $this->createPage('/about');
-        $page->set('content', 'Testing 123');
-        $page->set('fieldset', 'default');
+        $page = tap($this->createPage('/about')->date('2019-01-02'))->save();
+        $collection = $page->collection()->dated(true);
 
         $this
-            ->actingAs($user)
-            ->post('/about', ['preview' => true, 'fields' => ['content' => 'Updated content']])
+            ->get('/about')
             ->assertStatus(200)
-            ->assertSee('Updated content');
+            ->assertSee('The template contents');
+
+        $collection->futureDateBehavior('private');
+
+        $this
+            ->get('/about')
+            ->assertStatus(404);
+    }
+
+    /** @test */
+    function past_private_entries_are_not_viewable()
+    {
+        Carbon::setTestNow(Carbon::parse('2019-01-01'));
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRendered('default', 'The template contents');
+
+        $page = tap($this->createPage('/about')->date('2018-01-01'))->save();
+        $collection = $page->collection()->dated(true);
+
+        $this
+            ->get('/about')
+            ->assertStatus(200)
+            ->assertSee('The template contents');
+
+        $collection->pastDateBehavior('private');
+
+        $this
+            ->get('/about')
+            ->assertStatus(404);
     }
 
     /** @test */
@@ -257,8 +285,7 @@ class FrontendTest extends TestCase
         $this->withoutExceptionHandling();
         Event::fake();
 
-        $page = $this->createPage('about');
-        $page->set('headers', ['X-Foo' => 'Bar']);
+        $this->createPage('about')->set('headers', ['X-Foo' => 'Bar'])->save();
 
         $this->get('about')->assertStatus(200);
 
@@ -280,6 +307,18 @@ class FrontendTest extends TestCase
         $this->assertEquals('/foo/baz', $class->removeIgnoredSegments('/foo/bar/baz'));
         $this->assertEquals('/foo/baz', $class->removeIgnoredSegments('/foo/bar/baz/qux'));
         $this->assertEquals('/foo/baz/flux', $class->removeIgnoredSegments('/foo/bar/baz/qux/flux'));
+    }
+
+    /** @test */
+    function amp_requests_load_their_amp_directory_counterparts()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    function amp_requests_without_an_amp_template_result_in_a_404()
+    {
+        $this->markTestIncomplete();
     }
 
     /** @test */
@@ -326,7 +365,8 @@ class FrontendTest extends TestCase
     {
         $collection = Collection::create('pages')
             ->route('{slug}')
-            ->template('default');
+            ->template('default')
+            ->entryBlueprints(['empty']);
 
         $entry = Entry::create()
             ->id($slug)

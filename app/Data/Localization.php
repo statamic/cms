@@ -3,9 +3,12 @@
 namespace Statamic\Data;
 
 use Statamic\API\Site;
+use Statamic\FluentlyGetsAndSets;
 
 trait Localization
 {
+    use FluentlyGetsAndSets;
+
     protected $id;
     protected $locale;
     protected $localizable;
@@ -13,24 +16,12 @@ trait Localization
 
     public function id($id = null)
     {
-        if (func_num_args() === 0) {
-            return $this->id;
-        }
-
-        $this->id = $id;
-
-        return $this;
+        return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
     public function locale($locale = null)
     {
-        if (func_num_args() === 0) {
-            return $this->locale;
-        }
-
-        $this->locale = $locale;
-
-        return $this;
+        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
     public function site()
@@ -42,13 +33,7 @@ trait Localization
 
     public function localizable($localizable = null)
     {
-        if (func_num_args() === 0) {
-            return $this->localizable;
-        }
-
-        $this->localizable = $localizable;
-
-        return $this;
+        return $this->fluentlyGetOrSet('localizable')->args(func_get_args());
     }
 
     protected function unlocalizableData()

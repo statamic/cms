@@ -9,7 +9,7 @@
             <template slot="body">
                 <div class="mb-2">
                     <label :class="{ 'text-red': errors.password.length }">{{ __('Password for :username', { username: this.username }) }} <i class="required">*</i></label>
-                    <input type="password" name="password" class="form-control" v-model="password" ref="password" @keydown.enter.prevent="submit" />
+                    <input type="password" name="password" class="input-text" v-model="password" ref="password" @keydown.enter.prevent="submit" />
                     <small class="block text-red mt-1" v-if="errors.username.length">{{ errors.username[0] }}</small>
                     <small class="block text-red mt-1" v-if="errors.password.length">{{ errors.password[0] }}</small>
                 </div>
@@ -60,7 +60,7 @@ export default {
                 password: this.password
             };
 
-            this.axios.post(cp_url('auth/login'), payload).then(response => {
+            this.$axios.post(cp_url('auth/login'), payload).then(response => {
                 this.errors = [];
                 this.$notify.success(__('Logged in'));
                 this.show = false;

@@ -13,12 +13,11 @@
 @import "vendors/codemirror";
 @import "vendors/date-picker";
 @import "vendors/luminous";
-@import "vendors/medium-editor-theme";
-@import "vendors/medium-editor";
-@import "vendors/redactor";
 @import "vendors/selectize";
 @import "vendors/sweetalert";
 @import "vendors/tippy";
+@import "vendors/vue-select";
+
 
 // Core things that need to override vendor things
 @import "core/layout";
@@ -30,7 +29,6 @@
 @import "elements/dropdowns";
 @import "elements/forms";
 @import "elements/icons";
-@import "elements/lists";
 @import "elements/tables";
 
 // Components
@@ -55,12 +53,14 @@
 @import "components/modal";
 @import "components/nav-main";
 @import "components/nav-mobile";
+@import "components/notifications";
 @import "components/page-tree";
 @import "components/pagination";
 @import "components/popover";
 @import "components/preview";
 @import "components/publish";
 @import "components/progress";
+@import "components/revisions";
 @import "components/roles";
 @import "components/shortcuts";
 @import "components/sortable";
@@ -73,21 +73,41 @@
 
 // Fieldtypes
 @import "components/fieldtypes/array";
+@import "components/fieldtypes/assets";
 @import "components/fieldtypes/bard";
 @import "components/fieldtypes/checkboxes";
 @import "components/fieldtypes/datetime";
 @import "components/fieldtypes/environment";
-@import "components/fieldtypes/grid-replicator";
+@import "components/fieldtypes/grid";
 @import "components/fieldtypes/hidden";
+@import "components/fieldtypes/list";
 @import "components/fieldtypes/markdown";
 @import "components/fieldtypes/partial";
-@import "components/fieldtypes/redactor";
 @import "components/fieldtypes/relate";
+@import "components/fieldtypes/replicator";
 @import "components/fieldtypes/revealer";
 @import "components/fieldtypes/section";
+@import "components/fieldtypes/table";
 @import "components/fieldtypes/tags";
+@import "components/fieldtypes/textarea";
+@import "components/fieldtypes/video";
 @import "components/fieldtypes/yaml";
 
 @tailwind utilities;
 
 @import "core/utilities";
+
+
+#statamic {
+    transition: all 0.3s ease;
+    min-height: 100vh;
+}
+
+.pane-slide-enter-active,
+.pane-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.pane-slide-enter,
+.pane-slide-leave-to {
+    transform: translateX(24rem);
+}

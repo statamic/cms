@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <div class="addon-grid my-4">
-                    <div class="addon-card bg-white text-grey-dark h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
+                    <div class="addon-card bg-white text-grey-80 h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                         <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                         <div class="px-3 mb-2 relative text-center">
                             <a :href="addon.seller.website" class="relative">
@@ -53,8 +53,6 @@
 </style>
 
 <script>
-    import axios from 'axios';
-
     export default {
 
         props: [
@@ -108,7 +106,7 @@
 
         methods: {
             getAddons() {
-                axios.get(window.Statamic.cpRoot+'/api/addons', {'params': this.params}).then(response => {
+                this.$axios.get(window.Statamic.$config.get('cpRoot')+'/api/addons', {'params': this.params}).then(response => {
                     this.loaded = true;
                     this.rows = response.data.data;
                     this.meta = response.data.meta;

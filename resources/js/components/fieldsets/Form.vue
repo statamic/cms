@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import FieldsetFields from './Fields.vue';
 
 export default {
@@ -20,7 +19,7 @@ export default {
     methods: {
 
         save() {
-            axios[this.method](this.action, this.fieldset)
+            this.$axios[this.method](this.action, this.fieldset)
                 .then(response => this.saved(response))
                 .catch(e => {
                     this.$notify.error(e.response.data.message);

@@ -2,27 +2,39 @@
     <table class="data-table" :class="{ 'opacity-50': loading }">
         <thead v-if="visibleColumns.length > 1">
             <tr>
-                <th class="checkbox-column" v-if="allowBulkActions"></th>
+                <th class="checkbox-column" v-if="allowBulkActions || reorderable"></th>
                 <th
                     v-for="column in visibleColumns"
                     :key="column.field"
-                    class="sortable-column"
-                    :class="{'current-column': sharedState.sortColumn === column.field}"
+                    :class="{
+                        'current-column': sharedState.sortColumn === column.field,
+                        'sortable-column': column.sortable === true,
+                        'cursor-not-allowed': !sortable,
+                    }"
                     @click.prevent="changeSortColumn(column.field)"
                 >
                     <span v-text="column.label" />
-                    <svg :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5" style="enable-background:new 0 0 10 6.5;">
+                    <svg v-if="column.sortable === true" :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5">
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z"/>
                     </svg>
                 </th>
                 <th class="actions-column"></th>
             </tr>
         </thead>
+        <sortable-list
+            v-model="rows"
+            :vertical="true"
+            item-class="sortable-row"
+            handle-class="table-drag-handle"
+            @sorted="$emit('reordered', rows)"
+        >
         <tbody>
             <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)">
-                <td class="checkbox-column" v-if="allowBulkActions">
+            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)" class="sortable-row outline-none">
+                <td class="table-drag-handle" v-if="reorderable"></td>
+                <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
                     <input
+                        v-if="!reorderable"
                         type="checkbox"
                         :value="row.id"
                         v-model="sharedState.selections"
@@ -33,13 +45,14 @@
                 <td v-for="column in visibleColumns" :key="column.field">
                     <slot
                         :name="`cell-${column.field}`"
-                        :value="row[column.field]"
+                        :value="row[column.value || column.field]"
+                        :values="row"
                         :row="row"
                         :index="actualIndex(row)"
                         :display-index="index"
                         :checkbox-id="`checkbox-${row.id}`"
                     >
-                        <table-field :value="row[column.field]" :fieldtype="column.fieldtype" />
+                        <table-field :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
                 </td>
                 <td class="text-right">
@@ -52,16 +65,19 @@
                 </td>
             </tr>
         </tbody>
+        </sortable-list>
     </table>
 </template>
 
 <script>
 import TableField from './TableField.vue';
+import SortableList from '../sortable/SortableList.vue';
 
 export default {
 
     components: {
-        TableField
+        TableField,
+        SortableList,
     },
 
     props: {
@@ -76,15 +92,28 @@ export default {
         toggleSelectionOnRowClick: {
             type: Boolean,
             default: false
-        }
+        },
+        sortable: {
+            type: Boolean,
+            default: true
+        },
+        reorderable: {
+            type: Boolean,
+            default: false
+        },
     },
 
     inject: ['sharedState'],
 
     computed: {
 
-        rows() {
-            return this.sharedState.rows;
+        rows: {
+            get() {
+                return this.sharedState.rows;
+            },
+            set(rows) {
+                this.sharedState.rows = rows;
+            }
         },
 
         reachedSelectionLimit() {
@@ -95,6 +124,12 @@ export default {
             const columns = this.sharedState.columns.filter(column => column.visible);
 
             return columns.length ? columns : this.sharedState.columns;
+        },
+
+        sortableColumns() {
+            return this.sharedState.columns
+                .filter(column => column.sortable)
+                .map(column => column.field);
         }
 
     },
@@ -102,6 +137,12 @@ export default {
     methods: {
 
         changeSortColumn(column) {
+            if (!this.sortable) return;
+
+            if (! this.sortableColumns.includes(column)) {
+                return;
+            }
+
             this.sharedState.currentPage = 1;
             if (this.sharedState.sortColumn === column) this.swapSortDirection();
             this.sharedState.sortColumn = column;

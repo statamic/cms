@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\API\User;
+use Statamic\API\Preference;
 use Statamic\Extend\Management\WidgetLoader;
 
 class DashboardController extends CpController
@@ -28,7 +29,9 @@ class DashboardController extends CpController
      */
     private function getDisplayableWidgets($loader)
     {
-        return collect(config('statamic.cp.widgets', []))
+        $widgets = Preference::get('widgets') ?? config('statamic.cp.widgets') ?? [];
+
+        return collect($widgets)
             ->map(function ($config) {
                 return is_string($config) ? ['type' => $config] : $config;
             })
@@ -42,7 +45,8 @@ class DashboardController extends CpController
             ->map(function ($config) use ($loader) {
                 return [
                     'widget' => $widget = $loader->load(array_get($config, 'type'), $config),
-                    'classes' => $widget->config('classes', 'w-full'),
+                    'classes' => $widget->config('classes'),
+                    'width' => $widget->config('width', 100),
                     'html' => (string) $widget->html()
                 ];
             })

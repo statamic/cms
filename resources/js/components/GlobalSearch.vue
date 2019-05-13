@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
-            <div class="state-container w-4 h-4 text-grey-light" @click="focus">
+            <div class="state-container w-4 h-4 text-grey-40" @click="focus">
                 <svg-icon name="magnifying-glass"></svg-icon>
             </div>
 
@@ -18,14 +18,19 @@
                 :placeholder="placeholder"
                 />
 
-            <span v-if="! (isDirty || searching)" class="rounded px-sm text-2xs border text-grey-light">/</span>
+            <span v-if="! (isDirty || searching)" class="rounded px-sm pb-px text-2xs border text-grey-50">/</span>
+            <loading-graphic v-if="searching" :size="14" :inline="true" text="" />
 
-            <div v-show="focused" class="global-search-results">
+            <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
                 <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousedown="hit" @mousemove="setActive(index)">
                     <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
                     <div class="flex-1 ml-1 title" v-html="result.title"></div>
-                    <span class="rounded px-sm py-px text-2xs uppercase bg-grey-lightest text-grey" v-html="result.collection"></span>
+                    <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
+                        <template v-if="result.is_entry">{{ result.collection }}</template>
+                        <template v-if="result.is_user">{{ __('User') }}</template>
+                        <template v-if="result.is_asset">{{ __('Asset') }}</template>
+                    </span>
                 </div>
 
                 <div v-if="! hasResults && hasFavorites">
@@ -36,7 +41,7 @@
                         <div class="flex-1 ml-1 title" v-html="favorite.name"></div>
                     </div>
 
-                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm text-2xs border text-grey-light">/</span> key</div>
+                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm pb-px text-2xs border text-grey-50">/</span> key</div>
                 </div>
             </div>
         </div>
@@ -92,14 +97,13 @@ export default {
         update: _.debounce(function () {
             if (!this.query) {
                 this.reset();
+                this.searching = false;
                 return;
             }
 
-            this.searching = true;
-
             let payload = {params: Object.assign({ q:this.query }, this.data) };
 
-            this.axios.get(this.endpoint, payload)
+            this.$axios.get(this.endpoint, payload)
                 .then(response => {
                     this.results = !!this.limit ? response.data.slice(0, this.limit) : response.data;
                     this.current = -1;
@@ -111,7 +115,6 @@ export default {
             this.results = [];
             this.query = '';
             this.searching = false;
-            this.focused = false;
         },
 
         setActive(index) {
@@ -150,6 +153,7 @@ export default {
 
     watch: {
         query(query) {
+            this.searching = true;
             this.update();
         },
 

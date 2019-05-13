@@ -1,5 +1,4 @@
 <script>
-import axios from 'axios';
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 
@@ -13,7 +12,7 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        perPage: {
+        initialPerPage: {
             type: Number,
             default: 25
         }
@@ -21,6 +20,7 @@ export default {
 
     data() {
         return {
+            source: null,
             initializing: true,
             loading: true,
             items: [],
@@ -28,6 +28,7 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
+            perPage: this.initialPerPage,
             meta: null,
             searchQuery: '',
         }
@@ -54,11 +55,16 @@ export default {
 
     created() {
         this.request();
+        this.$events.$on('filters-reset', this.perPageReset);
     },
 
     watch: {
 
         parameters(after, before) {
+            // A change to the search query would trigger both watchers.
+            // We only want the searchQuery one to kick in.
+            if (before.search !== after.search) return;
+
             if (JSON.stringify(before) === JSON.stringify(after)) return;
             this.request();
         },
@@ -68,6 +74,13 @@ export default {
             handler(loading) {
                 this.$progress.loading(this.listingKey, loading);
             }
+        },
+
+        searchQuery(query) {
+            this.page = 1;
+            this.sortColumn = null;
+            this.sortDirection = null;
+            this.request();
         }
 
     },
@@ -77,7 +90,13 @@ export default {
         request() {
             this.loading = true;
 
-            axios.get(this.requestUrl, { params: this.parameters }).then(response => {
+            if (this.source) this.source.cancel();
+            this.source = this.$axios.CancelToken.source();
+
+            this.$axios.get(this.requestUrl, {
+                params: this.parameters,
+                cancelToken: this.source.token
+            }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.activeFilters = {...response.data.meta.filters};
@@ -85,7 +104,17 @@ export default {
                 this.meta = response.data.meta;
                 this.loading = false;
                 this.initializing = false;
-            });
+                this.afterRequestCompleted();
+            }).catch(e => {
+                if (this.$axios.isCancel(e)) return;
+                this.loading = false;
+                this.initializing = false;
+                this.$notify.error(e.response ? e.response.data.message : __('Something went wrong'));
+            })
+        },
+
+        afterRequestCompleted(response) {
+            //
         },
 
         sorted(column, direction) {
@@ -96,6 +125,10 @@ export default {
         perPageChanged(perPage) {
             this.perPage = perPage;
             this.page = 1;
+        },
+
+        perPageReset() {
+            this.perPageChanged(this.initialPerPage);
         }
 
     }

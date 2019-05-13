@@ -138,7 +138,7 @@ class Collection extends Tags
             }
         }
 
-        return Entry::whereCollection($collections);
+        return Entry::whereInCollection($collections);
     }
 
     private function getTaxonomyCollection($collection)
@@ -310,7 +310,7 @@ class Collection extends Tags
                 // Paginated? we need to nest inside a scope key
                 $as = $as ?: 'entries';
 
-                $data = [$as => $this->collection->toArray()];
+                $data = [$as => $this->collection->toAugmentedArray()];
 
                 $data['paginate'] = $this->pagination_data;
 
@@ -323,14 +323,14 @@ class Collection extends Tags
                 if ($as) {
                     $data = [
                         array_merge(
-                            [$as => $this->collection->toArray()],
+                            [$as => $this->collection->toAugmentedArray()],
                             $this->getCollectionMetaData()
                         )
                     ];
                 } else {
                     // Add the meta data (total_results, etc) into each iteration.
                     $meta = $this->getCollectionMetaData();
-                    $data = collect($this->collection->toArray())->map(function ($item) use ($meta) {
+                    $data = collect($this->collection->toAugmentedArray())->map(function ($item) use ($meta) {
                         return array_merge($item, $meta);
                     })->all();
                 }
@@ -430,11 +430,11 @@ class Collection extends Tags
 
         // If no sort order has been specified, we'll need to get a sensible default.
         // For date based entries it'll be by date. For number based it'll be by order, etc.
-        $type = $this->collection->first()->collection()->order();
+        $collection = $this->collection->first()->collection();
 
-        if ($type === 'date') {
+        if ($collection->dated()) {
             $sort = 'date:desc|title:asc';
-        } elseif ($type === 'number') {
+        } elseif ($collection->ordered()) {
             $sort = 'order:asc';
         } else {
             $sort = 'title:asc';

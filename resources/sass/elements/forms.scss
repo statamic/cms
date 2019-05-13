@@ -11,7 +11,7 @@ form {
 }
 
 label {
-    @apply .text-grey-dark .font-normal .text-sm .block .leading-normal;
+    @apply .text-grey-80 .font-normal .text-sm .block .leading-normal;
 }
 
 input[type="checkbox"] {
@@ -19,7 +19,7 @@ input[type="checkbox"] {
 }
 
 select {
-    @apply .text-base .bg-grey-lighter .border-2 .border-grey-lighter .cursor-pointer;
+    @apply .text-base .bg-grey-30 .border-2 .border-grey-30 .cursor-pointer;
 }
 
 
@@ -27,20 +27,22 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-lighten-6 w-full border p-1 rounded shadow-inner;
+    @apply appearance-none bg-grey-10 text-grey-80 w-full border p-1 rounded shadow-inner;
+    height: 38px;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
-
-    height: 38px;
 
     &:focus, &:focus-within {
         @apply focus-outline;
     }
+
 }
 
-textarea.input-text {
-    @apply p-2;
-    min-height: 80px;
+// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
+input.input-text:read-only,
+textarea.input-text:read-only,
+.input-text.read-only {
+    @apply bg-grey-30 text-grey-70;
 }
 
 // Used inside tables, grids, and so on
@@ -48,13 +50,55 @@ textarea.input-text {
     @apply appearance-none shadow-none bg-white w-full p-1;
 
     &:focus {
-        @apply outline-none bg-grey-lightest;
+        @apply outline-none bg-grey-20;
+    }
+}
+
+
+/* Input Groups
+  ========================================================================== */
+
+.input-group {
+    @apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
+    height: 38px;
+
+    &:focus, &:focus-within {
+        @apply focus-outline;
+    }
+
+    .input-text {
+        @apply .flex-1;
+
+        &:focus, &:focus-within {
+            @apply focus-none;
+        }
+    }
+
+    .input-text:not(:first-child) {
+        @apply rounded-l-none border-l-0;
+    }
+
+    .input-text:not(:last-child) {
+        @apply rounded-r-none border-r-0;
+    }
+
+    .input-group-prepend {
+        @apply rounded-l bg-grey-30 px-1 border border-grey-50 text-sm;
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .input-group-append {
+        @apply rounded-r bg-grey-30 px-1 border border-grey-50 text-sm;
+        height: 38px;
+        line-height: 38px;
     }
 }
 
 
 /* Radio and Checkbox Fields
   ========================================================================== */
+
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
     @apply mb-1 flex items-center;
@@ -88,15 +132,19 @@ textarea.input-text {
 /* Select Fields
   ========================================================================== */
   .select-input-container {
-      position: relative;
+      @apply rounded relative;
+
+      &:focus, &:focus-within {
+          @apply focus-outline;
+      }
 
       select {
-          @include button(#fff, $color_gray_dark);
-          @apply block appearance-none pl-1.5 pr-3 bg-white cursor-pointer w-full h-full relative shadow-button;
+          @include button(#fff, config('colors.grey-80'));
+          @apply block appearance-none pl-1.5 pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
       }
 
       .select-input-toggle {
-          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-darker;
+          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-90;
 
           svg {
               @apply fill-current h-4 w-4;
@@ -104,38 +152,6 @@ textarea.input-text {
       }
   }
 
-
-  /* @TODO Legacy stuff to remove, reduce, or refactor
-    ========================================================================== */
-.form-control {
-    @apply .text-sm .w-full .rounded .border-0 .bg-grey-lightest .shadow-inner;
-
-    padding: 8px 10px;
-
-    .replicator-fieldtype & {
-        background: #fff;
-    }
-
-    &.code {
-        font-family: $font_monospace;
-        font-size: 12px;
-        color: $color_red;
-    }
-
-    &.alt {
-        background: $color_search_alt;
-        box-shadow: none;
-    }
-
-    &.mono {
-        font-family: $font_monospace;
-        font-size: 12px;
-    }
-}
-
-textarea.form-control {
-    min-height: 80px;
-}
 
 label .required {
     color: $color_red;
@@ -145,28 +161,6 @@ label .required {
         margin-left: 5px;
     }
 }
-
-    // span.status {
-    //     border-radius: 7px;
-    //     display: inline-block;
-    //     float: left;
-    //     height: 7px;
-    //     margin-right: 10px;
-    //     position: relative;
-    //     top: 6px;
-    //     width: 7px;
-    // }
-    //
-    // span.status-draft {
-    //     background: $color_gray_light;
-    // }
-    // span.status-hidden {
-    //     border: solid 1px $color_gray_light;
-    // }
-    // span.status-live {
-    //     background: $color_green;
-    // }
-// }
 
 input[type="file"] {
     padding: 16px;
@@ -188,7 +182,7 @@ input.slug {
     -webkit-font-smoothing: antialiased;
     &:hover,
     &:focus {
-        @extend .form-control;
+        @extend .input-text;
         transition: none !important;
     }
 }
@@ -216,11 +210,11 @@ input.slug {
     }
 
     .help-block {
-        @apply .block .mb-1 .text-grey-light .text-xs;
+        @apply .block .mb-1 .text-grey-60 .text-xs;
         a {
             @apply .text-red;
             &:hover {
-                @apply .text-grey-dark;
+                @apply .text-grey-80;
             }
         }
     }

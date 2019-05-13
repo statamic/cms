@@ -13,7 +13,7 @@ class CombIndexTest extends TestCase
 
     private $fs;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

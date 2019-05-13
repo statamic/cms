@@ -4,8 +4,11 @@
             class="input-text"
             :value="value"
             :disabled="disabled"
+            :readonly="isReadOnly"
             :placeholder="placeholder"
             @input="$emit('input', $event.target.value)"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
             v-elastic
         />
         <div class="text-right text-xs" :class="limitIndicatorColor" v-if="limit">
@@ -22,6 +25,7 @@ export default {
     mixins: [LengthLimiter],
     props: {
         disabled: { default: false },
+        isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         value: { required: true },
     }

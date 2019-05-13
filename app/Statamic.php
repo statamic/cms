@@ -3,7 +3,9 @@
 namespace Statamic;
 
 use Closure;
+use Statamic\API\URL;
 use Statamic\API\File;
+use Statamic\API\Site;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
 use Statamic\API\Preference;
@@ -100,22 +102,37 @@ class Statamic
         return starts_with(request()->path(), config('statamic.cp.route'));
    }
 
+   public static function isAmpRequest()
+   {
+        if (! config('statamic.amp.enabled')) {
+            return false;
+        }
+
+        $url = Site::current()->relativePath(
+            str_finish(request()->getUri(), '/')
+        );
+
+        return starts_with($url, '/' . config('statamic.amp.route'));
+   }
+
     public static function jsonVariables(Request $request)
     {
         $defaults = [
             'version' => static::version(),
+            'laravelVersion' => app()->version(),
             'csrfToken' => csrf_token(),
-            'siteRoot' => site_root(),
             'cpRoot' => cp_root(),
             'urlPath' => '/' . request()->path(),
-            'resourceUrl' => cp_resource_url('/'),
+            'resourceUrl' => Statamic::assetUrl(),
             'locales' => \Statamic\API\Config::get('statamic.system.locales'),
             'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
             'conditions' => [],
             'MediumEditorExtensions' => [],
-            'flash' => [],
+            'flash' => static::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-            'preferences' => Preference::all(),
+            'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
+            'preferences' => Preference::all(), // TODO: Move to CpServiceProvider
+            'user' => auth()->check() ? user()->toJavascriptArray() : [],
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);
@@ -137,5 +154,24 @@ class Statamic
         return StaticStringy::collapseWhitespace(
             File::get(statamic_path("resources/dist/svg/{$name}.svg"))
         );
+    }
+
+    public static function assetUrl($url = '/')
+    {
+        return static::url('vendor/statamic/cp/' . $url);
+    }
+
+    public static function url($url = '/')
+    {
+        return URL::tidy(Site::default()->url() . '/' . $url);
+    }
+
+    public static function flash()
+    {
+        if ($success = session('success')) {
+            $messages[] = ['type' => 'success', 'message' => $success];
+        }
+
+        return $messages ?? [];
     }
 }

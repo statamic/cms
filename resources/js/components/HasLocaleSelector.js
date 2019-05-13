@@ -9,7 +9,7 @@ export default {
     computed: {
 
         locales() {
-            return _.map(Statamic.locales, (locale, handle) => {
+            return _.map(Statamic.$config.get('locales'), (locale, handle) => {
                 return { text: locale.name, value: handle };
             });
         }
@@ -23,9 +23,9 @@ export default {
     methods: {
 
         getInitialLocale() {
-            const defaultLocale = Object.keys(Statamic.locales)[0];
+            const defaultLocale = Object.keys(Statamic.$config.get('locales'))[0];
 
-            if (Object.keys(Statamic.locales).length === 1) return defaultLocale;
+            if (Object.keys(Statamic.$config.get('locales')).length === 1) return defaultLocale;
 
             const key = this.getLocaleLocalStorageKey();
 

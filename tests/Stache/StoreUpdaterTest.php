@@ -13,7 +13,7 @@ use Statamic\Stache\Stores\BasicStore;
 
 class StoreUpdaterTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -21,7 +21,7 @@ class StoreUpdaterTest extends TestCase
             mkdir($this->tempDir);
         }
 
-        $this->stache = (new Stache)->sites(['en', 'es']);
+        $this->stache = (new StoreUpdaterTestStache)->sites(['en', 'es']);
         $this->store = new class($this->stache, app('files')) extends BasicStore {
             public function key() { return 'test-store-key'; }
             public function getItemsFromCache($cache) {
@@ -40,10 +40,10 @@ class StoreUpdaterTest extends TestCase
             public function getItemKey($item) { return $item->id(); }
         };
         $this->stache->registerStore($this->store);
-        $this->updater = (new StoreUpdater(new Filesystem))->store($this->store);
+        $this->updater = (new StoreUpdater($this->stache, new Filesystem))->store($this->store);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -171,7 +171,6 @@ EOT;
             $this->tempDir.'/test.txt' => now()->subDays(1)->timestamp,
         ]));
 
-        Cache::shouldReceive('forever')->once()->with('stache::timestamps/test-store-key', $traversedFiles);
         // TODO: The caching of the items has been moved into the Persister class, which doesn't have any test coverage.
         // Cache::shouldReceive('forever')->once()->with('stache::items/test-store-key', \Mockery::any());
         // Cache::shouldReceive('forever')->once()->with('stache::meta/test-store-key', \Mockery::any());
@@ -180,6 +179,7 @@ EOT;
 
         $this->updater->update();
 
+        $this->assertEquals($this->stache->queuedTimestampCaches()['stache::timestamps/test-store-key'], $traversedFiles);
         $this->assertEquals('Item title updated', $this->store->getItem('123')->data()['title']);
         $this->assertEquals('/updated-uri', $this->store->getSiteUri('en', '123'));
     }
@@ -249,13 +249,12 @@ EOT;
         ]));
         Cache::shouldReceive('get')->with('stache::timestamps/test-store-key', [])->andReturn([]);
         Cache::shouldReceive('get')->with('stache::items/test-store-key')->andReturn([]);
-        Cache::shouldReceive('forever')->once()->with('stache::timestamps/test-store-key', [
-            $this->tempDir.'/test.txt' => now()->subDays(1)->timestamp,
-        ]);
-        Cache::shouldReceive('forever');
-
 
         $this->updater->update();
+
+        $this->assertEquals([
+            $this->tempDir.'/test.txt' => now()->subDays(1)->timestamp,
+        ], $this->stache->queuedTimestampCaches()['stache::timestamps/test-store-key']);
     }
 
     /** @test */
@@ -273,5 +272,15 @@ EOT;
         Cache::shouldNotReceive('forever');
 
         $this->updater->update();
+    }
+}
+
+class StoreUpdaterTestStache extends Stache
+{
+    public $timestamps;
+
+    public function queueTimestampCache($key, $timestamps)
+    {
+        $this->timestamps[$key] = $timestamps;
     }
 }

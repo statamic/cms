@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
 
     props: ['globals'],
@@ -42,7 +40,7 @@ export default {
 
         destroy(id, index) {
             const url = cp_url(`globals/${id}`);
-            axios.delete(url).then(response => {
+            this.$axios.delete(url).then(response => {
                 this.rows.splice(index, 1);
                 this.$notify.success(__('Global set deleted'));
             }).catch(error => {

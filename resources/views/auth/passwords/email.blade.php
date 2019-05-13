@@ -8,7 +8,7 @@
 
     <div class="card auth-card mx-auto">
         <div class="text-center pb-2 mb-2">
-            <h1 class="mb-2 text-lg text-grey-dark">{{ __('Forgot Your Password?') }}</h1>
+            <h1 class="mb-2 text-lg text-grey-80">{{ __('Forgot Your Password?') }}</h1>
             <p class="text-sm text-grey">{{ __('Enter your email address we’ll send you instructions to reset your password.') }}</p>
         </div>
 
@@ -26,7 +26,7 @@
                 @if ($errors->has('email'))
                     <small class="block text-red -mt-1 mb-1">{{ $errors->first('email') }}</small>
                 @endif
-                <input id="email" type="text" class="input-text form-control" name="email" value="{{ old('email') }}" >
+                <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
             </div>
             <button type="submit" class="btn btn-primary">
                 {{ __('Submit') }}

@@ -1,143 +1,176 @@
 <template>
-<ul>
-	<li v-for="(item, $index) in data" :key="$index" :class="{ editing: (editing == $index) }">
-		<span v-if="editing == $index">
-			<input
-				type="text"
-				v-model="data[$index]"
-				class="form-control"
-				@keydown.enter="updateItem(item, $index, $event)"
-				@keyup.up="goUp"
-				@keyup.down="goDown"
-			/>
-		</span>
-		<span v-if="editing != $index" @dblclick="editItem($index, $event)">
-		    {{ item }}
-			<i class="delete" @click="deleteItem($index)"></i>
-		</span>
-	</li>
-	<li>
-		<input type="text" class="form-control new-item" v-model="newItem"
-            :placeholder="`${__('Add another item')}...`"
-            @keydown.enter.prevent="addItem"
-            @blur="addItem"
-            @keyup.up="goUp"
-		/>
-	</li>
-</ul>
+    <sortable-list
+        v-model="data"
+        :vertical="true"
+        item-class="sortable-row"
+        handle-class="sortable-handle"
+        @dragstart="$emit('focus')"
+        @dragend="$emit('blur')"
+    >
+        <ul ref="list" class="outline-none">
+            <li class="sortable-row outline-none"
+                v-for="(item, index) in data"
+                :key="item._id"
+                :class="{ editing: (editing === index) }"
+            >
+                <span v-if="isReadOnly">
+                    {{ data[index].value }}
+                </span>
+                <template v-if="!isReadOnly">
+                    <span v-if="editing === index">
+                        <input
+                            type="text"
+                            class="w-full"
+                            v-model="data[index].value"
+                            :readonly="isReadOnly"
+                            @keydown.enter.prevent="saveAndAddNewItem"
+                            @keyup.up="previousItem"
+                            @keyup.down="nextItem"
+                            @focus="editItem(index)"
+                            @blur="focused = false"
+                        />
+                    </span>
+                    <span v-else @click.prevent="editItem(index)">
+                        <span class="sortable-handle">{{ item.value }}</span>
+                        <i class="delete" @click="deleteItem(index)"></i>
+                    </span>
+                </template>
+            </li>
+            <li>
+                <input
+                    v-if="!isReadOnly"
+                    type="text"
+                    class="w-full"
+                    v-model="newItem"
+                    ref="newItem"
+                    :placeholder="`${__('Add an item')}...`"
+                    @keydown.enter.prevent="addItem"
+                    @blur="newItemInputBlurred"
+                    @focus="editItem(data.length)"
+                    @keyup.up="previousItem"
+                />
+            </li>
+        </ul>
+    </sortable-list>
 </template>
 
 <script>
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SortableHelpers],
 
-    data: function () {
+    components: {
+        SortableList,
+        SortableItem
+    },
+
+    data() {
         return {
-            data: this.value || [],
+            data: [],
             newItem: '',
             editing: null,
+            focused: false,
         }
+    },
+
+    created() {
+        this.data = this.arrayToSortable(this.value || []);
     },
 
     watch: {
+        data: {
+            deep: true,
+            handler (data) {
+                this.update(this.sortableToArray(data));
+            }
+        },
 
-        data(value) {
-            this.update(value);
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
+            this.data = this.arrayToSortable(value);
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                    this.editing = null;
+                }
+            }, 1);
         }
-
     },
 
     methods: {
-        addItem: function() {
-            // Blank items are losers.
-            if (this.newItem !== '') {
-                this.data.push(this.newItem);
-                this.newItem = '';
-                this.editing = this.data.length;
+        addItem() {
+            if (this.newItem === '') {
+                return;
             }
 
+            this.data.push(this.newSortableValue(this.newItem));
+            this.newItem = '';
+            this.editing = this.data.length;
         },
 
-        editItem: function(index, event) {
-            event.preventDefault();
-
+        editItem(index) {
             this.editing = index;
 
-            // Async is good times.
             this.$nextTick(function () {
-                $(this.$el).find('.editing input').focus().select();
+                this.focusItem();
             });
         },
 
-        goUp: function() {
-            if (this.editing > 0) {
-                this.editing = this.editing - 1;
-                this.$nextTick(function () {
-                    $(this.$el).find('.editing input').focus().select();
-                });
-            }
+        newItemInputBlurred() {
+            this.addItem();
+            this.focused = false;
         },
 
-        goDown: function() {
+        focusItem() {
+            this.focused = true;
 
-            // Check if we're at the last one
-            if (this.editing === this.data.length - 1) {
-                this.editing = this.data.length;
-                $(this.$el).find('.new-item').focus();
-            } else {
-                this.editing = this.editing + 1;
-                this.$nextTick(function () {
-                    $(this.$el).find('.editing input').focus().select();
-                });
-            }
+            return this.editing === this.data.length
+                ? this.$refs.newItem.focus()
+                : this.$refs.list.querySelector('.editing input').select();
         },
 
-        updateItem: function(value, index, event) {
-            event.preventDefault();
+        previousItem() {
+            this.deleteIfEmpty();
 
-            // Let's remove blank items
-            if (value == '') {
-                this.data.$remove(index);
-            } else {
-                this.data[index] = value;
-            }
-
-            this.editing = this.data.length;
-
-            // Back to adding new items.
-            $(this.$el).find('.new-item').focus();
-
+            this.editItem(Math.max(this.editing - 1, 0));
         },
 
-        deleteItem: function(i) {
-            this.data.splice(i, 1);
+        nextItem() {
+            let deletedAdjustment = this.deleteIfEmpty() ? 1 : 0;
+
+            this.editItem(this.editing + 1 - deletedAdjustment);
+        },
+
+        saveAndAddNewItem() {
+            this.deleteIfEmpty();
+
+            this.editItem(this.data.length);
+        },
+
+        deleteIfEmpty() {
+            if (data_get(this.data[this.editing], 'value', true)) {
+                return;
+            }
+
+            return this.deleteItem(this.editing);
+        },
+
+        deleteItem(index) {
+            return this.data.splice(index, 1);
         },
 
         getReplicatorPreviewText() {
-            return this.data.join(', ');
+            return this.data.map(item => item.value).join(', ');
         }
-    },
-
-    mounted() {
-        var self = this,
-            start = '';
-        $(this.$el).sortable({
-            axis: "y",
-            revert: 175,
-            items: '> li:not(:last-child)',
-
-            start: function(e, ui) {
-                start = ui.item.index();
-            },
-
-            update: function(e, ui) {
-                var end  = ui.item.index(),
-                    swap = self.data.splice(start, 1)[0];
-
-                self.data.splice(end, 0, swap);
-            }
-        });
     }
 };
 </script>

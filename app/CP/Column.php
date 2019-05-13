@@ -12,7 +12,10 @@ class Column
     public $field;
     public $fieldtype;
     public $label;
+    public $visibleDefault = true;
     public $visible = true;
+    public $sortable = true;
+    public $value = null;
 
     /**
      * Make new column instance.
@@ -37,11 +40,25 @@ class Column
      */
     public function field($field = null)
     {
-        return $this->fluentlyGetOrSet('field', $field, function () {
-            if (is_null($this->label)) {
-                $this->label(Str::slugToTitle($this->field), true);
-            }
-        });
+        return $this
+            ->fluentlyGetOrSet('field')
+            ->afterSetter(function ($field) {
+                if (is_null($this->label)) {
+                    $this->label(Str::slugToTitle($field), true);
+                }
+            })
+            ->value($field);
+    }
+
+    /**
+     * Get or set the value field.
+     *
+     * @param null|string $value
+     * @return mixed
+     */
+    public function value($value = null)
+    {
+        return $this->fluentlyGetOrSet('value')->value($value);
     }
 
     /**
@@ -52,7 +69,7 @@ class Column
      */
     public function fieldtype($fieldtype = null)
     {
-        return $this->fluentlyGetOrSet('fieldtype', $fieldtype);
+        return $this->fluentlyGetOrSet('fieldtype')->value($fieldtype);
     }
 
     /**
@@ -63,7 +80,18 @@ class Column
      */
     public function label($label = null)
     {
-        return $this->fluentlyGetOrSet('label', $label);
+        return $this->fluentlyGetOrSet('label')->value($label);
+    }
+
+    /**
+     * Get or set visibility default, for resetting user preferences, etc.
+     *
+     * @param null|bool $visibleDefault
+     * @return mixed
+     */
+    public function visibleDefault($visible = null)
+    {
+        return $this->fluentlyGetOrSet('visibleDefault')->value($visible);
     }
 
     /**
@@ -74,7 +102,18 @@ class Column
      */
     public function visible($visible = null)
     {
-        return $this->fluentlyGetOrSet('visible', $visible);
+        return $this->fluentlyGetOrSet('visible')->value($visible);
+    }
+
+    /**
+     * Get or set sortable.
+     *
+     * @param null|bool $sortable
+     * @return mixed
+     */
+    public function sortable($sortable = null)
+    {
+        return $this->fluentlyGetOrSet('sortable')->value($sortable);
     }
 
     /**

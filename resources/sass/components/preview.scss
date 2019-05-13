@@ -1,186 +1,110 @@
-/* ==========================================================================
-   LIVE PREVIEW
-   ========================================================================== */
-
-// @TODO Rename to live preview
-.sneak-peek-wrapper {
-    background: $bg;
-    opacity: 0;
-    z-index: -1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    &.on {
-        z-index: 1000;
-        opacity: 1;
-    }
-
-    &.animating {
-        transition: opacity .2s ease;
-    }
+.live-preview {
+    @apply pin;
+    z-index: 998; // arbitrary under stacks.
 }
 
-.sneak-peek-viewport {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    .icon {
-        font-size: 60px;
-        line-height: 0;
-        color: rgba(black, .3);
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin: -30px 0 0 -30px;
-        opacity: 0;
-
-        &:before {
-            top: 0;
-        }
-    }
-
-    .sneak-peek-iframe-wrap {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-    }
-
-    iframe {
-        width: 100%;
-        height: 100%;
-    }
+.live-preview-header {
+    @apply relative bg-grey-20 border-b px-3 py-2 shadow flex items-center justify-between;
+    z-index: 2;
 }
 
-.sneak-peek-header {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 8px 16px;
-    background: #fff;
-    border-bottom: 1px solid $border;
+.live-preview-main {
+    z-index: 1;
 }
 
-.sneak-peek-resizer {
-    width: 8px;
-    background: #fff;
-    box-shadow: inset 0 0 10px rgba(0,0,0,.5);
-    position: absolute;
-    height: 100%;
-    cursor: col-resize;
-    z-index: 1000;
-    opacity: 0;
+.live-preview-editor {
+    @apply flex relative bg-white h-full;
+    z-index: 3;
 }
 
-.sneak-peeking {
+.live-preview-contents {
+    @apply relative bg-grey-50 flex-1 flex flex-col;
+    z-index: 1;
+}
 
-    .nav-main,
-    .cp-head,
-    #publish-controls,
-    .sticky-wrapper,
-    #sticky-wrapper {
-        display: none !important;
-    }
-
-    .sneak-peek-header {
-        display: flex;
-    }
-
-    .page-wrapper {
-        background: #fff;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        z-index: 1001;
-        margin: 0;
-        opacity: 0;
-        margin-left: -300px;
-    }
-
-    .publish-form {
-        position: absolute;
-        top: 48px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        overflow: scroll;
-        padding: 0;
-        margin: 0;
-
-        .equal {
-            flex-basis: 100%;
-        }
-    }
-    .card {
-        padding: 0;
-        margin: 0;
-        box-shadow: none;
+.live-preview .publish-tabs {
+    @apply bg-grey-30 ml-0 pl-0;
+    a {
         border-radius: 0;
     }
+}
 
-    .publish-fields .form-group {
-        flex-basis: 100%;
-        max-width: 100%;
+.live-preview-contents iframe {
+    &.responsive { @apply h-full w-full; }
+    &.device { @apply mt-2 shadow-lg rounded; }
+}
 
-        &.width-100,
-        &.width-75,
-        &.width-66,
-        &.width-50,
-        &.width-33,
-        &.width-25 {
-            flex-basis: 100%;
-            max-width: 100%;
-        }
+.live-preview-fields {
+    @apply relative;
+    z-index: 2;
+}
+
+.live-preview-resizer {
+    @apply w-4 border-l border-r border-grey-30 shadow-sm;
+    z-index: 1;
+    cursor: ew-resize;
+    background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+}
+
+
+.live-preview-header-slide-enter-active,
+.live-preview-header-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.live-preview-header-slide-enter,
+.live-preview-header-slide-leave-to {
+    transform: translateY(-100px);
+}
+
+.live-preview-editor-slide-enter-active,
+.live-preview-editor-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.live-preview-editor-slide-enter,
+.live-preview-editor-slide-leave-to {
+    transform: translateX(-50px);
+    opacity: 0;
+}
+
+.live-preview-contents-slide-enter-active,
+.live-preview-contents-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.live-preview-contents-slide-enter,
+.live-preview-contents-slide-leave-to {
+    transform: translateX(50px);
+    opacity: 0;
+}
+
+
+// We only want the animation to happen when its on the regular publish page.
+// When portal-ed into live preview, it won't be inside .workspace
+.workspace {
+    .live-preview-sections-drop-enter-active,
+    .live-preview-sections-drop-leave-active {
+        transition: all 0.2s;
     }
-
-    .sneak-peek-viewport {
-        opacity: 1;
-        margin-left: 300px;
+    .live-preview-sections-drop-enter-active {
+        transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275)
     }
-
-    .sneak-peek-viewport .icon {
-        opacity: 1;
-        transition: opacity 1s ease-in;
+    .live-preview-sections-drop-leave-active {
+        transition-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045);
     }
-
-    .publish-fields .section-fieldtype,
-    .publish-fields .section-fieldtype:first-of-type {
-        margin: 0 0 15px !important;
-        padding: 15px !important;
-    }
-
-    .form-group, .form-group.inline {
-        flex-basis: 100%;
-        flex-wrap: wrap;
-
-        .form-group { flex-basis: 100%; }
+    .live-preview-sections-drop-enter,
+    .live-preview-sections-drop-leave-to {
+        transform: translateY(100px);
+        opacity: 0;
     }
 }
 
-.sneak-peek-animating {
-    .page-wrapper, .sneak-peek-viewport, .sneak-peek-resizer {
-        transition: all 0.5s ease-in-out;
-    }
+
+
+// Responsive
+
+@element .live-preview-fields and (min-width: 1000px) {
+    :self { @apply p-3 bg-grey-30; }
 }
 
-.sneak-peek-editing {
-    .page-wrapper, .sneak-peek-viewport, .sneak-peek-resizer {
-        opacity: 1;
-    }
-    .page-wrapper {
-        margin-left: 0;
-    }
-    .sneak-peek-viewport {
-        margin-left: 0;
-    }
+@element .live-preview-fields and (max-width: 1000px) {
+    :self .publish-section { @apply shadow-none }
 }

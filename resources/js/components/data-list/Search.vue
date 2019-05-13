@@ -5,6 +5,7 @@
         placeholder="Search..."
         :value="value"
         @input="emitEvent"
+        @keyup.esc="reset"
     >
 </template>
 
@@ -15,7 +16,11 @@ export default {
     methods: {
         emitEvent: _.debounce(function (event) {
             this.$emit('input', event.target.value);
-        }, 300)
-    }
+        }, 300),
+
+        reset() {
+            this.$emit('input', '');
+        }
+    },
 }
 </script>

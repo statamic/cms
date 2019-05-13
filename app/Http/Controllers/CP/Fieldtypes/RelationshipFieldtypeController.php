@@ -2,64 +2,38 @@
 
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
-use Statamic\API\Entry;
+use Statamic\Fields\Field;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Fields\Fieldtypes\Relationship;
 use Statamic\Http\Controllers\CP\CpController;
+use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
 
 class RelationshipFieldtypeController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Resource::collection($this->getIndexItems())->additional(['meta' => [
-            'sortColumn' => $this->getSortColumn(),
+        $fieldtype = $this->fieldtype($request);
+
+        return Resource::collection($fieldtype->getIndexItems($request))->additional(['meta' => [
+            'sortColumn' => $fieldtype->getSortColumn($request),
         ]]);
-    }
-
-    protected function getIndexItems()
-    {
-        return $this->getIndexQuery()
-            ->orderBy($this->getSortColumn(), $this->getSortDirection())
-            ->paginate();
-    }
-
-    protected function getSortColumn()
-    {
-        return request('sort', 'title');
-    }
-
-    protected function getSortDirection()
-    {
-        return request('order', 'asc');
-    }
-
-    protected function getIndexQuery()
-    {
-        $query = Entry::query();
-
-        if ($collections = request('collections')) {
-            $query->whereIn('collection', $collections);
-        }
-
-        if ($search = request('search')) {
-            $query->where('title', 'like', '%'.$search.'%');
-        }
-
-        return $query;
     }
 
     public function data(Request $request)
     {
-        $items = $this->fieldtype()
-            ->getItemData($request->selections)
+        $items = $this->fieldtype($request)
+            ->getItemData($request->selections, $request->site)
             ->values();
 
         return Resource::collection($items);
     }
 
-    protected function fieldtype()
+    protected function fieldtype($request)
     {
-        return new Relationship;
+        $config = json_decode(base64_decode($request->config), true);
+
+        return Fieldtype::find($config['type'])->setField(
+            new Field('relationship', $config)
+        );
     }
 }

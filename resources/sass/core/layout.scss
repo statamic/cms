@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply .w-full .bg-grey-lighter relative;
+    @apply .w-full .bg-grey-30 relative;
 }
 
 a {
@@ -12,7 +12,7 @@ a {
 }
 
 #main {
-    @apply flex pb-6;
+    @apply flex;
 }
 
 #main .nav-main {
@@ -26,7 +26,9 @@ a {
 }
 
 @screen md {
-    #main { padding: 72px 0 0; }
+    #main {
+        @apply pt-3;
+    }
     #main .workspace {
         padding-left: 14rem;
         @apply pt-0;
@@ -68,7 +70,13 @@ a {
 /* Page Wrapper
   ========================================================================== */
 .page-wrapper {
-    @apply .px-3 .pb-5 .w-full;
+    @apply p-3 pt-0 .w-full;
+}
+
+@screen md {
+    .page-wrapper {
+        @apply px-4;
+    }
 }
 
 .fieldtype-hidden {
@@ -79,7 +87,7 @@ a {
 /* Outside the Control Panel
   ========================================================================== */
 .outside {
-    @apply .bg-grey-lighter .px-1 .min-h-screen;
+    @apply .bg-grey-30 .px-1 .min-h-screen;
 
     label {
         color: #596498;

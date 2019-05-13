@@ -4,8 +4,8 @@ namespace Statamic\Providers;
 
 use Statamic\Tags;
 use Statamic\Actions;
-use Statamic\Filters;
 use Statamic\DataStore;
+use Statamic\Query\Scopes;
 use Statamic\Extend\Modifier;
 use Statamic\Fields\Fieldtypes;
 use Statamic\View\BaseModifiers;
@@ -26,11 +26,10 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'arr', 'asset_container', 'asset_folder', 'bard', 'checkboxes', 'collection',
+        'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'pages', 'partial', 'radio', 'redactor', 'redactor_settings', 'relate', 'replicator', 'replicator_sets',
-        'theme', 'time', 'title', 'toggle', 'user_groups', 'user_roles', 'video', 'yaml',
-        'revealer', 'section', 'select', 'slug', 'suggest', 'table', 'tags', 'taxonomy', 'template', 'text', 'textarea',
+        'radio', 'time', 'title', 'toggle', 'video', 'yaml',
+        'revealer', 'section', 'table', 'tags', 'template', 'textarea',
     ];
 
     /**
@@ -70,7 +69,6 @@ class ExtensionServiceProvider extends ServiceProvider
         'email' => 'obfuscateEmail',
         'l10n' => 'formatLocalized',
         'lowercase' => 'lower',
-        '85' => 'slackEasterEgg',
         'tz' => 'timezone',
         'in_future' => 'isFuture',
         'inPast' => 'isPast',
@@ -88,21 +86,83 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $fieldtypes = [
+        Fieldtypes\Arr::class,
+        Fieldtypes\AssetContainer::class,
+        Fieldtypes\AssetFolder::class,
         Fieldtypes\Assets::class,
+        Fieldtypes\Bard::class,
+        Fieldtypes\Bard\Buttons::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Date::class,
-        \Statamic\Forms\Fieldtype::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
-        Fieldtypes\Relationship::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Range::class,
+        Fieldtypes\Relationship::class,
+        Fieldtypes\Replicator::class,
+        Fieldtypes\Select::class,
+        Fieldtypes\Sets::class,
+        Fieldtypes\Slug::class,
         Fieldtypes\Template::class,
+        Fieldtypes\Text::class,
+        Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
+        Fieldtypes\UserGroups::class,
+        Fieldtypes\UserRoles::class,
+        Fieldtypes\Users::class,
         Fieldtypes\Yaml::class,
+        \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $tags = [
+        Tags\Asset::class,
+        Tags\Assets::class,
+        Tags\Cache::class,
+        Tags\Can::class,
+        Tags\Collection\Collection::class,
+        Tags\Dump::class,
+        Tags\Entries::class,
+        Tags\Env::class,
+        Tags\GetContent::class,
+        Tags\GetFiles::class,
+        Tags\Glide::class,
+        Tags\In::class,
+        Tags\Is::class,
+        Tags\Link::class,
+        Tags\Locales::class,
+        Tags\Markdown::class,
+        Tags\Member::class,
+        Tags\Mix::class,
+        Tags\Nav::class,
+        Tags\NotFound::class,
+        Tags\OAuth::class,
+        Tags\Obfuscate::class,
+        Tags\Pages::class,
+        Tags\ParentTags::class,
+        Tags\Partial::class,
+        Tags\Path::class,
+        Tags\Redirect::class,
+        Tags\Relate::class,
+        Tags\Rotate::class,
+        Tags\Routes::class,
+        Tags\Scope::class,
+        Tags\Set::class,
+        Tags\Section::class,
+        Tags\Taxonomy::class,
+        Tags\Theme::class,
+        Tags\Trans::class,
+        Tags\TransChoice::class,
+        Tags\Users::class,
+        Tags\Widont::class,
+        Tags\Yields::class,
+        \Statamic\Forms\Tags::class,
+        \Statamic\Auth\UserTags::class,
+        \Statamic\Auth\Protect\Tags::class,
+        \Statamic\Search\Tags::class,
     ];
 
     /**
@@ -121,7 +181,7 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->registerTags();
         $this->registerModifiers();
         $this->registerFieldtypes();
-        $this->registerFilters();
+        $this->registerScopes();
         $this->registerActions();
         $this->registerWidgets();
     }
@@ -135,22 +195,9 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $parent = 'statamic.tags';
 
-        $tags = [
-            Tags\Asset::class, Tags\Assets::class, Tags\Cache::class, Tags\Can::class, Tags\Collection::class,
-            Tags\Dump::class, Tags\Entries::class, Tags\Env::class, Tags\GetContent::class, Tags\GetFiles::class,
-            Tags\GetValue::class, Tags\Glide::class, Tags\In::class, Tags\Is::class, Tags\Link::class,
-            Tags\Locales::class, Tags\Markdown::class, Tags\Member::class, Tags\Mix::class, Tags\Nav::class,
-            Tags\NotFound::class, Tags\OAuth::class, Tags\Obfuscate::class, Tags\Pages::class, Tags\ParentTags::class,
-            Tags\Partial::class, Tags\Path::class, Tags\Redirect::class, Tags\Relate::class, Tags\Rotate::class,
-            Tags\Routes::class, Tags\Section::class, Tags\Taxonomy::class, Tags\Theme::class, Tags\Trans::class,
-            Tags\TransChoice::class, Tags\Users::class, Tags\Widont::class, Tags\Yields::class,
-            \Statamic\Forms\Tags::class, \Statamic\Auth\UserTags::class, \Statamic\Auth\Protect\Tags::class,
-            \Statamic\Search\Tags::class
-        ];
-
         $this->registerParent($parent);
 
-        foreach ($tags as $tag) {
+        foreach ($this->tags as $tag) {
             $this->registerExtension($tag, $parent);
             $this->registerAliases($tag, $parent);
         }
@@ -222,6 +269,7 @@ class ExtensionServiceProvider extends ServiceProvider
         }
 
         foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
+            $studly = studly_case($actual);
             $this->app[$parent][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
         }
 
@@ -231,27 +279,28 @@ class ExtensionServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register filters.
+     * Register scopes.
      *
      * @return void
      */
-    protected function registerFilters()
+    protected function registerScopes()
     {
-        $parent = 'statamic.filters';
+        $parent = 'statamic.scopes';
 
-        $filters = [
-            Filters\Site::class,
-            Filters\UserRole::class,
-            Filters\UserGroup::class,
+        $scopes = [
+            Scopes\Filters\Fields::class,
+            Scopes\Filters\Site::class,
+            Scopes\Filters\UserRole::class,
+            Scopes\Filters\UserGroup::class,
         ];
 
         $this->registerParent($parent);
 
-        foreach ($filters as $filter) {
-            $this->registerExtension($filter, $parent);
+        foreach ($scopes as $scope) {
+            $this->registerExtension($scope, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Filters', $parent);
+        $this->registerExtensionsInAppFolder('Scopes', $parent);
     }
 
     /**
@@ -269,6 +318,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Unpublish::class,
             Actions\SendActivationEmail::class,
             Actions\MoveAsset::class,
+            Actions\DeleteEntry::class,
         ];
 
         $this->registerParent($parent);

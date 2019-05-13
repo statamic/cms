@@ -1,14 +1,16 @@
 <template>
 
-    <div class="replicator">
+    <div class="replicator-fieldtype-container">
 
         <sortable-list
             v-model="values"
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            @dragstart="$emit('focus')"
+            @dragend="$emit('blur')"
         >
-            <div slot-scope="{}">
+            <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
                     v-for="(set, index) in values"
                     :key="`set-${set._id}`"
@@ -18,13 +20,15 @@
                     :parent-name="name"
                     :sortable-item-class="sortableItemClass"
                     :sortable-handle-class="sortableHandleClass"
+                    :is-read-only="isReadOnly"
                     @updated="updated"
-                    @removed="removed"
+                    @focus="focused = true"
+                    @blur="blurred"
                 />
             </div>
         </sortable-list>
 
-        <div class="set-buttons">
+        <div class="set-buttons" v-if="!isReadOnly">
             <button
                 v-for="set in setConfigs"
                 :key="set.handle"
@@ -55,7 +59,8 @@ export default {
 
     data() {
         return {
-            values: null
+            values: null,
+            focused: false,
         }
     },
 
@@ -80,7 +85,7 @@ export default {
         let values = JSON.parse(JSON.stringify(this.value || []));
 
         // Assign each set a unique id that Vue can use as a v-for key.
-        this.values = values.map(set => Object.assign(set, { _id: uniqid() }));
+        this.values = values.map(set => Object.assign(set, { _id: uniqid(), enabled: true }));
     },
 
     methods: {
@@ -103,6 +108,7 @@ export default {
             let newSet = {
                 _id: uniqid(), // Assign a unique id that Vue can use as a v-for key.
                 type: handle,
+                enabled: true
             };
 
             // Get nulls for all the set's fields so Vue can track them more reliably.
@@ -122,15 +128,39 @@ export default {
         collapseAll() { },
         expandAll() { },
 
+        blurred() {
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.focused = false;
+                }
+            }, 1);
+        }
+
     },
 
     watch: {
+
+        value(value, oldValue) {
+            this.values = value;
+        },
 
         values: {
             deep: true,
             handler(values) {
                 this.$emit('updated', values);
             }
+        },
+
+        focused(focused, oldFocused) {
+            if (focused === oldFocused) return;
+
+            if (focused) return this.$emit('focus');
+
+            setTimeout(() => {
+                if (!this.$el.contains(document.activeElement)) {
+                    this.$emit('blur');
+                }
+            }, 1);
         }
 
     }

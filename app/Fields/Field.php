@@ -85,6 +85,24 @@ class Field implements Arrayable
         return (bool) $this->get('listable');
     }
 
+    public function isSortable()
+    {
+        if (is_null($this->get('sortable'))) {
+            return true;
+        }
+
+        return (bool) $this->get('sortable');
+    }
+
+    public function isFilterable()
+    {
+        if (is_null($this->get('filterable'))) {
+            return $this->isListable();
+        }
+
+        return (bool) $this->get('filterable');
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [
@@ -147,6 +165,13 @@ class Field implements Arrayable
         return $this;
     }
 
+    public function augment()
+    {
+        $this->value = $this->fieldtype()->augment($this->value);
+
+        return $this;
+    }
+
     public function toArray()
     {
         return array_merge($this->config, [
@@ -168,18 +193,22 @@ class Field implements Arrayable
 
     public function get(string $key, $fallback = null)
     {
-        return $this->config[$key] ?? $fallback;
+        return array_get($this->config, $key, $fallback);
     }
 
     private function preProcessedConfig()
     {
-        $fields = $this->fieldtype()->configFields()->addValues($this->config);
+        $fieldtype = $this->fieldtype();
 
-        return array_merge($this->config, $fields->preProcess()->values());
+        $fields = $fieldtype->configFields()->addValues($this->config);
+
+        return array_merge($this->config, $fields->preProcess()->values(), [
+            'component' => $fieldtype->component(),
+        ]);
     }
 
     public function meta()
     {
-        return $this->fieldtype()->preload($this->value());
+        return $this->fieldtype()->preload();
     }
 }

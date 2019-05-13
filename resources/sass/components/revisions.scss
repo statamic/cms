@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Revisions
+   ========================================================================== */
+
+.revision-list {
+    // @apply pb-2;
+}
+
+.revision-date {
+    @apply p-2 pb-1 mt-2;
+}
+
+.revision-item {
+    @apply p-1 text-sm block cursor-pointer border-t;
+    &:hover {
+        @apply bg-grey-20;
+    }
+    &:last-child {
+        @apply border-b;
+    }
+}
+
+.revision-item-bullet-container {
+    @apply w-4 relative;
+    top: -2px;
+
+    .revision-item-bullet {
+        @apply bg-grey-60 inline-block relative;
+        border-radius: 7px;
+        height: 7px;
+        width: 7px;
+        flex-shrink: 0;
+    }
+}
+
+.revision-item .badge {
+    @apply uppercase text-4xs ml-1 text-white rounded-sm;
+    height: 16px;
+
+    &.publish { @apply bg-green-light; }
+    &.revision,
+    &.restore { @apply text-grey-70; }
+    &.unpublish { @apply bg-red; }
+}
+
+.revision-item-note {
+    @apply text-sm text-grey-80 font-medium mb-sm;
+    width: 300px;
+}
+
+.revision-item.status-published {
+    .revision-item-bullet { @apply bg-green; }
+}
+
+.revision-item.status-working-copy {
+    @apply text-blue;
+    .revision-item-bullet { @apply bg-blue; }
+    .badge { @apply bg-blue; }
+}

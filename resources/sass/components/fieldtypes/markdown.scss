@@ -33,7 +33,7 @@
         }
 
         a {
-            @apply text-grey-light outline-none;
+            @apply text-grey-40 outline-none;
 
             &:hover {
                 @apply text-blue;
@@ -41,7 +41,7 @@
         }
 
         .active a {
-            @apply .text-grey-dark;
+            @apply .text-grey-80;
         }
     }
 
@@ -50,7 +50,7 @@
     }
 
     .CodeMirror {
-        @apply .bg-grey-lighten-6 .shadow-inner .h-auto .font-mono .leading-normal .p-1.5 .text-xs;
+        @apply .bg-grey-10 .shadow-inner .h-auto .font-mono .leading-normal .p-1.5 .text-xs;
         border-radius: 0 0 3px 3px;
 
         .cm-comment {
@@ -61,12 +61,12 @@
     .CodeMirror-code { min-height: 100px; }
 
     .CodeMirror-lines {
+        @apply border-r border-grey-30;
         max-width: 860px;
-        margin: 0 auto;
     }
 
     .helpers {
-        @apply border-t text-xs text-grey;
+        @apply border-t text-xs text-grey flex items-center;
     }
 
     .markdown-cheatsheet-helper {
@@ -77,17 +77,20 @@
             position: relative;
             bottom: -2px;
             margin-right: 3px;
-            opacity: 0.65;
         }
     }
 
     .markdown-asset-helper {
         @apply py-1 px-2 inline-block;
-
-        .icon {
-            @apply mr-sm;
-        }
     }
+}
+
+
+/* Read Only
+  ========================================================================== */
+
+.read-only-field .CodeMirror {
+    @apply bg-grey-30 text-grey-70;
 }
 
 
@@ -114,12 +117,12 @@
 /* Inside a Replicator fieldtype
   ========================================================================== */
 
-  .replicator-fieldtype .markdown-fieldtype,
-  .grid-fieldtype .grid-stacked .markdown-fieldtype {
-      .CodeMirror {
-          background: #fff;
-      }
-  }
+  // .replicator-fieldtype .markdown-fieldtype,
+  // .grid-fieldtype .grid-stacked .markdown-fieldtype {
+  //     .CodeMirror {
+  //         background: #fff;
+  //     }
+  // }
 
 
 
@@ -144,15 +147,11 @@
     height: 100vh;
 
     .CodeMirror {
+        @apply border-r border-grey-20;
         box-shadow: none !important;
         background: #fff;
         padding: 64px 32px;
         max-width: 860px;
-        margin: 0 auto;
-    }
-
-    .CodeMirror-lines {
-        border-right: none !important;
     }
 }
 
@@ -161,53 +160,53 @@
 /* @TODO make sure Sneak Peek mode looks good
   ========================================================================== */
 
-.sneak-peeking .markdown-fieldtype {
-    .markdown-toolbar { padding: 9px 4px 7px; }
-    .CodeMirror { font-size: 13px; }
-    .markdown-preview { padding: 10px; }
-}
+// .sneak-peeking .markdown-fieldtype {
+//     .markdown-toolbar { padding: 9px 4px 7px; }
+//     .CodeMirror { font-size: 13px; }
+//     .markdown-preview { padding: 10px; }
+// }
 
 
 /* Reponsive Wangjangling
   ========================================================================== */
-
-@media (max-width: 1180px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 700px; }
-}
-
-@media (max-width: 1020px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 640px; }
-}
-
-@media (min-width: 768px) and (max-width: 900px) {
-    .markdown-fieldtype .CodeMirror-lines {
-        max-width: 520px;
-        border-right: none !important;
-    }
-}
-
-@media (max-width: 766px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 600px; }
-}
-
-@media (max-width: 720px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 500px; }
-}
-
-@media (max-width: 620px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 400px; }
-}
-
-@media (max-width: 520px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 320px; }
-}
-
-@media (max-width: 420px) {
-    .markdown-fieldtype .CodeMirror-lines { max-width: 280px; }
-}
-
-@media (min-width: 1366px) and (max-width: 1600px) {
-.markdown-fieldtype .CodeMirror-lines {
-        max-width: 720px;
-    }
-}
+//
+// @media (max-width: 1180px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 700px; }
+// }
+//
+// @media (max-width: 1020px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 640px; }
+// }
+//
+// @media (min-width: 768px) and (max-width: 900px) {
+//     .markdown-fieldtype .CodeMirror-lines {
+//         max-width: 520px;
+//         border-right: none !important;
+//     }
+// }
+//
+// @media (max-width: 766px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 600px; }
+// }
+//
+// @media (max-width: 720px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 500px; }
+// }
+//
+// @media (max-width: 620px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 400px; }
+// }
+//
+// @media (max-width: 520px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 320px; }
+// }
+//
+// @media (max-width: 420px) {
+//     .markdown-fieldtype .CodeMirror-lines { max-width: 280px; }
+// }
+//
+// @media (min-width: 1366px) and (max-width: 1600px) {
+// .markdown-fieldtype .CodeMirror-lines {
+//         max-width: 720px;
+//     }
+// }

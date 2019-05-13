@@ -3,33 +3,37 @@ import Vue from 'vue';
 class Preference {
     constructor(instance) {
         this.instance = instance;
-        this.storeUrl = '/cp/preferences';
+        this.storeUrl = cp_url('preferences');
     }
 
     all() {
-        return this.instance.$store.state.statamic.preferences;
+        return this.instance.$store.state.statamic.config.preferences;
     }
 
     get(key, fallback) {
-        return this.dotNotationGet(key, this.all()) || fallback;
+        return data_get(this.all(), key, fallback);
     }
 
     set(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.post(this.storeUrl, {'key': key, 'value': value})
+            this.instance.$axios.post(this.storeUrl, {key, value})
         );
     }
 
     append(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.post(this.storeUrl, {'key': key, 'value': value, append: true})
+            this.instance.$axios.post(this.storeUrl, {key, value, append: true})
         );
     }
 
-    remove(key) {
+    remove(key, value=null, cleanup=true) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.axios.delete(`${this.storeUrl}/${key}`)
+            this.instance.$axios.delete(`${this.storeUrl}/${key}`, {data: {value, cleanup}})
         );
+    }
+
+    removeValue(key, value) {
+        return this.remove(key, value);
     }
 
     commitOnSuccessAndReturnPromise(promise) {
@@ -38,13 +42,6 @@ class Preference {
         });
 
         return promise;
-    }
-
-    // Because we don't have access to lodash, and underscore doesn't have a direct solution.
-    // Source: https://stackoverflow.com/a/22129960
-    dotNotationGet(path, obj) {
-        var properties = Array.isArray(path) ? path : path.split('.');
-        return properties.reduce((prev, curr) => prev && prev[curr], obj);
     }
 }
 

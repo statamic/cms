@@ -7,6 +7,7 @@ use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -24,7 +25,11 @@ class CpServiceProvider extends ServiceProvider
             'translationLocale' => $this->app['translator']->locale(),
             'translations' => $this->app['translator']->toJson(),
             'sites' => $this->sites(),
-            'selectedSite' => Site::selected()->handle()
+            'selectedSite' => Site::selected()->handle(),
+            'ampEnabled' => config('statamic.amp.enabled'),
+            'bard' => ['plugins' => [], 'buttons' => []],
+            'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
+            'livePreview' => config('statamic.live_preview'),
         ]);
     }
 

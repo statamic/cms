@@ -4,19 +4,19 @@
         <div class="form-group">
             <label>{{ __('Display Text') }}</label>
             <small class="help-block">{{ __('cp.display_text_instructions') }}</small>
-            <input type="text" class="form-control" v-model="field.display" v-focus="true" />
+            <input type="text" class="input-text" v-model="field.display" v-focus="true" />
         </div>
 
         <div class="form-group">
             <label>{{ __('cp.field_name') }}</label>
             <small class="help-block">{{ __('cp.field_name_instructions') }}</small>
-            <input type="text" class="form-control" v-model="field.name" @keydown="isNameModified = true" />
+            <input type="text" class="input-text" v-model="field.name" @keydown="isNameModified = true" />
         </div>
 
         <div class="form-group">
             <label>{{ __('cp.validation_rules') }}</label>
             <small class="help-block">{{ __('Validation rule instructions...') }}</small>
-            <input type="text" class="form-control" v-model="field.validate" />
+            <input type="text" class="input-text" v-model="field.validate" />
         </div>
 
     </div>

@@ -24,4 +24,34 @@ class Test extends Tags
 
         return $this->parse([$var => $val]);
     }
+
+    public function someLoopParsing()
+    {
+        return $this->parseLoop([
+            [], [],
+        ]);
+    }
+
+    public function returnSimpleArray()
+    {
+        return ['one' => 'a', 'two' => 'b'];
+    }
+
+    public function returnMultidimensionalArray()
+    {
+        return [
+            ['one' => 'a', 'two' => 'b'],
+            ['one' => 'c', 'two' => 'd'],
+        ];
+    }
+
+    public function returnEmptyArray()
+    {
+        return [];
+    }
+
+    public function returnCollection()
+    {
+        return collect($this->returnMultidimensionalArray());
+    }
 }

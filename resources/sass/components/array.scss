@@ -16,7 +16,7 @@
     }
 
     th {
-        @apply border-r p-1 bg-grey-lighter;
+        @apply border-r p-1 bg-grey-30;
     }
 
     td {
@@ -46,6 +46,6 @@
     }
 
     td:focus-within {
-        @apply bg-grey-lightest;
+        @apply bg-grey-20;
     }
 }

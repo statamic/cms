@@ -11,7 +11,11 @@
             name="slug"
             :config="config"
             :value="slug"
-            @updated="slug = $event" />
+            :read-only="isReadOnly"
+            @updated="slug = $event"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
     </slugify>
 
 </template>

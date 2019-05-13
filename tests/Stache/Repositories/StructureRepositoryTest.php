@@ -13,7 +13,7 @@ use Statamic\Stache\Repositories\StructureRepository;
 
 class StuctureRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

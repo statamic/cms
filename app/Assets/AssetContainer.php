@@ -3,35 +3,34 @@
 namespace Statamic\Assets;
 
 use Statamic\API;
-use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Parse;
 use Statamic\API\Folder;
+use Statamic\API\Search;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Asset as AssetAPI;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class AssetContainer implements AssetContainerContract
+class AssetContainer implements AssetContainerContract, Augmentable
 {
-    use ExistsAsFile;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $title;
     protected $handle;
     protected $disk;
-    protected $private;
     protected $blueprint;
-    protected $assets;
-
-    public function __construct()
-    {
-        $this->assets = collect();
-    }
+    protected $private;
+    protected $allowUploads;
+    protected $createFolders;
+    protected $searchIndex;
 
     public function id($id = null)
     {
@@ -41,25 +40,20 @@ class AssetContainer implements AssetContainerContract
 
     public function handle($handle = null)
     {
-        if (func_num_args() === 0) {
-            return $this->handle;
-        }
-
-        $this->handle = $handle;
-
-        return $this;
+        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
     public function title($title = null)
     {
-        if (func_num_args() === 0) {
-            return $this->title ?? ucfirst($this->handle());
-        }
-
-        $this->title = $title;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? ucfirst($this->handle);
+            })
+            ->args(func_get_args());
     }
+
+
 
     public function diskPath()
     {
@@ -91,12 +85,23 @@ class AssetContainer implements AssetContainerContract
      */
     public function toArray()
     {
-        $data = $this->data();
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+            'disk' => $this->disk,
+            'blueprint' => $this->blueprint,
+            'allow_uploads' => $this->allowUploads(),
+            'create_folders' => $this->createFolders(),
+            'search_index' => $this->searchIndex,
+        ];
+    }
 
-        $data['id'] = $this->id();
-        $data['disk'] = array_get($this->data(), 'disk');
-
-        return $data;
+    public function toAugmentedArray()
+    {
+        return array_merge($this->toArray(), [
+            'handle' => $this->handle(),
+            'assets' => $this->assets()
+        ]);
     }
 
     /**
@@ -114,22 +119,26 @@ class AssetContainer implements AssetContainerContract
         return cp_route('asset-containers.destroy', $this->id());
     }
 
+    public function showUrl()
+    {
+        return cp_route('assets.browse.show', $this->handle());
+    }
+
     /**
      * Get or set the blueprint to be used by assets in this container
      *
      * @param string $blueprint
-     * @return \Statamic\Fields\Blueprint
+     * @return \Statamic\Fields\Blueprint|$this
      */
     public function blueprint($blueprint = null)
     {
-        if (func_num_args() === 0) {
-            return Blueprint::find($this->blueprint ?? config('statamic.theming.blueprints.asset'))
-                ?? Blueprint::find('asset');
-        }
-
-        $this->blueprint = $blueprint;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return Blueprint::find($blueprint ?? config('statamic.theming.blueprints.asset'))
+                    ?? Blueprint::find('asset');
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -141,28 +150,9 @@ class AssetContainer implements AssetContainerContract
     {
         API\AssetContainer::save($this);
 
+        // event(new AssetContainerSaved($this));
+
         return $this;
-        $path = "assets/{$this->id}.yaml";
-
-        $data = array_filter($this->toArray());
-        unset($data['id']);
-
-        // Get rid of the driver key if it's local. It's local by default.
-        if (array_get($data, 'driver') === 'local') {
-            unset($data['driver']);
-        }
-
-        // Move assets array to the bottom because it's just easier to read.
-        if ($assets = array_get($data, 'assets')) {
-            unset($data['assets']);
-            $data['assets'] = $assets;
-        }
-
-        $yaml = YAML::dump($data);
-
-        File::disk('content')->put($path, $yaml);
-
-        event(new AssetContainerSaved($this));
     }
 
     /**
@@ -181,13 +171,12 @@ class AssetContainer implements AssetContainerContract
 
     public function disk($disk = null)
     {
-        if (func_num_args() === 0) {
-            return $this->disk ? File::disk($this->disk) : null;
-        }
-
-        $this->disk = $disk;
-
-        return $this;
+        return $this
+            ->fluentlyGetOrSet('disk')
+            ->getter(function ($disk) {
+                return $disk ? File::disk($disk) : null;
+            })
+            ->args(func_get_args());
     }
 
     public function diskHandle()
@@ -218,7 +207,9 @@ class AssetContainer implements AssetContainerContract
 
         // Get rid of files we never want to show up.
         $files = $files->reject(function ($path) {
-            return Str::endsWith($path, ['.DS_Store', 'folder.yaml']);
+            return Str::startsWith($path, '.meta/')
+                || Str::contains($path, '/.meta/')
+                || Str::endsWith($path, ['.DS_Store']);
         });
 
         return $files->values();
@@ -239,9 +230,11 @@ class AssetContainer implements AssetContainerContract
             $recursive = true;
         }
 
-        $folders = collect($this->disk()->getFolders($folder, $recursive));
+        $paths = $this->disk()->getFolders($folder, $recursive);
 
-        return $folders->values();
+        return collect($paths)->reject(function ($path) {
+            return basename($path) === '.meta';
+        })->values();
     }
 
     /**
@@ -253,13 +246,15 @@ class AssetContainer implements AssetContainerContract
      */
     public function assets($folder = null, $recursive = false)
     {
-        $assets = $this->files($folder, $recursive)->keyBy(function ($path) {
-            return $path;
-        })->map(function ($path) {
-            return $this->asset($path);
-        });
+        $query = $this->queryAssets();
 
-        return collect_assets($assets);
+        if ($folder && $recursive) {
+            $query->where('folder', 'like', "{$folder}%");
+        } elseif ($folder) {
+            $query->where('folder', $folder);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -295,15 +290,13 @@ class AssetContainer implements AssetContainerContract
      */
     public function asset($path)
     {
-        if (! $this->disk()->exists($path)) {
-            return;
+        $asset = API\Asset::make()->container($this)->path($path);
+
+        if (! $asset->disk()->exists($asset->path())) {
+            return null;
         }
 
-        if (! $asset = $this->assets->get($path)) {
-            $asset = API\Asset::make();
-            $asset->container($this);
-            $asset->path($path);
-        }
+        $asset->hydrate();
 
         return $asset;
     }
@@ -324,27 +317,6 @@ class AssetContainer implements AssetContainerContract
             ->title(array_get($data, 'title'));
     }
 
-    public function addAsset(\Statamic\Assets\Asset $asset)
-    {
-        $asset->container($this);
-
-        $this->assets[$asset->path()] = $asset;
-
-        return $this;
-    }
-
-    public function removeAsset(\Statamic\Assets\Asset $asset)
-    {
-        $this->assets->forget($asset->path());
-
-        return $this;
-    }
-
-    public function pendingAssets()
-    {
-        return $this->assets;
-    }
-
     /**
      * Whether the container's assets are web-accessible
      *
@@ -357,31 +329,83 @@ class AssetContainer implements AssetContainerContract
 
     public function private($private = null)
     {
-        if (func_num_args() === 0) {
-            return (bool) $this->private;
-        }
+        return $this
+            ->fluentlyGetOrSet('private')
+            ->getter(function ($private) {
+                return (bool) $private;
+            })
+            ->args(func_get_args());
+    }
 
-        $this->private = $private;
+    /**
+     * The ability to upload into this container.
+     *
+     * @param bool|null $allowUploads
+     * @return bool|$this
+     */
+    public function allowUploads($allowUploads = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('allowUploads')
+            ->getter(function ($allowUploads) {
+                return (bool) ($allowUploads ?? true);
+            })
+            ->args(func_get_args());
+    }
 
-        return $this;
+    /**
+     * The ability to create folders within this container.
+     *
+     * @param bool|null $createFolders
+     * @return bool|$this
+     */
+    public function createFolders($createFolders = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('createFolders')
+            ->getter(function ($createFolders) {
+                return (bool) ($createFolders ?? true);
+            })
+            ->args(func_get_args());
     }
 
     protected function fileData()
     {
-        return [
-            'title' => $this->title(),
-            'disk' => $this->disk,
-            'blueprint' => $this->blueprint,
-            'assets' => $this->assets->map->data()->map(function ($data) {
-                return Arr::removeNullValues($data);
-            })->reject(function ($data) {
-                return empty($data);
-            })->all(),
-        ];
+        $data = array_except($this->toArray(), 'handle');
+
+        if ($data['allow_uploads'] === true) {
+            unset($data['allow_uploads']);
+        }
+
+        if ($data['create_folders'] === true) {
+            unset($data['create_folders']);
+        }
+
+        return $data;
     }
 
     public function toCacheableArray()
     {
         return $this->fileData();
+    }
+
+    public function queryAssets()
+    {
+        return API\Asset::query()->where('container', $this);
+    }
+
+    public function hasSearchIndex()
+    {
+        return $this->searchIndex() !== null;
+    }
+
+    public function searchIndex($index = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('searchIndex')
+            ->getter(function ($index) {
+                return $index ? Search::index($index) : null;
+            })
+            ->args(func_get_args());
     }
 }

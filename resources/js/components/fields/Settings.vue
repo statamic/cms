@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full overflow-auto p-4 bg-grey-lighter h-full">
+    <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
 
         <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
@@ -9,8 +9,8 @@
         <div v-if="fieldtypesLoaded" class="flex items-center mb-3 -mt-1">
             <h1 class="flex-1">
                 {{ config.display || config.handle }}
-                <small class="block text-xs text-grey-light font-medium leading-none mt-1 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-light text-current" :name="fieldtype.icon"></svg-icon>
+                <small class="block text-xs text-grey-40 font-medium leading-none mt-1 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-40 text-current" :name="fieldtype.icon"></svg-icon>
                     {{ fieldtype.title }}
                 </small>
             </h1>
@@ -60,8 +60,16 @@
                     TODO:
                     - Validation
                     - Default value
-                    - Display conditions
                 -->
+
+                <field-conditions-builder
+                    :config="config"
+                    :suggestable-fields="suggestableConditionFields"
+                    @updated="updateFieldConditions" />
+
+                <field-validation-builder
+                    :config="config"
+                    @updated="updateFieldValidation" />
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
@@ -80,18 +88,20 @@
 <script>
 import PublishField from '../publish/Field.vue';
 import ProvidesFieldtypes from './ProvidesFieldtypes';
-import FieldConditionsBuilder from '../field-conditions-builder/FieldConditionsBuilder.vue';
+import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
+import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
 
     components: {
         PublishField,
         FieldConditionsBuilder,
+        FieldValidationBuilder,
     },
 
     mixins: [ProvidesFieldtypes],
 
-    props: ['config', 'type', 'root'],
+    props: ['config', 'type', 'root', 'suggestableConditionFields'],
 
     model: {
         prop: 'config',
@@ -122,7 +132,7 @@ export default {
         },
 
         canBeLocalized: function() {
-            return this.root && Object.keys(Statamic.locales).length > 1 && this.fieldtype.canBeLocalized;
+            return this.root && Object.keys(Statamic.$config.get('locales')).length > 1 && this.fieldtype.canBeLocalized;
         },
 
         canBeValidated: function() {
@@ -183,6 +193,30 @@ export default {
             values[handle] = value;
             this.$emit('input', values);
             this.$emit('updated', handle, value);
+        },
+
+        updateFieldConditions(conditions) {
+            let values = {};
+
+            _.each(this.values, (value, key) => {
+                if (! FIELD_CONDITIONS_KEYS.includes(key)) {
+                    values[key] = value;
+                }
+            });
+
+            this.$emit('input', {...values, ...conditions});
+        },
+
+        updateFieldValidation(rules) {
+            const values = clone(this.values);
+
+            if (rules) {
+                values.validate = rules;
+            } else {
+                delete values.validate;
+            }
+
+            this.$emit('input', values);
         }
 
     }

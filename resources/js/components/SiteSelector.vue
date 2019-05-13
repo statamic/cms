@@ -1,9 +1,9 @@
 <template>
 
-    <div class="flex items-center px-2 border-l h-full text-sm">
+    <div class="site-selector">
         <dropdown-list>
-            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-dark" slot="trigger">
-                <i class="block h-6 w-6 mr-1"><slot name="icon" /></i><span>{{ activeName }}</span>
+            <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-80" slot="trigger">
+                <i class="site-selector-icon"><slot name="icon" /></i><span>{{ activeName }}</span>
             </button>
             <ul class="dropdown-menu">
                 <li v-for="site in sites" :key="site.handle">
@@ -26,11 +26,11 @@ export default {
     computed: {
 
         sites() {
-            return Statamic.sites;
+            return Statamic.$config.get('sites');
         },
 
         active() {
-            return Statamic.selectedSite;
+            return Statamic.$config.get('selectedSite');
         },
 
         activeName() {

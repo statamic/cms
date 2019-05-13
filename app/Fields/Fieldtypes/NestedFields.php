@@ -9,6 +9,8 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 
 class NestedFields extends Fieldtype
 {
+    protected static $handle = 'fields';
+
     protected $selectable = false;
 
     public function preProcess($config)

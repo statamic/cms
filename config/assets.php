@@ -97,8 +97,21 @@ return [
     */
 
     'thumbnails' => [
-        'max_width' => 6000,
-        'max_height' => 6000,
+        'max_width' => 10000,
+        'max_height' => 10000,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Previews with Google Docs
+    |--------------------------------------------------------------------------
+    |
+    | Filetypes that cannot be rendered with HTML5 can opt into the Google Docs
+    | Viewer. Google will get temporary access to these files so keep that in
+    | mind for any privacy implecations: https://policies.google.com/privacy
+    |
+    */
+
+    'google_docs_viewer' => false,
 
 ];

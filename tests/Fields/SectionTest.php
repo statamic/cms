@@ -139,6 +139,11 @@ class SectionTest extends TestCase
                     'instructions' => 'One instructions',
                     'required' => true,
                     'validate' => 'required|min:2',
+                    'component' => 'text',
+                    'placeholder' => null,
+                    'character_limit' => 0,
+                    'prepend' => null,
+                    'append' => null,
                 ],
                 [
                     'handle' => 'two',
@@ -146,7 +151,9 @@ class SectionTest extends TestCase
                     'display' => 'Two',
                     'instructions' => 'Two instructions',
                     'required' => false,
-                    'validate' => 'min:2'
+                    'validate' => 'min:2',
+                    'character_limit' => null,
+                    'component' => 'textarea',
                 ]
             ]
         ], $section->toPublishArray());

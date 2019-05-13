@@ -13,7 +13,7 @@ class EloquentPermissibleTest extends TestCase
 {
     use PermissibleContractTests;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

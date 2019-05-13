@@ -26,7 +26,7 @@
                         <a class="border flex items-center group w-full rounded shadow-sm py-1 px-2"
                             @click="select(option)">
                             <svg-icon class="h-4 w-4 opacity-50 group-hover:opacity-100" :name="option.icon"></svg-icon>
-                            <span class="pl-2 text-grey-dark group-hover:text-grey-darkest">{{ option.text }}</span>
+                            <span class="pl-2 text-grey-80 group-hover:text-grey-100">{{ option.text }}</span>
                         </a>
                     </div>
                 </div>

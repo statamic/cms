@@ -4,10 +4,9 @@
 
 .stacks-on-stacks {
     position: fixed;
-    top: 48px;
-    left: 0; right: 0; bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     // padding-top: 48px;
-    z-index: 99;
+    z-index: 999; // arbitrary to make it sit on top of random stuff.
 
     .vue-portal-target {
         @apply absolute pin;
@@ -23,8 +22,14 @@
         z-index: 99;
         opacity: 0.2;
         pointer-events: none;
-        transition: left .3s ease;
+        transition: all .3s ease;
+
+        &.stack-overlay-fade-enter,
+        &.stack-overlay-fade-leave-to {
+            opacity: 0;
+        }
     }
+
 
     .stack-hit-area {
         @apply absolute pin cursor-pointer;
@@ -35,40 +40,16 @@
         @apply h-full relative shadow-lg;
         z-index: 101;
         transition: all 0.2s ease;
+
+        &.stack-slide-enter,
+        &.stack-slide-leave-to {
+            transform: translateX(10px);
+            opacity: 0;
+        }
     }
+
 
     .hovering .stack-content {
         transform: translateX(-16px);
     }
-}
-
-
-/* Transitions
-  ========================================================================== */
-
-.stack-slide-enter-active {
-    transition: all .3s ease;
-}
-
-.stack-slide-leave-active {
-    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-
-.stack-slide-enter,
-.stack-slide-leave-to {
-    transform: translateX(10px);
-    opacity: 0;
-}
-
-.stack-overlay-enter-active {
-  animation: overlay-fade-in .5s;
-}
-
-.stack-overlay-leave-active {
-  animation: overlay-fade-in .5s reverse;
-}
-
-@keyframes overlay-fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 0.2; }
 }

@@ -10,14 +10,15 @@
             ref="uploader"
             :container="container.id"
             :path="path"
+            :enabled="canUpload"
             @updated="uploadsUpdated"
             @upload-complete="uploadCompleted"
             @error="uploadError"
         >
             <div slot-scope="{ dragging }" class="relative" :class="{ 'shadow': showContainerTabs }">
                 <div class="drag-notification" v-show="dragging">
-                    <i class="icon icon-download" />
-                    Drop to upload.
+                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    {{ __('Drop File to Upload') }}
                 </div>
 
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
@@ -25,7 +26,7 @@
                         v-text="item.title"
                         :class="{
                             active: item.id === container.id,
-                            'border-b border-grey-lighter': item.id !== container.id
+                            'border-b border-grey-30': item.id !== container.id
                         }"
                         @click="selectContainer(item.id)"
                     />
@@ -35,9 +36,12 @@
                     v-if="!initializing"
                     :rows="assets"
                     :columns="columns"
-                    :search-query="searchQuery"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
+                    :search="false"
+                    :sort="false"
+                    :sort-column="sortColumn"
+                    :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }">
@@ -47,22 +51,36 @@
                                 <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
-                                <button
-                                    class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative"
-                                    @click="openFileBrowser"
-                                >
-                                    <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
-                                    <span>{{ __('Upload') }}</span>
-                                </button>
-                            </div>
+                                <data-list-bulk-actions
+                                    v-if="hasSelections && hasActions"
+                                    :url="actionUrl"
+                                    :actions="actions"
+                                    @started="actionStarted"
+                                    @completed="bulkActionsCompleted"
+                                />
 
-                            <data-list-bulk-actions
-                                v-if="hasActions"
-                                :url="actionUrl"
-                                :actions="actions"
-                                @started="actionStarted"
-                                @completed="bulkActionsCompleted"
-                            />
+                                <template v-if="! hasSelections">
+                                    <button v-if="canCreateFolders" class="btn btn-flat btn-icon-only" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
+                                        <span>{{ __('Create Folder') }}</span>
+                                    </button>
+
+                                    <button v-if="canUpload" class="btn btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
+                                </template>
+
+                                <div class="btn-group-flat ml-2">
+                                    <button @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                        <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
+                                    </button>
+                                    <button @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                        <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                                    </button>
+                                </div>
+
+                            </div>
 
                             <uploads
                                 v-if="uploads.length"
@@ -70,35 +88,50 @@
                                 class="-mt-px"
                             />
 
-                            <data-list-table :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true">
+                            <data-list-table v-if="mode === 'table'" :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true" @sorted="sorted">
 
                                 <template slot="tbody-start">
                                     <tr v-if="folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
                                                 ..
                                             </a>
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="folder in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-6 h-6 mr-1 inline-block"></file-icon>
-                                                {{ folder.title || folder.path }}
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                                {{ folder.basename }}
                                             </a>
                                         </td>
-                                        <td :colspan="columns.length" />
+                                        <td class="text-right" :colspan="columns.length">
+                                            <dropdown-list>
+                                                <ul class="dropdown-menu">
+                                                    <li><a @click="editedFolderPath = folder.path" v-text="__('Edit')"></a></li>
+                                                </ul>
+                                            </dropdown-list>
+
+                                            <folder-editor
+                                                v-if="editedFolderPath === folder.path"
+                                                :initial-directory="folder.basename"
+                                                :container="container"
+                                                :path="path"
+                                                @closed="editedFolderPath = null"
+                                                @updated="folderUpdated(i, $event)"
+                                            />
+                                        </td>
                                     </tr>
                                 </template>
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                        <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
-                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.title || asset.basename }}</label>
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1" />
+                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.basename }}</label>
                                     </div>
                                 </template>
 
@@ -120,6 +153,39 @@
 
                             </data-list-table>
 
+                            <!-- Grid Mode -->
+                            <div class="data-grid" v-if="mode === 'grid'">
+                                <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
+                                    <!-- Parent Folder -->
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.parent_path)">
+                                            <div class="absolute pin flex items-center justify-center">
+                                                <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
+                                            </div>
+                                        </div>
+                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate">..</div>
+                                    </div>
+                                    <!-- Sub-Folders -->
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.path)">
+                                            <div class="absolute pin flex items-center justify-center">
+                                                <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
+                                            </div>
+                                        </div>
+                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="folder.basename" :title="folder.basename" />
+                                    </div>
+                                    <!-- Assets -->
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('asset-doubleclicked', asset)">
+                                            <div class="absolute pin flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
+                                                <asset-thumbnail :asset="asset" class="h-full w-full" />
+                                            </div>
+                                        </div>
+                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="asset.basename" :title="asset.basename" />
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                         <data-list-pagination
@@ -128,7 +194,7 @@
                             @page-selected="page = $event"
                         />
 
-                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-light">
+                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-70">
                             There are no assets.
                         </div>
 
@@ -142,17 +208,26 @@
             :id="editedAssetId"
             @closed="closeAssetEditor"
             @saved="assetSaved"
-            @deleted="assetDeleted">
-        </asset-editor>
+            @deleted="assetDeleted"
+        />
+
+        <folder-creator
+            v-if="creatingFolder"
+            :container="container"
+            :path="path"
+            @closed="creatingFolder = false"
+            @created="folderCreated"
+        />
 
     </div>
 
 </template>
 
 <script>
-import axios from 'axios';
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
+import FolderCreator from '../Folder/Create.vue';
+import FolderEditor from '../Folder/Edit.vue';
 import HasActions from '../../data-list/HasActions';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
@@ -168,6 +243,8 @@ export default {
         AssetEditor,
         Uploader,
         Uploads,
+        FolderEditor,
+        FolderCreator,
     },
 
     props: {
@@ -185,8 +262,8 @@ export default {
         return {
             columns: [
                 { label: __('File'), field: 'basename', visible: true },
-                { label: __('Size'), field: 'size_formatted', visible: true },
-                { label: __('Last Modified'), field: 'last_modified_relative', visible: true },
+                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true },
+                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true },
             ],
             containers: [],
             container: {},
@@ -198,10 +275,15 @@ export default {
             folder: {},
             searchQuery: '',
             editedAssetId: null,
+            editedFolderPath: null,
+            creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: 25, // TODO: Should come from the controller, or a config.
+            perPage: 30, // TODO: Should come from the controller, or a config.
             meta: {},
+            sortColumn: 'basename',
+            sortDirection: 'asc',
+            mode: 'table'
         }
     },
 
@@ -231,15 +313,30 @@ export default {
             // return this.can('assets:'+ this.container.id +':edit')
         },
 
+        canUpload() {
+            return this.container.allow_uploads;
+        },
+
+        canCreateFolders() {
+            return this.container.create_folders;
+        },
+
         parameters() {
             return {
                 page: this.page,
-                perPage: this.perPage
+                perPage: this.perPage,
+                sort: this.sortColumn,
+                order: this.sortDirection,
+                search: this.searchQuery,
             }
         },
 
         hasMaxFiles() {
             return this.maxFiles !== undefined && this.maxFiles !== Infinity;
+        },
+
+        hasSelections() {
+            return this.selectedAssets.length > 0;
         }
 
     },
@@ -289,17 +386,21 @@ export default {
         },
 
         loadContainers() {
-            axios.get(cp_url('asset-containers')).then(response => {
+            this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
                 this.container = this.containers[this.selectedContainer];
+                this.mode = this.$preferences.get(`assets.${this.container.id}.mode`, this.mode);
             });
         },
 
         loadAssets() {
             this.loadingAssets = true;
-            const url = cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
 
-            axios.get(url, { params: this.parameters }).then(response => {
+            const url = this.searchQuery
+                ? cp_url(`assets/browse/search/${this.container.id}`)
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
+
+            this.$axios.get(url, { params: this.parameters }).then(response => {
                 this.assets = response.data.data;
                 this.folders = response.data.meta.folders;
                 this.folder = response.data.meta.folder;
@@ -307,7 +408,7 @@ export default {
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {
-                this.$notify.error(e.response.data.message, { dismissible: false });
+                this.$notify.error(e.response.data.message, { action: null, duration: null });
                 this.assets = [];
                 this.folders = [];
                 this.loadingAssets = false;
@@ -327,6 +428,11 @@ export default {
             this.container = this.containers[id];
             this.path = '/';
             this.$emit('navigated', this.container, this.path);
+        },
+
+        setMode(mode) {
+            this.mode = mode;
+            this.$preferences.set(`assets.${this.container.id}.mode`, mode);
         },
 
         edit(id) {
@@ -349,23 +455,13 @@ export default {
             this.loadAssets();
         },
 
-        destroy(id) {
-            // TODO
-            console.log('deleting asset');
-        },
-
-        destroyMultiple(ids) {
-            // TODO
-            console.log('deleting multiple assets', ids);
-        },
-
         uploadsUpdated(uploads) {
             this.uploads = uploads;
         },
 
         uploadCompleted(asset) {
             this.loadAssets();
-            this.$notify.success(__(':file uploaded', { file: asset.basename }), { timeout: 3000 });
+            this.$notify.success(__(':file uploaded', { file: asset.basename }));
         },
 
         uploadError(upload, uploads) {
@@ -376,6 +472,37 @@ export default {
         openFileBrowser() {
             this.$refs.uploader.browse();
         },
+
+        folderCreated(folder) {
+            this.folders.push(folder);
+            this.folders = _.sortBy(this.folders, 'title');
+            this.creatingFolder = false;
+        },
+
+        folderUpdated(index, newFolder) {
+            this.folders[index] = newFolder;
+            this.editedFolderPath = null;
+        },
+
+        sorted(column, direction) {
+            this.sortColumn = column;
+            this.sortDirection = direction;
+        },
+
+        isSelected(id) {
+            return this.selectedAssets.includes(id);
+        },
+
+        toggleSelection(id) {
+            const i = this.selectedAssets.indexOf(id);
+
+            if (i != -1) {
+                this.selectedAssets.splice(i, 1);
+            } else if (! this.reachedSelectionLimit) {
+                this.selectedAssets.push(id);
+            }
+            this.$emit('selections-updated', this.selectedAssets);
+        }
     }
 
 }

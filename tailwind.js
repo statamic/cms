@@ -3,29 +3,36 @@ var defaultConfig = require('tailwindcss/defaultConfig')
 var colors = {
     'transparent':      'transparent',
     'black':            '#000000',
-    'grey-darkest':     'hsla(210, 20%, 10%, 1)', // grey-darken-3
-    'grey-darker':      'hsla(210, 15%, 20%, 1)', // grey-darken-2
-    'grey-dark':        'hsla(210, 10%, 30%, 1)', // grey-darken-1
-    'grey':             'hsla(210, 10%, 50%, 1)', // grey
-    'grey-light':       'hsla(210, 15%, 70%, 1)', // lighten-1
-    'grey-lighten-2':   'hsla(210, 15%, 80%, 1)', // lighten-2
-    'grey-lighten-3':   'hsla(210, 15%, 86%, 1)', // lighten-3
-    'grey-lighter':     'hsla(210, 30%, 95%, 1)', // lighten-4
-    'grey-lightest':    'hsla(210, 40%, 98%, 1)', // lighten-5
-    'grey-lighten-6':   'hsla(210, 40%, 99%, 1)', // lighten-6
+    'grey-100':         'hsl(210, 20%, 10%)',
+    'grey':             'hsl(210, 10%, 50%)', // default grey is grey-70
+    'grey-90':          'hsl(210, 15%, 20%)',
+    'grey-80':          'hsl(210, 10%, 30%)',
+    'grey-70':          'hsl(210, 10%, 50%)',
+    'grey-60':          'hsl(210, 15%, 70%)',
+    'grey-50':          'hsl(210, 15%, 80%)',
+    'grey-40':          'hsl(210, 15%, 86%)',
+    'grey-30':          'hsl(210, 30%, 95%)',
+    'grey-20':          'hsl(214, 60%, 97.5%)',
+    'grey-10':          'hsl(218, 90%, 99%)',
+    'white':            '#ffffff',
     'green':            '#479967',
-    'blue-light':       'hsla(210, 100%, 75%, 1)',
-    'blue':             'hsla(200, 80%, 50%, 1)',
-    'blue-dark':        'hsla(200, 70%, 40%, 1)',
-    'red-dark':         'hsla(2, 57%, 53%, 1)',
-    'red':              'hsla(2, 76%, 60%, 1)',
-    'red-light':        'hsla(2, 76%, 70%, 1)', // lighten-1
-    'red-lighter':      'hsla(2, 76%, 95%, 1)', // lighten-2
+    'green-light':      '#64BD63',
+    'blue-lighter':     'hsl(207, 86%, 70%)',
+    'blue-light':       'hsl(210, 100%, 75%)',
+    'blue':             'hsl(200, 80%, 50%)',
+    'blue-dark':        'hsl(200, 75%, 45%)', //#4990bb
+    'blue-darker':      'hsl(200, 75%, 40%)',
+    'red-dark':         'hsl(2, 57%, 53%)',
+    'red':              'hsl(2, 76%, 60%)',
+    'red-light':        'hsl(2, 76%, 70%)',
+    'red-lighter':      'hsl(2, 76%, 95%)',
     'yellow':           '#fbfab0',
     'yellow-dark':      '#d8cd1b',
-    'white':            '#ffffff',
+    'orange':           '#f5a82f',
     'pink':             '#ff269e',
     'purple':           '#c471ed',
+    'darken-10':        'rgba(0,0,0,.1)',
+    'darken-20':        'rgba(0,0,0,.2)',
 }
 
 // Set brand colors
@@ -243,7 +250,7 @@ module.exports = {
     |
     */
 
-    borderColors: Object.assign({ default: colors['grey-lighten-3'] }, colors),
+    borderColors: Object.assign({ default: colors['grey-40'] }, colors),
 
 
 
@@ -282,6 +289,7 @@ module.exports = {
         '2':      '0.5rem',
         '3':      '0.75rem',
         '4':      '1rem',
+        '5':      '1.25rem',
         '6':      '1.5rem',
         '8':      '2rem',
         '10':     '2.5rem',
@@ -332,6 +340,7 @@ module.exports = {
         '4':      '16px',
         '6':      '24px',
         '8':      '32px',
+        '9':      '36px',
         '10':     '40px',
         '12':     '48px',
         '14':     '56px',
@@ -357,7 +366,7 @@ module.exports = {
     minWidth: {
         '0':    '0',
         'xs': '10rem',
-        // 'sm': '20rem',
+        '100': '100px',
         // 'md': '30rem',
         // 'lg': '40rem',
         // 'xl': '50rem',

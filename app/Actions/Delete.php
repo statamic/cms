@@ -10,6 +10,10 @@ class Delete extends Action
 
     public function visibleTo($key, $context)
     {
+        if ($key === 'entries') {
+            return false;
+        }
+
         return true;
     }
 

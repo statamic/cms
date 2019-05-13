@@ -1,5 +1,18 @@
 <template>
-    <text-input :name="name" :value="value" @input="update" :autofocus="config.autofocus" :type="config.input" />
+    <text-input
+        ref="input"
+        :value="value"
+        :autofocus="config.autofocus"
+        :type="config.input"
+        :isReadOnly="isReadOnly"
+        :prepend="config.prepend"
+        :append="config.append"
+        :limit="config.character_limit"
+        :placeholder="config.placeholder"
+        @input="update"
+        @focus="$emit('focus')"
+        @blur="$emit('blur')"
+    />
 </template>
 
 <script>

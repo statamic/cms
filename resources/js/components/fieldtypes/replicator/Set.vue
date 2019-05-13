@@ -1,33 +1,39 @@
 <template>
 
-    <div :class="sortableItemClass" class="bg-grey-lightest shadow mb-2 rounded border">
+    <div :class="sortableItemClass" class="replicator-set">
 
-        <div :class="sortableHandleClass" class="cursor-move bg-grey-lighter border-b px-2 py-1 text-sm flex items-center justify-between">
-            <div class="pt-1">
-                <label class="mb-1 leading-none" v-text="config.display" />
+        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly }">
+            <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
+            <div class="flex-1 ml-1 flex items-center">
+                <label v-text="config.display" class="text-xs"/>
                 <div
                     v-if="config.instructions"
                     v-html="instructions"
-                    class="help-block -mt-1" />
+                    class="help-block replicator-set-instructions" />
             </div>
-            <div>
+            <div class="replicator-set-controls" v-if="!isReadOnly">
+                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
                     <ul class="dropdown-menu">
-                        <li class="warning"><a @click.prevent="destroy">Delete Set</a></li>
+                        <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
                     </ul>
                 </dropdown-list>
             </div>
         </div>
 
-        <div>
+        <div class="replicator-set-body">
             <set-field
                 v-for="field in fields"
+                v-show="showField(field)"
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                @updated="updated"
+                :read-only="isReadOnly"
+                @updated="updated(field.handle, $event)"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
             />
         </div>
 
@@ -47,10 +53,13 @@
 
 <script>
 import SetField from './Field.vue';
+import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
 
     components: { SetField },
+
+    mixins: [ValidatesFieldConditions],
 
     props: {
         config: {
@@ -74,7 +83,8 @@ export default {
         },
         sortableHandleClass: {
             type: String
-        }
+        },
+        isReadOnly: Boolean,
     },
 
     computed: {
@@ -96,7 +106,7 @@ export default {
         },
 
         isHidden() {
-            return false; // TODO
+            return this.values['#hidden'] === true;
         }
 
     },
@@ -114,7 +124,19 @@ export default {
         },
 
         toggle() {
-            // TODO
+            this.isHidden ? this.expand() : this.collapse();
+        },
+
+        toggleEnabledState() {
+            Vue.set(this.values, 'enabled', ! this.values.enabled);
+        },
+
+        expand() {
+            Vue.set(this.values, '#hidden', false);
+        },
+
+        collapse() {
+            Vue.set(this.values, '#hidden', true);
         }
 
     }

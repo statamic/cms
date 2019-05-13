@@ -6,6 +6,7 @@ use Statamic\Sites\Site;
 use Statamic\Fields\Value;
 use Statamic\API\GlobalSet;
 use Illuminate\Http\Request;
+use Statamic\Contracts\Data\Augmentable;
 
 class Cascade
 {
@@ -106,19 +107,7 @@ class Cascade
 
             $global = $global->in($this->site->handle());
 
-            $fields = $global->blueprint()
-                ? $global->blueprint()->fields()->all()
-                : collect();
-
-            // TODO: The global should know what meta data to exclude.
-            $data = array_except($global->data(), ['blueprint']);
-
-            $variables = collect($data)
-                ->map(function ($value, $handle) use ($fields) {
-                    return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
-                })->all();
-
-            $this->set($global->handle(), $variables);
+            $this->set($global->handle(), $global->toAugmentedArray());
         }
 
         $mainGlobal = $this->get('global') ?? [];
@@ -136,14 +125,9 @@ class Cascade
             return $this;
         }
 
-        $fields = (method_exists($this->content, 'blueprint') ? $this->content->blueprint() : false)
-            ? $this->content->blueprint()->fields()->all()
-            : collect();
-
-        $variables = collect($this->content->toArray())
-            ->map(function ($value, $handle) use ($fields) {
-                return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
-            })->all();
+        $variables = $this->content instanceof Augmentable
+            ? $this->content->toAugmentedArray()
+            : $this->content->toArray();
 
         foreach ($variables as $key => $value) {
             $this->set($key, $value);
@@ -193,6 +177,7 @@ class Cascade
             'locale_name' => $siteName,
             'locale_full' => $siteLocale,
             'locale_url' => $siteUrl,
+            'cp_url' => cp_route('index'),
         ];
     }
 

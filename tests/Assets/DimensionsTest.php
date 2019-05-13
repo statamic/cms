@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class DimensionsTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -60,7 +60,7 @@ $rem-base: 16px;
             }
 
             .dr-dates-dash {
-                @apply text-grey-light;
+                @apply text-grey-40;
                 position: relative;
                 top: -2px;
                 padding: 0 5px;
@@ -179,7 +179,7 @@ $rem-base: 16px;
                 }
             }
             .dr-days-of-week-list {
-                @apply bg-grey-lightest flex p-sm border-t border-b text-grey-light text-2xs;
+                @apply bg-grey-20 flex p-sm border-t border-b text-grey-40 text-2xs;
 
                 .dr-day-of-week {
                     width: calc(100% / 7);
@@ -195,8 +195,8 @@ $rem-base: 16px;
                     width: calc(100% / 7);
 
                     &.dr-hover:not(.dr-current) {
-                        @apply bg-grey-lightest;
-                        @apply bg-grey-lighter;
+                        @apply bg-grey-20;
+                        @apply bg-grey-30;
                     }
 
                     &.dr-hover-before {
@@ -212,10 +212,10 @@ $rem-base: 16px;
                     }
                 }
                 .dr-selected, .dr-start, .dr-end {
-                    @apply bg-grey-lighter;
+                    @apply bg-grey-30;
                 }
                 .dr-maybe {
-                    @apply bg-grey-lighter;
+                    @apply bg-grey-30;
                 }
                 .dr-fade {
                     color: $mouse;
@@ -260,11 +260,11 @@ $rem-base: 16px;
             white-space: nowrap;
 
             &:hover {
-                @apply bg-grey-lighter;
+                @apply bg-grey-30;
             }
 
             .dr-item-aside {
-                @apply text-grey;
+                @apply text-grey-70;
                 font-size: rem(12);
                 margin-left: rem(5);
             }

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="text-2xs">
+    <div class="text-2xs flex">
         <a
             v-for="asset in value"
             :key="asset.id"

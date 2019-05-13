@@ -14,6 +14,7 @@ use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
 use Statamic\Contracts\Data\Structures\Structure;
+use Statamic\API\AssetContainer as AssetContainerAPI;
 
 class DefaultNav
 {
@@ -85,15 +86,20 @@ class DefaultNav
             });
 
         Nav::content('Taxonomies')
-            ->route('')
+            ->route('taxonomies.index')
             ->icon('tags');
             // ->can() // TODO: Permission to manage taxonomies?
 
         Nav::content('Assets')
             ->route('assets.index')
-            ->icon('assets');
-            // ->can() // TODO: Permission to manage assets?
-            // ->children() // TODO: Show asset containers as children?
+            ->icon('assets')
+            // ->can() // TODO: Permission to manage assets/containers?
+            ->children(function () {
+                return AssetContainerAPI::all()->map(function ($assetContainer) {
+                    return Nav::item($assetContainer->title())
+                        ->url($assetContainer->showUrl());
+                });
+            });
 
         Nav::content('Globals')
             ->route('globals.index')
@@ -201,13 +207,13 @@ class DefaultNav
             ->route('')
             ->icon('hammer-wrench');
 
-        Nav::site('Fieldsets')
-            ->route('fieldsets.index')
-            ->icon('wireframe');
-
         Nav::site('Blueprints')
             ->route('blueprints.index')
             ->icon('blueprints');
+
+        Nav::site('Fieldsets')
+            ->route('fieldsets.index')
+            ->icon('wireframe');
 
         return $this;
     }

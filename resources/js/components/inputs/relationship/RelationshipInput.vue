@@ -3,14 +3,17 @@
     <div class="relationship-input">
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <div v-if="!initializing">
-            <div ref="items" class="outline-none">
-                <related-item
+        <template v-if="!initializing">
+            <div ref="items" class="relationship-input-items outline-none">
+                <component
+                    :is="itemComponent"
                     v-for="(item, i) in items"
                     :key="item.id"
                     :item="item"
+                    :config="config"
                     :status-icon="statusIcons"
-                    :editable="editableItems"
+                    :editable="canEdit"
+                    :sortable="!readOnly && canReorder"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -20,47 +23,51 @@
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-else class="relative" :class="{ 'mt-2': items.length > 0 }" >
+            <div v-if="canSelectOrCreate" class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
-                        <button class="text-button text-blue hover:text-grey-dark mr-3 flex items-center outline-none" @click="isCreating = true">
+                        <button v-if="canCreate" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
                             <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                            {{ __('Create & Link Entry') }}
+                            {{ __('Create & Link Item') }}
                         </button>
                         <inline-create-form
                             v-if="isCreating"
+                            :site="site"
                             @created="itemCreated"
                             @closed="stopCreating"
                         />
                     </div>
-                    <button class="text-blue hover:text-grey-dark flex mb-1 outline-none" @click.prevent="isSelecting = true">
+                    <button class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                        Link Existing Entry
+                        {{ __('Link Existing Item') }}
                     </button>
                 </div>
             </div>
 
-            <stack name="item-selector" v-if="isSelecting">
+            <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
+                    slot-scope="{ close }"
                     :url="selectionsUrl"
+                    :site="site"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="selections"
                     :initial-columns="columns"
                     :max-selections="maxItems"
+                    :search="search"
+                    :can-create="canCreate"
                     @selected="selectionsUpdated"
-                    @closed="isSelecting = false"
+                    @closed="close"
                 />
             </stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
-        </div>
+        </template>
     </div>
 
 </template>
 
 <script>
-import axios from 'axios';
 import Popper from 'vue-popperjs';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
@@ -72,13 +79,23 @@ export default {
     props: {
         name: String,
         value: { required: true },
+        config: Object,
         initialData: Array,
         maxItems: Number,
+        itemComponent: {
+            type: String,
+            default: 'RelatedItem',
+        },
         itemDataUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
-        editableItems: Boolean,
-        columns: Array
+        columns: Array,
+        site: String,
+        search: Boolean,
+        canEdit: Boolean,
+        canCreate: Boolean,
+        canReorder: Boolean,
+        readOnly: Boolean,
     },
 
     components: {
@@ -116,6 +133,10 @@ export default {
             return this.selections.length >= this.maxItems;
         },
 
+        canSelectOrCreate() {
+            return !this.readOnly && !this.maxItemsReached;
+        }
+
     },
 
     mounted() {
@@ -129,12 +150,21 @@ export default {
             this.$emit('input', this.selections);
         },
 
+        value(value) {
+            if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
+            this.selectionsUpdated(value);
+        },
+
         loading: {
             immediate: true,
             handler(loading) {
                 this.$progress.loading(`relationship-fieldtype-${this._uid}`, loading);
             }
         },
+
+        isSelecting(selecting) {
+            this.$emit(selecting ? 'focus' : 'blur');
+        }
 
     },
 
@@ -163,7 +193,7 @@ export default {
             this.loading = true;
             const params = { selections };
 
-            return axios.get(this.itemDataUrl, { params }).then(response => {
+            return this.$axios.get(this.itemDataUrl, { params }).then(response => {
                 this.loading = false;
                 this.initializing = false;
 
@@ -183,10 +213,12 @@ export default {
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
             }).on('drag:start', e => {
-                if (this.selections.length === 1) e.cancel();
+                this.selections.length === 1 ? e.cancel() : this.$emit('focus');
+            }).on('drag:stop', e => {
+                this.$emit('blur');
             }).on('sortable:stop', e => {
                 this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
-            });
+            })
         },
 
         itemCreated(item) {

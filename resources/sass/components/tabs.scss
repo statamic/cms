@@ -3,25 +3,35 @@
    ========================================================================== */
 
 .tabs {
-    @apply .bg-white .shadow .rounded-md .text-center .flex .w-full .overflow-hidden;
+    @apply .flex .w-full items-end overflow-hidden pl-1 -ml-1;
     height: 48px;
 
     a {
-        @apply .bg-grey-lightest .py-sm .px-1 .leading-tight .text-xs .w-full .h-full .min-h-full .relative .flex-1 .flex .items-center .justify-center;
-        box-shadow: inset -1px 0 #e6ebf1;
+        @apply .bg-grey-10 .py-sm .px-2 .leading-tight .text-xs .w-auto .relative .flex .items-center .justify-center rounded-t-md shadow border-b border-grey-30 select-none;
+        min-width: 140px;
+        height: 94%;
+        min-height: 94%;
+
     }
 
     a.active {
-        color: $brand-primary;
-        background-color: #fff;
-        box-shadow: $brand-primary 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+        @apply bg-white text-blue border-t-2 border-blue relative .h-full .min-h-full border-b-0;
+        z-index: 2;
+    }
+
+    a.ghost {
+        @apply bg-transparent relative .h-full .min-h-full shadow-none border-none text-grey-50 px-3;
+        min-width: 0;
+        &:hover {
+            @apply text-blue;
+        }
     }
 
     a.has-error {
-        color: $color_red;
+        @apply text-red;
 
         &.active {
-            box-shadow: $color_red 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+            box-shadow: config('colors.red') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
         }
     }
 }

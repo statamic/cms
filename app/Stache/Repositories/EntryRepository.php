@@ -41,7 +41,7 @@ class EntryRepository implements RepositoryContract
 
     public function find($id): ?Entry
     {
-        if (! $store = $this->stache->getStoreById($id)) {
+        if (! $store = $this->store->getStoreById($id)) {
             return null;
         }
 
@@ -63,13 +63,34 @@ class EntryRepository implements RepositoryContract
             ?? $this->find($this->store->getIdFromUri($uri, $site));
     }
 
+    // TODO: Refactor usages.
+    public function whereUri(string $uri, string $site = null): ?Entry
+    {
+        return $this->findByUri($uri, $site);
+    }
+
     public function save($entry)
     {
         $localizable = $entry->entry();
 
         if (! $localizable->id()) {
-            $localizable->id($this->stache->generateId());
+            // Put the new ID on the newly cloned item, as well as the one that was saved.
+            $localizable->id($id = $this->stache->generateId());
+            $entry->id($id);
         }
+
+        // Clone the entry and all of its localizations so that any modifications to the
+        // original objects aren't reflected in the cache until explicitly saved again.
+        $localizable = clone $localizable;
+        $localizable
+            ->localizations()
+            ->except($entry->locale())
+            ->each(function ($localization) use ($localizable) {
+                $localizable->addLocalization(clone $localization);
+            });
+
+        // Make sure the version we're saving is re-added to the entry.
+        $localizable->addLocalization(clone $entry);
 
         $this->store
             ->store($entry->collectionHandle())
@@ -78,13 +99,43 @@ class EntryRepository implements RepositoryContract
         $this->store->save($entry);
     }
 
+    public function deleteLocalizable($localizable)
+    {
+        $localizable->localizations()->each(function ($localization) {
+            $this->store->delete($localization);
+        });
+
+        $this->store->remove($localizable->id());
+    }
+
+    public function deleteLocalization($localization)
+    {
+        $localizable = $localization->entry();
+
+        $localizable->removeLocalization($localization);
+
+        $this->store
+            ->store($localizable->collectionHandle())
+            ->insert($localizable)
+            ->removeSiteUri($localization->locale(), $localization->id())
+            ->removeSitePath($localization->locale(), $localization->id());
+
+        $this->store->delete($localization);
+    }
+
     public function query()
     {
         return new QueryBuilder;
     }
 
-    public function make()
+    public function make(): Entry
     {
         return new \Statamic\Data\Entries\Entry;
+    }
+
+    // TODO: Remove
+    public function create()
+    {
+        return $this->make();
     }
 }

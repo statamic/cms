@@ -73,8 +73,12 @@ export default {
     mounted() {
         const sortable = new Sortable(this.$el, this.computedOptions);
 
+        sortable.on('drag:start', () => this.$emit('dragstart'));
+        sortable.on('drag:stop', () => this.$emit('dragend'));
+
         sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
             this.$emit('input', move(this.value, oldIndex, newIndex))
+            this.$emit('sorted', this.value);
         })
 
         this.$on('hook:destroyed', () => {

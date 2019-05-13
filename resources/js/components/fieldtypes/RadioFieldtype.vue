@@ -1,7 +1,7 @@
 <template>
     <div class="radio-fieldtype-wrapper" :class="{'inline-mode': config.inline}">
         <div
-            v-for="(option, $index) in config.options"
+            v-for="(option, $index) in options"
             :key="$index"
             class="option"
         >
@@ -10,6 +10,7 @@
                 @input="update($event.target.value)"
                 :value="option.value"
                 :id="name + $index"
+                :checked="value === option.value"
             />
             <label :for="name + $index">{{ option.text }}</label>
         </div>
@@ -17,8 +18,16 @@
 </template>
 
 <script>
+import HasInputOptions from './HasInputOptions.js'
+
 export default {
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, HasInputOptions],
+
+    computed: {
+        options() {
+            return this.normalizeInputOptions(this.config.options);
+        }
+    },
 
     methods: {
 

@@ -2,7 +2,7 @@
 
 namespace Statamic\Exceptions;
 
-use Statamic\View\Antlers\View;
+use Statamic\View\View;
 use Facades\Statamic\View\Cascade;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;
 
@@ -18,7 +18,6 @@ class NotFoundHttpException extends SymfonyException
         return (new View)
             ->template('errors.404')
             ->layout($this->layout())
-            ->data(Cascade::instance()->hydrate()->toArray())
             ->render();
     }
 

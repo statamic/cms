@@ -1,0 +1,17 @@
+/* ==========================================================================
+   TEXTAREA FIELDTYPE
+   ========================================================================== */
+
+.textarea-fieldtype textarea {
+    @apply p-2;
+    min-height: 80px;
+}
+
+/* Inside a Grid
+  ========================================================================== */
+
+ .grid-fieldtype .textarea-fieldtype textarea {
+     @apply p-1;
+     min-height: 22px;
+     height: 22px;
+ }

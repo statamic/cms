@@ -5,6 +5,8 @@ namespace Statamic\Providers;
 use Statamic\API\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Contracts\Data\Augmentable;
+use Illuminate\Contracts\Support\Arrayable;
 
 class CollectionsServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,7 @@ class CollectionsServiceProvider extends ServiceProvider
         $this->l10n();
         $this->pipe();
         $this->transpose();
+        $this->toAugmentedArray();
     }
 
     /**
@@ -165,6 +168,18 @@ class CollectionsServiceProvider extends ServiceProvider
                 }
             }
             return new static($transposed);
+        });
+    }
+
+    protected function toAugmentedArray()
+    {
+        Collection::macro('toAugmentedArray', function () {
+            return array_map(function ($value) {
+                if ($value instanceof Augmentable) {
+                    return $value->toAugmentedArray();
+                }
+                return $value instanceof Arrayable ? $value->toArray() : $value;
+            }, $this->items);
         });
     }
 }

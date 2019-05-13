@@ -6,13 +6,18 @@ use Mockery;
 use Statamic\API;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
+use Statamic\API\Collection;
+use Illuminate\Support\Carbon;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
+use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Contracts\Data\Entries\Entry;
 
 class EntriesStoreTest extends TestCase
 {
-    function setUp()
+    use PreventSavingStacheItemsToDisk;
+
+    function setUp(): void
     {
         parent::setUp();
 
@@ -24,6 +29,11 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_gets_nested_files()
     {
+        Collection::make('alphabetical')->save();
+        Collection::make('blog')->save();
+        Collection::make('numeric')->save();
+        Collection::make('pages')->save();
+
         $files = Traverser::traverse($this->store);
 
         $this->assertEquals(collect([
@@ -59,7 +69,6 @@ class EntriesStoreTest extends TestCase
                 'localizations' => [
                     'en' => [
                         'slug' => 'test',
-                        'order' => '1',
                         'published' => true,
                         'path' => '/path/to/en.md',
                         'data' => [
@@ -67,7 +76,6 @@ class EntriesStoreTest extends TestCase
                         ]
                     ],
                     'fr' => [
-                        'order' => '3',
                         'published' => false,
                         'slug' => 'le-test',
                         'path' => '/path/to/fr.md',
@@ -88,14 +96,12 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('123', $entry->id());
         tap($entry->in('en'), function ($entry) {
             $this->assertEquals('test', $entry->slug());
-            $this->assertEquals('1', $entry->order());
             $this->assertEquals('/path/to/en.md', $entry->initialPath());
             $this->assertTrue($entry->published());
             $this->assertEquals('Test Entry', $entry->get('title'));
         });
         tap($entry->in('fr'), function ($entry) {
             $this->assertEquals('le-test', $entry->slug());
-            $this->assertEquals('3', $entry->order());
             $this->assertEquals('/path/to/fr.md', $entry->initialPath());
             $this->assertFalse($entry->published());
             $this->assertEquals('Le Test Entry', $entry->get('title'));
@@ -106,7 +112,7 @@ class EntriesStoreTest extends TestCase
     function it_makes_entry_instances_from_files()
     {
         API\Collection::shouldReceive('whereHandle')->with('blog')->andReturn(
-            new \Statamic\Data\Entries\Collection
+            (new \Statamic\Data\Entries\Collection)->dated(true)
         );
 
         $item = $this->store->createItemFromFile(
@@ -118,7 +124,7 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('123', $item->id());
         $this->assertEquals('Example', $item->get('title'));
         $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
-        $this->assertEquals('2017-01-02', $item->order());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2017-01-02 00:00')->eq($item->date()));
         $this->assertEquals('my-post', $item->slug());
         $this->assertTrue($item->published());
     }
@@ -143,11 +149,11 @@ class EntriesStoreTest extends TestCase
 
         $entry = (new \Statamic\Data\Entries\Entry)
             ->id('test-blog-entry')
-            ->collection((new \Statamic\Data\Entries\Collection)->handle('blog'))
+            ->collection((new \Statamic\Data\Entries\Collection)->handle('blog')->dated(true))
             ->in('en', function ($loc) {
                 $loc
                     ->slug('test')
-                    ->order('2017-07-04')
+                    ->date('2017-07-04')
                     ->data(['foo' => 'bar', 'content' => 'test content']);
             });
 

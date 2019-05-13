@@ -16,7 +16,7 @@
                     />
                 </div>
 
-                <div class="border-grey-lighter border-t mt-2 pt-2 text-grey-light text-xs">
+                <div class="border-grey-30 border-t mt-2 pt-2 text-grey-40 text-xs">
                     <div class="mb-1">More options:</div>
                     <ul class="pl-2">
                         <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>
@@ -65,7 +65,7 @@ export default {
             fieldReference: null,
             selectingFieldtype: false,
             creatingFieldsetField: false,
-            suggestions: Object.values(window.Statamic.fieldsetFields).map(field => {
+            suggestions: Object.values(window.Statamic.$config.get('fieldsetFields')).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
                     text: field.display,
@@ -90,7 +90,7 @@ export default {
 
             this.fieldReference = reference;
 
-            const field = JSON.parse(JSON.stringify(window.Statamic.fieldsetFields[reference]));
+            const field = JSON.parse(JSON.stringify(window.Statamic.$config.get('fieldsetFields')[reference]));
 
             this.$emit('added', {
                 _id: uniqid(),
@@ -108,7 +108,6 @@ export default {
         addInlineField() {
             this.selectingFieldtype = true;
             this.$refs.popper.doClose();
-            this.$nextTick(() => this.$modal.show('fieldtype-selector'));
         },
 
         fieldtypeSelected(field) {

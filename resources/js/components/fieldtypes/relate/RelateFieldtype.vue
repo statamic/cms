@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import RelatePanes from './RelatePanesFieldtype.vue'
 import RelateTags from './RelateTagsFieldtype.vue'
 import GetsSuggestKey from '../GetsSuggestKey';
@@ -96,7 +95,7 @@ export default {
                     this.populateSuggestions(prefetched);
                 } else {
                     const type = this.config.type;
-                    axios.get(cp_url(`suggestions/${type}`), { params: this.config }).then(response => {
+                    this.$axios.get(cp_url(`suggestions/${type}`), { params: this.config }).then(response => {
                         this.populateSuggestions(response.data);
                     });
                 }

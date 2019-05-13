@@ -32,7 +32,7 @@ class LoginController extends CpController
             'title' => __('Login'),
             // 'oauth' => OAuth::enabled() && !empty(OAuth::providers()),
             'oauth' => false,
-            'referer' => $request->referer
+            'referer' => url()->previous()
         ];
 
         $view = view('statamic::auth.login', $data);
@@ -46,7 +46,7 @@ class LoginController extends CpController
 
     public function redirectPath()
     {
-        return cp_route('index');
+        return request('referer') ?? cp_route('index');
     }
 
     protected function authenticated(Request $request, $user)

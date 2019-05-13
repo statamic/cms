@@ -25,17 +25,17 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Records:</span> {{ $stache['records'] }}</div>
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Size:</span> {{ $stache['size'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Records:</span> {{ $stache['records'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Size:</span> {{ $stache['size'] }}</div>
                 @if ($stache['time'])
-                    <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Build time:</span> {{ $stache['time'] }}</div>
+                    <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Build time:</span> {{ $stache['time'] }}</div>
                 @endif
                 @if ($stache['rebuilt'])
-                    <div class="badge-pill-sm"><span class="text-grey-dark font-medium">Last rebuild:</span> {{ $stache['rebuilt'] }}</div>
+                    <div class="badge-pill-sm"><span class="text-grey-80 font-medium">Last rebuild:</span> {{ $stache['rebuilt'] }}</div>
                 @endif
             </div>
         </div>
-        <div class="p-2 bg-grey-lightest border-t">
+        <div class="p-2 bg-grey-20 border-t">
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
@@ -49,9 +49,9 @@
                 @endunless
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Strategy:</span> {{ $static['strategy'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Strategy:</span> {{ $static['strategy'] }}</div>
                 @if ($static['enabled'])
-                    <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Pages:</span> {{ $static['count'] }}</div>
+                    <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Pages:</span> {{ $static['count'] }}</div>
                 @endif
             </div>
         </div>
@@ -68,11 +68,11 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Driver:</span> {{ $cache['driver'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Driver:</span> {{ $cache['driver'] }}</div>
             </div>
         </div>
 
-        <div class="p-2 border-t bg-grey-lightest rounded-b">
+        <div class="p-2 border-t bg-grey-20 rounded-b">
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Image Cache') }}</h2>
@@ -84,8 +84,8 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Cached images:</span> {{ $images['count'] }}</div>
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-dark font-medium">Size:</span> {{ $images['size'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Cached images:</span> {{ $images['count'] }}</div>
+                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">Size:</span> {{ $images['size'] }}</div>
             </div>
         </div>
     </div>

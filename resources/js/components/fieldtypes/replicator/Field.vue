@@ -1,8 +1,11 @@
 <template>
 
-    <div class="form-group p-2 m-0" :class="`${field.type}-fieldtype`">
+    <div class="p-2 m-0" :class="classes">
 
-        <label class="block">{{ display }}</label>
+        <label class="block">
+            {{ display }}
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
+        </label>
 
         <div
             class="help-block"
@@ -18,7 +21,10 @@
             :config="field"
             :value="value"
             :name="name"
-            @updated="updated"
+            :read-only="isReadOnly"
+            @updated="$emit('updated', $event)"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
         />
 
     </div>
@@ -43,7 +49,8 @@ export default {
         setIndex: {
             type: Number,
             required: true
-        }
+        },
+        readOnly: Boolean,
     },
 
     inject: ['storeName'],
@@ -74,14 +81,21 @@ export default {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
             return state.errors[this.errorKey] || [];
-        }
+        },
 
-    },
+        isReadOnly() {
+            return this.readOnly || this.field.read_only || false;
+        },
 
-    methods: {
-
-        updated(value) {
-            this.$emit('updated', this.field.handle, value);
+        classes() {
+            return [
+                'form-group publish-field',
+                `${this.field.type}-fieldtype`,
+                `field-${tailwind_width_class(this.field.width)}`,
+                this.isReadOnly ? 'read-only-field' : '',
+                this.field.classes || '',
+                { 'has-error': this.hasError }
+            ];
         }
 
     }

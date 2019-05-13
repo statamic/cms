@@ -2,7 +2,7 @@
 
     <div>
         <stack name="configure-global" v-if="editing" @closed="editing = false">
-            <div class="h-full overflow-auto p-3 bg-grey-lighter">
+            <div class="h-full overflow-auto p-3 bg-grey-30">
                 <div v-if="saving" class="absolute pin z-200 flex items-center justify-center text-center">
                     <loading-graphic :text="__('Saving')" />
                 </div>
@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import Popper from 'vue-popperjs';
 
 export default {
@@ -115,14 +114,14 @@ export default {
             this.clearErrors();
             this.saving = true;
 
-            axios.patch(this.saveUrl, this.values).then(response => {
+            this.$axios.patch(this.saveUrl, this.values).then(response => {
                 window.location.reload();
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message, { timeout: 2000 });
+                    this.$notify.error(message);
                     this.saving = false;
                 } else {
                     this.$notify.error('Something went wrong');

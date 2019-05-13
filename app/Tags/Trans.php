@@ -13,7 +13,7 @@ class Trans extends Tags
      */
     public function __call($method, $args)
     {
-        $key = $this->get('key', $this->tag_method);
+        $key = $this->get('key', $this->method);
 
         return trans($key, $this->parameters);
     }

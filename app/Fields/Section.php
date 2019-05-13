@@ -10,6 +10,7 @@ class Section
 {
     protected $handle;
     protected $contents = [];
+    protected $extraFields = [];
 
     public function __construct($handle)
     {
@@ -35,7 +36,31 @@ class Section
 
     public function fields(): Fields
     {
-        return new Fields(array_get($this->contents, 'fields', []));
+        $fields = array_get($this->contents, 'fields', []);
+
+        if (! empty($this->extraFields)) {
+            foreach ($this->extraFields as $handle => $extra) {
+                $new = [
+                    'handle' => $handle,
+                    'field' => $extra['field']
+                ];
+
+                if ($extra['prepend']) {
+                    array_unshift($fields, $new);
+                } else {
+                    $fields[] = $new;
+                }
+            }
+        }
+
+        return new Fields($fields);
+    }
+
+    public function extraFields(array $fields)
+    {
+        $this->extraFields = $fields;
+
+        return $this;
     }
 
     public function toPublishArray()

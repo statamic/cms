@@ -1,374 +1,254 @@
 <template>
-    <div class="bard-fieldtype-wrapper replicator" :class="{'bard-fullscreen': fullScreenMode, 'no-sets': !hasSets }">
 
-        <div class="bard-blocks" v-if="isReady" ref="blocks">
-            <component
-                :is="block.type === 'text' ? 'BardText' : 'BardSet'"
-                v-for="(block, index) in values"
-                ref="set"
-                :class="{ 'divider-at-start': canShowDividerAtStart(index), 'divider-at-end': canShowDividerAtEnd(index) }"
-                :key="block._id"
-                :values="block"
-                :index="index"
-                :parent-name="name"
-                :config="setConfig(block.type)"
-                :show-source="showSource"
-                @set-inserted="setInserted"
-                @removed="removed"
-                @source-toggled="toggleSource"
-                @arrow-up-at-start="goToPreviousTextField"
-                @arrow-down-at-end="goToNextTextField"
-                @updated="updated"
-            >
-                <template slot="divider-start">
-                    <div v-show="canShowDividerAtStart(index)" class="bard-divider bard-divider-start" @click="addTextBlock(index-1)"></div>
-                </template>
-                <template slot="divider-end">
-                    <div v-show="canShowDividerAtEnd(index)" class="bard-divider bard-divider-end" @click="addTextBlock(index)"></div>
-                </template>
-                <template slot="expand-collapse">
-                    <li><a @click="collapseAll">{{ __('Collapse All') }}</a></li>
-                    <li><a @click="expandAll">{{ __('Expand All') }}</a></li>
-                </template>
-            </component>
+    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
+
+        <editor-menu-bar :editor="editor" v-if="!readOnly">
+            <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
+                <div class="flex items-center no-select" v-if="toolbarIsFixed">
+                    <component
+                        v-for="button in buttons"
+                        :key="button.name"
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(isActive, button)"
+                        :config="config"
+                        :bard="_self"
+                        :editor="editor" />
+                </div>
+                <div class="flex items-center no-select">
+                    <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                        <svg-icon name="file-code" class="w-4 h-4 "/>
+                    </button>
+                    <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                        <svg-icon name="shrink" class="w-4 h-4" v-if="fullScreenMode" />
+                        <svg-icon name="expand" class="w-4 h-4" v-else />
+                    </button>
+                </div>
+            </div>
+        </editor-menu-bar>
+
+        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }">
+            <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
+                <div
+                    slot-scope="{ commands, isActive, menu }"
+                    class="bard-floating-toolbar"
+                    :class="{ 'active': menu.isActive }"
+                    :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
+                >
+                    <component
+                        v-for="button in buttons"
+                        :key="button.name"
+                        :is="button.component || 'BardToolbarButton'"
+                        :button="button"
+                        :active="buttonIsActive(isActive, button)"
+                        :bard="_self"
+                        :config="config"
+                        :editor="editor" />
+                </div>
+            </editor-menu-bubble>
+
+            <editor-floating-menu :editor="editor">
+                <div
+                    slot-scope="{ commands, isActive, menu }"
+                    class="bard-set-selector"
+                    :class="{
+                        'invisible': !menu.isActive,
+                        'visible': menu.isActive
+                    }"
+                    :style="`top: ${menu.top}px`"
+                >
+                    <dropdown-list ref="setSelectorDropdown">
+                        <button type="button" class="btn btn-round" slot="trigger">
+                            <span class="icon icon-plus text-grey-80 antialiased"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li v-for="set in config.sets" :key="set.handle">
+                                <a @click="addSet(set.handle)" v-text="set.display || set.handle" />
+                            </li>
+                        </ul>
+                    </dropdown-list>
+                </div>
+            </editor-floating-menu>
+
+            <editor-content :editor="editor" v-show="!showSource" />
+
+            <bard-source :html="html" v-if="showSource" />
         </div>
-
-        <div class="bard-field-title" v-text="config.display"></div>
-
-        <div class="bard-field-options select-none">
-            <a @click="toggleSource" :class="{ active: showSource }" v-if="allowSource"><i class="icon icon-code"></i></a>
-            <a @click="toggleFullscreen"><i class="icon" :class="{ 'icon-resize-full-screen' : ! fullScreenMode, 'icon-resize-100' : fullScreenMode }"></i></a>
+        <div class="bard-footer-toolbar" v-if="config.reading_time">
+            {{ readingTime }} {{ __('Reading Time') }}
         </div>
     </div>
+
 </template>
 
 <script>
-import Replicator from '../replicator/Replicator.vue';
-import { Draggable } from '@shopify/draggable';
+import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
+import {
+    Blockquote,
+    CodeBlock,
+    HardBreak,
+    Heading,
+    OrderedList,
+    BulletList,
+    ListItem,
+    Bold,
+    Code,
+    Italic,
+    Strike,
+    Underline,
+    History
+} from 'tiptap-extensions';
+import Set from './Set';
+import BardSource from './Source.vue';
+import Link from './Link';
+import Image from './Image';
+import RemoveFormat from './RemoveFormat';
+import LinkToolbarButton from './LinkToolbarButton.vue';
+import ConfirmSetDelete from './ConfirmSetDelete';
+import { availableButtons, addButtonHtml } from '../bard/buttons';
+import readTimeEstimate from 'read-time-estimate';
 
 export default {
 
-    mixins: [Replicator, Fieldtype],
+    mixins: [Fieldtype],
 
     components: {
-        BardSet: require('./BardSet.vue'),
-        BardText: require('./BardText.vue')
+        EditorContent,
+        EditorMenuBar,
+        EditorFloatingMenu,
+        EditorMenuBubble,
+        BardSource,
+        BardToolbarButton,
+        LinkToolbarButton,
     },
 
-    computed: {
-
-        textBlocks() {
-            if (!this.isReady) return;
-            return this.$refs.set.filter(set => set.values.type === 'text');
-        },
-
-        allowSource() {
-            if (this.config.markdown) return false;
-
-            return this.config.allow_source === undefined ? true : this.config.allow_source
+    provide() {
+        return {
+            setConfigs: this.config.sets
         }
-
     },
 
     data() {
         return {
-            isReady: false,
-            setBeingDragged: null,
-            lastDraggedOverElement: null,
-            hasSets: this.config.sets !== undefined,
+            editor: null,
+            html: null,
+            json: null,
             showSource: false,
             fullScreenMode: false,
-            previousScrollPosition: null
-        };
+            buttons: [],
+        }
     },
 
-    created() {
-        this.combineConsecutiveTextBlocks();
+    computed: {
+
+        allowSource() {
+            return this.config.allow_source === undefined ? true : this.config.allow_source;
+        },
+
+        toolbarIsFixed() {
+            return this.config.toolbar_mode === 'fixed';
+        },
+
+        toolbarIsFloating() {
+            return this.config.toolbar_mode === 'floating';
+        },
+
+        readingTime() {
+            if (this.html) {
+                var stats = readTimeEstimate(this.html, 265, 12, 500, ['img', 'Image', 'bard-set']);
+                var duration = moment.duration(stats.duration, 'minutes');
+
+                return moment.utc(duration.asMilliseconds()).format("mm:ss");
+            }
+        }
+
     },
 
     mounted() {
-        this.isReady = true;
-        this.$nextTick(() => {
-            this.draggable();
-            if (this.accordionMode) this.collapseAll();
+        this.initToolbarButtons();
+
+        this.editor = new Editor({
+            extensions: [
+                new Blockquote(),
+                new BulletList(),
+                new CodeBlock(),
+                new HardBreak(),
+                new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
+                new ListItem(),
+                new OrderedList(),
+                new Bold(),
+                new Code(),
+                new Italic(),
+                new Strike(),
+                new Underline(),
+                new History(),
+                new Set({ bard: this }),
+                new ConfirmSetDelete(),
+                new Link({ vm: this }),
+                new RemoveFormat(),
+                new Image({ bard: this }),
+            ],
+            content: this.valueToContent(this.value),
+            editable: !this.readOnly,
+            onFocus: () => this.$emit('focus'),
+            onBlur: () => {
+                // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                // blur event immediately. We need to make sure that the newly focused element is outside
+                // of Bard. We use a timeout because activeElement only exists after the blur event.
+                setTimeout(() => {
+                    if (!this.$el.contains(document.activeElement)) this.$emit('blur');
+                }, 1);
+            },
+            onUpdate: ({ getJSON, getHTML }) => {
+                let value = getJSON().content;
+                // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
+                value = JSON.stringify(value);
+                this.update(value);
+                this.html = getHTML();
+            },
         });
+
+        this.html = this.editor.getHTML();
+    },
+
+    beforeDestroy() {
+        this.editor.destroy();
     },
 
     watch: {
 
-        values: {
-            deep: true,
-            handler(values) {
-                if (values.length === 0) {
-                    values = [{type: 'text', text: '<p><br></p>'}];
-                    this.$nextTick(() => this.getBlock(0).focus());
-                }
+        value(value, oldValue) {
+            if (value === oldValue) return;
 
-                this.values = values;
+            const oldContent = this.editor.getJSON();
+            const content = this.valueToContent(value);
+
+            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
+                this.editor.setContent(content);
             }
+        },
+
+        readOnly(readOnly) {
+            this.editor.setOptions({ editable: !this.readOnly });
         }
 
     },
 
     methods: {
 
-        addTextBlock(index, text) {
-            text = text || '<p><br></p>';
-            index = index + 1;
-            this.values.splice(index, 0, { type: 'text', text });
-            this.$nextTick(() => {
-                const block = this.getBlock(index);
-                if (text) {
-                    block.focusAt(0);
-                } else {
-                    block.focus();
-                }
-            });
-        },
+        addSet(handle) {
+            const config = _.find(this.config.sets, { handle }) || {};
 
-        addBlock: function(type, index) {
-            var newSet = { type: type };
+            let values = {type: handle};
 
-            // Get nulls for all the set's fields so Vue can track them more reliably.
-            var set = this.setConfig(type);
-            _.each(set.fields, function(field) {
-                newSet[field.handle] = field.default
+            _.each(config.fields, field => {
+                values[field.handle] = field.default
                 // || Statamic.fieldtypeDefaults[field.type] // TODO
                 || null;
             });
 
-            if (index === undefined) {
-                index = this.values.length;
-            }
-
-            this.values.splice(index, 0, newSet);
-
-            this.$nextTick(() => this.getBlock(index).focus());
-        },
-
-        setSelected(type, index) {
-            var newSet = { type: type };
-
-            // Get nulls for all the set's fields so Vue can track them more reliably.
-            var set = this.setConfig(type);
-            _.each(set.fields, function(field) {
-                newSet[field.handle] = field.default
-                // || Statamic.fieldtypeDefaults[field.type] // TODO
-                || null;
-            });
-
-            this.values.splice(index, 1, newSet);
-
-            this.$nextTick(() => this.getBlock(index).focus());
-        },
-
-        setInserted(type, index, before, after) {
-            const newSet = this.getBlankSet(type);
-            const beforeSet = { type: 'text', text: before };
-            const afterSet = { type: 'text', text: after };
-
-            let newItems = [beforeSet, newSet, afterSet].filter(set => {
-                if (set.type !== 'text') return true;
-                return set.text !== '';
-            });
-
-            this.values.splice(index, 1, ...newItems);
-        },
-
-        getBlankSet(type) {
-            let newSet = { type: type };
-
-            // Get nulls for all the set's fields so Vue can track them more reliably.
-            var set = this.setConfig(type);
-            _.each(set.fields, function(field) {
-                newSet[field.handle] = field.default
-                // || Statamic.fieldtypeDefaults[field.type] // TODO
-                || null;
-            });
-
-            return newSet;
-        },
-
-        getBlock(index) {
-            const blocks = this.$refs.set;
-            if (!blocks) return;
-            return blocks[index];
-        },
-
-        /**
-         * Whether a divider / insertion point can be displayed before a given block.
-         * We don't want the UI to get clogged with multiple empty blocks.
-         */
-        canShowDividerAtStart(index) {
-            return index === 0;
-        },
-
-        /**
-         * Whether a divider / insertion point can be displayed after a given block.
-         * We don't want the UI to get clogged with multiple empty blocks.
-         */
-        canShowDividerAtEnd(index) {
-            if (!this.isReady) return false;
-
-            if (index === this.values.length - 1) {
-                return true;
-            }
-
-            // If the blocks haven't been rendered yet,
-            const block = this.getBlock(index + 1);
-            if (! block) return false;
-
-            return block.values.type !== 'text';
-        },
-
-        draggable() {
-            const draggable = new Draggable(this.$refs.blocks, {
-                draggable: '.bard-block',
-                handle: '.bard-drag-handle',
-                mirror: {
-                    xAxis: false,
-                    constrainDimensions: true
-                },
-                delay: 200
-            });
-
-            draggable.on('drag:start', (e, a) => {
-                let doc = document.documentElement;
-                this.previousScrollPosition = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-
-                this.setBeingDragged = e.originalSource.__vue__.index;
-                this.textBlocks.forEach(block => block.addDropAreas());
-            });
-
-            draggable.on('drag:move', (e) => {
-                if (!e.originalEvent) return; // Sometimes this is undefined for whatever reason.
-
-                const target = e.originalEvent.target;
-
-                if (target.classList.contains('bard-drop-area-inner') || target.classList.contains('bard-divider')) {
-                    this.lastDraggedOverElement = target;
-                }
-            });
-
-            draggable.on('drag:stop', (e) => {
-                // Prevent the div from actually being moved. Vue will do that for us.
-                e.cancel();
-
-                if (this.lastDraggedOverElement) {
-                    this.moveSetToNewLocation();
-                } else {
-                    this.removeDropAreas();
-                }
-
-                this.$nextTick(() => {
-                    window.scrollTo(0, this.previousScrollPosition);
-                    this.previousScrollPosition = null;
-                });
-            });
-        },
-
-        moveSetToNewLocation() {
-            // Get the block this was dragged over.
-            // There's obviously a better way to do this. Or is there?
-            let block;
-            if (this.lastDraggedOverElement.classList.contains('bard-divider')) {
-                block = this.lastDraggedOverElement.parentNode.__vue__;
-            } else {
-                block = this.lastDraggedOverElement // .bard-drop-area-inner
-                    .parentNode // .bard-drop-area
-                    .parentNode // .bard-editor
-                    .parentNode // .bard-block
-                    .__vue__;
-            }
-
-            this.removeDropAreas();
-
-            if (! block) return;
-
-            this.moveSet(block);
-
-            this.lastDraggedOverElement = null;
-        },
-
-        moveSet(block) {
-            if (block.values.type === 'text') {
-                return this.moveSetIntoText(block);
-            }
-
-            const start = this.setBeingDragged;
-            let end = block.index + (start > block.index ? 1 : 0);
-
-            // The only place a start divider exists is right at the beginning. In this case, we
-            // want to move the set to the beginning of everything, instead of *after* some other set.
-            if (this.lastDraggedOverElement.classList.contains('bard-divider-start')) {
-                end = 0;
-            }
-
-            this.values.splice(end, 0, this.values.splice(start, 1)[0]);
-
-            this.combineConsecutiveTextBlocks();
-        },
-
-        moveSetIntoText(block) {
-            block.insertParagraph();
-
-            const [before, after] = block.getBeforeAndAfterHtml();
-            const beforeSet = { type: 'text', text: before };
-            const afterSet = { type: 'text', text: after };
-            const set = this.values[this.setBeingDragged];
-
-            this.values.splice(this.setBeingDragged, 1);
-
-            let newItems = [beforeSet, set, afterSet].filter(set => {
-                if (set.type !== 'text') return true;
-                return set.text !== '';
-            });
-
-            const index = this.getInsertIndex(this.setBeingDragged, block.index);
-            this.values.splice(index, 1, ...newItems);
-
-            this.setBeingDragged = null;
-
-            this.combineConsecutiveTextBlocks();
-        },
-
-        removeDropAreas() {
-            this.textBlocks.forEach(block => block.removeDropAreas());
-        },
-
-        getInsertIndex(from, to) {
-            if (from === 0) return 0;
-
-            if (from < to) return to - 1;
-
-            return to;
-        },
-
-        combineConsecutiveTextBlocks() {
-            let data = [];
-            let previousBlockWasText = false
-
-            this.values.forEach((block, i) => {
-                if (block.type !== 'text') {
-                    data.push(block)
-                    previousBlockWasText = false;
-                    return;
-                }
-
-                if (! previousBlockWasText) {
-                    data.push(block);
-                    previousBlockWasText = true;
-                    return;
-                }
-
-                data[data.length-1].text += block.text;
-            });
-
-            this.values = data;
-        },
-
-        toggleSource() {
-            this.showSource = !this.showSource;
+            this.editor.commands.set({ values });
+            this.$refs.setSelectorDropdown.close();
         },
 
         toggleFullscreen() {
@@ -376,55 +256,48 @@ export default {
             this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
-        removed(index) {
-            const block = this.getBlock(index - 1);
-            const focus = (block && block.values.type === 'text') ? block.plainText().length : null;
+        initToolbarButtons() {
+            const selectedButtons = this.config.buttons || [
+                'h2', 'h3', 'bold', 'italic', 'unorderedlist', 'orderedlist', 'removeformat', 'quote', 'anchor',
+            ];
 
-            this.values.splice(index, 1);
-            this.combineConsecutiveTextBlocks();
+            // Get the configured buttons and swap them with corresponding objects
+            let buttons = selectedButtons.map(button => {
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() })
+                    || button;
+            });
 
-            if (block) {
-                this.$nextTick(() => this.getBlock(index - 1).focusAt(focus));
-            }
+            // Let addons add, remove, or control the position of buttons.
+            Statamic.$config.get('bard').buttons.forEach(callback => callback.call(null, buttons));
+
+            // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
+            buttons = buttons.filter(button => typeof button != 'string');
+
+            // Generate fallback html for each button
+            buttons = addButtonHtml(buttons);
+
+            // Remove buttons that don't pass conditions.
+            // eg. only the insert asset button can be shown if a container has been set.
+            buttons = buttons.filter(button => {
+                return (button.condition) ? button.condition.call(null, this.config) : true;
+            });
+
+            this.buttons = buttons;
         },
 
-        goToPreviousTextField(index) {
-            if (index === 0) return;
-
-            while (index > 0) {
-                index--;
-                const block = this.getBlock(index);
-                if (block.values.type === 'text') {
-                    setTimeout(() => { block.focusAt('end') }, 10);
-                    return;
-                }
-            }
+        buttonIsActive(isActive, button) {
+            if (! isActive.hasOwnProperty(button.command)) return false;
+            return isActive[button.command](button.args);
         },
 
-        goToNextTextField(index) {
-            const totalBlocks = this.$refs.set.length - 1;
+        valueToContent(value) {
+            // A json string is passed from PHP since that's what's submitted.
+            value = JSON.parse(this.value);
 
-            if (index === totalBlocks) return;
-
-            while (index < totalBlocks) {
-                index++;
-                const block = this.getBlock(index);
-                if (block.values.type === 'text') {
-                    setTimeout(() => { block.focusAt('start') }, 10);
-                    return;
-                }
-            }
-        },
-
-        updated(index, set) {
-            this.values.splice(index, 1, set);
-        },
-
-        getReplicatorPreviewText() {
-            return _.map(this.$refs.set, (set) => {
-                return (set.values.type === 'text') ? set.plainText() : set.getCollapsedPreview();
-            }).join(', ');
-        },
+            return value.length
+                ? { type: 'doc', content: value }
+                : null;
+        }
     }
-};
+}
 </script>

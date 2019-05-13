@@ -3,14 +3,19 @@
    ========================================================================== */
 
 .badge {
-    @apply text-3xs roman bg-red text-white rounded-full leading-normal;
-    padding: 2px 6px 1px;
+    @apply text-3xs roman bg-grey-30 text-grey-80 rounded-md leading-normal;
+    padding: 1px 5px 0;
 }
 
 .badge-pill {
-    @apply bg-grey-lighter px-1 py-sm rounded;
+    @apply bg-grey-30 px-1 py-sm rounded;
 }
 
 .badge-pill-sm {
-    @apply bg-grey-lighter px-sm py-px rounded;
+    @apply bg-grey-30 px-sm py-px rounded;
+}
+
+.badge-updates {
+    @apply text-3xs roman bg-red text-white rounded-full leading-normal;
+    padding: 2px 6px 1px;
 }

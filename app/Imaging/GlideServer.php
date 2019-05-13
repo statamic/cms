@@ -51,5 +51,7 @@ class GlideServer
         if (config('statamic.cp.enabled')) {
             $presets = array_merge($presets, Image::getCpImageManipulationPresets());
         }
+
+        return $presets;
     }
 }

@@ -17,7 +17,9 @@ class TagLoader
 
     private function init($class, $properties)
     {
-        return tap(app($class), function ($tag) use ($properties) {
+        $tag = is_string($class) ? app($class) : $class;
+
+        return tap($tag, function ($tag) use ($properties) {
             $tag->setProperties($properties);
         });
     }

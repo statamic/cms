@@ -1,5 +1,29 @@
 import Vue from 'vue';
 import Notifications from './mixins/Notifications.js';
+import Statamic from './components/Statamic.js';
+
+Vue.config.silent = false;
+Vue.config.devtools = true;
+Vue.config.productionTip = false
+
+window.Vue = Vue;
+window.Statamic = Statamic;
+window._ = require('underscore');
+window.$ = window.jQuery = require('jquery');
+window.rangy = require('rangy');
+window.EQCSS = require('eqcss');
+
+require('./bootstrap/globals');
+require('./bootstrap/polyfills');
+require('./bootstrap/underscore-mixins');
+require('./bootstrap/jquery-plugins');
+require('./bootstrap/plugins');
+require('./bootstrap/filters');
+require('./bootstrap/mixins');
+require('./bootstrap/components');
+require('./bootstrap/fieldtypes');
+require('./bootstrap/directives');
+
 // import Wizard from './mixins/Wizard.js';
 import axios from 'axios';
 import PortalVue from "portal-vue";
@@ -7,53 +31,71 @@ import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
+import VTooltip from 'v-tooltip'
+import ReactiveProvide from 'vue-reactive-provide';
+import vSelect from 'vue-select'
 
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.csrfToken;
+// Customize vSelect UI components
+vSelect.props.components.default = () => ({
+    Deselect: {
+        render: createElement => createElement('span', __('×')),
+    },
+    OpenIndicator: {
+        render: createElement => createElement('span', {
+            class: { 'toggle': true },
+            domProps: {
+                innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 20 20"><path fill="currentColor" d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>'
+            }
+        })
+    }
+});
 
-Vue.prototype.axios = axios;
+Statamic.booting(Statamic => {
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
+});
+
+Vue.prototype.$axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
+require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 Vue.prototype.$events = new Vue();
+Vue.prototype.$echo = Statamic.$echo;
 
-Vue.moment = require('moment');
-
-Vue.config.productionTip = false
+window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
+Vue.use(VTooltip)
 Vue.use(Vuex);
+Vue.use(ReactiveProvide);
 
-// Vue.http.interceptors.push({
-//     response: function (response) {
-//         if (response.status === 401) {
-//             this.$root.showLoginModal = true;
-//         }
-//
-//         return response;
-//     }
-// });
+Vue.component(vSelect)
+
+Statamic.$store = new Vuex.Store({
+    modules: {
+        statamic: StatamicStore,
+        publish: {
+            namespaced: true
+        }
+    }
+});
 
 require('./components/NotificationBus');
 require('./components/ModalBus');
 require('./components/stacks/Stacks');
+require('./components/panes/Panes');
 require('./components/ProgressBar');
 require('./components/DirtyState');
+require('./components/Config');
 require('./components/Preference');
 
-var vm = new Vue({
+Statamic.app({
     el: '#statamic',
 
     mixins: [Notifications],
 
-    store: new Vuex.Store({
-        modules: {
-            statamic: StatamicStore,
-            publish: {
-                namespaced: true
-            }
-        }
-    }),
+    store: Statamic.$store,
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue'),
@@ -82,20 +124,27 @@ var vm = new Vue({
         UserGroupListing: require('./components/user-groups/Listing.vue'),
         UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
         CollectionWizard: require('./components/collections/Wizard.vue'),
+        CollectionEditForm: require('./components/collections/EditForm.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
         Stacks: require('./components/stacks/Stacks.vue'),
+        AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue'),
+        AssetContainerEditForm: require('./components/asset-containers/EditForm.vue'),
     },
 
     data: {
-        version: Statamic.version,
         showLoginModal: false,
         navOpen: true,
         modals: [],
-        stacks: []
+        stacks: [],
+        pane: false,
     },
 
     computed: {
+
+        version() {
+            return Statamic.$config.get('version');
+        },
 
         computedNavOpen() {
             if (this.stackCount > 0) return false;
@@ -117,6 +166,9 @@ var vm = new Vue({
             this.toggleNav();
         });
 
+        if (this.$config.get('broadcasting.enabled')) {
+            this.$echo.start();
+        }
     },
 
     created() {

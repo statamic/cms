@@ -1,61 +1,115 @@
 <template>
-    <dropdown-list>
-        <button class="btn btn-icon-only antialiased ml-2 dropdown-toggle relative" slot="trigger">
-            <svg-icon name="filter" class="h-4 w-4 mr-1 text-current"></svg-icon>
-            <span>{{ __('Filter') }}</span>
-            <div v-if="activeFilterCount" class="badge ml-1 bg-blue" v-text="activeFilterCount" />
+    <div>
+        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" @click="filtering = !filtering">
+            <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
+            <span>{{ __('Filters') }}</span>
+            <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
         </button>
-        <ul class="dropdown-menu">
-            <li><h6>{{ __('Filter List') }}</h6></li>
-            <li class="divider"></li>
+        <pane name="filters" v-if="filtering">
+            <div>
 
-            <data-list-filter
-                v-for="filter in filters"
-                :key="filter.handle"
-                :filter="filter"
-                :initial-value="activeFilters[filter.handle]"
-                @changed="filterChanged(filter.handle, $event)"
-            />
+                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                    {{ __('Filters') }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        @click="filtering = false"
+                        v-html="'&times'" />
+                </div>
 
-            <li class="flex items-center">
-                <select class="w-auto" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
-                    <option
-                        v-for="value in perPageOptions"
-                        :key="value"
-                        :value="value"
-                        v-text="value" />
-                </select>
-                <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
-            </li>
-        </ul>
-    </dropdown-list>
+                <data-list-filter
+                    v-for="filter in standardFilters"
+                    :key="filter.handle"
+                    :filter="filter"
+                    :initial-value="activeFilters[filter.handle]"
+                    @changed="filterChanged(filter.handle, $event)"
+                />
+
+                <field-filters
+                    :filter="fieldsFilter"
+                    :initial-value="activeFilters['fields']"
+                    @changed="filterChanged('fields', $event)"
+                />
+
+                <div class="p-3 pt-0">
+                    <select class="w-auto mt-3" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
+                        <option
+                            v-for="value in perPageOptions"
+                            :key="value"
+                            :value="value"
+                            v-text="value" />
+                    </select>
+                    <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
+                </div>
+
+                <div v-if="preferencesKey" class="p-3 pt-0">
+                    <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                    <template v-else>
+                        <div class="flex justify-center mt-3">
+                            <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
+                        </div>
+                        <div class="flex justify-center mt-2">
+                            <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                        </div>
+                    </template>
+                </div>
+
+            </div>
+        </pane>
+    </div>
 </template>
 
 <script>
 import DataListFilter from './Filter.vue';
+import FieldFilters from './FieldFilters.vue';
 
 export default {
 
     components: {
-        DataListFilter
+        DataListFilter,
+        FieldFilters,
     },
 
     props: {
         perPage: Number,
         filters: Array,
-        activeFilters: Object
+        activeFilters: Object,
+        preferencesKey: String
     },
 
     data() {
         return {
-            perPageOptions: [2, 25, 50, 100]
+            filtering: false,
+            perPageOptions: [2, 25, 50, 100],
+            saving: false,
         }
     },
 
     computed: {
 
+        standardFilters() {
+            return this.filters.filter(filter => filter.handle !== 'fields');
+        },
+
+        fieldsFilter() {
+            return this.filters.filter(filter => filter.handle === 'fields')[0];
+        },
+
         activeFilterCount() {
-            return Object.keys(this.activeFilters).length;
+            let count = Object.keys(this.activeFilters).length;
+
+            if (this.activeFilters.hasOwnProperty('fields')) {
+                count = count + Object.keys(this.activeFilters.fields).length - 1;
+            }
+
+            return count;
+        },
+
+        preferencesPayload() {
+            return {
+                ...(this.activeFilterCount ? clone(this.activeFilters) : {}),
+                perPage: this.perPage
+            };
         }
 
     },
@@ -70,6 +124,36 @@ export default {
                 Vue.delete(filters, handle);
             }
             this.$emit('filters-changed', filters);
+        },
+
+        save() {
+            this.saving = true;
+
+            this.$preferences.set(this.preferencesKey, this.preferencesPayload)
+                .then(response => {
+                    this.saving = false;
+                    this.$notify.success(__('Filters saved'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
+        },
+
+        reset() {
+            this.$events.$emit('filters-reset');
+
+            this.saving = true;
+
+            this.$preferences.remove(this.preferencesKey)
+                .then(response => {
+                    this.saving = false;
+                    this.$notify.success(__('Columns reset'));
+                })
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(__('Something went wrong'));
+                });
         }
 
     }

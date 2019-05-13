@@ -10,10 +10,12 @@ use Statamic\Contracts\Data\Repositories\GlobalRepository as RepositoryContract;
 
 class GlobalRepository implements RepositoryContract
 {
+    protected $stache;
     protected $store;
 
     public function __construct(Stache $stache)
     {
+        $this->stache = $stache;
         $this->store = $stache->store('globals');
     }
 
@@ -39,7 +41,20 @@ class GlobalRepository implements RepositoryContract
 
     public function save($global)
     {
-        $this->store->setItem($global->id(), $global);
+        $localizable = $global->localizable();
+
+        if (! $localizable->id()) {
+            $localizable->id($this->stache->generateId());
+        }
+
+        // Clone the entry and all of its localizations so that any modifications to the
+        // original objects aren't reflected in the cache until explicitly saved again.
+        $localizable = clone $localizable;
+        $localizable->localizations()->each(function ($localization) use ($localizable) {
+            $localizable->addLocalization(clone $localization);
+        });
+
+        $this->store->insert($global);
 
         $this->store->save($global);
     }

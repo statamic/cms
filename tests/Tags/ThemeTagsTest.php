@@ -8,11 +8,9 @@ use Statamic\API\Parse;
 
 class ThemeTagsTest extends TestCase
 {
-    use PartialTests;
-
     protected $path;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->path = '';
 
@@ -22,11 +20,6 @@ class ThemeTagsTest extends TestCase
     private function tag($tag)
     {
         return Parse::template($tag, []);
-    }
-
-    protected function partialTag($src, $params = '')
-    {
-        return $this->tag("{{ theme:partial src=\"$src\" $params }}");
     }
 
     public function testOutputsThemedJs()

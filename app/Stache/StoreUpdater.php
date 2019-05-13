@@ -8,13 +8,15 @@ use Facades\Statamic\Stache\Traverser;
 
 class StoreUpdater
 {
+    protected $stache;
     protected $store;
     protected $filesystem;
     protected $files;
     protected $timestamps;
 
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Stache $stache, Filesystem $filesystem)
     {
+        $this->stache = $stache;
         $this->filesystem = $filesystem;
     }
 
@@ -88,6 +90,6 @@ class StoreUpdater
             return;
         }
 
-        Cache::forever($this->timestampsCacheKey(), $this->files()->all());
+        $this->stache->queueTimestampCache($this->timestampsCacheKey(), $this->files()->all());
     }
 }

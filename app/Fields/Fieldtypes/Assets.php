@@ -14,8 +14,8 @@ class Assets extends Fieldtype
     protected $categories = ['media', 'relationship'];
 
     protected $configFields = [
-        'container' => ['type' => 'asset_container'],
-        'folder' => ['type' => 'asset_folder'],
+        'container' => ['type' => 'asset_container', 'max_items' => 1],
+        'folder' => ['type' => 'asset_folder', 'max_items' => 1],
         'restrict' => ['type' => 'toggle'],
         'max_files' => ['type' => 'integer'],
         'mode' => [
@@ -85,22 +85,14 @@ class Assets extends Fieldtype
             }
 
             if ($asset->isImage()) {
-                $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
-                $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
+                $asset->setSupplement('thumbnail', $asset->thumbnailUrl('small'));
+                $asset->setSupplement('toenail', $asset->thumbnailUrl('large'));
             }
 
             $assets->put($url, $asset);
         }
 
         return $assets->values();
-    }
-
-    protected function thumbnail($asset, $preset = null)
-    {
-        return cp_route('assets.thumbnails.show', [
-            'asset' => base64_encode($asset->id()),
-            'size' => $preset
-        ]);
     }
 
     public function augment($value)
@@ -130,9 +122,15 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        $data = Arr::wrap($this->augment($data));
+        if (! $assets = $this->augment($data)) {
+            return [];
+        }
 
-        return collect($data)->map(function ($asset) {
+        if ($this->config('max_files') === 1) {
+            $assets = collect([$assets]);
+        }
+
+        return $assets->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),

@@ -3,17 +3,22 @@
 namespace Tests\View\Antlers;
 
 use Tests\TestCase;
+use Statamic\Tags\Tags;
 use Statamic\API\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Blueprint;
 use Illuminate\Support\Facades\Log;
+use Statamic\Contracts\Data\Augmentable;
 use Illuminate\Contracts\Support\Arrayable;
+use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Data\Augmentable as AugmentableTrait;
 
 class ParserTest extends TestCase
 {
     private $variables;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -146,7 +151,26 @@ EOT;
     {
         $template = "{{ missing }}";
 
-        $this->assertEquals(null, Antlers::parse($template, $this->variables));
+        $this->assertEquals('', Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
+    function accessing_strings_as_arrays_returns_null()
+    {
+        $this->assertEquals('bar, ><', Antlers::parse('{{ foo }}, >{{ foo:test }}<', ['foo' => 'bar']));
+    }
+
+    /** @test */
+    function accessing_string_as_array_which_exists_as_callback_calls_the_callback()
+    {
+        (new class extends Tags {
+            public static $handle = 'foo';
+            public function test() {
+                return 'callback';
+            }
+        })::register();
+
+        $this->assertEquals('bar, callback', Antlers::parse('{{ foo }}, {{ foo:test }}', ['foo' => 'bar']));
     }
 
     /** @test */
@@ -248,6 +272,79 @@ EOT;
         $this->assertEquals(null, Antlers::parse($should_also_fail, $this->variables));
     }
 
+    public function testTernaryCondition()
+    {
+        $template = '{{ string ? "Pass" : "Fail" }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionIsntTooGreedy()
+    {
+        $template = '{{ content }} {{ string ? "Pass" : "Fail" }} {{ content }}';
+
+        $this->assertEquals('Paragraph Pass Paragraph', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithAVariable()
+    {
+        $template = '{{ string ? string : "Fail" }}';
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithModifiers()
+    {
+        $template = '{{ string ? string | upper : "Fail" }}';
+
+        $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithMultipleLines()
+    {
+        $template = <<<EOT
+{{ string
+    ? "Pass"
+    : "Fail" }}
+EOT;
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
+    public function testElvisCondition()
+    {
+        $template = '{{ string ?: "Pass" }}';
+        $template2 = '{{ missing ?: "Pass" }}';
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+    }
+
+    public function testNullCoalescence()
+    {
+        $template = '{{ string ?? "Pass" }}';
+        $template2 = '{{ missing ?? "Pass" }}';
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+    }
+
+    public function testNullCoalescenceAssignment()
+    {
+        $template = '{{ string ??= "Pass" }}';
+        $template2 = '{{ missing ??= "Pass" }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+        $this->assertEquals(null, Antlers::parse($template2, $this->variables));
+    }
+
+    public function testNullCoalescenceAssignmentInsideLoop()
+    {
+        $template = '{{ complex }}{{ first ??= "Pass" }}{{ /complex }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
     public function testSingleStandardStringModifierTight()
     {
         $template = "{{ string|upper }}";
@@ -308,21 +405,21 @@ EOT;
     {
         $template = "{{ content|markdown|lower }}";
 
-        $this->assertEquals("<p>paragraph</p>".PHP_EOL, Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>", Antlers::parse($template, $this->variables));
     }
 
     public function testChainedStandardModifiersRelaxedOnContent()
     {
         $template = "{{ content | markdown | lower }}";
 
-        $this->assertEquals("<p>paragraph</p>".PHP_EOL, Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>", Antlers::parse($template, $this->variables));
     }
 
     public function testChainedParameterModifiersOnContent()
     {
         $template = "{{ content markdown='true' lower='true' }}";
 
-        $this->assertEquals("<p>paragraph</p>".PHP_EOL, Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>", Antlers::parse($template, $this->variables));
     }
 
     public function testConditionsWithModifiers()
@@ -426,7 +523,7 @@ EOT;
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing of="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
+            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing var="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
         );
     }
 
@@ -476,6 +573,120 @@ EOT;
         $this->assertEquals('noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness', $parsed);
 
         $this->assertEquals('{{ string }} Hello wilderness', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $variables = [
+            'string' => 'hello',
+            'content' => 'before {{ string }} after',
+        ];
+
+        $parsed = $parser->parse('{{ content | noparse }} {{ string }}', $variables);
+
+        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
+
+        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_doesnt_parse_noparse_tags_inside_callbacks_and_requires_extractions_to_be_reinjected()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function array() {
+                return [];
+            }
+            public function loop()
+            {
+                return [
+                    ['string' => 'One'],
+                    ['string' => 'Two'],
+                ];
+            }
+        })::register();
+
+        $parser = Antlers::parser();
+
+$template = <<<EOT
+{{ tag:array }}{{ noparse }}{{ string }}{{ /noparse }}{{ /tag:array }}
+{{ tag:loop }}
+    {{ index }} {{ noparse }}{{ string }}{{ /noparse }} {{ string }}
+{{ /tag:loop }}
+EOT;
+
+$expectedBeforeInjection = <<<EOT
+noparse_ac3458695912d204af897d3c67f93cbe
+    1 noparse_ac3458695912d204af897d3c67f93cbe One
+    2 noparse_ac3458695912d204af897d3c67f93cbe Two
+EOT;
+
+$expectedAfterInjection = <<<EOT
+{{ string }}
+    1 {{ string }} One
+    2 {{ string }} Two
+EOT;
+
+        $parsed = $parser->parse($template, $this->variables);
+        $this->assertEquals($expectedBeforeInjection, trim($parsed));
+        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
+    }
+
+    /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_inside_callbacks_and_requires_extractions_to_be_reinjected()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function array() {
+                return [
+                    'string' => 'hello',
+                    'content' => 'beforesingle {{ string }} aftersingle',
+                ];
+            }
+            public function loop()
+            {
+                return [
+                    [
+                        'string' => 'One',
+                        'content' => 'beforepair {{ string }} afterpair',
+                    ],
+                    [
+                        'string' => 'Two',
+                        'content' => 'beforepair {{ string }} afterpair',
+                    ],
+                ];
+            }
+        })::register();
+
+        $parser = Antlers::parser();
+
+$template = <<<EOT
+{{ tag:array }}{{ content | noparse }}{{ /tag:array }}
+{{ tag:loop }}
+    {{ index }} {{ content | noparse }} {{ string }}
+{{ /tag:loop }}
+EOT;
+
+$expectedBeforeInjection = <<<EOT
+noparse_0548be789865a16ab6e495f84a3080c0
+    1 noparse_aa4a7fa8e2faf61751b68038fee92c4d One
+    2 noparse_aa4a7fa8e2faf61751b68038fee92c4d Two
+EOT;
+
+$expectedAfterInjection = <<<EOT
+beforesingle {{ string }} aftersingle
+    1 beforepair {{ string }} afterpair One
+    2 beforepair {{ string }} afterpair Two
+EOT;
+
+        $parsed = $parser->parse($template);
+        $this->assertEquals($expectedBeforeInjection, trim($parsed));
+        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
     }
 
     /** @test */
@@ -617,6 +828,44 @@ EOT;
     }
 
     /** @test */
+    function it_parses_value_objects_values_when_configured_to_do_so()
+    {
+        $fieldtypeOne = new class extends Fieldtype {
+            public function augment($value) { return 'augmented ' . $value; }
+            public function config(?string $key = null, $fallback = null) { return true; } // fake what's being returned from the field config
+        };
+        $fieldtypeTwo = new class extends Fieldtype {
+            public function augment($value) { return 'augmented ' . $value; }
+            public function config(?string $key = null, $fallback = null) { return false; } // fake what's being returned from the field config
+        };
+
+        $parseable = new Value('before {{ string }} after', 'parseable', $fieldtypeOne);
+        $nonParseable = new Value('before {{ string }} after', 'non_parseable', $fieldtypeTwo);
+
+        $template = <<<EOT
+{{ parseable }}
+{{ non_parseable }}
+EOT;
+
+        $expected = <<<EOT
+augmented before hello after
+augmented before  after
+EOT;
+
+        $variables = [
+            'parseable' => $parseable,
+            'non_parseable' => $nonParseable,
+            'string' => 'hello'
+        ];
+
+        $this->assertEquals($expected, Antlers::parse($template, $variables));
+        $this->assertEquals('AUGMENTED BEFORE HELLO AFTER', Antlers::parse('{{ parseable | upper }}', $variables));
+        $this->assertEquals('AUGMENTED BEFORE  AFTER', Antlers::parse('{{ non_parseable | upper }}', $variables));
+        $this->assertEquals('AUGMENTED BEFORE HELLO AFTER', Antlers::parse('{{ parseable upper="true" }}', $variables));
+        $this->assertEquals('AUGMENTED BEFORE  AFTER', Antlers::parse('{{ non_parseable upper="true" }}', $variables));
+    }
+
+    /** @test */
     function it_casts_objects_to_string_when_using_single_tags()
     {
         $object = new class {
@@ -650,11 +899,6 @@ EOT;
             'two' => 'bar',
         ]);
 
-        $nonArrayableObject = new NonArrayableObject([
-            'one' => 'foo',
-            'two' => 'bar',
-        ]);
-
         $this->assertEquals(
             'foo bar',
             Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
@@ -663,10 +907,16 @@ EOT;
         );
     }
 
+    /** @test */
     function it_cannot_cast_non_arrayable_objects_to_arrays_when_using_tag_pairs()
     {
         Log::shouldReceive('debug')->once()
             ->with('Cannot loop over non-loopable variable: {{ object }}');
+
+        $nonArrayableObject = new NonArrayableObject([
+            'one' => 'foo',
+            'two' => 'bar',
+        ]);
 
         $this->assertEquals(
             '',
@@ -674,6 +924,308 @@ EOT;
                 'object' => $nonArrayableObject
             ])
         );
+    }
+
+    /** @test */
+    function callback_tags_that_return_unparsed_simple_arrays_get_parsed()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['one' => 'a', 'two' => 'b'];
+            }
+        })::register();
+
+        $template = <<<EOT
+{{ tag }}
+    {{ one }} {{ two }}
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+    a b
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template));
+    }
+
+    /** @test */
+    function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [
+                    ['one' => 'a', 'two' => 'b'],
+                    ['one' => 'c', 'two' => 'd'],
+                ];
+            }
+        })::register();
+
+        $template = <<<EOT
+{{ string }}
+{{ tag }}
+    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+Hello wilderness
+    1 first not-last a b ><
+    2 not-first last c d ><
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, ['string' => 'Hello wilderness']));
+    }
+
+    /** @test */
+    function callback_tags_that_return_empty_arrays_get_parsed_with_no_results()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [];
+            }
+        })::register();
+
+        $template = <<<EOT
+{{ tag }}
+    {{ if no_results }}no results{{ else }}there are results{{ /if }}
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+    no results
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
+    function callback_tags_that_return_collections_get_parsed()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return collect([
+                    ['one' => 'a', 'two' => 'b'],
+                    ['one' => 'c', 'two' => 'd'],
+                ]);
+            }
+        })::register();
+
+        $template = <<<EOT
+{{ string }}
+{{ tag }}
+    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+Hello wilderness
+    1 first not-last a b ><
+    2 not-first last c d ><
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
+    function it_automatically_augments_augmentable_objects_when_using_tag_pairs()
+    {
+        $augmentable = new AugmentableObject([
+            'one' => 'foo',
+            'two' => 'bar',
+        ]);
+
+        $this->assertEquals(
+            'FOO! bar',
+            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+                'object' => $augmentable
+            ])
+        );
+    }
+
+    /** @test */
+    function it_automatically_augments_collections_when_using_tag_pairs()
+    {
+        $augmentable = collect([
+            new AugmentableObject(['one' => 'foo', 'two' => 'bar']),
+            new AugmentableObject(['one' => 'baz', 'two' => 'qux']),
+        ]);
+
+        $this->assertEquals(
+            'FOO! bar BAZ! qux ',
+            Antlers::parse('{{ object }}{{ one }} {{ two }} {{ /object }}', [
+                'object' => $augmentable
+            ])
+        );
+    }
+
+    /** @test */
+    function callback_tag_pair_context_is_limited_to_its_own_variables()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['drink' => 'juice'];
+            }
+        })::register();
+
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ tag }}{{ drink }} {{ food }}{{ /tag }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>juice <
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function variable_tag_pair_context_is_limited_to_its_own_variables()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => ['drink' => 'juice']
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ array }}{{ drink }} {{ food }}{{ /array }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>juice <
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function tags_can_access_context()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [
+                    'parameter' => $this->context['food'],
+                    'drink' => 'juice',
+                ];
+            }
+        })::register();
+
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }}
+>{{ tag }}{{ parameter }} {{ drink }} {{ food }}{{ /tag }}<
+EOT;
+
+        $expected = <<<EOT
+whisky burger
+>burger juice <
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function it_can_reach_into_the_cascade()
+    {
+        $cascade = $this->mock(Cascade::class, function ($m) {
+            $m->shouldReceive('get')->with('page')->once()->andReturn(['drink' => 'juice']);
+            $m->shouldReceive('get')->with('global')->once()->andReturn(['drink' => 'water']);
+            $m->shouldReceive('get')->with('menu')->once()->andReturn(['drink' => 'vodka']);
+            $m->shouldNotReceive('get')->with('nested');
+            $m->shouldNotReceive('get')->with('augmented');
+        });
+
+        $parser = Antlers::parser()->cascade($cascade);
+
+        $fieldtype = new class extends Fieldtype {};
+        $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
+
+        $context = [
+            'drink' => 'whisky',
+            'augmented' => $augmented,
+            'nested' => [
+                'drink' => 'coke',
+                'augmented' => $augmented,
+            ]
+        ];
+
+        $template = <<<EOT
+var: {{ drink }}
+page: {{ page:drink }}
+global: {{ global:drink }}
+menu: {{ menu:drink }}
+nested: {{ nested:drink }}
+augmented: {{ augmented:drink }}
+nested augmented: {{ nested:augmented:drink }}
+EOT;
+
+        $expected = <<<EOT
+var: whisky
+page: juice
+global: water
+menu: vodka
+nested: coke
+augmented: la croix
+nested augmented: la croix
+EOT;
+
+        $this->assertEquals($expected, $parser->parse($template, $context));
+    }
+
+    /** @test */
+    function it_can_create_scopes()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => ['drink' => 'juice']
+        ];
+
+        $template = <<<EOT
+{{ scope:test }}
+drink: {{ drink }}
+food: {{ food }}
+
+{{ array }}
+    array:drink: {{ drink }}
+    array:food: >{{ food }}<
+    array:test:drink: {{ test:drink }}
+    array:test:food: {{ test:food }}
+{{ /array }}
+{{ /scope:test }}
+EOT;
+
+        $expected = <<<EOT
+drink: whisky
+food: burger
+
+    array:drink: juice
+    array:food: ><
+    array:test:drink: whisky
+    array:test:food: burger
+EOT;
+
+        $this->assertEquals($expected, trim(Antlers::parse($template, $context)));
     }
 }
 
@@ -689,5 +1241,24 @@ class ArrayableObject extends NonArrayableObject implements Arrayable
 {
     function toArray() {
         return $this->data;
+    }
+}
+
+class AugmentableObject extends ArrayableObject implements Augmentable
+{
+    use AugmentableTrait;
+
+    public function blueprint()
+    {
+        FieldtypeRepository::shouldReceive('find')->andReturn(new class extends Fieldtype {
+            public function augment($data)
+            {
+                return strtoupper($data) . '!';
+            }
+        });
+
+        return (new Blueprint)->setContents(['fields' => [
+            ['handle' => 'one', 'field' => ['type' => 'test']]
+        ]]);
     }
 }

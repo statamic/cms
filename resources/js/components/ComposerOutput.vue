@@ -4,13 +4,11 @@
             <template v-if="composer.status">{{ composer.status }}</template>
             <span v-if="polling" class="icon icon-circular-graph animation-spin ml-1"></span>
         </p>
-        <pre v-if="output" class="p-1 rounded bg-grey-lighter text-grey text-sm clearfix">{{ output }}</pre>
+        <pre v-if="output" class="p-1 rounded bg-grey-30 text-grey text-sm clearfix">{{ output }}</pre>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-
     export default {
         props: {
             package: {
@@ -55,7 +53,7 @@
             },
 
             checkComposer() {
-                axios.get('/cp/composer/check', {params: this.params}).then(response => {
+                this.$axios.get('/cp/composer/check', {params: this.params}).then(response => {
                     this.output = response.data.output;
 
                     if (response.data.output === false || response.data.completed) {

@@ -108,7 +108,7 @@ class MakeAddon extends GeneratorCommand
         $json = $this->files->get($this->getStub('addon/composer.json.stub'));
 
         $json = str_replace('DummyNamespace', str_replace('\\', '\\\\', $this->addonNamespace()), $json);
-        $json = str_replace('dummy-package', $this->package, $json);
+        $json = str_replace('dummy/package', $this->package, $json);
         $json = str_replace('DummyTitle', $this->addonTitle(), $json);
 
         $this->files->put($this->addonPath('composer.json'), $json);

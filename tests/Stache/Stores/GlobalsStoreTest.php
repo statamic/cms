@@ -15,7 +15,7 @@ use Statamic\Contracts\Data\Globals\GlobalSet;
 
 class GlobalsStoreTest extends TestCase
 {
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ class GlobalsStoreTest extends TestCase
         $stache->registerStore($this->store = (new GlobalsStore($stache, app('files')))->directory($this->tempDir));
     }
 
-    function tearDown()
+    function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);

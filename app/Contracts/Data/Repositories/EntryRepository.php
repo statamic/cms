@@ -2,15 +2,17 @@
 
 namespace Statamic\Contracts\Data\Repositories;
 
-use Statamic\Contracts\Data\Entries\Entry;
-use Statamic\Data\Entries\EntryCollection;
-
 interface EntryRepository
 {
-    public function all(): EntryCollection;
-    public function whereCollection(string $handle): EntryCollection;
-    public function whereInCollection(array $handles): EntryCollection;
-    public function find($id): ?Entry;
-    public function findByUri(string $uri): ?Entry;
-    public function findBySlug(string $slug, string $collection): ?Entry;
+    public function all();
+    public function whereCollection(string $handle);
+    public function whereInCollection(array $handles);
+    public function find($id);
+    public function findByUri(string $uri);
+    public function findBySlug(string $slug, string $collection);
+    public function make();
+    public function query();
+    public function save($entry);
+    public function deleteLocalizable($localizableEntry);
+    public function deleteLocalization($localizedEntry);
 }

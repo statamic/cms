@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class BlueprintRepository
 {
+    protected static $blueprints = [];
     protected $files;
     protected $directory;
     protected $fallbackDirectory;
@@ -33,15 +34,27 @@ class BlueprintRepository
 
     public function find($handle): ?Blueprint
     {
+        if (! $handle) {
+            return null;
+        }
+
+        if ($cached = array_get(static::$blueprints, $handle)) {
+            return $cached;
+        }
+
         if (! $this->files->exists($path = "{$this->directory}/{$handle}.yaml")) {
             if (! $this->files->exists($path = "{$this->fallbackDirectory}/{$handle}.yaml")) {
                 return null;
             }
         }
 
-        return (new Blueprint)
+        $blueprint = (new Blueprint)
             ->setHandle($handle)
             ->setContents(YAML::parse($this->files->get($path)));
+
+        static::$blueprints[$handle] = $blueprint;
+
+        return $blueprint;
     }
 
     public function all(): Collection
@@ -76,5 +89,14 @@ class BlueprintRepository
             "{$this->directory}/{$blueprint->handle()}.yaml",
             YAML::dump($blueprint->contents())
         );
+    }
+
+    public function makeFromFields($fields)
+    {
+        $fields = collect($fields)->map(function ($field, $handle) {
+            return compact('handle', 'field');
+        });
+
+        return (new Blueprint)->setContents(['fields' => $fields]);
     }
 }

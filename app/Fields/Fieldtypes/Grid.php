@@ -4,25 +4,26 @@ namespace Statamic\Fields\Fieldtypes;
 
 use Statamic\API\Helper;
 use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Fields\ConfigFields;
 
 class Grid extends Fieldtype
 {
     protected $defaultable = false;
 
     protected $configFields = [
-        'mode' => [
-            'type' => 'select',
+        'mode'        => [
+            'type'    => 'select',
             'default' => 'table',
             'options' => ['table' => 'Table', 'stacked' => 'Stacked'],
         ],
-        'max_rows' => ['type' => 'integer'],
-        'min_rows' => ['type' => 'integer'],
-        'add_row' => ['type' => 'text'],
-        'fields' => ['type' => 'fields'],
+        'max_rows'    => ['type' => 'integer'],
+        'min_rows'    => ['type' => 'integer'],
+        'add_row'     => ['type' => 'text'],
+        'reorderable' => ['type' => 'toggle', 'default' => true],
+        'fields'      => ['type' => 'fields'],
     ];
 
     public function process($data)
@@ -75,14 +76,25 @@ class Grid extends Fieldtype
         return $rules;
     }
 
-    // public function extraRules(): array
-    // {
-    //     // TODO
-    //     $fieldset = (new Fieldset)->contents(['fields' => $this->config('fields')]);
-    //     $rules = (new Validation)->fieldset($fieldset)->rules();
+    public function extraRules(): array
+    {
+        $rules = (new Validation)->fields($this->fields())->rules();
 
-    //     return collect($rules)->mapWithKeys(function ($rules, $handle) {
-    //         return ["{$this->getName()}.*.{$handle}" => $rules];
-    //     })->all();
-    // }
+        return collect($rules)->mapWithKeys(function ($rules, $handle) {
+            return ["{$this->field->handle()}.*.{$handle}" => $rules];
+        })->all();
+    }
+
+    public function preload()
+    {
+        return [
+            'defaults' => $this->defaultRowData(),
+            'fields' => $this->fields()->meta(),
+        ];
+    }
+
+    protected function defaultRowData()
+    {
+        return $this->fields()->all()->map->defaultValue();
+    }
 }

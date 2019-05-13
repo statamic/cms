@@ -4,7 +4,7 @@
         :config="fieldConfig"
         :value="value"
         :errors="fieldErrors"
-        @updated="updated"
+        @updated="$emit('input', $event)"
     />
 
 </template>
@@ -78,14 +78,6 @@ export default {
 
         fieldErrors() {
             return this.error ? [this.error] : this.errors;
-        }
-
-    },
-
-    methods: {
-
-        updated(handle, value) {
-            this.$emit('input', value);
         }
 
     }

@@ -3,15 +3,14 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center justify-between hidden relative w-full fixed;
-    z-index: 998;
+    @apply bg-white shadow h-12 items-center justify-between hidden relative w-full px-2;
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
 @screen md {
-    .global-header { @apply flex; }
+    .global-header { @apply flex px-4; }
 }
 
 /* Search
@@ -51,7 +50,7 @@
     }
 
     .active {
-        @apply bg-grey-lighter;
+        @apply bg-grey-30;
     }
 
     .title {
@@ -59,7 +58,7 @@
     }
 
     .url {
-        @apply text-2xs text-grey-light;
+        @apply text-2xs text-grey-40;
     }
 
     .status {
@@ -85,6 +84,16 @@
         font-size: 21px;
         left: -3px;
         position: relative;
+    }
+}
+
+.site-selector {
+    @apply flex items-center px-2 border-l border-r mr-2 h-full text-sm;
+
+    .site-selector-icon {
+        @apply block mr-1;
+        height: 20px;
+        width: 1.25rem;
     }
 }
 

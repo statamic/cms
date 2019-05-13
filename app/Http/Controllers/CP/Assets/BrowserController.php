@@ -16,6 +16,10 @@ class BrowserController extends CpController
     {
         $containers = AssetContainer::all();
 
+        if ($containers->isEmpty()) {
+            return view('statamic::assets.index');
+        }
+
         // TODO: Filter out unauthorized containers
         // TODO: Handle no authorized containers
 
@@ -44,38 +48,40 @@ class BrowserController extends CpController
 
         $container = AssetContainer::find($container);
 
-        // Grab all the assets from the container.
-        $assets = $container->assets($path);
-        $assets = $this->supplementAssetsForDisplay($assets);
+        $paginator = $container
+            ->queryAssets()
+            ->where('folder', $path)
+            ->orderBy($request->sort, $request->order)
+            ->paginate(30);
 
-        // Get data about the subfolders in the requested asset folder.
-        $folders = [];
-        foreach ($container->assetFolders($path) as $f) {
-            $folders[] = [
-                'path' => $f->path(),
-                'title' => $f->title()
-            ];
-        }
+        $this->supplementAssetsForDisplay($paginator->getCollection());
 
-        // Set up the paginator, since we don't want to display all the assets.
-        // TODO: Instead of manually creating a paginator, get one from the Asset QueryBuilder once it exists.
-        $totalAssetCount = $assets->count();
-        $perPage = request('perPage');
-        $currentPage = (int) $this->request->page ?: 1;
-        $offset = ($currentPage - 1) * $perPage;
-        $assets = new LengthAwarePaginator(
-            $assets->values()->slice($offset, $perPage),
-            $totalAssetCount, $perPage, $currentPage
-        );
-
-        $assets->each(function($asset) {
-            $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
-        });
-
-        return Resource::collection($assets)->additional(['meta' => [
+        return Resource::collection($paginator)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
-            'folders' => $folders,
+            'folders' => $container->assetFolders($path)->values()->toArray(),
             'folder' => $container->assetFolder($path)->toArray()
+        ]]);
+    }
+
+    public function search(Request $request, $container)
+    {
+        // TODO: Handle invalid $container in url
+        // TODO: Auth
+
+        $container = AssetContainer::find($container);
+
+        $query = $container->hasSearchIndex()
+            ? $container->searchIndex()->ensureExists()->search($request->search)
+            : $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+
+        $paginator = $query->paginate(30);
+
+        $this->supplementAssetsForDisplay($paginator->getCollection());
+
+        return Resource::collection($paginator)->additional(['meta' => [
+            'container' => $this->toContainerArray($container),
+            'folders' => [],
+            'folder' => $container->assetFolder('/')->toArray()
         ]]);
     }
 
@@ -91,6 +97,7 @@ class BrowserController extends CpController
             // Set some values for better listing formatting.
             $asset->setSupplement('size_formatted', Str::fileSizeForHumans($asset->size(), 0));
             $asset->setSupplement('last_modified_formatted', $asset->lastModified()->format(config('statamic.cp.date_format')));
+            $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
         }
 
         return $assets;
@@ -98,10 +105,7 @@ class BrowserController extends CpController
 
     private function thumbnail($asset, $preset = null)
     {
-        return cp_route('assets.thumbnails.show', [
-            'asset' => base64_encode($asset->id()),
-            'size' => $preset
-        ]);
+        return $asset->thumbnailUrl($preset);
     }
 
     private function toContainerArray($container)

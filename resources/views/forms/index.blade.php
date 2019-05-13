@@ -2,28 +2,24 @@
 
 @section('content')
 
-    @if(count($forms) == 0)
-        <div class="text-center max-w-md mx-auto mt-5 screen-centered border-2 border-dashed rounded-lg px-4 py-8">
-            @svg('empty/form')
-            <h1 class="my-3">{{ __('Create your first Form now') }}</h1>
-            <p class="text-grey mb-3">
-                {{ __('Forms are used to collect information from your visitors and dispatch notifications to you and your team of new submissions') }}
-            </p>
-            @can('super')
-                <a href="{{ cp_route('forms.create') }}" class="btn-primary btn-lg">{{ __('Create Form') }}</a>
-            @endcan
-        </div>
-    @endif
+    @unless($forms->isEmpty())
 
-    @if(count($forms) > 0)
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Forms') }}</h1>
-            @can('super')
-                <a href="{{ cp_route('forms.create') }}" class="btn btn-primary">{{ __('Create Form') }}</a>
-            @endcan
+            <a href="{{ cp_route('forms.create') }}" class="btn-primary">{{ __('Create Form') }}</a>
         </div>
 
         <form-listing :forms="{{ json_encode($forms) }}"></form-listing>
-    @endif
+
+    @else
+
+        @include('statamic::partials.create-first', [
+            'resource' => 'Form',
+            'description' => 'Forms are used to collect information from your visitors and dispatch notifications to you and your team of new submissions',
+            'svg' => 'empty/form',
+            'route' => cp_route('forms.create')
+        ])
+
+    @endunless
 
 @endsection

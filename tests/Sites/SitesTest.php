@@ -16,7 +16,7 @@ class SitesTest extends TestCase
         $app['config']->set('app.url', 'http://absolute-url-resolved-from-request.com');
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -2,10 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\API\Arr;
+use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
+use Statamic\Fields\Validation;
 use Statamic\API\AssetContainer;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class AssetContainersController extends CpController
 {
@@ -18,6 +20,8 @@ class AssetContainersController extends CpController
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
+                'allow_uploads' => $container->allowUploads(),
+                'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl()
             ];
@@ -38,11 +42,20 @@ class AssetContainersController extends CpController
     {
         $container = AssetContainer::find($container);
 
-        // TODO: auth
+        $this->authorize('edit', $container, 'You are not authorized to edit asset containers.');
+
+        $values = $container->toArray();
+
+        $fields = ($blueprint = $this->formBlueprint())
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
 
         return view('statamic::assets.containers.edit', [
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
             'container' => $container,
-            'disks' => $this->disks()
         ]);
     }
 
@@ -50,51 +63,71 @@ class AssetContainersController extends CpController
     {
         $container = AssetContainer::find($container);
 
-        // TODO: auth
+        $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
-        $request->validate([
-            'title' => 'required',
-            'disk' => 'required',
-        ]);
+        $validation = (new Validation)->fields(
+            $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
+        );
+
+        $request->validate($validation->rules());
+
+        $values = $fields->values();
 
         $container
-            ->title($request->title)
-            ->disk($request->disk)
-            ->blueprint(Arr::first(json_decode($request->blueprint, true)))
-            ->save();
+            ->title($values['title'])
+            ->disk($values['disk'])
+            ->blueprint($values['blueprint'])
+            ->allowUploads($values['allow_uploads'])
+            ->createFolders($values['create_folders']);
 
-        return back()->with('success', 'Container saved');
+        $container->save();
+
+        return $container->toArray();
     }
 
     public function create()
     {
-        // TODO: auth
+        $this->authorize('create', AssetContainerContract::class, 'You are not authorized to create asset containers.');
+
+        $fields = ($blueprint = $this->formBlueprint())
+            ->fields()
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'disk' => $this->disks()->first(),
+        ]);
 
         return view('statamic::assets.containers.create', [
-            'disks' => $this->disks()
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $values,
+            'meta' => $fields->meta(),
         ]);
     }
 
     public function store(Request $request)
     {
-        // TODO: auth
+        $this->authorize('create', AssetContainerContract::class, 'You are not authorized to create asset containers.');
 
-        $request->validate([
-            'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
-            'disk' => 'required',
-        ]);
+        $validation = (new Validation)->fields(
+            $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
+        );
 
-        $title = $request->title;
-        $handle = $request->handle ?? snake_case($title);
+        $request->validate($validation->rules());
 
-        $container = AssetContainer::make($handle)
-            ->title($title)
-            ->disk($request->disk)
-            ->blueprint(Arr::first(json_decode($request->blueprint, true)))
-            ->save();
+        $values = $fields->values();
 
-        return redirect($container->editUrl())->with('success', 'Container saved');
+        $container = AssetContainer::make($values['handle'])
+            ->title($values['title'])
+            ->disk($values['disk'])
+            ->blueprint($values['blueprint'])
+            ->allowUploads($values['allow_uploads'])
+            ->createFolders($values['create_folders']);
+
+        $container->save();
+
+        session()->flash('success', 'Container saved');
+
+        return ['redirect' => $container->showUrl()];
     }
 
     public function destroy($container)
@@ -113,10 +146,47 @@ class AssetContainersController extends CpController
 
     private function disks()
     {
-        return collect(config('filesystems.disks'))
-            ->keys()
-            ->map(function ($disk) {
-                return ['text' => $disk, 'value' => $disk];
-            });
+        return collect(config('filesystems.disks'))->keys();
+    }
+
+    protected function formBlueprint()
+    {
+        return Blueprint::makeFromFields([
+            'title' => [
+                'type' => 'text',
+                'validate' => 'required',
+                'width' => 50,
+            ],
+            'handle' => [
+                'type' => 'slug',
+                'validate' => 'required|alpha_dash',
+                'width' => 50,
+            ],
+            'disk' => [
+                'type' => 'select',
+                'display' => __('Disk'),
+                'instructions' => __('The filesystem disk this container will use.'),
+                'options' => $this->disks()->all(),
+                'width' => 50,
+            ],
+            'blueprint' => [
+                'type' => 'blueprints',
+                'instructions' => __('The blueprint that assets in this container will use.'),
+                'max_items' => 1,
+                'width' => 50,
+            ],
+            'allow_uploads' => [
+                'type' => 'toggle',
+                'instructions' => __('The ability to upload into this container.'),
+                'default' => true,
+                'width' => 50,
+            ],
+            'create_folders' => [
+                'type' => 'toggle',
+                'instructions' => __('The ability to create folders within this container.'),
+                'default' => true,
+                'width' => 50,
+            ],
+        ]);
     }
 }
