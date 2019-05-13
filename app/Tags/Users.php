@@ -7,9 +7,9 @@ use Statamic\API\UserGroup;
 
 class Users extends Tags
 {
-    use OutputsItems;
 
     protected $defaultAsKey = 'users';
+    use GetsQueryResults, OutputsItems;
 
     /**
      * {{ get_content from="" }} ... {{ /get_content }}
@@ -26,6 +26,6 @@ class Users extends Tags
             $query->where('role', $role);
         }
 
-        return $this->output($query->get()->values());
+        return $this->output($this->results($query));
     }
 }
