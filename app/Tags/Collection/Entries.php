@@ -67,6 +67,7 @@ class Entries
 
         if ($this->orderBys->first()->direction === 'desc') {
             $this->orderBys = $this->orderBys->map->reverse();
+            $reversed = true;
         }
 
         if ($collection->orderable()) {
@@ -77,7 +78,9 @@ class Entries
             throw new \Exception('collection:next requires ordered or dated collection');
         }
 
-        return $this->results($query);
+        return $reversed ?? false
+            ? $this->results($query)->reverse()->values()
+            : $this->results($query);
     }
 
     public function previous($currentEntry)
@@ -92,6 +95,7 @@ class Entries
 
         if ($this->orderBys->first()->direction === 'asc') {
             $this->orderBys = $this->orderBys->map->reverse();
+            $reversed = true;
         }
 
         if ($collection->orderable()) {
@@ -102,7 +106,9 @@ class Entries
             throw new \Exception('collection:previous requires ordered or dated collection');
         }
 
-        return $this->results($query)->reverse()->values();
+        return $reversed ?? false
+            ? $this->results($query)->reverse()->values()
+            : $this->results($query);
     }
 
     protected function query()
