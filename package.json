@@ -25,6 +25,7 @@
     "element-resize-detector": "^1.1.14",
     "eqcss": "^1.9.1",
     "fuse.js": "^3.2.1",
+    "generate-password": "^1.4.1",
     "jquery": "^3.4.1",
     "jquery-ui": "file:resources/js/vendor/jquery-ui",
     "laravel-echo": "^1.5.3",

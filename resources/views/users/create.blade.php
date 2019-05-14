@@ -1,6 +1,12 @@
 @extends('statamic::layout')
 
 @section('content')
+    <user-wizard
+        route="{{ cp_route('users.store') }}">
+    </user-wizard>
+@stop
+
+@section('xcontent')
     <div class="max-w-lg mx-auto rounded shadow bg-white">
         <div class="max-w-md mx-auto px-2 py-6 text-center">
             <h1 class="mb-3">{{ __('Add a New User') }}</h1>
