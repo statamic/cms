@@ -9,7 +9,7 @@
         <label class="publish-field-label" :class="{'font-bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
             <template v-else>{{ config.handle | deslugify | titleize }}</template>
-            <i class="required" v-if="config.required">*</i>
+            <i class="required ml-sm" v-if="config.required">*</i>
             <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
                 {{ isLocked ? __('Locked') : __('Read Only') }}
