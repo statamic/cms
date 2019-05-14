@@ -45,6 +45,7 @@ Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue'));
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue'));
 Vue.component('status-fieldtype', StatusFieldtype);
+Vue.component('structure_sites-fieldtype', require('../components/structures/Sites.vue'));
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue'));
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue'));
 Vue.component('template-fieldtype', TemplateFieldtype);

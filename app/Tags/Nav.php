@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\Tags\Tags;
 use Statamic\API\Content;
@@ -110,7 +111,7 @@ class Nav extends Tags
             'include_home' => $this->getBool('include_home'),
             'exclude'      => $this->getList('exclude'),
             'conditions'   => $this->getConditionParameters(),
-            'locale'       => $this->get('locale', site_locale()),
+            'site'         => $this->get('site', Site::current()->handle()),
             'limit'        => $this->getInt('limit'),
             'offset'       => $this->getInt('offset'),
         ];

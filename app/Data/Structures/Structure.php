@@ -5,7 +5,6 @@ namespace Statamic\Data\Structures;
 use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Stache;
-use Statamic\Data\Localizable;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Structure as StructureAPI;
@@ -13,11 +12,12 @@ use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
 class Structure implements StructureContract
 {
-    use Localizable, FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile;
 
     protected $title;
     protected $handle;
     protected $sites;
+    protected $trees;
 
     public function id()
     {
@@ -78,13 +78,55 @@ class Structure implements StructureContract
         ]);
     }
 
-    public function makeTree()
+    protected function fileData()
     {
-        return (new Tree)->structure($this);
+        $data = [
+            'title' => $this->title,
+            'sites' => $this->sites,
+        ];
+
+        if (! Site::hasMultiple()) {
+            $data['tree'] = $this->in($this->locale())->toArray();
+        }
+
+        return $data;
     }
 
-    public function makeLocalization()
+    public function trees()
     {
-        return $this->makeTree();
+        return collect($this->trees);
+    }
+
+    public function makeTree($site)
+    {
+        return (new Tree)
+            ->locale($site)
+            ->structure($this);
+    }
+
+    public function addTree($tree)
+    {
+        $tree->structure($this);
+
+        $this->trees[$tree->locale()] = $tree;
+
+        return $this;
+    }
+
+    public function removeTree($tree)
+    {
+        unset($this->trees[$tree->locale()]);
+
+        return $this;
+    }
+
+    public function existsIn($site)
+    {
+        return isset($this->trees[$site]);
+    }
+
+    public function in($site)
+    {
+        return $this->trees[$site] ?? null;
     }
 }

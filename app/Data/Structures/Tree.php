@@ -2,20 +2,27 @@
 
 namespace Statamic\Data\Structures;
 
-use Statamic\Data\Localization;
-use Statamic\Data\ExistsAsFile;
+use Statamic\API;
+use Statamic\API\Stache;
 use Statamic\Data\ContainsData;
-use Statamic\Contracts\Data\Localization as LocalizationContract;
+use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
+use Statamic\Contracts\Data\Localization;
 
-class Tree implements LocalizationContract
+class Tree implements Localization
 {
-    use Localization, ExistsAsFile;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $route;
     protected $root;
     protected $tree = [];
     protected $withParent = true;
     protected $structure;
+
+    public function locale($locale = null)
+    {
+        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
+    }
 
     public function structure($structure = null)
     {
@@ -51,13 +58,17 @@ class Tree implements LocalizationContract
     {
         return vsprintf('%s/%s/%s.yaml', [
             rtrim(Stache::store('structures')->directory(), '/'),
-            $this->locale,
-            $this->handle
+            $this->locale(),
+            $this->handle()
         ]);
     }
 
     public function parent()
     {
+        if (!$this->root) {
+            return null;
+        }
+
         return (new Page)
             ->setEntry($this->root)
             ->setRoute($this->route())
@@ -93,5 +104,40 @@ class Tree implements LocalizationContract
         $this->withParent = false;
 
         return $this;
+    }
+
+    public function save()
+    {
+        $this
+            ->structure()
+            ->addTree($this)
+            ->save();
+    }
+
+    protected function fileData()
+    {
+        return [
+            'route' => $this->route,
+            'root' => $this->root,
+            'tree' => $this->removeEmptyChildren($this->tree),
+        ];
+    }
+
+    protected function removeEmptyChildren($array)
+    {
+        return collect($array)->map(function ($item) {
+            $item['children'] = $this->removeEmptyChildren(array_get($item, 'children', []));
+
+            if (empty($item['children'])) {
+                unset($item['children']);
+            }
+
+            return $item;
+        })->all();
+    }
+
+    public function editUrl()
+    {
+        return cp_route('structures.show', ['structure' => $this->handle(), 'site' => $this->locale()]);
     }
 }

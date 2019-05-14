@@ -43,7 +43,7 @@ class StructureRepository implements RepositoryContract
 
         list($handle, $id) = explode('::', $key);
 
-        return $this->find($handle)->page($id);
+        return $this->find($handle)->in($site)->page($id);
     }
 
     public function save(Structure $structure)

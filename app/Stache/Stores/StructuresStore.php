@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\API;
+use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\Stache\Stache;
@@ -94,15 +95,19 @@ class StructuresStore extends BasicStore
             return $structure->handle() === $handle;
         });
 
-        $variables = $structure
-            ->makeTree()
-            ->id($structure->id())
-            ->locale($site)
+        if (!$structure->sites()->contains($site)) {
+            // If this file is for a site that the structure
+            // isn't configure to use, just ignore it.
+            return $structure;
+        }
+
+        $tree = $structure
+            ->makeTree($site)
             ->route($data['route'] ?? null)
             ->root($data['root'] ?? null)
             ->tree($data['tree'] ?? []);
 
-        return $structure->addLocalization($variables);
+        return $structure->addTree($tree);
     }
 
     public function getItemKey($item, $path)
@@ -117,10 +122,18 @@ class StructuresStore extends BasicStore
 
     public function save(Structure $structure)
     {
-        $path = $this->directory . '/' . $structure->handle() . '.yaml';
-        $contents = YAML::dump($this->toSaveableArray($structure));
+        File::put($structure->path(), $structure->fileContents());
 
-        $this->files->put($path, $contents);
+        if (! Site::hasMultiple()) {
+            return;
+        }
+
+        foreach ($structure->trees() as $tree) {
+            File::put($tree->path(), $tree->fileContents());
+        }
+
+        // TODO: Any localizations that exist on disk but don't
+        // exist in the structure should be deleted.
     }
 
     protected function toSaveableArray($structure)
@@ -214,7 +227,7 @@ class StructuresStore extends BasicStore
         collect($this->treeQueue)->unique()->each(function ($structure) {
             $this->flushStructureEntryUris($structure->handle());
 
-            foreach ($structure->localizations() as $tree) {
+            foreach ($structure->trees() as $tree) {
                 foreach ($tree->uris() as $key => $uri) {
                     $this->entryUris
                         ->get($tree->locale())

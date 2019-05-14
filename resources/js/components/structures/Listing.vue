@@ -30,7 +30,6 @@ export default {
             rows: this.initialRows,
             columns: [
                 { label: __('Title'), field: 'title', visible: true },
-                { label: __('Pages'), field: 'pages', visible: true },
             ]
         }
     }
