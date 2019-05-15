@@ -18,7 +18,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Name of your Collection</label>
                 <input type="text" v-model="collection.title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Usually a noun, like "Blog", "Product", or "Breakfast Foods".
                 </div>
@@ -26,7 +26,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Handle</label>
                 <input type="text" v-model="collection.handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     How you'll reference to this collection in your templates. Cannot be easily changed.
                 </div>
@@ -141,7 +141,7 @@
                             @updated="collection.blueprints = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     You can pick an existing Blueprint or creates a new one.
                 </div>
@@ -161,7 +161,7 @@
                             @updated="collection.template = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default template.
                 </div>
@@ -176,7 +176,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
                 <input type="text" v-model="collection.route" class="input-text">
-                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Routes are optional. If you don't need a URL, you don't need a route.
                 </div>
@@ -184,7 +184,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm">Accelerated Mobile Pages (AMP)</label>
                 <label><input type="checkbox" v-model="collection.amp" /> Enable AMP</label>
-                <div class="text-2xs text-grey-40 mt-1 flex items-center">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     The AMP version of an entry will be routed to <code>{site url}/amp/{entry url}</code>
                 </div>

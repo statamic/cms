@@ -127,6 +127,8 @@ Route::group([
         Route::resource('preferences', 'PreferenceController');
     });
 
+    Route::post('user-exists', 'Users\UserWizardController')->name('user.exists');
+
     Route::get('search', 'SearchController')->name('search');
 
     Route::group(['namespace' => 'Utilities'], function () {
