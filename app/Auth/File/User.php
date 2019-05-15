@@ -117,9 +117,7 @@ class User extends BaseUser
      */
     public function getRememberToken()
     {
-        $yaml = YAML::parse(File::get($this->rememberPath(), ''));
-
-        return array_get($yaml, $this->id());
+        return $this->getMeta('remember_token');
     }
 
     /**
@@ -130,11 +128,7 @@ class User extends BaseUser
      */
     public function setRememberToken($token)
     {
-        $yaml = YAML::parse(File::get($this->rememberPath(), ''));
-
-        $yaml[$this->id()] = $token;
-
-        File::put($this->rememberPath(), YAML::dump($yaml));
+        $this->setMeta('remember_token', $token);
     }
 
     /**
