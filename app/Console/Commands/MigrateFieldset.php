@@ -232,7 +232,7 @@ class MigrateFieldset extends Command
     {
         return $config
             ->except('type')
-            ->prepend($config['type'], 'type')
+            ->prepend(Arr::get($config, 'type', 'text'), 'type')
             ->all();
     }
 

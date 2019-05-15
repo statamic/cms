@@ -15,4 +15,7 @@ interface UserRepository
 
     // current/logged in
     // oauth
+
+    public function save(User $user);
+    public function delete(User $user);
 }

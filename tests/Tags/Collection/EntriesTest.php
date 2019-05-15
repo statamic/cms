@@ -90,21 +90,21 @@ class EntriesTest extends TestCase
     /** @test */
     function it_limits_entries_with_offset()
     {
-        $this->makeEntry()->set('title', 'One')->save();
-        $this->makeEntry()->set('title', 'Two')->save();
-        $this->makeEntry()->set('title', 'Three')->save();
-        $this->makeEntry()->set('title', 'Four')->save();
-        $this->makeEntry()->set('title', 'Five')->save();
+        $this->makeEntry()->set('title', 'A')->save();
+        $this->makeEntry()->set('title', 'B')->save();
+        $this->makeEntry()->set('title', 'C')->save();
+        $this->makeEntry()->set('title', 'D')->save();
+        $this->makeEntry()->set('title', 'E')->save();
 
         $this->assertCount(5, $this->getEntries());
 
         $this->assertEquals(
-            ['One', 'Two', 'Three'],
+            ['A', 'B', 'C'],
             $this->getEntries(['limit' => 3])->map->get('title')->values()->all()
         );
 
         $this->assertEquals(
-            ['Two', 'Three', 'Four'],
+            ['B', 'C', 'D'],
             $this->getEntries(['limit' => 3, 'offset' => 1])->map->get('title')->values()->all()
         );
     }

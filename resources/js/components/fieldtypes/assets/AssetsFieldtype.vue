@@ -28,7 +28,7 @@
                 <template v-if="!loading">
 
                     <div
-                        v-if="!maxFilesReached"
+                        v-if="!maxFilesReached && !isReadOnly"
                         class="assets-fieldtype-picker"
                         :class="{
                             'is-expanded': expanded,
@@ -75,6 +75,8 @@
                             v-model="assets"
                             item-class="asset-tile"
                             handle-class="asset-thumb-container"
+                            @dragstart="$emit('focus')"
+                            @dragend="$emit('blur')"
                         >
                             <div
                                 class="asset-grid-listing border rounded overflow-hidden"
@@ -464,6 +466,10 @@ export default {
             if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
                 this.loadAssets(value);
             }
+        },
+
+        showSelector(selecting) {
+            this.$emit(selecting ? 'focus' : 'blur');
         }
 
     },

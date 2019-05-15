@@ -171,6 +171,15 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return $this;
     }
 
+    public function delete()
+    {
+        API\User::delete($this);
+
+        // TODO: dispatch event
+
+        return $this;
+    }
+
     public function getEmailForPasswordReset()
     {
         return $this->email();

@@ -93,6 +93,11 @@ class UsersStore extends BasicStore
         }
     }
 
+    public function delete($user)
+    {
+        File::delete($user->path());
+    }
+
     /**
      * TODO: Replace this with Arr::removeNullValues from v2.
      * I copied this temporarily to get it working without porting all of the Arr class.

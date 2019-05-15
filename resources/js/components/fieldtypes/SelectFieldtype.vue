@@ -2,6 +2,7 @@
     <v-select
         ref="input"
         @input="update"
+        :name="name"
         :clearable="config.clearable"
         :disabled="config.disabled"
         :options="options"

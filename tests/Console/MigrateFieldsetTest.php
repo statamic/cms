@@ -65,6 +65,32 @@ class MigrateFieldsetTest extends TestCase
     }
 
     /** @test */
+    function it_assumes_type_text()
+    {
+        $blueprint = $this->migrateFieldsetToBlueprint([
+            'title' => 'Gallery',
+            'fields' => [
+                'title' => [
+                    'width' => 50
+                ]
+            ]
+        ]);
+
+        $this->assertEquals($blueprint, [
+            'title' => 'Gallery',
+            'fields' => [
+                [
+                    'handle' => 'title',
+                    'field' => [
+                        'type' => 'text',
+                        'width' => 50
+                    ]
+                ]
+            ]
+        ]);
+    }
+
+    /** @test */
     function it_can_migrate_nested_fields()
     {
         $blueprint = $this->migrateFieldsetToBlueprint([
