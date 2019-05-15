@@ -60,6 +60,7 @@ class UsersController extends CpController
                 return [
                     'edit_url' => $user->editUrl(),
                     'deleteable' => $request->user()->can('delete', $user),
+                    'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
                     'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never")
                 ];
             });

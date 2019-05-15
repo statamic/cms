@@ -32,6 +32,10 @@
                                 {{ value }}
                             </a>
                         </template>
+                        <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
+                            <span v-if="roles.length === 0" />
+                            <span v-for="role in roles" class="badge-pill-sm mr-sm">{{ role }}</span>
+                        </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
                                 <div class="dropdown-menu">
