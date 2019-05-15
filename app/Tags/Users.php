@@ -19,7 +19,7 @@ class Users extends Tags
      */
     public function index()
     {
-        $query = User::query();
+        $query = $this->query();
 
         if ($group = $this->get('group')) {
             $query->where('group', $group);
