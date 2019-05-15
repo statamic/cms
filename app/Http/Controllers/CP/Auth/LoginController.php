@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
+use Statamic\API\Str;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -46,7 +47,9 @@ class LoginController extends CpController
 
     public function redirectPath()
     {
-        return request('referer') ?? cp_route('index');
+        $referer = request('referer');
+
+        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : cp_route('index');
     }
 
     protected function authenticated(Request $request, $user)
