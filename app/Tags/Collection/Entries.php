@@ -17,23 +17,19 @@ class Entries
         Query\HasOrderBys,
         Query\GetsResults;
 
-    protected $collections;
     protected $ignoredParams = ['as'];
     protected $parameters;
+    protected $collections;
+    protected $orderBys;
     protected $site;
-    protected $limit;
-    protected $offset;
-    protected $paginate;
     protected $showPublished;
     protected $showUnpublished;
-    protected $showPast;
     protected $since;
     protected $until;
-    protected $orderBys;
 
     public function __construct($parameters)
     {
-        $this->parameters = $this->parseParameters($parameters);
+        $this->parseParameters($parameters);
     }
 
     public function get()
@@ -126,25 +122,20 @@ class Entries
 
     protected function parseParameters($params)
     {
-        $params = Arr::except($params, $this->ignoredParams);
-
-        $this->collections = $this->parseCollections($params);
-        $this->site = Arr::getFirst($params, ['site', 'locale']);
-
-        $this->showPublished = Arr::get($params, 'show_published', true);
-        $this->showUnpublished = Arr::get($params, 'show_unpublished', false);
-        $this->since = Arr::get($params, 'since');
-        $this->until = Arr::get($params, 'until');
-
+        $this->parameters = Arr::except($params, $this->ignoredParams);
+        $this->collections = $this->parseCollections();
         $this->orderBys = $this->parseOrderBys();
-
-        return $params;
+        $this->site = Arr::getFirst($this->parameters, ['site', 'locale']);
+        $this->showPublished = Arr::get($this->parameters, 'show_published', true);
+        $this->showUnpublished = Arr::get($this->parameters, 'show_unpublished', false);
+        $this->since = Arr::get($this->parameters, 'since');
+        $this->until = Arr::get($this->parameters, 'until');
     }
 
-    protected function parseCollections($params)
+    protected function parseCollections()
     {
-        $from = Arr::getFirst($params, ['from', 'in', 'folder', 'use', 'collection']);
-        $not = Arr::getFirst($params, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
+        $from = Arr::getFirst($this->parameters, ['from', 'in', 'folder', 'use', 'collection']);
+        $not = Arr::getFirst($this->parameters, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         $collections = $from === '*'
             ? collect(Collection::handles())
