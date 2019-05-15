@@ -26,13 +26,16 @@
                             @per-page-changed="perPageChanged" />
                     </div>
                     <data-list-table :allow-bulk-actions="true" @sorted="sorted">
-                        <template slot="cell-name" slot-scope="{ row: user, value }">
-                            <a :href="user.edit_url">{{ value }}</a>
+                        <template slot="cell-email" slot-scope="{ row: user, value }">
+                            <a :href="user.edit_url" class="flex items-center">
+                                <avatar :user="user" class="w-8 h-8 rounded-full mr-1" />
+                                {{ value }}
+                            </a>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
                                 <div class="dropdown-menu">
-                                    <div class="li"><a :href="user.edit_url">Edit</a></div>
+                                    <div class="li"><a :href="user.edit_url" v-text="__('Edit')"></a></div>
                                     <data-list-inline-actions
                                         :item="user.id"
                                         :url="actionUrl"
