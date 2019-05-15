@@ -38,6 +38,7 @@ class EntriesStore extends AggregateStore
             $entry = Entry::make()
                 ->id($id)
                 ->collection($collection)
+                ->locale($item['locale'])
                 ->slug($item['slug'])
                 ->date($item['date'])
                 ->data($item['data'])
