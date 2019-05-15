@@ -7,7 +7,6 @@ use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Entry;
 use Statamic\Tags\Query;
-use Statamic\Query\OrderBy;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 
@@ -15,6 +14,7 @@ class Entries
 {
     use Query\HasConditions,
         Query\HasScopes,
+        Query\HasOrderBys,
         Query\GetsResults;
 
     protected $collections;
@@ -136,7 +136,7 @@ class Entries
         $this->since = Arr::get($params, 'since');
         $this->until = Arr::get($params, 'until');
 
-        $this->orderBys = $this->parseOrderBys($params);
+        $this->orderBys = $this->parseOrderBys();
 
         return $params;
     }
@@ -162,16 +162,7 @@ class Entries
             ->values();
     }
 
-    protected function parseOrderBys($params)
-    {
-        $piped = Arr::getFirst($params, ['order_by', 'sort']) ?? $this->parseDefaultOrderBy();
-
-        return collect(explode('|', $piped))->filter()->map(function ($orderBy) {
-            return OrderBy::parse($orderBy);
-        });
-    }
-
-    protected function parseDefaultOrderBy()
+    protected function defaultOrderBy()
     {
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
@@ -247,13 +238,6 @@ class Entries
         if ($this->until) {
             $query->where('date', '<', Carbon::parse($this->until));
         }
-    }
-
-    public function queryOrderBys($query)
-    {
-        $this->orderBys->each(function ($orderBy) use ($query) {
-            $query->orderBy($orderBy->sort, $orderBy->direction);
-        });
     }
 
     protected function allCollectionsAreDates()
