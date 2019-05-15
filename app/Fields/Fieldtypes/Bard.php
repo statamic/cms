@@ -64,6 +64,10 @@ class Bard extends Replicator
 
     public function augment($value)
     {
+        if ($this->field->handle() == "content") {
+            throw new \Exception("Unfortunately, you can't have a Bard field named content.");
+        }
+
         if ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
         }
