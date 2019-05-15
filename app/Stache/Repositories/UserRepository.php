@@ -65,4 +65,11 @@ class UserRepository extends BaseRepository
 
         $this->store->save($user);
     }
+
+    public function delete($user)
+    {
+        $this->store->remove($user);
+
+        $this->store->delete($user);
+    }
 }
