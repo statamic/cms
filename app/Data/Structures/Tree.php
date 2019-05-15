@@ -13,6 +13,7 @@ class Tree implements Localization
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
+    protected $locale;
     protected $route;
     protected $root;
     protected $tree = [];
