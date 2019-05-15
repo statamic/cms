@@ -34,29 +34,25 @@ class EntriesStore extends AggregateStore
         // The collection has been deleted.
         throw_unless($collection, new StoreExpiredException);
 
-        foreach ($cache as $id => $item) {
-            $entry = $entries->get($id) ?? Entry::make()
+        return $cache->map(function ($item, $id) use ($collection) {
+            $entry = Entry::make()
                 ->id($id)
-                ->collection($collection);
+                ->collection($collection)
+                ->slug($item['slug'])
+                ->date($item['date'])
+                ->data($item['data'])
+                ->published($item['published'])
+                ->initialPath($item['path']);
 
-            foreach ($item['localizations'] as $site => $attributes) {
-                $entry->in($site, function ($localized) use ($attributes, $collection) {
-                    $localized
-                        ->slug($attributes['slug'])
-                        ->initialPath($attributes['path'])
-                        ->published($attributes['published'])
-                        ->data($attributes['data']);
-
-                    if ($collection->dated()) {
-                        $localized->date($attributes['date']);
-                    }
-                });
+            if ($item['origin']) {
+                $this->localizationQueue[] = [
+                    'origin' => $item['origin'],
+                    'localization' => $entry,
+                ];
             }
 
-            $entries[$id] = $entry;
-        }
-
-        return $entries;
+            return $entry;
+        });
     }
 
     public function getCacheableMeta()
@@ -103,7 +99,7 @@ class EntriesStore extends AggregateStore
 
         $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
-        if ($origin = array_get($data, 'origin')) {
+        if ($origin = Arr::pull($data, 'origin')) {
             $this->localizationQueue[] = [
                 'origin' => $origin,
                 'localization' => $entry,

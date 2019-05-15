@@ -88,6 +88,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         return [
             'collection' => $this->collectionHandle(),
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
             'slug' => $this->slug(),
             'date' => optional($this->date())->format('Y-m-d-Hi'),
             'published' => $this->published(),

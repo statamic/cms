@@ -140,4 +140,14 @@ class Tree implements Localization
     {
         return cp_route('structures.show', ['structure' => $this->handle(), 'site' => $this->locale()]);
     }
+
+    public function toCacheableArray()
+    {
+        return [
+            'path' => $this->initialPath() ?? $this->path(),
+            'route' => $this->route,
+            'root' => $this->root,
+            'tree' => $this->tree,
+        ];
+    }
 }

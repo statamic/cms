@@ -31,11 +31,8 @@ class GlobalsStore extends BasicStore
 
     public function getItemsFromCache($cache)
     {
-        $globals = collect();
-
-        foreach ($cache as $id => $item) {
-            throw new \Exception('handle globals from cache');
-            $set = $globals->get($id) ?? GlobalSet::make()
+        return $cache->map(function ($item, $id) {
+            $set = GlobalSet::make()
                 ->id($id)
                 ->handle($item['handle'])
                 ->title($item['title'])
@@ -43,20 +40,17 @@ class GlobalsStore extends BasicStore
                 ->sites($item['sites'])
                 ->initialPath($item['path']);
 
-            foreach ($item['localizations'] as $site => $attributes) {
-                $localized = (new LocalizedGlobalSet)
-                    ->id($id)
-                    ->locale($site)
-                    ->initialPath($attributes['path'])
-                    ->data($attributes['data']);
-
-                $set->addLocalization($localized);
+            foreach ($item['localizations'] as $site => $localization) {
+                $set->addLocalization(
+                    $set
+                        ->makeLocalization($site)
+                        ->initialPath($localization['path'])
+                        ->data($localization['data'])
+                );
             }
 
-            $globals[$id] = $set;
-        }
-
-        return $globals;
+            return $set;
+        });
     }
 
     public function createItemFromFile($path, $contents)

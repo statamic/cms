@@ -33,10 +33,24 @@ class StructuresStore extends BasicStore
     public function getItemsFromCache($cache)
     {
         return $cache->map(function ($item, $handle) {
-            throw new \Exception('handle builing a structure from the cache');
-            return app(Structure::class)
-                ->handle($handle)
-                ->data($item);
+            $structure = API\Structure::make()
+                ->title($item['title'])
+                ->handle($item['handle'])
+                ->sites($item['sites'])
+                ->initialPath($item['path']);
+
+            foreach ($item['trees'] as $site => $tree) {
+                $structure->addTree(
+                    $structure
+                        ->makeTree($site)
+                        ->route($tree['route'])
+                        ->root($tree['root'])
+                        ->tree($tree['tree'])
+                        ->initialPath($tree['path'])
+                );
+            }
+
+            return $structure;
         });
     }
 

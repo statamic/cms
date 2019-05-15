@@ -67,7 +67,13 @@ class Structure implements StructureContract
 
     public function toCacheableArray()
     {
-        return $this->data;
+        return [
+            'title' => $this->title,
+            'handle' => $this->handle,
+            'sites' => $this->sites,
+            'path' => $this->initialPath() ?? $this->path(),
+            'trees' => $this->trees()->map->toCacheableArray()->all()
+        ];
     }
 
     public function path()
