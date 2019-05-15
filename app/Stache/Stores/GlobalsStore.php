@@ -23,7 +23,7 @@ class GlobalsStore extends BasicStore
     public function setItem($key, $item)
     {
         if ($item instanceof LocalizedGlobalSet) {
-            $item = $item->localizable();
+            $item = $item->globalSet();
         }
 
         return parent::setItem($key, $item);
@@ -74,9 +74,7 @@ class GlobalsStore extends BasicStore
     {
         $set = $this->createBaseGlobalFromFile($handle, $path, $data);
 
-        $localized = (new Variables)
-            ->id($set->id())
-            ->locale(Site::default()->handle())
+        $localized = $set->makeLocalization()
             ->initialPath($path)
             ->data($data['data'] ?? []);
 
@@ -124,9 +122,7 @@ class GlobalsStore extends BasicStore
             return $global->handle() === $handle;
         });
 
-        $variables = (new Variables)
-            ->id($set->id())
-            ->locale($site)
+        $variables = $set->makeLocalization($site)
             ->initialPath($path)
             ->data(Arr::except($data, 'origin'));
 
@@ -164,7 +160,7 @@ class GlobalsStore extends BasicStore
     public function save($global)
     {
         if ($global instanceof LocalizedGlobalSet) {
-            $global = $global->localizable();
+            $global = $global->globalSet();
         }
 
         $this->write($global);

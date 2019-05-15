@@ -5,27 +5,45 @@ namespace Statamic\Data\Globals;
 use Statamic\API\Site;
 use Statamic\API\Stache;
 use Statamic\API\GlobalSet;
+use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\Localization;
+use Statamic\FluentlyGetsAndSets;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
-use Statamic\Contracts\Data\Localization as LocalizationContract;
 use Statamic\Contracts\Data\Globals\LocalizedGlobalSet as Contract;
-use Statamic\Data\HasOrigin;
 
-class Variables implements Contract, LocalizationContract, AugmentableContract
+class Variables implements Contract, Localization, AugmentableContract
 {
-    use Localization, ExistsAsFile, ContainsData, Augmentable, HasOrigin;
+    use ExistsAsFile, ContainsData, Augmentable, HasOrigin, FluentlyGetsAndSets;
+
+    protected $set;
+    protected $locale;
+
+    public function globalSet($set = null)
+    {
+        return $this->fluentlyGetOrSet('set')->args(func_get_args());
+    }
+
+    public function locale($locale = null)
+    {
+        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
+    }
+
+    public function id()
+    {
+        return $this->globalSet()->id();
+    }
 
     public function handle()
     {
-        return $this->localizable()->handle();
+        return $this->globalSet()->handle();
     }
 
     public function title()
     {
-        return $this->localizable()->title();
+        return $this->globalSet()->title();
     }
 
     public function path()
@@ -40,46 +58,68 @@ class Variables implements Contract, LocalizationContract, AugmentableContract
 
     public function editUrl()
     {
-        return cp_route('globals.edit', [
-            $this->id(),
-            $this->handle(),
-            $this->locale(),
-        ]);
+        return $this->cpUrl('globals.edit');
     }
 
     public function updateUrl()
     {
-        return cp_route('globals.update', [
-            $this->id(),
-            $this->handle(),
-            $this->locale(),
-        ]);
+        return $this->cpUrl('globals.update');
+    }
+
+    protected function cpUrl($route)
+    {
+        $params = [$this->id(), $this->handle()];
+
+        if (Site::hasMultiple()) {
+            $params['site'] = $this->locale();
+        }
+
+        return cp_route($route, $params);
     }
 
     public function save()
     {
-        GlobalSet::save($this);
-
-        $this->localizable()->addLocalization($this);
-
-        if ($this->shouldPropagate) {
-            $this->propagate();
-        }
-
-        // GlobalSetSaved::dispatch($this, []);  // TODO
+        $this
+            ->globalSet()
+            ->addLocalization($this)
+            ->save();
 
         return $this;
     }
 
+    public function site()
+    {
+        return Site::get($this->locale());
+    }
+
     public function sites()
     {
-        return Site::all()->map->handle();
-        // TODO: Global should be able to control which sites it can be localized into.
+        return $this->globalSet()->sites();
     }
 
     public function blueprint()
     {
-        return $this->localizable()->blueprint();
+        return $this->globalSet()->blueprint() ?? $this->fallbackBlueprint();
+    }
+
+    protected function fallbackBlueprint()
+    {
+        $fields  = collect($this->values())
+            ->except(['id', 'title', 'blueprint'])
+            ->map(function ($field, $handle) {
+                return [
+                    'handle' => $handle,
+                    'field' => ['type' => 'text'],
+                ];
+            });
+
+        return (new \Statamic\Fields\Blueprint)->setContents([
+            'sections' => [
+                'main' => [
+                    'fields' => $fields->all()
+                ]
+            ]
+        ]);
     }
 
     public function toArray()
@@ -92,11 +132,18 @@ class Variables implements Contract, LocalizationContract, AugmentableContract
 
     protected function fileData()
     {
-        return $this->data();
+        return array_merge([
+            'origin' => $this->hasOrigin() ? $this->origin->locale() : null,
+        ], $this->data());
     }
 
     protected function augmentedArrayData()
     {
         return $this->values();
+    }
+
+    public function reference()
+    {
+        return "globals::{$this->id()}";
     }
 }

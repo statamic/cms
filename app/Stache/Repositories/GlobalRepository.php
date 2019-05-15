@@ -41,18 +41,11 @@ class GlobalRepository implements RepositoryContract
 
     public function save($global)
     {
-        $localizable = $global->localizable();
-
-        if (! $localizable->id()) {
-            $localizable->id($this->stache->generateId());
+        if (! $global->id()) {
+            $global->id($this->stache->generateId());
         }
 
-        // Clone the entry and all of its localizations so that any modifications to the
-        // original objects aren't reflected in the cache until explicitly saved again.
-        $localizable = clone $localizable;
-        $localizable->localizations()->each(function ($localization) use ($localizable) {
-            $localizable->addLocalization(clone $localization);
-        });
+        // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
 
         $this->store->insert($global);
 

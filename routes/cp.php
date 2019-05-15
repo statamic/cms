@@ -67,9 +67,10 @@ Route::group([
     Route::get('globals', 'GlobalsController@index')->name('globals.index');
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
     Route::post('globals', 'GlobalsController@store')->name('globals.store');
-    Route::get('globals/{id}/{handle}/{site}', 'GlobalsController@edit')->name('globals.edit');
-    Route::patch('globals/{id}/{handle}/{site}', 'GlobalsController@update')->name('globals.update');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
+    Route::get('globals/{id}/{handle}', 'GlobalsController@edit')->name('globals.edit');
+    Route::patch('globals/{id}/{handle}', 'GlobalsController@update')->name('globals.update');
+    Route::post('globals/{id}/{handle}/localize', 'Globals\LocalizeGlobalsController')->name('globals.localize');
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');
