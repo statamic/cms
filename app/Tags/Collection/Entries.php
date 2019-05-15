@@ -5,6 +5,7 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\Tags\Query;
 use Statamic\API\Collection;
