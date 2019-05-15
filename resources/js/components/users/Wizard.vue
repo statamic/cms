@@ -19,14 +19,38 @@
             <!-- Email Address -->
             <div class="max-w-md mx-auto px-2 pb-5">
                 <label class="font-bold text-base mb-sm" for="email">Email Address*</label>
-                <input type="email" v-model="user.email" id="email" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
+
+                <div class="text-2xs text-red mt-1 flex items-center" v-if="userExists">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Email addresses serve as usernames and must be unique
+                    This user already exists.
+                </div>
+                <div class="text-2xs text-grey-60 mt-1 flex items-center" v-else>
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    The email address also serves as a username and must be unique
                 </div>
             </div>
 
-             <div class="max-w-md mx-auto px-2 pb-3">
+            <!-- Name -->
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Name</label>
+                <input type="text" v-model="user.name" id="name" class="input-text" autofocus tabindex="2">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    You can leave the name blank if you want to let the user fill it in.
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div v-if="currentStep === 1" class="max-w-md mx-auto px-2 pb-2">
+            <div class="py-6 text-center">
+                <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
+                <p class="text-grey">Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.</p>
+            </div>
+
+            <!-- Super Admin -->
+             <div class="pb-5">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super_admin" />
                     <label class="font-bold ml-1">Super Admin</label>
@@ -38,9 +62,9 @@
             </div>
 
             <!-- Roles -->
-            <div class="max-w-md mx-auto px-2 pb-3" v-if="! user.super_admin">
+            <div class="pb-5" v-if="! user.super_admin">
                 <label class="font-bold text-base mb-sm" for="role">Roles</label>
-               <publish-field-meta
+                <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
                     :initial-value="user.roles">
                     <div slot-scope="{ meta, value, loading }">
@@ -54,41 +78,29 @@
                     </div>
                 </publish-field-meta>
             </div>
-
-            <div class="max-w-md mx-auto px-2 pb-5">
-                <div class="flex items-center">
-                    <toggle-input v-model="generate_password" />
-                    <label class="font-bold ml-1">Automatically generate password</label>
-
-                </div>
-                <div class="mt-3" v-if="! generate_password">
-                    <label class="font-bold text-base mb-sm" for="name">{{ __('Password')}}</label>
-                    <input type="text" v-model="customizedPassword" class="input-text" tabindex="2">
-                </div>
-                <div class="text-2xs text-grey-60 mt-1 mb-3 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    User will be required to change their password after sign-in
-                </div>
-            </div>
         </div>
 
-        <!-- Step 2 -->
-        <div v-if="currentStep === 1">
+        <!-- Step 3 -->
+        <div v-if="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Invitation') }}</h1>
-                <p class="text-grey">Send credentials and login details to the new user.</p>
+                <p class="text-grey">Send a welcome email with account activiation details to the new user.</p>
             </div>
+
+            <!-- Send Email? -->
             <div class="max-w-md mx-auto px-2 mb-3 flex items-center">
                 <toggle-input v-model="send_invite" />
                 <label class="font-bold ml-1">Send email invite</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-7 border rounded-lg " v-if="send_invite">
+                <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-2 pb-5">
                     <label class="font-bold text-base mb-sm" for="email">Email Subject</label>
                     <input type="text" v-model="email_subject" class="input-text bg-white">
                 </div>
 
+                <!-- Email Content -->
                 <div class="max-w-md mx-auto px-2">
                     <label class="font-bold text-base mb-sm" for="email">Email Content</label>
                     <textarea
@@ -99,12 +111,13 @@
                 </div>
             </div>
 
+            <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7" v-if="!send_invite">
                 <p class="mb-1">Copy these credentials and share them with <code>{{ user.email }}</code> via your preferred method.</p>
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
-Login URL: url
+Activation URL: url
 Username: {{ user.email }}
-Password: {{ password }}</textarea>
+</textarea>
             </div>
         </div>
 
@@ -126,7 +139,8 @@ Password: {{ password }}</textarea>
 
 <script>
 // Yer a wizard Harry
-var generator = require('generate-password');
+
+import isEmail from 'validator/lib/isEmail';
 
 export default {
     props: {
@@ -137,18 +151,17 @@ export default {
 
     data() {
         return {
-            steps: ['User Information', 'Customize Invitation'],
+            steps: ['User Information', 'Roles & Groups', 'Customize Invitation'],
             currentStep: 0,
             user: {
                 email: null,
                 super_admin: true,
                 roles: []
             },
-            generate_password: true,
             send_invite: true,
-            customizedPassword: null,
-            email_subject: __('You have a new Statamic account on ') + window.location.hostname,
-            customizedMessage: null
+            email_subject: __('Activate your new Statamic account on ') + window.location.hostname,
+            customizedMessage: null,
+            userExists: false
         }
     },
 
@@ -162,18 +175,12 @@ export default {
         canContinue() {
             return this.canGoToStep(this.currentStep + 1);
         },
-        password() {
-            return this.customizedPassword || generator.generate({length: 12, numbers: true})
-        },
         message: {
             get() {
-                return this.customizedMessage || `You have a new Statamic account on ${window.location.hostname}. Sign in to begin managing the website.
+                return this.customizedMessage || `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.
 
-**Your username**
-${this.user.email}
-
-**Your temporary password**
-${this.password}
+**Your activation link**
+[link]
 
 For your security, this link expires after 48 hours. After that, please contact the site administrator for a new password.`
             },
@@ -183,6 +190,9 @@ For your security, this link expires after 48 hours. After that, please contact 
         },
         finishButtonText() {
             return this.send_invite ? 'Create and Send Email' : 'Create User';
+        },
+        isValidEmail() {
+            return this.user.email && isEmail(this.user.email)
         }
     },
 
@@ -204,10 +214,19 @@ For your security, this link expires after 48 hours. After that, please contact 
         },
         canGoToStep(step) {
             if (step === 1) {
-                return Boolean(this.user.email) && (this.generate_password || (!this.generate_password && this.customizedPassword));
+                return this.isValidEmail && ! this.userExists;
+            } else if (step === 2) {
+                return this.canGoToStep(1);
             }
 
             return true;
+        },
+        checkIfUserExists() {
+            this.$axios.post(cp_url('user-exists'), {email: this.user.email}).then(response => {
+                this.userExists = response.data.exists
+            }).catch(error => {
+                this.$notify.error(error.response.data.message);
+            });
         },
         submit() {
             this.$axios.post(this.route, this.user).then(response => {
@@ -215,6 +234,14 @@ For your security, this link expires after 48 hours. After that, please contact 
             }).catch(error => {
                 this.$notify.error(error.response.data.message);
             });
+        }
+    },
+
+    watch: {
+        'user.email': function(email) {
+            if (this.isValidEmail) {
+                this.checkIfUserExists()
+            }
         }
     },
 

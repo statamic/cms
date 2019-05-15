@@ -15,7 +15,9 @@ use Statamic\API\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
+use Illuminate\Notifications\Notifiable;
 use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Notifications\NewUserInvitation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -65,8 +67,9 @@ class UsersController extends CpController
             'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
-                ['label' => __('Name'), 'field' => 'name'],
                 ['label' => __('Email'), 'field' => 'email'],
+                ['label' => __('Name'), 'field' => 'name'],
+                ['label' => __('Roles'), 'field' => 'roles'],
             ],
         ]]);
     }
@@ -118,13 +121,13 @@ class UsersController extends CpController
 
         $user = User::make()
             ->email($request->email)
-            // ->password('secret') // TODO: Either accept input, hash some garbage, or make password nullable in migration.
+            ->password($request->password)
             ->data($values)
             ->roles($request->roles ?? [])
             ->groups($request->groups ?? [])
             ->save();
 
-        return ['redirect' => $user->editUrl()];
+        return ['redirect' => cp_route('users.index')];
     }
 
     public function edit($id)
