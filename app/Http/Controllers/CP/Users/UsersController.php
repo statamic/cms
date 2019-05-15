@@ -59,7 +59,8 @@ class UsersController extends CpController
             ->supplement(function ($user) use ($request) {
                 return [
                     'edit_url' => $user->editUrl(),
-                    'deleteable' => $request->user()->can('delete', $user)
+                    'deleteable' => $request->user()->can('delete', $user),
+                    'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never")
                 ];
             });
 
@@ -70,6 +71,7 @@ class UsersController extends CpController
                 ['label' => __('Email'), 'field' => 'email'],
                 ['label' => __('Name'), 'field' => 'name'],
                 ['label' => __('Roles'), 'field' => 'roles'],
+                ['label' => __('Last Login'), 'field' => 'last_login'],
             ],
         ]]);
     }

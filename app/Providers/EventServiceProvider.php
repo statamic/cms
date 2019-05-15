@@ -16,6 +16,9 @@ class EventServiceProvider extends ServiceProvider
         \Statamic\View\Events\ViewRendered::class => [
             \Statamic\View\Debugbar\AddVariables::class,
         ],
+        \Illuminate\Auth\Events\Login::class => [
+            \Statamic\Auth\SetLastLoginTimestamp::class
+        ]
     ];
 
     protected $subscribe = [
