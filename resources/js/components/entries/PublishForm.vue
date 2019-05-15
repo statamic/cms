@@ -30,7 +30,7 @@
                 :searchable="false"
                 :multiple="false"
                 @input="localizationSelected"
-                class="w-32 mr-2"
+                class="w-48 mr-2"
             >
                 <template slot="option" slot-scope="option">
                     <div class="flex items-center" v-tooltip="localizationStatusText(option)">
