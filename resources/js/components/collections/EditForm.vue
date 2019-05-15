@@ -13,7 +13,13 @@
     >
         <div>
             <div class="flex items-center mb-3">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1">
+                    <small class="subhead block">
+                        <a :href="listingUrl" v-text="__('Collections')" />
+                    </small>
+
+                    {{ title }}
+                </h1>
                 <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
@@ -31,7 +37,8 @@ export default {
         initialValues: Object,
         meta: Object,
         initialTitle: String,
-        url: String
+        url: String,
+        listingUrl: String,
     },
 
     data() {
