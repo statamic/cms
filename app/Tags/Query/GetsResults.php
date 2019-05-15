@@ -1,14 +1,14 @@
 <?php
 
-namespace Statamic\Tags;
+namespace Statamic\Tags\Query;
 
 use Statamic\API\Arr;
 
-trait GetsQueryResults
+trait GetsResults
 {
-    protected function results($query, $params = null)
+    protected function results($query)
     {
-        $params = $this->parsePaginationParameters($params ?? $this->parameters);
+        $params = $this->parsePaginationParameters();
 
         if ($paginate = $params['paginate']) {
             return $query->paginate($paginate);
@@ -25,11 +25,11 @@ trait GetsQueryResults
         return $query->get();
     }
 
-    protected function parsePaginationParameters($params)
+    protected function parsePaginationParameters()
     {
-        $paginate = Arr::get($params, 'paginate');
-        $limit = Arr::get($params, 'limit');
-        $offset = Arr::get($params, 'offset');
+        $paginate = Arr::get($this->parameters, 'paginate');
+        $limit = Arr::get($this->parameters, 'limit');
+        $offset = Arr::get($this->parameters, 'offset');
 
         if ($paginate === true) {
             $paginate = $limit;

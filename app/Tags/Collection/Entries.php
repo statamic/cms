@@ -6,14 +6,15 @@ use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Entry;
+use Statamic\Tags\Query;
 use Statamic\Query\OrderBy;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
-use Statamic\Tags\GetsQueryResults;
 
 class Entries
 {
-    use GetsQueryResults, HasConditions;
+    use Query\HasConditions,
+        Query\GetsResults;
 
     protected $collections;
     protected $ignoredParams = ['as'];
@@ -57,10 +58,8 @@ class Entries
 
     public function next($currentEntry)
     {
-        $pagination = $this->parsePaginationParameters($this->parameters);
-
-        throw_if($pagination['paginate'], new \Exception('collection:next is not compatible with [paginate] parameter'));
-        throw_if($pagination['offset'], new \Exception('collection:next is not compatible with [offset] parameter'));
+        throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
+        throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
 
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
@@ -85,10 +84,8 @@ class Entries
 
     public function previous($currentEntry)
     {
-        $pagination = $this->parsePaginationParameters($this->parameters);
-
-        throw_if($pagination['paginate'], new \Exception('collection:previous is not compatible with [paginate] parameter'));
-        throw_if($pagination['offset'], new \Exception('collection:previous is not compatible with [offset] parameter'));
+        throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
+        throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
 
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];

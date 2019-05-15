@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Tags\Collection;
+namespace Tests\Tags\Query;
 
 use Statamic\API;
 use Tests\TestCase;
+use Illuminate\Support\Carbon;
 use Statamic\Tags\Collection\Entries;
 use Tests\PreventSavingStacheItemsToDisk;
-use Illuminate\Support\Carbon;
 
 class HasConditionsTest extends TestCase
 {

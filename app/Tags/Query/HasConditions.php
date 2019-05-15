@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tags\Collection;
+namespace Statamic\Tags\Query;
 
 use Statamic\API\Str;
 use Carbon\Carbon;
