@@ -345,16 +345,6 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         return false;
     }
 
-    protected function unlocalizableData()
-    {
-        $data = $this->blueprint()->fields()
-            ->addValues($this->data)
-            ->unlocalizable()
-            ->values();
-
-        return array_except($data, ['slug', 'order', 'published']);
-    }
-
     public function in($locale)
     {
         if ($this->locale === $locale) {
