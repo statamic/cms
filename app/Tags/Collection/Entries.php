@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
 class Entries
 {
     use Query\HasConditions,
+        Query\HasScopes,
         Query\GetsResults;
 
     protected $collections;
@@ -28,7 +29,6 @@ class Entries
     protected $showPast;
     protected $since;
     protected $until;
-    protected $scopes;
     protected $orderBys;
 
     public function __construct($parameters)
@@ -136,7 +136,6 @@ class Entries
         $this->since = Arr::get($params, 'since');
         $this->until = Arr::get($params, 'until');
 
-        $this->scopes = $this->parseQueryScopes($params);
         $this->orderBys = $this->parseOrderBys($params);
 
         return $params;
@@ -161,13 +160,6 @@ class Entries
                 return $collection;
             })
             ->values();
-    }
-
-    protected function parseQueryScopes($params)
-    {
-        $scopes = Arr::getFirst($params, ['query', 'filter']);
-
-        return collect(explode('|', $scopes));
     }
 
     protected function parseOrderBys($params)
@@ -255,19 +247,6 @@ class Entries
         if ($this->until) {
             $query->where('date', '<', Carbon::parse($this->until));
         }
-    }
-
-    public function queryScopes($query)
-    {
-        $this->scopes
-            ->map(function ($handle) {
-                return app('statamic.scopes')->get($handle);
-            })
-            ->filter()
-            ->each(function ($class) use ($query) {
-                $scope = app($class);
-                $scope->apply($query, $this->parameters);
-            });
     }
 
     public function queryOrderBys($query)
