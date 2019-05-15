@@ -4,10 +4,15 @@ namespace Statamic\Tags;
 
 use Statamic\API\User;
 use Statamic\API\UserGroup;
+use Statamic\Tags\Query;
 
 class Users extends Tags
 {
-    use GetsQueryResults, OutputsItems;
+    use Query\HasConditions,
+        Query\HasScopes,
+        Query\HasOrderBys,
+        Query\GetsResults,
+        OutputsItems;
 
     /**
      * {{ get_content from="" }} ... {{ /get_content }}
@@ -25,5 +30,16 @@ class Users extends Tags
         }
 
         return $this->output($this->results($query));
+    }
+
+    protected function query()
+    {
+        $query = User::query();
+
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $query;
     }
 }
