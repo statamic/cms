@@ -20,6 +20,11 @@ class Handler extends ExceptionHandler
         return parent::render($request, $e);
     }
 
+    protected function whoopsHandler()
+    {
+        return (new WhoopsHandler)->forDebug();
+    }
+
     /**
      * Temporarily disable Whoops even if it's installed.
      *

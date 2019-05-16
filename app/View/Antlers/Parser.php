@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Exceptions\WhoopsHandler as Whoops;
 
 class Parser
 {
@@ -117,11 +118,14 @@ class Parser
 
         try {
             $parsed = $this->parse($text, $data);
-        } catch (ParsingException $e) {
-            throw $e; // Thrown in a sub-parse.
         } catch (\Exception | \Error $e) {
-            $message = "Error parsing view [{$this->view}]\n{$e->getMessage()}";
-            throw new ParsingException($message, 0, $e);
+            Whoops::addDataTable('Parser', [
+                'view' => $this->view,
+                'text' => $text,
+                'data' => $data,
+            ]);
+
+            throw $e;
         }
 
         $this->view = $existingView;
