@@ -20,7 +20,7 @@ class Repository implements RepositoryContract
             return null;
         }
 
-        return $this->eloquentModelToStatamicEntry($model);
+        return Entry::fromModel($model);
     }
 
     public function all(): EntryCollection
@@ -52,9 +52,12 @@ class Repository implements RepositoryContract
 
     public function save($entry)
     {
-        $model = $this->statamicEntryToModel($entry);
+        $model = $entry->toModel();
 
         $model->save();
+
+        $entry->model($model);
+
     }
 
     public function make()
@@ -66,12 +69,17 @@ class Repository implements RepositoryContract
     {
         // Convert the eloquent model to one of the Statamic Entry objects.
         return collect_entries($models->map(function ($model) {
-            return $this->eloquentModelToStatamicEntry($model);
+            return Entry::fromModel($model);
         }));
     }
 
     public function eloquentModelToStatamicEntry($model)
     {
         return Entry::fromModel($model);
+    }
+
+    public function delete($entry)
+    {
+        $entry->model()->delete();
     }
 }

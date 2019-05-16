@@ -8,7 +8,7 @@ trait HasOrigin
 
     public function values()
     {
-        $originValues = $this->origin ? $this->origin->values() : [];
+        $originValues = $this->hasOrigin() ? $this->origin()->values() : [];
 
         return array_merge($originValues, $this->data);
     }
@@ -16,7 +16,7 @@ trait HasOrigin
     public function value($key)
     {
         return $this->get($key)
-            ?? ($this->origin ? $this->origin->value($key) : null);
+            ?? ($this->hasOrigin() ? $this->origin()->value($key) : null);
     }
 
     public function origin($origin = null)
