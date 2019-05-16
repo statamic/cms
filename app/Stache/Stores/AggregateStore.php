@@ -122,6 +122,8 @@ abstract class AggregateStore extends Store
     {
         $this->stores->each->markAsLoaded();
 
+        $this->loadingComplete();
+
         return $this;
     }
 

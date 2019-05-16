@@ -24,11 +24,9 @@ class RouteServiceProvider extends ServiceProvider
             abort_if(
                 ! ($entry = Entry::find($entry))
                 || $entry->collection() !== $route->parameter('collection')
-                || ! Site::get($site = $route->parameter('site'))
-                || ! $entry->collection()->sites()->contains($site)
             , 404);
 
-            return $entry->inOrClone($site);
+            return $entry;
         });
     }
 

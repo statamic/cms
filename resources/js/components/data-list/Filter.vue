@@ -10,7 +10,7 @@
             :errors="errors"
             @updated="$emit('changed', $event)"
         >
-            <publish-fields :fields="filter.fields" />
+            <publish-fields slot-scope="{ setValue }" :fields="filter.fields" @updated="setValue" />
         </publish-container>
     </div>
 

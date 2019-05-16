@@ -26,6 +26,9 @@ export default {
         },
         site: {
             type: String
+        },
+        localizedFields: {
+            type: Array
         }
     },
 
@@ -61,6 +64,7 @@ export default {
                 fieldset: _.clone(this.fieldset),
                 values: _.clone(this.values),
                 meta: _.clone(this.meta),
+                localizedFields: _.clone(this.localizedFields),
                 site: this.site,
             };
 
@@ -77,6 +81,7 @@ export default {
                     fieldset: initial.fieldset,
                     values: initial.values,
                     meta: initial.meta,
+                    localizedFields: initial.localizedFields,
                     site: initial.site,
                     fieldLocks: {},
                     errors: {},
@@ -97,6 +102,9 @@ export default {
                     },
                     setSite(state, site) {
                         state.site = site;
+                    },
+                    setLocalizedFields(state, fields) {
+                        state.localizedFields = fields;
                     },
                     lockField(state, { handle, user }) {
                         Vue.set(state.fieldLocks, handle, user || true);
@@ -130,7 +138,7 @@ export default {
 
         emitUpdatedEvent(values) {
             this.$emit('updated', values);
-            this.$dirty.add(this.name);
+            this.dirty();
         },
 
         saved() {
@@ -150,6 +158,10 @@ export default {
                 handle, value,
                 user: Statamic.user.id
             });
+        },
+
+        dirty() {
+            this.$dirty.add(this.name);
         }
 
     },
@@ -177,6 +189,10 @@ export default {
 
         errors(errors) {
             this.$store.commit(`publish/${this.name}/setErrors`, errors);
+        },
+
+        localizedFields(fields) {
+            this.$store.commit(`publish/${this.name}/setLocalizedFields`, fields);
         }
 
     },

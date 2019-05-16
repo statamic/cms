@@ -6,6 +6,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Data\Localizable;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Stache\Exceptions\StoreExpiredException;
 
 abstract class BasicStore extends Store
@@ -358,26 +359,16 @@ abstract class BasicStore extends Store
 
         $this->setItem($key, $item);
 
-        // TODO: This is ugly. Make it less ugly.
-        if ($item instanceof Localizable) {
-            $this->forEachSite(function ($site, $store) use ($item, $key) {
-                if (! $item->existsIn($site)) {
-                    return;
-                }
+        $site = $this->stache->sites()->first();
 
-                $item = $item->in($site);
-                $store->setSitePath($site, $key, $item->path());
-                if (method_exists($item, 'uri')) {
-                    $store->setSiteUri($site, $key, $item->uri());
-                }
-            });
-        } else {
-            $this->setSitePath($this->stache->sites()->first(), $key, $item->path());
-            if (method_exists($item, 'uri')) {
-                $this->forEachSite(function ($site, $store) use ($item, $key) {
-                    $store->setSiteUri($site, $key, $item->uri());
-                });
-            }
+        if ($item instanceof Localization) {
+            $site = $item->locale();
+        }
+
+        $this->setSitePath($site, $key, $item->path());
+
+        if (method_exists($item, 'uri')) {
+            $this->setSiteUri($site, $key, $item->uri());
         }
 
         $this->markAsUpdated();

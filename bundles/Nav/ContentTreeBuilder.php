@@ -9,13 +9,19 @@ class ContentTreeBuilder
 {
     public function build($params)
     {
-        $structure = Structure::find($params['structure']);
-
-        if (!$params['include_home']) {
-            $structure->withoutParent();
+        if (! $structure = Structure::find($params['structure'])) {
+            return null;
         }
 
-        return $this->toTree($structure->pages()->all(), 1);
+        if (! $tree = $structure->in($params['site'])) {
+            return null;
+        }
+
+        if (!$params['include_home']) {
+            $tree->withoutParent();
+        }
+
+        return $this->toTree($tree->pages()->all(), 1);
     }
 
     protected function toTree($pages, $depth)

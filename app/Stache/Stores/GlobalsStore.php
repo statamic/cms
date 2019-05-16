@@ -2,16 +2,19 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\Arr;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\GlobalSet;
 use Statamic\API\Collection;
-use Statamic\Data\Globals\LocalizedGlobalSet;
+use Statamic\Data\Globals\Variables;
 use Statamic\Contracts\Data\Globals\GlobalSet as GlobalsContract;
 
 class GlobalsStore extends BasicStore
 {
+    protected $localizationQueue = [];
+
     public function key()
     {
         return 'globals';
@@ -20,7 +23,7 @@ class GlobalsStore extends BasicStore
     public function setItem($key, $item)
     {
         if ($item instanceof LocalizedGlobalSet) {
-            $item = $item->localizable();
+            $item = $item->globalSet();
         }
 
         return parent::setItem($key, $item);
@@ -28,10 +31,8 @@ class GlobalsStore extends BasicStore
 
     public function getItemsFromCache($cache)
     {
-        $globals = collect();
-
-        foreach ($cache as $id => $item) {
-            $set = $globals->get($id) ?? GlobalSet::make()
+        return $cache->map(function ($item, $id) {
+            $set = GlobalSet::make()
                 ->id($id)
                 ->handle($item['handle'])
                 ->title($item['title'])
@@ -39,20 +40,17 @@ class GlobalsStore extends BasicStore
                 ->sites($item['sites'])
                 ->initialPath($item['path']);
 
-            foreach ($item['localizations'] as $site => $attributes) {
-                $localized = (new LocalizedGlobalSet)
-                    ->id($id)
-                    ->locale($site)
-                    ->initialPath($attributes['path'])
-                    ->data($attributes['data']);
-
-                $set->addLocalization($localized);
+            foreach ($item['localizations'] as $site => $localization) {
+                $set->addLocalization(
+                    $set
+                        ->makeLocalization($site)
+                        ->initialPath($localization['path'])
+                        ->data($localization['data'])
+                );
             }
 
-            $globals[$id] = $set;
-        }
-
-        return $globals;
+            return $set;
+        });
     }
 
     public function createItemFromFile($path, $contents)
@@ -68,15 +66,16 @@ class GlobalsStore extends BasicStore
 
     protected function createSingleSiteGlobalFromFile($handle, $path, $data)
     {
-        $set = $this->createBaseGlobalFromFile($handle, $path, $data);
+        $set = $this
+            ->createBaseGlobalFromFile($handle, $path, $data)
+            ->sites([$site = Site::default()->handle()]);
 
-        $localized = (new LocalizedGlobalSet)
-            ->id($set->id())
-            ->locale(Site::default()->handle())
-            ->initialPath($path)
-            ->data($data['data'] ?? []);
-
-        return $set->addLocalization($localized);
+        return $set->addLocalization(
+            $set
+                ->makeLocalization($site)
+                ->initialPath($path)
+                ->data($data['data'] ?? [])
+        );
     }
 
     protected function createMultiSiteGlobalFromFile($handle, $path, $data)
@@ -120,13 +119,19 @@ class GlobalsStore extends BasicStore
             return $global->handle() === $handle;
         });
 
-        $localized = (new LocalizedGlobalSet)
-            ->id($set->id())
-            ->locale($site)
+        $variables = $set->makeLocalization($site)
             ->initialPath($path)
-            ->data($data);
+            ->data(Arr::except($data, 'origin'));
 
-        return $set->addLocalization($localized);
+        if ($origin = Arr::get($data, 'origin')) {
+            $this->localizationQueue[] = [
+                'set' => $set,
+                'origin' => $origin,
+                'localization' => $variables,
+            ];
+        }
+
+        return $set->addLocalization($variables);
     }
 
     public function getItemKey($item, $path)
@@ -152,7 +157,7 @@ class GlobalsStore extends BasicStore
     public function save($global)
     {
         if ($global instanceof LocalizedGlobalSet) {
-            $global = $global->localizable();
+            $global = $global->globalSet();
         }
 
         $this->write($global);
@@ -174,5 +179,18 @@ class GlobalsStore extends BasicStore
         // if (($initial = $global->initialPath()) && $path !== $initial) {
         //     File::delete($global->initialPath());
         // }
+    }
+
+
+    public function loadingComplete()
+    {
+        foreach ($this->localizationQueue as $item) {
+            $set = $item['set'];
+            $origin = $set->in($item['origin']);
+            $set->addLocalization(
+                $item['localization']->origin($origin)
+            );
+            $this->setItem($this->getItemKey($set, ''), $set);
+        }
     }
 }

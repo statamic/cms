@@ -94,15 +94,15 @@ class EntriesController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($entry->data())
+            ->addValues($entry->values())
             ->preProcess();
 
         $values = array_merge($fields->values(), [
-            'title' => $entry->get('title'),
+            'title' => $entry->value('title'),
             'slug' => $entry->slug()
         ]);
 
-        if ($entry->collection()->dated()) {
+        if ($collection->dated()) {
             $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
             $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
             $values['date'] = $datetime;
@@ -120,20 +120,24 @@ class EntriesController extends CpController
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $fields->meta(),
-            'collection' => $this->collectionToArray($entry->collection()),
+            'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
             'locale' => $entry->locale(),
-            'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
-                $exists = $entry->entry()->existsIn($handle);
-                $localized = $entry->entry()->inOrClone($handle);
+            'localizedFields' => array_keys($entry->data()),
+            'hasOrigin' => $hasOrigin = $entry->hasOrigin(),
+            'originValues' => $hasOrigin ? $entry->origin()->data() : [],
+            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+                $localized = $entry->in($handle);
+                $exists = $localized !== null;
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $entry->locale(),
                     'exists' => $exists,
+                    'origin' => $exists ? !$localized->hasOrigin() : null,
                     'published' => $exists ? $localized->published() : false,
-                    'url' => $localized->editUrl(),
+                    'url' => $exists ? $localized->editUrl() : null,
                 ];
             })->all()
         ];
@@ -168,12 +172,12 @@ class EntriesController extends CpController
 
         $values = array_except($fields->values(), ['slug', 'date']);
 
-        foreach ($values as $key => $value) {
-            $entry->set($key, $value);
+        if ($entry->hasOrigin()) {
+            $values = array_only($values, $request->input('_localized'));
         }
 
         $entry
-            ->set('title', $request->title)
+            ->data($values)
             ->slug($request->slug);
 
         if ($entry->collection()->dated()) {
@@ -262,14 +266,12 @@ class EntriesController extends CpController
 
         $values = array_except($fields->values(), ['slug']);
 
-        $entry = Entry::create()
+        $entry = Entry::make()
             ->collection($collection)
-            ->in($site->handle(), function ($localized) use ($values, $request) {
-                $localized
-                    ->published(false)
-                    ->slug($request->slug)
-                    ->data($values);
-            });
+            ->locale($site->handle())
+            ->published(false)
+            ->slug($request->slug)
+            ->data($values);
 
         if ($collection->dated()) {
             $entry->date($values['date'] ?? now()->format('Y-m-d-Hi'));

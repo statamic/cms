@@ -107,7 +107,8 @@ class Blueprint
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
-            'sections' => $this->sections()->map->toPublishArray()->values()->all()
+            'sections' => $this->sections()->map->toPublishArray()->values()->all(),
+            'empty' => $this->isEmpty(),
         ];
     }
 

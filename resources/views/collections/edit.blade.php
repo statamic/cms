@@ -8,6 +8,7 @@
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"
         url="{{ cp_route('collections.update', $collection->handle()) }}"
+        listing-url="{{ cp_route('collections.index')}}"
     ></collection-edit-form>
 
 @stop

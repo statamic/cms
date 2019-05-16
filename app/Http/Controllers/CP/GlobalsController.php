@@ -19,12 +19,14 @@ class GlobalsController extends CpController
         })->tap(function ($globals) {
             $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
         })->map(function ($set) {
+            $localized = $set->in(Site::selected()->handle());
+
             return [
                 'id' => $set->id(),
                 'handle' => $set->handle(),
                 'title' => $set->title(),
                 'deleteable' => user()->can('delete', $set),
-                'edit_url' => $set->editUrl(),
+                'edit_url' => $localized->editUrl(),
             ];
         })->values();
 
@@ -33,17 +35,17 @@ class GlobalsController extends CpController
         ]);
     }
 
-    public function edit($id, $handle, $site)
+    public function edit(Request $request, $id)
     {
+        $site = $request->site ?? Site::selected()->handle();
+
         if (! $set = GlobalSet::find($id)) {
             return $this->pageNotFound();
         }
 
-        if (! $set->sites()->contains($site)) {
-            return $this->pageNotFound();
+        if (! $set = $set->in($site)) {
+            return abort(404);
         }
-
-        $set = $set->inOrClone($site);
 
         $this->authorize('edit', $set);
 
@@ -53,26 +55,63 @@ class GlobalsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($set->data())
+            ->addValues($set->values())
             ->preProcess();
 
         $values = $fields->values();
 
-        return view('statamic::globals.edit', [
-            'set' => $set,
-            'blueprint' => $blueprint,
+        $viewData = [
+            'reference' => $set->reference(),
+            'editing' => true,
+            'actions' => [
+                'save' => $set->updateUrl(),
+            ],
             'values' => $values,
             'meta' => $fields->meta(),
-        ]);
+            'blueprint' => $blueprint->toPublishArray(),
+            'readOnly' => $request->user()->cant('edit', $set),
+            'locale' => $set->locale(),
+            'localizedFields' => array_keys($set->data()),
+            'hasOrigin' => $hasOrigin = $set->hasOrigin(),
+            'originValues' => $hasOrigin ? $set->origin()->data() : [],
+            'localizations' => $set->globalSet()->sites()->map(function ($handle) use ($set) {
+                $localized = $set->globalSet()->in($handle);
+                $exists = $localized !== null;
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $set->locale(),
+                    'exists' => $exists,
+                    'origin' => $exists ? !$localized->hasOrigin() : null,
+                    'url' => $exists ? $localized->editUrl() : null,
+                ];
+            })->all()
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        if ($request->has('created')) {
+            session()->now('success', __('Globals created'));
+        }
+
+        return view('statamic::globals.edit', array_merge($viewData, [
+            'set' => $set
+        ]));
     }
 
-    public function update(Request $request, $id, $handle, $site)
+    public function update(Request $request, $id, $handle)
     {
+        $site = $request->site ?? Site::selected()->handle();
+
         if (! $set = GlobalSet::find($id)) {
             return $this->pageNotFound();
         }
 
-        $set = $set->inOrClone($site);
+        if (! $set = $set->in($site)) {
+            abort(404);
+        }
 
         $this->authorize('edit', $set);
 
@@ -82,9 +121,13 @@ class GlobalsController extends CpController
 
         $request->validate($validation->rules());
 
-        foreach ($fields->values() as $key => $value) {
-            $set->set($key, $value);
+        $values = $fields->values();
+
+        if ($set->hasOrigin()) {
+            $values = array_only($values, $request->input('_localized'));
         }
+
+        $set->data($values);
 
         $set->save();
 

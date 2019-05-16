@@ -164,6 +164,10 @@ export default {
 
         isSelecting(selecting) {
             this.$emit(selecting ? 'focus' : 'blur');
+        },
+
+        itemData(data) {
+            this.$emit('item-data-updated', data);
         }
 
     },
@@ -191,7 +195,7 @@ export default {
 
         getDataForSelections(selections) {
             this.loading = true;
-            const params = { selections };
+            const params = { site: this.site, selections };
 
             return this.$axios.get(this.itemDataUrl, { params }).then(response => {
                 this.loading = false;

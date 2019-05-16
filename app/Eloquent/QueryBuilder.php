@@ -25,6 +25,11 @@ abstract class QueryBuilder
         return $this->transform($this->builder->get());
     }
 
+    public function first()
+    {
+        return $this->get()->first();
+    }
+
     public function paginate()
     {
         $paginator = $this->builder->paginate();
@@ -39,5 +44,20 @@ abstract class QueryBuilder
         return $this->builder->count();
     }
 
+    public function where($column, $operator, $value = null)
+    {
+        $this->builder->where($this->column($column), $operator, $value);
+
+        return $this;
+    }
+
+    public function orderBy($column, $direction = 'asc')
+    {
+        $this->builder->orderBy($this->column($column), $direction);
+
+        return $this;
+    }
+
+    abstract protected function column($column);
     abstract protected function transform($items);
 }

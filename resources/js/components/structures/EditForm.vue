@@ -15,9 +15,8 @@
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">
                     <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Collections')" />
+                        <a :href="listingUrl" v-text="__('Structures')" />
                     </small>
-
                     {{ title }}
                 </h1>
                 <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>

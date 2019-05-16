@@ -5,6 +5,7 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\Tags\Query;
 use Statamic\API\Collection;
@@ -169,11 +170,15 @@ class Entries
 
     protected function querySite($query)
     {
-        if (! $this->site) {
+        $site = Arr::getFirst($this->parameters, ['site', 'locale']);
+
+        if ($site === '*') {
             return;
         }
 
-        return $query->where('site', $this->site);
+        $site = Site::current()->handle();
+
+        return $query->where('site', $site);
     }
 
     protected function queryPublished($query)

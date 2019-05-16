@@ -24,7 +24,7 @@ trait ExistsAsFile
         return $this;
     }
 
-    protected function fileData()
+    public function fileData()
     {
         return array_merge($this->data(), [
             'id' => $this->id()

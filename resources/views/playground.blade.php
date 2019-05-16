@@ -50,10 +50,6 @@
         <div class="mb-2">
             <v-select :multiple="true" :options="['Nintendo 64', 'Super Nintendo', 'Nintendo Gameboy', 'Sega Genesis', 'Sega Game Gear', 'Atari 2600']"></v-select>
         </div>
-        <div class="mb-2">
-            <h3 class="mt-5 mb-1">Site Switcher</h3>
-            <site-switcher :options="['Audi', 'Honda', 'Toyota']"></site-switcher>
-        </div>
     </div>
 
     <h2 class="mb-1">Typography</h2>

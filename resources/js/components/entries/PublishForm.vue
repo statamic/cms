@@ -21,30 +21,31 @@
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="isDirty" v-text="'Unsaved Changes'" />
             <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="!published" v-text="'Unpublished Entry'" />
 
-            <div
-                class="mr-3 text-xs flex items-center"
+            <v-select
                 v-if="localizations.length > 1"
+                :value="activeLocalization"
+                label="name"
+                :clearable="false"
+                :options="localizations"
+                :searchable="false"
+                :multiple="false"
+                @input="localizationSelected"
+                class="w-48 mr-2"
             >
-                <button
-                    v-for="loc in localizations"
-                    :key="loc.handle"
-                    class="inline-flex items-center py-1 px-2 rounded outline-none leading-normal"
-                    :class="{ 'bg-grey-20': loc.active }"
-                    @click="localizationSelected(loc)"
-                    v-tooltip.top="localizationStatusText(loc)"
-                >
-                    <div class="w-4 text-right flex items-center">
-                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === loc.handle" />
-                        <span v-if="localizing != loc.handle" class="little-dot"
-                            :class="{
-                                'bg-green': loc.published,
-                                'bg-grey-40': !loc.published,
-                                'bg-red': !loc.exists
-                            }" />
+                <template slot="option" slot-scope="option">
+                    <div class="flex items-center" v-tooltip="localizationStatusText(option)">
+                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
+                        <span class="little-dot mr-1" :class="{
+                            'bg-green': option.published,
+                            'bg-grey-50': !option.published,
+                            'bg-red': !option.exists
+                        }" />
+                        {{ option.name }}
+                        <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
+                        <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
                     </div>
-                    {{ loc.name }}
-                </button>
-            </div>
+                </template>
+            </v-select>
 
             <button v-if="!isCreating" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
 
@@ -101,10 +102,11 @@
             :meta="meta"
             :errors="errors"
             :site="site"
+            :localized-fields="localizedFields"
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{ container, components, setValue }"
+                slot-scope="{ container, components }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -128,7 +130,10 @@
                             v-show="sectionsVisible"
                             :live-preview="isPreviewing"
                             :read-only="readOnly"
+                            :syncable="hasOrigin"
                             @updated="setValue"
+                            @synced="syncField"
+                            @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
                             @blur="container.$emit('blur', $event)"
                         />
@@ -160,6 +165,9 @@ export default {
         initialMeta: Object,
         initialTitle: String,
         initialLocalizations: Array,
+        initialLocalizedFields: Array,
+        initialHasOrigin: Boolean,
+        initialOriginValues: Object,
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionTitle: String,
@@ -182,6 +190,9 @@ export default {
             values: _.clone(this.initialValues),
             meta: _.clone(this.initialMeta),
             localizations: _.clone(this.initialLocalizations),
+            localizedFields: this.initialLocalizedFields,
+            hasOrigin: this.initialHasOrigin,
+            originValues: this.initialOriginValues,
             site: this.initialSite,
             isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
@@ -225,6 +236,10 @@ export default {
 
         isDirty() {
             return this.$dirty.has(this.publishContainer);
+        },
+
+        activeLocalization() {
+            return _.findWhere(this.localizations, { active: true });
         }
 
     },
@@ -251,7 +266,8 @@ export default {
             this.clearErrors();
 
             const payload = { ...this.values, ...{
-                blueprint: this.fieldset.handle
+                blueprint: this.fieldset.handle,
+                _localized: this.localizedFields,
             }};
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
@@ -292,11 +308,23 @@ export default {
             }
 
             this.localizing = localization.handle;
+
+            if (localization.exists) {
+                this.editLocalization(localization);
+            } else {
+                this.createLocalization(localization);
+            }
+        },
+
+        editLocalization(localization) {
             this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
+                this.originValues = data.originValues;
                 this.meta = data.meta;
                 this.localizations = data.localizations;
+                this.localizedFields = data.localizedFields;
+                this.hasOrigin = data.hasOrigin;
                 this.publishUrl = data.actions[this.action];
                 this.collection = data.collection;
                 this.title = data.editing ? data.values.title : this.title;
@@ -306,6 +334,13 @@ export default {
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.removeNavigationWarning());
             })
+        },
+
+        createLocalization(localization) {
+            const url = this.activeLocalization.url + '/localize';
+            this.$axios.post(url, { site: localization.handle }).then(response => {
+                this.editLocalization(response.data);
+            });
         },
 
         localizationStatusText(localization) {
@@ -338,7 +373,28 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.$nextTick(() => this.$emit('saved', response));
-        }
+        },
+
+        setValue(handle, value) {
+            if (this.hasOrigin) this.desyncField(handle);
+
+            this.$refs.container.setValue(handle, value);
+        },
+
+        syncField(handle) {
+            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+                return;
+
+            this.localizedFields = this.localizedFields.filter(field => field !== handle);
+            this.$refs.container.setValue(handle, this.originValues[handle]);
+        },
+
+        desyncField(handle) {
+            if (!this.localizedFields.includes(handle))
+                this.localizedFields.push(handle);
+
+            this.$refs.container.dirty();
+        },
 
     },
 

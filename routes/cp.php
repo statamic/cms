@@ -41,10 +41,11 @@ Route::group([
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
             Route::post('{site}', 'EntriesController@store')->name('collections.entries.store');
 
-            Route::group(['prefix' => '{entry}/{slug}/{site}'], function () {
+            Route::group(['prefix' => '{entry}/{slug}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
                 Route::post('/', 'PublishedEntriesController@store')->name('collections.entries.published.store');
                 Route::delete('/', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
+                Route::post('localize', 'LocalizeEntryController')->name('collections.entries.localize');
 
                 Route::resource('revisions', 'EntryRevisionsController', [
                     'as' => 'collections.entries',
@@ -66,9 +67,10 @@ Route::group([
     Route::get('globals', 'GlobalsController@index')->name('globals.index');
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
     Route::post('globals', 'GlobalsController@store')->name('globals.store');
-    Route::get('globals/{id}/{handle}/{site}', 'GlobalsController@edit')->name('globals.edit');
-    Route::patch('globals/{id}/{handle}/{site}', 'GlobalsController@update')->name('globals.update');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
+    Route::get('globals/{id}/{handle}', 'GlobalsController@edit')->name('globals.edit');
+    Route::patch('globals/{id}/{handle}', 'GlobalsController@update')->name('globals.update');
+    Route::post('globals/{id}/{handle}/localize', 'Globals\LocalizeGlobalsController')->name('globals.localize');
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');

@@ -21,7 +21,7 @@
     transform: rotate(90deg);
 }
 
-.open .dropdown-menu {
+.open > .dropdown-menu {
     transform: scale(1);
     opacity: 1;
     z-index: 9999;

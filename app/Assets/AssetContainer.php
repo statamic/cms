@@ -369,7 +369,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
             ->args(func_get_args());
     }
 
-    protected function fileData()
+    public function fileData()
     {
         $data = array_except($this->toArray(), 'handle');
 

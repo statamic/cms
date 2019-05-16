@@ -6,29 +6,24 @@ use Statamic\API;
 use Statamic\API\Site;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
-use Statamic\Data\Localizable;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Globals\GlobalSet as Contract;
 
 class GlobalSet implements Contract
 {
-    use Localizable, ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $id;
     protected $title;
     protected $handle;
     protected $sites;
     protected $blueprint;
+    protected $localizations;
 
     public function id($id = null)
     {
-        return $this
-            ->fluentlyGetOrSet('id')
-            ->afterSetter(function ($id) {
-                $this->localizations()->each->id($id);
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
     public function sites($sites = null)
@@ -60,29 +55,9 @@ class GlobalSet implements Contract
     {
         return $this->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint) ?? $this->fallbackBlueprint();
+                return Blueprint::find($blueprint);
             })
             ->args(func_get_args());
-    }
-
-    protected function fallbackBlueprint()
-    {
-        $fields  = collect($this->data())
-            ->except(['id', 'title', 'blueprint'])
-            ->map(function ($field, $handle) {
-                return [
-                    'handle' => $handle,
-                    'field' => ['type' => 'text'],
-                ];
-            });
-
-        return (new \Statamic\Fields\Blueprint)->setContents([
-            'sections' => [
-                'main' => [
-                    'fields' => $fields->all()
-                ]
-            ]
-        ]);
     }
 
     public function path()
@@ -92,11 +67,6 @@ class GlobalSet implements Contract
             $this->handle(),
             'yaml'
         ]);
-    }
-
-    protected function makeLocalization()
-    {
-        return new LocalizedGlobalSet;
     }
 
     public function toCacheableArray()
@@ -123,7 +93,7 @@ class GlobalSet implements Contract
         return $this;
     }
 
-    protected function fileData()
+    public function fileData()
     {
         $data = [
             'id' => $this->id,
@@ -138,5 +108,46 @@ class GlobalSet implements Contract
         }
 
         return $data;
+    }
+
+    public function makeLocalization($site, $origin = null)
+    {
+        return (new Variables)
+            ->globalSet($this)
+            ->locale($site);
+    }
+
+    public function addLocalization($localization)
+    {
+        $localization->globalSet($this);
+
+        $this->localizations[$localization->locale()] = $localization;
+
+        return $this;
+    }
+
+    public function in($locale)
+    {
+        return $this->localizations[$locale] ?? null;
+    }
+
+    public function inSelectedSite()
+    {
+        return $this->in(Site::selected()->handle());
+    }
+
+    public function existsIn($locale)
+    {
+        return $this->in($locale) !== null;
+    }
+
+    public function localizations()
+    {
+        return collect($this->localizations);
+    }
+
+    public function toArray()
+    {
+        throw new \Exception('GlobalSet toArray');
     }
 }

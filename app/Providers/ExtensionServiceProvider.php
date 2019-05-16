@@ -106,6 +106,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Replicator::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
+        Fieldtypes\StructureSites::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Template::class,
         Fieldtypes\Text::class,

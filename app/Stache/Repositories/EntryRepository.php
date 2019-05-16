@@ -71,56 +71,24 @@ class EntryRepository implements RepositoryContract
 
     public function save($entry)
     {
-        $localizable = $entry->entry();
-
-        if (! $localizable->id()) {
-            // Put the new ID on the newly cloned item, as well as the one that was saved.
-            $localizable->id($id = $this->stache->generateId());
-            $entry->id($id);
+        if (! $entry->id()) {
+            $entry->id($this->stache->generateId());
         }
 
-        // Clone the entry and all of its localizations so that any modifications to the
-        // original objects aren't reflected in the cache until explicitly saved again.
-        $localizable = clone $localizable;
-        $localizable
-            ->localizations()
-            ->except($entry->locale())
-            ->each(function ($localization) use ($localizable) {
-                $localizable->addLocalization(clone $localization);
-            });
-
-        // Make sure the version we're saving is re-added to the entry.
-        $localizable->addLocalization(clone $entry);
+        // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
 
         $this->store
             ->store($entry->collectionHandle())
-            ->insert($localizable);
+            ->insert($entry);
 
         $this->store->save($entry);
     }
 
-    public function deleteLocalizable($localizable)
+    public function delete($entry)
     {
-        $localizable->localizations()->each(function ($localization) {
-            $this->store->delete($localization);
-        });
+        $this->store->remove($entry->id());
 
-        $this->store->remove($localizable->id());
-    }
-
-    public function deleteLocalization($localization)
-    {
-        $localizable = $localization->entry();
-
-        $localizable->removeLocalization($localization);
-
-        $this->store
-            ->store($localizable->collectionHandle())
-            ->insert($localizable)
-            ->removeSiteUri($localization->locale(), $localization->id())
-            ->removeSitePath($localization->locale(), $localization->id());
-
-        $this->store->delete($localization);
+        $this->store->delete($entry);
     }
 
     public function query()
