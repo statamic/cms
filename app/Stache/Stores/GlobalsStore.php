@@ -66,13 +66,16 @@ class GlobalsStore extends BasicStore
 
     protected function createSingleSiteGlobalFromFile($handle, $path, $data)
     {
-        $set = $this->createBaseGlobalFromFile($handle, $path, $data);
+        $set = $this
+            ->createBaseGlobalFromFile($handle, $path, $data)
+            ->sites([$site = Site::default()->handle()]);
 
-        $localized = $set->makeLocalization()
-            ->initialPath($path)
-            ->data($data['data'] ?? []);
-
-        return $set->addLocalization($localized);
+        return $set->addLocalization(
+            $set
+                ->makeLocalization($site)
+                ->initialPath($path)
+                ->data($data['data'] ?? [])
+        );
     }
 
     protected function createMultiSiteGlobalFromFile($handle, $path, $data)

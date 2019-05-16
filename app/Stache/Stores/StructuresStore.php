@@ -67,7 +67,17 @@ class StructuresStore extends BasicStore
 
     protected function createSingleSiteStructureFromFile($handle, $path, $data)
     {
-        throw new \Exception('createSingleSiteStructureFromFile');
+        $structure = $this
+            ->createBaseStructureFromFile($handle, $path, $data)
+            ->sites([$site = Site::default()->handle()]);
+
+        return $structure->addTree(
+            $structure
+                ->makeTree($site)
+                ->route($data['route'] ?? null)
+                ->root($data['root'] ?? null)
+                ->tree($data['tree'])
+        );
     }
 
     protected function createMultiSiteStructureFromFile($handle, $path, $data)
