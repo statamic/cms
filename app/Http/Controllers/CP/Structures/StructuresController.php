@@ -91,6 +91,9 @@ class StructuresController extends CpController
             'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
                 $localized = $structure->in($handle);
                 $exists = $localized !== null;
+                if (!$exists) {
+                    return null;
+                }
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -98,7 +101,7 @@ class StructuresController extends CpController
                     'exists' => $exists,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];
-            })->all()
+            })->filter()->all()
         ]);
     }
 
