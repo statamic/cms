@@ -115,7 +115,7 @@ class Tree implements Localization
             ->save();
     }
 
-    protected function fileData()
+    public function fileData()
     {
         return [
             'route' => $this->route,

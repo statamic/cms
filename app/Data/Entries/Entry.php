@@ -267,7 +267,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         return $this->collection()->sites();
     }
 
-    protected function fileData()
+    public function fileData()
     {
         return array_merge($this->data(), [
             'id' => $this->id(),

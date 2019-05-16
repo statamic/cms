@@ -130,7 +130,7 @@ class Variables implements Contract, Localization, AugmentableContract
         ], $this->supplements);
     }
 
-    protected function fileData()
+    public function fileData()
     {
         return array_merge([
             'origin' => $this->hasOrigin() ? $this->origin->locale() : null,

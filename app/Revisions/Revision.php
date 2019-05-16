@@ -95,7 +95,7 @@ class Revision implements Contract, Arrayable
         ]);
     }
 
-    protected function fileData()
+    public function fileData()
     {
         return [
             'action' => $this->action,

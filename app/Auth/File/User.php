@@ -344,7 +344,7 @@ class User extends BaseUser
         return storage_path("statamic/users/{$this->id}.yaml");
     }
 
-    protected function fileData()
+    public function fileData()
     {
         return array_merge($this->data(), [
             'id' => (string) $this->id(),

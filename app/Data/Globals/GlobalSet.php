@@ -93,7 +93,7 @@ class GlobalSet implements Contract
         return $this;
     }
 
-    protected function fileData()
+    public function fileData()
     {
         $data = [
             'id' => $this->id,

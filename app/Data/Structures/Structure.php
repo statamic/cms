@@ -84,7 +84,7 @@ class Structure implements StructureContract
         ]);
     }
 
-    protected function fileData()
+    public function fileData()
     {
         $data = [
             'title' => $this->title,
