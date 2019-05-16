@@ -26,16 +26,6 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Temporarily disable Whoops even if it's installed.
-     *
-     * See https://github.com/filp/whoops/issues/562
-     */
-    protected function renderExceptionWithWhoops(Exception $e)
-    {
-        return $this->renderExceptionWithSymfony($e, config('app.debug'));
-    }
-
-    /**
      * Render an exception to a string using Symfony.
      *
      * @param  \Exception  $e
