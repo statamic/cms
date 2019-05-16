@@ -83,7 +83,6 @@ class GlobalsController extends CpController
                     'active' => $handle === $set->locale(),
                     'exists' => $exists,
                     'origin' => $exists ? !$localized->hasOrigin() : null,
-                    // 'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];
             })->all()
