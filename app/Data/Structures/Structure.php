@@ -92,7 +92,7 @@ class Structure implements StructureContract
         ];
 
         if (! Site::hasMultiple()) {
-            $data['tree'] = $this->in($this->locale())->toArray();
+            $data = array_merge($data, $this->in(Site::default()->handle())->fileData());
         }
 
         return $data;
