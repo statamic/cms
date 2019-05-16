@@ -9,6 +9,7 @@
                 autocomplete="off"
                 class="search-input"
                 ref="input"
+                name="search"
                 v-model="query"
                 @keydown.up.prevent="moveUp"
                 @keydown.down.prevent="moveDown"
@@ -16,7 +17,8 @@
                 @keydown.esc.prevent="reset"
                 @focus="focused = true"
                 :placeholder="placeholder"
-                />
+                tabindex="-1"
+            />
 
             <span v-if="! (isDirty || searching)" class="rounded px-sm pb-px text-2xs border text-grey-50">/</span>
             <loading-graphic v-if="searching" :size="14" :inline="true" text="" />
@@ -114,6 +116,7 @@ export default {
         reset() {
             this.results = [];
             this.query = '';
+            this.focused = false;
             this.searching = false;
         },
 

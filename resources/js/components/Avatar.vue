@@ -2,7 +2,7 @@
 
     <div class="rounded-sm overflow-hidden">
         <img v-if="user.avatar" :src="user.avatar" class="block" />
-        <div v-else v-text="initials" class="text-center bg-pink text-white" />
+        <div v-else class="text-center flex items-center justify-center h-full w-full bg-pink text-white"><span>{{ initials }}</span></div>
     </div>
 
 </template>

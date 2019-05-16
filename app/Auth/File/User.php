@@ -95,7 +95,7 @@ class User extends BaseUser
     }
 
     /**
-     * The timestamp of the last modification date.
+     * The timestamp of the last modification date and time.
      *
      * @return \Carbon\Carbon
      */
@@ -117,9 +117,7 @@ class User extends BaseUser
      */
     public function getRememberToken()
     {
-        $yaml = YAML::parse(File::get($this->rememberPath(), ''));
-
-        return array_get($yaml, $this->id());
+        return $this->getMeta('remember_token');
     }
 
     /**
@@ -130,15 +128,12 @@ class User extends BaseUser
      */
     public function setRememberToken($token)
     {
-        $yaml = YAML::parse(File::get($this->rememberPath(), ''));
-
-        $yaml[$this->id()] = $token;
-
-        File::put($this->rememberPath(), YAML::dump($yaml));
+        $this->setMeta('remember_token', $token);
     }
 
     /**
      * Get the column name for the "remember me" token.
+     * It's a required Laravel thing.
      *
      * @return string
      */
@@ -290,6 +285,63 @@ class User extends BaseUser
             'data' => $this->data(),
             'preferences' => $this->preferences(),
         ];
+    }
+
+    public function lastLogin()
+    {
+        $last_login = $this->getMeta('last_login');
+
+        return $last_login ? carbon($last_login) : $last_login;
+    }
+
+    public function setLastLogin($carbon)
+    {
+        $this->setMeta('last_login', $carbon->timestamp);
+    }
+
+    public function sendActivationNotification()
+    {
+
+    }
+
+    /**
+     * Get a value from the user's meta YAML file
+     *
+     * @param  string $key
+     * @param  mixed $default
+     * @return mixed
+     */
+    public function getMeta($key, $default = null)
+    {
+        $yaml = YAML::parse(File::get($this->metaPath(), ''));
+
+        return array_get($yaml, $key, $default);
+    }
+
+     /**
+     * Write to the user's meta YAML file
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @return void
+     */
+    public function setMeta($key, $value)
+    {
+        $yaml = YAML::parse(File::get($this->metaPath(), ''));
+
+        $yaml[$key] = $value;
+
+        File::put($this->metaPath(), YAML::dump($yaml));
+    }
+
+    /**
+     * Path to the user's meta YAML file
+     *
+     * @return string
+     */
+    protected function metaPath()
+    {
+        return storage_path("statamic/users/{$this->id}.yaml");
     }
 
     protected function fileData()

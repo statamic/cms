@@ -9,7 +9,8 @@ fields:
     handle: email
     field:
       type: text
-      display: Email address
+      input: email
+      display: Email Address
   -
     handle: roles
     field:
@@ -20,11 +21,6 @@ fields:
     field:
       type: user_groups
       width: 50
-  -
-    handle: biography
-    field:
-      type: textarea
-      display: Biography
   -
     handle: avatar
     field:

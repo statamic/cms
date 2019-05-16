@@ -3,6 +3,7 @@ import Vue from "vue";
 Vue.component('select-input', require('../components/inputs/Select.vue'));
 Vue.component('text-input', require('../components/inputs/Text.vue'));
 Vue.component('textarea-input', require('../components/inputs/Textarea.vue'));
+Vue.component('toggle-input', require('../components/inputs/Toggle.vue'));
 Vue.component('relationship-input', require('../components/inputs/relationship/RelationshipInput.vue'));
 
 Vue.component('text-fieldtype', require('../components/fieldtypes/TextFieldtype.vue'));
