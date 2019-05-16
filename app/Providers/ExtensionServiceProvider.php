@@ -140,7 +140,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\NotFound::class,
         Tags\OAuth::class,
         Tags\Obfuscate::class,
-        Tags\Pages::class,
         Tags\ParentTags::class,
         Tags\Partial::class,
         Tags\Path::class,
