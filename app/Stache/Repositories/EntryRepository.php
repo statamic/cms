@@ -63,12 +63,6 @@ class EntryRepository implements RepositoryContract
             ?? $this->find($this->store->getIdFromUri($uri, $site));
     }
 
-    // TODO: Refactor usages.
-    public function whereUri(string $uri, string $site = null): ?Entry
-    {
-        return $this->findByUri($uri, $site);
-    }
-
     public function save($entry)
     {
         if (! $entry->id()) {

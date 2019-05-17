@@ -156,7 +156,7 @@ class Nav extends Tags
         foreach ($segment_urls as $segment_url) {
             $default_segment_uri = URL::getDefaultUri($locale, $segment_url);
 
-            $content = Entry::whereUri($default_segment_uri);
+            $content = Entry::findByUri($default_segment_uri);
 
             if (! $content) {
                 $content = app(\Statamic\Routing\Router::class)->getRoute($segment_url);

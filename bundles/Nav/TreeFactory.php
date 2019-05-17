@@ -64,7 +64,7 @@ class TreeFactory
     private function prependHome($tree_content)
     {
         $home = [
-            'page'     => Page::whereUri('/')->in($this->params['locale'])->get(),
+            'page'     => Page::findByUri('/')->in($this->params['locale'])->get(),
             'depth'    => 1,
             'children' => []
         ];

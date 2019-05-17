@@ -216,7 +216,7 @@ class PathBuilder implements PathBuilderContract
         if (substr_count($this->uri, '/') > 1) {
             $parent = URL::parent($this->uri);
 
-            if (! $page = Page::whereUri($parent)) {
+            if (! $page = Page::findByUri($parent)) {
                 throw new \Exception("Parent page [$parent] doesn't exist.");
             }
 

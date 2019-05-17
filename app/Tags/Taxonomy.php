@@ -122,7 +122,7 @@ class Taxonomy extends Tags
         foreach ($pages as $page) {
             $url = Str::ensureLeft($page, '/');
 
-            if ($content = Page::whereUri($url)) {
+            if ($content = Page::findByUri($url)) {
                 $collections[] = $content->entriesCollection();
             }
         }

@@ -107,7 +107,7 @@ class Route implements Responsable
             return $entry;
         }
 
-        if ($entry = Entry::whereUri($item)) {
+        if ($entry = Entry::findByUri($item)) {
             return $entry;
         }
     }

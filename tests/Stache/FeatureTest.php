@@ -129,17 +129,17 @@ class FeatureTest extends TestCase
     /** @test */
     function it_gets_an_entry_by_uri()
     {
-        $entry = Entry::whereUri('/numeric/two');
+        $entry = Entry::findByUri('/numeric/two');
         $this->assertEquals('numeric-two', $entry->id());
         $this->assertEquals('Two', $entry->get('title'));
 
-        $this->assertNull(Entry::whereUri('/unknown'));
+        $this->assertNull(Entry::findByUri('/unknown'));
     }
 
     /** @test */
     function it_gets_an_entry_in_structure_by_uri()
     {
-        $entry = Entry::whereUri('/about/board/directors');
+        $entry = Entry::findByUri('/about/board/directors');
         $this->assertEquals('pages-directors', $entry->id());
         $this->assertEquals('Directors', $entry->get('title'));
     }

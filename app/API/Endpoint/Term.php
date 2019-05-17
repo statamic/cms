@@ -71,7 +71,7 @@ class Term
      * @param string $uri
      * @return \Statamic\Contracts\Data\Taxonomies\Term
      */
-    public function whereUri($uri)
+    public function findByUri($uri)
     {
         return self::service()->uri($uri);
     }

@@ -91,7 +91,7 @@ class FrontendController extends Controller
     {
         $site = Site::current()->handle();
 
-        if ($entry = Entry::whereUri($uri, $site)) {
+        if ($entry = Entry::findByUri($uri, $site)) {
             return $entry->in($site);
         }
     }

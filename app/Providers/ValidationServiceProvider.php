@@ -62,7 +62,7 @@ class ValidationServiceProvider extends ServiceProvider
 
             $uri = URL::assemble($parameters[0], $value);
 
-            if (! $existing = Page::whereUri(Str::ensureLeft($uri, '/'))) {
+            if (! $existing = Page::findByUri(Str::ensureLeft($uri, '/'))) {
                 return true;
             }
 
