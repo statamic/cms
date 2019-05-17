@@ -74,7 +74,7 @@
                             :value="value"
                             :meta="meta"
                             name="user.roles"
-                            @updated="user.roles = $event" />
+                            @input="user.roles = $event" />
                     </div>
                 </publish-field-meta>
             </div>

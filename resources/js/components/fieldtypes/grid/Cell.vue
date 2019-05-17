@@ -9,7 +9,7 @@
                 :meta="meta"
                 :name="name"
                 :read-only="grid.isReadOnly"
-                @updated="$emit('updated', $event)"
+                @input="$emit('updated', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />

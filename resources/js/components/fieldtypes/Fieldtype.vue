@@ -25,7 +25,7 @@ export default {
 
     methods: {
         update(value) {
-            this.$emit('updated', value);
+            this.$emit('input', value);
         }
     },
 

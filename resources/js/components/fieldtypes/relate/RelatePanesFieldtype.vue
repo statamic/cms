@@ -171,7 +171,7 @@ export default {
         },
 
         data: function(data) {
-            this.$emit('updated', data);
+            this.$emit('input', data);
 
             this.$nextTick(function() {
                 $(this.$refs.sortable).sortable('refresh');

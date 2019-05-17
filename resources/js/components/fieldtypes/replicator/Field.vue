@@ -22,7 +22,7 @@
             :value="value"
             :name="name"
             :read-only="isReadOnly"
-            @updated="$emit('updated', $event)"
+            @input="$emit('updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />

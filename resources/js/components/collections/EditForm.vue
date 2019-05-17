@@ -12,6 +12,9 @@
         @updated="values = $event"
     >
         <div>
+
+            z<text-fieldtype v-model="someText" />z
+
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">
                     <small class="subhead block">
@@ -47,6 +50,7 @@ export default {
             values: this.initialValues,
             error: null,
             errors: {},
+            someText: 'hello'
         }
     },
 

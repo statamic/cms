@@ -35,7 +35,7 @@ export default {
             maxItems: this.maxItems,
             plugins: ['drag_drop', 'remove_button'],
             onChange: function(value) {
-                self.$emit('updated', value);
+                self.$emit('input', value);
             },
             create: this.create
         });

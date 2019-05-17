@@ -41,12 +41,6 @@ export default {
             this.options = options;
             this.loading = false;
         });
-    },
-
-    methods: {
-        handleUpdate(value) {
-            this.update(value.value)
-        }
     }
 
 };

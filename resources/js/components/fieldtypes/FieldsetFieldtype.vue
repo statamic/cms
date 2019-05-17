@@ -27,7 +27,7 @@
                         :name="name"
                         :value="value"
                         :config="selectConfig"
-                        @updated="update" />
+                        @input="update" />
                 </div>
 
                 <div class="flex">

@@ -8,7 +8,7 @@
             :value="value"
             :meta="relationshipMeta"
             :config="{ type: 'asset_folder' }"
-            @updated="update($event)"
+            @input="update"
         />
     </div>
 </template>

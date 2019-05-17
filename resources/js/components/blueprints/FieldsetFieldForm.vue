@@ -26,9 +26,8 @@
 
                     <fieldset-fieldtype
                         name="fieldset"
-                        :value="fieldset"
                         :config="{}"
-                        @updated="fieldset = $event"
+                        v-model="fieldset"
                     />
 
                 </div>

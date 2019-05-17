@@ -12,7 +12,7 @@
             :errors="errors[field.handle]"
             :read-only="readOnly"
             :syncable="syncable"
-            @updated="$emit('updated', field.handle, $event)"
+            @input="$emit('updated', field.handle, $event)"
             @synced="$emit('synced', field.handle)"
             @desynced="$emit('desynced', field.handle)"
             @focus="$emit('focus', field.handle)"

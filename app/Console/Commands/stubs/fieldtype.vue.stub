@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <text-input :value="value" @input="update($event)" />
+        <text-input :value="value" @input="update" />
     </div>
 
 </template>

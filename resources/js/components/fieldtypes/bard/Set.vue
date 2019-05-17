@@ -17,8 +17,7 @@
                 <toggle-fieldtype
                     name="set-enabled"
                     class="toggle-sm mr-2"
-                    :value="enabled"
-                    @updated="enabled = $event" />
+                    v-model="enabled" />
                 <dropdown-list>
                     <ul class="dropdown-menu">
                         <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>

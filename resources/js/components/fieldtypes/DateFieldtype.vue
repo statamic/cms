@@ -21,7 +21,7 @@
     		</div>
 
 			<div v-if="config.time_enabled" class="ml-1 time-fieldtype">
-				<time-fieldtype ref="time" v-if="time" :value="time" @updated="updateTime" :required="config.time_required" :config="{}" name=""></time-fieldtype>
+				<time-fieldtype ref="time" v-if="time" :value="time" @input="updateTime" :required="config.time_required" :config="{}" name=""></time-fieldtype>
 				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
 					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>
                     <span v-text="__('Add Time')"></span>

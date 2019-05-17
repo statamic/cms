@@ -17,7 +17,7 @@
                     <tr v-for="site in sites" :key="site.handle">
                         <td class="align-middle">
                             <div class="flex items-center">
-                                <toggle-fieldtype name="enabled" :value="site.enabled" @updated="site.enabled = $event" />
+                                <toggle-fieldtype name="enabled" v-model="site.enabled" />
                                 <div class="ml-2">{{ site.name }}</div>
                             </div>
                         </td>

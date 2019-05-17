@@ -138,7 +138,7 @@
                             :value="value"
                             :meta="meta"
                             name="blueprints"
-                            @updated="collection.blueprints = $event" />
+                            @input="collection.blueprints = $event" />
                     </div>
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
@@ -158,7 +158,7 @@
                             :value="value"
                             :meta="meta"
                             name="template"
-                            @updated="collection.template = $event" />
+                            @input="collection.template = $event" />
                     </div>
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">

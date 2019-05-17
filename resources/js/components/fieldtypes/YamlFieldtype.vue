@@ -34,7 +34,7 @@ export default {
         });
 
         this.codemirror.on('change', (cm) => {
-            this.$emit('updated', cm.doc.getValue());
+            this.update(cm.doc.getValue());
         });
     },
 
