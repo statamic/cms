@@ -78,7 +78,7 @@ class EntryFactory
 
     protected function createCollection()
     {
-        return Collection::whereHandle($this->collection)
+        return Collection::findByHandle($this->collection)
             ?? Collection::make($this->collection)
                 ->sites(['en'])
                 ->save();

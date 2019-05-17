@@ -19,7 +19,7 @@ class InAPI extends API
 
         foreach ($groups as $handle) {
             // Get the group
-            if (! $group = UserGroup::whereHandle($handle)) {
+            if (! $group = UserGroup::findByHandle($handle)) {
                 // If the group doesn't exist, we'll log an error and move on.
                 \Log::error("Group [$handle] doesn't exist");
                 continue;

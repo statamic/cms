@@ -18,7 +18,7 @@ class GlobalSet
      * @param string $handle
      * @return \Statamic\Contracts\Data\Globals\GlobalSet
      */
-    public function whereHandle($handle)
+    public function findByHandle($handle)
     {
         return $this->repo()->handle($handle);
     }

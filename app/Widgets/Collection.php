@@ -19,7 +19,7 @@ class Collection extends Widget
             return "Error: Collection [$collection] doesn't exist.";
         }
 
-        $collection = CollectionAPI::whereHandle($collection);
+        $collection = CollectionAPI::findByHandle($collection);
 
         if (! auth()->user()->can('view', $collection)) {
             return;

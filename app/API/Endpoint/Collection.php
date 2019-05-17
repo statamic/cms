@@ -36,7 +36,7 @@ class Collection
      * @param string $handle
      * @return \Statamic\Contracts\Data\Entries\Collection
      */
-    public function whereHandle($handle)
+    public function findByHandle($handle)
     {
         return $this->repo()->findByHandle($handle);
     }
@@ -49,7 +49,7 @@ class Collection
      */
     public function handleExists($handle)
     {
-        return self::whereHandle($handle) !== null;
+        return self::findByHandle($handle) !== null;
     }
 
     public function make($handle = null)

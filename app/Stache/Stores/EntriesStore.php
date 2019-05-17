@@ -29,7 +29,7 @@ class EntriesStore extends AggregateStore
             return $entries;
         }
 
-        $collection = Collection::whereHandle(Arr::first($cache)['collection']);
+        $collection = Collection::findByHandle(Arr::first($cache)['collection']);
 
         // The collection has been deleted.
         throw_unless($collection, new StoreExpiredException);
@@ -90,7 +90,7 @@ class EntriesStore extends AggregateStore
         }
 
         $collectionHandle = $collection;
-        $collection = Collection::whereHandle($collection);
+        $collection = Collection::findByHandle($collection);
 
         if (! $entry = $this->store($collectionHandle)->getItem($id)) {
             $entry = Entry::make()
@@ -139,7 +139,7 @@ class EntriesStore extends AggregateStore
             $relative = substr($relative, strlen($dir));
         }
 
-        if (! Collection::whereHandle(explode('/', $relative)[0])) {
+        if (! Collection::findByHandle(explode('/', $relative)[0])) {
             return false;
         }
 

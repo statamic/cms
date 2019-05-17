@@ -14,7 +14,7 @@ class Collections extends Relationship
 
     protected function toItemArray($id, $site = null)
     {
-        if ($collection = Collection::whereHandle($id)) {
+        if ($collection = Collection::findByHandle($id)) {
             return [
                 'title' => $collection->title(),
                 'id' => $collection->handle(),
@@ -45,6 +45,6 @@ class Collections extends Relationship
 
     protected function augmentValue($value)
     {
-        return Collection::whereHandle($value);
+        return Collection::findByHandle($value);
     }
 }

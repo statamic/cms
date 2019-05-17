@@ -33,7 +33,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindCollections()
     {
         Route::bind('collection', function ($collection) {
-            abort_if(! $collection = Collection::whereHandle($collection), 404);
+            abort_if(! $collection = Collection::findByHandle($collection), 404);
             return $collection;
         });
     }

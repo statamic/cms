@@ -168,7 +168,7 @@ class EntryRepositoryTest extends TestCase
     {
         $entry = EntryAPI::make()
             ->id('test-blog-entry')
-            ->collection(Collection::whereHandle('blog'));
+            ->collection(Collection::findByHandle('blog'));
 
         $localized = $entry->in('en', function ($loc) {
             $loc
@@ -212,7 +212,7 @@ class EntryRepositoryTest extends TestCase
     {
         $entry = EntryAPI::make()
             ->id('test-blog-entry')
-            ->collection(Collection::whereHandle('blog'));
+            ->collection(Collection::findByHandle('blog'));
 
         $localized = $entry->in('en', function ($loc) {
             $loc
@@ -261,7 +261,7 @@ class EntryRepositoryTest extends TestCase
 
         $entry = EntryAPI::make()
             ->id('test-blog-entry')
-            ->collection(Collection::whereHandle('blog'));
+            ->collection(Collection::findByHandle('blog'));
 
         $localized = $entry->in('en', function ($loc) {
             $loc

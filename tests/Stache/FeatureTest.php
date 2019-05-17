@@ -244,7 +244,7 @@ class FeatureTest extends TestCase
     {
         Entry::make()
             ->id('123')
-            ->collection(Collection::whereHandle('blog'))
+            ->collection(Collection::findByHandle('blog'))
             ->in('en', function ($loc) {
                 $loc
                     ->slug('test-entry')

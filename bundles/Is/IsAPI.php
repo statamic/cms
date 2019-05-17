@@ -19,7 +19,7 @@ class IsAPI extends API
 
         foreach ($roles as $handle) {
             // Get the role
-            if (! $role = Role::whereHandle($handle)) {
+            if (! $role = Role::findByHandle($handle)) {
                 // If the role doesn't exist, we'll log an error and move on.
                 \Log::error("Role [$handle] doesn't exist");
                 continue;

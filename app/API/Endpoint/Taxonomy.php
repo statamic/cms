@@ -36,7 +36,7 @@ class Taxonomy
      * @param string $handle
      * @return \Statamic\Contracts\Data\Taxonomies\Taxonomy
      */
-    public function whereHandle($handle)
+    public function findByHandle($handle)
     {
         return app(TaxonomiesService::class)->handle($handle);
     }
@@ -49,7 +49,7 @@ class Taxonomy
      */
     public function handleExists($handle)
     {
-        return self::whereHandle($handle) !== null;
+        return self::findByHandle($handle) !== null;
     }
 
     public function save(TaxonomyContract $taxonomy)

@@ -187,7 +187,7 @@ class Term extends Content implements TermContract
     public function taxonomy($taxonomy = null)
     {
         if (is_null($taxonomy)) {
-            return TaxonomyAPI::whereHandle($this->attributes['taxonomy']);
+            return TaxonomyAPI::findByHandle($this->attributes['taxonomy']);
         }
 
         // If we've been passed an actual collection, we just need the name of it.

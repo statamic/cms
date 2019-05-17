@@ -147,7 +147,7 @@ class Entries
         return $collections
             ->diff($excludedCollections)
             ->map(function ($handle) {
-                $collection = Collection::whereHandle($handle);
+                $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
                 return $collection;
             })
