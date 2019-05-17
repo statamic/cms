@@ -88,8 +88,12 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply ml-4;
-    flex-basis: 440px;
+    @apply ml-4 flex-no-shrink w-1/4 max-w-sm;
+
+    .publish-section {
+        position: sticky;
+        top: 10px;
+    }
 
     .publish-fields {
         @apply py-1;
@@ -119,7 +123,7 @@ code.parent-url {
 }
 
 .publish-section {
-    @apply shadow bg-white rounded-md;
+    @apply shadow bg-white rounded-md w-full;
 }
 
 

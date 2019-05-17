@@ -14,80 +14,12 @@
                 </div>
             </h1>
 
-            <div class="pt-px text-2xs text-grey-60 mr-2 flex" v-if="readOnly">
+            <div class="pt-px text-2xs text-grey-60 flex" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
-            <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
-            <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="isDirty" v-text="'Unsaved Changes'" />
-            <div class="pt-px text-2xs text-grey-60 mr-2" v-else-if="!published" v-text="'Unpublished Entry'" />
-
-            <v-select
-                v-if="localizations.length > 1"
-                :value="activeLocalization"
-                label="name"
-                :clearable="false"
-                :options="localizations"
-                :searchable="false"
-                :multiple="false"
-                @input="localizationSelected"
-                class="w-48 mr-2"
-            >
-                <template slot="option" slot-scope="option">
-                    <div class="flex items-center" v-tooltip="localizationStatusText(option)">
-                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
-                        <span class="little-dot mr-1" :class="{
-                            'bg-green': option.published,
-                            'bg-grey-50': !option.published,
-                            'bg-red': !option.exists
-                        }" />
-                        {{ option.name }}
-                        <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
-                        <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
-                    </div>
-                </template>
-            </v-select>
-
-            <button v-if="!isCreating" class="btn mr-2 flex items-center" @click="showRevisionHistory = true" v-text="__('History')" />
-
-            <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
-                <revision-history
-                    slot-scope="{ close }"
-                    :index-url="actions.revisions"
-                    :restore-url="actions.restore"
-                    @closed="close"
-                />
-            </stack>
-
-            <button
-                class="btn mr-2"
-                v-if="isBase"
-                v-text="__('Live Preview')"
-                @click="openLivePreview" />
-
-            <button
-                v-if="!readOnly && !canPublish"
-                class="btn btn-primary min-w-100"
-                :class="{ 'opacity-25': !canSave }"
-                :disabled="!canSave"
-                @click.prevent="save"
-                v-text="__('Save')" />
-
-            <button
-                v-if="canPublish"
-                class="btn btn-primary min-w-100"
-                :class="{ 'opacity-25': !canPublish }"
-                :disabled="!canPublish"
-                @click="confirmingPublish = true"
-                v-text="`${__('Publish')}...`" />
-
-            <publish-actions
-                v-if="confirmingPublish"
-                :actions="actions"
-                :published="published"
-                @closed="confirmingPublish = false"
-                @saving="saving = true"
-                @saved="publishActionCompleted"
-            />
+            <div class="pt-px text-2xs text-grey-60" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
+            <div class="pt-px text-2xs text-grey-60" v-else-if="isDirty" v-text="'Unsaved Changes'" />
+            <div class="pt-px text-2xs text-grey-60" v-else-if="!published" v-text="'Unpublished Entry'" />
 
             <slot name="action-buttons-right" />
         </div>
@@ -128,7 +60,6 @@
                     <transition name="live-preview-sections-drop">
                         <publish-sections
                             v-show="sectionsVisible"
-                            :live-preview="isPreviewing"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
                             @updated="setValue"
@@ -136,11 +67,101 @@
                             @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
                             @blur="container.$emit('blur', $event)"
-                        />
+                        >
+                            <template #actions="{ shouldShowSidebar }">
+
+                                <div :class="{ 'flex justify-between items-center p-1 card': !shouldShowSidebar }">
+
+                                    <div :class="{ 'mb-2': shouldShowSidebar, 'min-w-xs': !shouldShowSidebar }">
+                                        <button
+                                            v-if="!readOnly && !canPublish"
+                                            class="btn btn-primary w-full"
+                                            :class="{ 'opacity-25': !canSave }"
+                                            :disabled="!canSave"
+                                            @click.prevent="save"
+                                            v-text="__('Save')" />
+
+                                        <button
+                                            v-if="canPublish"
+                                            class="btn btn-primary w-full"
+                                            :class="{ 'opacity-25': !canPublish }"
+                                            :disabled="!canPublish"
+                                            @click="confirmingPublish = true"
+                                            v-text="`${__('Publish')}...`" />
+                                    </div>
+
+                                    <v-select
+                                        v-if="localizations.length > 1"
+                                        :value="activeLocalization"
+                                        label="name"
+                                        :clearable="false"
+                                        :options="localizations"
+                                        :searchable="false"
+                                        :multiple="false"
+                                        @input="localizationSelected"
+                                        class="w-full mb-2"
+                                    >
+                                        <template slot="option" slot-scope="option">
+                                            <div class="flex items-center" v-tooltip="localizationStatusText(option)">
+                                                <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
+                                                <span class="little-dot mr-1" :class="{
+                                                    'bg-green': option.published,
+                                                    'bg-grey-50': !option.published,
+                                                    'bg-red': !option.exists
+                                                }" />
+                                                {{ option.name }}
+                                                <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
+                                                <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
+                                            </div>
+                                        </template>
+                                    </v-select>
+
+                                    <div class="flex flex-wrap justify-center text-grey text-2xs">
+                                        <!-- <button
+                                            class="flex items-center m-1 whitespace-no-wrap">
+                                            <svg-icon name="earth" class="w-4 mr-sm" /> {{ __('English') }}
+                                        </button> -->
+
+                                        <button
+                                            class="flex items-center m-1 whitespace-no-wrap"
+                                            v-if="!isCreating"
+                                            @click="showRevisionHistory = true">
+                                            <svg-icon name="time" class="w-4 mr-sm" /> {{ __('History') }}
+                                        </button>
+
+                                        <button
+                                            class="flex items-center m-1 whitespace-no-wrap"
+                                            v-if="isBase"
+                                            @click="openLivePreview">
+                                            <svg-icon name="search" class="w-4 mr-sm" /> {{ __('Preview') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </template>
+                        </publish-sections>
                     </transition>
                 </div>
             </live-preview>
         </publish-container>
+
+        <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
+            <revision-history
+                slot-scope="{ close }"
+                :index-url="actions.revisions"
+                :restore-url="actions.restore"
+                @closed="close"
+            />
+        </stack>
+
+        <publish-actions
+            v-if="confirmingPublish"
+            :actions="actions"
+            :published="published"
+            @closed="confirmingPublish = false"
+            @saving="saving = true"
+            @saved="publishActionCompleted"
+        />
     </div>
 
 </template>

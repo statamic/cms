@@ -3,6 +3,8 @@
     <element-container @resized="containerWidth = $event.width">
     <div>
 
+        <portal-target name="actions" />
+
         <div class="publish-tabs tabs" v-show="mainSections.length > 1">
             <a v-for="section in mainSections"
                 :key="section.handle"
@@ -16,30 +18,35 @@
         </div>
 
         <div class="flex justify-between">
-            <div class="w-full">
-                <div
-                    class="publish-section"
-                    :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
-                    v-for="section in mainSections"
-                    :key="section.handle"
-                    v-show="section.handle === active"
-                >
-                    <publish-fields
-                        :fields="section.fields"
-                        :read-only="readOnly"
-                        :syncable="syncable"
-                        @updated="(handle, value) => $emit('updated', handle, value)"
-                        @synced="$emit('synced', $event)"
-                        @desynced="$emit('desynced', $event)"
-                        @focus="$emit('focus', $event)"
-                        @blur="$emit('blur', $event)"
-                    />
-                </div>
+            <div
+                class="publish-section"
+                :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
+                v-for="section in mainSections"
+                :key="section.handle"
+                v-show="section.handle === active"
+            >
+                <publish-fields
+                    :fields="section.fields"
+                    :read-only="readOnly"
+                    :syncable="syncable"
+                    @updated="(handle, value) => $emit('updated', handle, value)"
+                    @synced="$emit('synced', $event)"
+                    @desynced="$emit('desynced', $event)"
+                    @focus="$emit('focus', $event)"
+                    @blur="$emit('blur', $event)"
+                />
             </div>
 
-            <div class="publish-sidebar" v-if="shouldShowSidebar">
+            <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-section">
+                    <portal to="actions" :disabled="shouldShowSidebar">
+                        <div :class="{ 'p-2 border-b border-grey-30': shouldShowSidebar, 'mb-3': !shouldShowSidebar }">
+                            <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
+                        </div>
+                    </portal>
+
                     <publish-fields
+                        v-if="shouldShowSidebar && sidebarSection"
                         :fields="sidebarSection.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
@@ -98,11 +105,7 @@ export default {
         },
 
         shouldShowSidebar() {
-            if (! this.sidebarSection) return false;
-
-            if (this.sidebarSection.fields.length == 0 || this.containerWidth < 1010) return false;
-
-            return true;
+            return this.containerWidth > 1010;
         },
 
         errors() {
