@@ -77,4 +77,20 @@ class Replicator extends Fieldtype
             return array_get($value, 'enabled', true) === false;
         });
     }
+
+    public function preload()
+    {
+        return [
+            'existing' => collect($this->field->value())->map(function ($set) {
+                $config = $this->config("sets.{$set['type']}.fields", []);
+                return (new Fields($config))->addValues($set)->meta();
+            })->toArray(),
+            'new' => collect($this->config('sets'))->map(function ($set, $handle) {
+                return (new Fields($set['fields']))->meta();
+            })->toArray(),
+            'defaults' => collect($this->config('sets'))->map(function ($set) {
+                return (new Fields($set['fields']))->all()->map->defaultValue();
+            })->all()
+        ];
+    }
 }
