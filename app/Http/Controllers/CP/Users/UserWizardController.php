@@ -14,6 +14,6 @@ class UserWizardController extends CpController
     {
         $user = User::findByEmail($request->email);
 
-         return ['exists' => (bool) $user];
+        return ['exists' => (bool) $user];
     }
 }

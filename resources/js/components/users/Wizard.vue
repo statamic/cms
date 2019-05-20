@@ -179,10 +179,7 @@ export default {
             get() {
                 return this.customizedMessage || `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.
 
-**Your activation link**
-[link]
-
-For your security, this link expires after 48 hours. After that, please contact the site administrator for a new password.`
+For your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`
             },
             set(message) {
                 this.customizedMessage = message;
@@ -229,7 +226,9 @@ For your security, this link expires after 48 hours. After that, please contact 
             });
         },
         submit() {
-            this.$axios.post(this.route, this.user).then(response => {
+            let payload = {subject: this.email_subject, message: this.message, ...this.user};
+
+            this.$axios.post(this.route, payload).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
                 this.$notify.error(error.response.data.message);

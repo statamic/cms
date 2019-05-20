@@ -24,7 +24,7 @@ class TokenRepository extends DatabaseTokenRepository
         $this->hashKey = $hashKey;
         $this->expires = $expires * 60;
 
-        $this->path = cache_path('password_resets.yaml');
+        $this->path = storage_path('statamic/password_resets.yaml');
     }
 
     public function create(CanResetPasswordContract $user)

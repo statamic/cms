@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\API;
+use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 
 class SendActivationEmail extends Action
 {
@@ -11,8 +12,8 @@ class SendActivationEmail extends Action
         return $key === 'users';
     }
 
-    public function run($items)
+    public function run($users)
     {
-        //
+        $users->each->generateTokenAndSendPasswordResetNotification();
     }
 }

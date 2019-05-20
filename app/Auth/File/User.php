@@ -13,7 +13,10 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Statamic\Preferences\HasPreferences;
+use Statamic\Notifications\PasswordReset;
+use Statamic\Notifications\ActivateAccount;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
@@ -299,9 +302,18 @@ class User extends BaseUser
         $this->setMeta('last_login', $carbon->timestamp);
     }
 
-    public function sendActivationNotification()
+    public function sendPasswordResetNotification($token)
     {
+        $notification = $this->password() ? new PasswordReset($token) : new ActivateAccount($token);
 
+        $this->notify($notification);
+    }
+
+    public function generateTokenAndSendPasswordResetNotification()
+    {
+        $token = Password::broker()->createToken($this);
+
+        $this->sendPasswordResetNotification($token);
     }
 
     /**

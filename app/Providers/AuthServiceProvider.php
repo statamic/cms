@@ -82,14 +82,6 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->extend('auth.password', function ($broker, $app) {
             return new PasswordBrokerManager($app);
         });
-
-        ResetPassword::toMailUsing(function ($notifiable, $token) {
-            return (new MailMessage)
-                ->subject(__('Reset Password Notification'))
-                ->line(__('You are receiving this email because we received a password reset request for your account.'))
-                ->action(__('Reset Password'), PasswordReset::url($token))
-                ->line(__('If you did not request a password reset, no further action is required.'));
-        });
     }
 
     protected function autoConfigure()

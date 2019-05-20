@@ -17,8 +17,9 @@ use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
 use Illuminate\Notifications\Notifiable;
 use Statamic\Http\Requests\FilteredRequest;
-use Statamic\Notifications\NewUserInvitation;
+use Statamic\Notifications\ActivateAccount;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Notifications\NewUserInvitation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Auth\User as UserContract;
 
@@ -124,11 +125,16 @@ class UsersController extends CpController
 
         $user = User::make()
             ->email($request->email)
-            ->password($request->password)
             ->data($values)
             ->roles($request->roles ?? [])
-            ->groups($request->groups ?? [])
-            ->save();
+            ->groups($request->groups ?? []);
+
+        $user->save();
+
+        ActivateAccount::subject($request->subject);
+        ActivateAccount::body($request->message);
+
+        $user->generateTokenAndSendPasswordResetNotification();
 
         return ['redirect' => cp_route('users.index')];
     }
