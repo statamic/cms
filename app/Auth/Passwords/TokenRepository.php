@@ -44,7 +44,7 @@ class TokenRepository extends DatabaseTokenRepository
 
         $resets[$payload['email']] = [
             'token' => $payload['token'],
-            'created_at' => (string) $payload['created_at']
+            'created_at' => $payload['created_at']->timestamp
         ];
 
         $this->putResets($resets);
@@ -69,7 +69,7 @@ class TokenRepository extends DatabaseTokenRepository
         $record = $this->getResets()->get($user->email());
 
         return $record &&
-            ! $this->tokenExpired($record['created_at'])
+            ! $this->tokenExpired(Carbon::createFromTimestamp($record['created_at']))
             && $this->hasher->check($token, $record['token']);
     }
 
