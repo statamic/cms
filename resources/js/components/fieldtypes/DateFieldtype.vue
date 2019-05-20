@@ -8,7 +8,12 @@
 
     	<div class="date-time-container flex" v-if="hasDate">
 
-    		<div class="flex-1">
+            <div v-if="isReadOnly">
+                {{ formattedDateString }}
+                {{ time }}
+            </div>
+
+    		<div class="flex-1" v-if="!isReadOnly">
                 <div class="input-text cursor-text flex items-center">
                     <div class="daterange daterange--single" ref="date"></div>
                     <button class="text-blue text-xs ml-1" tabindex="0"
@@ -20,7 +25,7 @@
                 </div>
     		</div>
 
-			<div v-if="config.time_enabled" class="ml-1 time-fieldtype">
+			<div v-if="!isReadOnly && config.time_enabled" class="ml-1 time-fieldtype">
 				<time-fieldtype ref="time" v-if="time" :value="time" @input="updateTime" :required="config.time_required" :config="{}" name=""></time-fieldtype>
 				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
 					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>
@@ -56,18 +61,7 @@ export default {
 
         hasTime() {
             return this.data && this.data.length > 10;
-        }
-    },
-
-    watch: {
-
-        data(value) {
-            this.update(value);
-        }
-
-    },
-
-    methods: {
+        },
 
         /**
          * Return the date string.
@@ -80,6 +74,21 @@ export default {
                 return Vue.moment().format('YYYY-MM-DD')
             }
         },
+
+        formattedDateString() {
+            return Vue.moment(this.dateString).format(this.config.format || 'MMMM D, YYYY');
+        }
+    },
+
+    watch: {
+
+        data(value) {
+            this.update(value);
+        }
+
+    },
+
+    methods: {
 
         /**
          * Updates the date string
@@ -100,9 +109,9 @@ export default {
 
             this.$watch('time', function(newTime, oldTime) {
                 if (newTime === null) {
-                    self.data = self.dateString();
+                    self.data = self.dateString;
                 } else {
-                    self.data = self.dateString() + ' ' + newTime;
+                    self.data = self.dateString + ' ' + newTime;
                 }
             });
         },
@@ -135,7 +144,7 @@ export default {
 
             // Use the date if there is one, otherwise use today's date.
             var date = (this.data)
-                ? Vue.moment(self.dateString())
+                ? Vue.moment(self.dateString)
                 : Vue.moment().format('YYYY-MM-DD');
 
             this.calendar = new Calendar({
