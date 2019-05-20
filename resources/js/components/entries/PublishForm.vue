@@ -70,7 +70,7 @@
                         >
                             <template #actions="{ shouldShowSidebar }">
 
-                                <div :class="{ 'flex justify-between items-center p-1 card': !shouldShowSidebar }">
+                                <div class="p-2" :class="{ 'flex justify-between items-center p-1 card': !shouldShowSidebar }">
 
                                     <div :class="{ 'mb-2': shouldShowSidebar, 'min-w-xs': !shouldShowSidebar }">
                                         <button
@@ -90,38 +90,7 @@
                                             v-text="`${__('Publish')}...`" />
                                     </div>
 
-                                    <v-select
-                                        v-if="localizations.length > 1"
-                                        :value="activeLocalization"
-                                        label="name"
-                                        :clearable="false"
-                                        :options="localizations"
-                                        :searchable="false"
-                                        :multiple="false"
-                                        @input="localizationSelected"
-                                        class="w-full mb-2"
-                                    >
-                                        <template slot="option" slot-scope="option">
-                                            <div class="flex items-center" v-tooltip="localizationStatusText(option)">
-                                                <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
-                                                <span class="little-dot mr-1" :class="{
-                                                    'bg-green': option.published,
-                                                    'bg-grey-50': !option.published,
-                                                    'bg-red': !option.exists
-                                                }" />
-                                                {{ option.name }}
-                                                <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
-                                                <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
-                                            </div>
-                                        </template>
-                                    </v-select>
-
                                     <div class="flex flex-wrap justify-center text-grey text-2xs">
-                                        <!-- <button
-                                            class="flex items-center m-1 whitespace-no-wrap">
-                                            <svg-icon name="earth" class="w-4 mr-sm" /> {{ __('English') }}
-                                        </button> -->
-
                                         <button
                                             class="flex items-center m-1 whitespace-no-wrap"
                                             v-if="!isCreating"
@@ -135,6 +104,27 @@
                                             @click="openLivePreview">
                                             <svg-icon name="search" class="w-4 mr-sm" /> {{ __('Preview') }}
                                         </button>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <div
+                                        v-for="option in localizations"
+                                        :key="option.handle"
+                                        class="revision-item flex items-center border-grey-30"
+                                        @click="localizationSelected(option)"
+                                    >
+                                        <div class="flex-1 flex items-center">
+                                            <span class="little-dot mr-1" :class="{
+                                                'bg-green': option.published,
+                                                'bg-grey-50': !option.published,
+                                                'bg-red': !option.exists
+                                            }" />
+                                            {{ option.name }}
+                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localizing === option.handle" />
+                                        </div>
+                                        <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                                        <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
                                     </div>
                                 </div>
 
