@@ -147,7 +147,7 @@ export default {
         values: {
             deep: true,
             handler(values) {
-                this.$emit('updated', values);
+                this.update(values);
             }
         },
 
