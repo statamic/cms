@@ -112,6 +112,7 @@
                                         v-for="option in localizations"
                                         :key="option.handle"
                                         class="revision-item flex items-center border-grey-30"
+                                        :class="{ 'opacity-50': !option.active }"
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center">
