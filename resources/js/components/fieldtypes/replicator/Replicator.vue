@@ -115,7 +115,7 @@ export default {
         },
 
         addSet(handle, index) {
-            const id =  uniqid();
+            const id = uniqid();
 
             let set = Object.assign({}, this.meta.defaults[handle], {
                 _id: id,
