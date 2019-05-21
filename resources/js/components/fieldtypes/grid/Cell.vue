@@ -59,7 +59,7 @@ export default {
     computed: {
 
         fieldtypeComponent() {
-            return `${this.field.type}-fieldtype`;
+            return `${this.field.component || this.field.type}-fieldtype`;
         },
 
         name() {

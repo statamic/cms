@@ -11,7 +11,7 @@
             :is="component"
             :fields="fields"
             :rows="rows"
-            :meta="meta.fields"
+            :meta="metas"
             :name="name"
             @updated="updated"
             @removed="removed"
@@ -51,6 +51,7 @@ export default {
             rows: null,
             containerWidth: null,
             focused: false,
+            metas: {}
         }
     },
 
@@ -100,8 +101,16 @@ export default {
         // Rows should be cloned so we don't unintentionally modify the prop.
         let rows = _.clone(this.value || []);
 
-        // Assign each row a unique id that Vue can use as a v-for key.
-        this.rows = rows.map(row => Object.assign(row, { _id: uniqid() }));
+        let metas = {};
+
+        rows = rows.map((row, index) => {
+            let id = uniqid();
+            metas[id] = this.meta.existing[index];
+            return Object.assign(row, { _id: id });
+        });
+
+        this.metas = metas;
+        this.rows = rows;
 
         if (this.config.min_rows) {
             const rowsToAdd = this.config.min_rows - this.rows.length;
@@ -142,13 +151,16 @@ export default {
     methods: {
 
         addRow() {
+            const id = uniqid();
+
             const row = _.chain(this.fields)
                 .indexBy('handle')
                 .mapObject(field => this.meta.defaults[field.handle])
                 .value();
 
-            row._id = uniqid(); // Assign a unique id that Vue can use as a v-for key.
+            row._id = id;
 
+            this.metas[id] = this.meta.new;
             this.rows.push(row);
         },
 

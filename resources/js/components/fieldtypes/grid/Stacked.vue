@@ -15,7 +15,7 @@
                 :index="index"
                 :fields="fields"
                 :values="row"
-                :meta="meta"
+                :meta="meta[row._id]"
                 :name="name"
                 @updated="(row, value) => $emit('updated', row, value)"
                 @removed="(row) => $emit('removed', row)"

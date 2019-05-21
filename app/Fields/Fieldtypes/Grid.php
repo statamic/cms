@@ -89,7 +89,10 @@ class Grid extends Fieldtype
     {
         return [
             'defaults' => $this->defaultRowData(),
-            'fields' => $this->fields()->meta(),
+            'new' => $this->fields()->meta(),
+            'existing' => collect($this->field->value())->map(function ($row) {
+                return $this->fields()->addValues($row)->meta();
+            })->toArray(),
         ];
     }
 
