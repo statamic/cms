@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields\Fieldtypes;
 
+use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtypes\Bard\Augmentor;
 
 class Bard extends Replicator
@@ -107,6 +108,8 @@ class Bard extends Replicator
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
 
+        unset($row['attrs']['id']);
+
         if (array_get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
         }
@@ -179,5 +182,26 @@ class Bard extends Replicator
                 ]
             ];
         })->all();
+    }
+
+    public function preload()
+    {
+        $value = json_decode($this->field->value(), true);
+
+        return [
+            'existing' => collect($value)->filter(function ($item) {
+                return $item['type'] === 'set';
+            })->map(function ($set) {
+                $values = $set['attrs']['values'];
+                $config = $this->config("sets.{$values['type']}.fields", []);
+                return (new Fields($config))->addValues($values)->meta();
+            })->toArray(),
+            'new' => collect($this->config('sets'))->map(function ($set, $handle) {
+                return (new Fields($set['fields']))->meta();
+            })->toArray(),
+            'defaults' => collect($this->config('sets'))->map(function ($set) {
+                return (new Fields($set['fields']))->all()->map->defaultValue();
+            })->all()
+        ];
     }
 }

@@ -14,6 +14,7 @@ export default class SetNode extends Node {
     get schema() {
         return {
             attrs: {
+                id: {},
                 enabled: { default: true },
                 values: {},
             },

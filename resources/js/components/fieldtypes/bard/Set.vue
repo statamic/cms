@@ -32,9 +32,10 @@
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
+                :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                @updated="updated"
+                @updated="updated(field.handle, $event)"
                 @focus="focused"
                 @blur="blurred"
             />
@@ -72,6 +73,10 @@ export default {
 
         values() {
             return this.node.attrs.values;
+        },
+
+        meta() {
+            return this.options.bard.metas[this.node.attrs.id];
         },
 
         config() {
