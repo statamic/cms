@@ -326,6 +326,10 @@ export default {
             } else {
                 this.createLocalization(localization);
             }
+
+            if (this.publishContainer === 'base') {
+                window.history.replaceState({}, '', localization.url);
+            }
         },
 
         editLocalization(localization) {
