@@ -169,15 +169,17 @@ export default {
 
     created() {
         let content = this.valueToContent(clone(this.value));
-        content.content = content.content.map((item, i) => {
-            if (item.type === 'set') {
-                const id = uniqid();
-                item.attrs.id = id;
-                this.metas[id] = this.meta.existing[i];
-            }
-            return item;
-        });
-        this.content = content;
+        if (content) {
+            content.content = content.content.map((item, i) => {
+                if (item.type === 'set') {
+                    const id = uniqid();
+                    item.attrs.id = id;
+                    this.metas[id] = this.meta.existing[i];
+                }
+                return item;
+            });
+            this.content = content;
+        }
     },
 
     mounted() {
