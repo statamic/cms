@@ -17,11 +17,7 @@
         </div>
 
 
-        <publish-field-meta
-            :config="field"
-            :initial-value="value"
-            :initial-meta="meta"
-        ><component
+        <component
             :is="fieldtypeComponent"
             :config="field"
             :meta="meta"
@@ -31,7 +27,7 @@
             @input="$emit('updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
-        /></publish-field-meta>
+        />
 
     </div>
 
