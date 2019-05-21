@@ -135,7 +135,8 @@ class EntriesController extends CpController
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $entry->locale(),
                     'exists' => $exists,
-                    'origin' => $exists ? !$localized->hasOrigin() : null,
+                    'root' => $exists ? $localized->isRoot() : false,
+                    'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
                     'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];

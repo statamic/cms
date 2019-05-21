@@ -28,4 +28,20 @@ trait HasOrigin
     {
         return $this->origin !== null;
     }
+
+    public function isRoot()
+    {
+        return !$this->hasOrigin();
+    }
+
+    public function root()
+    {
+        $entry = $this;
+
+        while ($entry->hasOrigin()) {
+            $entry = $entry->origin();
+        }
+
+        return $entry;
+    }
 }

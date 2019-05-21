@@ -125,6 +125,7 @@
                                         </div>
                                         <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                         <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
+                                        <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
 

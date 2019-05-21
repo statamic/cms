@@ -349,15 +349,26 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function in($locale)
     {
-        if ($this->locale === $locale) {
+        if ($locale === $this->locale) {
             return $this;
         }
 
-        if ($this->origin && $this->origin->locale() === $locale) {
-            return $this->origin;
+        if (! $this->isRoot()) {
+            return $this->root()->in($locale);
         }
 
-        return $this->localizations[$locale] ?? null;
+        return $this->descendants()->get($locale);
+    }
+
+    public function descendants()
+    {
+        $localizations = collect($this->localizations);
+
+        foreach ($localizations as $loc) {
+            $localizations = $localizations->merge($loc->descendants());
+        }
+
+        return $localizations;
     }
 
     public function existsIn($locale)
