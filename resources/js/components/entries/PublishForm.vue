@@ -107,7 +107,7 @@
                                     </div>
                                 </div>
 
-                                <div class="">
+                                <div class="" v-if="localizations.length > 1">
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
