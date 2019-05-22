@@ -144,19 +144,17 @@ class Relationship extends Fieldtype
         ];
     }
 
-    public function getItemData($values, $site = null)
+    public function getItemData($values)
     {
-        $site = $site ?? Site::selected()->handle();
-
-        return collect($values)->map(function ($id) use ($site) {
-            return $this->toItemArray($id, $site);
+        return collect($values)->map(function ($id) {
+            return $this->toItemArray($id);
         })->values();
     }
 
-    protected function toItemArray($id, $site)
+    protected function toItemArray($id)
     {
         if ($entry = Entry::find($id)) {
-            return $entry->in($site)->toArray();
+            return $entry->toArray();
         }
 
         return $this->invalidItemArray($id);
