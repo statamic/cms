@@ -149,7 +149,7 @@ Statamic.app({
         },
 
         computedNavOpen() {
-            if (this.stackCount > 0) return false;
+            // if (this.stackCount > 0) return false;
 
             return this.navOpen;
         },
