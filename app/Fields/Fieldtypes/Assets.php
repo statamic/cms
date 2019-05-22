@@ -12,6 +12,7 @@ use Statamic\Assets\AssetCollection;
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
+    protected $defaultValue = [];
 
     protected $configFields = [
         'container' => ['type' => 'asset_container', 'max_items' => 1],
@@ -30,11 +31,6 @@ class Assets extends Fieldtype
     public function canHaveDefault()
     {
         return false;
-    }
-
-    public function blank()
-    {
-        return [];
     }
 
     public function preProcess($values)
