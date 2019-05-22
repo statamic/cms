@@ -74,7 +74,7 @@ class DefaultNav
                 });
             });
 
-        Nav::content('Structure')
+        Nav::content('Structures')
             ->route('structures.index')
             ->icon('hierarchy-files')
             ->can('index', Structure::class)
