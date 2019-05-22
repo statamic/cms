@@ -15,6 +15,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Revisions\Revisable;
+use Facades\Statamic\View\Cascade;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Responsable;
