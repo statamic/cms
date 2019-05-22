@@ -189,6 +189,10 @@ class EntriesController extends CpController
                 ->user($request->user())
                 ->save();
         } else {
+            if (! $entry->revisionsEnabled()) {
+                $entry->published($request->published);
+            }
+
             $entry
                 ->set('updated_by', $request->user()->id())
                 ->set('updated_at', now()->timestamp)

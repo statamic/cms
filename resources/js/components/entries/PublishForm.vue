@@ -93,6 +93,16 @@
 
                                     <div class="flex flex-wrap justify-center text-grey text-2xs">
                                         <button
+                                            v-if="!revisionsEnabled"
+                                            class="flex items-center m-1 whitespace-no-wrap outline-none"
+                                            :class="{ 'text-green': published }"
+                                            @click="togglePublishState"
+                                        >
+                                            <span class="little-dot mr-sm" :class="{ 'bg-green': published, 'bg-grey-60': !published }" />
+                                            <span v-text="published ? __('Published') : __('Draft')" />
+                                        </button>
+
+                                        <button
                                             class="flex items-center m-1 whitespace-no-wrap"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
@@ -291,6 +301,7 @@ export default {
 
             const payload = { ...this.values, ...{
                 blueprint: this.fieldset.handle,
+                published: this.published,
                 _localized: this.localizedFields,
             }};
 
@@ -429,6 +440,11 @@ export default {
 
             this.$refs.container.dirty();
         },
+
+        togglePublishState() {
+            this.published = !this.published;
+            this.$refs.container.dirty();
+        }
 
     },
 
