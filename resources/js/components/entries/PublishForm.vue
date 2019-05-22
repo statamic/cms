@@ -204,6 +204,7 @@ export default {
         isCreating: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
+        revisionsEnabled: Boolean
     },
 
     data() {
@@ -270,10 +271,6 @@ export default {
 
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
-        },
-
-        revisionsEnabled() {
-            return this.$config.get('revisions.enabled');
         }
 
     },

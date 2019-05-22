@@ -27,6 +27,7 @@ class Collection implements Contract
     protected $dated = false;
     protected $orderable = false;
     protected $ampable = false;
+    protected $revisions = false;
     protected $positions = [];
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
@@ -301,5 +302,10 @@ class Collection implements Contract
                 return $behavior ?? 'public';
             })
             ->args(func_get_args());
+    }
+
+    public function revisionsEnabled($enabled = null)
+    {
+        return $this->fluentlyGetOrSet('revisions')->args(func_get_args());
     }
 }

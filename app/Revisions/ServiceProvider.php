@@ -8,13 +8,6 @@ use Statamic\Contracts\Revisions\RevisionRepository as RevisionRepositoryContrac
 
 class ServiceProvider extends LaravelServiceProvider
 {
-    public function boot()
-    {
-        Statamic::provideToScript(['revisions' => [
-            'enabled' => config('statamic.revisions.enabled'),
-        ]]);
-    }
-
     public function register()
     {
         $this->app->bind(RevisionRepositoryContract::class, RevisionRepository::class);
