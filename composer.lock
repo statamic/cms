@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d8b5994a9686dae336539492c0ee8455",
+    "content-hash": "1c5ed7732af868605a97507d441df779",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -2382,16 +2382,16 @@
         },
         {
             "name": "scrumpy/prosemirror-to-html",
-            "version": "dev-master",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jasonvarga/prosemirror-to-html.git",
-                "reference": "7cfed3b4cc093da784e160a39c06a95dc6b38cfd"
+                "url": "https://github.com/scrumpy/prosemirror-to-html.git",
+                "reference": "6397f7990243d164521cfdbe5cbc518c90ab0fe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jasonvarga/prosemirror-to-html/zipball/7cfed3b4cc093da784e160a39c06a95dc6b38cfd",
-                "reference": "7cfed3b4cc093da784e160a39c06a95dc6b38cfd",
+                "url": "https://api.github.com/repos/scrumpy/prosemirror-to-html/zipball/6397f7990243d164521cfdbe5cbc518c90ab0fe2",
+                "reference": "6397f7990243d164521cfdbe5cbc518c90ab0fe2",
                 "shasum": ""
             },
             "require": {
@@ -2407,11 +2407,7 @@
                     "Scrumpy\\ProseMirrorToHtml\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Scrumpy\\ProseMirrorToHtml\\Test\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2424,10 +2420,7 @@
             "keywords": [
                 "prosemirror"
             ],
-            "support": {
-                "source": "https://github.com/jasonvarga/prosemirror-to-html/tree/master"
-            },
-            "time": "2019-04-10T20:52:40+00:00"
+            "time": "2019-04-15T16:25:29+00:00"
         },
         {
             "name": "seld/jsonlint",
@@ -3771,7 +3764,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "dev-master",
+            "version": "4.3.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
@@ -6007,7 +6000,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "netcarver/textile": 20,
-        "scrumpy/prosemirror-to-html": 20,
         "symfony/yaml": 20,
         "tightenco/mailthief": 20
     },

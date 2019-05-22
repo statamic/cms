@@ -13,7 +13,7 @@
         "league/glide": "^1.1",
         "netcarver/textile": "3.6.*@dev",
         "scrumpy/html-to-prosemirror": "^0.4.0",
-        "scrumpy/prosemirror-to-html": "dev-master",
+        "scrumpy/prosemirror-to-html": "^0.4.0",
         "statamic/stringy": "^3.1",
         "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*",
@@ -64,10 +64,6 @@
             "options": {
                 "symlink": false
             }
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/jasonvarga/prosemirror-to-html"
         }
     ]
 }
