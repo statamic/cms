@@ -14,6 +14,7 @@
                     :status-icon="statusIcons"
                     :editable="canEdit"
                     :sortable="!readOnly && canReorder"
+                    :read-only="readOnly"
                     class="item outline-none"
                     @removed="remove(i)"
                 />

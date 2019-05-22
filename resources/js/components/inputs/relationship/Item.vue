@@ -26,7 +26,7 @@
 
         </div>
 
-        <div class="pr-1 flex items-center">
+        <div class="pr-1 flex items-center" v-if="!readOnly">
             <dropdown-list>
                 <ul class="dropdown-menu">
                     <li v-if="editable"><a @click.prevent="edit" v-text="__('Edit')"></a></li>
@@ -53,6 +53,7 @@ export default {
         statusIcon: Boolean,
         editable: Boolean,
         sortable: Boolean,
+        readOnly: Boolean,
     },
 
     data() {
