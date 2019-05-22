@@ -1,29 +1,27 @@
 <template>
 
-    <div class="inline-block whitespace-normal relative max-w-md"
+    <div class="bard-inline-image-container"
         @mousedown="parentMousedown"
         @dragstart="parentDragStart"
+        ref="dragHandle"
     >
-        <div
-            class="inline-block"
-            @click="showingToolbar = true"
-            ref="dragHandle"
-        >
-            <div class="bg-white border h-8 w-8 inline-flex items-center justify-center rounded text-grey" v-if="!src">
-                <span class="fa fa-picture-o" />
+        <div v-if="src">
+            <div class="p-1 text-center">
+                <img :src="src" class="block mx-auto" />
             </div>
-            <img v-if="src" :src="src" alt="" class="inline-block" />
+
+            <div class="flex items-center p-1 pt-0 rounded-b" v-if="src">
+                <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
+                <button class="btn" @click="openSelector">
+                    {{ __('Replace Image') }}
+                </button>
+            </div>
         </div>
 
-        <div class="bard-link-toolbar" v-if="showingToolbar">
-            <div class="flex items-center px-2">
-                <input type="text" v-model="alt" class="input" :placeholder="__('Alt text')" />
-                <div class="bard-link-toolbar-buttons">
-                    <button v-tooltip="__('Select...')" @click="openSelector">
-                        Select...
-                    </button>
-                </div>
-            </div>
+        <div v-else class="text-center p-2">
+            <button class="btn" @click="openSelector">
+                {{ __('Choose Image') }}
+            </button>
         </div>
 
         <stack

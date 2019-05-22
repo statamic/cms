@@ -356,3 +356,10 @@
         margin: 0 0 0 8px;
     }
 }
+
+.bard-inline-image-container {
+    @apply relative bg-white border rounded whitespace-normal mb-3;
+    &:hover {
+        cursor: grab;
+    }
+}
