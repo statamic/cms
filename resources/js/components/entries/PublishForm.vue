@@ -411,6 +411,10 @@ export default {
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);
             this.$refs.container.setValue(handle, this.originValues[handle]);
+
+            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
+            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
+            this.meta[handle] = this.originMeta[handle];
         },
 
         desyncField(handle) {
