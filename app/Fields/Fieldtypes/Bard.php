@@ -188,20 +188,22 @@ class Bard extends Replicator
     {
         $value = json_decode($this->field->value(), true);
 
-        return [
-            'existing' => collect($value)->filter(function ($item) {
-                return $item['type'] === 'set';
-            })->map(function ($set) {
-                $values = $set['attrs']['values'];
-                $config = $this->config("sets.{$values['type']}.fields", []);
-                return (new Fields($config))->addValues($values)->meta();
-            })->toArray(),
-            'new' => collect($this->config('sets'))->map(function ($set, $handle) {
-                return (new Fields($set['fields']))->meta();
-            })->toArray(),
-            'defaults' => collect($this->config('sets'))->map(function ($set) {
-                return (new Fields($set['fields']))->all()->map->defaultValue();
-            })->all()
-        ];
+        $existing = collect($value)->filter(function ($item) {
+            return $item['type'] === 'set';
+        })->map(function ($set) {
+            $values = $set['attrs']['values'];
+            $config = $this->config("sets.{$values['type']}.fields", []);
+            return (new Fields($config))->addValues($values)->meta();
+        })->toArray();
+
+        $defaults = collect($this->config('sets'))->map(function ($set) {
+            return (new Fields($set['fields']))->all()->map->defaultValue()->all();
+        })->all();
+
+        $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
+            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta();
+        })->toArray();
+
+        return compact('existing', 'new', 'defaults');
     }
 }
