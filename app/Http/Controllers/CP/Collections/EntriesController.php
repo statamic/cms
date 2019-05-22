@@ -183,12 +183,16 @@ class EntriesController extends CpController
             $entry->date($date);
         }
 
-        if ($entry->published()) {
+        if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
                 ->user($request->user())
                 ->save();
         } else {
+            if (! $entry->revisionsEnabled()) {
+                $entry->published($request->published);
+            }
+
             $entry
                 ->set('updated_by', $request->user()->id())
                 ->set('updated_at', now()->timestamp)

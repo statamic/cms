@@ -22,6 +22,7 @@
         initial-site="{{ $locale }}"
         :initial-is-working-copy="{{ bool_str($entry->hasWorkingCopy()) }}"
         :initial-is-root="{{ bool_str($isRoot) }}"
+        :revisions-enabled="{{ bool_str($entry->revisionsEnabled()) }}"
         :amp="{{ bool_str($entry->ampable()) }}"
     ></entry-publish-form>
 

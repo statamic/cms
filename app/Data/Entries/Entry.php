@@ -399,4 +399,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         // TODO: This is just here to make things work without rewriting a bunch of places.
     }
+
+    public function revisionsEnabled()
+    {
+        return $this->collection()->revisionsEnabled();
+    }
 }
