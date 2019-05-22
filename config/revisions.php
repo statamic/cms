@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'enabled' => false,
+    'enabled' => env('STATAMIC_REVISIONS_ENABLED', false),
 
     /*
     |--------------------------------------------------------------------------
