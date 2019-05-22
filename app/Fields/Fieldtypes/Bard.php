@@ -23,6 +23,7 @@ class Bard extends Replicator
                 'removeformat',
                 'quote',
                 'anchor',
+                'image',
             ]
         ],
         'save_html' => ['type' => 'toggle'],
