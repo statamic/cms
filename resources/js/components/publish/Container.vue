@@ -99,6 +99,9 @@ export default {
                     setValues(state, values) {
                         state.values = values;
                     },
+                    setMeta(state, meta) {
+                        state.meta = meta;
+                    },
                     setIsRoot(state, isRoot) {
                         state.isRoot = isRoot;
                     },
@@ -181,6 +184,13 @@ export default {
             handler(after, before) {
                 if (before === after) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
+            }
+        },
+
+        meta: {
+            deep: true,
+            handler(after, before) {
+                this.$store.commit(`publish/${this.name}/setMeta`, after);
             }
         },
 

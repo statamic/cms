@@ -182,6 +182,7 @@ export default {
         initialLocalizedFields: Array,
         initialHasOrigin: Boolean,
         initialOriginValues: Object,
+        initialOriginMeta: Object,
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionTitle: String,
@@ -208,6 +209,7 @@ export default {
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
             originValues: this.initialOriginValues,
+            originMeta: this.initialOriginMeta,
             site: this.initialSite,
             isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
@@ -341,6 +343,7 @@ export default {
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
+                this.originMeta = data.originMeta;
                 this.meta = data.meta;
                 this.localizations = data.localizations;
                 this.localizedFields = data.localizedFields;

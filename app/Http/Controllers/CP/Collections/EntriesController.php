@@ -92,20 +92,10 @@ class EntriesController extends CpController
 
         event(new PublishBlueprintFound($blueprint, 'entry', $entry));
 
-        $fields = $blueprint
-            ->fields()
-            ->addValues($entry->values())
-            ->preProcess();
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
-        $values = array_merge($fields->values(), [
-            'title' => $entry->value('title'),
-            'slug' => $entry->slug()
-        ]);
-
-        if ($collection->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
+        if ($hasOrigin = $entry->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($entry->origin(), $blueprint);
         }
 
         $viewData = [
@@ -119,15 +109,16 @@ class EntriesController extends CpController
                 'createRevision' => $entry->createRevisionUrl(),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
-            'meta' => $fields->meta(),
+            'meta' => $meta,
             'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizedFields' => array_keys($entry->data()),
-            'hasOrigin' => $hasOrigin = $entry->hasOrigin(),
-            'originValues' => $hasOrigin ? $entry->origin()->data() : [],
             'isRoot' => $entry->isRoot(),
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? [],
+            'originMeta' => $originMeta ?? [],
             'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
@@ -310,5 +301,26 @@ class EntriesController extends CpController
             'title' => $collection->title(),
             'url' => cp_route('collections.show', $collection->handle())
         ];
+    }
+
+    protected function extractFromFields($entry, $blueprint)
+    {
+        $fields = $blueprint
+            ->fields()
+            ->addValues($entry->values())
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'title' => $entry->value('title'),
+            'slug' => $entry->slug()
+        ]);
+
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
+        return [$values, $fields->meta()];
     }
 }
