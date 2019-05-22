@@ -68,8 +68,11 @@
         svg.asc {
             transform: scaleY(-1);
         }
+	}
 
-    }
+	.sortable-row.draggable-mirror {
+		@apply bg-white border-b;
+	}
 }
 
 .data-list-header ~ .data-table {
