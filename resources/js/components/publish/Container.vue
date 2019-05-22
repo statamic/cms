@@ -31,7 +31,7 @@ export default {
             type: Array
         },
         isRoot: {
-            type: Boolean
+            // intentionally not a boolean. we rely on it being undefined in places.
         }
     },
 
