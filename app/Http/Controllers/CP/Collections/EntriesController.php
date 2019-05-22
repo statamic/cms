@@ -183,7 +183,7 @@ class EntriesController extends CpController
             $entry->date($date);
         }
 
-        if ($entry->published()) {
+        if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
                 ->user($request->user())

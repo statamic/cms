@@ -42,6 +42,10 @@ trait Revisable
 
     public function fromWorkingCopy()
     {
+        if (! $this->revisionsEnabled()) {
+            return $this;
+        }
+
         return $this->makeFromRevision($this->workingCopy());
     }
 
@@ -138,6 +142,11 @@ trait Revisable
             ->user($options['user'] ?? false)
             ->message($options['message'] ?? false)
             ->save();
+    }
+
+    public function revisionsEnabled()
+    {
+        return config('statamic.revisions.enabled');
     }
 
     abstract protected function revisionKey();

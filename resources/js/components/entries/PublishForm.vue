@@ -94,7 +94,7 @@
                                     <div class="flex flex-wrap justify-center text-grey text-2xs">
                                         <button
                                             class="flex items-center m-1 whitespace-no-wrap"
-                                            v-if="!isCreating"
+                                            v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
                                             <svg-icon name="time" class="w-4 mr-sm" /> {{ __('History') }}
                                         </button>
@@ -241,6 +241,8 @@ export default {
         },
 
         canPublish() {
+            if (!this.revisionsEnabled) return false;
+
             return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading;
         },
 
@@ -258,6 +260,10 @@ export default {
 
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
+        },
+
+        revisionsEnabled() {
+            return this.$config.get('revisions.enabled');
         }
 
     },
