@@ -20,6 +20,7 @@
         :initial-origin-values="{{ json_encode($originValues, JSON_FORCE_OBJECT) }}"
         initial-site="{{ $locale }}"
         :initial-is-working-copy="{{ bool_str($entry->hasWorkingCopy()) }}"
+        :initial-is-root="{{ bool_str($isRoot) }}"
         :amp="{{ bool_str($entry->ampable()) }}"
     ></entry-publish-form>
 

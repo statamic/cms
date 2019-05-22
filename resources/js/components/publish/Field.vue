@@ -17,6 +17,7 @@
             <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
 
             <button
+                v-if="!isReadOnly"
                 v-show="syncable && isSynced"
                 class="outline-none"
                 @click="$emit('desynced')"
@@ -26,6 +27,7 @@
             </button>
 
             <button
+                v-if="!isReadOnly"
                 v-show="syncable && !isSynced"
                 class="outline-none"
                 @click="$emit('synced')"
@@ -99,6 +101,8 @@ export default {
         },
 
         isReadOnly() {
+            if (this.storeState.isRoot === false && !this.config.localizable) return true;
+
             return this.isLocked || this.readOnly || this.config.read_only || false;
         },
 
@@ -114,9 +118,7 @@ export default {
         },
 
         locks() {
-            let state = this.$store.state.publish[this.storeName];
-            if (!state) return {};
-            return state.fieldLocks;
+            return this.storeState.fieldLocks;
         },
 
         isLocked() {
@@ -132,8 +134,11 @@ export default {
 
         isSynced() {
             if (!this.syncable) return;
-            let state = this.$store.state.publish[this.storeName];
-            return !state.localizedFields.includes(this.config.handle);
+            return !this.storeState.localizedFields.includes(this.config.handle);
+        },
+
+        storeState() {
+            return this.$store.state.publish[this.storeName] || {};
         }
 
     },

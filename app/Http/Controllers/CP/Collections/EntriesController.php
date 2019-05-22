@@ -127,6 +127,7 @@ class EntriesController extends CpController
             'localizedFields' => array_keys($entry->data()),
             'hasOrigin' => $hasOrigin = $entry->hasOrigin(),
             'originValues' => $hasOrigin ? $entry->origin()->data() : [],
+            'isRoot' => $entry->isRoot(),
             'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;

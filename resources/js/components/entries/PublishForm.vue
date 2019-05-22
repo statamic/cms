@@ -35,6 +35,7 @@
             :errors="errors"
             :site="site"
             :localized-fields="localizedFields"
+            :is-root="isRoot"
             @updated="values = $event"
         >
             <live-preview
@@ -191,6 +192,7 @@ export default {
         initialPublished: Boolean,
         isCreating: Boolean,
         initialReadOnly: Boolean,
+        initialIsRoot: Boolean,
     },
 
     data() {
@@ -218,6 +220,7 @@ export default {
             published: this.initialPublished,
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
+            isRoot: this.initialIsRoot,
         }
     },
 
@@ -347,6 +350,7 @@ export default {
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
+                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.removeNavigationWarning());

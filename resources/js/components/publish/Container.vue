@@ -29,6 +29,9 @@ export default {
         },
         localizedFields: {
             type: Array
+        },
+        isRoot: {
+            type: Boolean
         }
     },
 
@@ -66,6 +69,7 @@ export default {
                 meta: _.clone(this.meta),
                 localizedFields: _.clone(this.localizedFields),
                 site: this.site,
+                isRoot: this.isRoot,
             };
 
             // If the store already exists, just reinitialize the state.
@@ -85,6 +89,7 @@ export default {
                     site: initial.site,
                     fieldLocks: {},
                     errors: {},
+                    isRoot: initial.isRoot,
                 },
                 mutations: {
                     setValue(state, payload) {
@@ -93,6 +98,9 @@ export default {
                     },
                     setValues(state, values) {
                         state.values = values;
+                    },
+                    setIsRoot(state, isRoot) {
+                        state.isRoot = isRoot;
                     },
                     setFieldset(state, fieldset) {
                         state.fieldset = fieldset;
@@ -174,6 +182,10 @@ export default {
                 if (before === after) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
             }
+        },
+
+        isRoot(isRoot) {
+            this.$store.commit(`publish/${this.name}/setIsRoot`, isRoot);
         },
 
         fieldset: {
