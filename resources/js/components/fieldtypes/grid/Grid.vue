@@ -97,34 +97,42 @@ export default {
         include: ['config', 'isReorderable', 'isReadOnly']
     },
 
-    created() {
-        // Rows should be cloned so we don't unintentionally modify the prop.
-        let rows = _.clone(this.value || []);
-
-        let metas = {};
-
-        rows = rows.map((row, index) => {
-            let id = uniqid();
-            metas[id] = this.meta.existing[index];
-            return Object.assign(row, { _id: id });
-        });
-
-        this.metas = metas;
-        this.rows = rows;
-
-        if (this.config.min_rows) {
-            const rowsToAdd = this.config.min_rows - this.rows.length;
-            for (var i = 1; i <= rowsToAdd; i++) this.addRow();
-        }
-
-        // Add watcher manually after initial data wangjangling to prevent a premature dirty state.
-        this.$watch('rows', rows => this.update(rows));
-    },
-
     watch: {
 
-        value(value) {
-            this.rows = value;
+        value: {
+            immediate: true,
+            handler(value) {
+                if (value.length === 0) {
+                    this.rows = value;
+                    return;
+                }
+
+                if (value[0].hasOwnProperty('_id')) {
+                    this.rows = value;
+                    return;
+                }
+
+                let rows = value || [];
+                let metas = {};
+
+                rows = rows.map((row, index) => {
+                    let id = uniqid();
+                    metas[id] = this.meta.existing[index];
+                    return Object.assign(row, { _id: id });
+                });
+
+                this.metas = metas;
+                this.rows = rows;
+
+                if (this.config.min_rows) {
+                    const rowsToAdd = this.config.min_rows - this.rows.length;
+                    for (var i = 1; i <= rowsToAdd; i++) this.addRow();
+                }
+            }
+        },
+
+        rows(rows) {
+            this.update(rows);
         },
 
         isReorderable: {
