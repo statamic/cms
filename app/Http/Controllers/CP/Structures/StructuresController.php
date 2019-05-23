@@ -157,7 +157,38 @@ class StructuresController extends CpController
 
     public function store(Request $request)
     {
-        //
+        $values = $request->validate([
+            'title' => 'required',
+            'handle' => 'required|alpha_dash',
+            'collections' => 'array',
+            'collection' => 'nullable',
+            'max_depth' => 'nullable|integer',
+            'route' => 'nullable', // todo: change to the structuresites fieldtype
+        ]);
+
+        $structure = Structure::make()
+            ->title($values['title'])
+            ->handle($values['handle'])
+            ->collections($values['collections'] ?? []);
+
+        $sites = [ // todo: change to the structuresites fieldtype
+            ['handle' => 'english', 'route' => $values['route']],
+        ];
+
+        foreach ($sites as $site) {
+            $tree = $structure->makeTree($site['handle']);
+            $tree->route($site['route']);
+            $structure->addTree($tree);
+        }
+
+        $structure->save();
+
+        if ($values['collection']) {
+            Collection::findByHandle($values['collection'])->structure($structure->handle())->save();
+            // todo: add all the collection's entries to the tree.
+        }
+
+        return ['redirect' => $structure->showUrl()];
     }
 
     public function editFormBlueprint()

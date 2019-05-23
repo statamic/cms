@@ -127,6 +127,7 @@ Statamic.app({
         CollectionWizard: require('./components/collections/Wizard.vue'),
         CollectionEditForm: require('./components/collections/EditForm.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
+        StructureWizard: require('./components/structures/Wizard.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
         StructureEditForm: require('./components/structures/EditForm.vue'),
         Stacks: require('./components/stacks/Stacks.vue'),
