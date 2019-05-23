@@ -260,6 +260,7 @@ class Collection implements Contract
             'entry_order' => $this->getEntryOrder(),
             'amp' => $array['amp'] ?: null,
             'dated' => $array['dated'] ?: null,
+            'orderable' => $array['orderable'] ?: null,
             'date_behavior' => [
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
