@@ -264,7 +264,6 @@ class Collection implements Contract
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
-            'structure' => optional($this->structure())->handle(),
         ]));
 
         if (! Site::hasMultiple()) {
@@ -305,6 +304,7 @@ class Collection implements Contract
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,
+            'structure' => optional($this->structure())->handle(),
         ];
     }
 

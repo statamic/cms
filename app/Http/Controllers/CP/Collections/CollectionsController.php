@@ -175,10 +175,10 @@ class CollectionsController extends CpController
             ->route($data['route'])
             ->dated($data['dated'])
             ->template($data['template'])
-            ->orderable($data['orderable'])
+            ->structure($structure = array_get($data, 'structure'))
+            ->orderable($structure ? false : $data['orderable'])
             ->ampable($data['amp'])
-            ->entryBlueprints($data['blueprints'])
-            ->structure($data['structure'] ?? null);
+            ->entryBlueprints($data['blueprints']);
     }
 
     protected function editFormBlueprint()
@@ -224,6 +224,7 @@ class CollectionsController extends CpController
                 'type' => 'toggle',
                 'instructions' => __('Whether entries can have a manual order defined. This enables drag and drop reordering.'),
                 'width' => 50,
+                'if' => ['structure' => 'empty']
             ],
             'sort_direction' => [
                 'type' => 'select',
@@ -232,7 +233,13 @@ class CollectionsController extends CpController
                 'options' => [
                     'asc' => 'Ascending',
                     'desc' => 'Descending'
-                ]
+                ],
+                'if' => ['structure' => 'empty']
+            ],
+            'structure' => [
+                'type' => 'structures',
+                'max_items' => 1,
+                'instructions' => __('Choosing a structure will let your page hierarchy dictate its order and URLs.'),
             ],
 
             'content_model' => ['type' => 'section'],
