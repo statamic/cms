@@ -174,11 +174,37 @@
                 <p class="text-grey">Route rules determine the URL pattern of your collection's entries.</p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
-                <input type="text" v-model="collection.route" class="input-text">
+                <label class="font-bold text-base mb-sm" for="structure">Structure</label>
+                <publish-field-meta
+                    :config="{ handle: 'structure', type: 'structures', max_items: 1 }"
+                    :initial-value="collection.structure ? [collection.structure] : []">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            :config="{ handle: 'structure', type: 'structures', max_items: 1 }"
+                            :value="value"
+                            :meta="meta"
+                            name="structure"
+                            @input="collection.structure = $event[0]" />
+                    </div>
+                </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Routes are optional. If you don't need a URL, you don't need a route.
+                    Choosing a structure will let your page hierarchy dictate its URLs.
+                </div>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
+                <template v-if="!collection.structure">
+                    <input type="text" v-model="collection.route" class="input-text">
+                    <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                        <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                        Routes are optional. If you don't need a URL, you don't need a route.
+                    </div>
+                </template>
+                <div v-else class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    The route will be derived from the structure.
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
@@ -231,6 +257,7 @@ export default {
                 template: null,
                 route: null,
                 amp: false,
+                structure: null,
             }
         }
     },

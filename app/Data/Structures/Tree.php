@@ -151,4 +151,11 @@ class Tree implements Localization
             'tree' => $this->tree,
         ];
     }
+
+    public function append($entry)
+    {
+        $this->tree[] = ['entry' => $entry->id()];
+
+        return $this;
+    }
 }

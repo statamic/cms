@@ -7,6 +7,7 @@ use Statamic\API\Arr;
 use Statamic\API\Search;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
+use Statamic\API\Structure;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
@@ -31,6 +32,7 @@ class Collection implements Contract
     protected $positions = [];
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
+    protected $structure;
 
     public function handle($handle = null)
     {
@@ -261,6 +263,7 @@ class Collection implements Contract
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
+            'structure' => optional($this->structure())->handle(),
         ]));
     }
 
@@ -307,5 +310,15 @@ class Collection implements Contract
     public function revisionsEnabled($enabled = null)
     {
         return $this->fluentlyGetOrSet('revisions')->args(func_get_args());
+    }
+
+    public function structure($structure = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structure')
+            ->getter(function ($structure) {
+                return is_string($structure) ? Structure::findByHandle($structure) : $structure;
+            })
+            ->args(func_get_args());
     }
 }

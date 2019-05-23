@@ -286,6 +286,13 @@ class EntriesController extends CpController
                 ->save();
         }
 
+        if ($structure = $collection->structure()) {
+            $tree = $structure
+                ->in($site->handle())
+                ->append($entry)
+                ->save();
+        }
+
         return [
             'redirect' => $entry->editUrl(),
             'entry' => $entry->toArray()

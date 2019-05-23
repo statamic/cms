@@ -102,6 +102,7 @@ class CollectionsController extends CpController
             'dateBehavior' => 'nullable',
             'sortDirection' => 'in:asc,desc',
             'amp' => 'boolean',
+            'structure' => 'nullable',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -176,7 +177,8 @@ class CollectionsController extends CpController
             ->template($data['template'])
             ->orderable($data['orderable'])
             ->ampable($data['amp'])
-            ->entryBlueprints($data['blueprints']);
+            ->entryBlueprints($data['blueprints'])
+            ->structure($data['structure']);
     }
 
     protected function editFormBlueprint()

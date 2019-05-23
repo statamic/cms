@@ -34,6 +34,7 @@
             action-url="{{ cp_route('collections.entries.action', $collection->handle()) }}"
             :reorderable="{{ bool_str($collection->orderable()) }}"
             reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
+            structure-url="{{ optional($collection->structure())->showUrl() }}"
         ></entry-list>
 
     @else

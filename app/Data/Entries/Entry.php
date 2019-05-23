@@ -405,4 +405,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         return $this->collection()->revisionsEnabled();
     }
+
+    public function structure()
+    {
+        return $this->collection()->structure();
+    }
 }

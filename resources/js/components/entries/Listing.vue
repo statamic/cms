@@ -105,6 +105,7 @@ export default {
         collection: String,
         reorderable: Boolean,
         reorderUrl: String,
+        structureUrl: String,
     },
 
     data() {
@@ -125,6 +126,8 @@ export default {
         },
 
         showReorderButton() {
+            if (this.structureUrl) return true;
+
             return this.reorderable && !this.reordering;
         },
 
@@ -143,6 +146,11 @@ export default {
         },
 
         reorder() {
+            if (this.structureUrl) {
+                window.location = this.structureUrl;
+                return;
+            }
+
             // If the listing isn't in order when attempting to reorder, things would get
             // all jumbled up. We'll change the sort order, which triggers an async
             // request. Once it's completed, reordering will be re-triggered.
