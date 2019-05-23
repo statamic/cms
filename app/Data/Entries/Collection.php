@@ -122,6 +122,10 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('blueprints')
             ->getter(function ($blueprints) {
+                if (is_null($blueprints)) {
+                    return collect([$this->fallbackEntryBlueprint()]);
+                }
+
                 return collect($blueprints)->map(function ($blueprint) {
                     return Blueprint::find($blueprint);
                 });
@@ -132,9 +136,13 @@ class Collection implements Contract
     public function entryBlueprint()
     {
         return $this->ensureEntryBlueprintFields(
-            $this->entryBlueprints()->first()
-                ?? Blueprint::find(config('statamic.theming.blueprints.default'))
+            $this->entryBlueprints()->first() ?? $this->fallbackEntryBlueprint()
         );
+    }
+
+    public function fallbackEntryBlueprint()
+    {
+        return Blueprint::find(config('statamic.theming.blueprints.default'));
     }
 
     public function ensureEntryBlueprintFields($blueprint)
