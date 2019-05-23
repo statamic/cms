@@ -39,6 +39,13 @@
                 v-text="__('Add Page')" />
 
             <button
+                class="btn mr-2"
+                :class="{ 'disabled': !changed }"
+                :disabled="!changed"
+                @click="cancel"
+                v-text="__('Cancel')" />
+
+            <button
                 class="btn btn-primary"
                 :class="{ 'disabled': !changed }"
                 :disabled="!changed"
@@ -250,6 +257,13 @@ export default {
 
         createLocalization(localization) {
             console.log('todo.');
+        },
+
+        cancel() {
+            if (! confirm('Are you sure?')) return;
+
+            this.pages = this.initialPages;
+            this.updateTreeData();
         }
 
     }
