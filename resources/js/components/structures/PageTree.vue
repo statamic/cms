@@ -264,6 +264,7 @@ export default {
 
             this.pages = this.initialPages;
             this.updateTreeData();
+            this.changed = false;
         }
 
     }
