@@ -32,9 +32,11 @@ class EntriesController extends CpController
             $sortDirection = $collection->sortDirection();
         }
 
-        $paginator = $query
-            ->orderBy($sortField, $sortDirection)
-            ->paginate(request('perPage'));
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $paginator = $query->paginate(request('perPage'));
 
         $entries = $paginator->supplement(function ($entry) {
             return ['deleteable' => me()->can('delete', $entry)];
