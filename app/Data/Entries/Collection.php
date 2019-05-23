@@ -4,6 +4,7 @@ namespace Statamic\Data\Entries;
 
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\Site;
 use Statamic\API\Search;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
@@ -255,7 +256,7 @@ class Collection implements Contract
             'future_date_behavior'
         ]);
 
-        return Arr::removeNullValues(array_merge($array, [
+        $array = Arr::removeNullValues(array_merge($array, [
             'entry_order' => $this->getEntryOrder(),
             'amp' => $array['amp'] ?: null,
             'dated' => $array['dated'] ?: null,
@@ -265,6 +266,16 @@ class Collection implements Contract
             ],
             'structure' => optional($this->structure())->handle(),
         ]));
+
+        if (! Site::hasMultiple()) {
+            unset($array['sites']);
+        }
+
+        if ($array['date_behavior'] == ['past' => 'public', 'future' => 'public']) {
+            unset($array['date_behavior']);
+        }
+
+        return $array;
     }
 
     public function futureDateBehavior($behavior = null)
