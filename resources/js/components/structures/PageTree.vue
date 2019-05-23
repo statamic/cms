@@ -4,6 +4,8 @@
         <div class="flex items-center mb-3">
             <slot name="header" />
 
+            <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isDirty" v-text="__('Unsaved Changes')" />
+
             <dropdown-list class="mr-2">
                 <ul class="dropdown-menu">
                     <li><a :href="editUrl">{{ __('Edit Structure') }}</a></li>
@@ -32,7 +34,7 @@
             </v-select>
 
             <button
-                class="btn btn-primary mr-2"
+                class="btn mr-2"
                 @click="openPageSelector"
                 v-text="__('Add Page')" />
 
@@ -41,7 +43,7 @@
                 :class="{ 'disabled': !changed }"
                 :disabled="!changed"
                 @click="save"
-                v-text="__('Save Page Order')" />
+                v-text="__('Save')" />
         </div>
 
         <loading-graphic v-if="loading"></loading-graphic>
@@ -147,6 +149,10 @@ export default {
 
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
+        },
+
+        isDirty() {
+            return this.$dirty.has('page-tree');
         }
 
     },
