@@ -88,10 +88,11 @@ class Structure implements StructureContract
     {
         $data = [
             'title' => $this->title,
-            'sites' => $this->sites,
         ];
 
-        if (! Site::hasMultiple()) {
+        if (Site::hasMultiple()) {
+            $data['sites'] = $this->sites;
+        } else {
             $data = array_merge($data, $this->in(Site::default()->handle())->fileData());
         }
 
