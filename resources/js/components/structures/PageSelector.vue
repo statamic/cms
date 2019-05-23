@@ -59,6 +59,7 @@ export default {
 
     props: {
         site: String,
+        collections: Array,
     },
 
     data() {
@@ -86,7 +87,7 @@ export default {
         selectionsUrl() {
             return cp_url('fieldtypes/relationship') + '?' + qs.stringify({
                 config: this.configParameter,
-                collections: ['pages'],
+                collections: this.collections,
             });
         },
 

@@ -11,6 +11,7 @@
         :root="{{ json_encode($root) }}"
         site="{{ $site }}"
         :localizations="{{ json_encode($localizations) }}"
+        :collections="{{ json_encode($collections) }}"
     >
         <template slot="header">
             <h1 class="flex-1">

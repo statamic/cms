@@ -6,6 +6,7 @@ use Statamic\API\Site;
 use Statamic\API\Blueprint;
 use Statamic\API\Structure;
 use Illuminate\Http\Request;
+use Statamic\API\Collection;
 use Statamic\Fields\Validation;
 use Statamic\Data\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
@@ -88,6 +89,7 @@ class StructuresController extends CpController
             'structure' => $structure,
             'pages' => $pages,
             'root' => optional($tree->parent())->toArray(),
+            'collections' => $structure->collections()->map->handle()->all(),
             'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
                 $localized = $structure->in($handle);
                 $exists = $localized !== null;

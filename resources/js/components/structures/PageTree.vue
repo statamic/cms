@@ -104,6 +104,7 @@
         <page-selector
             v-if="pageSelectorOpened"
             :site="site"
+            :collections="collections"
             @selected="pagesSelected"
             @closed="closePageSelector"
         />
@@ -139,6 +140,7 @@ export default {
         root: Object,
         site: String,
         localizations: Array,
+        collections: Array,
     },
 
     data() {

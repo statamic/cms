@@ -69,7 +69,8 @@ class StructuresStore extends BasicStore
     {
         $structure = $this
             ->createBaseStructureFromFile($handle, $path, $data)
-            ->sites([$site = Site::default()->handle()]);
+            ->sites([$site = Site::default()->handle()])
+            ->collections($data['collections'] ?? null);
 
         return $structure->addTree(
             $structure
@@ -93,6 +94,7 @@ class StructuresStore extends BasicStore
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->sites($data['sites'] ?? null)
+            ->collections($data['collections'] ?? null)
             ->initialPath($path);
 
         // // If the base set file was modified, its localizations will already exist in the Stache.

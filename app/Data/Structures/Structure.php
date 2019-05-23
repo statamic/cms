@@ -5,6 +5,7 @@ namespace Statamic\Data\Structures;
 use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Stache;
+use Statamic\API\Collection;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Structure as StructureAPI;
@@ -18,6 +19,7 @@ class Structure implements StructureContract
     protected $handle;
     protected $sites;
     protected $trees;
+    protected $collections;
 
     public function id()
     {
@@ -88,6 +90,7 @@ class Structure implements StructureContract
     {
         $data = [
             'title' => $this->title,
+            'collections' => $this->collections,
         ];
 
         if (Site::hasMultiple()) {
@@ -135,5 +138,28 @@ class Structure implements StructureContract
     public function in($site)
     {
         return $this->trees[$site] ?? null;
+    }
+
+    public function collections($collections = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('collections')
+            ->getter(function ($collections) {
+                if ($collection = $this->collection()) {
+                    return collect([$collection]);
+                }
+
+                return collect($collections)->map(function ($collection) {
+                    return Collection::findByHandle($collection);
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function collection()
+    {
+        return Collection::all()->first(function ($collection) {
+            return $collection->structure() === $this;
+        });
     }
 }
