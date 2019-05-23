@@ -274,10 +274,17 @@ class EntriesController extends CpController
             $entry->date($values['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
-        $entry->store([
-            'message' => $request->message,
-            'user' => $request->user(),
-        ]);
+        if ($entry->revisionsEnabled()) {
+            $entry->store([
+                'message' => $request->message,
+                'user' => $request->user(),
+            ]);
+        } else {
+            $entry
+                ->set('updated_by', $request->user()->id())
+                ->set('updated_at', now()->timestamp)
+                ->save();
+        }
 
         return [
             'redirect' => $entry->editUrl(),
