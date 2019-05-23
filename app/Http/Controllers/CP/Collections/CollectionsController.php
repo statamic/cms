@@ -178,7 +178,7 @@ class CollectionsController extends CpController
             ->orderable($data['orderable'])
             ->ampable($data['amp'])
             ->entryBlueprints($data['blueprints'])
-            ->structure($data['structure']);
+            ->structure($data['structure'] ?? null);
     }
 
     protected function editFormBlueprint()
