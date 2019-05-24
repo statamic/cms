@@ -8,7 +8,7 @@
 
         <data-list
             v-if="!initializing"
-            :rows="items"
+            :rows="itemsWithExclusions"
             :columns="columns"
             :sort="false"
             :sort-column="sortColumn"
@@ -107,7 +107,8 @@ export default {
         maxSelections: Number,
         site: String,
         search: Boolean,
-        canCreate: Boolean
+        canCreate: Boolean,
+        exclusions: Array,
     },
 
     data() {
@@ -140,6 +141,10 @@ export default {
 
         hasMaxSelections() {
             return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
+        },
+
+        itemsWithExclusions() {
+            return this.items.filter(item => !this.exclusions.includes(item.id));
         }
 
     },

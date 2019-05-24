@@ -57,6 +57,7 @@
                     :max-selections="maxItems"
                     :search="search"
                     :can-create="canCreate"
+                    :exclusions="exclusions"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -97,6 +98,7 @@ export default {
         canCreate: Boolean,
         canReorder: Boolean,
         readOnly: Boolean,
+        exclusions: Array,
     },
 
     components: {
