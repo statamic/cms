@@ -77,6 +77,7 @@
                             ref="selector"
                             :site="site"
                             :collections="collections"
+                            :exclusions="pageIds"
                             @selected="pagesSelected"
                         />
 
@@ -163,6 +164,7 @@ export default {
             changed: false,
             pages: this.initialPages,
             treeData: [],
+            pageIds: [],
             firstPageIsRoot: this.hasRoot,
             parentPageForAdding: null,
         }
@@ -188,6 +190,14 @@ export default {
 
         firstPageIsRoot(value) {
             this.changed = true;
+        },
+
+        pages: {
+            immediate: true,
+            deep: true,
+            handler(pages) {
+                this.pageIds = this.getPageIds(pages);
+            }
         }
 
     },
@@ -207,6 +217,17 @@ export default {
                 this.updateTreeData();
                 this.loading = false;
             });
+        },
+
+        getPageIds(pages) {
+            let ids = [];
+            pages.forEach(page => {
+                ids.push(page.id);
+                if (page.children.length) {
+                    ids = [...ids, ...this.getPageIds(page.children)];
+                }
+            })
+            return ids;
         },
 
         treeChanged(node, tree) {
