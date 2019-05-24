@@ -95,12 +95,8 @@ code.parent-url {
         top: 10px;
     }
 
-    .publish-fields {
-        @apply py-1;
-    }
-
     .publish-fields .form-group {
-        @apply p-1.5;
+        @apply p-2;
     }
 }
 
