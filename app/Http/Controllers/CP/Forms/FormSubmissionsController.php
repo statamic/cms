@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Statamic\API\Form;
+use Statamic\CP\Column;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\Http\Controllers\CP\CpController;
@@ -17,12 +18,11 @@ class FormSubmissionsController extends CpController
 
         $this->authorize('view', $form);
 
-        $columns = collect($form->columns())->map(function ($val, $column) {
-            return ['label' => $column, 'field' => $column, 'translation' => $val];
-        })->values()->reverse()->push([
-            'label' => 'datestring',
-            'field' => 'datestamp'
-        ])->reverse()->values();
+        $columns = $form->columns()
+            ->setPreferred("forms.{$form->handle()}.columns")
+            ->ensurePrepended(Column::make('datestamp')->label('date')->value('datestring'))
+            ->rejectUnlisted()
+            ->values();
 
         $submissions = $form->submissions()->map(function ($submission) use ($form) {
             $this->sanitizeSubmission($submission);
@@ -48,9 +48,7 @@ class FormSubmissionsController extends CpController
         }
 
         // Perform the sort!
-        if ($customSort !== 'datestamp' || $sortOrder !== 'desc') {
-            $submissions = $submissions->sortBy($sort, null, $sortOrder === 'desc');
-        }
+        $submissions = $submissions->sortBy($sort, null, $sortOrder === 'desc');
 
         // Set up the paginator, since we don't want to display all the entries.
         $totalSubmissionCount = $submissions->count();

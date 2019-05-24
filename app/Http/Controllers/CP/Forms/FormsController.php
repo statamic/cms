@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Statamic\API\Str;
 use Statamic\API\Form;
+use Statamic\CP\Column;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Forms\Form as FormContract;
 
@@ -46,9 +47,7 @@ class FormsController extends CpController
         $array = $form->toArray();
 
         $array['honeypot'] = $form->honeypot();
-
-        $array['columns'] = array_keys($form->columns());
-
+        $array['columns'] = $form->columns()->map->field();
         $array['metrics'] = $this->preProcessMetrics($form);
         $array['email'] = $form->email();
 

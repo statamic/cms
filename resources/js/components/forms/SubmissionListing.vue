@@ -15,8 +15,8 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div class="card p-0" slot-scope="{ rows }">
-                <data-list-table v-if="rows.length" @sorted="sorted">
+            <div class="card p-0" slot-scope="{ }">
+                <data-list-table v-if="submissions.length" @sorted="sorted">
                     <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
                         <a :href="submission.url">{{ value }}</a>
                     </template>
@@ -83,7 +83,7 @@ export default {
             const url = cp_url(`forms/${this.form}/submissions`);
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
-                this.columns = response.data.meta.columns.map(column => column.field);
+                this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.submissions = response.data.data;
                 this.loading = false;
