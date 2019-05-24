@@ -8,6 +8,7 @@
             v-model="selections"
             :config="config"
             :site="site"
+            :initial-data="[]"
             :item-data-url="itemDataUrl"
             :selections-url="selectionsUrl"
             :search="true"
