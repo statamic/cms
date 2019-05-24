@@ -132,7 +132,7 @@ class DefaultNav
             ->children(function () {
                 return FormAPI::all()->map(function ($form) {
                     return Nav::item($form->title())
-                        ->url($form->editUrl())
+                        ->url($form->url())
                         ->can('view', $form);
                 });
             });
