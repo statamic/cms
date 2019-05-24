@@ -73,6 +73,7 @@
 
                     <div class="publish-fields">
                         <page-selector
+                            v-if="collections.length"
                             ref="selector"
                             :site="site"
                             :collections="collections"
