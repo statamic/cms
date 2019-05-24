@@ -118,7 +118,7 @@ export default {
         },
 
         locks() {
-            return this.storeState.fieldLocks;
+            return this.storeState.fieldLocks || {};
         },
 
         isLocked() {
