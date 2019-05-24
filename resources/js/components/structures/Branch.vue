@@ -20,6 +20,7 @@
             <div class="pr-1">
                 <dropdown-list>
                     <ul class="dropdown-menu">
+                        <li><a @click.prevent="$emit('add-page')">{{ __('Add Page') }}</a></li>
                         <li class="warning"><a href="" @click.prevent="remove">{{ __('Delete') }}</a></li>
                     </ul>
                 </dropdown-list>

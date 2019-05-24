@@ -3,54 +3,7 @@
 
         <div class="flex items-center mb-3">
             <slot name="header" />
-
             <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isDirty" v-text="__('Unsaved Changes')" />
-
-            <dropdown-list class="mr-2">
-                <ul class="dropdown-menu">
-                    <li><a :href="editUrl">{{ __('Edit Structure') }}</a></li>
-                    <li class="warning"><a href="#">{{ __('Delete Structure') }}</a></li>
-                </ul>
-            </dropdown-list>
-
-            <v-select
-                v-if="localizations.length > 1"
-                :value="activeLocalization"
-                label="name"
-                :clearable="false"
-                :options="localizations"
-                :searchable="false"
-                :multiple="false"
-                @input="localizationSelected"
-                class="w-48 mr-2"
-            >
-                <template slot="option" slot-scope="option">
-                    <div class="flex items-center">
-                        <span class="little-dot mr-1" :class="{ 'bg-green': option.exists, 'bg-red': !option.exists }" />
-                        {{ option.name }}
-                        <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
-                    </div>
-                </template>
-            </v-select>
-
-            <button
-                class="btn mr-2"
-                @click="openPageSelector"
-                v-text="__('Add Page')" />
-
-            <button
-                class="btn mr-2"
-                :class="{ 'disabled': !changed }"
-                :disabled="!changed"
-                @click="cancel"
-                v-text="__('Cancel')" />
-
-            <button
-                class="btn btn-primary"
-                :class="{ 'disabled': !changed }"
-                :disabled="!changed"
-                @click="save"
-                v-text="__('Save')" />
         </div>
 
         <loading-graphic v-if="loading"></loading-graphic>
@@ -68,40 +21,98 @@
             </div>
         </div>
 
-        <div v-if="pages.length">
+        <div v-if="pages.length" class="flex flex-row-reverse justify-between">
 
-            <div class="flex items-center mb-2">
-                <toggle-fieldtype v-model="firstPageIsRoot" name="firstPageIsRoot" />
-                <div class="text-xs ml-1">First page is the root.</div>
+            <div class="publish-sidebar">
+                <div class="publish-section">
+                    <div class="p-2">
+                        <button
+                            class="btn btn-primary w-full mb-2"
+                            :class="{ 'disabled': !changed }"
+                            :disabled="!changed"
+                            @click="save"
+                            v-text="__('Save')" />
+
+                        <div class="flex flex-wrap justify-center text-grey text-2xs">
+
+                            <a :href="editUrl"
+                                class="flex items-center m-1 whitespace-no-wrap"
+                                :class="{ 'disabled': !changed }"
+                                @click="cancel">
+                                <svg-icon name="hammer-wrench" class="w-4 mr-sm" />
+                                {{ __('Edit') }}
+                            </a>
+
+                            <button
+                                class="flex items-center m-1 whitespace-no-wrap outline-none"
+                                :class="{ 'opacity-50': !changed }"
+                                @click="cancel">
+                                <span class="mr-sm">&times;</span>
+                                {{ __('Discard Changes') }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="" v-if="localizations.length > 1">
+                        <div
+                            v-for="option in localizations"
+                            :key="option.handle"
+                            class="revision-item flex items-center border-grey-30"
+                            :class="{ 'opacity-50': !option.active }"
+                            @click="localizationSelected(option)"
+                        >
+                            <div class="flex-1 flex items-center">
+                                <span class="little-dot mr-1 bg-green" />
+                                {{ option.name }}
+                            </div>
+                            <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                            <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
+                            <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                        </div>
+                    </div>
+
+                    <div class="publish-fields">
+                        <page-selector
+                            ref="selector"
+                            :site="site"
+                            :collections="collections"
+                            @selected="pagesSelected"
+                        />
+
+                        <form-group
+                            fieldtype="toggle"
+                            handle="root"
+                            display="Home Page"
+                            :instructions='__(`The first page in the tree will be the home page.`)'
+                            v-model="firstPageIsRoot" />
+                    </div>
+                </div>
             </div>
 
-            <draggable-tree
-                draggable
-                :data="treeData"
-                :space="1"
-                :indent="24"
-                @change="treeChanged"
-                @drag="treeDragstart"
-            >
-                <tree-branch
-                    slot-scope="{ data: page, store, vm }"
-                    :page="page"
-                    :depth="vm.level"
-                    :vm="vm"
-                    :first-page-is-root="firstPageIsRoot"
-                    @removed="pageRemoved"
-                />
-            </draggable-tree>
+            <div class="page-tree w-full">
+                <draggable-tree
+                    draggable
+                    ref="tree"
+                    :data="treeData"
+                    :space="1"
+                    :indent="24"
+                    @change="treeChanged"
+                    @drag="treeDragstart"
+                >
+                    <tree-branch
+                        slot-scope="{ data: page, store, vm }"
+                        :page="page"
+                        :depth="vm.level"
+                        :vm="vm"
+                        :first-page-is-root="firstPageIsRoot"
+                        @removed="pageRemoved"
+                        @add-page="addChildPage(vm)"
+                    />
+                </draggable-tree>
+
+            </div>
 
         </div>
-
-        <page-selector
-            v-if="pageSelectorOpened"
-            :site="site"
-            :collections="collections"
-            @selected="pagesSelected"
-            @closed="closePageSelector"
-        />
 
         <audio ref="soundDrop">
             <source :src="soundDropUrl" type="audio/mp3">
@@ -149,8 +160,8 @@ export default {
             changed: false,
             pages: this.initialPages,
             treeData: [],
-            pageSelectorOpened: false,
             firstPageIsRoot: this.hasRoot,
+            parentPageForAdding: null,
         }
     },
 
@@ -196,6 +207,12 @@ export default {
         },
 
         treeChanged(node, tree) {
+            this.treeUpdated(tree);
+        },
+
+        treeUpdated(tree) {
+            tree = tree || this.$refs.tree;
+
             this.pages = tree.getPureData();
             this.$refs.soundDrop.play();
             this.changed = true;
@@ -212,19 +229,13 @@ export default {
             });
         },
 
-        openPageSelector() {
-            this.pageSelectorOpened = true;
-        },
-
-        closePageSelector() {
-            this.pageSelectorOpened = false;
-        },
-
         pagesSelected(selections) {
-            this.closePageSelector();
+            const parent = this.parentPageForAdding
+                ? this.parentPageForAdding.data.children
+                : this.treeData;
 
             selections.forEach(selection => {
-                this.pages.push({
+                parent.push({
                     id: selection.id,
                     title: selection.title,
                     slug: selection.slug,
@@ -234,8 +245,8 @@ export default {
                 });
             });
 
-            this.updateTreeData();
-            this.changed = true;
+            this.parentPageForAdding = null;
+            this.treeUpdated();
         },
 
         updateTreeData() {
@@ -266,6 +277,7 @@ export default {
         },
 
         cancel() {
+            if (!this.isDirty) return;
             if (! confirm('Are you sure?')) return;
 
             this.pages = this.initialPages;
@@ -294,6 +306,11 @@ export default {
                 if (isRoot || isBeyondMaxDepth) droppable = false;
                 this.$set(childNode, 'droppable', droppable);
             });
+        },
+
+        addChildPage(vm) {
+            this.parentPageForAdding = vm;
+            this.$refs.selector.linkExistingItem();
         }
 
     }
