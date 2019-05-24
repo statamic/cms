@@ -55,10 +55,6 @@
 
         <loading-graphic v-if="loading"></loading-graphic>
 
-        <div class="tree-node-inner mb-1" v-if="root">
-            <tree-branch :root="true" :page="root" :depth="1" />
-        </div>
-
         <div v-if="pages.length == 0">
             <div class="no-results border-dashed border-2">
                 <div class="text-center max-w-md mx-auto mt-5 rounded-lg px-4 py-8">
@@ -74,14 +70,9 @@
 
         <div v-if="pages.length">
 
-            <div v-if="!root" class="tree-node-inner flex mb-1 opacity-50">
-                <div class="page-root">
-                    <i class="icon icon-home mx-auto opacity-25"></i>
-                </div>
-                <button class="flex-1 p-1 ml-1 text-grey leading-normal text-left outline-none">
-                    No root page defined.
-                    <span class="text-blue">Select...</span>
-                </button>
+            <div class="flex items-center mb-2">
+                <toggle-fieldtype v-model="firstPageIsRoot" name="firstPageIsRoot" />
+                <div class="text-xs ml-1">First page is the root.</div>
             </div>
 
             <draggable-tree
@@ -90,12 +81,14 @@
                 :space="1"
                 :indent="24"
                 @change="treeChanged"
-                @drag="treeDragged"
+                @drag="treeDragstart"
             >
                 <tree-branch
                     slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
+                    :vm="vm"
+                    :first-page-is-root="firstPageIsRoot"
                     @removed="pageRemoved"
                 />
             </draggable-tree>
@@ -139,7 +132,6 @@ export default {
         submitUrl: String,
         editUrl: String,
         soundDropUrl: String,
-        root: Object,
         site: String,
         localizations: Array,
         collections: Array,
@@ -147,6 +139,7 @@ export default {
             type: Number,
             default: Infinity,
         },
+        hasRoot: Boolean,
     },
 
     data() {
@@ -157,6 +150,7 @@ export default {
             pages: this.initialPages,
             treeData: [],
             pageSelectorOpened: false,
+            firstPageIsRoot: this.hasRoot,
         }
     },
 
@@ -176,6 +170,10 @@ export default {
 
         changed(changed) {
             this.$dirty.state('page-tree', changed);
+        },
+
+        firstPageIsRoot(value) {
+            this.changed = true;
         }
 
     },
@@ -205,7 +203,7 @@ export default {
 
         save() {
             this.saving = true;
-            const payload = { pages: this.pages, site: this.site };
+            const payload = { pages: this.pages, site: this.site, firstPageIsRoot: this.firstPageIsRoot };
 
             this.$axios.post(this.submitUrl, payload).then(response => {
                 this.changed = false;
@@ -275,7 +273,7 @@ export default {
             this.changed = false;
         },
 
-        treeDragged(node) {
+        treeDragstart(node) {
             // Support for maxDepth.
             // Adapted from https://github.com/phphe/vue-draggable-nested-tree/blob/a5bcf2ccdb4c2da5a699bf2ddf3443f4e1dba8f9/src/examples/MaxLevel.vue#L56-L75
             let nodeLevels = 1;
@@ -288,7 +286,13 @@ export default {
             const childNodeMaxLevel = this.maxDepth - nodeLevels;
             th.depthFirstSearch(this.treeData, (childNode) => {
                 if (childNode === node) return;
-                this.$set(childNode, 'droppable', childNode._vm.level <= childNodeMaxLevel);
+                const index = childNode.parent.children.indexOf(childNode);
+                const level = childNode._vm.level;
+                const isRoot = this.firstPageIsRoot && level === 1 && index === 0;
+                const isBeyondMaxDepth = level > childNodeMaxLevel;
+                let droppable = true;
+                if (isRoot || isBeyondMaxDepth) droppable = false;
+                this.$set(childNode, 'droppable', droppable);
             });
         }
 

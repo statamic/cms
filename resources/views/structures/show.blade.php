@@ -8,11 +8,11 @@
         submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
         edit-url="{{ cp_route('structures.edit', $structure->handle()) }}"
         sound-drop-url="{{ Statamic::assetUrl('audio/click.mp3') }}"
-        :root="{{ json_encode($root) }}"
         site="{{ $site }}"
         :localizations="{{ json_encode($localizations) }}"
         :collections="{{ json_encode($collections) }}"
         :max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
+        :has-root="{{ bool_str($hasRoot) }}"
     >
         <template slot="header">
             <h1 class="flex-1">

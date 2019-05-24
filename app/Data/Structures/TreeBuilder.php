@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Structures;
 
+use Statamic\API\Arr;
 use Statamic\API\Structure;
 
 class TreeBuilder
@@ -16,7 +17,7 @@ class TreeBuilder
             return null;
         }
 
-        if (!$params['include_home']) {
+        if (! Arr::get($params, 'include_home')) {
             $tree->withoutParent();
         }
 

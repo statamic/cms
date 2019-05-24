@@ -80,7 +80,7 @@ class StructuresController extends CpController
 
         $pages = (new TreeBuilder)->buildForController([
             'structure' => $structure->handle(),
-            'include_home' => false,
+            'include_home' => true,
             'site' => $site,
         ]);
 
@@ -88,7 +88,7 @@ class StructuresController extends CpController
             'site' => $site,
             'structure' => $structure,
             'pages' => $pages,
-            'root' => optional($tree->parent())->toArray(),
+            'hasRoot' => $tree->parent() !== null,
             'collections' => $structure->collections()->map->handle()->all(),
             'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
                 $localized = $structure->in($handle);

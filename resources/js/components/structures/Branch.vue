@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex">
+    <div class="flex" :class="{ 'mb-1': isRoot }">
         <div class="page-move w-6" v-if="!root" />
 
         <div v-if="root" class="page-root">
@@ -13,6 +13,7 @@
                 class="flex-1"
                 :class="{ 'text-sm font-medium': isTopLevel }"
             >
+                <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
                 <a :href="page.edit_url">{{ page.title }}</a>
             </div>
 
@@ -36,12 +37,22 @@ export default {
         page: Object,
         depth: Number,
         root: Boolean,
+        vm: Object,
+        firstPageIsRoot: Boolean,
     },
 
     computed: {
 
         isTopLevel() {
             return this.depth === 1;
+        },
+
+        isRoot() {
+            if (!this.firstPageIsRoot) return false;
+            if (!this.isTopLevel) return false;
+
+            const firstNodeId = this.vm.data.parent.children[0].id;
+            return this.page.id === firstNodeId;
         }
 
     },

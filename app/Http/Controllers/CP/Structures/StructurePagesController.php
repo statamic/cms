@@ -17,7 +17,7 @@ class StructurePagesController extends CpController
 
         $pages = (new TreeBuilder)->buildForController([
             'structure' => $structure->handle(),
-            'include_home' => false,
+            'include_home' => true,
             'site' => $site,
         ]);
 
@@ -26,9 +26,17 @@ class StructurePagesController extends CpController
 
     public function store(Request $request, $structure)
     {
+        $tree = $this->toTree($request->pages);
+
+        if ($request->firstPageIsRoot) {
+            $root = array_pull($tree, 0)['entry'];
+            $tree = array_values($tree);
+        }
+
         $tree = Structure::find($structure)
             ->in($request->site)
-            ->tree($this->toTree($request->pages));
+            ->root($root ?? null)
+            ->tree($tree);
 
         $tree->save();
     }
