@@ -131,7 +131,7 @@
                 <input type="number" min="1" step="1" v-model="structure.max_depth" class="input-text">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The deepest a page may be nested
+                    The deepest a page may be nested. Leave blank for no limit.
                 </div>
             </div>
         </div>
