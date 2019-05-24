@@ -10,6 +10,7 @@ use Statamic\API\Config;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Crypt;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\PublishException;
 use Statamic\Http\Controllers\Controller;

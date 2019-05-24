@@ -4,12 +4,12 @@ namespace Statamic\Forms;
 
 use Statamic\API\URL;
 use Statamic\API\Form;
-use Statamic\Tags\Collection;
 use DebugBar\DebugBarException;
+use Statamic\Tags\Tags as BaseTags;
 use Illuminate\Support\Facades\Crypt;
 use DebugBar\DataCollector\ConfigCollector;
 
-class Tags extends Collection
+class Tags extends BaseTags
 {
     protected static $handle = 'form';
 

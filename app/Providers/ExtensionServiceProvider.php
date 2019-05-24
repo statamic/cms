@@ -159,7 +159,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Users::class,
         Tags\Widont::class,
         Tags\Yields::class,
-        // \Statamic\Forms\Tags::class,
+        \Statamic\Forms\Tags::class,
         \Statamic\Auth\UserTags::class,
         \Statamic\Auth\Protect\Tags::class,
         \Statamic\Search\Tags::class,
