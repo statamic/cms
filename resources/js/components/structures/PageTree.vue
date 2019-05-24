@@ -90,6 +90,7 @@
                 :space="1"
                 :indent="24"
                 @change="treeChanged"
+                @drag="treeDragged"
             >
                 <tree-branch
                     slot-scope="{ data: page, store, vm }"
@@ -118,6 +119,7 @@
 
 
 <script>
+import * as th from 'tree-helper';
 import {Sortable, Plugins} from '@shopify/draggable';
 import {DraggableTree} from 'vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
@@ -141,6 +143,10 @@ export default {
         site: String,
         localizations: Array,
         collections: Array,
+        maxDepth: {
+            type: Number,
+            default: Infinity,
+        },
     },
 
     data() {
@@ -267,6 +273,23 @@ export default {
             this.pages = this.initialPages;
             this.updateTreeData();
             this.changed = false;
+        },
+
+        treeDragged(node) {
+            // Support for maxDepth.
+            // Adapted from https://github.com/phphe/vue-draggable-nested-tree/blob/a5bcf2ccdb4c2da5a699bf2ddf3443f4e1dba8f9/src/examples/MaxLevel.vue#L56-L75
+            let nodeLevels = 1;
+            th.depthFirstSearch(node, (childNode) => {
+                if (childNode._vm.level > nodeLevels) {
+                    nodeLevels = childNode._vm.level;
+                }
+            });
+            nodeLevels = nodeLevels - node._vm.level + 1;
+            const childNodeMaxLevel = this.maxDepth - nodeLevels;
+            th.depthFirstSearch(this.treeData, (childNode) => {
+                if (childNode === node) return;
+                this.$set(childNode, 'droppable', childNode._vm.level <= childNodeMaxLevel);
+            });
         }
 
     }

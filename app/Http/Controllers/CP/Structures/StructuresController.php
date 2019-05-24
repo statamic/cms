@@ -169,7 +169,8 @@ class StructuresController extends CpController
         $structure = Structure::make()
             ->title($values['title'])
             ->handle($values['handle'])
-            ->collections($values['collections'] ?? []);
+            ->collections($values['collections'] ?? [])
+            ->maxDepth($values['max_depth']);
 
         $sites = [ // todo: change to the structuresites fieldtype
             ['handle' => 'english', 'route' => $values['route']],

@@ -37,6 +37,7 @@ class StructuresStore extends BasicStore
                 ->title($item['title'])
                 ->handle($item['handle'])
                 ->sites($item['sites'])
+                ->maxDepth($item['max_depth'])
                 ->initialPath($item['path']);
 
             foreach ($item['trees'] as $site => $tree) {
@@ -70,6 +71,7 @@ class StructuresStore extends BasicStore
         $structure = $this
             ->createBaseStructureFromFile($handle, $path, $data)
             ->sites([$site = Site::default()->handle()])
+            ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null);
 
         return $structure->addTree(
@@ -94,6 +96,7 @@ class StructuresStore extends BasicStore
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->sites($data['sites'] ?? null)
+            ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null)
             ->initialPath($path);
 

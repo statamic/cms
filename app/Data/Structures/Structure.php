@@ -20,6 +20,7 @@ class Structure implements StructureContract
     protected $sites;
     protected $trees;
     protected $collections;
+    protected $maxDepth;
 
     public function id()
     {
@@ -74,6 +75,7 @@ class Structure implements StructureContract
             'handle' => $this->handle,
             'sites' => $this->sites,
             'path' => $this->initialPath() ?? $this->path(),
+            'max_depth' => $this->maxDepth,
             'trees' => $this->trees()->map->toCacheableArray()->all()
         ];
     }
@@ -91,6 +93,7 @@ class Structure implements StructureContract
         $data = [
             'title' => $this->title,
             'collections' => $this->collections,
+            'max_depth' => $this->maxDepth,
         ];
 
         if (Site::hasMultiple()) {
@@ -161,5 +164,14 @@ class Structure implements StructureContract
         return Collection::all()->first(function ($collection) {
             return $collection->structure() === $this;
         });
+    }
+
+    public function maxDepth($maxDepth = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('maxDepth')
+            ->setter(function ($maxDepth) {
+                return (int) $maxDepth ?: null;
+            })->args(func_get_args());
     }
 }

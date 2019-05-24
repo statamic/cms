@@ -12,6 +12,7 @@
         site="{{ $site }}"
         :localizations="{{ json_encode($localizations) }}"
         :collections="{{ json_encode($collections) }}"
+        :max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
     >
         <template slot="header">
             <h1 class="flex-1">
