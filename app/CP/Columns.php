@@ -38,6 +38,16 @@ class Columns extends Collection
     }
 
     /**
+     * Reject unlisted columns.
+     *
+     * @return $this
+     */
+    public function rejectUnlisted()
+    {
+        return $this->filter->listable();
+    }
+
+    /**
      * Set preferred column visibility and order.
      *
      * @param mixed $preferred

@@ -51,6 +51,7 @@ class EntriesController extends CpController
         $columns = $collection->entryBlueprint()
             ->columns()
             ->setPreferred("collections.{$collection->handle()}.columns")
+            ->rejectUnlisted()
             ->values();
 
         return Resource::collection($paginator)->additional(['meta' => [

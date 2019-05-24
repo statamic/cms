@@ -85,6 +85,15 @@ class Field implements Arrayable
         return (bool) $this->get('listable');
     }
 
+    public function isVisible()
+    {
+        if (is_null($this->get('listable'))) {
+            return true;
+        }
+
+        return ! in_array($this->get('listable'), [false, 'hidden']);
+    }
+
     public function isSortable()
     {
         if (is_null($this->get('sortable'))) {

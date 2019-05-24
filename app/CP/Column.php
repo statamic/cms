@@ -12,6 +12,7 @@ class Column
     public $field;
     public $fieldtype;
     public $label;
+    public $listable = true;
     public $visibleDefault = true;
     public $visible = true;
     public $sortable = true;
@@ -81,6 +82,16 @@ class Column
     public function label($label = null)
     {
         return $this->fluentlyGetOrSet('label')->value($label);
+    }
+
+    /**
+     * Get or set listable.  Setting `false` will override visibility.
+     *
+     * @param mixed $listable
+     */
+    public function listable($listable = null)
+    {
+        return $this->fluentlyGetOrSet('listable')->value($listable);
     }
 
     /**
