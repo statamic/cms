@@ -13,6 +13,7 @@
         :collections="{{ json_encode($collections) }}"
         :max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :has-root="{{ bool_str($hasRoot) }}"
+        :has-collection="{{ bool_str($hasCollection) }}"
     >
         <template slot="header">
             <h1 class="flex-1">

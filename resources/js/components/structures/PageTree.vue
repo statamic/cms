@@ -81,6 +81,7 @@
                         />
 
                         <form-group
+                            v-if="hasCollection"
                             fieldtype="toggle"
                             handle="root"
                             display="Home Page"
@@ -152,6 +153,7 @@ export default {
             default: Infinity,
         },
         hasRoot: Boolean,
+        hasCollection: Boolean,
     },
 
     data() {
