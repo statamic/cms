@@ -14,7 +14,9 @@
 }
 
 .dropdown .rotating-dots {
+    position: relative;
     transition: .12s ease-out;
+    top: 1px;
 }
 
 .dropdown.open .rotating-dots {

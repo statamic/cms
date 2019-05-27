@@ -123,6 +123,7 @@ class Relationship extends Fieldtype
     {
         return [
             Column::make('title'),
+            Column::make('collection'),
             Column::make('url')->label('URL'),
         ];
     }
