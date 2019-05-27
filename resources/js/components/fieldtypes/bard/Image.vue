@@ -12,8 +12,11 @@
 
             <div class="flex items-center p-1 pt-0 rounded-b" v-if="src">
                 <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
-                <button class="btn" @click="openSelector">
-                    {{ __('Replace Image') }}
+                <button class="btn-flat mr-1" @click="openSelector">
+                    {{ __('Replace') }}
+                </button>
+                <button class="btn-flat" @click="remove">
+                    {{ __('Remove') }}
                 </button>
             </div>
         </div>
@@ -21,6 +24,9 @@
         <div v-else class="text-center p-2">
             <button class="btn" @click="openSelector">
                 {{ __('Choose Image') }}
+            </button>
+            <button class="btn-flat" @click="remove">
+                {{ __('Remove') }}
             </button>
         </div>
 
@@ -133,6 +139,10 @@ export default {
         openSelector() {
             this.showingSelector = true;
             this.$root.hideOverflow = true;
+        },
+
+        remove() {
+            alert('make for to many much deletings')
         },
 
         closeSelector() {
