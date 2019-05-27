@@ -77,7 +77,7 @@
                             ref="selector"
                             :site="site"
                             :collections="collections"
-                            :exclusions="pageIds"
+                            :exclusions="exclusions"
                             @selected="pagesSelected"
                         />
 
@@ -178,6 +178,10 @@ export default {
 
         isDirty() {
             return this.$dirty.has('page-tree');
+        },
+
+        exclusions() {
+            return this.hasCollection ? this.pageIds : [];
         }
 
     },
