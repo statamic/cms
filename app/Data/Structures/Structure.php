@@ -76,6 +76,7 @@ class Structure implements StructureContract
             'sites' => $this->sites,
             'path' => $this->initialPath() ?? $this->path(),
             'max_depth' => $this->maxDepth,
+            'collections' => $this->collections,
             'trees' => $this->trees()->map->toCacheableArray()->all()
         ];
     }
