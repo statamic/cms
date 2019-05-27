@@ -1,6 +1,6 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-text block-inline px-sm w-auto" :class="{ 'read-only': isReadOnly }">
+        <div class="input-text flex items-center px-sm w-auto" :class="{ 'read-only': isReadOnly }">
             <input class="input-time input-hour"
                 type="number" min="00" max="23" v-model="hour" ref="hour"
                 placeholder="00"
