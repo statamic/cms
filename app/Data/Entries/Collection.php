@@ -344,6 +344,8 @@ class Collection implements Contract
 
     public function delete()
     {
+        $this->queryEntries()->get()->each->delete();
+
         API\Collection::delete($this);
 
         return true;
