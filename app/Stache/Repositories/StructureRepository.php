@@ -53,6 +53,13 @@ class StructureRepository implements RepositoryContract
         $this->store->save($structure);
     }
 
+    public function delete(Structure $structure)
+    {
+        $this->store->removeItem($structure->handle());
+
+        $this->store->delete($structure);
+    }
+
     public function make()
     {
         return new \Statamic\Data\Structures\Structure;

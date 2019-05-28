@@ -165,6 +165,11 @@ class StructuresStore extends BasicStore
         // exist in the structure should be deleted.
     }
 
+    public function delete(Structure $structure)
+    {
+        File::delete($structure->path());
+    }
+
     protected function toSaveableArray($structure)
     {
         $data = $structure->data();

@@ -174,4 +174,11 @@ class Structure implements StructureContract
                 return (int) $maxDepth ?: null;
             })->args(func_get_args());
     }
+
+    public function delete()
+    {
+        StructureAPI::delete($this);
+
+        return true;
+    }
 }

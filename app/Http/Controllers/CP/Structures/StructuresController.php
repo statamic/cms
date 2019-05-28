@@ -28,7 +28,7 @@ class StructuresController extends CpController
                 'title' => $structure->title(),
                 'show_url' => $tree->editUrl(),
                 'edit_url' => $structure->editUrl(),
-                'deletetable' => me()->can('delete', $structure)
+                'deleteable' => me()->can('delete', $structure)
             ];
         })->values();
 
@@ -211,5 +211,12 @@ class StructuresController extends CpController
                 'display' => Site::hasMultiple() ? __('Sites') : __('Route'),
             ]
         ]);
+    }
+
+    public function destroy($structure)
+    {
+        $structure = Structure::findByHandle($structure);
+
+        return Structure::delete($structure);
     }
 }

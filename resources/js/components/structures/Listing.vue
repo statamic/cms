@@ -32,6 +32,12 @@ export default {
                 { label: __('Title'), field: 'title', visible: true },
             ]
         }
+    },
+
+    methods: {
+        destroy(id) {
+            this.$axios.delete(`/cp/structures/${id}`);
+        }
     }
 
 }
