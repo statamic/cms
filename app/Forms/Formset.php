@@ -125,6 +125,11 @@ class Formset implements FormsetContract
         $this->data[$key] = $value;
     }
 
+    public function path()
+    {
+        return config('statamic.forms.formsets') . "/{$this->name()}.yaml";
+    }
+
     /**
      * Save the formset
      *
@@ -132,8 +137,6 @@ class Formset implements FormsetContract
      */
     public function save()
     {
-        $path = config('statamic.forms.formsets') . "/{$this->name()}.yaml";
-
         $data = array_filter([
             'title' => $this->title(),
             'honeypot' => $this->get('honeypot'),
@@ -143,7 +146,17 @@ class Formset implements FormsetContract
             'email' => $this->get('email')
         ]);
 
-        File::put($path, YAML::dump($data));
+        File::put($this->path(), YAML::dump($data));
+    }
+
+    /**
+     * Delete the formset
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        File::delete($this->path());
     }
 
     /**
