@@ -23,6 +23,7 @@ class FormsController extends CpController
                 'submissions' => $form->submissions()->count(),
                 'show_url' => $form->url(),
                 'edit_url' => $form->editUrl(),
+                'deleteable' => me()->can('delete', $form)
             ];
         })->values();
 
@@ -233,5 +234,16 @@ class FormsController extends CpController
         }
 
         return $fields;
+    }
+
+    public function destroy($form)
+    {
+        $form = Form::find($form);
+
+        $this->authorize('delete', $form, 'You are not authorized to delete this form.');
+
+        $form->delete();
+
+        return true;
     }
 }

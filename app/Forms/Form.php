@@ -183,6 +183,14 @@ class Form implements FormContract
     }
 
     /**
+     * Delete the form
+     */
+    public function delete()
+    {
+        $this->formset()->delete();
+    }
+
+    /**
      * Get the date format
      *
      * @return string

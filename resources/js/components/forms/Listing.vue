@@ -9,7 +9,9 @@
                     <dropdown-list>
                         <ul class="dropdown-menu">
                             <li><a :href="form.edit_url">Edit</a></li>
-                            <li class="warning"><a @click.prevent="destroy(form.id)">Delete</a></li>
+                            <li class="warning" v-if="form.deleteable">
+                                <a @click.prevent="destroy(form.id)">Delete</a>
+                            </li>
                         </ul>
                     </dropdown-list>
                 </template>
@@ -34,9 +36,9 @@ export default {
 
     methods: {
 
-        destroy(handle) {
+        destroy(id) {
             if (confirm('Are you sure?')) {
-                console.log(`Deleting form ${handle}`); // TODO
+                this.$axios.delete(`/cp/forms/${id}`);
             }
         }
 
