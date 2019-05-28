@@ -163,8 +163,6 @@ class CollectionsController extends CpController
         $this->authorize('delete', $collection, 'You are not authorized to delete this collection.');
 
         $collection->delete();
-
-        return true;
     }
 
     protected function updateCollection($collection, $data)

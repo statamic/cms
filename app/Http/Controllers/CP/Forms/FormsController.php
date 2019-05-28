@@ -243,7 +243,5 @@ class FormsController extends CpController
         $this->authorize('delete', $form, 'You are not authorized to delete this form.');
 
         $form->delete();
-
-        return true;
     }
 }

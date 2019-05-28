@@ -220,6 +220,6 @@ class StructuresController extends CpController
 
         $this->authorize('delete', $structure, 'You are not authorized to delete this structure.');
 
-        return Structure::delete($structure);
+        $structure->delete();
     }
 }
