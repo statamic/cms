@@ -27,7 +27,8 @@ class CollectionsController extends CpController
                 'title' => $collection->title(),
                 'entries' => \Statamic\API\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
-                'entries_url' => cp_route('collections.show', $collection->handle())
+                'entries_url' => cp_route('collections.show', $collection->handle()),
+                'deleteable' => me()->can('delete', $collection)
             ];
         })->values();
 
@@ -159,13 +160,11 @@ class CollectionsController extends CpController
 
     public function destroy($collection)
     {
-        $this->authorize('delete', $collection, 'You are not authorized to delete collections.');
+        $this->authorize('delete', $collection, 'You are not authorized to delete this collection.');
 
         $collection->delete();
 
-        return redirect()
-            ->route('statamic.cp.collections.index')
-            ->with('success', 'Collection deleted.');
+        return true;
     }
 
     protected function updateCollection($collection, $data)

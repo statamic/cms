@@ -341,4 +341,11 @@ class Collection implements Contract
             })
             ->args(func_get_args());
     }
+
+    public function delete()
+    {
+        API\Collection::delete($this);
+
+        return true;
+    }
 }

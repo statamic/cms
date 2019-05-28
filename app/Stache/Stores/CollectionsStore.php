@@ -76,6 +76,11 @@ class CollectionsStore extends BasicStore
         $this->files->put($collection->path(), $collection->fileContents());
     }
 
+    public function delete(CollectionContract $collection)
+    {
+        $this->files->delete($collection->path());
+    }
+
     public function removeByPath($path)
     {
         parent::removeByPath($path);

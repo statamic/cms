@@ -9,7 +9,9 @@
                     <dropdown-list>
                         <ul class="dropdown-menu">
                             <li><a :href="collection.edit_url">Edit</a></li>
-                            <li class="warning"><a @click.prevent="deleteCollection(collection.id)">Delete</a></li>
+                            <li class="warning" v-if="collection.deleteable">
+                                <a @click.prevent="destroy(collection.id)">Delete</a>
+                            </li>
                         </ul>
                     </dropdown-list>
                 </template>
@@ -30,13 +32,9 @@ export default {
         }
     },
     methods: {
-        bulkDelete(ids) {
-            //TODO: Axios call & update rows
-        },
-        deleteCollection(id) {
+        destroy(id) {
             if (confirm('Are you sure?')) {
-                // TODO: Axios call to delete it.
-                console.log(`Deleting collection ${id}`);
+                this.$axios.delete(`/cp/collections/${id}`);
             }
         }
     }
