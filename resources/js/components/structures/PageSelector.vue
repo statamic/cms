@@ -1,7 +1,8 @@
 <template>
 
     <div class="form-group">
-        <label class="block font-medium mb-1">Add Pages</label>
+        <label class="block font-medium mb-1">Create pages from entries</label>
+        <div class="help-block -mt-1">You may reference multiple entries a time.</div>
         <relationship-input
             ref="input"
             name="entries"

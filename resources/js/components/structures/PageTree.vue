@@ -72,6 +72,14 @@
                     </div>
 
                     <div class="publish-fields">
+                        <div class="form-group text-sm">
+                            <label class="block font-medium mb-1">Pages</label>
+                            <div class="help-block -mt-1">A page can be a URL, a reference to an entry, or even just some text.</div>
+                            <button @click="createPage" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none">
+                                <svg-icon name="hierarchy-files" class="w-4 h-4 mr-sm" /> Create Page
+                            </button>
+                        </div>
+
                         <page-selector
                             v-if="collections.length"
                             ref="selector"
@@ -103,19 +111,28 @@
                     @drag="treeDragstart"
                 >
                     <tree-branch
-                        slot-scope="{ data: page, store, vm }"
+                        slot-scope="{ data: page, store: tree, vm }"
                         :page="page"
                         :depth="vm.level"
                         :vm="vm"
                         :first-page-is-root="firstPageIsRoot"
+                        @edit="editPage(page, vm)"
+                        @updated="pageUpdated(tree)"
                         @removed="pageRemoved"
-                        @add-page="addChildPage(vm)"
+                        @create-page="createChildPage(vm)"
+                        @create-entry="createChildEntries(vm)"
                     />
                 </draggable-tree>
 
             </div>
 
         </div>
+
+        <page-editor
+            v-if="creatingPage"
+            @closed="closePageCreator"
+            @submitted="pageCreated"
+        />
 
         <audio ref="soundDrop">
             <source :src="soundDropUrl" type="audio/mp3">
@@ -131,6 +148,7 @@ import {Sortable, Plugins} from '@shopify/draggable';
 import {DraggableTree} from 'vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 import PageSelector from './PageSelector.vue';
+import PageEditor from './PageEditor.vue';
 
 export default {
 
@@ -138,6 +156,7 @@ export default {
         DraggableTree,
         TreeBranch,
         PageSelector,
+        PageEditor,
     },
 
     props: {
@@ -167,6 +186,8 @@ export default {
             pageIds: [],
             firstPageIsRoot: this.hasRoot,
             parentPageForAdding: null,
+            targetPage: null,
+            creatingPage: false,
         }
     },
 
@@ -336,9 +357,40 @@ export default {
             });
         },
 
-        addChildPage(vm) {
+        createChildPage(vm) {
+            this.parentPageForAdding = vm;
+            this.openPageCreator();
+        },
+
+        createChildEntries(vm) {
             this.parentPageForAdding = vm;
             this.$refs.selector.linkExistingItem();
+        },
+
+        createPage() {
+            this.openPageCreator();
+        },
+
+        openPageCreator() {
+            this.creatingPage = true;
+        },
+
+        closePageCreator() {
+            this.creatingPage = false;
+        },
+
+        pageCreated(page) {
+            this.closePageCreator();
+            this.pagesSelected([{
+                title: page.title,
+                url: page.url,
+                children: []
+            }]);
+        },
+
+        pageUpdated(tree) {
+            this.pages = tree.getPureData();
+            this.changed = true;
         }
 
     }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
+use Statamic\API\Arr;
 use Statamic\API\Site;
 use Statamic\API\Structure;
 use Illuminate\Http\Request;
@@ -44,10 +45,12 @@ class StructurePagesController extends CpController
     protected function toTree($items)
     {
         return collect($items)->map(function ($item) {
-            return [
-                'entry' => $item['id'],
+            return Arr::removeNullValues([
+                'entry' => $ref = $item['id'] ?? null,
+                'title' => $ref ? null : ($item['title'] ?? null),
+                'url' => $ref ? null : ($item['url'] ?? null),
                 'children' => $this->toTree($item['children'])
-            ];
+            ]);
         })->all();
     }
 }

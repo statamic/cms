@@ -38,6 +38,7 @@ class StructuresStore extends BasicStore
                 ->handle($item['handle'])
                 ->sites($item['sites'])
                 ->maxDepth($item['max_depth'])
+                ->collections($item['collections'])
                 ->initialPath($item['path']);
 
             foreach ($item['trees'] as $site => $tree) {
@@ -259,13 +260,25 @@ class StructuresStore extends BasicStore
     public function loadingComplete()
     {
         collect($this->treeQueue)->unique()->each(function ($structure) {
+            if (! $structure->collection()) {
+                // Only structures linked to a collection should cause entry URIs to be updated.
+                return;
+            }
+
             $this->flushStructureEntryUris($structure->handle());
 
             foreach ($structure->trees() as $tree) {
-                foreach ($tree->uris() as $key => $uri) {
+                $locale = $tree->locale();
+                $handle = $tree->handle();
+
+                foreach ($tree->flattenedPages() as $page) {
+                    if (! $page->reference()) {
+                        continue;
+                    }
+
                     $this->entryUris
-                        ->get($tree->locale())
-                        ->put($tree->handle() . '::' . $key, $uri);
+                        ->get($locale)
+                        ->put($handle . '::' . $page->reference(), $page->uri());
                 }
             }
         });

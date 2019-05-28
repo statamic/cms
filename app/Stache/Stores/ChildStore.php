@@ -54,4 +54,9 @@ class ChildStore extends BasicStore
 
         $this->parent->cacheMetaKeys();
     }
+
+    public function shouldStoreUri($item)
+    {
+        return $this->parent->shouldStoreUri($item);
+    }
 }

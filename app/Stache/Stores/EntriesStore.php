@@ -167,4 +167,9 @@ class EntriesStore extends AggregateStore
             $this->setItem($this->getItemKey($origin, ''), $origin);
         }
     }
+
+    public function shouldStoreUri($item)
+    {
+        return !$item->hasStructure();
+    }
 }

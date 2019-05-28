@@ -367,13 +367,18 @@ abstract class BasicStore extends Store
 
         $this->setSitePath($site, $key, $item->path());
 
-        if (method_exists($item, 'uri')) {
+        if ($this->shouldStoreUri($item)) {
             $this->setSiteUri($site, $key, $item->uri());
         }
 
         $this->markAsUpdated();
 
         return $this;
+    }
+
+    public function shouldStoreUri($item)
+    {
+        return method_exists($item, 'uri');
     }
 
     public function removeByPath($path)

@@ -78,11 +78,16 @@ class Tree implements Localization
 
     public function pages()
     {
-        return (new Pages)
+        $pages = (new Pages)
             ->setTree($this->tree)
             ->setParent($this->parent())
-            ->setRoute($this->route())
             ->prependParent($this->withParent);
+
+        if ($route = $this->route()) {
+            $pages->setRoute($route);
+        }
+
+        return $pages;
     }
 
     public function flattenedPages()
@@ -97,7 +102,10 @@ class Tree implements Localization
 
     public function page(string $id): ?Page
     {
-        return $this->flattenedPages()->get($id);
+        return $this->flattenedPages()
+            ->filter->reference()
+            ->keyBy->reference()
+            ->get($id);
     }
 
     public function withoutParent()

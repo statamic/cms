@@ -41,32 +41,34 @@ class Pages
 
     public function all()
     {
-        $pages = collect($this->tree)->keyBy('entry')->map(function ($branch) {
-            return (new Page)
+        $pages = collect($this->tree)->map(function ($branch) {
+            $page = (new Page)
                 ->setParent($this->parent)
-                ->setRoute($this->route)
-                ->setEntry($branch['entry'])
+                ->setEntry($branch['entry'] ?? null)
+                ->setUrl($branch['url'] ?? null)
+                ->setTitle($branch['title'] ?? null)
                 ->setChildren($branch['children'] ?? []);
+
+            if ($this->route) {
+                $page->setRoute($this->route);
+            }
+
+            return $page;
         });
 
         if ($this->prependParent && $this->parent) {
-            $pages->prepend($this->parent, $this->parent->reference());
+            $pages->prepend($this->parent);
         }
 
         return $pages;
-    }
-
-    public function uris()
-    {
-        return $this->all()->map->uri();
     }
 
     public function flattenedPages()
     {
         $flattened = collect();
 
-        foreach ($this->all() as $id => $page) {
-            $flattened->put($id, $page);
+        foreach ($this->all() as $page) {
+            $flattened->push($page);
             $flattened = $flattened->merge($page->flattenedPages());
         }
 

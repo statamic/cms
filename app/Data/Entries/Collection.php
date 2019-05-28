@@ -342,6 +342,11 @@ class Collection implements Contract
             ->args(func_get_args());
     }
 
+    public function hasStructure()
+    {
+        return $this->structure !== null;
+    }
+
     public function delete()
     {
         $this->queryEntries()->get()->each->delete();

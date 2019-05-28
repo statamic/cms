@@ -2,24 +2,64 @@
 
 namespace Statamic\Data\Structures;
 
+use Statamic\API\URL;
+use Statamic\API\Site;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Content\UrlBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
-use Statamic\Data\Routable;
+use Illuminate\Contracts\Support\Responsable;
 
-class Page implements Entry
+class Page implements Entry, Responsable
 {
-    use Routable;
-
     protected $reference;
     protected $entry;
     protected $route;
     protected $parent;
     protected $children;
     protected $isRoot = false;
+    protected $url;
+    protected $title;
+
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function url()
+    {
+        if ($this->url) {
+            return $this->url;
+        }
+
+        if ($this->reference) {
+            return URL::makeRelative($this->absoluteUrl());
+        }
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function title()
+    {
+        if ($this->title) {
+            return $this->title;
+        }
+
+        return optional($this->entry())->value('title');
+    }
 
     public function setEntry($reference): self
     {
+        if ($reference === null) {
+            return $this;
+        }
+
         if (! is_string($reference)) {
             $this->entry = $reference;
             $reference = $reference->id();
@@ -70,11 +110,15 @@ class Page implements Entry
 
     public function slug()
     {
-        return $this->entry()->slug();
+        return optional($this->entry())->slug();
     }
 
     public function uri()
     {
+        if (! $this->reference) {
+            return;
+        }
+
         return app(UrlBuilder::class)
             ->content($this)
             ->merge([
@@ -82,6 +126,20 @@ class Page implements Entry
                 'slug' => $this->isRoot() ? '' : $this->slug()
             ])
             ->build($this->route);
+    }
+
+    public function absoluteUrl()
+    {
+        if ($this->url) {
+            return $this->url;
+        }
+
+        if ($this->reference) {
+            return vsprintf('%s/%s', [
+                rtrim($this->site()->absoluteUrl(), '/'),
+                ltrim($this->uri(), '/')
+            ]);
+        }
     }
 
     public function isRoot()
@@ -105,11 +163,16 @@ class Page implements Entry
 
     public function pages()
     {
-        return (new Pages)
+        $pages = (new Pages)
             ->setTree($this->children ?? [])
             ->setParent($this)
-            ->setRoute($this->route)
             ->prependParent(false);
+
+        if ($this->route) {
+            $pages->setRoute($this->route);
+        }
+
+        return $pages;
     }
 
     public function flattenedPages()
@@ -121,7 +184,10 @@ class Page implements Entry
 
     public function toArray()
     {
-        return array_merge($this->entry()->toArray(), [
+        $array = $this->reference ? $this->entry()->toArray() : [];
+
+        return array_merge($array, [
+            'title' => $this->title(),
             'url' => $this->url(),
             'uri' => $this->uri(),
             'permalink' => $this->absoluteUrl(),
@@ -130,11 +196,38 @@ class Page implements Entry
 
     public function editUrl()
     {
-        return $this->entry()->editUrl();
+        return optional($this->entry())->editUrl();
     }
 
-    public function __call($method, $args)
+    public function id()
     {
-        return call_user_func_array([$this->entry(), $method], $args);
+        return optional($this->entry())->id();
+    }
+
+    public function in($site)
+    {
+        if ($this->reference) {
+            return $this->entry()->in($site);
+        }
+
+        return $this;
+    }
+
+    public function site()
+    {
+        if ($this->reference) {
+            return $this->entry()->site();
+        }
+
+        return Site::current(); // TODO: Get it from the tree instead.
+    }
+
+    public function toResponse($request)
+    {
+        if ($this->reference) {
+            return $this->entry()->toResponse($request);
+        }
+
+        throw new \LogicException('A page without a reference to an entry cannot be rendered.');
     }
 }

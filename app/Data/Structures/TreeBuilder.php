@@ -26,7 +26,7 @@ class TreeBuilder
 
     protected function toTree($pages, $depth)
     {
-        return $pages->keyBy->uri()->map(function ($page) use ($depth) {
+        return $pages->map(function ($page) use ($depth) {
             return [
                 'page' => $page,
                 'depth' => $depth,
@@ -49,7 +49,7 @@ class TreeBuilder
 
             return [
                 'id'          => $page->id(),
-                'title'       => (string) $page->value('title'),
+                'title'       => $page->title(),
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
                 'slug'        => $page->slug(),
