@@ -9,7 +9,9 @@
                     <dropdown-list>
                         <ul class="dropdown-menu">
                             <li><a :href="structure.edit_url">Edit</a></li>
-                            <li class="warning" v-if="structure.deleteable"><a @click.prevent="destroy(structure.id, index)">Delete</a></li>
+                            <li class="warning" v-if="structure.deleteable">
+                                <a @click.prevent="destroy(structure.id, index)">Delete</a>
+                            </li>
                         </ul>
                     </dropdown-list>
                 </template>
@@ -36,7 +38,9 @@ export default {
 
     methods: {
         destroy(id) {
-            this.$axios.delete(`/cp/structures/${id}`);
+            if (confirm('Are you sure?')) {
+                this.$axios.delete(`/cp/structures/${id}`);
+            }
         }
     }
 
