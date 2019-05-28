@@ -43,45 +43,7 @@ class PagesTest extends TestCase
         $this->assertInstanceOf(Collection::class, $list);
         $this->assertCount(2, $list);
         $this->assertEveryItemIsInstanceOf(Page::class, $list);
-        $this->assertEquals(['one', 'two'], $list->keys()->all());
-    }
-
-    /** @test */
-    function it_gets_uris_of_pages()
-    {
-        $entryOne = new class extends Entry {
-            public function slug($slug = null) { return 'one'; }
-        };
-        $entryTwo = new class extends Entry {
-            public function slug($slug = null) { return 'two'; }
-        };
-        EntryAPI::shouldReceive('find')->with('one')->andReturn($entryOne);
-        EntryAPI::shouldReceive('find')->with('two')->andReturn($entryTwo);
-
-        $parent = Mockery::mock(Page::class);
-        $parent->shouldReceive('reference')->andReturn('root');
-        $parent->shouldReceive('uri')->andReturn('/the-parent');
-
-        $pages = (new Pages)
-            ->setParent($parent)
-            ->setRoute('{parent_uri}/{slug}')
-            ->setTree([
-                ['entry' => 'one', 'children' => [
-                    ['entry' => 'one-one'],
-                    ['entry' => 'one-two', 'children' => [
-                        ['entry' => 'one-two-one']
-                    ]],
-                ]],
-                ['entry' => 'two']
-            ]);
-
-        $this->assertInstanceOf(Collection::class, $pages->uris());
-        $this->assertCount(3, $pages->uris());
-        $this->assertEquals([
-            'root' => '/the-parent',
-            'one' => '/the-parent/one',
-            'two' => '/the-parent/two'
-        ], $pages->uris()->all());
+        $this->assertEquals(['one', 'two'], $list->map->reference()->all());
     }
 
     /** @test */
@@ -142,6 +104,8 @@ class PagesTest extends TestCase
             'one-two' => '/root/one/one-two',
             'one-two-one' => '/root/one/one-two/one-two-one',
             'two' => '/root/two',
-        ], $pages->flattenedPages()->map->uri()->all());
+        ], $pages->flattenedPages()->mapWithKeys(function ($page) {
+            return [$page->reference() => $page->uri()];
+        })->all());
     }
 }

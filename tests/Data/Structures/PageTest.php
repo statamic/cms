@@ -108,7 +108,7 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(2, $pages->all());
         $this->assertEveryItemIsInstanceOf(Page::class, $pages->all());
-        $this->assertEquals(['one', 'two'], $pages->all()->keys()->all());
+        $this->assertEquals(['one', 'two'], $pages->all()->map->reference()->all());
     }
 
     /** @test */
@@ -163,6 +163,8 @@ class PageTest extends TestCase
             'two' => '/two',
             'three' => '/two/three',
             'four' => '/two/three/four',
-        ], $flattened->map->uri()->all());
+        ], $flattened->mapWithKeys(function ($page) {
+            return [$page->reference() => $page->uri()];
+        })->all());
     }
 }
