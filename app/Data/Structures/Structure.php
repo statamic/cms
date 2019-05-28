@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Structures;
 
+use Statamic\API\Str;
 use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Stache;
@@ -40,7 +41,11 @@ class Structure implements StructureContract
 
     public function title($title = null)
     {
-        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?: Str::humanize($this->handle());
+            })->args(func_get_args());
     }
 
     public function sites($sites = null)
