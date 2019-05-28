@@ -187,6 +187,8 @@ class Form implements FormContract
      */
     public function delete()
     {
+        $this->submissions()->each->delete();
+
         $this->formset()->delete();
     }
 
