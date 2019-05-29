@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Collections'))
+@section('title', __('Taxonomies'))
 
 @section('content')
 

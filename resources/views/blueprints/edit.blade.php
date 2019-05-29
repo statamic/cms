@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', __('Edit Blueprint'))
 
 @section('content')
 

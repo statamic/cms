@@ -593,3 +593,10 @@ if (! function_exists('debugbar')) {
         return optional();
     }
 }
+
+if (! function_exists('crumb')) {
+    function crumb(...$values)
+    {
+        return implode(' ‹ ', array_map("__", $values));
+    }
+}

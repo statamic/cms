@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', __('Create Structure'))
 
 @section('content')
     <structure-wizard

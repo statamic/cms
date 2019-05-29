@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', crumb('Submission ' . $submission->id(), $submission->form->title(), 'Forms'))
 
 @section('content')
 

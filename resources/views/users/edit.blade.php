@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', __('Edit User'))
 
 @section('content')
 
@@ -50,8 +51,3 @@
     </user-publish-form>
 
 @endsection
-
-
-
-
-

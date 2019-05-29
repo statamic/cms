@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', crumb($collection->title(), 'Collections'))
 
 @section('content')
 

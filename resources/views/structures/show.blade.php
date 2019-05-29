@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', crumb($structure->title(), 'Structures'))
 
 @section('content')
 
