@@ -46,10 +46,8 @@
                     <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                     <template v-else>
                         <div class="flex justify-center mt-3">
-                            <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
-                        </div>
-                        <div class="flex justify-center mt-2">
-                            <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                            <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
+                            <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
                         </div>
                     </template>
                 </div>
