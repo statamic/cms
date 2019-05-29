@@ -1,5 +1,5 @@
 <template>
-    <li @click="selectAndClose"><a v-text="text"></a></li>
+    <div class="li" @click="selectAndClose"><a v-text="text"></a></div>
 </template>
 
 <script>
