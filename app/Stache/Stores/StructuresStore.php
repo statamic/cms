@@ -263,7 +263,7 @@ class StructuresStore extends BasicStore
 
     public function loadingComplete()
     {
-        collect($this->treeQueue)->unique()->each(function ($structure) {
+        collect($this->treeQueue)->unique->handle()->each(function ($structure) {
             if (! $structure->collection()) {
                 // Only structures linked to a collection should cause entry URIs to be updated.
                 return;
