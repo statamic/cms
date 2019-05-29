@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <div id="statamic" :style="{ marginRight: pane ? `24rem` : null }">
+    <div id="statamic" :style="{ marginRight: panes.length ? `24rem` : null }">
 
       <session-expiry
           email="{{ my()->email() }}"

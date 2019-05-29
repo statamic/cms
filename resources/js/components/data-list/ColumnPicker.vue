@@ -5,7 +5,7 @@
             <span>{{ __('Columns') }}</span>
         </button>
 
-        <pane name="columns" v-if="customizing">
+        <pane name="columns" v-if="customizing" @closed="dismiss">
             <div>
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">

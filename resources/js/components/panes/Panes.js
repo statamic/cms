@@ -2,15 +2,19 @@ import Vue from 'vue'
 
 class Panes {
     constructor(instance) {
-        this.instance = instance;
+        this.panes = instance.$root.panes;
     }
 
     open(vm) {
-        this.instance.$root.pane = true;
+        this.panes.push(vm);
+
+        if (this.panes.length > 1) {
+            this.panes.slice(0, -1).forEach(pane => pane.close());
+        }
     }
 
-    close() {
-        this.instance.$root.pane = false;
+    close(vm) {
+        this.panes.splice(this.panes.indexOf(vm), 1);
     }
 }
 

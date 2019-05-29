@@ -140,7 +140,7 @@ Statamic.app({
         navOpen: true,
         modals: [],
         stacks: [],
-        pane: false,
+        panes: [],
     },
 
     computed: {
