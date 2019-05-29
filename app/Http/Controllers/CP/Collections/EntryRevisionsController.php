@@ -38,7 +38,7 @@ class EntryRevisionsController extends CpController
         ]);
     }
 
-    public function show(Request $request, $collection, $entry, $slug, $site, $revision)
+    public function show(Request $request, $collection, $entry, $slug, $revision)
     {
         $entry = $entry->makeFromRevision($revision);
 
@@ -78,15 +78,17 @@ class EntryRevisionsController extends CpController
             'readOnly' => $request->user()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
-                $exists = $entry->entry()->existsIn($handle);
-                $localized = $entry->entry()->inOrClone($handle);
+                $localized = $entry->in($handle);
+                $exists = $localized !== null;
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $entry->locale(),
                     'exists' => $exists,
+                    'root' => $exists ? $localized->isRoot() : false,
+                    'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
                     'published' => $exists ? $localized->published() : false,
-                    'url' => $localized->editUrl(),
+                    'url' => $exists ? $localized->editUrl() : null,
                 ];
             })->all()
         ];
