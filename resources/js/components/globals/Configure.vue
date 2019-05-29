@@ -83,7 +83,7 @@ export default {
             errors: {},
             title: this.initialTitle,
             handle: this.initialHandle,
-            blueprint: this.initialBlueprint ? [this.initialBlueprint] : null
+            blueprint: this.initialBlueprint ? [this.initialBlueprint] : [],
         }
     },
 
