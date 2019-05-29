@@ -8,20 +8,7 @@
 
         <loading-graphic v-if="loading"></loading-graphic>
 
-        <div v-if="pages.length == 0">
-            <div class="no-results border-dashed border-2">
-                <div class="text-center max-w-md mx-auto mt-5 rounded-lg px-4 py-8">
-                    <slot name="no-pages-svg" />
-                    <h1 class="my-3">Add the first page now</h1>
-                    <p class="text-grey mb-3">
-                        {{ __('Structures can contain entries arranged into a heirarchy from which you can create URLs or navigation areas.') }}
-                    </p>
-                    <button class="btn btn-primary btn-lg" v-text="__('Add first page')" @click="openPageSelector" />
-                </div>
-            </div>
-        </div>
-
-        <div v-if="pages.length" class="flex flex-row-reverse justify-between">
+        <div class="flex flex-row-reverse justify-between">
 
             <div class="publish-sidebar">
                 <div class="publish-section">
@@ -100,7 +87,18 @@
                 </div>
             </div>
 
-            <div class="page-tree w-full">
+            <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
+                <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
+                    <slot name="no-pages-svg" />
+                    <h1 class="my-3">Create the first page now</h1>
+                    <p class="text-grey mb-3">
+                        {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
+                    </p>
+                    <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
+                </div>
+            </div>
+
+            <div class="page-tree w-full" v-show="pages.length">
                 <draggable-tree
                     draggable
                     ref="tree"
