@@ -169,6 +169,10 @@ class StructuresStore extends BasicStore
     public function delete(Structure $structure)
     {
         File::delete($structure->path());
+
+        foreach ($structure->trees() as $tree) {
+            File::delete($tree->path());
+        }
     }
 
     protected function toSaveableArray($structure)
