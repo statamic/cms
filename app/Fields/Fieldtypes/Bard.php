@@ -120,6 +120,10 @@ class Bard extends Replicator
 
     public function preProcess($value)
     {
+        if (empty($value)) {
+            return '[]';
+        }
+
         if (is_string($value)) {
             $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
