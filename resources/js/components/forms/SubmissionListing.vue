@@ -22,10 +22,12 @@
                     </template>
                     <template slot="actions" slot-scope="{ row: submission, index }">
                         <dropdown-list>
-                            <ul class="dropdown-menu">
-                                <li><a :href="submission.url">View</a></li>
-                                <li class="warning" v-if="submission.deleteable"><a @click.prevent="destroy(submission.id, index)">Delete</a></li>
-                            </ul>
+                            <dropdown-item :text="__('View')" :redirect="submission.url" />
+                            <dropdown-item
+                                v-if="submission.deleteable"
+                                :text="__('Delete')"
+                                class="warning"
+                                @selected="destroy(submission.id, index)" />
                         </dropdown-list>
                     </template>
                 </data-list-table>

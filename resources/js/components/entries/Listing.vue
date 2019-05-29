@@ -70,18 +70,16 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
-                                <div class="dropdown-menu">
-                                    <div class="li"><a :href="entry.permalink">{{ __('View') }}</a></div>
-                                    <div class="li"><a :href="entry.edit_url">{{ __('Edit') }}</a></div>
-                                    <div class="li divider" />
-                                    <data-list-inline-actions
-                                        :item="entry.id"
-                                        :url="actionUrl"
-                                        :actions="actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </div>
+                                <dropdown-item :text="__('View')" :redirect="entry.permalink" />
+                                <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" />
+                                <div class="divider" />
+                                <data-list-inline-actions
+                                    :item="entry.id"
+                                    :url="actionUrl"
+                                    :actions="actions"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                />
                             </dropdown-list>
                         </template>
                     </data-list-table>

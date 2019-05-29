@@ -38,16 +38,14 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
-                                <div class="dropdown-menu">
-                                    <div class="li"><a :href="user.edit_url" v-text="__('Edit')"></a></div>
-                                    <data-list-inline-actions
-                                        :item="user.id"
-                                        :url="actionUrl"
-                                        :actions="actions"
-                                        @started="actionStarted"
-                                        @completed="actionCompleted"
-                                    />
-                                </div>
+                                <dropdown-item :text="__('Edit')" :redirect="user.edit_url" />
+                                <data-list-inline-actions
+                                    :item="user.id"
+                                    :url="actionUrl"
+                                    :actions="actions"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                />
                             </dropdown-list>
                         </template>
                         <data-list-bulk-actions

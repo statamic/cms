@@ -111,9 +111,7 @@
                                         </td>
                                         <td class="text-right" :colspan="columns.length">
                                             <dropdown-list>
-                                                <ul class="dropdown-menu">
-                                                    <li><a @click="editedFolderPath = folder.path" v-text="__('Edit')"></a></li>
-                                                </ul>
+                                                <dropdown-item :text="__('Edit')" @selected="editedFolderPath = folder.path" />
                                             </dropdown-list>
 
                                             <folder-editor
@@ -137,17 +135,15 @@
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
-                                        <div class="dropdown-menu">
-                                            <li><a @click="edit(asset.id)">Edit</a></li>
-                                            <div class="li divider" />
-                                            <data-list-inline-actions
-                                                :item="asset.id"
-                                                :url="actionUrl"
-                                                :actions="actions"
-                                                @started="actionStarted"
-                                                @completed="actionCompleted"
-                                            />
-                                        </div>
+                                        <dropdown-item :text="__('Edit')" @selected="edit(asset.id)" />
+                                        <div class="divider" />
+                                        <data-list-inline-actions
+                                            :item="asset.id"
+                                            :url="actionUrl"
+                                            :actions="actions"
+                                            @started="actionStarted"
+                                            @completed="actionCompleted"
+                                        />
                                     </dropdown-list>
                                 </template>
 

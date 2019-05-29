@@ -10,10 +10,12 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: global, index }">
                     <dropdown-list>
-                        <ul class="dropdown-menu">
-                            <li><a :href="global.edit_url">Edit</a></li>
-                            <li class="warning" v-if="global.deleteable"><a @click.prevent="destroy(global.id, index)">Delete</a></li>
-                        </ul>
+                        <dropdown-item :text="__('Edit')" :redirect="global.edit_url" />
+                        <dropdown-item
+                            v-if="global.deleteable"
+                            :text="__('Delete')"
+                            class="warning"
+                            @selected="destroy(global.id, index)" />
                     </dropdown-list>
                 </template>
             </data-list-table>

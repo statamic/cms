@@ -8,12 +8,11 @@
             :selections="1"
             @selected="run"
         >
-            <div
-                slot-scope="{ action, select }"
-                class="li"
-                :class="{ warning: action.dangerous }"
-            >
-                <a v-text="action.title" @click="select" />
+            <div slot-scope="{ action, select }">
+                <button
+                    v-text="action.title"
+                    :class="{ warning: action.dangerous }"
+                    @click="select" />
             </div>
         </data-list-action>
     </div>

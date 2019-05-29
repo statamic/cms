@@ -7,12 +7,12 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: form, index }">
                     <dropdown-list>
-                        <ul class="dropdown-menu">
-                            <li><a :href="form.edit_url">Edit</a></li>
-                            <li class="warning" v-if="form.deleteable">
-                                <a @click.prevent="confirmDeleteRow(form.id, index)">Delete</a>
-                            </li>
-                        </ul>
+                        <dropdown-item :text="__('Edit')" :redirect="form.edit_url" />
+                        <dropdown-item
+                            v-if="form.deleteable"
+                            :text="__('Delete')"
+                            class="warning"
+                            @selected="confirmDeleteRow(form.id, index)" />
                     </dropdown-list>
 
                     <confirmation-modal
