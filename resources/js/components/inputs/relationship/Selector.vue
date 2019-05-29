@@ -108,7 +108,10 @@ export default {
         site: String,
         search: Boolean,
         canCreate: Boolean,
-        exclusions: Array,
+        exclusions: {
+            type: Array,
+            default: () => []
+        }
     },
 
     data() {
