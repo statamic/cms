@@ -71,7 +71,7 @@
                         >
                             <template #actions="{ shouldShowSidebar }">
 
-                                <div class="p-2" :class="{ 'flex justify-between items-center p-1 card': !shouldShowSidebar }">
+                                <div class="p-2" :class="{ 'flex flex-row-reverse justify-between items-center px-0': !shouldShowSidebar }">
 
                                     <div :class="{ 'mb-2': shouldShowSidebar, 'min-w-xs': !shouldShowSidebar }">
                                         <button

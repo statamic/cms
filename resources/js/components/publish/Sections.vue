@@ -3,8 +3,6 @@
     <element-container @resized="containerWidth = $event.width">
     <div>
 
-        <portal-target name="actions" />
-
         <div class="publish-tabs tabs" v-show="mainSections.length > 1">
             <a v-for="section in mainSections"
                 :key="section.handle"
@@ -59,6 +57,8 @@
                 </div>
             </div>
         </div>
+
+        <portal-target name="actions" />
 
     </div>
     </element-container>
