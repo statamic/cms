@@ -13,7 +13,7 @@
                     <button
                         type="button"
                         class="btn-close"
-                        @click="filtering = false"
+                        @click="dismiss"
                         v-html="'&times'" />
                 </div>
 
@@ -114,6 +114,10 @@ export default {
 
     methods: {
 
+        dismiss() {
+            this.filtering = false
+        },
+
         filterChanged(handle, value) {
             let filters = this.activeFilters;
             if (value) {
@@ -153,8 +157,11 @@ export default {
                     this.$notify.error(__('Something went wrong'));
                 });
         }
+    },
 
-    }
+    created() {
+        this.$mousetrap.bind('esc', this.dismiss)
+    },
 
 }
 </script>

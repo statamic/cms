@@ -13,7 +13,7 @@
                     <button
                         type="button"
                         class="btn-close"
-                        @click="customizing = false"
+                        @click="dismiss"
                         v-html="'&times'" />
                 </div>
 
@@ -91,6 +91,10 @@ export default {
 
     methods: {
 
+        dismiss() {
+            this.customizing = false
+        },
+
         save() {
             if (! this.selectedColumns.length) {
                 return this.$notify.error(__('At least 1 column is required'));
@@ -126,7 +130,10 @@ export default {
                     this.$notify.error(__('Something went wrong'));
                 });
         }
+    },
 
-    }
+    created() {
+        this.$mousetrap.bind('esc', this.dismiss)
+    },
 }
 </script>
