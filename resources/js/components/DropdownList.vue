@@ -7,7 +7,9 @@
                 </a>
             </slot>
         </div>
-        <slot></slot>
+        <ul class="dropdown-menu">
+            <slot></slot>
+        </ul>
     </div>
 </template>
 
