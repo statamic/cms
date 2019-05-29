@@ -19,6 +19,10 @@ class Assets extends Fieldtype
         'folder' => ['type' => 'asset_folder', 'max_items' => 1],
         'restrict' => ['type' => 'toggle'],
         'max_files' => ['type' => 'integer'],
+        'allow_uploads' => [
+            'type' => 'toggle',
+            'default' => true
+        ],
         'mode' => [
             'type' => 'select',
             'options' => [

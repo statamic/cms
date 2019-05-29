@@ -9,6 +9,7 @@
             v-if="containerSpecified"
             ref="uploader"
             :container="container"
+            :enabled="config.allow_uploads"
             :path="folder"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
@@ -20,7 +21,7 @@
                     <loading-graphic :inline="true" />
                 </div>
 
-                <div class="drag-notification" v-show="containerSpecified && dragging && !showSelector">
+                <div class="drag-notification" v-if="config.allow_uploads" v-show="containerSpecified && dragging && !showSelector">
                     <svg-icon name="upload" class="h-12 w-12 mb-2" />
                     {{ __('Drop File to Upload') }}
                 </div>
@@ -46,12 +47,16 @@
                             {{ __('Assets') }}
                         </button>
 
-                        <p class="ml-2 text-xs text-grey-60">
+                        <p class="ml-2 text-xs text-grey-60" v-if="config.allow_uploads">
                             <button type="button" class="text-blue underline hover:text-blue-dark" @click.prevent="uploadFile">
                                 {{ __('Select file') }}
                             </button>
                             <span v-text="__('or drag & drop to upload.')"></span>
                         </p>
+                        <p class="ml-2 text-xs text-grey-60" v-else>
+                            {{ __('Uploads are disabled')}}
+                        </p>
+
 
                         <button
                             type="button"
