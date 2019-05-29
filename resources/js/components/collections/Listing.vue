@@ -12,7 +12,7 @@
                             v-if="collection.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @selected="confirmDeleteRow(collection.id, index)" />
+                            @click="confirmDeleteRow(collection.id, index)" />
                     </dropdown-list>
 
                     <confirmation-modal

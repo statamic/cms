@@ -21,7 +21,7 @@ export default {
                 return;
             }
 
-            this.$emit('selected');
+            this.$emit('click');
 
             this.$parent.close();
         }
