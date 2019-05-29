@@ -7,7 +7,7 @@
                 </a>
             </slot>
         </div>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu" v-if="showListIf">
             <slot></slot>
         </div>
     </div>
@@ -17,12 +17,22 @@
 import { mixin as clickaway } from 'vue-clickaway';
 
 export default {
+
     mixins: [ clickaway ],
+
+    props: {
+        showListIf: {
+            type: Boolean,
+            default: true
+        }
+    },
+
     data() {
         return {
             isOpen: false
         }
     },
+
     methods: {
         toggle() {
             this.isOpen = ! this.isOpen;
@@ -34,5 +44,6 @@ export default {
             this.isOpen = false
         }
     }
+
 }
 </script>
