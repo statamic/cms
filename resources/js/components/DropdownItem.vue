@@ -1,5 +1,5 @@
 <template>
-    <div class="li" @click="selectAndClose"><a v-text="text"></a></div>
+    <button class="block li" v-text="text" @click="selectAndClose" />
 </template>
 
 <script>
