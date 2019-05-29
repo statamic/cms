@@ -39,11 +39,11 @@
 
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-section">
-                    <portal to="actions" :disabled="shouldShowSidebar">
-                        <div :class="{ '': shouldShowSidebar, 'mb-3': !shouldShowSidebar }">
+                    <div class="publish-section-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
+                        <portal to="actions" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
-                        </div>
-                    </portal>
+                        </portal>
+                    </div>
 
                     <publish-fields
                         v-if="shouldShowSidebar && sidebarSection"

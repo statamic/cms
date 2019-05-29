@@ -90,11 +90,12 @@ code.parent-url {
 .publish-sidebar {
     @apply ml-4 flex-no-shrink w-1/4 max-w-sm;
 
-    .publish-section {
+    .publish-section-actions {
+        @apply bg-white border-b z-10 rounded-t;
         position: sticky;
-        top: 10px;
+        top: 0;
     }
-
+    
     .publish-fields .form-group {
         @apply p-2;
     }
