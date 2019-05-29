@@ -14,7 +14,7 @@
                 </div>
             </h1>
 
-            <div class="pt-px text-2xs text-grey-60 flex" v-if="readOnly">
+            <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
             <div class="pt-px text-2xs text-grey-60" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
