@@ -110,7 +110,7 @@
                                         </button>
 
                                         <button
-                                            class="flex items-center m-1 whitespace-no-wrap"
+                                            class="flex items-center m-1 hover:text-grey-90 whitespace-no-wrap"
                                             v-if="isBase"
                                             @click="openLivePreview">
                                             <svg-icon name="search" class="w-4 mr-sm" /> {{ __('Preview') }}
