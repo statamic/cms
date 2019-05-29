@@ -38,7 +38,7 @@
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-section">
                     <div class="publish-section-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
-                        <portal to="actions" :disabled="shouldShowSidebar">
+                        <portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </portal>
                     </div>
@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <portal-target name="actions" />
+        <portal-target :name="actionsPortal" />
 
     </div>
     </element-container>
@@ -130,6 +130,10 @@ export default {
                 errors[field] = this.sectionFields[field];
             });
             return errors;
+        },
+
+        actionsPortal() {
+            return `publish-actions-${this.storeName}`;
         }
 
     },

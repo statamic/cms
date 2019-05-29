@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <portal to="live-preview-fields" :disabled="!previewing">
+        <portal :to="livePreviewFieldsPortal" :disabled="!previewing">
             <provider :variables="provides">
                 <slot name="default" />
             </provider>
@@ -41,7 +41,7 @@
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
                             <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{ 'p-3 bg-grey-30': poppedOut }">
-                                <portal-target name="live-preview-fields" />
+                                <portal-target :name="livePreviewFieldsPortal" />
                             </div>
 
                             <resizer
@@ -143,6 +143,10 @@ export default {
 
         inputs() {
             return this.$config.get('livePreview.inputs', {});
+        },
+
+        livePreviewFieldsPortal() {
+            return `live-preview-fields-${this.storeName}`;
         }
 
     },
