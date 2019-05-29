@@ -95,10 +95,6 @@ export default {
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
     },
 
-    render() {
-        return this.$scopedSlots.default({ })
-    },
-
     methods: {
 
         clickedHitArea() {
