@@ -42,6 +42,16 @@ export default {
         buttonClass() {
             return this.danger ? 'btn-danger' : 'btn-primary';
         }
-    }
+    },
+
+    methods: {
+        dismiss() {
+            this.$emit('cancel')
+        }
+    },
+
+    created() {
+        this.$mousetrap.bind('esc', this.dismiss)
+    },
 }
 </script>
