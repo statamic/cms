@@ -8,7 +8,7 @@
     // padding-top: 48px;
     z-index: 999; // arbitrary to make it sit on top of random stuff.
 
-    .vue-portal-target {
+    > .vue-portal-target {
         @apply absolute pin;
     }
 
