@@ -67,7 +67,11 @@ export default {
             }
         }
 
-    }
+    },
+
+    created() {
+        this.$mousetrap.bind('esc', this.cancel)
+    },
 
 }
 </script>
