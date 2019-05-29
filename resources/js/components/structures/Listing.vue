@@ -1,5 +1,5 @@
 <template>
-    <data-list :columns="columns" :rows="initialRows">
+    <data-list :columns="columns" :rows="rows">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: structure }">
@@ -10,10 +10,21 @@
                         <ul class="dropdown-menu">
                             <li><a :href="structure.edit_url">Edit</a></li>
                             <li class="warning" v-if="structure.deleteable">
-                                <a @click.prevent="destroy(structure.id, index)">Delete</a>
+                                <a @click.prevent="confirmDeleteRow(structure.id, index)">Delete</a>
                             </li>
                         </ul>
                     </dropdown-list>
+
+                    <confirmation-modal
+                        v-if="deletingRow !== false"
+                        :title="deletingModalTitle"
+                        :bodyText="__('Are you sure you want to delete this structure?')"
+                        :buttonText="__('Delete')"
+                        :danger="true"
+                        @confirm="deleteRow('/cp/structures')"
+                        @cancel="cancelDeleteRow"
+                    >
+                    </confirmation-modal>
                 </template>
             </data-list-table>
         </div>
@@ -21,7 +32,11 @@
 </template>
 
 <script>
+import DeletesListingRow from '../DeletesListingRow.js'
+
 export default {
+
+    mixins: [DeletesListingRow],
 
     props: [
         'initialRows',
@@ -33,14 +48,6 @@ export default {
             columns: [
                 { label: __('Title'), field: 'title', visible: true },
             ]
-        }
-    },
-
-    methods: {
-        destroy(id) {
-            if (confirm('Are you sure?')) {
-                this.$axios.delete(`/cp/structures/${id}`);
-            }
         }
     }
 
