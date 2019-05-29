@@ -15,34 +15,37 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div slot-scope="{ }">
+            <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
                     <div class="data-list-header">
                         <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
-                        <button class="btn btn-flat"
-                            v-if="showReorderButton"
-                            @click="reorder"
-                            v-text="__('Reorder')"
-                        />
-                        <template v-if="reordering">
-                            <button class="btn btn-flat mr-1" @click="saveOrder">Save Order</button>
-                            <button class="btn btn-flat" @click="cancelReordering">Cancel</button>
-                        </template>
                         <data-list-bulk-actions
                             :url="actionUrl"
                             :actions="entryActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
-                        <data-list-filters
-                            :filters="filters"
-                            :active-filters="activeFilters"
-                            :per-page="perPage"
-                            :preferences-key="preferencesKey('filters')"
-                            @filters-changed="filtersChanged"
-                            @per-page-changed="perPageChanged" />
-                        <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        <template v-if="!hasSelections">
+                            <button class="btn btn-flat ml-1"
+                                v-if="showReorderButton"
+                                @click="reorder"
+                                v-text="__('Reorder')"
+                            />
+                            <template v-if="reordering">
+                                <button class="btn btn-flat ml-1" @click="saveOrder">Save Order</button>
+                                <button class="btn btn-flat ml-1" @click="cancelReordering">Cancel</button>
+                            </template>
+                            <data-list-filters
+                                class="ml-1"
+                                :filters="filters"
+                                :active-filters="activeFilters"
+                                :per-page="perPage"
+                                :preferences-key="preferencesKey('filters')"
+                                @filters-changed="filtersChanged"
+                                @per-page-changed="perPageChanged" />
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
+                        </template>
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />

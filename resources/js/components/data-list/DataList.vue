@@ -128,7 +128,10 @@ export default {
     },
 
     render() {
-        return this.$scopedSlots.default({ rows: this.filteredRows });
+        return this.$scopedSlots.default({
+            rows: this.filteredRows,
+            hasSelections: this.sharedState.selections.length > 0,
+        });
     }
 
 }

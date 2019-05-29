@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" @click="filtering = !filtering">
+        <button class="btn btn-flat btn-icon-only dropdown-toggle relative" @click="filtering = !filtering">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
