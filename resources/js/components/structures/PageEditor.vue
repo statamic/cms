@@ -4,7 +4,7 @@
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                {{ __('Page') }}
+                {{ __('Create Page Link') }}
                 <button
                     type="button"
                     class="btn-close"
@@ -18,12 +18,12 @@
                     <form-group
                         display="Title"
                         handle="title"
-                        instructions="The display text for this link. Leave blank to use the URL."
+                        instructions="The link display text. Leave blank to use the URL."
                         v-model="title"
                     />
                     <form-group
                         display="URL"
-                        instructions="May be an internal or external URL. Leave blank if you want a text-only page (for headers, etc)"
+                        instructions="Enter any internal or external URL, or leave blank for a text-only item."
                         handle="url"
                         v-model="url"
                     />
@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="p-3">
-                    <button @click="submit" class="btn btn-primary w-full">Submit</button>
+                    <button @click="submit" class="btn btn-primary w-full">{{ __('Submit') }}</button>
                 </div>
 
             </div>

@@ -73,10 +73,10 @@
 
                     <div class="publish-fields">
                         <div class="form-group text-sm">
-                            <label class="block font-medium mb-1">Pages</label>
-                            <div class="help-block -mt-1">A page can be a URL, a reference to an entry, or even just some text.</div>
+                            <label class="block font-medium mb-1">{{ __('Page Links') }}</label>
+                            <div class="help-block -mt-1">A page link can be a URL, a reference to an entry, or even simple text.</div>
                             <button @click="createPage" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none">
-                                <svg-icon name="hierarchy-files" class="w-4 h-4 mr-sm" /> Create Page
+                                <svg-icon name="hierarchy-files" class="w-4 h-4 mr-sm" /> {{ __('Create Link') }}
                             </button>
                         </div>
 
