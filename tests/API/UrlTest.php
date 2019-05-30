@@ -74,11 +74,11 @@ class UrlTest extends TestCase
     public function testDeterminesExternalUrl()
     {
         Site::setConfig('sites.en.url', 'http://this-site.com/');
-        $this->assertTrue(URL::isExternalUrl('http://that-site.com'));
-        $this->assertTrue(URL::isExternalUrl('http://that-site.com/'));
-        $this->assertTrue(URL::isExternalUrl('http://that-site.com/some-slug'));
-        $this->assertFalse(URL::isExternalUrl('http://this-site.com'));
-        $this->assertFalse(URL::isExternalUrl('http://this-site.com/'));
-        $this->assertFalse(URL::isExternalUrl('http://this-site.com/some-slug'));
+        $this->assertTrue(URL::isExternal('http://that-site.com'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/'));
+        $this->assertTrue(URL::isExternal('http://that-site.com/some-slug'));
+        $this->assertFalse(URL::isExternal('http://this-site.com'));
+        $this->assertFalse(URL::isExternal('http://this-site.com/'));
+        $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
     }
 }

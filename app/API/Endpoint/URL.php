@@ -244,7 +244,7 @@ class URL
      * @param  string  $url
      * @return boolean
      */
-    public function isExternalUrl($url)
+    public function isExternal($url)
     {
         return ! Pattern::startsWith(
             Str::ensureRight($url, '/'),
