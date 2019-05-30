@@ -1,7 +1,6 @@
 <template>
     <button @click="selectAndClose">
-        <template v-if="text">{{ text }}</template>
-        <slot v-else></slot>
+        <slot>{{ text }}</slot>
     </button>
 </template>
 
