@@ -415,4 +415,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         return $this->collection()->hasStructure();
     }
+
+    public function route()
+    {
+        return $this->collection()->route();
+    }
 }
