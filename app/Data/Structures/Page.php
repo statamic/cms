@@ -220,7 +220,11 @@ class Page implements Entry, Responsable
     public function in($site)
     {
         if ($this->reference) {
-            return $this->entry()->in($site);
+            if (! $entry = $this->entry()->in($site)) {
+                return null;
+            }
+
+            return $this->setEntry($entry->id());
         }
 
         return $this;
