@@ -187,4 +187,13 @@ class Structure implements StructureContract
 
         return true;
     }
+
+    public function entryUri($entry)
+    {
+        return $this->in($entry->locale())
+            ->flattenedPages()
+            ->keyBy->reference()
+            ->get($entry->id())
+            ->uri();
+    }
 }

@@ -22,6 +22,10 @@ trait Routable
 
     public function uri()
     {
+        if ($structure = $this->structure()) {
+            return $structure->entryUri($this);
+        }
+
         if (! $route = $this->collection()->route()) {
             return null;
         }

@@ -50,9 +50,15 @@ class Tree implements Localization
         return $this->structure->handle();
     }
 
-    public function route($route = null)
+    public function route()
     {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args());
+        if (! $collection = $this->structure->collection()) {
+            return null;
+        }
+
+        return is_array($route = $collection->route())
+            ? $route[$this->locale()]
+            : $route;
     }
 
     public function path()
@@ -156,7 +162,6 @@ class Tree implements Localization
     {
         return [
             'path' => $this->initialPath() ?? $this->path(),
-            'route' => $this->route,
             'root' => $this->root,
             'tree' => $this->tree,
         ];

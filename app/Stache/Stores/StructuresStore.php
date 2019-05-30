@@ -45,7 +45,6 @@ class StructuresStore extends BasicStore
                 $structure->addTree(
                     $structure
                         ->makeTree($site)
-                        ->route($tree['route'])
                         ->root($tree['root'])
                         ->tree($tree['tree'] ?? [])
                         ->initialPath($tree['path'])
@@ -78,7 +77,6 @@ class StructuresStore extends BasicStore
         return $structure->addTree(
             $structure
                 ->makeTree($site)
-                ->route($data['route'] ?? null)
                 ->root($data['root'] ?? null)
                 ->tree($data['tree'] ?? [])
         );
@@ -133,7 +131,6 @@ class StructuresStore extends BasicStore
 
         $tree = $structure
             ->makeTree($site)
-            ->route($data['route'] ?? null)
             ->root($data['root'] ?? null)
             ->tree($data['tree'] ?? []);
 

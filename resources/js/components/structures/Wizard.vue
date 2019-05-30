@@ -111,21 +111,6 @@
                     If the collection you intend to use does not exist yet, just choose this structure when you create it.
                 </div>
             </div>
-        </div>
-
-        <div v-if="currentStep === 3">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Pages</h1>
-                <p class="text-grey">Control various options about how the pages in the structure behave.</p>
-            </div>
-            <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'collection'">
-                <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
-                <input type="text" v-model="structure.route" class="input-text">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The route defines the URLs for the entries in the collection. You can use `parent_uri` to if you plan to nest pages.
-                </div>
-            </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Max Depth</label>
                 <input type="number" min="1" step="1" v-model="structure.max_depth" class="input-text">
@@ -144,7 +129,7 @@
                 <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
-                <button tabindex="4" class="btn-primary mx-3" @click="submit" v-if="onLastStep">
+                <button tabindex="4" class="btn-primary mx-3" :disabled="! canComplete" @click="submit" v-if="onLastStep">
                     {{ __('Create structure')}}
                 </button>
             </div>
@@ -163,7 +148,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Purpose', 'Contents', 'Pages'],
+            steps: ['Naming', 'Purpose', 'Contents'],
             currentStep: 0,
             purpose: null,
             structure: {
@@ -187,6 +172,9 @@ export default {
         canContinue() {
             return this.canGoToStep(this.currentStep + 1);
         },
+        canComplete() {
+            return this.canGoToStep(3);
+        }
     },
 
     watch: {
