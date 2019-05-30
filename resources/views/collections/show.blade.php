@@ -11,8 +11,8 @@
             {{ $collection->title() }}
         </h1>
         <dropdown-list class="mr-2">
-            <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}" />
-            <dropdown-item :text="__('Delete Collection')" class="warning" />
+            <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
+            <dropdown-item :text="__('Delete Collection')" class="warning"></dropdown-item>
         </dropdown-list>
         @can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
             <create-entry-button

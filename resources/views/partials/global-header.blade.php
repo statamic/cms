@@ -65,15 +65,16 @@
                 </a>
             </template>
 
-            <li class="px-1">
+            <div class="px-1">
                 <div class="text-base mb-px">{{ my()->email() }}</div>
                 @if (me()->isSuper())
                     <div class="text-2xs mt-px text-grey-60">{{ __('Super Admin') }}</div>
                 @endif
-            </li>
+            </div>
             <div class="divider"></div>
-            <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}" />
-            <dropdown-item :text="__('Logout')" redirect="{{ route('statamic.cp.logout') }}" />
+
+            <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
+            <dropdown-item :text="__('Logout')" redirect="{{ route('statamic.cp.logout') }}"></dropdown-item>
         </dropdown-list>
     </div>
 </div>
