@@ -7,8 +7,10 @@ use Tests\TestCase;
 use Statamic\Data\Entries\Entry;
 use Illuminate\Support\Collection;
 use Statamic\Data\Structures\Page;
+use Statamic\Data\Structures\Tree;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Structures\Pages;
+use Statamic\Data\Structures\Structure;
 use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class PagesTest extends TestCase
@@ -27,9 +29,14 @@ class PagesTest extends TestCase
     /** @test */
     function it_gets_a_list_of_pages()
     {
+        $parent = Mockery::mock(Page::class);
+        $parent->shouldReceive('reference')->andReturn('the-root');
+        $parent->shouldReceive('flattenedPages')->andReturn(collect());
+        $parent->shouldReceive('uri')->andReturn('/root');
+
         $pages = (new Pages)
-            ->setRoute('irrelevant')
-            ->setTree([
+            ->setParent($parent)
+            ->setPages([
                 ['entry' => 'one', 'children' => [
                     ['entry' => 'one-one'],
                     ['entry' => 'one-two', 'children' => [
@@ -41,53 +48,24 @@ class PagesTest extends TestCase
 
         $list = $pages->all();
         $this->assertInstanceOf(Collection::class, $list);
-        $this->assertCount(2, $list);
+        $this->assertCount(3, $list);
         $this->assertEveryItemIsInstanceOf(Page::class, $list);
-        $this->assertEquals(['one', 'two'], $list->map->reference()->all());
+        $this->assertEquals(['the-root', 'one', 'two'], $list->map->reference()->all());
     }
 
     /** @test */
     function it_gets_flattened_pages()
     {
-        EntryAPI::shouldReceive('find')->with('one')
-            ->andReturn(new class extends Entry {
-                public function id($id = null) { return 'one'; }
-                public function slug($slug = null) { return 'one'; }
-            });
-
-        EntryAPI::shouldReceive('find')->with('one-one')
-            ->andReturn(new class extends Entry {
-                public function id($id = null) { return 'one-one'; }
-                public function slug($slug = null) { return 'one-one'; }
-            });
-
-        EntryAPI::shouldReceive('find')->with('one-two')
-            ->andReturn(new class extends Entry {
-                public function id($id = null) { return 'one-two'; }
-                public function slug($slug = null) { return 'one-two'; }
-            });
-
-        EntryAPI::shouldReceive('find')->with('one-two-one')
-            ->andReturn(new class extends Entry {
-                public function id($id = null) { return 'one-two-one'; }
-                public function slug($slug = null) { return 'one-two-one'; }
-            });
-
-        EntryAPI::shouldReceive('find')->with('two')
-            ->andReturn(new class extends Entry {
-                public function id($id = null) { return 'two'; }
-                public function slug($slug = null) { return 'two'; }
-            });
-
         $parent = Mockery::mock(Page::class);
         $parent->shouldReceive('reference')->andReturn('the-root');
         $parent->shouldReceive('flattenedPages')->andReturn(collect());
         $parent->shouldReceive('uri')->andReturn('/root');
 
         $pages = (new Pages)
+            ->setTree(new Tree)
             ->setParent($parent)
             ->setRoute('{parent_uri}/{slug}')
-            ->setTree([
+            ->setPages([
                 ['entry' => 'one', 'children' => [
                     ['entry' => 'one-one'],
                     ['entry' => 'one-two', 'children' => [
@@ -98,14 +76,12 @@ class PagesTest extends TestCase
             ]);
 
         $this->assertEquals([
-            'the-root' => '/root',
-            'one' => '/root/one',
-            'one-one' => '/root/one/one-one',
-            'one-two' => '/root/one/one-two',
-            'one-two-one' => '/root/one/one-two/one-two-one',
-            'two' => '/root/two',
-        ], $pages->flattenedPages()->mapWithKeys(function ($page) {
-            return [$page->reference() => $page->uri()];
-        })->all());
+            'the-root',
+            'one',
+            'one-one',
+            'one-two',
+            'one-two-one',
+            'two',
+        ], $pages->flattenedPages()->map->reference()->all());
     }
 }

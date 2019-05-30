@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Responsable;
 
 class Page implements Entry, Responsable
 {
+    protected $tree;
     protected $reference;
     protected $entry;
     protected $route;
@@ -119,6 +120,10 @@ class Page implements Entry, Responsable
             return;
         }
 
+        if (! $this->structure()->collection()) {
+            return $this->entry()->uri();
+        }
+
         return app(UrlBuilder::class)
             ->content($this)
             ->merge([
@@ -147,6 +152,13 @@ class Page implements Entry, Responsable
         return $this->isRoot;
     }
 
+    public function setTree($tree)
+    {
+        $this->tree = $tree;
+
+        return $this;
+    }
+
     public function setRoot(bool $isRoot)
     {
         $this->isRoot = $isRoot;
@@ -164,7 +176,8 @@ class Page implements Entry, Responsable
     public function pages()
     {
         $pages = (new Pages)
-            ->setTree($this->children ?? [])
+            ->setTree($this->tree)
+            ->setPages($this->children ?? [])
             ->setParent($this)
             ->prependParent(false);
 
@@ -229,5 +242,10 @@ class Page implements Entry, Responsable
         }
 
         throw new \LogicException('A page without a reference to an entry cannot be rendered.');
+    }
+
+    public function structure()
+    {
+        return $this->tree->structure();
     }
 }
