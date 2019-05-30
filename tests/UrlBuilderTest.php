@@ -23,24 +23,21 @@ class UrlBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->entry = \Statamic\API\Entry::make()
+        $entry = \Statamic\API\Entry::make()
             ->id('post')
             ->collection(
                 \Statamic\API\Collection::create('example')->dated(true)
-            );
+            )
+            ->slug('post')
+            ->date('2015-01-02')
+            ->data(['foo' => 'bar', 'slashed' => 'foo/bar']);
 
-        $this->entry->in('en', function ($loc) {
-            $loc
-                ->slug('post')
-                ->order('2015-01-02')
-                ->data(['foo' => 'bar', 'slashed' => 'foo/bar']);
-        });
-
-        $this->entry->addLocalization(
-            $this->entry->inOrClone('fr')->slug('le-post')
+        $entry->addLocalization(
+            $entry->makeLocalization('fr')->slug('le-post')
         );
 
-        $this->builder = app('Statamic\Contracts\Data\Content\UrlBuilder')->content($this->entry);
+        $this->builder = app('Statamic\Contracts\Data\Content\UrlBuilder')->content($entry);
+        $this->entry = $entry;
     }
 
     public function testBuildsSimpleUrl()
@@ -50,7 +47,6 @@ class UrlBuilderTest extends TestCase
 
     public function testBuildsDateUrl()
     {
-        $this->markTestSkipped(); // TODO: Come back when entries can return dates again.
         $this->assertEquals('/blog/2015/01/02/post', $this->builder->build('/blog/{year}/{month}/{day}/{slug}'));
     }
 
