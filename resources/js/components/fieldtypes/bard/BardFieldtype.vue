@@ -58,14 +58,15 @@
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list ref="setSelectorDropdown">
-                        <button type="button" class="btn btn-round" slot="trigger">
-                            <span class="icon icon-plus text-grey-80 antialiased"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li v-for="set in config.sets" :key="set.handle">
-                                <a @click="addSet(set.handle)" v-text="set.display || set.handle" />
-                            </li>
-                        </ul>
+                        <template v-slot:trigger>
+                            <button type="button" class="btn btn-round">
+                                <span class="icon icon-plus text-grey-80 antialiased"></span>
+                            </button>
+                        </template>
+
+                        <div v-for="set in config.sets" :key="set.handle">
+                            <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
+                        </div>
                     </dropdown-list>
                 </div>
             </editor-floating-menu>

@@ -30,10 +30,8 @@
 
         <div class="pr-1 flex items-center" v-if="!readOnly">
             <dropdown-list>
-                <ul class="dropdown-menu">
-                    <li v-if="editable"><a @click.prevent="edit" v-text="__('Edit')"></a></li>
-                    <li class="warning"><a @click.prevent="$emit('removed')" v-text="__('Unlink')"></a></li>
-                </ul>
+                <dropdown-item :text="__('Edit')" @click="edit" v-if="editable" />
+                <dropdown-item :text="__('Unlink')" class="warning" @click="$emit('removed')" />
             </dropdown-list>
         </div>
     </div>

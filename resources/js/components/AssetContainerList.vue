@@ -8,7 +8,7 @@
                 <template slot="actions" slot-scope="{ row: container, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="container.edit_url" />
-                        <dropdown-item :text="__('Delete')" class="warning" @selected="destroy(container, index)" />
+                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(container, index)" />
                     </dropdown-list>
                 </template>
             </data-list-table>

@@ -15,11 +15,9 @@
 
             <div class="pr-1">
                 <dropdown-list>
-                    <ul class="dropdown-menu">
-                        <li><a @click.prevent="$emit('create-page')">{{ __('Create Page') }}</a></li>
-                        <li><a @click.prevent="$emit('create-entry')">{{ __('Create Page from Entry') }}</a></li>
-                        <li class="warning"><a href="" @click.prevent="remove">{{ __('Delete') }}</a></li>
-                    </ul>
+                    <dropdown-item :text="__('Create Page')" @click="$emit('create-page')" />
+                    <dropdown-item :text="__('Create Page from Entry')" @click="$emit('create-entry')" />
+                    <dropdown-item :text="__('Delete')" class="warning" @click="remove" />
                 </dropdown-list>
             </div>
 

@@ -1,18 +1,14 @@
 <template>
-    <button v-text="text" @click="selectAndClose" />
+    <button @click="selectAndClose">
+        <template v-if="text">{{ text }}</template>
+        <slot v-else></slot>
+    </button>
 </template>
 
 <script>
 export default {
-    props: {
-        text: {
-            type: String,
-            required: true
-        },
-        redirect: {
-            type: String
-        }
-    },
+
+    props: ['text', 'redirect'],
 
     methods: {
         selectAndClose() {
@@ -26,5 +22,6 @@ export default {
             this.$parent.close();
         }
     }
+
 }
 </script>

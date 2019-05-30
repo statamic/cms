@@ -111,7 +111,7 @@
                                         </td>
                                         <td class="text-right" :colspan="columns.length">
                                             <dropdown-list>
-                                                <dropdown-item :text="__('Edit')" @selected="editedFolderPath = folder.path" />
+                                                <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" />
                                             </dropdown-list>
 
                                             <folder-editor
@@ -135,7 +135,7 @@
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
-                                        <dropdown-item :text="__('Edit')" @selected="edit(asset.id)" />
+                                        <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
                                         <div class="divider" />
                                         <data-list-inline-actions
                                             :item="asset.id"

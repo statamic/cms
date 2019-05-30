@@ -18,11 +18,9 @@
         />
 
         <td class="row-controls" v-if="!grid.isReadOnly">
-            <dropdown-list ref="dropdown">
-                <ul class="dropdown-menu">
-                    <li><a @click="duplicate(index)" v-text="__('Duplicate Row')"></a></li>
-                    <li class="warning"><a @click="$emit('removed', index)" v-text="__('Delete Row')"></a></li>
-                </ul>
+            <dropdown-list>
+                <dropdown-item :text="__('Duplicate Row')" @click="$emit('duplicate', index)" />
+                <dropdown-item :text="__('Delete Row')" class="warning" @click="$emit('removed', index)" />
             </dropdown-list>
         </td>
     </tr>
@@ -75,27 +73,19 @@ export default {
     ],
 
     computed: {
-
         isExcessive() {
             const max = this.grid.config.max_rows;
             if (! max) return false;
             return this.index >= max;
         }
-
     },
 
     methods: {
-        duplicate(index) {
-            this.$emit('duplicate', index);
-            this.$refs.dropdown.close();
-        },
-
         updated(handle, value) {
             let row = JSON.parse(JSON.stringify(this.values));
             row[handle] = value;
             this.$emit('updated', this.index, row);
         }
-
     }
 
 }

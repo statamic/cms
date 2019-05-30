@@ -10,10 +10,8 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: role, index }">
                     <dropdown-list>
-                        <ul class="dropdown-menu">
-                            <li><a :href="role.edit_url">{{ __('Edit') }}</a></li>
-                            <li class="warning"><a @click.prevent="destroy(role.id, index)">{{ __('Delete') }}</a></li>
-                        </ul>
+                        <dropdown-item :text="__('Edit')" :redirect="role.edit_url" />
+                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(role.id, index)" />
                     </dropdown-list>
                 </template>
             </data-list-table>

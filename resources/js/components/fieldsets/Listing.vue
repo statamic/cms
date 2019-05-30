@@ -10,10 +10,8 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: fieldset }">
                     <dropdown-list>
-                        <ul class="dropdown-menu">
-                            <li><a :href="fieldset.edit_url">Edit</a></li>
-                            <li class="warning"><a @click.prevent="destroy(fieldset.id)">Delete</a></li>
-                        </ul>
+                        <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
+                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(fieldset.id)" />
                     </dropdown-list>
                 </template>
             </data-list-table>

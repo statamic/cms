@@ -12,7 +12,7 @@
                             v-if="form.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @selected="confirmDeleteRow(form.id, index)" />
+                            @click="confirmDeleteRow(form.id, index)" />
                     </dropdown-list>
 
                     <confirmation-modal

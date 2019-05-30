@@ -11,7 +11,7 @@
                 <template slot="actions" slot-scope="{ row: blueprint }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="blueprint.edit_url" />
-                        <dropdown-item :text="__('Delete')" class="warning" @selected="destroy(blueprint.id)" />
+                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(blueprint.id)" />
                     </dropdown-list>
                 </template>
             </data-list-table>

@@ -27,7 +27,7 @@
                                 v-if="submission.deleteable"
                                 :text="__('Delete')"
                                 class="warning"
-                                @selected="destroy(submission.id, index)" />
+                                @click="destroy(submission.id, index)" />
                         </dropdown-list>
                     </template>
                 </data-list-table>

@@ -15,7 +15,7 @@
                             v-if="global.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @selected="destroy(global.id, index)" />
+                            @click="destroy(global.id, index)" />
                     </dropdown-list>
                 </template>
             </data-list-table>

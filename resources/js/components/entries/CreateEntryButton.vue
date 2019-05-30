@@ -9,7 +9,7 @@
         </template>
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
-            <dropdown-item :text="blueprint.title" @selected="select(blueprint.handle)" />
+            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
         </div>
     </dropdown-list>
 

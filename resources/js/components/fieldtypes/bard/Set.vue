@@ -19,9 +19,7 @@
                     class="toggle-sm mr-2"
                     v-model="enabled" />
                 <dropdown-list>
-                    <ul class="dropdown-menu">
-                        <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
-                    </ul>
+                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
