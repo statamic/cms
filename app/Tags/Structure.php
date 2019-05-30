@@ -35,7 +35,8 @@ class Structure extends Tags
                 'children'    => $children,
                 'parent'      => $parent,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
-                'is_parent'   => URL::isAncestor($page->uri())
+                'is_parent'   => URL::isAncestor($page->uri()),
+                'is_external' => URL::isExternal($page->absoluteUrl()),
             ]);
         })->all();
     }

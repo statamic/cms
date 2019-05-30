@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Facades\Statamic\Fields\FieldRepository;
-use Statamic\Fields\Fieldtypes\NestedFields;
+use Statamic\Fieldtypes\NestedFields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
 class NestedFieldsTest extends TestCase

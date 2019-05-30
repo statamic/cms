@@ -176,15 +176,25 @@ class GlobalsController extends CpController
 
         $handle = $request->handle ?? snake_case($request->title);
 
+        $sites = [Site::default()->handle()]; // TODO: site picker
+
         $global = GlobalSet::make()
             ->handle($handle)
             ->title($data['title'])
             ->blueprint($data['blueprint'] ?? null)
-            ->sites([
-                $site = Site::default()->handle() // TODO: site picker
-            ])->in($site, function () {
-                //
-            })->save();
+            ->sites($sites);
+
+        $origin = null;
+        foreach ($sites as $i => $site) {
+            $variables = $global->makeLocalization($site);
+            $variables->origin($origin);
+            if ($i === 0) {
+                $origin = $variables;
+            }
+            $global->addLocalization($variables);
+        }
+
+        $global->save();
 
         session()->flash('message', __('Global Set created'));
 

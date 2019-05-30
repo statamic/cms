@@ -277,6 +277,7 @@ export default {
     watch: {
         'collection.title': function(val) {
             this.collection.handle = this.$slugify(val, '_');
+            this.collection.route = this.collection.handle + '/{slug}';
         },
 
         'collection.dateBehavior': function (behavior) {

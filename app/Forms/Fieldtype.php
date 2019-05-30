@@ -4,7 +4,7 @@ namespace Statamic\Forms;
 
 use Statamic\API;
 use Statamic\CP\Column;
-use Statamic\Fields\Fieldtypes\Relationship;
+use Statamic\Fieldtypes\Relationship;
 
 class Fieldtype extends Relationship
 {

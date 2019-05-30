@@ -71,6 +71,7 @@ class Tree implements Localization
         }
 
         return (new Page)
+            ->setTree($this)
             ->setEntry($this->root)
             ->setRoute($this->route())
             ->setRoot(true);
@@ -79,7 +80,8 @@ class Tree implements Localization
     public function pages()
     {
         $pages = (new Pages)
-            ->setTree($this->tree)
+            ->setTree($this)
+            ->setPages($this->tree)
             ->setParent($this->parent())
             ->prependParent($this->withParent);
 

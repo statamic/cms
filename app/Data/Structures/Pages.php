@@ -7,13 +7,21 @@ use Statamic\Data\Structures\Page;
 class Pages
 {
     protected $tree;
+    protected $pages;
     protected $route;
     protected $parent;
     protected $prependParent = true;
 
-    public function setTree(array $tree): self
+    public function setTree(Tree $tree): self
     {
         $this->tree = $tree;
+
+        return $this;
+    }
+
+    public function setPages(array $pages): self
+    {
+        $this->pages = $pages;
 
         return $this;
     }
@@ -41,8 +49,9 @@ class Pages
 
     public function all()
     {
-        $pages = collect($this->tree)->map(function ($branch) {
+        $pages = collect($this->pages)->map(function ($branch) {
             $page = (new Page)
+                ->setTree($this->tree)
                 ->setParent($this->parent)
                 ->setEntry($branch['entry'] ?? null)
                 ->setUrl($branch['url'] ?? null)
