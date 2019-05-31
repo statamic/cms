@@ -268,4 +268,9 @@ class Page implements Entry, Responsable
     {
         return $this->tree->structure();
     }
+
+    public function routeData()
+    {
+        return $this->entry()->routeData();
+    }
 }

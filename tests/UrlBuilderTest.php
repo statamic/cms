@@ -4,6 +4,7 @@ namespace Tests;
 
 use Statamic\API\Entry;
 use Statamic\Stache\Stache;
+use Statamic\Contracts\Data\Content\UrlBuilder;
 
 class UrlBuilderTest extends TestCase
 {
@@ -25,6 +26,7 @@ class UrlBuilderTest extends TestCase
 
         $entry = \Statamic\API\Entry::make()
             ->id('post')
+            ->locale('en')
             ->collection(
                 \Statamic\API\Collection::create('example')->dated(true)
             )
@@ -36,42 +38,82 @@ class UrlBuilderTest extends TestCase
             $entry->makeLocalization('fr')->slug('le-post')
         );
 
-        $this->builder = app('Statamic\Contracts\Data\Content\UrlBuilder')->content($entry);
+        $this->builder = app(UrlBuilder::class)->content($entry);
         $this->entry = $entry;
     }
 
-    public function testBuildsSimpleUrl()
+    /** @test */
+    public function it_builds_a_simple_url()
     {
-        $this->assertEquals('/blog/post', $this->builder->build('/blog/{slug}'));
+        $this->assertEquals('/blog/post', $this->builder->build('/blog/{{ slug }}'));
     }
 
-    public function testBuildsDateUrl()
+    /** @test */
+    public function it_builds_a_date_url()
     {
-        $this->assertEquals('/blog/2015/01/02/post', $this->builder->build('/blog/{year}/{month}/{day}/{slug}'));
+        $this->assertEquals('/blog/2015/01/02/post', $this->builder->build('/blog/{{ year }}/{{ month }}/{{ day }}/{{ slug }}'));
     }
 
-    public function testBuildsSimpleLocalizedUrl()
+    /** @test */
+    public function it_builds_a_simple_localized_url()
     {
         $this->builder->content($this->entry->in('fr'));
-        $this->assertEquals('/blog/le-post', $this->builder->build('/blog/{slug}'));
+        $this->assertEquals('/blog/le-post', $this->builder->build('/blog/{{ slug }}'));
     }
 
-    public function testKeepsSlashesInValues()
+    /** @test */
+    public function it_keeps_slashes_in_values()
     {
         $this->builder->content($this->entry);
-        $this->assertEquals('/blog/foo/bar', $this->builder->build('/blog/{slashed}'));
+        $this->assertEquals('/blog/foo/bar', $this->builder->build('/blog/{{ slashed }}'));
     }
 
-    function testVariablesCanBeMergedIn()
+    /** @test */
+    function it_trims_trailing_slashes()
+    {
+        $this->assertEquals('/blog/test', $this->builder->build('/blog/test/'));
+    }
+
+    /** @test */
+    function it_ensures_a_leading_slash()
+    {
+        $this->assertEquals('/blog/test', $this->builder->build('blog/test'));
+    }
+
+    /** @test */
+    function it_merges_in_extra_variables()
     {
         $this->assertEquals(
             '/bar/post',
-            $this->builder->build('/{foo}/{slug}')
+            $this->builder->build('/{{ foo }}/{{ slug }}')
         );
 
         $this->assertEquals(
             '/baz/post',
-            $this->builder->merge(['foo' => 'baz'])->build('/{foo}/{slug}')
+            $this->builder->merge(['foo' => 'baz'])->build('/{{ foo }}/{{ slug }}')
+        );
+    }
+
+    /** @test */
+    function it_slugifies_non_slugified_values()
+    {
+        $this->assertEquals(
+            '/test/bar-baz',
+            $this->builder->merge(['foo' => 'Bar baz'])->build('/test/{{ foo }}')
+        );
+
+        $this->assertEquals(
+            '/test/bar_baz',
+            $this->builder->merge(['foo' => 'bar_baz'])->build('/test/{{ foo }}')
+        );
+    }
+
+    /** @test */
+    function it_removes_consecutive_slashes_left_by_null_values()
+    {
+        $this->assertEquals(
+            '/test/foo/baz',
+            $this->builder->merge(['foo' => 'foo', 'baz' => 'baz'])->build('/test/{{ foo }}/{{ bar }}/{{ baz }}')
         );
     }
 }

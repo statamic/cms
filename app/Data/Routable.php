@@ -54,4 +54,23 @@ trait Routable
             ltrim($this->uri(), '/')
         ]);
     }
+
+    public function routeData()
+    {
+        $data = array_merge($this->values(), [
+            'id' => $this->id(),
+            'slug' => $this->slug(),
+            'published' => $this->published(),
+        ]);
+
+        if ($this->hasDate()) {
+            $data = array_merge($data, [
+                'year' => $this->date()->format('Y'),
+                'month' => $this->date()->format('m'),
+                'day' => $this->date()->format('d'),
+            ]);
+        }
+
+        return $data;
+    }
 }
