@@ -140,7 +140,7 @@ class Page implements Entry, Responsable
         return app(UrlBuilder::class)
             ->content($this)
             ->merge([
-                'parent_uri' => $this->parent ? $this->parent->uri() : '',
+                'parent_uri' => $this->parent && !$this->parent->isRoot() ? $this->parent->uri() : '',
                 'slug' => $this->isRoot() ? '' : $this->slug(),
                 'depth' => $this->depth,
                 'is_root' => $this->isRoot(),
