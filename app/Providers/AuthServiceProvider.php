@@ -70,7 +70,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::before(function ($user, $ability) {
-            return $user->isSuper() ? true : $user->hasPermission($ability);
+            return $user->isSuper() ? true : null;
+        });
+
+        Gate::after(function ($user, $ability) {
+            return $user->hasPermission($ability);
         });
 
         CorePermissions::boot();
