@@ -49,6 +49,12 @@ class UrlBuilderTest extends TestCase
     }
 
     /** @test */
+    public function it_builds_a_simple_url_using_mustache_tags()
+    {
+        $this->assertEquals('/blog/post', $this->builder->build('/blog/{slug}'));
+    }
+
+    /** @test */
     public function it_builds_a_date_url()
     {
         $this->assertEquals('/blog/2015/01/02/post', $this->builder->build('/blog/{{ year }}/{{ month }}/{{ day }}/{{ slug }}'));

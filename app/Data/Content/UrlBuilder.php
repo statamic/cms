@@ -44,9 +44,11 @@ class UrlBuilder implements UrlBuilderContract
     {
         // Routes can be defined as a string for just the route URL,
         // or they can be an array with a route for each locale.
-        $route_url = (is_array($route)) ? $route[$this->content->locale()] : $route;
+        $route = (is_array($route)) ? $route[$this->content->locale()] : $route;
 
-        $url = Antlers::parse($route_url, $this->routeData());
+        $route = $this->convertToAntlers($route);
+
+        $url = Antlers::parse($route, $this->routeData());
 
         // Slugify it because we're dealing with URLs after all.
         $url = $this->slugify($url);
@@ -59,6 +61,17 @@ class UrlBuilder implements UrlBuilderContract
         $url = rtrim($url, '/');
 
         return Str::ensureLeft($url, '/');
+    }
+
+    private function convertToAntlers($route)
+    {
+        if (Str::contains($route, '{{')) {
+            return $route;
+        }
+
+        return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $route);
     }
 
     private function routeData()
