@@ -21,6 +21,7 @@ class Page implements Entry, Responsable
     protected $url;
     protected $title;
     protected $depth;
+    protected static $uris = [];
 
     public function setUrl($url)
     {
@@ -133,11 +134,15 @@ class Page implements Entry, Responsable
             return;
         }
 
-        if (! $this->structure()->collection()) {
-            return $this->entry()->uri();
+        if ($cached = static::$uris[$this->reference] ?? null) {
+            return $cached;
         }
 
-        return app(UrlBuilder::class)
+        if (! $this->structure()->collection()) {
+            return static::$uris[$this->reference] = $this->entry()->uri();
+        }
+
+        return static::$uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
                 'parent_uri' => $this->parent && !$this->parent->isRoot() ? $this->parent->uri() : '',
