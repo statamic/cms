@@ -20,6 +20,7 @@ class Page implements Entry, Responsable
     protected $isRoot = false;
     protected $url;
     protected $title;
+    protected $depth;
 
     public function setUrl($url)
     {
@@ -37,6 +38,18 @@ class Page implements Entry, Responsable
         if ($this->reference) {
             return URL::makeRelative($this->absoluteUrl());
         }
+    }
+
+    public function setDepth($depth)
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    public function depth()
+    {
+        return $this->depth;
     }
 
     public function setTitle($title)
@@ -128,7 +141,8 @@ class Page implements Entry, Responsable
             ->content($this)
             ->merge([
                 'parent_uri' => $this->parent ? $this->parent->uri() : '',
-                'slug' => $this->isRoot() ? '' : $this->slug()
+                'slug' => $this->isRoot() ? '' : $this->slug(),
+                'depth' => $this->depth,
             ])
             ->build($this->route);
     }
@@ -179,6 +193,7 @@ class Page implements Entry, Responsable
             ->setTree($this->tree)
             ->setPages($this->children ?? [])
             ->setParent($this)
+            ->setDepth($this->depth + 1)
             ->prependParent(false);
 
         if ($this->route) {

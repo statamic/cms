@@ -80,6 +80,7 @@ class Tree implements Localization
             ->setTree($this)
             ->setEntry($this->root)
             ->setRoute($this->route())
+            ->setDepth(1)
             ->setRoot(true);
     }
 
@@ -89,6 +90,7 @@ class Tree implements Localization
             ->setTree($this)
             ->setPages($this->tree)
             ->setParent($this->parent())
+            ->setDepth(1)
             ->prependParent($this->withParent);
 
         if ($route = $this->route()) {

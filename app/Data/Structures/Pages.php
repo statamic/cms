@@ -10,6 +10,7 @@ class Pages
     protected $pages;
     protected $route;
     protected $parent;
+    protected $depth;
     protected $prependParent = true;
 
     public function setTree(Tree $tree): self
@@ -31,6 +32,18 @@ class Pages
         $this->route = $route;
 
         return $this;
+    }
+
+    public function setDepth($depth)
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    public function depth()
+    {
+        return $this->depth;
     }
 
     public function setParent(?Page $parent): self
@@ -56,6 +69,7 @@ class Pages
                 ->setEntry($branch['entry'] ?? null)
                 ->setUrl($branch['url'] ?? null)
                 ->setTitle($branch['title'] ?? null)
+                ->setDepth($this->depth)
                 ->setChildren($branch['children'] ?? []);
 
             if ($this->route) {
