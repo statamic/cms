@@ -1,9 +1,7 @@
 <template>
 
-    <div class="form-group">
-        <label class="block font-medium mb-1">Create links from entries</label>
-        <div class="help-block -mt-1">You may reference multiple entries a time.</div>
         <relationship-input
+            class="hidden"
             ref="input"
             name="entries"
             v-model="selections"
@@ -19,7 +17,6 @@
             :can-reorder="true"
             @item-data-updated="itemDataUpdated"
         />
-    </div>
 
 </template>
 

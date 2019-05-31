@@ -13,7 +13,7 @@
         :localizations="{{ json_encode($localizations) }}"
         :collections="{{ json_encode($collections) }}"
         :max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
-        :has-root="{{ bool_str($hasRoot) }}"
+        :expects-root="{{ bool_str($expectsRoot) }}"
         :has-collection="{{ bool_str($hasCollection) }}"
     >
         <template slot="header">

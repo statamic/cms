@@ -3,128 +3,95 @@
 
         <div class="flex items-center mb-3">
             <slot name="header" />
+
             <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isDirty" v-text="__('Unsaved Changes')" />
+
+            <dropdown-list class="mr-2">
+                <dropdown-item :text="__('Edit Structure')" :redirect="editUrl" />
+                <dropdown-item :text="__('Discard Changes')" @click="cancel" />
+            </dropdown-list>
+
+            <dropdown-list>
+                <template #trigger>
+                    <button class="btn" v-text="`${__('Link')}`" />
+                </template>
+                <dropdown-item :text="__('Create Link')" @click="createPage" />
+                <dropdown-item :text="__('Create Link from Entry')" @click="createEntries" />
+            </dropdown-list>
+
+            <button
+                class="btn btn-primary min-w-100 ml-2"
+                :class="{ 'disabled': !changed }"
+                :disabled="!changed"
+                @click="save"
+                v-text="__('Save')" />
         </div>
 
         <loading-graphic v-if="loading"></loading-graphic>
 
-        <div class="flex flex-row-reverse justify-between">
-
-            <div class="publish-sidebar">
-                <div class="publish-section">
-                    <div class="p-2">
-                        <button
-                            class="btn btn-primary w-full mb-2"
-                            :class="{ 'disabled': !changed }"
-                            :disabled="!changed"
-                            @click="save"
-                            v-text="__('Save')" />
-
-                        <div class="flex flex-wrap justify-center text-grey text-2xs">
-
-                            <a :href="editUrl"
-                                class="flex items-center m-1 whitespace-no-wrap"
-                                :class="{ 'disabled': !changed }"
-                                @click="cancel">
-                                <svg-icon name="hammer-wrench" class="w-4 mr-sm" />
-                                {{ __('Edit') }}
-                            </a>
-
-                            <button
-                                class="flex items-center m-1 whitespace-no-wrap outline-none"
-                                :class="{ 'opacity-50': !changed }"
-                                @click="cancel">
-                                <span class="mr-sm">&times;</span>
-                                {{ __('Discard Changes') }}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="" v-if="localizations.length > 1">
-                        <div
-                            v-for="option in localizations"
-                            :key="option.handle"
-                            class="revision-item flex items-center border-grey-30"
-                            :class="{ 'opacity-50': !option.active }"
-                            @click="localizationSelected(option)"
-                        >
-                            <div class="flex-1 flex items-center">
-                                <span class="little-dot mr-1 bg-green" />
-                                {{ option.name }}
-                            </div>
-                            <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                            <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
-                            <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
-                        </div>
-                    </div>
-
-                    <div class="publish-fields">
-                        <div class="form-group text-sm">
-                            <label class="block font-medium mb-1">{{ __('Page Links') }}</label>
-                            <div class="help-block -mt-1">A page link can be a URL, a reference to an entry, or even simple text.</div>
-                            <button @click="createPage" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none">
-                                <svg-icon name="hierarchy-files" class="w-4 h-4 mr-sm" /> {{ __('Create Link') }}
-                            </button>
-                        </div>
-
-                        <page-selector
-                            v-if="collections.length"
-                            ref="selector"
-                            :site="site"
-                            :collections="collections"
-                            :exclusions="exclusions"
-                            @selected="pagesSelected"
-                        />
-
-                        <form-group
-                            v-if="hasCollection"
-                            fieldtype="toggle"
-                            handle="root"
-                            display="Home Page"
-                            :instructions='__(`The first page in the tree will be the home page.`)'
-                            v-model="firstPageIsRoot" />
-                    </div>
+        <div class="" v-if="localizations.length > 1">
+            <div
+                v-for="option in localizations"
+                :key="option.handle"
+                class="revision-item flex items-center border-grey-30"
+                :class="{ 'opacity-50': !option.active }"
+                @click="localizationSelected(option)"
+            >
+                <div class="flex-1 flex items-center">
+                    <span class="little-dot mr-1 bg-green" />
+                    {{ option.name }}
                 </div>
+                <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
+                <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
             </div>
+        </div>
 
-            <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
-                <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
-                    <slot name="no-pages-svg" />
-                    <h1 class="my-3">Create the first page now</h1>
-                    <p class="text-grey mb-3">
-                        {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
-                    </p>
-                    <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
-                </div>
+        <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
+            <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
+                <slot name="no-pages-svg" />
+                <h1 class="my-3">Create the first page now</h1>
+                <p class="text-grey mb-3">
+                    {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
+                </p>
+                <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
             </div>
+        </div>
 
-            <div class="page-tree w-full" v-show="pages.length">
-                <draggable-tree
-                    draggable
-                    ref="tree"
-                    :data="treeData"
-                    :space="1"
-                    :indent="24"
-                    @change="treeChanged"
-                    @drag="treeDragstart"
-                >
-                    <tree-branch
-                        slot-scope="{ data: page, store: tree, vm }"
-                        :page="page"
-                        :depth="vm.level"
-                        :vm="vm"
-                        :first-page-is-root="firstPageIsRoot"
-                        @edit="editPage(page, vm)"
-                        @updated="pageUpdated(tree)"
-                        @removed="pageRemoved"
-                        @create-page="createChildPage(vm)"
-                        @create-entry="createChildEntries(vm)"
-                    />
-                </draggable-tree>
-
-            </div>
+        <div class="page-tree w-full" v-show="pages.length">
+            <draggable-tree
+                draggable
+                ref="tree"
+                :data="treeData"
+                :space="1"
+                :indent="24"
+                @change="treeChanged"
+                @drag="treeDragstart"
+            >
+                <tree-branch
+                    slot-scope="{ data: page, store: tree, vm }"
+                    :page="page"
+                    :depth="vm.level"
+                    :vm="vm"
+                    :first-page-is-root="expectsRoot"
+                    @edit="editPage(page, vm)"
+                    @updated="pageUpdated(tree)"
+                    @removed="pageRemoved"
+                    @create-page="createChildPage(vm)"
+                    @create-entry="createChildEntries(vm)"
+                />
+            </draggable-tree>
 
         </div>
+
+        <page-selector
+            v-if="collections.length"
+            ref="selector"
+            :site="site"
+            :collections="collections"
+            :exclusions="exclusions"
+            @selected="pagesSelected"
+        />
 
         <page-editor
             v-if="creatingPage"
@@ -170,7 +137,7 @@ export default {
             type: Number,
             default: Infinity,
         },
-        hasRoot: Boolean,
+        expectsRoot: Boolean,
         hasCollection: Boolean,
     },
 
@@ -182,7 +149,6 @@ export default {
             pages: this.initialPages,
             treeData: [],
             pageIds: [],
-            firstPageIsRoot: this.hasRoot,
             parentPageForAdding: null,
             targetPage: null,
             creatingPage: false,
@@ -211,7 +177,7 @@ export default {
             this.$dirty.state('page-tree', changed);
         },
 
-        firstPageIsRoot(value) {
+        expectsRoot(value) {
             this.changed = true;
         },
 
@@ -267,7 +233,7 @@ export default {
 
         save() {
             this.saving = true;
-            const payload = { pages: this.pages, site: this.site, firstPageIsRoot: this.firstPageIsRoot };
+            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot };
 
             this.$axios.post(this.submitUrl, payload).then(response => {
                 this.changed = false;
@@ -347,7 +313,7 @@ export default {
                 if (childNode === node) return;
                 const index = childNode.parent.children.indexOf(childNode);
                 const level = childNode._vm.level;
-                const isRoot = this.firstPageIsRoot && level === 1 && index === 0;
+                const isRoot = this.expectsRoot && level === 1 && index === 0;
                 const isBeyondMaxDepth = level > childNodeMaxLevel;
                 let droppable = true;
                 if (isRoot || isBeyondMaxDepth) droppable = false;
@@ -362,11 +328,15 @@ export default {
 
         createChildEntries(vm) {
             this.parentPageForAdding = vm;
-            this.$refs.selector.linkExistingItem();
+            this.createEntries();
         },
 
         createPage() {
             this.openPageCreator();
+        },
+
+        createEntries() {
+            this.$refs.selector.linkExistingItem();
         },
 
         openPageCreator() {

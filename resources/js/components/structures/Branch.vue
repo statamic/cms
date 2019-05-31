@@ -5,19 +5,20 @@
 
         <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
 
-            <div
-                class="flex-1"
-                :class="{ 'text-sm font-medium': isTopLevel }"
-            >
+            <div class="flex items-center flex-1">
                 <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
-                <a @click="edit">{{ page.title || page.url }}</a>
+                <a @click="edit" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
             </div>
 
-            <div class="pr-1">
-                <dropdown-list>
-                    <dropdown-item :text="__('Create Page')" @click="$emit('create-page')" />
-                    <dropdown-item :text="__('Create Page from Entry')" @click="$emit('create-entry')" />
-                    <dropdown-item :text="__('Delete')" class="warning" @click="remove" />
+            <div class="pr-1 flex items-center">
+                <svg-icon v-if="isEntry" class="inline-block w-4 h-4 text-grey-50" name="hyperlink" v-tooltip="__('Entry link')" />
+                <svg-icon v-if="isLink" class="inline-block w-4 h-4 text-grey-50" name="external-link" v-tooltip="__('External link')" />
+                <svg-icon v-if="isText" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
+
+                <dropdown-list class="ml-2">
+                    <dropdown-item :text="__('Create Link')" @click="$emit('create-page')" />
+                    <dropdown-item :text="__('Create Link from Entry')" @click="$emit('create-entry')" />
+                    <dropdown-item :text="__('Remove')" class="warning" @click="remove" />
                 </dropdown-list>
             </div>
 
@@ -69,6 +70,18 @@ export default {
 
             const firstNodeId = this.vm.data.parent.children[0].id;
             return this.page.id === firstNodeId;
+        },
+
+        isEntry() {
+            return Boolean(this.page.id);
+        },
+
+        isLink() {
+            return !this.page.id && this.page.title && this.page.url;
+        },
+
+        isText() {
+            return this.page.title && !this.page.url;
         }
 
     },

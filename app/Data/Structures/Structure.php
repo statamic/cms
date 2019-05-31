@@ -22,6 +22,7 @@ class Structure implements StructureContract
     protected $trees;
     protected $collections;
     protected $maxDepth;
+    protected $expectsRoot = false;
 
     public function id()
     {
@@ -79,6 +80,7 @@ class Structure implements StructureContract
             'title' => $this->title,
             'handle' => $this->handle,
             'sites' => $this->sites,
+            'expects_root' => $this->expectsRoot,
             'path' => $this->initialPath() ?? $this->path(),
             'max_depth' => $this->maxDepth,
             'collections' => $this->collections,
@@ -100,6 +102,7 @@ class Structure implements StructureContract
             'title' => $this->title,
             'collections' => $this->collections,
             'max_depth' => $this->maxDepth,
+            'expects_root' => $this->collection() ? $this->expectsRoot : null,
         ];
 
         if (Site::hasMultiple()) {
@@ -109,6 +112,11 @@ class Structure implements StructureContract
         }
 
         return $data;
+    }
+
+    public function expectsRoot($expectsRoot = null)
+    {
+        return $this->fluentlyGetOrSet('expectsRoot')->args(func_get_args());
     }
 
     public function trees()

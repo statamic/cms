@@ -2,6 +2,10 @@
 
     .tree-node-inner {
         @apply relative text-xs bg-white shadow rounded;
+
+        &:hover {
+            @apply bg-grey-10;
+        }
     }
 
     .draggable-placeholder-inner {

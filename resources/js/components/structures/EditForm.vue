@@ -11,7 +11,7 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div>
+        <div slot-scope="{ setValue }">
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">
                     <small class="subhead block">
@@ -50,10 +50,6 @@ export default {
     },
 
     methods: {
-
-        setValue(handle, value) {
-            this.values[handle] = value;
-        },
 
         clearErrors() {
             this.error = null;

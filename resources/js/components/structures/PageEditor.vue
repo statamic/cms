@@ -4,7 +4,7 @@
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                {{ __('Create Page Link') }}
+                {{ __('Link') }}
                 <button
                     type="button"
                     class="btn-close"

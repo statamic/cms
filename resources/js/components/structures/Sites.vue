@@ -48,6 +48,8 @@ export default {
 
     mixins: [Fieldtype],
 
+    inject: ['storeName'],
+
     data() {
         return {
             sites: this.value,
@@ -58,6 +60,10 @@ export default {
 
         hasMultipleSites() {
             return this.$config.get('sites').length > 1;
+        },
+
+        purpose() {
+            return this.$store.state.publish[this.storeName].values.purpose;
         }
 
     },
@@ -65,6 +71,18 @@ export default {
     watch: {
         sites(sites) {
             this.update(sites);
+        },
+
+        purpose: {
+            immediate: true,
+            handler(purpose) {
+                // We can't use a field condition because the logic also relies on whether we have multiple sites enabled.
+                if (this.hasMultipleSites) return;
+
+                this.$nextTick(() => {
+                    this.$el.closest('.form-group').classList.toggle('hidden', purpose === 'navigation');
+                });
+            }
         }
     }
 

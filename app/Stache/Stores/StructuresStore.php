@@ -39,7 +39,8 @@ class StructuresStore extends BasicStore
                 ->sites($item['sites'])
                 ->maxDepth($item['max_depth'])
                 ->collections($item['collections'])
-                ->initialPath($item['path']);
+                ->initialPath($item['path'])
+                ->expectsRoot($item['expects_root']);
 
             foreach ($item['trees'] as $site => $tree) {
                 $structure->addTree(
@@ -97,6 +98,7 @@ class StructuresStore extends BasicStore
             ->sites($data['sites'] ?? null)
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null)
+            ->expectsRoot($data['expects_root'] ?? false)
             ->initialPath($path);
 
         // // If the base set file was modified, its localizations will already exist in the Stache.
