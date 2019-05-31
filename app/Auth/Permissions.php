@@ -26,14 +26,23 @@ class Permissions
         static::$permissions[] = $permission;
 
         if (! $permission->placeholder()) {
-            $permission->permissions(true)->each(function ($permission) {
-                Gate::define($permission->value(), function ($user) use ($permission) {
-                    return $user->hasPermission($permission->value());
-                });
-            });
+            $this->registerGatesForPermission($permission);
         }
 
         return $permission;
+    }
+
+    protected function registerGatesForPermission($permission)
+    {
+        $permission->permissions()->each(function ($permission) {
+            Gate::define($permission->value(), function ($user) use ($permission) {
+                return $user->hasPermission($permission->value());
+            });
+
+            $permission->children()->each(function ($child) {
+                $this->registerGatesForPermission($child);
+            });
+        });
     }
 
     public function all()
