@@ -74,7 +74,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::after(function ($user, $ability) {
-            return $user->hasPermission($ability);
+            return $user->hasPermission($ability) === true ? true : null;
         });
 
         CorePermissions::boot();
