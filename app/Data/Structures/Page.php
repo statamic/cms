@@ -143,6 +143,7 @@ class Page implements Entry, Responsable
                 'parent_uri' => $this->parent ? $this->parent->uri() : '',
                 'slug' => $this->isRoot() ? '' : $this->slug(),
                 'depth' => $this->depth,
+                'is_root' => $this->isRoot(),
             ])
             ->build($this->route);
     }
