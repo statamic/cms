@@ -12,7 +12,7 @@
                 :id="name + $index"
                 :checked="value === option.value"
             />
-            <label :for="name + $index">{{ option.text }}</label>
+            <label :for="name + $index">{{ option.label }}</label>
         </div>
     </div>
 </template>
