@@ -3,6 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\API\Arr;
+use Statamic\API\Str;
+use Statamic\API\Site;
+use Statamic\API\Entry;
 use Statamic\Tags\Collection\Collection;
 
 class GetContent extends Collection
@@ -28,7 +31,24 @@ class GetContent extends Collection
      */
     public function index()
     {
-        $this->parameters['id:matches'] = $this->get(['from', 'id']);
+        $from = $this->getList(['from', 'id']);
+
+        if (Str::startsWith($from[0], '/')) {
+            $site = $this->get(['site', 'locale'], Site::current()->handle());
+
+            $entries = collect_entries($from)->map(function ($item) use ($site) {
+                return Entry::findByUri($item, $site);
+            });
+
+            return $this->output($entries);
+        }
+
+        // TODO: Support multiple IDs.
+        if (count($from) > 1) {
+            throw new \Exception('The get_content tag currently only supports getting a single item by ID.');
+        }
+
+        $this->parameters['id:matches'] = $from[0];
         $this->parameters['from'] = '*';
 
         return parent::index();
