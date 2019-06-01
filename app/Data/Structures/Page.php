@@ -4,13 +4,17 @@ namespace Statamic\Data\Structures;
 
 use Statamic\API\URL;
 use Statamic\API\Site;
+use Statamic\Data\Augmentable;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Content\UrlBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
 use Illuminate\Contracts\Support\Responsable;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 
-class Page implements Entry, Responsable
+class Page implements Entry, AugmentableContract, Responsable
 {
+    use Augmentable;
+
     protected $tree;
     protected $reference;
     protected $entry;
@@ -277,5 +281,10 @@ class Page implements Entry, Responsable
     public function routeData()
     {
         return $this->entry()->routeData();
+    }
+
+    public function blueprint()
+    {
+        return $this->entry()->blueprint();
     }
 }
