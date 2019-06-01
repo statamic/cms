@@ -70,6 +70,18 @@ abstract class Tags
      */
     public $parser;
 
+    /**
+     * The method that will handle wildcard tags.
+     * @var string
+     */
+    protected $wildcardMethod = 'wildcard';
+
+    /**
+     * Whether a wildcard method has already been handled.
+     * @var bool
+     */
+    protected $wildcardHandled;
+
     public function setProperties($properties)
     {
         $this->parser      = $properties['parser'];
@@ -79,6 +91,22 @@ abstract class Tags
         $this->isPair      = $this->content !== '';
         $this->tag         = array_get($properties, 'tag');
         $this->method      = array_get($properties, 'tag_method');
+    }
+
+    /**
+     * Handle missing methods.
+     *
+     * If classes want to provide a catch-all tag, they should add a `wildcard` method.
+     */
+    public function __call($method, $args)
+    {
+        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
+            throw new \BadMethodCallException("Call to undefined method {$method}.");
+        }
+
+        $this->wildcardHandled = true;
+
+        return $this->{$this->wildcardMethod}($this->tag);
     }
 
     /**
