@@ -86,8 +86,9 @@ class Blueprint
                 ->field($field->handle())
                 ->fieldtype($field->fieldtype()->indexComponent())
                 ->label(__($field->display()))
-                ->visibleDefault($field->isListable())
-                ->visible($field->isListable())
+                ->listable($field->isListable())
+                ->visibleDefault($field->isVisible())
+                ->visible($field->isVisible())
                 ->sortable($field->isSortable());
         }));
     }
@@ -107,7 +108,8 @@ class Blueprint
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
-            'sections' => $this->sections()->map->toPublishArray()->values()->all()
+            'sections' => $this->sections()->map->toPublishArray()->values()->all(),
+            'empty' => $this->isEmpty(),
         ];
     }
 

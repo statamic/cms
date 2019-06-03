@@ -32,15 +32,17 @@ class EntriesController extends CpController
             $sortDirection = $collection->sortDirection();
         }
 
-        $paginator = $query
-            ->orderBy($sortField, $sortDirection)
-            ->paginate(request('perPage'));
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $paginator = $query->paginate(request('perPage'));
 
         $entries = $paginator->supplement(function ($entry) {
             return ['deleteable' => me()->can('delete', $entry)];
         })->preProcessForIndex();
 
-        if ($collection->order() === 'date') {
+        if ($collection->dated()) {
             $entries->supplement('date', function ($entry) {
                 return $entry->date()->inPreferredFormat();
             });
@@ -49,6 +51,7 @@ class EntriesController extends CpController
         $columns = $collection->entryBlueprint()
             ->columns()
             ->setPreferred("collections.{$collection->handle()}.columns")
+            ->rejectUnlisted()
             ->values();
 
         return Resource::collection($paginator)->additional(['meta' => [
@@ -92,20 +95,10 @@ class EntriesController extends CpController
 
         event(new PublishBlueprintFound($blueprint, 'entry', $entry));
 
-        $fields = $blueprint
-            ->fields()
-            ->addValues($entry->data())
-            ->preProcess();
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
-        $values = array_merge($fields->values(), [
-            'title' => $entry->get('title'),
-            'slug' => $entry->slug()
-        ]);
-
-        if ($entry->orderType() === 'date') {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
-            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
-            $values['date'] = $datetime;
+        if ($hasOrigin = $entry->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($entry->origin(), $blueprint);
         }
 
         $viewData = [
@@ -118,22 +111,29 @@ class EntriesController extends CpController
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
             ],
-            'values' => $values,
-            'meta' => $fields->meta(),
-            'collection' => $this->collectionToArray($entry->collection()),
+            'values' => array_merge($values, ['id' => $entry->id()]),
+            'meta' => $meta,
+            'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
             'locale' => $entry->locale(),
-            'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
-                $exists = $entry->entry()->existsIn($handle);
-                $localized = $entry->entry()->inOrClone($handle);
+            'localizedFields' => array_keys($entry->data()),
+            'isRoot' => $entry->isRoot(),
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? [],
+            'originMeta' => $originMeta ?? [],
+            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+                $localized = $entry->in($handle);
+                $exists = $localized !== null;
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $entry->locale(),
                     'exists' => $exists,
+                    'root' => $exists ? $localized->isRoot() : false,
+                    'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
                     'published' => $exists ? $localized->published() : false,
-                    'url' => $localized->editUrl(),
+                    'url' => $exists ? $localized->editUrl() : null,
                 ];
             })->all()
         ];
@@ -157,7 +157,7 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $entry->blueprint()->fields()->addValues($request->except('id'))->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
@@ -168,30 +168,34 @@ class EntriesController extends CpController
 
         $values = array_except($fields->values(), ['slug', 'date']);
 
-        foreach ($values as $key => $value) {
-            $entry->set($key, $value);
+        if ($entry->hasOrigin()) {
+            $values = array_only($values, $request->input('_localized'));
         }
 
         $entry
-            ->set('title', $request->title)
+            ->data($values)
             ->slug($request->slug);
 
-        if ($entry->orderType() === 'date') {
+        if ($entry->collection()->dated()) {
             // If there's a time, adjust the format into a datetime order string.
             if (strlen($date = $request->date) > 10) {
                 $date = str_replace(':', '', $date);
                 $date = str_replace(' ', '-', $date);
             }
 
-            $entry->order($date);
+            $entry->date($date);
         }
 
-        if ($entry->published()) {
+        if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
                 ->user($request->user())
                 ->save();
         } else {
+            if (! $entry->revisionsEnabled()) {
+                $entry->published($request->published);
+            }
+
             $entry
                 ->set('updated_by', $request->user()->id())
                 ->set('updated_at', now()->timestamp)
@@ -262,23 +266,35 @@ class EntriesController extends CpController
 
         $values = array_except($fields->values(), ['slug']);
 
-        $entry = Entry::create()
+        $entry = Entry::make()
             ->collection($collection)
-            ->in($site->handle(), function ($localized) use ($values, $request) {
-                $localized
-                    ->published(false)
-                    ->slug($request->slug)
-                    ->data($values);
-            });
+            ->locale($site->handle())
+            ->published(false)
+            ->slug($request->slug)
+            ->data($values);
 
-        if ($collection->order() === 'date') {
-            $entry->order($values['date'] ?? now()->format('Y-m-d-Hi'));
+        if ($collection->dated()) {
+            $entry->date($values['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
-        $entry->store([
-            'message' => $request->message,
-            'user' => $request->user(),
-        ]);
+        if ($entry->revisionsEnabled()) {
+            $entry->store([
+                'message' => $request->message,
+                'user' => $request->user(),
+            ]);
+        } else {
+            $entry
+                ->set('updated_by', $request->user()->id())
+                ->set('updated_at', now()->timestamp)
+                ->save();
+        }
+
+        if ($structure = $collection->structure()) {
+            $tree = $structure
+                ->in($site->handle())
+                ->append($entry)
+                ->save();
+        }
 
         return [
             'redirect' => $entry->editUrl(),
@@ -306,5 +322,26 @@ class EntriesController extends CpController
             'title' => $collection->title(),
             'url' => cp_route('collections.show', $collection->handle())
         ];
+    }
+
+    protected function extractFromFields($entry, $blueprint)
+    {
+        $fields = $blueprint
+            ->fields()
+            ->addValues($entry->values())
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'title' => $entry->value('title'),
+            'slug' => $entry->slug()
+        ]);
+
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
+        return [$values, $fields->meta()];
     }
 }

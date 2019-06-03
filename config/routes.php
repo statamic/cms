@@ -8,15 +8,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may define any template or controller based routes. Each route
-    | may contain wildcards, and can point to either a template name or an
-    | array containing all the data to be passed in to the template.
+    | may contain wildcards and can point to the name of a template or an
+    | array containing any data you want passed in to that template.
     |
     | More info: https://docs.statamic.com/routing
     |
     */
 
     'routes' => [
-        // '/login' => 'auth/login',
+        // '/' => 'home'
     ],
 
     /*
@@ -24,14 +24,14 @@ return [
     | Vanity Routes
     |--------------------------------------------------------------------------
     |
-    | A Vanity URL is a dummy, easy to remember URL that redirects you to a
-    | permanent URL. For example, a http://example.com/promo URL that may
-    | redirect you to http://example.com/blog/2016/09/this-months-promo
+    | Vanity URLs are easy to remember aliases that 302 redirect visitors to
+    | permanent URLs. For example, you can set https://example.com/hot-dogs
+    | to redirect to https://example.com/blog/2019/09/big-sale-on-hot-dogs.
     |
     */
 
     'vanity' => [
-        // '/promo' => '/blog/2017/09/this-months-promo',
+        // '/promo' => '/blog/2019/09/big-sale-on-hot-dogs',
     ],
 
     /*

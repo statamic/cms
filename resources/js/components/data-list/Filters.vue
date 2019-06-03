@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button class="btn btn-flat btn-icon-only ml-2 dropdown-toggle relative" @click="filtering = !filtering">
+        <button class="btn btn-flat btn-icon-only dropdown-toggle relative" @click="filtering = !filtering">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
         </button>
-        <pane name="filters" v-if="filtering">
+        <pane name="filters" v-if="filtering" @closed="dismiss">
             <div>
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
@@ -13,7 +13,7 @@
                     <button
                         type="button"
                         class="btn-close"
-                        @click="filtering = false"
+                        @click="dismiss"
                         v-html="'&times'" />
                 </div>
 
@@ -46,10 +46,8 @@
                     <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                     <template v-else>
                         <div class="flex justify-center mt-3">
-                            <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
-                        </div>
-                        <div class="flex justify-center mt-2">
-                            <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                            <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
+                            <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
                         </div>
                     </template>
                 </div>
@@ -116,6 +114,10 @@ export default {
 
     methods: {
 
+        dismiss() {
+            this.filtering = false
+        },
+
         filterChanged(handle, value) {
             let filters = this.activeFilters;
             if (value) {
@@ -155,8 +157,11 @@ export default {
                     this.$notify.error(__('Something went wrong'));
                 });
         }
+    },
 
-    }
+    created() {
+        this.$mousetrap.bind('esc', this.dismiss)
+    },
 
 }
 </script>

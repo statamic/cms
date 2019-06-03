@@ -1,4 +1,5 @@
 @extends('statamic::layout')
+@section('title', __('Structures'))
 
 @section('content')
 
@@ -8,7 +9,7 @@
             <h1 class="flex-1">{{ __('Structures') }}</h1>
 
             @can('create', 'Statamic\Contracts\Data\Structures\Structure')
-                <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ __('Create Structure') }}</a>
+                <a href="{{ cp_route('structures.create') }}" class="btn-primary">{{ __('Create Structure') }}</a>
             @endcan
         </div>
 

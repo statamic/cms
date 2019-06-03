@@ -36,7 +36,7 @@
     }
 
     &:disabled {
-        @apply opacity-75;
+        @apply opacity-50;
         cursor: not-allowed;
     }
 }

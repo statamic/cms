@@ -43,8 +43,16 @@ button, .btn, .btn-* {
 .btn-flat {
     @include button(white, black);
     @apply shadow-none text-grey-80 bg-grey-30;
+    position: inherit;
     &:hover {
-        @apply bg-grey-40;
+        @apply bg-grey-30;
+        box-shadow: none !important;
+    }
+    &:focus {
+        @apply focus-outline bg-grey-30;
+    }
+    &:active, &:focus:active {
+        @apply bg-grey-50;
         box-shadow: none !important;
     }
 }

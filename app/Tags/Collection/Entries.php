@@ -5,100 +5,138 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\Site;
 use Statamic\API\Entry;
+use Statamic\Tags\Query;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 
 class Entries
 {
-    use HasConditions;
+    use Query\HasConditions,
+        Query\HasScopes,
+        Query\HasOrderBys,
+        Query\GetsResults;
 
-    protected $collections;
     protected $ignoredParams = ['as'];
     protected $parameters;
+    protected $collections;
+    protected $orderBys;
     protected $site;
-    protected $limit;
-    protected $offset;
-    protected $paginate;
     protected $showPublished;
     protected $showUnpublished;
-    protected $showPast;
-    protected $showFuture;
     protected $since;
     protected $until;
-    protected $scopes;
-    protected $sort;
 
     public function __construct($parameters)
     {
-        $this->parameters = $this->parseParameters($parameters);
+        $this->parseParameters($parameters);
     }
 
     public function get()
     {
-        $query = Entry::query()
-            ->whereIn('collection', $this->collections->map->handle()->all());
-
         try {
-            $this->querySite($query);
-            $this->queryPublished($query);
-            $this->queryPastFuture($query);
-            $this->querySinceUntil($query);
-            $this->queryConditions($query);
-            $this->queryScopes($query);
-            $this->querySort($query);
-        } catch (NoResultsExpected $e) {
+            $query = $this->query();
+        } catch (NoResultsExpected $exception) {
             return collect_entries();
         }
 
-        if ($perPage = $this->paginate) {
-            return $query->paginate($perPage);
+        return $this->results($query);
+    }
+
+    public function count()
+    {
+        try {
+            return $this->query()->count();
+        } catch (NoResultsExpected $exception) {
+            return 0;
+        }
+    }
+
+    public function next($currentEntry)
+    {
+        throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
+        throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
+
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+
+        if ($this->orderBys->first()->direction === 'desc') {
+            $this->orderBys = $this->orderBys->map->reverse();
+            $reversed = true;
         }
 
-        if ($limit = $this->limit) {
-            $query->limit($limit);
+        if ($collection->orderable()) {
+            $query = $this->query()->where('order', '>', $currentEntry->order());
+        } elseif ($collection->dated()) {
+            $query = $this->query()->where('date', '>', $currentEntry->date());
+        } else {
+            throw new \Exception('collection:next requires ordered or dated collection');
         }
 
-        if ($offset = $this->offset) {
-            $query->offset($offset);
+        return $reversed ?? false
+            ? $this->results($query)->reverse()->values()
+            : $this->results($query);
+    }
+
+    public function previous($currentEntry)
+    {
+        throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
+        throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
+
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+
+        if ($this->orderBys->first()->direction === 'asc') {
+            $this->orderBys = $this->orderBys->map->reverse();
+            $reversed = true;
         }
 
-        return $query->get();
+        if ($collection->orderable()) {
+            $query = $this->query()->where('order', '<', $currentEntry->order());
+        } elseif ($collection->dated()) {
+            $query = $this->query()->where('date', '<', $currentEntry->date());
+        } else {
+            throw new \Exception('collection:previous requires ordered or dated collection');
+        }
+
+        return $reversed ?? false
+            ? $this->results($query)->reverse()->values()
+            : $this->results($query);
+    }
+
+    protected function query()
+    {
+        $query = Entry::query()
+            ->whereIn('collection', $this->collections->map->handle()->all());
+
+        $this->querySite($query);
+        $this->queryPublished($query);
+        $this->queryPastFuture($query);
+        $this->querySinceUntil($query);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
+
+        return $query;
     }
 
     protected function parseParameters($params)
     {
-        $params = Arr::except($params, $this->ignoredParams);
-
-        $this->collections = $this->parseCollections($params);
-        $this->site = Arr::getFirst($params, ['site', 'locale']);
-
-        $this->limit = Arr::get($params, 'limit');
-        $this->offset = Arr::get($params, 'offset');
-        $this->paginate = Arr::get($params, 'paginate');
-
-        if ($this->paginate === true) {
-            $this->paginate = $this->limit;
-        }
-
-        $this->showPublished = Arr::get($params, 'show_published', true);
-        $this->showUnpublished = Arr::get($params, 'show_unpublished', false);
-        $this->showPast = Arr::get($params, 'show_past', true);
-        $this->showFuture = Arr::get($params, 'show_future', false);
-        $this->since = Arr::get($params, 'since');
-        $this->until = Arr::get($params, 'until');
-
-        $this->scopes = $this->parseQueryScopes($params);
-
-        $this->sort = Arr::get($params, 'sort');
-
-        return $params;
+        $this->parameters = Arr::except($params, $this->ignoredParams);
+        $this->collections = $this->parseCollections();
+        $this->orderBys = $this->parseOrderBys();
+        $this->site = Arr::getFirst($this->parameters, ['site', 'locale']);
+        $this->showPublished = Arr::get($this->parameters, 'show_published', true);
+        $this->showUnpublished = Arr::get($this->parameters, 'show_unpublished', false);
+        $this->since = Arr::get($this->parameters, 'since');
+        $this->until = Arr::get($this->parameters, 'until');
     }
 
-    protected function parseCollections($params)
+    protected function parseCollections()
     {
-        $from = Arr::getFirst($params, ['from', 'folder', 'use']);
-        $not = Arr::getFirst($params, ['not_from', 'not_folder', 'dont_use']);
+        $from = Arr::getFirst($this->parameters, ['from', 'in', 'folder', 'use', 'collection']);
+        $not = Arr::getFirst($this->parameters, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         $collections = $from === '*'
             ? collect(Collection::handles())
@@ -109,26 +147,38 @@ class Entries
         return $collections
             ->diff($excludedCollections)
             ->map(function ($handle) {
-                $collection = Collection::whereHandle($handle);
+                $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
                 return $collection;
-            });
+            })
+            ->values();
     }
 
-    protected function parseQueryScopes($params)
+    protected function defaultOrderBy()
     {
-        $scopes = Arr::getFirst($params, ['query', 'filter']);
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
 
-        return collect(explode('|', $scopes));
+        if ($collection->orderable()) {
+            return 'order:asc';
+        } elseif ($collection->dated()) {
+            return 'date:desc|title:asc';
+        }
+
+        return 'title:asc';
     }
 
     protected function querySite($query)
     {
-        if (! $this->site) {
+        $site = Arr::getFirst($this->parameters, ['site', 'locale']);
+
+        if ($site === '*') {
             return;
         }
 
-        return $query->where('site', $this->site);
+        $site = Site::current()->handle();
+
+        return $query->where('site', $site);
     }
 
     protected function queryPublished($query)
@@ -150,11 +200,21 @@ class Entries
             return;
         }
 
-        if ($this->showFuture && $this->showPast) {
+        // Collection date behaviors
+        // TODO: but only if all collections have the same configuration.
+        $collection = $this->collections[0];
+        $showFuture = $collection->futureDateBehavior() === 'public';
+        $showPast = $collection->pastDateBehavior() === 'public';
+
+        // Override by tag parameters.
+        $showFuture = $this->parameters['show_future'] ?? $showFuture;
+        $showPast = $this->parameters['show_past'] ?? $showPast;
+
+        if ($showFuture && $showPast) {
             return;
-        } elseif ($this->showFuture && ! $this->showPast) {
+        } elseif ($showFuture && ! $showPast) {
             return $query->where('date', '>', Carbon::now());
-        } elseif (! $this->showFuture && $this->showPast) {
+        } elseif (! $showFuture && $showPast) {
             return $query->where('date', '<', Carbon::now());
         }
 
@@ -176,35 +236,10 @@ class Entries
         }
     }
 
-    public function queryScopes($query)
-    {
-        $this->scopes
-            ->map(function ($handle) {
-                return app('statamic.scopes')->get($handle);
-            })
-            ->filter()
-            ->each(function ($class) use ($query) {
-                $scope = app($class);
-                $scope->apply($query, $this->parameters);
-            });
-    }
-
-    public function querySort($query)
-    {
-        if (! $this->sort) {
-            return;
-        }
-
-        $sort = explode(':', $this->sort)[0];
-        $direction = explode(':', $this->sort)[1] ?? 'asc';
-
-        $query->orderBy($sort, $direction);
-    }
-
     protected function allCollectionsAreDates()
     {
         return $this->allCollectionsAre(function ($collection) {
-            return $collection->order() === 'date';
+            return $collection->dated();
         });
     }
 

@@ -4,15 +4,16 @@
     "keywords": ["statamic", "cms", "flat file", "laravel"],
     "require": {
         "composer/composer": "^1.7",
+        "erusev/parsedown": "^1.7",
+        "erusev/parsedown-extra": "^0.7.1",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*|5.7.*|5.8.*",
+        "laravelcollective/html": "5.6.*|5.7.*|5.8.*",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
-        "michelf/php-markdown": "1.7.0",
         "netcarver/textile": "3.6.*@dev",
-        "ranabd36/laravelcollective": "^5.8",
         "scrumpy/html-to-prosemirror": "^0.4.0",
-        "scrumpy/prosemirror-to-html": "dev-master",
+        "scrumpy/prosemirror-to-html": "^0.4.0",
         "statamic/stringy": "^3.1",
         "symfony/yaml": "^4.1@dev",
         "webpatser/laravel-uuid": "1.*",
@@ -23,6 +24,7 @@
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
         "orchestra/testbench": "3.8",
+        "phpunit/phpunit": "^7.0",
         "tightenco/mailthief": "dev-master"
     },
     "autoload": {
@@ -62,10 +64,6 @@
             "options": {
                 "symlink": false
             }
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/jasonvarga/prosemirror-to-html"
         }
     ]
 }

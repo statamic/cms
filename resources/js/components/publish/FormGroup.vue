@@ -4,7 +4,7 @@
         :config="fieldConfig"
         :value="value"
         :errors="fieldErrors"
-        @updated="$emit('input', $event)"
+        @input="$emit('input', $event)"
     />
 
 </template>

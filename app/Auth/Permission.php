@@ -70,7 +70,7 @@ class Permission
         return $this->callback;
     }
 
-    public function permissions($withChildren = false)
+    public function permissions()
     {
         $permissions = collect([$this]);
 
@@ -85,10 +85,6 @@ class Permission
                     $this, $replacement['value'], $replacement['label']
                 );
             })->values();
-        }
-
-        if ($withChildren) {
-            $permissions = $permissions->merge($this->children());
         }
 
         return $permissions;

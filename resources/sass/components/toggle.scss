@@ -34,6 +34,10 @@ $toggle_radius: 20px;
     height: 22px;
     border-radius: $toggle_radius;
     transition: all 0.2s ease;
+
+    &.disabled {
+        cursor: not-allowed;
+    }
 }
 
 

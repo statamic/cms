@@ -124,6 +124,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'preferences' => $this->preferences(),
             'edit_url' => $this->editUrl(),
             'is_user' => true,
+            'last_login' => $this->lastLogin(),
         ], $roles, $groups, $this->supplements);
     }
 
@@ -165,6 +166,15 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public function save()
     {
         API\User::save($this);
+
+        // TODO: dispatch event
+
+        return $this;
+    }
+
+    public function delete()
+    {
+        API\User::delete($this);
 
         // TODO: dispatch event
 

@@ -1,4 +1,5 @@
 @extends('statamic::outside')
+@section('title', __('Reset User'))
 
 @section('title')
     <h1>{{ $title }}</h1>

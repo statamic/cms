@@ -17,6 +17,7 @@ class CollectionRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
+        $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/collections';
         $stache->registerStore((new CollectionsStore($stache, app('files')))->directory($this->directory));
 
@@ -35,7 +36,6 @@ class CollectionRepositoryTest extends TestCase
         $ordered = $collections->sortBy->handle()->values();
         $this->assertEquals(['alphabetical', 'blog', 'numeric', 'pages'], $ordered->map->handle()->all());
         $this->assertEquals(['Alphabetical', 'Blog', 'Numeric', 'Pages'], $ordered->map->title()->all());
-        $this->assertEquals(['alphabetical', 'date', 'number', 'alphabetical'], $ordered->map->order()->all());
     }
 
     /** @test */
@@ -45,28 +45,24 @@ class CollectionRepositoryTest extends TestCase
             $this->assertInstanceOf(Collection::class, $collection);
             $this->assertEquals('alphabetical', $collection->handle());
             $this->assertEquals('Alphabetical', $collection->title());
-            $this->assertEquals('alphabetical', $collection->order());
         });
 
         tap($this->repo->findByHandle('blog'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
             $this->assertEquals('blog', $collection->handle());
             $this->assertEquals('Blog', $collection->title());
-            $this->assertEquals('date', $collection->order());
         });
 
         tap($this->repo->findByHandle('numeric'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
             $this->assertEquals('numeric', $collection->handle());
             $this->assertEquals('Numeric', $collection->title());
-            $this->assertEquals('number', $collection->order());
         });
 
         tap($this->repo->findByHandle('pages'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
             $this->assertEquals('pages', $collection->handle());
             $this->assertEquals('Pages', $collection->title());
-            $this->assertEquals('alphabetical', $collection->order());
         });
 
         $this->assertNull($this->repo->findByHandle('unknown'));

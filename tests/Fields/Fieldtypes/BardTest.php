@@ -4,7 +4,7 @@ namespace Tests\Fields\Fieldtypes;
 
 use Tests\TestCase;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard;
 
 class BardTest extends TestCase
 {

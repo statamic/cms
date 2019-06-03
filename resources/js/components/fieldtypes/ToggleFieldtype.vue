@@ -1,7 +1,7 @@
 <template>
     <div class="toggle-fieldtype-wrapper">
         <div class="toggle-container" :class="{ 'on': isOn }" @click="toggle">
-            <div class="toggle-slider">
+            <div class="toggle-slider" :class="{disabled: isReadOnly}">
                 <div class="toggle-knob" tabindex="0" @keyup.prevent.space.enter="toggle" ref="knob"></div>
                 <input type="hidden" :name="name" :value="state ? 1 : 0">
             </div>
@@ -42,8 +42,10 @@ export default {
 
     methods: {
         toggle() {
-            this.state = !this.state;
-            this.update(this.state);
+            if (! this.isReadOnly) {
+                this.state = !this.state;
+                this.update(this.state);
+            }
         },
         focus() {
             this.$refs.knob.focus();

@@ -22,7 +22,7 @@ class RelationshipFieldtypeController extends CpController
     public function data(Request $request)
     {
         $items = $this->fieldtype($request)
-            ->getItemData($request->selections, $request->site)
+            ->getItemData($request->selections)
             ->values();
 
         return Resource::collection($items);

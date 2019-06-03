@@ -63,6 +63,7 @@ return [
     |
     | Here you may define the rules that trigger when and how content would be
     | flushed from the static cache. See the documentation for more details.
+    | If a custom class is not defined, the default invalidator is used.
     |
     | https://docs.statamic.com/static-caching
     |
@@ -70,7 +71,7 @@ return [
 
     'invalidation' => [
 
-        'class' => \Statamic\StaticCaching\DefaultInvalidator::class,
+        'class' => null,
 
         'rules' => [
             //

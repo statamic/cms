@@ -14,6 +14,7 @@
                     :status-icon="statusIcons"
                     :editable="canEdit"
                     :sortable="!readOnly && canReorder"
+                    :read-only="readOnly"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -37,7 +38,7 @@
                             @closed="stopCreating"
                         />
                     </div>
-                    <button class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
+                    <button ref="existing" class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                         {{ __('Link Existing Item') }}
                     </button>
@@ -56,6 +57,7 @@
                     :max-selections="maxItems"
                     :search="search"
                     :can-create="canCreate"
+                    :exclusions="exclusions"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -96,6 +98,7 @@ export default {
         canCreate: Boolean,
         canReorder: Boolean,
         readOnly: Boolean,
+        exclusions: Array,
     },
 
     components: {
@@ -164,6 +167,10 @@ export default {
 
         isSelecting(selecting) {
             this.$emit(selecting ? 'focus' : 'blur');
+        },
+
+        itemData(data) {
+            this.$emit('item-data-updated', data);
         }
 
     },
@@ -191,7 +198,7 @@ export default {
 
         getDataForSelections(selections) {
             this.loading = true;
-            const params = { selections };
+            const params = { site: this.site, selections };
 
             return this.$axios.get(this.itemDataUrl, { params }).then(response => {
                 this.loading = false;

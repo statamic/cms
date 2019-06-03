@@ -1,5 +1,12 @@
 <template>
-    <v-date-picker :formats="formats" :mode="config.mode" :input="value" v-model="data" @input="handleUpdate" is-inline />
+    <v-date-picker
+        v-model="date"
+        :attributes="attrs"
+        :formats="formats"
+        :mode="config.mode"
+        :input="value"
+        @input="handleUpdate"
+        is-inline />
 </template>
 
 <script>
@@ -10,7 +17,7 @@ export default {
 
     data() {
         return {
-            data: this.value,
+            date: this.value,
             formats: {
                 title: 'MMMM YYYY',
                 weekdays: 'W',
@@ -25,7 +32,7 @@ export default {
                     popover: {
                         label: __('Today'),
                     },
-                    dates: new Date(),
+                    dates: new Date()
                 },
             ],
         }

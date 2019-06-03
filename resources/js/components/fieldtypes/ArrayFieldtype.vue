@@ -14,11 +14,12 @@
 
         <template v-else-if="isDynamic">
             <div class="table-field">
-                <table class="bordered-table" v-if="valueCount">
+                <table class="table-fieldtype-table" v-if="valueCount">
                     <thead>
                         <tr>
-                            <th class="text-center p-1">{{ keyHeader }}</th>
-                            <th class="text-center p-1">{{ valueHeader }}</th>
+                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                            <th class="w-1/4">{{ keyHeader }}</th>
+                            <th class="">{{ valueHeader }}</th>
                             <th class="row-controls"></th>
                         </tr>
                     </thead>
@@ -31,15 +32,15 @@
                     >
                         <tbody>
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
+                                <td class="table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
-                                    <input type="text" class="input-text-minimal" v-model="element.key" />
+                                    <input type="text" class="input-text font-bold" v-model="element.key" />
                                 </td>
                                 <td>
-                                    <input type="text" class="input-text-minimal" v-model="element.value" />
+                                    <input type="text" class="input-text" v-model="element.value" />
                                 </td>
                                 <td class="row-controls">
-                                    <span class="icon icon-menu move sortable-handle"></span>
-                                    <span class="icon icon-cross delete" @click="confirmDeleteValue(index)"></span>
+                                    <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -148,6 +149,14 @@ export default {
 
         confirmDeleteValue(index) {
             this.deleting = index;
+        },
+
+        deleteOrConfirm(index) {
+            if (this.data[index].key === null && this.data[index].value === null) {
+                this.deleteValue(index);
+            } else {
+                this.confirmDeleteValue(index);
+            }
         },
 
         deleteValue(index) {

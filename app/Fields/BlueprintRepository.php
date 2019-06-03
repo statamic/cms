@@ -90,4 +90,13 @@ class BlueprintRepository
             YAML::dump($blueprint->contents())
         );
     }
+
+    public function makeFromFields($fields)
+    {
+        $fields = collect($fields)->map(function ($field, $handle) {
+            return compact('handle', 'field');
+        });
+
+        return (new Blueprint)->setContents(['fields' => $fields]);
+    }
 }

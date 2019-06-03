@@ -1,11 +1,14 @@
 @extends('statamic::layout')
+@section('title', crumb('Submission ' . $submission->id(), $submission->form->title(), 'Forms'))
 
 @section('content')
 
     <div class="flex mb-3">
         <h1>
-            <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
-            @svg('chevron-right')
+            <small class="subhead block">
+                <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
+                @svg('chevron-right')
+            </small>
             <a href="{{ cp_route('forms.show', $submission->form->handle()) }}">
                 {{ $submission->form->title() }}
             </a>

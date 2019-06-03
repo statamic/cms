@@ -20,7 +20,7 @@
                 :meta="meta[field.handle]"
                 :read-only="grid.isReadOnly"
                 class="p-2"
-                @updated="updated(field.handle, $event)"
+                @input="updated(field.handle, $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />

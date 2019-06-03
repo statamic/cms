@@ -1,7 +1,8 @@
 @extends('statamic::layout')
+@section('title', __('Create Structure'))
 
 @section('content')
-
-    TODO: Create a structure.
-
-@endsection
+    <structure-wizard
+        route="{{ cp_route('structures.store') }}">
+    </structure-wizard>
+@stop

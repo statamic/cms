@@ -15,17 +15,19 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div class="card p-0" slot-scope="{ rows }">
-                <data-list-table v-if="rows.length" @sorted="sorted">
+            <div class="card p-0" slot-scope="{ }">
+                <data-list-table v-if="submissions.length" @sorted="sorted">
                     <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
                         <a :href="submission.url">{{ value }}</a>
                     </template>
                     <template slot="actions" slot-scope="{ row: submission, index }">
                         <dropdown-list>
-                            <ul class="dropdown-menu">
-                                <li><a :href="submission.url">View</a></li>
-                                <li class="warning" v-if="submission.deleteable"><a @click.prevent="destroy(submission.id, index)">Delete</a></li>
-                            </ul>
+                            <dropdown-item :text="__('View')" :redirect="submission.url" />
+                            <dropdown-item
+                                v-if="submission.deleteable"
+                                :text="__('Delete')"
+                                class="warning"
+                                @click="destroy(submission.id, index)" />
                         </dropdown-list>
                     </template>
                 </data-list-table>
@@ -83,7 +85,7 @@ export default {
             const url = cp_url(`forms/${this.form}/submissions`);
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
-                this.columns = response.data.meta.columns.map(column => column.field);
+                this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.submissions = response.data.data;
                 this.loading = false;

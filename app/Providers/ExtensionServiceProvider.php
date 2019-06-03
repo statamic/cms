@@ -5,9 +5,9 @@ namespace Statamic\Providers;
 use Statamic\Tags;
 use Statamic\Actions;
 use Statamic\DataStore;
+use Statamic\Fieldtypes;
 use Statamic\Query\Scopes;
 use Statamic\Extend\Modifier;
-use Statamic\Fields\Fieldtypes;
 use Statamic\View\BaseModifiers;
 use Statamic\Extensions\FileStore;
 use Illuminate\Filesystem\Filesystem;
@@ -101,10 +101,13 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
+        Fieldtypes\Range::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Replicator::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
+        Fieldtypes\Structures::class,
+        Fieldtypes\StructureSites::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Template::class,
         Fieldtypes\Text::class,
@@ -124,7 +127,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Can::class,
         Tags\Collection\Collection::class,
         Tags\Dump::class,
-        Tags\Entries::class,
         Tags\Env::class,
         Tags\GetContent::class,
         Tags\GetFiles::class,
@@ -140,7 +142,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\NotFound::class,
         Tags\OAuth::class,
         Tags\Obfuscate::class,
-        Tags\Pages::class,
         Tags\ParentTags::class,
         Tags\Partial::class,
         Tags\Path::class,
@@ -149,7 +150,9 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Rotate::class,
         Tags\Routes::class,
         Tags\Scope::class,
+        Tags\Set::class,
         Tags\Section::class,
+        Tags\Structure::class,
         Tags\Taxonomy::class,
         Tags\Theme::class,
         Tags\Trans::class,

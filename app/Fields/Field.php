@@ -85,6 +85,15 @@ class Field implements Arrayable
         return (bool) $this->get('listable');
     }
 
+    public function isVisible()
+    {
+        if (is_null($this->get('listable'))) {
+            return true;
+        }
+
+        return ! in_array($this->get('listable'), [false, 'hidden']);
+    }
+
     public function isSortable()
     {
         if (is_null($this->get('sortable'))) {
@@ -161,6 +170,13 @@ class Field implements Arrayable
     public function preProcessIndex()
     {
         $this->value = $this->fieldtype()->preProcessIndex($this->value);
+
+        return $this;
+    }
+
+    public function augment()
+    {
+        $this->value = $this->fieldtype()->augment($this->value);
 
         return $this;
     }

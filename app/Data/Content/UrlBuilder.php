@@ -4,6 +4,7 @@ namespace Statamic\Data\Content;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
+use Statamic\API\Antlers;
 use Statamic\Contracts\Data\Content\UrlBuilder as UrlBuilderContract;
 
 class UrlBuilder implements UrlBuilderContract
@@ -13,7 +14,7 @@ class UrlBuilder implements UrlBuilderContract
      */
     protected $content;
 
-    protected $merged;
+    protected $merged = [];
 
     /**
      * @param \Statamic\Contracts\Data\Entry|\Statamic\Data\Taxonomies\Term $content
@@ -43,35 +44,39 @@ class UrlBuilder implements UrlBuilderContract
     {
         // Routes can be defined as a string for just the route URL,
         // or they can be an array with a route for each locale.
-        $route_url = (is_array($route)) ? $route[$this->content->locale()] : $route;
+        $route = (is_array($route)) ? $route[$this->content->locale()] : $route;
 
-        preg_match_all('/{\s*([a-zA-Z0-9_\-]+)\s*}/', $route_url, $matches);
+        $route = $this->convertToAntlers($route);
 
-        $url = $route_url;
+        $url = Antlers::parse($route, $this->routeData());
 
-        foreach ($matches[1] as $key => $variable) {
-            // Get the corresponding value for the provided variable.
-            $value = $this->getValue($variable);
-
-            // If the value is an array, we'll grab the first value. This is useful
-            // for including a taxonomy term (an array) as part of the URI.
-            if (is_array($value)) {
-                $value = reset($value);
-            }
-
-            // Slugify it because we're dealing with URLs after all.
-            $value = $this->slugify($value);
-
-            // Replace the variable in the URL.
-            $url = str_replace($matches[0][$key], $value, $url);
-        }
+        // Slugify it because we're dealing with URLs after all.
+        $url = $this->slugify($url);
 
         // If provided variables had no matching value, we would end up with
         // blank spaces in the URL, possibly resulting in double slashes.
         // Tidying up the URL will de-duplicate those extra slashes.
         $url = URL::tidy($url);
 
+        $url = rtrim($url, '/');
+
         return Str::ensureLeft($url, '/');
+    }
+
+    private function convertToAntlers($route)
+    {
+        if (Str::contains($route, '{{')) {
+            return $route;
+        }
+
+        return preg_replace_callback('/{\s*([a-zA-Z0-9_\-]+)\s*}/', function ($match) {
+            return "{{ {$match[1]} }}";
+        }, $route);
+    }
+
+    private function routeData()
+    {
+        return array_merge($this->content->routeData(), $this->merged);
     }
 
     private function slugify($value)
@@ -88,84 +93,5 @@ class UrlBuilder implements UrlBuilderContract
         $value = str_replace($slashPlaceholder, '/', $value);
 
         return $value;
-    }
-
-    /**
-     * Given a route variable, get the appropriate value from the content
-     *
-     * @param string $variable
-     * @return string
-     */
-    private function getValue($variable)
-    {
-        if (array_has($this->merged, $variable)) {
-            return $this->merged[$variable];
-        }
-
-        // Handle special values like {year}, {month}, and {day}.
-        if ($specialValue = $this->getSpecialValue($variable)) {
-            return $specialValue;
-        }
-
-        // Get the value from the content if it exists.
-        if ($contentValue = $this->getContentValue($variable)) {
-            return $contentValue;
-        }
-
-        return null;
-    }
-
-    /**
-     * Get a special value based on a variable
-     *
-     * @param string $variable
-     * @return mixed
-     */
-    private function getSpecialValue($variable)
-    {
-        switch ($variable) {
-            case 'year':
-                $value = $this->content->date()->format('Y');
-                break;
-            case 'month':
-                $value = $this->content->date()->format('m');
-                break;
-            case 'day':
-                $value = $this->content->date()->format('d');
-                break;
-            default:
-                $value = null;
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get a value from the content based on a variable
-     *
-     * @param string $variable
-     * @return mixed
-     */
-    private function getContentValue($variable)
-    {
-        // If the given variable exists as data on the content object
-        // (ie. in the front-matter), we'll just use that as-is.
-        if ($this->content->has($variable)) {
-            return $this->content->get($variable);
-        }
-
-        // Otherwise, attempt to get it from a method on the object if one exists.
-        // This will allow us to reference dynamic values like ->title() and so on.
-        $method = Str::camel($variable);
-
-        if (method_exists($this->content, $method)) {
-            return $this->content->$method();
-        }
-
-        try {
-            return $this->content->$method();
-        } catch (\BadMethodCallException $e) {
-
-        }
     }
 }

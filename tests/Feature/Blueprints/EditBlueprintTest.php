@@ -7,11 +7,13 @@ use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Blueprint;
 use Tests\Fakes\FakeBlueprintRepository;
+use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\BlueprintRepository;
 
 class EditBlueprintTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     protected function setUp(): void
     {
@@ -39,7 +41,7 @@ class EditBlueprintTest extends TestCase
     function it_provides_the_blueprint()
     {
         $this->withoutExceptionHandling();
-        $user = API\User::make()->makeSuper();
+        $user = API\User::make()->makeSuper()->save();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this

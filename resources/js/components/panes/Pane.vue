@@ -18,7 +18,7 @@ export default {
     },
 
     destroyed() {
-        this.$panes.close();
+        this.$panes.close(this);
     },
 
     methods: {

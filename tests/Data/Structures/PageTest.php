@@ -7,8 +7,10 @@ use Tests\TestCase;
 use Statamic\Data\Entries\Entry;
 use Illuminate\Support\Collection;
 use Statamic\Data\Structures\Page;
+use Statamic\Data\Structures\Tree;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Structures\Pages;
+use Statamic\Data\Structures\Structure;
 
 class PageTest extends TestCase
 {
@@ -68,7 +70,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_uri()
+    function it_builds_a_uri_based_on_the_position_in_the_structure_when_the_structure_has_a_collection()
     {
         $entry = new class extends Entry {
             public function id($id = null) {
@@ -83,12 +85,40 @@ class PageTest extends TestCase
         $parent->shouldReceive('id')->andReturn('not-the-entry');
         $parent->shouldReceive('uri')->andReturn('/the/parent/uri');
 
+        $tree = (new Tree)->structure(
+            $this->mock(Structure::class)->shouldReceive('collection')->andReturnTrue()->getMock()
+        );
+
         $page = (new Page)
+            ->setTree($tree)
             ->setRoute('/foo/{parent_uri}/bar/{slug}')
             ->setParent($parent)
             ->setEntry($entry);
 
         $this->assertEquals('/foo/the/parent/uri/bar/entry-slug', $page->uri());
+    }
+
+    /** @test */
+    function it_gets_the_entrys_uri_when_the_structure_does_not_have_a_collection()
+    {
+        $entry = new class extends Entry {
+            public function id($id = null) {
+                return '1';
+            }
+            public function uri() {
+                return '/the/actual/entry/uri';
+            }
+        };
+
+        $tree = (new Tree)->structure(
+            $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
+        );
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setEntry($entry);
+
+        $this->assertEquals('/the/actual/entry/uri', $page->uri());
     }
 
     /** @test */
@@ -108,7 +138,7 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(2, $pages->all());
         $this->assertEveryItemIsInstanceOf(Page::class, $pages->all());
-        $this->assertEquals(['one', 'two'], $pages->all()->keys()->all());
+        $this->assertEquals(['one', 'two'], $pages->all()->map->reference()->all());
     }
 
     /** @test */
@@ -163,6 +193,8 @@ class PageTest extends TestCase
             'two' => '/two',
             'three' => '/two/three',
             'four' => '/two/three/four',
-        ], $flattened->map->uri()->all());
+        ], $flattened->mapWithKeys(function ($page) {
+            return [$page->reference() => $page->uri()];
+        })->all());
     }
 }

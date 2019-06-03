@@ -16,12 +16,14 @@
                     :key="`set-${set._id}`"
                     :index="index"
                     :values="set"
+                    :meta="metas[set._id]"
                     :config="setConfig(set.type)"
                     :parent-name="name"
                     :sortable-item-class="sortableItemClass"
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
                     @updated="updated"
+                    @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
                 />
@@ -60,6 +62,7 @@ export default {
     data() {
         return {
             values: null,
+            metas: {},
             focused: false,
         }
     },
@@ -84,8 +87,16 @@ export default {
         // Values should be cloned so we don't unintentionally modify the prop.
         let values = JSON.parse(JSON.stringify(this.value || []));
 
-        // Assign each set a unique id that Vue can use as a v-for key.
-        this.values = values.map(set => Object.assign(set, { _id: uniqid(), enabled: true }));
+        let metas = {};
+
+        values = values.map((set, index) => {
+            let id = uniqid();
+            metas[id] = this.meta.existing[index];
+            return Object.assign(set, { _id: id, enabled: true });
+        });
+
+        this.values = values;
+        this.metas = metas;
     },
 
     methods: {
@@ -98,31 +109,22 @@ export default {
             this.values.splice(index, 1, set);
         },
 
-        removed(index) {
-            if (confirm(__('Are you sure?'))) {
-                this.values.splice(index, 1);
-            }
+        removed(set, index) {
+            Vue.delete(this.metas, set._id);
+            this.values.splice(index, 1);
         },
 
         addSet(handle, index) {
-            let newSet = {
-                _id: uniqid(), // Assign a unique id that Vue can use as a v-for key.
-                type: handle,
-                enabled: true
-            };
+            const id = uniqid();
 
-            // Get nulls for all the set's fields so Vue can track them more reliably.
-            _.each(this.setConfig(handle).fields, field => {
-                newSet[field.handle] = field.default
-                    // || Statamic.fieldtypeDefaults[field.type] // TODO: inject fieldtype default here.
-                    || null;
+            let set = Object.assign({}, this.meta.defaults[handle], {
+                _id: id,
+                type: handle,
+                enabled: true,
             });
 
-            if (index === undefined) {
-                index = this.values.length;
-            }
-
-            this.values.splice(index, 0, newSet);
+            this.metas[id] = this.meta.new[handle];
+            this.values.push(set);
         },
 
         collapseAll() { },
@@ -147,7 +149,7 @@ export default {
         values: {
             deep: true,
             handler(values) {
-                this.$emit('updated', values);
+                this.update(values);
             }
         },
 

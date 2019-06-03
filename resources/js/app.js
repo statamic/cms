@@ -33,7 +33,23 @@ import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 import VTooltip from 'v-tooltip'
 import ReactiveProvide from 'vue-reactive-provide';
+import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
+
+// Customize vSelect UI components
+vSelect.props.components.default = () => ({
+    Deselect: {
+        render: createElement => createElement('span', __('×')),
+    },
+    OpenIndicator: {
+        render: createElement => createElement('span', {
+            class: { 'toggle': true },
+            domProps: {
+                innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 20 20"><path fill="currentColor" d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>'
+            }
+        })
+    }
+});
 
 Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -55,6 +71,8 @@ Vue.use(VTooltip)
 Vue.use(Vuex);
 Vue.use(ReactiveProvide);
 Vue.use(VCalendar);
+
+Vue.component(vSelect)
 
 Statamic.$store = new Vuex.Store({
     modules: {
@@ -103,14 +121,20 @@ Statamic.app({
         FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
         UserListing: require('./components/users/Listing.vue'),
         UserPublishForm: require('./components/users/PublishForm.vue'),
+        UserWizard: require('./components/users/Wizard.vue'),
         RoleListing: require('./components/roles/Listing.vue'),
         RolePublishForm: require('./components/roles/PublishForm.vue'),
         UserGroupListing: require('./components/user-groups/Listing.vue'),
         UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
         CollectionWizard: require('./components/collections/Wizard.vue'),
+        CollectionEditForm: require('./components/collections/EditForm.vue'),
         SessionExpiry: require('./components/SessionExpiry.vue'),
+        StructureWizard: require('./components/structures/Wizard.vue'),
         StructureListing: require('./components/structures/Listing.vue'),
+        StructureEditForm: require('./components/structures/EditForm.vue'),
         Stacks: require('./components/stacks/Stacks.vue'),
+        AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue'),
+        AssetContainerEditForm: require('./components/asset-containers/EditForm.vue'),
     },
 
     data: {
@@ -118,7 +142,7 @@ Statamic.app({
         navOpen: true,
         modals: [],
         stacks: [],
-        pane: false,
+        panes: [],
     },
 
     computed: {
@@ -128,7 +152,7 @@ Statamic.app({
         },
 
         computedNavOpen() {
-            if (this.stackCount > 0) return false;
+            // if (this.stackCount > 0) return false;
 
             return this.navOpen;
         },

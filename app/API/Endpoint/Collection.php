@@ -3,6 +3,7 @@
 namespace Statamic\API\Endpoint;
 
 use Statamic\Events\Data\CollectionSaved;
+use Statamic\Events\Data\CollectionDeleted;
 use Statamic\Contracts\Data\Repositories\CollectionRepository;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
@@ -36,7 +37,7 @@ class Collection
      * @param string $handle
      * @return \Statamic\Contracts\Data\Entries\Collection
      */
-    public function whereHandle($handle)
+    public function findByHandle($handle)
     {
         return $this->repo()->findByHandle($handle);
     }
@@ -49,7 +50,7 @@ class Collection
      */
     public function handleExists($handle)
     {
-        return self::whereHandle($handle) !== null;
+        return self::findByHandle($handle) !== null;
     }
 
     public function make($handle = null)
@@ -74,6 +75,13 @@ class Collection
         $this->repo()->save($collection);
 
         CollectionSaved::dispatch($collection);
+    }
+
+    public function delete(CollectionContract $collection)
+    {
+        $this->repo()->delete($collection);
+
+        CollectionDeleted::dispatch($collection);
     }
 
     protected function repo(): CollectionRepository

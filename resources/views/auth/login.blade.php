@@ -1,5 +1,6 @@
 @extends('statamic::outside')
 @section('body_class', 'rad-mode')
+@section('title', __('Login'))
 
 @section('content')
 <div class="logo pt-7">

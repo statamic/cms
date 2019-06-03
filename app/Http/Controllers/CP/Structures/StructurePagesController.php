@@ -2,57 +2,55 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
+use Statamic\API\Arr;
+use Statamic\API\Site;
 use Statamic\API\Structure;
 use Illuminate\Http\Request;
+use Statamic\Data\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
 
 class StructurePagesController extends CpController
 {
-    public function index($structure)
+    public function index(Request $request, $structure)
     {
         $structure = Structure::find($structure);
+        $site = $request->site ?? Site::selected()->handle();
 
-        $tree = (new \Statamic\Addons\Nav\ContentTreeBuilder)->build([
+        $pages = (new TreeBuilder)->buildForController([
             'structure' => $structure->handle(),
-            'include_home' => false
+            'include_home' => true,
+            'site' => $site,
         ]);
 
-        $data = $this->transformTree($tree);
-
-        return ['pages' => $data];
+        return ['pages' => $pages];
     }
 
     public function store(Request $request, $structure)
     {
-        $structure = Structure::find($structure);
+        $tree = $this->toTree($request->pages);
 
-        $structure->data(array_merge($structure->data(), [
-            'tree' => $this->toTree($request->pages)
-        ]))->save();
-    }
+        if ($request->firstPageIsRoot) {
+            $root = array_pull($tree, 0)['entry'];
+            $tree = array_values($tree);
+        }
 
-    protected function transformTree($tree)
-    {
-        return collect($tree)->map(function ($item) {
-            $page = $item['page'];
+        $tree = Structure::find($structure)
+            ->in($request->site)
+            ->root($root ?? null)
+            ->tree($tree);
 
-            return [
-                'id'          => $page->id(),
-                'title'       => (string) $page->get('title'),
-                'url'         => $page->url(),
-                'slug'        => $page->slug(),
-                'children'    => (! empty($item['children'])) ? $this->transformTree($item['children']) : []
-            ];
-        })->values()->all();
+        $tree->save();
     }
 
     protected function toTree($items)
     {
         return collect($items)->map(function ($item) {
-            return [
-                'entry' => $item['id'],
+            return Arr::removeNullValues([
+                'entry' => $ref = $item['id'] ?? null,
+                'title' => $ref ? null : ($item['title'] ?? null),
+                'url' => $ref ? null : ($item['url'] ?? null),
                 'children' => $this->toTree($item['children'])
-            ];
+            ]);
         })->all();
     }
 }

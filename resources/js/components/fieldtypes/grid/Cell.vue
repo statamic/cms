@@ -9,7 +9,7 @@
                 :meta="meta"
                 :name="name"
                 :read-only="grid.isReadOnly"
-                @updated="$emit('updated', $event)"
+                @input="$emit('updated', $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />
@@ -59,7 +59,7 @@ export default {
     computed: {
 
         fieldtypeComponent() {
-            return `${this.field.type}-fieldtype`;
+            return `${this.field.component || this.field.type}-fieldtype`;
         },
 
         name() {

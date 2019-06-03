@@ -11,6 +11,7 @@ class EntryFactory
     protected $slug;
     protected $data = [];
     protected $published = true;
+    protected $order;
 
     public function id($id)
     {
@@ -42,6 +43,12 @@ class EntryFactory
         return $this;
     }
 
+    public function order($order)
+    {
+        $this->order = $order;
+        return $this;
+    }
+
     public function make()
     {
         $entry = Entry::make()->collection($this->createCollection());
@@ -55,6 +62,10 @@ class EntryFactory
                 ->slug($this->slug)
                 ->data($this->data)
                 ->published($this->published);
+
+            if ($this->order) {
+                $localized->order($this->order);
+            }
         });
 
         return $entry;
@@ -67,8 +78,9 @@ class EntryFactory
 
     protected function createCollection()
     {
-        return Collection::make($this->collection)
-            ->sites(['en'])
-            ->save();
+        return Collection::findByHandle($this->collection)
+            ?? Collection::make($this->collection)
+                ->sites(['en'])
+                ->save();
     }
 }

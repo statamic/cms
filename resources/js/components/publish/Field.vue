@@ -9,12 +9,32 @@
         <label class="publish-field-label" :class="{'font-bold': config.bold}">
             <template v-if="config.display">{{ config.display }}</template>
             <template v-else>{{ config.handle | deslugify | titleize }}</template>
-            <i class="required" v-if="config.required">*</i>
+            <i class="required ml-sm" v-if="config.required">*</i>
             <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
                 {{ isLocked ? __('Locked') : __('Read Only') }}
             </span>
             <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
+
+            <button
+                v-if="!isReadOnly"
+                v-show="syncable && isSynced"
+                class="outline-none"
+                @click="$emit('desynced')"
+            >
+                <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
+                    v-tooltip.top="__('Synced with origin. Click or edit the field to desync.')" />
+            </button>
+
+            <button
+                v-if="!isReadOnly"
+                v-show="syncable && !isSynced"
+                class="outline-none"
+                @click="$emit('synced')"
+            >
+                <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
+                    v-tooltip.top="__('Desynced from origin. Click to sync and revert to the origin\'s value.')" />
+            </button>
         </label>
 
         <div
@@ -32,7 +52,7 @@
                 :meta="meta"
                 :name="config.handle"
                 :read-only="isReadOnly"
-                @updated="$emit('updated', $event)"
+                @input="$emit('input', $event)"
                 @focus="focused"
                 @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
@@ -62,7 +82,8 @@ export default {
         errors: {
             type: Array
         },
-        readOnly: Boolean
+        readOnly: Boolean,
+        syncable: Boolean,
     },
 
     inject: {
@@ -80,13 +101,15 @@ export default {
         },
 
         isReadOnly() {
+            if (this.storeState.isRoot === false && !this.config.localizable) return true;
+
             return this.isLocked || this.readOnly || this.config.read_only || false;
         },
 
         classes() {
             return [
                 'form-group publish-field',
-                `${this.config.type}-fieldtype`,
+                `${this.config.component || this.config.type}-fieldtype`,
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
@@ -95,9 +118,7 @@ export default {
         },
 
         locks() {
-            let state = this.$store.state.publish[this.storeName];
-            if (!state) return {};
-            return state.fieldLocks;
+            return this.storeState.fieldLocks || {};
         },
 
         isLocked() {
@@ -109,6 +130,15 @@ export default {
                 let user = this.locks[this.config.handle];
                 if (typeof user === 'object') return user;
             }
+        },
+
+        isSynced() {
+            if (!this.syncable) return;
+            return !this.storeState.localizedFields.includes(this.config.handle);
+        },
+
+        storeState() {
+            return this.$store.state.publish[this.storeName] || {};
         }
 
     },

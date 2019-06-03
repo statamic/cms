@@ -12,7 +12,7 @@
                         name="field"
                         :suggestions-prop="suggestions"
                         :value="[fieldReference]"
-                        @updated="addReferenceField($event[0])"
+                        @input="addReferenceField($event[0])"
                     />
                 </div>
 

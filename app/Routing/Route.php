@@ -91,6 +91,11 @@ class Route implements Responsable
         ]);
     }
 
+    public function private()
+    {
+        return false;
+    }
+
     public function site()
     {
         return Site::current();
@@ -102,7 +107,7 @@ class Route implements Responsable
             return $entry;
         }
 
-        if ($entry = Entry::whereUri($item)) {
+        if ($entry = Entry::findByUri($item)) {
             return $entry;
         }
     }

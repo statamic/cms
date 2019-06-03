@@ -1,5 +1,6 @@
 @extends('statamic::layout')
 @section('content-class', 'publishing')
+@section('title', __('Settings'))
 
 @section('content')
 

@@ -54,7 +54,7 @@ class EditEntryTest extends TestCase
             ['handle' => 'unused', 'field' => ['type' => 'text']],
         ]]));
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
-        $user = User::make()->assignRole('test');
+        $user = User::make()->assignRole('test')->save();
 
         $entry = EntryFactory::slug('test')
             ->collection('blog')
@@ -120,7 +120,7 @@ class EditEntryTest extends TestCase
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
         $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);
-        $user = User::make()->assignRole('test');
+        $user = User::make()->assignRole('test')->save();
 
         $entry = EntryFactory::slug('test')
             ->collection('blog')

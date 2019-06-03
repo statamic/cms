@@ -58,14 +58,15 @@
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list ref="setSelectorDropdown">
-                        <button type="button" class="btn btn-round" slot="trigger">
-                            <span class="icon icon-plus text-grey-80 antialiased"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li v-for="set in config.sets" :key="set.handle">
-                                <a @click="addSet(set.handle)" v-text="set.display || set.handle" />
-                            </li>
-                        </ul>
+                        <template v-slot:trigger>
+                            <button type="button" class="btn btn-round">
+                                <span class="icon icon-plus text-grey-80 antialiased"></span>
+                            </button>
+                        </template>
+
+                        <div v-for="set in config.sets" :key="set.handle">
+                            <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
+                        </div>
                     </dropdown-list>
                 </div>
             </editor-floating-menu>
@@ -82,6 +83,7 @@
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import { Editor, EditorContent, EditorMenuBar, EditorFloatingMenu, EditorMenuBubble } from 'tiptap';
 import {
     Blockquote,
@@ -130,12 +132,14 @@ export default {
 
     data() {
         return {
+            content: null,
             editor: null,
             html: null,
             json: null,
             showSource: false,
             fullScreenMode: false,
             buttons: [],
+            metas: {},
         }
     },
 
@@ -164,6 +168,21 @@ export default {
 
     },
 
+    created() {
+        let content = this.valueToContent(clone(this.value));
+        if (content) {
+            content.content = content.content.map((item, i) => {
+                if (item.type === 'set') {
+                    const id = uniqid();
+                    item.attrs.id = id;
+                    this.metas[id] = this.meta.existing[i];
+                }
+                return item;
+            });
+            this.content = content;
+        }
+    },
+
     mounted() {
         this.initToolbarButtons();
 
@@ -188,7 +207,7 @@ export default {
                 new RemoveFormat(),
                 new Image({ bard: this }),
             ],
-            content: this.valueToContent(this.value),
+            content: this.content,
             editable: !this.readOnly,
             onFocus: () => this.$emit('focus'),
             onBlur: () => {
@@ -237,17 +256,10 @@ export default {
     methods: {
 
         addSet(handle) {
-            const config = _.find(this.config.sets, { handle }) || {};
-
-            let values = {type: handle};
-
-            _.each(config.fields, field => {
-                values[field.handle] = field.default
-                // || Statamic.fieldtypeDefaults[field.type] // TODO
-                || null;
-            });
-
-            this.editor.commands.set({ values });
+            const id = uniqid();
+            const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
+            this.metas[id] = this.meta.new[handle];
+            this.editor.commands.set({ id, values });
             this.$refs.setSelectorDropdown.close();
         },
 
@@ -292,7 +304,7 @@ export default {
 
         valueToContent(value) {
             // A json string is passed from PHP since that's what's submitted.
-            value = JSON.parse(this.value);
+            value = JSON.parse(value);
 
             return value.length
                 ? { type: 'doc', content: value }

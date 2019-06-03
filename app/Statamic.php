@@ -132,7 +132,7 @@ class Statamic
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'preferences' => Preference::all(), // TODO: Move to CpServiceProvider
-            'user' => optional(user())->toJavascriptArray(),
+            'user' => auth()->check() ? user()->toJavascriptArray() : [],
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);

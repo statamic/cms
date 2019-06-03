@@ -48,18 +48,32 @@ class Install extends Command
 
     protected function createFiles()
     {
-        $dirs = [
+        $gitkeeps = [
             base_path('content/assets'),
             base_path('content/collections'),
             base_path('content/globals'),
             base_path('content/taxonomies'),
             base_path('content/structures'),
             base_path('users'),
+            storage_path('statamic/users'),
+            storage_path('statamic/search'),
+            storage_path('statamic/revisions'),
         ];
 
-        foreach ($dirs as $dir) {
+        $gitignores = [
+            //
+        ];
+
+        foreach ($gitkeeps as $dir) {
             if (! File::exists($gitkeep = $dir.'/.gitkeep')) {
                 File::put($gitkeep, '');
+                $this->info("Created the <comment>[$dir]</comment> directory.");
+            }
+        }
+
+        foreach ($gitignores as $dir) {
+            if (! File::exists($gitignore = $dir.'/.gitignore')) {
+                File::put($gitignore, "*\n!.gitignore");
                 $this->info("Created the <comment>[$dir]</comment> directory.");
             }
         }

@@ -25,14 +25,6 @@ class Permissions
 
         static::$permissions[] = $permission;
 
-        if (! $permission->placeholder()) {
-            $permission->permissions(true)->each(function ($permission) {
-                Gate::define($permission->value(), function ($user) use ($permission) {
-                    return $user->hasPermission($permission->value());
-                });
-            });
-        }
-
         return $permission;
     }
 

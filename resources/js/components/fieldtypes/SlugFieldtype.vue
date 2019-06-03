@@ -10,9 +10,11 @@
             class="font-mono text-xs"
             name="slug"
             :config="config"
-            :value="slug"
             :read-only="isReadOnly"
-            @updated="slug = $event" />
+            v-model="slug"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
+        />
     </slugify>
 
 </template>

@@ -14,6 +14,8 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class EntriesStore extends AggregateStore
 {
+    protected $localizationQueue = [];
+
     public function key()
     {
         return 'entries';
@@ -27,31 +29,31 @@ class EntriesStore extends AggregateStore
             return $entries;
         }
 
-        $collection = Collection::whereHandle(Arr::first($cache)['collection']);
+        $collection = Collection::findByHandle(Arr::first($cache)['collection']);
 
         // The collection has been deleted.
         throw_unless($collection, new StoreExpiredException);
 
-        foreach ($cache as $id => $item) {
-            $entry = $entries->get($id) ?? Entry::make()
+        return $cache->map(function ($item, $id) use ($collection) {
+            $entry = Entry::make()
                 ->id($id)
-                ->collection($collection);
+                ->collection($collection)
+                ->locale($item['locale'])
+                ->slug($item['slug'])
+                ->date($item['date'])
+                ->data($item['data'])
+                ->published($item['published'])
+                ->initialPath($item['path']);
 
-            foreach ($item['localizations'] as $site => $attributes) {
-                $entry->in($site, function ($localized) use ($attributes) {
-                    $localized
-                        ->slug($attributes['slug'])
-                        ->initialPath($attributes['path'])
-                        ->published($attributes['published'])
-                        ->order($attributes['order'])
-                        ->data($attributes['data']);
-                });
+            if ($item['origin']) {
+                $this->localizationQueue[] = [
+                    'origin' => $item['origin'],
+                    'localization' => $entry,
+                ];
             }
 
-            $entries[$id] = $entry;
-        }
-
-        return $entries;
+            return $entry;
+        });
     }
 
     public function getCacheableMeta()
@@ -87,25 +89,37 @@ class EntriesStore extends AggregateStore
             $id = $this->stache->generateId();
         }
 
-        if (! $entry = $this->store($collection)->getItem($id)) {
+        $collectionHandle = $collection;
+        $collection = Collection::findByHandle($collection);
+
+        if (! $entry = $this->store($collectionHandle)->getItem($id)) {
             $entry = Entry::make()
                 ->id($id)
-                ->collection(Collection::whereHandle($collection));
+                ->collection($collection);
         }
 
-        $localized = $entry->in($site, function ($localized) use ($data, $path) {
-            $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
+        $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
-            $localized
-                ->slug($slug)
-                ->initialPath($path)
-                ->published(array_pull($data, 'published', true))
-                ->order(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path))
-                ->data($data);
-        });
+        if ($origin = Arr::pull($data, 'origin')) {
+            $this->localizationQueue[] = [
+                'origin' => $origin,
+                'localization' => $entry,
+            ];
+        }
+
+        $entry
+            ->locale($site)
+            ->slug($slug)
+            ->initialPath($path)
+            ->published(array_pull($data, 'published', true))
+            ->data($data);
+
+        if ($collection->dated()) {
+            $entry->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
+        }
 
         if (isset($idGenerated)) {
-            $localized->save();
+            $entry->save();
         }
 
         return $entry;
@@ -125,7 +139,7 @@ class EntriesStore extends AggregateStore
             $relative = substr($relative, strlen($dir));
         }
 
-        if (! Collection::whereHandle(explode('/', $relative)[0])) {
+        if (! Collection::findByHandle(explode('/', $relative)[0])) {
             return false;
         }
 
@@ -144,5 +158,18 @@ class EntriesStore extends AggregateStore
     public function delete($entry)
     {
         File::delete($entry->path());
+    }
+
+    public function loadingComplete()
+    {
+        foreach ($this->localizationQueue as $item) {
+            $origin = Entry::find($item['origin'])->addLocalization($item['localization']);
+            $this->setItem($this->getItemKey($origin, ''), $origin);
+        }
+    }
+
+    public function shouldStoreUri($item)
+    {
+        return !$item->hasStructure();
     }
 }

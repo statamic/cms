@@ -17,12 +17,9 @@
                 <toggle-fieldtype
                     name="set-enabled"
                     class="toggle-sm mr-2"
-                    :value="enabled"
-                    @updated="enabled = $event" />
+                    v-model="enabled" />
                 <dropdown-list>
-                    <ul class="dropdown-menu">
-                        <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
-                    </ul>
+                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
@@ -33,9 +30,10 @@
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
+                :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                @updated="updated"
+                @updated="updated(field.handle, $event)"
                 @focus="focused"
                 @blur="blurred"
             />
@@ -73,6 +71,10 @@ export default {
 
         values() {
             return this.node.attrs.values;
+        },
+
+        meta() {
+            return this.options.bard.metas[this.node.attrs.id];
         },
 
         config() {

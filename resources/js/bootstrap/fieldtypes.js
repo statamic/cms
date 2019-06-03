@@ -3,6 +3,7 @@ import Vue from "vue";
 Vue.component('select-input', require('../components/inputs/Select.vue'));
 Vue.component('text-input', require('../components/inputs/Text.vue'));
 Vue.component('textarea-input', require('../components/inputs/Textarea.vue'));
+Vue.component('toggle-input', require('../components/inputs/Toggle.vue'));
 Vue.component('relationship-input', require('../components/inputs/relationship/RelationshipInput.vue'));
 
 Vue.component('text-fieldtype', require('../components/fieldtypes/TextFieldtype.vue'));
@@ -35,6 +36,7 @@ Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.
 Vue.component('locale_settings-fieldtype', LocaleSettingsFieldtype);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue'));
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue'));
+Vue.component('range-fieldtype', require('../components/fieldtypes/RangeFieldtype.vue'));
 Vue.component('relate-fieldtype', RelateFieldtype);
 Vue.component('relationship-fieldtype', require('../components/fieldtypes/relationship/RelationshipFieldtype.vue'));
 Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue'));
@@ -44,6 +46,7 @@ Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue'));
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue'));
 Vue.component('status-fieldtype', StatusFieldtype);
+Vue.component('structure_sites-fieldtype', require('../components/structures/Sites.vue'));
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue'));
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue'));
 Vue.component('template-fieldtype', TemplateFieldtype);

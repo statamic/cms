@@ -32,4 +32,11 @@ class CollectionRepository implements RepositoryContract
 
         $this->store->save($collection);
     }
+
+    public function delete(Collection $collection)
+    {
+        $this->store->removeItem($collection->handle(), $collection);
+
+        $this->store->delete($collection);
+    }
 }

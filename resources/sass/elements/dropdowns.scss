@@ -2,6 +2,10 @@
    DROPDOWNS
    ========================================================================== */
 
+dropdown-list {
+    display: none;
+}
+
 .dropdown {
    position: relative;
 }
@@ -14,14 +18,16 @@
 }
 
 .dropdown .rotating-dots {
+    position: relative;
     transition: .12s ease-out;
+    top: 1px;
 }
 
 .dropdown.open .rotating-dots {
     transform: rotate(90deg);
 }
 
-.open .dropdown-menu {
+.open > .dropdown-menu {
     transform: scale(1);
     opacity: 1;
     z-index: 9999;
@@ -46,11 +52,9 @@
     background-clip: padding-box;
     text-shadow: none;
 
-    li { line-height: 1.4; }
-
-    li > a,
-    .li > a {
-        @apply block rounded text-xs font-normal px-1 py-sm text-blue;
+    button {
+        @apply block w-full text-left rounded text-xs font-normal px-1 py-sm text-blue;
+        line-height: 1.4;
         white-space: nowrap;
 
         &:hover {
@@ -72,12 +76,13 @@
         }
     }
 
-    li.warning a,
-    .li.warning a { color: $color_red; }
-    li.warning a:hover,
-    .li.warning a:hover {
-        background: $color_red;
-        color: #fff;
+    button.warning {
+        color: $color_red;
+
+        &:hover {
+            background: $color_red;
+            color: #fff;
+        }
     }
 
     .divider {

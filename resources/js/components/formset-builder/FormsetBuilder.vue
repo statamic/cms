@@ -32,13 +32,13 @@
                     <div class="form-group">
                         <label class="block">{{ __('Metrics') }}</label>
                         <small class="help-block">{{ __('cp.formset_metrics_instructions') }}</small>
-                        <grid-fieldtype :value="formset.metrics" :config="metricsGridConfig" name="metrics" @updated="formset.metrics = $event"></grid-fieldtype>
+                        <grid-fieldtype :value="formset.metrics" :config="metricsGridConfig" name="metrics" @input="formset.metrics = $event"></grid-fieldtype>
                     </div>
 
                     <div class="form-group">
                         <label class="block">{{ __('Emails') }}</label>
                         <small class="help-block">{{ __('cp.formset_emails_instructions') }}</small>
-                        <grid-fieldtype :value="formset.email" :config="emailGridConfig" name="email" @updated="formset.email = $event"></grid-fieldtype>
+                        <grid-fieldtype :value="formset.email" :config="emailGridConfig" name="email" @input="formset.email = $event"></grid-fieldtype>
                     </div>
 
                     <div class="form-group">

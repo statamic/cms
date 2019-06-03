@@ -338,6 +338,13 @@ EOT;
         $this->assertEquals(null, Antlers::parse($template2, $this->variables));
     }
 
+    public function testNullCoalescenceAssignmentInsideLoop()
+    {
+        $template = '{{ complex }}{{ first ??= "Pass" }}{{ /complex }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
     public function testSingleStandardStringModifierTight()
     {
         $template = "{{ string|upper }}";
@@ -398,21 +405,21 @@ EOT;
     {
         $template = "{{ content|markdown|lower }}";
 
-        $this->assertEquals("<p>paragraph</p>".PHP_EOL, Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>", Antlers::parse($template, $this->variables));
     }
 
     public function testChainedStandardModifiersRelaxedOnContent()
     {
         $template = "{{ content | markdown | lower }}";
 
-        $this->assertEquals("<p>paragraph</p>".PHP_EOL, Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>", Antlers::parse($template, $this->variables));
     }
 
     public function testChainedParameterModifiersOnContent()
     {
         $template = "{{ content markdown='true' lower='true' }}";
 
-        $this->assertEquals("<p>paragraph</p>".PHP_EOL, Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>", Antlers::parse($template, $this->variables));
     }
 
     public function testConditionsWithModifiers()

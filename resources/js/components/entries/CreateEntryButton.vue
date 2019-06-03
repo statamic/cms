@@ -1,17 +1,16 @@
 <template>
 
-    <dropdown-list>
-        <button
-            slot="trigger"
-            class="btn btn-primary"
-            @click="create"
-            v-text="__('Create Entry')"
-        />
-        <ul class="dropdown-menu" v-if="blueprints.length > 1">
-            <li v-for="blueprint in blueprints" :key="blueprint.handle">
-                <a @click="select(blueprint.handle)" v-text="blueprint.title" />
-            </li>
-        </ul>
+    <dropdown-list class="inline-block" :show-list-if="blueprints.length > 1">
+        <template v-slot:trigger>
+            <button
+                class="btn btn-primary"
+                @click="create"
+                v-text="__('Create Entry')" />
+        </template>
+
+        <div v-for="blueprint in blueprints" :key="blueprint.handle">
+            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
+        </div>
     </dropdown-list>
 
 </template>

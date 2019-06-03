@@ -1,4 +1,8 @@
 import Vue from 'vue'
+import vSelect from 'vue-select'
+
+// Third Party
+Vue.component('v-select', vSelect)
 
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue'));
@@ -45,7 +49,8 @@ Vue.component('collection-widget', require('../components/entries/Widget.vue'));
 Vue.component('svg-icon', require('../components/SvgIcon.vue'));
 Vue.component('file-icon', require('../components/FileIcon.vue'));
 Vue.component('loading-graphic', require('../components/LoadingGraphic.vue'));
-Vue.component('dropdown-list', require('../components/DropdownList'));
+Vue.component('dropdown-list', require('../components/DropdownList.vue'));
+Vue.component('dropdown-item', require('../components/DropdownItem.vue'));
 Vue.component('validation-errors', require('../components/ValidationErrors'));
 Vue.component('slugify', require('../components/Slugify.vue'));
 Vue.component('element-container', require('../components/ElementContainer.vue'));

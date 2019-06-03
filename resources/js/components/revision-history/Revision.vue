@@ -30,7 +30,7 @@
                     @closed="showDetails = false"
                 >
                     <template slot="action-buttons-right">
-                        <restore-revision :revision="revision" :url="restoreUrl" />
+                        <restore-revision :revision="revision" :url="restoreUrl" class="ml-2" />
                     </template>
                 </revision-preview>
             </div>

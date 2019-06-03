@@ -5,8 +5,8 @@ namespace Tests\Fields\Fieldtypes;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Fieldtypes\Grid;
-use Statamic\Fields\Fieldtypes\NestedFields;
+use Statamic\Fieldtypes\Grid;
+use Statamic\Fieldtypes\NestedFields;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 

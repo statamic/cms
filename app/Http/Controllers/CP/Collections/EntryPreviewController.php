@@ -55,7 +55,7 @@ class EntryPreviewController extends CpController
                     ->data($values);
             });
 
-        if ($collection->order() === 'date') {
+        if ($collection->dated()) {
             $entry->order($preview['date'] ?? now()->format('Y-m-d-Hi'));
         }
 

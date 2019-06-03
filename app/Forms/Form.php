@@ -3,10 +3,12 @@
 namespace Statamic\Forms;
 
 use Statamic\API\Str;
-use Statamic\API\YAML;
 use Statamic\API\File;
+use Statamic\API\YAML;
+use Statamic\CP\Column;
 use Statamic\API\Config;
 use Statamic\API\Folder;
+use Statamic\CP\Columns;
 use Statamic\Exceptions\FatalException;
 use Statamic\Contracts\Forms\Form as FormContract;
 
@@ -155,7 +157,19 @@ class Form implements FormContract
      */
     public function columns($columns = null)
     {
-        return $this->formset()->columns($columns);
+        if (func_num_args()) {
+            return $this->formset()->columns($columns);
+        }
+
+        $columns = collect($this->formset()->columns())
+            ->map(function ($display, $handle) {
+                return Column::make()
+                    ->field($handle)
+                    ->label($display);
+            })
+            ->values();
+
+        return new Columns($columns);
     }
 
     /**
@@ -166,6 +180,16 @@ class Form implements FormContract
         $this->formset()->name($this->name());
 
         $this->formset()->save();
+    }
+
+    /**
+     * Delete the form
+     */
+    public function delete()
+    {
+        $this->submissions()->each->delete();
+
+        $this->formset()->delete();
     }
 
     /**

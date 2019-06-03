@@ -1,11 +1,11 @@
 <template>
     <div>
-        <button class="btn btn-flat btn-icon-only ml-1 dropdown-toggle" @click="customizing = !customizing">
+        <button class="btn btn-flat btn-icon-only dropdown-toggle" @click="customizing = !customizing">
             <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
             <span>{{ __('Columns') }}</span>
         </button>
 
-        <pane name="columns" v-if="customizing">
+        <pane name="columns" v-if="customizing" @closed="dismiss">
             <div>
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
@@ -13,7 +13,7 @@
                     <button
                         type="button"
                         class="btn-close"
-                        @click="customizing = false"
+                        @click="dismiss"
                         v-html="'&times'" />
                 </div>
 
@@ -36,10 +36,8 @@
                         <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                         <template v-else>
                             <div class="flex justify-center mt-3">
-                                <button class="btn-flat w-full block btn-sm" @click="save">{{ __('Save') }}</button>
-                            </div>
-                            <div class="flex justify-center mt-2">
-                                <button class="btn-flat w-full block btn-sm" @click="reset">{{ __('Reset') }}</button>
+                                <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
+                                <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
                             </div>
                         </template>
                     </div>
@@ -93,6 +91,10 @@ export default {
 
     methods: {
 
+        dismiss() {
+            this.customizing = false
+        },
+
         save() {
             if (! this.selectedColumns.length) {
                 return this.$notify.error(__('At least 1 column is required'));
@@ -128,7 +130,10 @@ export default {
                     this.$notify.error(__('Something went wrong'));
                 });
         }
+    },
 
-    }
+    created() {
+        this.$mousetrap.bind('esc', this.dismiss)
+    },
 }
 </script>

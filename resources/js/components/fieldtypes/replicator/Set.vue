@@ -12,11 +12,9 @@
                     class="help-block replicator-set-instructions" />
             </div>
             <div class="replicator-set-controls" v-if="!isReadOnly">
-                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @updated="toggleEnabledState" :value="values.enabled" />
+                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @input="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
-                    <ul class="dropdown-menu">
-                        <li class="warning"><a @click.prevent="destroy">{{ __('Delete Set') }}</a></li>
-                    </ul>
+                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
@@ -27,6 +25,7 @@
                 v-show="showField(field)"
                 :key="field.handle"
                 :field="field"
+                :meta="meta[field.handle]"
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
@@ -63,6 +62,10 @@ export default {
 
     props: {
         config: {
+            type: Object,
+            required: true
+        },
+        meta: {
             type: Object,
             required: true
         },
@@ -120,7 +123,9 @@ export default {
         },
 
         destroy() {
-            this.$emit('removed', this.index);
+            if (! confirm(__('Are you sure?'))) return;
+
+            this.$emit('removed');
         },
 
         toggle() {

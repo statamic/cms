@@ -13,6 +13,9 @@
         :initial-meta="meta"
         :initial-published="published"
         :initial-localizations="localizations"
+        :initial-has-origin="false"
+        :initial-is-root="true"
+        :initial-origin-values="{}"
         @saved="saved"
     ></entry-publish-form>
 

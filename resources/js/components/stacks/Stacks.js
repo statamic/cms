@@ -2,7 +2,6 @@ import Vue from 'vue'
 
 class Stacks {
     constructor(instance) {
-        this.instance = instance;
         this.stacks = instance.$root.stacks;
     }
 

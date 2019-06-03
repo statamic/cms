@@ -39,7 +39,7 @@
                     <form-group
                         handle="blueprint"
                         fieldtype="blueprints"
-                        :config="{ max_items: 1 }"
+                        :config="{ component: 'relationship', max_items: 1 }"
                         :display="__('Blueprint')"
                         :instructions="__('global_set_blueprint_instructions')"
                         v-model="blueprint"
@@ -83,7 +83,7 @@ export default {
             errors: {},
             title: this.initialTitle,
             handle: this.initialHandle,
-            blueprint: this.initialBlueprint
+            blueprint: this.initialBlueprint ? [this.initialBlueprint] : [],
         }
     },
 
@@ -97,7 +97,7 @@ export default {
             return {
                 title: this.title,
                 handle: this.handle,
-                blueprint: this.blueprint ? this.blueprint[0] : null
+                blueprint: this.blueprint.length ? this.blueprint[0] : null
             }
         }
 

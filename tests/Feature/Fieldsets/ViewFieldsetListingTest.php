@@ -9,10 +9,12 @@ use Tests\FakesRoles;
 use Statamic\Auth\User;
 use Statamic\Fields\Fieldset;
 use Statamic\Data\Entries\Collection;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class ViewFieldsetListingTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     function it_shows_a_list_of_fieldsets()
@@ -22,7 +24,7 @@ class ViewFieldsetListingTest extends TestCase
             'bar' => $fieldsetB = $this->createFieldset('bar')
         ]));
 
-        $user = API\User::make()->makeSuper();
+        $user = API\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)

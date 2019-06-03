@@ -64,7 +64,7 @@ class RolesController extends CpController
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
 
-        return ['redirect' => cp_route('roles.edit', $role->handle())];
+        return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
     public function edit($role)
@@ -103,7 +103,7 @@ class RolesController extends CpController
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
 
-        return ['redirect' => cp_route('roles.edit', $role->handle())];
+        return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
     public function destroy($role)

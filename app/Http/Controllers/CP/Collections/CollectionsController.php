@@ -2,15 +2,14 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\API\Str;
 use Statamic\API\Site;
-use Statamic\API\User;
 use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
-use Statamic\API\Helper;
+use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
+use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
@@ -28,7 +27,8 @@ class CollectionsController extends CpController
                 'title' => $collection->title(),
                 'entries' => \Statamic\API\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
-                'entries_url' => cp_route('collections.show', $collection->handle())
+                'entries_url' => cp_route('collections.show', $collection->handle()),
+                'deleteable' => me()->can('delete', $collection)
             ];
         })->values();
 
@@ -73,7 +73,19 @@ class CollectionsController extends CpController
     {
         $this->authorize('edit', $collection, 'You are not authorized to edit collections.');
 
-        return view('statamic::collections.edit', compact('collection'));
+        $values = $collection->toArray();
+
+        $fields = ($blueprint = $this->editFormBlueprint())
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        return view('statamic::collections.edit', [
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+            'collection' => $collection,
+        ]);
     }
 
     public function store(Request $request)
@@ -84,18 +96,37 @@ class CollectionsController extends CpController
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
             'template' => 'nullable',
-            'fieldset' => 'nullable',
+            'blueprints' => 'array',
             'route' => 'nullable',
-            'order' => 'nullable',
+            'orderable' => 'boolean',
+            'dated' => 'boolean',
+            'dateBehavior' => 'nullable',
+            'sortDirection' => 'in:asc,desc',
+            'amp' => 'boolean',
+            'structure' => 'nullable',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $collection = tap(Collection::create($handle))
-            ->data(array_except($data, 'handle'))
-            ->save();
+        $collection = $this->updateCollection(Collection::create($handle), $data);
 
-        session()->flash('message', __('Collection created'));
+        switch ($data['dateBehavior']) {
+            case 'articles':
+                $collection
+                    ->pastDateBehavior('public')
+                    ->futureDateBehavior('private');
+                break;
+
+            case 'events':
+                $collection
+                    ->pastDateBehavior('public')
+                    ->futureDateBehavior('private');
+                break;
+        }
+
+        $collection->save();
+
+        session()->flash('success', __('Collection created'));
 
         return [
             'redirect' => $collection->showUrl()
@@ -106,29 +137,135 @@ class CollectionsController extends CpController
     {
         $this->authorize('update', $collection, 'You are not authorized to edit collections.');
 
-        $data = $request->validate([
-            'title' => 'required',
-            'template' => 'nullable',
-            'fieldset' => 'nullable',
-            'route' => 'nullable',
-        ]);
+        $validation = (new Validation)->fields(
+            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
+        );
 
-        tap($collection)
-            ->data(array_merge($collection->data(), $data))
-            ->save();
+        $request->validate($validation->rules());
 
-        return redirect($collection->editUrl())
-            ->with('success', 'Collection updated');
+        $collection = $this->updateCollection($collection, $values = $fields->values());
+
+        if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
+            $collection->futureDateBehavior($futureDateBehavior);
+        }
+
+        if ($pastDateBehavior = array_get($values, 'past_date_behavior')) {
+            $collection->pastDateBehavior($pastDateBehavior);
+        }
+
+        $collection->save();
+
+        return $collection->toArray();
     }
 
     public function destroy($collection)
     {
-        $this->authorize('delete', $collection, 'You are not authorized to delete collections.');
+        $this->authorize('delete', $collection, 'You are not authorized to delete this collection.');
 
         $collection->delete();
+    }
 
-        return redirect()
-            ->route('statamic.cp.collections.index')
-            ->with('success', 'Collection deleted.');
+    protected function updateCollection($collection, $data)
+    {
+        return $collection
+            ->title($data['title'])
+            ->route($data['route'])
+            ->dated($data['dated'])
+            ->template($data['template'])
+            ->structure($structure = array_get($data, 'structure'))
+            ->orderable($structure ? false : $data['orderable'])
+            ->ampable($data['amp'])
+            ->entryBlueprints($data['blueprints']);
+    }
+
+    protected function editFormBlueprint()
+    {
+        return Blueprint::makeFromFields([
+            'title' => [
+                'type' => 'text',
+                'validate' => 'required',
+                'width' => 50,
+            ],
+            'handle' => [
+                'type' => 'text',
+                'validate' => 'required|alpha_dash',
+                'width' => 50,
+            ],
+            'dates' => ['type' => 'section'],
+            'dated' => ['type' => 'toggle'],
+            'past_date_behavior' => [
+                'type' => 'select',
+                'display' => __('Past Date Behavior'),
+                'instructions' => __('How past dated entries should behave.'),
+                'width' => 50,
+                'options' => [
+                    'public' => 'Public - Always visible.',
+                    'unlisted' => 'Unlisted - Hidden from listings, but available at their URLs.',
+                    'private' => 'Private - Hidden from listings and trigger 404s when accessed directly.'
+                ],
+            ],
+            'future_date_behavior' => [
+                'type' => 'select',
+                'display' => __('Future Date Behavior'),
+                'instructions' => __('How future dated entries should behave.'),
+                'width' => 50,
+                'options' => [
+                    'public' => 'Public - Always visible.',
+                    'unlisted' => 'Unlisted - Hidden from listings, but available at their URLs.',
+                    'private' => 'Private - Hidden from listings and trigger 404s when accessed directly.'
+                ],
+            ],
+
+            'ordering' => ['type' => 'section'],
+            'orderable' => [
+                'type' => 'toggle',
+                'instructions' => __('Whether entries can have a manual order defined. This enables drag and drop reordering.'),
+                'width' => 50,
+                'if' => ['structure' => 'empty']
+            ],
+            'sort_direction' => [
+                'type' => 'select',
+                'instructions' => __('The default sort direction.'),
+                'width' => 50,
+                'options' => [
+                    'asc' => 'Ascending',
+                    'desc' => 'Descending'
+                ],
+                'if' => ['structure' => 'empty']
+            ],
+            'structure' => [
+                'type' => 'structures',
+                'max_items' => 1,
+                'instructions' => __('Choosing a structure will let your page hierarchy dictate its order and URLs.'),
+            ],
+
+            'content_model' => ['type' => 'section'],
+            'blueprints' => [
+                'type' => 'blueprints',
+                'instructions' => __('Entries in this collection may use any of these blueprints.'),
+                'validate' => 'min:1',
+            ],
+            'template' => [
+                'type' => 'text',
+                'instructions' => __('The default template, unless otherwise specified.'),
+                'width' => 50
+            ],
+            'layout' => [
+                'type' => 'text',
+                'instructions' => __('The default layout, unless otherwise specified.'),
+                'width' => 50
+            ],
+
+            'routing' => ['type' => 'section'],
+            'route' => [
+                'type' => 'text',
+                'instructions' => __('The route controls the URL pattern all entries in the collection will follow.'),
+            ],
+            'amp' => [
+                'type' => 'toggle',
+                'display' => __('Accelerated Mobile Pages (AMP)'),
+                'instructions' => __('Whether AMP pages should be enabled'),
+            ],
+        ]);
     }
 }

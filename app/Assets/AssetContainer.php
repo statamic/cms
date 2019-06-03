@@ -87,6 +87,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         return [
             'title' => $this->title(),
+            'handle' => $this->handle(),
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
             'allow_uploads' => $this->allowUploads(),
@@ -368,9 +369,9 @@ class AssetContainer implements AssetContainerContract, Augmentable
             ->args(func_get_args());
     }
 
-    protected function fileData()
+    public function fileData()
     {
-        $data = $this->toArray();
+        $data = array_except($this->toArray(), 'handle');
 
         if ($data['allow_uploads'] === true) {
             unset($data['allow_uploads']);

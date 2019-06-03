@@ -44,6 +44,10 @@ export default {
 
         initialValue(value) {
             this.value = value;
+        },
+
+        initialMeta(meta) {
+            this.meta = meta;
         }
 
     },

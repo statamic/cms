@@ -15,8 +15,11 @@ use Statamic\API\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;
+use Illuminate\Notifications\Notifiable;
 use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Notifications\ActivateAccount;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Notifications\NewUserInvitation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Auth\User as UserContract;
 
@@ -57,7 +60,9 @@ class UsersController extends CpController
             ->supplement(function ($user) use ($request) {
                 return [
                     'edit_url' => $user->editUrl(),
-                    'deleteable' => $request->user()->can('delete', $user)
+                    'deleteable' => $request->user()->can('delete', $user),
+                    'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
+                    'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never")
                 ];
             });
 
@@ -65,8 +70,10 @@ class UsersController extends CpController
             'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
-                ['label' => __('Name'), 'field' => 'name'],
                 ['label' => __('Email'), 'field' => 'email'],
+                ['label' => __('Name'), 'field' => 'name'],
+                ['label' => __('Roles'), 'field' => 'roles'],
+                ['label' => __('Last Login'), 'field' => 'last_login'],
             ],
         ]]);
     }
@@ -118,13 +125,18 @@ class UsersController extends CpController
 
         $user = User::make()
             ->email($request->email)
-            // ->password('secret') // TODO: Either accept input, hash some garbage, or make password nullable in migration.
             ->data($values)
             ->roles($request->roles ?? [])
-            ->groups($request->groups ?? [])
-            ->save();
+            ->groups($request->groups ?? []);
 
-        return ['redirect' => $user->editUrl()];
+        $user->save();
+
+        ActivateAccount::subject($request->subject);
+        ActivateAccount::body($request->message);
+
+        $user->generateTokenAndSendPasswordResetNotification();
+
+        return ['redirect' => cp_route('users.index')];
     }
 
     public function edit($id)

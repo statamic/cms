@@ -8,7 +8,6 @@ use Statamic\API\Term;
 use Statamic\Tags\Tags;
 use Statamic\API\Helper;
 use Statamic\API\Content;
-use Statamic\Extend\Management\FilterLoader;
 use Statamic\SiteHelpers\Filters as SiteHelperFilters;
 
 class Taxonomy extends Tags
@@ -123,7 +122,7 @@ class Taxonomy extends Tags
         foreach ($pages as $page) {
             $url = Str::ensureLeft($page, '/');
 
-            if ($content = Page::whereUri($url)) {
+            if ($content = Page::findByUri($url)) {
                 $collections[] = $content->entriesCollection();
             }
         }
@@ -212,6 +211,7 @@ class Taxonomy extends Tags
 
     private function customFilter($filter)
     {
+        // TODO: FilterLoader doesn't exist, use new HasScopes trait like Collection/Users/etc tags.
         $class = app(FilterLoader::class)->load($filter, [
             'collection' => $this->terms,
             'context' => $this->context,

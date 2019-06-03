@@ -2,13 +2,14 @@
     <table class="data-table" :class="{ 'opacity-50': loading }">
         <thead v-if="visibleColumns.length > 1">
             <tr>
-                <th class="checkbox-column" v-if="allowBulkActions"></th>
+                <th class="checkbox-column" v-if="allowBulkActions || reorderable"></th>
                 <th
                     v-for="column in visibleColumns"
                     :key="column.field"
                     :class="{
                         'current-column': sharedState.sortColumn === column.field,
-                        'sortable-column': column.sortable === true
+                        'sortable-column': column.sortable === true,
+                        'cursor-not-allowed': !sortable,
                     }"
                     @click.prevent="changeSortColumn(column.field)"
                 >
@@ -20,11 +21,20 @@
                 <th class="actions-column"></th>
             </tr>
         </thead>
+        <sortable-list
+            v-model="rows"
+            :vertical="true"
+            item-class="sortable-row"
+            handle-class="table-drag-handle"
+            @sorted="$emit('reordered', rows)"
+        >
         <tbody>
             <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)">
-                <td class="checkbox-column" v-if="allowBulkActions">
+            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)" class="sortable-row outline-none">
+                <td class="table-drag-handle" v-if="reorderable"></td>
+                <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
                     <input
+                        v-if="!reorderable"
                         type="checkbox"
                         :value="row.id"
                         v-model="sharedState.selections"
@@ -55,16 +65,19 @@
                 </td>
             </tr>
         </tbody>
+        </sortable-list>
     </table>
 </template>
 
 <script>
 import TableField from './TableField.vue';
+import SortableList from '../sortable/SortableList.vue';
 
 export default {
 
     components: {
-        TableField
+        TableField,
+        SortableList,
     },
 
     props: {
@@ -79,15 +92,28 @@ export default {
         toggleSelectionOnRowClick: {
             type: Boolean,
             default: false
-        }
+        },
+        sortable: {
+            type: Boolean,
+            default: true
+        },
+        reorderable: {
+            type: Boolean,
+            default: false
+        },
     },
 
     inject: ['sharedState'],
 
     computed: {
 
-        rows() {
-            return this.sharedState.rows;
+        rows: {
+            get() {
+                return this.sharedState.rows;
+            },
+            set(rows) {
+                this.sharedState.rows = rows;
+            }
         },
 
         reachedSelectionLimit() {
@@ -111,6 +137,8 @@ export default {
     methods: {
 
         changeSortColumn(column) {
+            if (!this.sortable) return;
+
             if (! this.sortableColumns.includes(column)) {
                 return;
             }

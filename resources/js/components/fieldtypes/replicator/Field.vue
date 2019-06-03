@@ -16,13 +16,15 @@
             <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
+
         <component
             :is="fieldtypeComponent"
             :config="field"
+            :meta="meta"
             :value="value"
             :name="name"
             :read-only="isReadOnly"
-            @updated="$emit('updated', $event)"
+            @input="$emit('updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />
@@ -38,6 +40,9 @@ export default {
         field: {
             type: Object,
             required: true
+        },
+        meta: {
+            type: Object,
         },
         value: {
             required: true
@@ -58,7 +63,7 @@ export default {
     computed: {
 
         fieldtypeComponent() {
-            return `${this.field.type}-fieldtype`;
+            return `${this.field.component || this.field.type}-fieldtype`;
         },
 
         name() {

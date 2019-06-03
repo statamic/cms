@@ -15,10 +15,14 @@
 }
 
 .data-table {
-    @apply w-full text-left text-grey;
+    @apply w-full text-left text-grey outline-none;
 
     thead {
-        @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
+        @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
+
+		tr {
+			@apply border-b;
+		}
 
         th {
             @apply font-medium px-2 py-1.5;
@@ -27,8 +31,13 @@
         }
     }
     tbody {
+		outline: none;
         tr {
-            @apply border-t text-sm;
+            @apply border-b text-sm;
+
+			&:last-child {
+				@apply border-none;
+			}
 
             &:hover {
                 @apply bg-grey-10;
@@ -37,8 +46,13 @@
             td:first-child { @apply .rounded-bl; }
             td:last-child { @apply .rounded-br; }
 
+            th {
+                @apply py-1 pr-2;
+            }
+            
             td {
                 @apply py-1 px-2;
+                work-break: break-all;
             }
         }
     }
@@ -67,14 +81,24 @@
         svg.asc {
             transform: scaleY(-1);
         }
+	}
 
-    }
+	.sortable-row.draggable-mirror {
+		@apply bg-white border-b;
+	}
 }
 
 .data-list-header ~ .data-table {
     thead th {
         border-radius: 0;
     }
+}
+
+td.table-drag-handle {
+	@apply w-3 border-r h-full p-1;
+	cursor: grab;
+	background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+	&:hover { @apply .bg-grey-30; }
 }
 
 table.table-legacy {

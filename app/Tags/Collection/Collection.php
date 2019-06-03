@@ -2,13 +2,18 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\API;
+use Statamic\API\URL;
+use Statamic\API\Entry;
 use Statamic\Tags\Tags;
+use Statamic\Tags\OutputsItems;
 use Statamic\Data\Entries\EntryCollection;
-use Illuminate\Contracts\Pagination\Paginator;
 
 class Collection extends Tags
 {
+    use OutputsItems;
+
+    protected $defaultAsKey = 'entries';
+
     /**
      * {{ collection:* }} ... {{ /collection:* }}
      */
@@ -24,48 +29,46 @@ class Collection extends Tags
      */
     public function index()
     {
-        $this->entries = (new Entries($this->parameters))->get();
+        $entries = $this->entries()->get();
 
-        return $this->output();
+        return $this->output($entries);
     }
 
-    protected function output()
+    /**
+     * {{ collection:count from="" }} ... {{ /collection:count }}
+     */
+    public function count()
     {
-        if ($this->entries instanceof Paginator) {
-            return $this->paginatedOutput();
-        }
-
-        if ($as = $this->get('as')) {
-            return [$as => $this->entries];
-        }
-
-        return $this->entries;
+        return $this->entries()->count();
     }
 
-    protected function paginatedOutput()
+    /**
+     * {{ collection:next from="" }} ... {{ /collection:next }}
+     */
+    public function next()
     {
-        $as = $this->get('as', 'entries');
-        $paginator = $this->entries;
-        $entries = $paginator->getCollection()->supplement('total_results', $paginator->total());
+        $entries = $this->entries()->next($this->currentEntry());
 
-        return [
-            $as => $entries,
-            'paginate' => $this->getPaginationData($paginator),
-            'total_results' => 10,
-        ];
+        return $this->output($entries);
     }
 
-    protected function getPaginationData($paginator)
+    /**
+     * {{ collection:previous from="" }} ... {{ /collection:previous }}
+     */
+    public function previous()
     {
-        return [
-            'total_items'    => $paginator->total(),
-            'items_per_page' => $paginator->perPage(),
-            'total_pages'    => $paginator->lastPage(),
-            'current_page'   => $paginator->currentPage(),
-            'prev_page'      => $paginator->previousPageUrl(),
-            'next_page'      => $paginator->nextPageUrl(),
-            'auto_links'     => $paginator->render('pagination::default'),
-            'links'          => $paginator->renderArray()
-        ];
+        $entries = $this->entries()->previous($this->currentEntry());
+
+        return $this->output($entries);
+    }
+
+    protected function entries()
+    {
+        return new Entries($this->parameters);
+    }
+
+    protected function currentEntry()
+    {
+        return Entry::find($this->get('current', $this->getContext('id')));
     }
 }

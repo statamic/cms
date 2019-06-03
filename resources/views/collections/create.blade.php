@@ -1,8 +1,8 @@
 @extends('statamic::layout')
+@section('title', __('Create Collection'))
 
 @section('content')
     <collection-wizard
-        :steps="['Naming', 'Ordering', 'Behavior', 'Content Model', 'Route']"
         route="{{ cp_route('collections.store') }}">
     </collection-wizard>
 @stop

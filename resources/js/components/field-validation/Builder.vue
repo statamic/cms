@@ -14,7 +14,7 @@
                 name="rules"
                 :value="rules"
                 ref="list"
-                @updated="updated" />
+                @input="updated" />
         </div>
 
         <p v-if="helpBlock" class="text-xs text-grey-60 ml-2 mt-1">

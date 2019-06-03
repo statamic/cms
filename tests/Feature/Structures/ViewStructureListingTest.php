@@ -7,9 +7,12 @@ use Statamic\API;
 use Tests\TestCase;
 use Statamic\Auth\User;
 use Statamic\Data\Structures\Structure;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class ViewStructureListingTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     function it_shows_a_list_of_structures()
     {
@@ -18,7 +21,7 @@ class ViewStructureListingTest extends TestCase
             'bar' => $structureB = $this->createStructure('bar')
         ]));
 
-        $user = API\User::make()->makeSuper();
+        $user = API\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)
@@ -33,7 +36,7 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_shows_no_results_when_there_are_no_structures()
     {
-        $user = API\User::make()->makeSuper();
+        $user = API\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)
@@ -52,7 +55,7 @@ class ViewStructureListingTest extends TestCase
             'bar' => $structureB = $this->createStructure('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'view bar structure']]);
-        $user = API\User::make()->assignRole('test');
+        $user = API\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -72,7 +75,7 @@ class ViewStructureListingTest extends TestCase
             'bar' => $structureB = $this->createStructure('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'configure structures', 'view bar structure']]);
-        $user = API\User::make()->assignRole('test');
+        $user = API\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -93,7 +96,7 @@ class ViewStructureListingTest extends TestCase
         ]));
 
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = API\User::make()->assignRole('test')->save();
 
         $response = $this
             ->from('/cp/original')
@@ -106,7 +109,7 @@ class ViewStructureListingTest extends TestCase
     function create_structure_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
-        $user = API\User::make()->assignRole('test');
+        $user = API\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -134,7 +137,7 @@ class ViewStructureListingTest extends TestCase
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
-        $user = API\User::make()->assignRole('test');
+        $user = API\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)

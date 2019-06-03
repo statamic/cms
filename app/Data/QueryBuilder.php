@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\Query\OrderBy;
 use Illuminate\Support\Carbon;
 use Statamic\Query\Builder as BaseQueryBuilder;
 
@@ -16,8 +17,9 @@ abstract class QueryBuilder extends BaseQueryBuilder
     {
         $items = $this->getFilteredItems();
 
-        if ($this->orderBy) {
-            $items = $items->multisort($this->orderBy . ':' . $this->orderDirection)->values();
+        if ($orderBys = $this->orderBys) {
+            $sort = collect($orderBys)->map->toString()->implode('|');
+            $items = $items->multisort($sort)->values();
         }
 
         return $this->limitItems($items);

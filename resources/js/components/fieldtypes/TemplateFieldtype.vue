@@ -1,7 +1,17 @@
 <template>
-    <div>
-        <loading-graphic :inline="true" v-if="loading" />
-        <select-input v-if="!loading" :name="name" :value="value" @input="update" :options="options" />
+    <div class="template-fieldtype-container">
+        <v-select
+            ref="input"
+            :name="name"
+            @input="update"
+            :clearable="config.clearable"
+            :disabled="config.disabled"
+            :options="options"
+            :reduce="selection => selection.value"
+            :searchable="true"
+            :push-tags="false"
+            :multiple="false"
+            :value="value" />
     </div>
 </template>
 
@@ -18,21 +28,19 @@ export default {
     },
 
     mounted() {
-
         this.$axios.get(cp_url('api/templates')).then(response => {
             var options = [];
 
             _.each(response.data, function(template) {
                 options.push({
                     value: template,
-                    text: template
+                    label: template
                 });
             });
 
             this.options = options;
             this.loading = false;
         });
-
     }
 
 };

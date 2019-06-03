@@ -2,7 +2,7 @@
 
     <portal :to="portal">
         <vue-modal v-bind="modalProps" @closed="modalClosed">
-            <slot />
+            <slot :close="close" />
         </vue-modal>
     </portal>
 
@@ -48,16 +48,16 @@ export default {
     },
 
     destroyed() {
-        this.destroy();
+        this.close();
     },
 
     methods: {
 
         modalClosed(event) {
-            this.destroy();
+            this.close();
         },
 
-        destroy() {
+        close() {
             this.$modals.remove(this.name);
             this.$emit('closed');
         }

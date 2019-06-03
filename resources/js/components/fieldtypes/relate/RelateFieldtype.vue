@@ -12,7 +12,7 @@
             :create="canCreate"
             :name="name"
             :disabled="disabled"
-            @updated="update($event)">
+            @updated="update">
         </relate-tags>
 
         <relate-panes
@@ -22,7 +22,7 @@
             :suggestions="suggestions"
             :max-items="maxItems"
             :name="name"
-            @updated="update($event)">
+            @updated="update">
         </relate-panes>
 
     </div>

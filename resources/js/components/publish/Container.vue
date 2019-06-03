@@ -26,6 +26,12 @@ export default {
         },
         site: {
             type: String
+        },
+        localizedFields: {
+            type: Array
+        },
+        isRoot: {
+            // intentionally not a boolean. we rely on it being undefined in places.
         }
     },
 
@@ -61,7 +67,9 @@ export default {
                 fieldset: _.clone(this.fieldset),
                 values: _.clone(this.values),
                 meta: _.clone(this.meta),
+                localizedFields: _.clone(this.localizedFields),
                 site: this.site,
+                isRoot: this.isRoot,
             };
 
             // If the store already exists, just reinitialize the state.
@@ -77,9 +85,11 @@ export default {
                     fieldset: initial.fieldset,
                     values: initial.values,
                     meta: initial.meta,
+                    localizedFields: initial.localizedFields,
                     site: initial.site,
                     fieldLocks: {},
                     errors: {},
+                    isRoot: initial.isRoot,
                 },
                 mutations: {
                     setValue(state, payload) {
@@ -89,6 +99,12 @@ export default {
                     setValues(state, values) {
                         state.values = values;
                     },
+                    setMeta(state, meta) {
+                        state.meta = meta;
+                    },
+                    setIsRoot(state, isRoot) {
+                        state.isRoot = isRoot;
+                    },
                     setFieldset(state, fieldset) {
                         state.fieldset = fieldset;
                     },
@@ -97,6 +113,9 @@ export default {
                     },
                     setSite(state, site) {
                         state.site = site;
+                    },
+                    setLocalizedFields(state, fields) {
+                        state.localizedFields = fields;
                     },
                     lockField(state, { handle, user }) {
                         Vue.set(state.fieldLocks, handle, user || true);
@@ -130,7 +149,7 @@ export default {
 
         emitUpdatedEvent(values) {
             this.$emit('updated', values);
-            this.$dirty.add(this.name);
+            this.dirty();
         },
 
         saved() {
@@ -150,6 +169,10 @@ export default {
                 handle, value,
                 user: Statamic.user.id
             });
+        },
+
+        dirty() {
+            this.$dirty.add(this.name);
         }
 
     },
@@ -162,6 +185,17 @@ export default {
                 if (before === after) return;
                 this.$store.commit(`publish/${this.name}/setValues`, after);
             }
+        },
+
+        meta: {
+            deep: true,
+            handler(after, before) {
+                this.$store.commit(`publish/${this.name}/setMeta`, after);
+            }
+        },
+
+        isRoot(isRoot) {
+            this.$store.commit(`publish/${this.name}/setIsRoot`, isRoot);
         },
 
         fieldset: {
@@ -177,6 +211,10 @@ export default {
 
         errors(errors) {
             this.$store.commit(`publish/${this.name}/setErrors`, errors);
+        },
+
+        localizedFields(fields) {
+            this.$store.commit(`publish/${this.name}/setLocalizedFields`, fields);
         }
 
     },

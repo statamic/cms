@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\API\Nav;
+use Statamic\API\Site;
 use Statamic\API\Form as FormAPI;
 use Statamic\API\Role as RoleAPI;
 use Statamic\Contracts\Auth\User;
@@ -73,7 +74,7 @@ class DefaultNav
                 });
             });
 
-        Nav::content('Structure')
+        Nav::content('Structures')
             ->route('structures.index')
             ->icon('hierarchy-files')
             ->can('index', Structure::class)
@@ -107,6 +108,7 @@ class DefaultNav
             ->can('index', GlobalSet::class)
             ->children(function () {
                 return GlobalSetAPI::all()->map(function ($globalSet) {
+                    $globalSet = $globalSet->in(Site::selected()->handle());
                     return Nav::item($globalSet->title())
                               ->url($globalSet->editUrl())
                               ->can('view', $globalSet);
@@ -130,7 +132,7 @@ class DefaultNav
             ->children(function () {
                 return FormAPI::all()->map(function ($form) {
                     return Nav::item($form->title())
-                        ->url($form->editUrl())
+                        ->url($form->url())
                         ->can('view', $form);
                 });
             });

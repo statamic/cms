@@ -100,4 +100,22 @@ class ColumnsTest extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
+
+    /** @test */
+    function it_can_reject_unlisted_columns()
+    {
+        $columns = $this->columns
+            ->ensureHas(Column::make('bard')->listable(false))
+            ->ensureHas(Column::make('authors')->visible(false))
+            ->rejectUnlisted();
+
+        $expected = [
+            'First Name',
+            'Last Name',
+            'Email',
+            'Authors',
+        ];
+
+        $this->assertEquals($expected, $columns->values()->map->label()->all());
+    }
 }

@@ -155,6 +155,8 @@ trait UserContractTests
             'avatar' => null,
             'initials' => 'JS',
             'is_user' => true,
+            'title' => 'john@example.com',
+            'edit_url' => 'http://localhost/cp/users/123/edit',
         ], $this->user()->toArray());
     }
 

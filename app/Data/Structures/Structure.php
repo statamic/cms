@@ -2,16 +2,32 @@
 
 namespace Statamic\Data\Structures;
 
+use Statamic\API\Str;
+use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Stache;
+use Statamic\API\Collection;
+use Statamic\Data\ExistsAsFile;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Structure as StructureAPI;
 use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
 class Structure implements StructureContract
 {
+    use FluentlyGetsAndSets, ExistsAsFile;
+
+    protected $title;
     protected $handle;
-    protected $data = [];
-    protected $withParent = true;
+    protected $sites;
+    protected $trees;
+    protected $collections;
+    protected $maxDepth;
+    protected $expectsRoot = false;
+
+    public function id()
+    {
+        return $this->handle();
+    }
 
     public function handle($handle = null)
     {
@@ -24,26 +40,23 @@ class Structure implements StructureContract
         return $this;
     }
 
-    public function data($data = null)
-    {
-        if (is_null($data)) {
-            return $this->data;
-        }
-
-        $this->data = $data;
-
-        return $this;
-    }
-
     public function title($title = null)
     {
-        if (is_null($title)) {
-            return array_get($this->data, 'title', ucfirst($this->handle()));
-        }
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?: Str::humanize($this->handle());
+            })->args(func_get_args());
+    }
 
-        $this->data['title'] = $title;
-
-        return $this;
+    public function sites($sites = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+            })
+            ->args(func_get_args());
     }
 
     public function showUrl()
@@ -56,66 +69,23 @@ class Structure implements StructureContract
         return cp_route('structures.edit', $this->handle());
     }
 
-    public function route($route = null)
-    {
-        if (func_num_args() === 0) {
-            return array_get($this->data, 'route');
-        }
-
-        $this->data['route'] = $route;
-
-        return $this;
-    }
-
-    public function parent()
-    {
-        return (new Page)
-            ->setEntry($this->data['root'])
-            ->setRoute($this->route())
-            ->setRoot(true);
-    }
-
     public function save()
     {
         StructureAPI::save($this);
     }
 
-    public function pages()
-    {
-        $tree = $this->data['tree'];
-
-        return (new Pages)
-            ->setTree($tree)
-            ->setParent($this->parent())
-            ->setRoute($this->route())
-            ->prependParent($this->withParent);
-    }
-
-    public function flattenedPages()
-    {
-        return $this->pages()->flattenedPages();
-    }
-
-    public function uris()
-    {
-        return $this->flattenedPages()->map->uri();
-    }
-
     public function toCacheableArray()
     {
-        return $this->data;
-    }
-
-    public function page(string $id): ?Page
-    {
-        return $this->flattenedPages()->get($id);
-    }
-
-    public function withoutParent()
-    {
-        $this->withParent = false;
-
-        return $this;
+        return [
+            'title' => $this->title,
+            'handle' => $this->handle,
+            'sites' => $this->sites,
+            'expects_root' => $this->expectsRoot,
+            'path' => $this->initialPath() ?? $this->path(),
+            'max_depth' => $this->maxDepth,
+            'collections' => $this->collections,
+            'trees' => $this->trees()->map->toCacheableArray()->all()
+        ];
     }
 
     public function path()
@@ -124,5 +94,114 @@ class Structure implements StructureContract
             rtrim(Stache::store('structures')->directory(), '/'),
             $this->handle
         ]);
+    }
+
+    public function fileData()
+    {
+        $data = [
+            'title' => $this->title,
+            'collections' => $this->collections,
+            'max_depth' => $this->maxDepth,
+            'expects_root' => $this->collection() ? $this->expectsRoot : null,
+        ];
+
+        if (Site::hasMultiple()) {
+            $data['sites'] = $this->sites;
+        } else {
+            $data = array_merge($data, $this->in(Site::default()->handle())->fileData());
+        }
+
+        return $data;
+    }
+
+    public function expectsRoot($expectsRoot = null)
+    {
+        return $this->fluentlyGetOrSet('expectsRoot')->args(func_get_args());
+    }
+
+    public function trees()
+    {
+        return collect($this->trees);
+    }
+
+    public function makeTree($site)
+    {
+        return (new Tree)
+            ->locale($site)
+            ->structure($this);
+    }
+
+    public function addTree($tree)
+    {
+        $tree->structure($this);
+
+        $this->trees[$tree->locale()] = $tree;
+
+        return $this;
+    }
+
+    public function removeTree($tree)
+    {
+        unset($this->trees[$tree->locale()]);
+
+        return $this;
+    }
+
+    public function existsIn($site)
+    {
+        return isset($this->trees[$site]);
+    }
+
+    public function in($site)
+    {
+        return $this->trees[$site] ?? null;
+    }
+
+    public function collections($collections = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('collections')
+            ->getter(function ($collections) {
+                if ($collection = $this->collection()) {
+                    return collect([$collection]);
+                }
+
+                return collect($collections)->map(function ($collection) {
+                    return Collection::findByHandle($collection);
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function collection()
+    {
+        return Collection::all()->first(function ($collection) {
+            return $collection->structure() === $this;
+        });
+    }
+
+    public function maxDepth($maxDepth = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('maxDepth')
+            ->setter(function ($maxDepth) {
+                return (int) $maxDepth ?: null;
+            })->args(func_get_args());
+    }
+
+    public function delete()
+    {
+        StructureAPI::delete($this);
+
+        return true;
+    }
+
+    public function entryUri($entry)
+    {
+        return $this->in($entry->locale())
+            ->flattenedPages()
+            ->keyBy->reference()
+            ->get($entry->id())
+            ->uri();
     }
 }
