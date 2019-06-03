@@ -40,7 +40,7 @@ class Page implements Entry, AugmentableContract, Responsable
             return $this->url;
         }
 
-        if ($this->reference) {
+        if ($this->reference && $this->referenceExists()) {
             return URL::makeRelative($this->absoluteUrl());
         }
     }
@@ -103,6 +103,11 @@ class Page implements Entry, AugmentableContract, Responsable
         return $this->reference;
     }
 
+    public function referenceExists()
+    {
+        return $this->entry() !== null;
+    }
+
     public function parent(): ?Page
     {
         return $this->parent;
@@ -134,7 +139,7 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function uri()
     {
-        if (! $this->reference) {
+        if (! $this->reference || ! $this->referenceExists()) {
             return;
         }
 
@@ -163,7 +168,7 @@ class Page implements Entry, AugmentableContract, Responsable
             return $this->url;
         }
 
-        if ($this->reference) {
+        if ($this->reference && $this->referenceExists()) {
             return vsprintf('%s/%s', [
                 rtrim($this->site()->absoluteUrl(), '/'),
                 ltrim($this->uri(), '/')
@@ -222,7 +227,7 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function toArray()
     {
-        $array = $this->reference ? $this->entry()->toArray() : [];
+        $array = $this->reference && $this->referenceExists() ? $this->entry()->toArray() : [];
 
         return array_merge($array, [
             'title' => $this->title(),
@@ -244,7 +249,7 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function in($site)
     {
-        if ($this->reference) {
+        if ($this->reference && $this->referenceExists()) {
             if (! $entry = $this->entry()->in($site)) {
                 return null;
             }
@@ -257,7 +262,7 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function site()
     {
-        if ($this->reference) {
+        if ($this->reference && $this->referenceExists()) {
             return $this->entry()->site();
         }
 
@@ -266,7 +271,7 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function toResponse($request)
     {
-        if ($this->reference) {
+        if ($this->reference && $this->referenceExists()) {
             return $this->entry()->toResponse($request);
         }
 

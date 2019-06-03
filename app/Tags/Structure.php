@@ -28,6 +28,11 @@ class Structure extends Tags
     {
         return collect($tree)->map(function ($item) use ($parent) {
             $page = $item['page'];
+
+            if ($page->reference() && !$page->referenceExists()) {
+                return null;
+            }
+
             $data = $page->toArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data);
 
@@ -38,6 +43,6 @@ class Structure extends Tags
                 'is_parent'   => URL::isAncestor($page->uri()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
             ]);
-        })->all();
+        })->filter()->values()->all();
     }
 }

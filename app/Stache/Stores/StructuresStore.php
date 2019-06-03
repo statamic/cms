@@ -274,7 +274,11 @@ class StructuresStore extends BasicStore
                 $locale = $tree->locale();
                 $handle = $tree->handle();
 
-                foreach ($tree->flattenedPages() as $page) {
+                $pages = $tree->flattenedPages()->filter(function ($page) {
+                    return $page->reference() && $page->referenceExists();
+                });
+
+                foreach ($pages as $page) {
                     if (! $page->reference()) {
                         continue;
                     }
