@@ -2,100 +2,13 @@
 
 namespace Statamic\Tags;
 
-use ArrayAccess;
-use ArrayIterator;
-use Statamic\API\Arr;
 use Statamic\API\Str;
-use IteratorAggregate;
 
-class Parameters implements ArrayAccess, IteratorAggregate
+class Parameters extends ArrayAccessor
 {
-    protected $parameters = [];
-
     public function __construct($parameters, $context)
     {
-        $this->parameters = $this->initialize($parameters, $context);
-    }
-
-    public function all()
-    {
-        return $this->parameters;
-    }
-
-    public function get($key, $default = null)
-    {
-        return Arr::getFirst($this->parameters, Arr::wrap($key), $default);
-    }
-
-    public function has($key)
-    {
-        return isset($this->parameters[$key]);
-    }
-
-    public function remove($key)
-    {
-        unset($this->parameters[$key]);
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->get($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->parameters[$key] = $value;
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
-    }
-
-    public function explode($key, $default = null)
-    {
-        if (! $value = $this->get($key)) {
-            return $default;
-        }
-
-        return explode('|', $value);
-    }
-
-    public function bool($key, $default = false)
-    {
-        if (! $value = $this->get($key)) {
-            return $default;
-        }
-
-        return (bool) $value;
-    }
-
-    public function int($key, $default = 0)
-    {
-        if (! $value = $this->get($key)) {
-            return $default;
-        }
-
-        return (int) $value;
-    }
-
-    public function float($key, $default = 0.0)
-    {
-        if (! $value = $this->get($key)) {
-            return is_int($default) ? (float) $default : $default;
-        }
-
-        return (float) $value;
-    }
-
-    public function getIterator()
-    {
-        return new ArrayIterator($this->parameters);
+        parent::__construct($this->initialize($parameters, $context));
     }
 
     protected function initialize($parameters, $context)

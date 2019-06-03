@@ -3,6 +3,8 @@
 namespace Tests\Tags;
 
 use Tests\TestCase;
+use Statamic\API\Antlers;
+use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 
 class ParametersTest extends TestCase
@@ -11,9 +13,9 @@ class ParametersTest extends TestCase
     {
         parent::setUp();
 
-        $context = [
+        $context = new Context([
             'foo' => 'bar'
-        ];
+        ], Antlers::parser());
 
         $this->params = new Parameters([
             'string' => 'hello',
@@ -88,11 +90,11 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_removes_keys()
+    function it_forgets_keys()
     {
         $this->assertEquals('hello', $this->params->get('string'));
 
-        $this->params->remove('string');
+        $this->params->forget('string');
 
         $this->assertNull($this->params->get('string'));
     }

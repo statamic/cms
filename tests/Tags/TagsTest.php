@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Statamic\Tags\Tags;
 use Statamic\API\Antlers;
 use Tests\TestDependency;
+use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 
 class TagsTest extends TestCase
@@ -25,7 +26,8 @@ class TagsTest extends TestCase
         ]);
 
         $this->assertEquals('This is the tag content', $class->content);
-        $this->assertEquals(['foo' => 'bar'], $class->context);
+        $this->assertInstanceOf(Context::class, $class->context);
+        $this->assertEquals(['foo' => 'bar'], $class->context->all());
         $this->assertInstanceOf(Parameters::class, $class->parameters);
         $this->assertEquals(['limit' => 3], $class->parameters->all());
         $this->assertEquals('test:listing', $class->tag);
