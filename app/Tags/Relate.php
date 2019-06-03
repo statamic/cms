@@ -4,8 +4,8 @@ namespace Statamic\Tags;
 
 class Relate extends Tags
 {
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        return $this->getContext($this->method);
+        return $this->context->get($tag);
     }
 }
