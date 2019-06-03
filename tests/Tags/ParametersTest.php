@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Extend;
+namespace Tests\Tags;
 
 use Tests\TestCase;
-use Statamic\Extend\Parameters;
+use Statamic\Tags\Parameters;
 
 class ParametersTest extends TestCase
 {

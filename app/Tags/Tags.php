@@ -9,7 +9,6 @@ use Statamic\API\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasContext;
-use Statamic\Extend\Parameters;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;

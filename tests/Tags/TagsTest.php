@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Statamic\Tags\Tags;
 use Statamic\API\Antlers;
 use Tests\TestDependency;
-use Statamic\Extend\Parameters;
+use Statamic\Tags\Parameters;
 
 class TagsTest extends TestCase
 {

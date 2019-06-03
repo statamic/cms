@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Tags;
 
 use ArrayAccess;
 use ArrayIterator;
