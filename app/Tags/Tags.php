@@ -32,6 +32,12 @@ abstract class Tags
     public $context;
 
     /**
+     * The parameters used on this tag.
+     * @public array
+     */
+    public $params;
+
+    /**
      * The tag that was used
      *
      * eg. For {{ ron:swanson foo="bar" }}, this would be `ron:swanson`
@@ -86,7 +92,8 @@ abstract class Tags
         $this->parser      = $properties['parser'];
         $this->content     = $properties['content'];
         $this->context     = new Context($properties['context'], $this->parser);
-        $this->parameters  = new Parameters($properties['parameters'], $this->context);
+        $this->params      = new Parameters($properties['parameters'], $this->context);
+        $this->parameters  = $this->params; // TODO: Remove with HasParameters trait
         $this->isPair      = $this->content !== '';
         $this->tag         = array_get($properties, 'tag');
         $this->method      = array_get($properties, 'tag_method');
