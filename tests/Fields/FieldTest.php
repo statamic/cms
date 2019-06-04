@@ -101,7 +101,7 @@ class FieldTest extends TestCase
         $field = new Field('test', ['type' => 'fieldtype_with_rules']);
 
         $this->assertEquals([
-            'test' => ['min:2', 'max:5']
+            'test' => ['min:2', 'max:5', 'nullable']
         ], $field->rules());
     }
 
@@ -148,7 +148,7 @@ class FieldTest extends TestCase
         $this->assertEquals([
             'test' => ['required'],
             'test.*.one' => ['required', 'min:2'],
-            'test.*.two' => ['max:2'],
+            'test.*.two' => ['max:2', 'nullable'],
         ], $field->rules());
     }
 
@@ -227,6 +227,44 @@ class FieldTest extends TestCase
         $this->assertTrue($requiredField->isRequired());
         $this->assertFalse($optionalField->isRequired());
         $this->assertFalse($explicitlyOptionalField->isRequired());
+    }
+
+    /** @test */
+    function it_adds_nullable_rule_when_not_required()
+    {
+        $fieldtype = new class extends Fieldtype {
+            protected $rules = null;
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype_with_no_rules')
+            ->andReturn($fieldtype);
+
+        $nullableField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'min:2'
+        ]);
+
+        $booleanRequiredField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'min:2',
+            'required' => true,
+        ]);
+
+        $validateRequiredField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'required|min:2'
+        ]);
+
+        $validateRequiredIfField = new Field('test', [
+            'type' => 'fieldtype_with_no_rules',
+            'validate' => 'required_if:foo|min:2'
+        ]);
+
+        $this->assertEquals(['test' => ['min:2', 'nullable']], $nullableField->rules());
+        $this->assertEquals(['test' => ['required', 'min:2']], $booleanRequiredField->rules());
+        $this->assertEquals(['test' => ['required', 'min:2']], $validateRequiredField->rules());
+        $this->assertEquals(['test' => ['required_if:foo', 'min:2']], $validateRequiredIfField->rules());
     }
 
     /** @test */
