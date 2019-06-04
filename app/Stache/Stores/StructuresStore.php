@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\API;
+use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
@@ -307,5 +308,48 @@ class StructuresStore extends BasicStore
         }
 
         $this->markAsUpdated();
+    }
+
+    public function insert($item, $key = null)
+    {
+        parent::insert($item, $key);
+
+        if (Site::hasMultiple()) {
+            $item->trees()->each(function ($tree) use ($key) {
+                $this->setSitePath($tree->locale(), $key.'::'.$tree->locale(), $tree->path());
+            });
+        }
+
+        return $this;
+    }
+
+    public function removeByPath($path)
+    {
+        $id = $this->getIdFromPath($path);
+
+        if (Str::contains($id, '::')) {
+            $this->removeTree($id);
+        } else {
+            $this->removeStructure($id);
+        }
+    }
+
+    protected function removeStructure($key)
+    {
+        $this->removeItem($key);
+        $this->flushStructureEntryUris($key);
+        $this->removeSitePath($this->stache->sites()->first(), $key);
+    }
+
+    protected function removeTree($key)
+    {
+        [$handle, $site] = explode('::', $key);
+
+        $this->flushStructureEntryUris($handle, $site);
+        $this->removeSitePath($site, $key);
+
+        $structure = $this->getItem($handle);
+        $structure->removeTree($structure->in($site));
+        $this->setItem($handle, $structure);
     }
 }

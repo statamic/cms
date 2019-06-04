@@ -5,7 +5,6 @@ namespace Statamic\Stache\Stores;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Contracts\Data\Localizable;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Stache\Exceptions\StoreExpiredException;
 
@@ -385,25 +384,14 @@ abstract class BasicStore extends Store
 
         $item = $this->getItem($id);
 
-        if ($item instanceof Localizable) {
-            $localization = $item->localizations()->first(function ($localized) use ($path) {
-                return $localized->path() === $path;
-            });
+        $this->removeItem($id);
 
-            $this->removeSiteUri($localization->locale(), $id);
-            $this->removeSitePath($localization->locale(), $id);
-            $item->removeLocalization($localization);
-            $this->setItem($id, $item);
+        $site = $item instanceof Localization
+            ? $item->locale()
+            : $this->stache->sites()->first();
 
-            if ($item->localizations()->isEmpty()) {
-                $this->removeItem($id);
-            }
-        } else {
-            $this->removeItem($id);
-            $site = $this->stache->sites()->first();
-            $this->removeSiteUri($site, $id);
-            $this->removeSitePath($site, $id);
-        }
+        $this->removeSiteUri($site, $id);
+        $this->removeSitePath($site, $id);
 
         return $this;
     }
