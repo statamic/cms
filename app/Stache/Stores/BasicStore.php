@@ -359,11 +359,9 @@ abstract class BasicStore extends Store
 
         $this->setItem($key, $item);
 
-        $site = $this->stache->sites()->first();
-
-        if ($item instanceof Localization) {
-            $site = $item->locale();
-        }
+        $site = $item instanceof Localization
+            ? $item->locale()
+            : $this->stache->sites()->first();
 
         $this->setSitePath($site, $key, $item->path());
 
