@@ -8,7 +8,6 @@ use Statamic\API\File;
 use Statamic\API\Site;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
-use Statamic\API\Preference;
 
 class Statamic
 {

@@ -5,6 +5,7 @@ namespace Statamic\Auth;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Blueprint;
+use Statamic\API\Preference;
 use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -121,7 +122,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'email' => $this->email(),
             'avatar' => $this->avatar(),
             'initials' => $this->initials(),
-            'preferences' => $this->preferences(),
+            'preferences' => Preference::all(), // Preference API respects fallbacks to role preferences!
             'permissions' => $this->permissions()->all(),
             'edit_url' => $this->editUrl(),
             'is_user' => true,
