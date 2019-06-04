@@ -91,4 +91,13 @@ class CollectionsStore extends BasicStore
 
         return $this;
     }
+
+    public function setItem($key, $item)
+    {
+        if ($this->markUpdates) {
+            optional($item->structure())->updateEntryUris();
+        }
+
+        return parent::setItem($key, $item);
+    }
 }

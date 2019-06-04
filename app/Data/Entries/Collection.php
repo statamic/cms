@@ -192,6 +192,8 @@ class Collection implements Contract
     {
         API\Collection::save($this);
 
+        optional($this->structure())->updateEntryUris();
+
         return $this;
     }
 

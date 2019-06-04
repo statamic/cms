@@ -204,4 +204,11 @@ class Structure implements StructureContract
             ->get($entry->id())
             ->uri();
     }
+
+    public function updateEntryUris()
+    {
+        StructureAPI::updateEntryUris($this);
+
+        return $this;
+    }
 }
