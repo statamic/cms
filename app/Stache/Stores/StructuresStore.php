@@ -269,6 +269,8 @@ class StructuresStore extends BasicStore
             $this->entryUris->put($site, collect($this->entryUris->get($site))->reject(function ($uri, $key) use ($handle) {
                 return str_before($key, '::') === $handle;
             }));
+
+            $this->entryRoutes->forget($handle . '::' . $site);
         }
     }
 
