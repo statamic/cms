@@ -131,7 +131,6 @@ class Statamic
             'flash' => static::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'preferences' => Preference::all(), // TODO: Move to CpServiceProvider
             'user' => auth()->check() ? user()->toJavascriptArray() : [],
         ];
 
