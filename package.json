@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
+    "@simonwep/pickr": "^0.6.4",
     "autosize": "~3.0.12",
     "axios": "^0.18.0",
     "baremetrics-calendar": "^1.0.14",
