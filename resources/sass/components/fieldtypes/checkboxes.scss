@@ -7,7 +7,7 @@
         @apply flex items-center mb-1;
     }
 
-    label {
+    .option + label {
         @apply ml-1;
     }
 }
