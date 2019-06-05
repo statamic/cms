@@ -12,21 +12,23 @@
         <!-- Step 1 -->
         <div v-if="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Structures</h1>
-                <p class="text-grey">Structures are heirarchial arrangements of your content, most often used to represent forms of site navigation.</p>
+                <h1 class="mb-3" v-text="__('Structures')" />
+                <p class="text-grey">
+                    {{ __('Structures are link trees most often used to create nav bars and other forms of site navigation.') }}
+                </p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Name of your structure</label>
+                <label class="font-bold text-base mb-sm" for="name" v-text="__('Structure Name')" />
                 <input type="text" v-model="structure.title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    For example: "Pages", "Documentation", or "Navigation".
+                    For example: "Pages", "Main Nav Bar", or "Documentation".
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Handle</label>
+                <label class="font-bold text-base mb-sm" for="name" v-text="__('Handle')" />
                 <input type="text" v-model="structure.handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     How you'll reference to this structure in your templates. Cannot be easily changed.
                 </div>
@@ -36,28 +38,28 @@
         <!-- Step 2 -->
         <div v-if="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Purpose</h1>
-                <p class="text-grey">Structures are heirarchial arrangements of your content, most often used to represent URL structure or site navigation.</p>
+                <h1 class="mb-3" v-text="__('Purpose')" />
+                <p class="text-grey">Structures can either control a collection with parent/child URLs, or define hand-crafted nav trees from existing entries and user-defined URLs.</p>
             </div>
             <div class="max-w-lg px-4 mx-auto pb-6 text-center">
                 <div class="-mx-2 flex flex-wrap justify-center">
                     <div class="w-full md:w-1/3 px-2 mb-2">
-                        <label for="purpose-navigation" class="radio-box" :class="{selected: purpose === 'navigation'}">
-                            <input id="purpose-navigation" class="absolute pin-t pin-r m-1" type="radio" v-model="purpose" value="navigation" />
+                        <label for="purpose-collection" class="radio-box" :class="{selected: purpose === 'collection'}">
+                            <input id="purpose-collection" class="absolute pin-t pin-r m-1" type="radio" v-model="purpose" value="collection" />
                             <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
-                            <h3 class="my-2 font-bold">Navigation</h3>
+                            <h3 class="my-2 font-bold" v-text="__('Collection')" />
                             <p class="text-2xs text-grey">
-                                Contains links to internal entries or hardcoded URLs.
+                                Control a collection's URLs with parent/child relationships.
                             </p>
                         </label>
                     </div>
                     <div class="w-full md:w-1/3 px-2 mb-2">
-                        <label for="purpose-collection" class="radio-box" :class="{selected: purpose === 'collection'}">
-                            <input id="purpose-collection" class="absolute pin-t pin-r m-1" type="radio" v-model="purpose" value="collection" />
+                        <label for="purpose-navigation" class="radio-box" :class="{selected: purpose === 'navigation'}">
+                            <input id="purpose-navigation" class="absolute pin-t pin-r m-1" type="radio" v-model="purpose" value="navigation" />
                             <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
-                            <h3 class="my-2 font-bold">Collection</h3>
+                            <h3 class="my-2 font-bold" v-text="__('Navigation')" />
                             <p class="text-2xs text-grey">
-                                Controls the URL structure of a collection.
+                                Create a tree of links to existing entries and/or user-defined URLs.
                             </p>
                         </label>
                     </div>
@@ -68,11 +70,11 @@
         <!-- Step 3 -->
         <div v-if="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Contents</h1>
-                <p class="text-grey">Choose the available contents of this structure.</p>
+                <h1 class="mb-3">Settings</h1>
+                <p class="text-grey">Define which collections are available to this Structure and how deep it can grow.</p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'navigation'">
-                <label class="font-bold text-base mb-sm" for="name">Collections</label>
+                <label class="font-bold text-base mb-sm" for="name" v-text="__('Collections')" />
                 <publish-field-meta
                     :config="{ handle: 'collections', type: 'collections' }"
                     :initial-value="structure.collections">
@@ -86,13 +88,13 @@
                             @input="structure.collections = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Any collections you select here will make its entries selectable when building your page tree.
+                    Entries from selected collections will be available to choose from when building the page tree.
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'collection'">
-                <label class="font-bold text-base mb-sm" for="name">Collection</label>
+                <label class="font-bold text-base mb-sm" for="name" v-text="__('Collection')" />
                 <publish-field-meta
                     :config="{ handle: 'collection', type: 'collections', max_items: 1 }"
                     :initial-value="structure.collection ? [structure.collection] : null">
@@ -106,17 +108,17 @@
                             @input="structure.collection = $event[0]" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    If the collection you intend to use does not exist yet, just choose this structure when you create it.
+                    <span>If the collection you intend to use does not exist yet, choose <b>this structure</b> later while creating it.</span>
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Max Depth</label>
                 <input type="number" min="1" step="1" v-model="structure.max_depth" class="input-text">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The deepest a page may be nested. Leave blank for no limit.
+                    The maximum number of levels deep a page may be nested. Leave blank for no limit.
                 </div>
             </div>
         </div>
@@ -148,7 +150,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Purpose', 'Contents'],
+            steps: ['Naming', 'Purpose', 'Settings'],
             currentStep: 0,
             purpose: null,
             structure: {

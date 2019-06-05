@@ -4,19 +4,18 @@
         <div class="flex items-center mb-3">
             <slot name="header" />
 
-            <div class="pt-px text-2xs text-grey-60 mr-2" v-if="isDirty" v-text="__('Unsaved Changes')" />
-
             <dropdown-list class="mr-2">
-                <dropdown-item :text="__('Edit Structure')" :redirect="editUrl" />
-                <dropdown-item :text="__('Discard Changes')" @click="cancel" />
+                <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
             </dropdown-list>
+
+            <a @click="cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
             <dropdown-list>
                 <template #trigger>
-                    <button class="btn" v-text="`${__('Link')}`" />
+                    <button class="btn" v-text="`${__('Add Link')}`" />
                 </template>
-                <dropdown-item :text="__('Create Link')" @click="createPage" />
-                <dropdown-item :text="__('Create Link from Entry')" @click="createEntries" />
+                <dropdown-item :text="__('Link to URL')" @click="createPage" />
+                <dropdown-item :text="__('Link to Entry')" @click="createEntries" />
             </dropdown-list>
 
             <button
@@ -50,7 +49,7 @@
         <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
             <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
                 <slot name="no-pages-svg" />
-                <h1 class="my-3">Create the first page now</h1>
+                <h1 class="my-3" v-text="__('Create your first link now.')" />
                 <p class="text-grey mb-3">
                     {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
                 </p>
