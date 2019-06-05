@@ -108,7 +108,8 @@ class Nav
             ->validateNesting()
             ->validateIcons()
             ->validateViews()
-            ->filterAuthorized()
+            ->authorizeItems()
+            ->authorizeChildren()
             ->buildSections();
     }
 
@@ -223,21 +224,50 @@ class Nav
     }
 
     /**
-     * Filter authorized nav items.
+     * Authorize nav items.
      *
      * @return $this
      */
-    protected function filterAuthorized()
+    protected function authorizeItems()
     {
-        $this->items = collect($this->items)
-            ->filter(function ($item) {
-                return $item->authorization()
-                    // TODO: Ensure this actually works.
-                    ? auth()->user()->can($item->can()->ability, $item->can()->arguments)
-                    : true;
+        $this->items = $this->filterAuthorizedNavItems($this->items);
+
+        return $this;
+    }
+
+    /**
+     * Authorize nav children.
+     *
+     * @return $this
+     */
+    protected function authorizeChildren()
+    {
+        collect($this->items)
+            ->reject(function ($item) {
+                return is_callable($item->children());
+            })
+            ->each(function ($item) {
+                $item->children($this->filterAuthorizedNavItems($item->children()));
             });
 
         return $this;
+    }
+
+    /**
+     * Filter authorized nav items.
+     *
+     * @param mixed $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function filterAuthorizedNavItems($items)
+    {
+        return collect($items)
+            ->filter(function ($item) {
+                return $item->authorization()
+                    ? auth()->user()->can($item->can()->ability, $item->can()->arguments)
+                    : true;
+            })
+            ->values();
     }
 
     /**
