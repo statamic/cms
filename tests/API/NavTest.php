@@ -27,7 +27,7 @@ class NavTest extends TestCase
     {
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
-            'Content' => ['Collections', 'Structure', 'Taxonomies', 'Assets', 'Globals'],
+            'Content' => ['Collections', 'Structures', 'Taxonomies', 'Assets', 'Globals'],
             'Tools' => ['Forms', 'Updates', 'Utilities'],
             'Users' => ['Users', 'Groups', 'Permissions'],
             'Site' => ['Addons', 'Preferences', 'Blueprints', 'Fieldsets']
