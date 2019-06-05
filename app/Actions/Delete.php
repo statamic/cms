@@ -14,6 +14,10 @@ class Delete extends Action
             return false;
         }
 
+        if ($key === 'users') {
+            return user()->can('delete users');
+        }
+
         return true;
     }
 
