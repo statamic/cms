@@ -34,6 +34,7 @@ import Popover  from 'vue-js-popover'
 import VTooltip from 'v-tooltip'
 import ReactiveProvide from 'vue-reactive-provide';
 import vSelect from 'vue-select'
+import VCalendar from 'v-calendar';
 
 // Customize vSelect UI components
 vSelect.props.components.default = () => ({
@@ -69,6 +70,7 @@ Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(VTooltip)
 Vue.use(Vuex);
 Vue.use(ReactiveProvide);
+Vue.use(VCalendar);
 
 Vue.component(vSelect)
 

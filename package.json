@@ -51,6 +51,7 @@
     "tiptap-extensions": "^1.21.0",
     "underscore": "^1.8.3",
     "uniqid": "^5.0.3",
+    "v-calendar": "^1.0.0-beta.14",
     "v-tooltip": "^2.0.0-rc.33",
     "validator": "^10.11.0",
     "vue": "^2.6.5",
