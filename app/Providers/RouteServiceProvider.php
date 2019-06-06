@@ -4,6 +4,7 @@ namespace Statamic\Providers;
 
 use Statamic\API\Site;
 use Statamic\API\Entry;
+use Statamic\API\Taxonomy;
 use Statamic\API\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +15,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->bindEntries();
         $this->bindCollections();
+        $this->bindTerms();
+        $this->bindTaxonomies();
         $this->bindSites();
         $this->bindRevisions();
     }
@@ -36,6 +39,19 @@ class RouteServiceProvider extends ServiceProvider
             abort_if(! $collection = Collection::findByHandle($collection), 404);
             return $collection;
         });
+    }
+
+    protected function bindTaxonomies()
+    {
+        Route::bind('taxonomy', function ($taxonomy) {
+            abort_if(! $taxonomy = Taxonomy::findByHandle($taxonomy), 404);
+            return $taxonomy;
+        });
+    }
+
+    protected function bindTerms()
+    {
+        
     }
 
     protected function bindSites()

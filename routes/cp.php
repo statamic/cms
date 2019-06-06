@@ -62,6 +62,15 @@ Route::group([
 
     Route::group(['namespace' => 'Taxonomies'], function () {
         Route::resource('taxonomies', 'TaxonomiesController');
+
+        Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
+            Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
+            Route::post('action', 'TermActionController')->name('taxonomies.terms.action');
+
+            Route::group(['prefix' => '{term}'], function () {
+                Route::get('/', 'TermsController@edit')->name('taxonomies.terms.edit');
+            });
+        });
     });
 
     Route::get('globals', 'GlobalsController@index')->name('globals.index');

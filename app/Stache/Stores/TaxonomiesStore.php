@@ -15,12 +15,11 @@ class TaxonomiesStore extends BasicStore
 
     public function createItemFromFile($path, $contents)
     {
-        $id = pathinfo($path, PATHINFO_FILENAME);
+        $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
 
-        $taxonomy = Taxonomy::create($id);
-        $taxonomy->data($data);
-        return $taxonomy;
+        return Taxonomy::make($handle)
+            ->title(array_get($data, 'title'));
     }
 
     public function getItemKey($item, $path)

@@ -32,4 +32,9 @@ class TaxonomyRepository implements RepositoryContract
 
         $this->store->save($taxonomy);
     }
+
+    public function make($handle = null)
+    {
+        return app(Taxonomy::class)->handle($handle);
+    }
 }
