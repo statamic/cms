@@ -7,13 +7,12 @@
         <h1>
             <small class="subhead block">
                 <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
-                @svg('chevron-right')
             </small>
             <a href="{{ cp_route('forms.show', $submission->form->handle()) }}">
                 {{ $submission->form->title() }}
             </a>
             @svg('chevron-right')
-            {{ __('Submission') }}
+            {{ carbon($submission->id())->format('M j, Y @ h:m') }}
         </h1>
     </div>
 

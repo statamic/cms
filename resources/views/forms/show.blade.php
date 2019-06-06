@@ -11,19 +11,20 @@
             {{ $form->title() }}
         </h1>
 
-        <a class="btn" href="{{ cp_route('forms.edit', $form->handle()) }}">{{ __('Edit') }}</a>
-        <a class="btn ml-1" href="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true">{{ __('Export CSV') }}</a>
-        <a class="btn ml-1" href="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true">{{ __('Export JSON') }}</a>
+        <a class="btn" href="{{ cp_route('forms.edit', $form->handle()) }}">{{ __('Edit Form') }}</a>
+        <dropdown-list class="ml-2">
+            <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
+            <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+            <dropdown-item :text="__('Export as JSON')" redirect="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+        </dropdown-list>
     </div>
 
     @if (! empty($form->metrics()))
     <div class="metrics mb-3">
         @foreach($form->metrics() as $metric)
-            <div class="card metric m-0 simple">
-                <div class="count">
-                    <small>{{ $metric->label() }}</small>
-                    <h2>{{ $metric->result() }}</h2>
-                </div>
+            <div class="card px-3">
+                <h3 class="mb-2 font-bold text-grey">{{ $metric->label() }}</h3>
+                <div class="text-4xl">{{ $metric->result() }}</div>
             </div>
         @endforeach
     </div>

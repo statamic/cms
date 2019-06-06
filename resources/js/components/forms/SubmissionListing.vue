@@ -18,7 +18,7 @@
             <div class="card p-0" slot-scope="{ }">
                 <data-list-table v-if="submissions.length" @sorted="sorted">
                     <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
-                        <a :href="submission.url">{{ value }}</a>
+                        <a :href="submission.url" class="text-blue">{{ value }}</a>
                     </template>
                     <template slot="actions" slot-scope="{ row: submission, index }">
                         <dropdown-list>

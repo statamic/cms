@@ -27,7 +27,7 @@
             </div>
         </editor-menu-bar>
 
-        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }">
+        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }" tabindex="0">
             <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
                 <div
                     slot-scope="{ commands, isActive, menu }"

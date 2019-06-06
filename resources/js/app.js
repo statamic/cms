@@ -91,6 +91,7 @@ require('./components/ProgressBar');
 require('./components/DirtyState');
 require('./components/Config');
 require('./components/Preference');
+require('./components/Permission');
 
 Statamic.app({
     el: '#statamic',

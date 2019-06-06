@@ -26,7 +26,7 @@ class Glide extends Tags
     {
         $tag = explode(':', $this->tag, 2)[1];
 
-        $item = $this->getContext($tag);
+        $item = $this->context->get($tag);
 
         return $this->output($this->generateGlideUrl($item));
     }

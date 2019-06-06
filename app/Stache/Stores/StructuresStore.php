@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\API;
+use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
@@ -13,6 +14,7 @@ use Statamic\Contracts\Data\Structures\Structure;
 class StructuresStore extends BasicStore
 {
     protected $entryUris;
+    protected $entryRoutes;
     protected $treeQueue = [];
 
     public function __construct(Stache $stache, Filesystem $files)
@@ -20,6 +22,7 @@ class StructuresStore extends BasicStore
         parent::__construct($stache, $files);
 
         $this->entryUris = collect();
+        $this->entryRoutes = collect();
         $this->forEachSite(function ($site) {
             $this->entryUris->put($site, collect());
         });
@@ -208,7 +211,8 @@ class StructuresStore extends BasicStore
     public function getCacheableMeta()
     {
         return array_merge(parent::getCacheableMeta(), [
-            'entryUris' => $this->entryUris->toArray()
+            'entryUris' => $this->entryUris->toArray(),
+            'entryRoutes' => $this->entryRoutes->toArray(),
         ]);
     }
 
@@ -218,12 +222,18 @@ class StructuresStore extends BasicStore
 
         $this->withoutMarkingAsUpdated(function () use ($data) {
             $this->setEntryUris($data['entryUris']);
+            $this->setEntryRoutes($data['entryRoutes']);
         });
     }
 
     public function setEntryUris($uris)
     {
         $this->entryUris = collect($uris);
+    }
+
+    public function setEntryRoutes($routes)
+    {
+        $this->entryRoutes = collect($routes);
     }
 
     public function getEntryUris($site = null)
@@ -235,11 +245,11 @@ class StructuresStore extends BasicStore
 
     public function setItem($key, $item)
     {
-        parent::setItem($key, $item);
+        if ($this->markUpdates) {
+            $this->treeQueue[] = $item;
+        }
 
-        $this->treeQueue[] = $item;
-
-        return $this;
+        return parent::setItem($key, $item);
     }
 
     public function removeItem($key)
@@ -251,39 +261,97 @@ class StructuresStore extends BasicStore
         return $this;
     }
 
-    protected function flushStructureEntryUris($handle)
+    protected function flushStructureEntryUris($handle, $site = null)
     {
-        foreach ($this->stache->sites() as $site) {
+        $sites = $site ? [$site] : $this->stache->sites();
+
+        foreach ($sites as $site) {
             $this->entryUris->put($site, collect($this->entryUris->get($site))->reject(function ($uri, $key) use ($handle) {
                 return str_before($key, '::') === $handle;
             }));
+
+            $this->entryRoutes->forget($handle . '::' . $site);
         }
     }
 
     public function loadingComplete()
     {
-        collect($this->treeQueue)->unique->handle()->each(function ($structure) {
-            if (! $structure->collection()) {
-                // Only structures linked to a collection should cause entry URIs to be updated.
-                return;
+        collect($this->treeQueue)
+            ->unique->handle()
+            ->filter->collection() // Only structures linked to a collection should cause entry URIs to be updated.
+            ->each->updateEntryUris();
+    }
+
+    public function updateEntryUris($structure)
+    {
+        foreach ($structure->trees() as $tree) {
+            $locale = $tree->locale();
+            $handle = $tree->handle();
+            $route = $tree->route();
+
+            if ($this->entryRoutes->get($handle . '::' . $locale) === $route) {
+                // If the route hasn't changed, don't do the work again. This could happen when the
+                // collection is inserted into the Stache twice. eg. Once when saving in the CP,
+                // then again when the Stache notices the file changed on the next request.
+                continue;
             }
 
-            $this->flushStructureEntryUris($structure->handle());
+            $this->flushStructureEntryUris($handle, $locale);
 
-            foreach ($structure->trees() as $tree) {
-                $locale = $tree->locale();
-                $handle = $tree->handle();
+            $tree->flattenedPages()->filter(function ($page) {
+                return $page->reference() && $page->referenceExists();
+            })->each(function ($page) use ($handle, $locale) {
+                $this->entryUris
+                    ->get($locale)
+                    ->put($handle . '::' . $page->reference(), $page->uri());
+            });
 
-                foreach ($tree->flattenedPages() as $page) {
-                    if (! $page->reference()) {
-                        continue;
-                    }
+            $this->entryRoutes->put($handle . '::' . $locale, $route);
+        }
 
-                    $this->entryUris
-                        ->get($locale)
-                        ->put($handle . '::' . $page->reference(), $page->uri());
-                }
-            }
-        });
+        $this->markAsUpdated();
+    }
+
+    public function insert($item, $key = null)
+    {
+        parent::insert($item, $key);
+
+        if (Site::hasMultiple()) {
+            $item->trees()->each(function ($tree) use ($key) {
+                $this->setSitePath($tree->locale(), $key.'::'.$tree->locale(), $tree->path());
+            });
+        }
+
+        return $this;
+    }
+
+    public function removeByPath($path)
+    {
+        $id = $this->getIdFromPath($path);
+
+        if (Str::contains($id, '::')) {
+            $this->removeTree($id);
+        } else {
+            $this->removeStructure($id);
+        }
+    }
+
+    protected function removeStructure($key)
+    {
+        $this->removeItem($key);
+        $this->flushStructureEntryUris($key);
+        $this->removeSitePath($this->stache->sites()->first(), $key);
+    }
+
+    protected function removeTree($key)
+    {
+        [$handle, $site] = explode('::', $key);
+
+        $this->flushStructureEntryUris($handle, $site);
+        $this->removeSitePath($site, $key);
+
+        $structure = $this->getItem($handle);
+        $structure->removeTree($structure->in($site));
+        $this->setItem($handle, $structure);
     }
 }

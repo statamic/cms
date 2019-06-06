@@ -27,12 +27,16 @@ class TreeBuilder
     protected function toTree($pages, $depth)
     {
         return $pages->map(function ($page) use ($depth) {
+            if ($page->reference() && !$page->referenceExists()) {
+                return null;
+            }
+
             return [
                 'page' => $page,
                 'depth' => $depth,
                 'children' => $this->toTree($page->pages()->all(), $depth + 1)
             ];
-        })->all();
+        })->filter()->values()->all();
     }
 
     public function buildForController($params)

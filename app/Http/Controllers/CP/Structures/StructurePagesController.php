@@ -29,7 +29,7 @@ class StructurePagesController extends CpController
     {
         $tree = $this->toTree($request->pages);
 
-        if ($request->firstPageIsRoot) {
+        if ($request->expectsRoot) {
             $root = array_pull($tree, 0)['entry'];
             $tree = array_values($tree);
         }

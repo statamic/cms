@@ -5,6 +5,7 @@ namespace Statamic\Auth;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Blueprint;
+use Statamic\API\Preference;
 use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -121,7 +122,8 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'email' => $this->email(),
             'avatar' => $this->avatar(),
             'initials' => $this->initials(),
-            'preferences' => $this->preferences(),
+            'preferences' => Preference::all(), // Preference API respects fallbacks to role preferences!
+            'permissions' => $this->permissions()->all(),
             'edit_url' => $this->editUrl(),
             'is_user' => true,
             'last_login' => $this->lastLogin(),
@@ -130,7 +132,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function toJavascriptArray()
     {
-        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name']);
+        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name', 'preferences', 'permissions']);
     }
 
     public function getAuthIdentifierName()

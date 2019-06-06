@@ -53,17 +53,35 @@ class Field implements Arrayable
 
     public function rules()
     {
-        $rules = [$this->handle => array_merge(
+        $rules = [$this->handle => $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
             Validation::explodeRules(array_get($this->config, 'validate')),
             Validation::explodeRules($this->fieldtype()->rules())
-        )];
+        ))];
 
         $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
-            return Validation::explodeRules($rules);
+            return $this->addNullableRule(Validation::explodeRules($rules));
         })->all();
 
         return array_merge($rules, $extra);
+    }
+
+    protected function addNullableRule($rules)
+    {
+        $nullable = true;
+
+        foreach ($rules as $rule) {
+            if (preg_match('/^required_?/', $rule)) {
+                $nullable = false;
+                break;
+            }
+        }
+
+        if ($nullable) {
+            $rules[] = 'nullable';
+        }
+
+        return $rules;
     }
 
     public function isRequired()

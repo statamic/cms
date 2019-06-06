@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\API\Arr;
+use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
@@ -192,5 +193,46 @@ class GlobalsStore extends BasicStore
             );
             $this->setItem($this->getItemKey($set, ''), $set);
         }
+    }
+
+    public function insert($item, $key = null)
+    {
+        parent::insert($item, $key);
+
+        if (Site::hasMultiple()) {
+            $item->localizations()->each(function ($localization) use ($key) {
+                $this->setSitePath($localization->locale(), $key.'::'.$localization->locale(), $localization->path());
+            });
+        }
+
+        return $this;
+    }
+
+    public function removeByPath($path)
+    {
+        $id = $this->getIdFromPath($path);
+
+        if (Str::contains($id, '::')) {
+            $this->removeLocalization($id);
+        } else {
+            $this->removeGlobal($id);
+        }
+    }
+
+    protected function removeGlobal($key)
+    {
+        $this->removeItem($key);
+        $this->removeSitePath($this->stache->sites()->first(), $key);
+    }
+
+    protected function removeLocalization($key)
+    {
+        [$handle, $site] = explode('::', $key);
+
+        $this->removeSitePath($site, $key);
+
+        $set = $this->getItem($handle);
+        $set->removeLocalization($set->in($site));
+        $this->setItem($handle, $set);
     }
 }

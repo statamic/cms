@@ -96,6 +96,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\Collections::class,
+        Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Markdown::class,

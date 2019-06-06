@@ -126,6 +126,13 @@ class GlobalSet implements Contract
         return $this;
     }
 
+    public function removeLocalization($localization)
+    {
+        unset($this->localizations[$localization->locale()]);
+
+        return $this;
+    }
+
     public function in($locale)
     {
         return $this->localizations[$locale] ?? null;

@@ -8,7 +8,6 @@ use Statamic\API\File;
 use Statamic\API\Site;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
-use Statamic\API\Preference;
 
 class Statamic
 {
@@ -131,7 +130,6 @@ class Statamic
             'flash' => static::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'preferences' => Preference::all(), // TODO: Move to CpServiceProvider
             'user' => auth()->check() ? user()->toJavascriptArray() : [],
         ];
 

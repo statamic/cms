@@ -8,15 +8,13 @@ use Statamic\API\Parse;
 use Statamic\API\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
-use Statamic\Extend\HasContext;
-use Statamic\Extend\Parameters;
 use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters, HasContext, RegistersItself;
+    use HasHandle, HasAliases, HasParameters, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -31,6 +29,12 @@ abstract class Tags
      * @public array
      */
     public $context;
+
+    /**
+     * The parameters used on this tag.
+     * @public array
+     */
+    public $params;
 
     /**
      * The tag that was used
@@ -86,8 +90,9 @@ abstract class Tags
     {
         $this->parser      = $properties['parser'];
         $this->content     = $properties['content'];
-        $this->context     = $properties['context'];
-        $this->parameters  = new Parameters($properties['parameters'], $this->context);
+        $this->context     = new Context($properties['context'], $this->parser);
+        $this->params      = new Parameters($properties['parameters'], $this->context);
+        $this->parameters  = $this->params; // TODO: Remove with HasParameters trait
         $this->isPair      = $this->content !== '';
         $this->tag         = array_get($properties, 'tag');
         $this->method      = array_get($properties, 'tag_method');

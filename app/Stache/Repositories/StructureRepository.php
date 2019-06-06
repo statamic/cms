@@ -64,4 +64,9 @@ class StructureRepository implements RepositoryContract
     {
         return new \Statamic\Data\Structures\Structure;
     }
+
+    public function updateEntryUris(Structure $structure)
+    {
+        $this->store->updateEntryUris($structure);
+    }
 }

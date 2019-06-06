@@ -27,7 +27,7 @@ class NavTest extends TestCase
     {
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
-            'Content' => ['Collections', 'Structure', 'Taxonomies', 'Assets', 'Globals'],
+            'Content' => ['Collections', 'Structures', 'Taxonomies', 'Assets', 'Globals'],
             'Tools' => ['Forms', 'Updates', 'Utilities'],
             'Users' => ['Users', 'Groups', 'Permissions'],
             'Site' => ['Addons', 'Preferences', 'Blueprints', 'Fieldsets']
@@ -160,6 +160,35 @@ class NavTest extends TestCase
         $this->assertEquals('B1', $item->children()->get(0)->name());
         $this->assertEquals('B2', $item->children()->get(1)->name());
         $this->assertEquals('HK-47', $item->children()->get(2)->name());
+    }
+
+    /** @test */
+    function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
+    {
+        $this->setTestRoles(['sith' => ['view sith diaries']]);
+        $this->actingAs(User::make()->assignRole('sith'));
+
+        Nav::custom('Diaries')
+            ->url('/diaries')
+            ->children([
+                Nav::item('Jedi')->url('/b1')->can('view jedi diaries'),
+                Nav::item('Sith')->url('/b2')->can('view sith diaries'),
+            ]);
+
+        Nav::custom('Logs')
+            ->url('/logs')
+            ->children([
+                Nav::item('Jedi')->url('/b1')->can('view jedi logs'),
+                Nav::item('Sith')->url('/b2')->can('view sith logs'),
+            ]);
+
+        $diaries = Nav::build()->get('Custom')->first();
+        $logs = Nav::build()->get('Custom')->last();
+
+        $this->assertCount(1, $diaries->children());
+        $this->assertEquals('Sith', $diaries->children()->get(0)->name());
+
+        $this->assertNull($logs->children());
     }
 
     /** @test */
