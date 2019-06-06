@@ -31,7 +31,7 @@ mix.extract([
     'selectize',
     'sweetalert',
     '@shopify/draggable',
-    'transliterations',
+    'speakingurl',
     'underscore',
     'vue',
     'vue-clickaway',
