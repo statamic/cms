@@ -5,8 +5,12 @@
         :formats="formats"
         :mode="config.mode"
         :input="value"
-        @input="handleUpdate"
-        is-inline />
+        :is-required="config.required"
+        :is-inline="config.inline"
+        :is-expanded="name === 'date' || config.full_width"
+        :columns="$screens({ default: 1, lg: config.columns })"
+        :rows="$screens({ default: 1, lg: config.rows })"
+        @input="handleUpdate" />
 </template>
 
 <script>
@@ -17,7 +21,7 @@ export default {
 
     data() {
         return {
-            date: this.value,
+            date: this.value ? Vue.moment(this.value).toDate() : (this.config.required) ? Vue.moment().toDate() : null,
             formats: {
                 title: 'MMMM YYYY',
                 weekdays: 'W',
@@ -42,29 +46,14 @@ export default {
 
     },
 
-    watch: {
-
-        data(value) {
-            this.update(value);
-        }
-
-    },
-
     methods: {
         handleUpdate(value) {
-            this.update(Vue.moment(value).format('YYYY-MM-DD HH:ss'))
-        },
-        /**
-         * Return the date string.
-         * `this.data` is the full datetime string. This will get just the date.
-         */
-        dateString() {
-            if (this.data && this.data.length >= 10) {
-                return this.data.substr(0, 10)
+            if (this.mode === "multiple") {
+                this.update(value);
             } else {
-                return Vue.moment().format('YYYY-MM-DD')
+                this.update(Vue.moment(value).format('YYYY-MM-DD HH:mm'))
             }
-        },
+        }
     },
 
     mounted() {

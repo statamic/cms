@@ -21,6 +21,23 @@ class Date extends Fieldtype
             'default' => '1900-01-01'
         ],
         'format' => ['type' => 'text'],
+        'full_width' => [
+            'type' => 'toggle',
+            'default' => false
+        ],
+        'inline' => [
+            'type' => 'toggle',
+            'default' => false
+        ],
+        'columns' => [
+            'type' => 'integer',
+            'default' => 1
+        ],
+        'rows' => [
+            'type' => 'integer',
+            'default' => 1
+        ],
+        // @TODO hook up multiple and range modes
         'mode' => [
             'type' => 'select',
             'default' => 'single',
