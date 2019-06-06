@@ -2,6 +2,7 @@
     <v-date-picker
         v-model="date"
         :attributes="attrs"
+        :locale="$config.get('locale')"
         :formats="formats"
         :mode="config.mode"
         :input="value"

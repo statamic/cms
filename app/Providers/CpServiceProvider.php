@@ -30,6 +30,7 @@ class CpServiceProvider extends ServiceProvider
             'bard' => ['plugins' => [], 'buttons' => []],
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
+            'locale' => config('app.locale'),
         ]);
     }
 
