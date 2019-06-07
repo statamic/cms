@@ -41,6 +41,11 @@ abstract class Action implements Arrayable
         return $this->fields;
     }
 
+    public function authorize($key, $context)
+    {
+        return true;
+    }
+
     public function toArray()
     {
         return [

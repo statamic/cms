@@ -19,6 +19,10 @@ abstract class ActionController extends CpController
 
         $action = Action::get($request->action)->context($request->context);
 
+        if (! $action->authorize($this->getKey(), $request->context)) {
+            abort(403, 'You are not authorized to run this action');
+        }
+
         $validation = (new Validation)->fields($action->fields());
 
         $request->replace($request->values)->validate($validation->rules());
@@ -30,4 +34,9 @@ abstract class ActionController extends CpController
     }
 
     abstract protected function getSelectedItems($items);
+
+    protected function getKey()
+    {
+        return static::$key;
+    }
 }
