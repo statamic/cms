@@ -174,12 +174,12 @@ class CollectionsServiceProvider extends ServiceProvider
     protected function toAugmentedArray()
     {
         Collection::macro('toAugmentedArray', function () {
-            return array_values(array_map(function ($value) {
+            return array_map(function ($value) {
                 if ($value instanceof Augmentable) {
                     return $value->toAugmentedArray();
                 }
                 return $value instanceof Arrayable ? $value->toArray() : $value;
-            }, $this->items));
+            }, $this->items);
         });
     }
 }
