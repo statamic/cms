@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Taxonomies;
 
+use Statamic\API;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\FluentlyGetsAndSets;
@@ -12,11 +13,17 @@ class Taxonomy implements Contract
     use FluentlyGetsAndSets;
 
     protected $handle;
+    protected $route;
     protected $title;
 
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
+
+    public function route($route = null)
+    {
+        return $this->fluentlyGetOrSet('route')->args(func_get_args());
     }
 
     public function title($title = null)
@@ -27,6 +34,11 @@ class Taxonomy implements Contract
                 return $title ?? ucfirst($this->handle);
             })
             ->args(func_get_args());
+    }
+
+    public function showUrl()
+    {
+        return cp_route('taxonomies.show', $this->handle());
     }
 
     public function editUrl()
@@ -44,7 +56,18 @@ class Taxonomy implements Contract
 
     public function termBlueprint()
     {
-        return Blueprint::find('default'); // todo
+        return $this->ensureTermBlueprintFields(
+            Blueprint::find(config('statamic.theming.blueprints.default'))
+        );
+    }
+
+    public function ensureTermBlueprintFields($blueprint)
+    {
+        $blueprint
+            ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
+            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+
+        return $blueprint;
     }
 
     public function sortField()
@@ -55,5 +78,10 @@ class Taxonomy implements Contract
     public function sortDirection()
     {
         return 'asc'; // todo
+    }
+
+    public function queryTerms()
+    {
+        return API\Term::query()->where('taxonomy', $this->handle());
     }
 }

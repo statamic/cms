@@ -9,6 +9,8 @@ trait Routable
 {
     protected $slug;
 
+    abstract public function route();
+
     public function slug($slug = null)
     {
         if (is_null($slug)) {
@@ -22,11 +24,7 @@ trait Routable
 
     public function uri()
     {
-        if ($structure = $this->structure()) {
-            return $structure->entryUri($this);
-        }
-
-        if (! $route = $this->collection()->route()) {
+        if (! $route = $this->route()) {
             return null;
         }
 

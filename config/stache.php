@@ -13,6 +13,11 @@ return [
             'directory' => base_path('content/taxonomies'),
         ],
 
+        'terms' => [
+            'class' => Stores\TermsStore::class,
+            'directory' => base_path('content/taxonomies'),
+        ],
+
         'collections' => [
             'class' => Stores\CollectionsStore::class,
             'directory' => base_path('content/collections'),

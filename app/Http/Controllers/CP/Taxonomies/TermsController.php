@@ -18,48 +18,65 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 
 class TermsController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $collection)
+    public function index(FilteredSiteRequest $request, $taxonomy)
     {
-        return [
-            'data' => [
-                [
-                    'title' => 'Boots (hardcoded)',
-                    'id' => 'boots',
-                    'edit_url' => cp_route('taxonomies.terms.edit', ['tags', 'boots'])
-                ],
-                [
-                    'title' => 'Cats (hardcoded)',
-                    'id' => 'cats',
-                    'edit_url' => cp_route('taxonomies.terms.edit', ['tags', 'cats'])
-                ]
-            ],
-            'links' => [
+        $query = $this->indexQuery($taxonomy);
 
-            ],
-            "meta" => [
-                "current_page" => 1,
-                "from" => 1,
-                "last_page" => 1,
-                "path" => "https:\/\/statamic3.test\/cp\/collections\/diary\/entries",
-                "per_page" => "25",
-                "to" => 2,
-                "total" => 2,
-                "filters" => [],
-                "sortColumn" => "title",
-                "columns" => [
-                    [
-                        "field" => "title",
-                        "fieldtype" => "text",
-                        "label" => "Title",
-                        "listable" => true,
-                        "visibleDefault" => true,
-                        "visible" => true,
-                        "sortable" => true,
-                        "value" => null
-                    ]
-                ]
-            ]
-        ];
+        $this->filter($query, $request->filters);
+
+        $sortField = request('sort');
+        $sortDirection = request('order');
+
+        if (!$sortField && !request('search')) {
+            $sortField = $taxonomy->sortField();
+            $sortDirection = $taxonomy->sortDirection();
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $paginator = $query->paginate(request('perPage'));
+
+        $paginator->supplement(function ($term) {
+            return ['deleteable' => me()->can('delete', $term)];
+        })->preProcessForIndex();
+
+        $columns = $taxonomy->termBlueprint()
+            ->columns()
+            ->setPreferred("taxonomies.{$taxonomy->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
+        return Resource::collection($paginator)->additional(['meta' => [
+            'filters' => $request->filters,
+            'sortColumn' => $sortField,
+            'columns' => $columns,
+        ]]);
+    }
+
+    protected function filter($query, $filters)
+    {
+        foreach ($filters as $handle => $values) {
+            $class = app('statamic.scopes')->get($handle);
+            $filter = app($class);
+            $filter->apply($query, $values);
+        }
+    }
+
+    protected function indexQuery($taxonomy)
+    {
+        $query = $taxonomy->queryTerms();
+
+        if ($search = request('search')) {
+            if ($taxonomy->hasSearchIndex()) {
+                return $taxonomy->searchIndex()->ensureExists()->search($search);
+            }
+
+            $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        return $query;
     }
 
     public function edit(Request $request, $taxonomy, $term)

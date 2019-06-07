@@ -95,6 +95,7 @@ class AppServiceProvider extends ServiceProvider
 
         collect([
             \Statamic\Contracts\Data\Repositories\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
+            \Statamic\Contracts\Data\Repositories\TermRepository::class => \Statamic\Stache\Repositories\TermRepository::class,
             \Statamic\Contracts\Data\Repositories\TaxonomyRepository::class => \Statamic\Stache\Repositories\TaxonomyRepository::class,
             \Statamic\Contracts\Data\Repositories\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
             \Statamic\Contracts\Data\Repositories\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,

@@ -61,7 +61,7 @@ abstract class AggregateStore extends Store
             return null;
         }
 
-        $store = explode('::', $store)[1];
+        $store = explode('::', $store, 2)[1];
 
         return $this->store($store);
     }
@@ -104,7 +104,7 @@ abstract class AggregateStore extends Store
 
     protected function extractKeys($string)
     {
-        return explode('::', $string);
+        return explode('::', $string, 2);
     }
 
     public function isLoaded()
@@ -137,6 +137,12 @@ abstract class AggregateStore extends Store
     public function load()
     {
         $this->stores->each->load();
+    }
+
+
+    protected function loadingComplete()
+    {
+        //
     }
 
     public function isUpdated()
@@ -274,5 +280,10 @@ abstract class AggregateStore extends Store
         $this->store($store)->removeByPath($path);
 
         return $this;
+    }
+
+    public function shouldStoreUri($item)
+    {
+        return true;
     }
 }

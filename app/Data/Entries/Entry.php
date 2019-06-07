@@ -26,7 +26,11 @@ use Statamic\Contracts\Data\Localization;
 
 class Entry implements Contract, AugmentableContract, Responsable, Localization
 {
-    use Routable, ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, HasOrigin;
+    use Routable {
+        uri as routableUri;
+    }
+    
+    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, HasOrigin;
 
     protected $id;
     protected $collection;
@@ -419,5 +423,14 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     public function route()
     {
         return $this->collection()->route();
+    }
+
+    public function uri()
+    {
+        if ($structure = $this->structure()) {
+            return $structure->entryUri($this);
+        }
+
+        return $this->routableUri();
     }
 }
