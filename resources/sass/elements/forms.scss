@@ -67,7 +67,7 @@ textarea.input-text:read-only,
     }
 
     .input-text {
-        @apply .flex-1;
+        @apply .flex-1 border-grey-50;
 
         &:focus, &:focus-within {
             @apply focus-none;

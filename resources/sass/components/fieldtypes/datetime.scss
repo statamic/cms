@@ -37,12 +37,8 @@
 
 .time-fieldtype {
 	.time-fieldtype-container {
-		@apply flex items-center w-auto;
-
-	}
-
-	.input-text:focus-within {
-		@apply focus-outline;
+		@apply flex items-center;
+		width: 140px;
 	}
 
 	.input-time {
@@ -56,7 +52,7 @@
 
 	.colon {
 		@apply select-none;
-		margin: 0 2px;
+		margin: 0;
 	}
 
 	input::-webkit-inner-spin-button,
