@@ -55,11 +55,36 @@ class Date extends Fieldtype
             return;
         }
 
+        if ($this->config('mode') === "range") {
+
+            // If switching from single to range, all bets are off.
+            if (! is_array($data)) {
+                return null;
+            }
+
+            return [
+                'start' => Carbon::parse($data['start'])->format('Y-m-d'),
+                'end' => Carbon::parse($data['end'])->format('Y-m-d')
+            ];
+        }
+
+        // If switching from range mode to single, use the start date.
+        if (is_array($data)) {
+            $data = array_get($data, 'start', null);
+        }
+
         return Carbon::createFromFormat($this->dateFormat($data), $data)->format('Y-m-d H:i');
     }
 
     public function process($data)
     {
+        if ($this->config('mode') === "range") {
+            return [
+                'start' => Carbon::parse($data['start'])->format('Y-m-d'),
+                'end' => Carbon::parse($data['end'])->format('Y-m-d')
+            ];
+        }
+
         $date = Carbon::parse($data);
 
         return $date->format($this->dateFormat($data));

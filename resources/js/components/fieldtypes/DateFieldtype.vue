@@ -34,7 +34,7 @@
                 </v-date-picker>
             </div>
 
-            <div v-if="config.time_enabled" class="md:ml-1 time-fieldtype">
+            <div v-if="config.time_enabled && config.mode === 'single'" class="md:ml-1 time-fieldtype">
 				<time-fieldtype ref="time" v-if="time" v-model="time" :required="config.time_required" :config="{}" name=""></time-fieldtype>
 				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
 					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>
@@ -54,7 +54,7 @@ export default {
 
     data() {
         return {
-            date: this.value ? Vue.moment(this.value).toDate() : (this.config.required) ? Vue.moment().toDate() : null,
+            date: this.parseDate(),
             time: this.value ? Vue.moment(this.date).format('HH:mm') : null,
             formats: {
                 title: 'MMMM YYYY',
@@ -106,24 +106,42 @@ export default {
 
     methods: {
         handleUpdate(value) {
-            if (this.mode === "multiple") {
-                this.update(this.dateTime);
-            } else {
+            if (this.config.mode === "single") {
                 this.update(Vue.moment(this.dateTime).format(this.format))
+            } else {
+                this.update(this.date);
             }
         },
+
         addDate() {
             this.date = Vue.moment().format(this.format);
         },
+
         addTime() {
             this.time = Vue.moment().format('HH:mm');
             this.$nextTick(function() {
                 $(this.$refs.time.$refs.hour).focus().select();
             });
         },
+
         removeTime() {
             this.time = null;
         },
+
+        parseDate() {
+            if (this.value) {
+                if (this.config.mode === "single") {
+                    return Vue.moment(this.value).toDate()
+                } else if (this.config.mode === "range") {
+                    return {
+                        'start': Vue.moment(this.value.start).toDate(),
+                        'end': Vue.moment(this.value.end).toDate()
+                    }
+                }
+             } else {
+                 return (this.config.required) ?  Vue.moment().toDate() : null
+             }
+        }
     },
 };
 </script>
