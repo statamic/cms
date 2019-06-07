@@ -48,6 +48,11 @@ class TermRepository implements RepositoryContract
         return $store->getItem($id);
     }
 
+    public function findByUri(string $uri, string $site = null): ?Term
+    {
+        return $this->find($this->store->getIdFromUri($uri, $site));
+    }
+
     public function findBySlug(string $slug, string $collection): ?Term
     {
         $store = $this->store->store($collection);

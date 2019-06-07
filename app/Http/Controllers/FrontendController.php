@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Statamic\API\URL;
 use Statamic\API\Site;
+use Statamic\API\Term;
 use Statamic\Statamic;
 use Statamic\API\Entry;
 use Statamic\API\Content;
@@ -93,6 +94,10 @@ class FrontendController extends Controller
 
         if ($entry = Entry::findByUri($uri, $site)) {
             return $entry->in($site);
+        }
+
+        if ($term = Term::findByUri($uri, $site)) {
+            return $term->in($site);
         }
     }
 

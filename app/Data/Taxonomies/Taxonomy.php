@@ -15,6 +15,8 @@ class Taxonomy implements Contract
     protected $handle;
     protected $route;
     protected $title;
+    protected $template;
+    protected $layout;
 
     public function handle($handle = null)
     {
@@ -83,5 +85,25 @@ class Taxonomy implements Contract
     public function queryTerms()
     {
         return API\Term::query()->where('taxonomy', $this->handle());
+    }
+
+    public function template($template = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                return $template ?? config('statamic.theming.views.term');
+            })
+            ->args(func_get_args());
+    }
+
+    public function layout($layout = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? config('statamic.theming.views.layout');
+            })
+            ->args(func_get_args());
     }
 }

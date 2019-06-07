@@ -6,12 +6,14 @@ use Statamic\API\Str;
 use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Path;
+use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Entry;
 use Statamic\API\Config;
 use Statamic\API\Stache;
 use Statamic\API\Fieldset;
 use Statamic\Data\Routable;
+use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
@@ -19,15 +21,19 @@ use Statamic\Data\Content\Content;
 use Statamic\Data\Services\TermsService;
 use Statamic\API\Taxonomy as TaxonomyAPI;
 use Statamic\Data\Content\ContentCollection;
+use Illuminate\Contracts\Support\Responsable;
 use Statamic\Data\Content\HasLocalizedSlugsInData;
 use Statamic\Contracts\Data\Taxonomies\Term as TermContract;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
-class Term implements TermContract
+class Term implements TermContract, Responsable, AugmentableContract
 {
-    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets;
+    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable;
 
     protected $taxonomy;
+    protected $template;
+    protected $layout;
 
     public function id()
     {
@@ -66,6 +72,14 @@ class Term implements TermContract
         return $this->taxonomy()->route();
     }
 
+    public function routeData()
+    {
+        return array_merge($this->values(), [
+            'id' => $this->id(),
+            'slug' => $this->slug(),
+        ]);
+    }
+
     public function values()
     {
         return $this->data();
@@ -92,5 +106,57 @@ class Term implements TermContract
             'path' => $this->initialPath() ?? $this->path(),
             'data' => $this->data(),
         ];
+    }
+
+    public function published()
+    {
+        return true;
+    }
+
+    public function private()
+    {
+        return false;
+    }
+
+    public function site()
+    {
+        return Site::current(); // todo
+    }
+
+    public function in($site)
+    {
+        return $this; // todo
+    }
+
+    public function toResponse($request)
+    {
+        return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+    }
+
+    public function template($template = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                return $template ?? $this->taxonomy()->template();
+            })
+            ->args(func_get_args());
+    }
+
+    public function layout($layout = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? $this->taxonomy()->layout();
+            })
+            ->args(func_get_args());
+    }
+
+    public function augmentedArrayData()
+    {
+        return array_merge($this->values(), [
+            'entries' => \Statamic\API\Entry::all(),
+        ]);
     }
 }

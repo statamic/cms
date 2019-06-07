@@ -19,7 +19,8 @@ class TaxonomiesStore extends BasicStore
         $data = YAML::parse($contents);
 
         return Taxonomy::make($handle)
-            ->title(array_get($data, 'title'));
+            ->title(array_get($data, 'title'))
+            ->route(array_get($data, 'route'));
     }
 
     public function getItemKey($item, $path)

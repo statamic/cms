@@ -11,6 +11,7 @@ interface TermRepository
     public function whereTaxonomy(string $handle);
     public function whereInTaxonomy(array $handles);
     public function find($id);
+    public function findByUri(string $uri);
     public function findBySlug(string $slug, string $collection);
     public function make();
     public function query();
