@@ -34,11 +34,15 @@ class CorePermissions
 
     protected function registerCollections()
     {
+        Permission::register('configure collections');
+
         Permission::register('view {collection} entries', function ($permission) {
             $permission->withChildren([
                 Permission::make('edit {collection} entries')->withChildren([
                     Permission::make('create {collection} entries'),
-                    Permission::make('delete {collection} entries')
+                    Permission::make('delete {collection} entries'),
+                    Permission::make('publish {collection} entries'),
+                    Permission::make('reorder {collection} entries')
                 ])
             ])->withReplacements('collection', function () {
                 return Collection::all()->map(function ($collection) {
