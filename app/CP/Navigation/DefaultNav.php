@@ -8,12 +8,14 @@ use Statamic\API\Form as FormAPI;
 use Statamic\API\Role as RoleAPI;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
+use Statamic\API\Taxonomy as TaxonomyAPI;
 use Statamic\API\GlobalSet as GlobalSetAPI;
 use Statamic\API\Structure as StructureAPI;
 use Statamic\API\UserGroup as UserGroupAPI;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
+use Statamic\Contracts\Data\Taxonomies\Taxonomy;
 use Statamic\Contracts\Data\Structures\Structure;
 use Statamic\API\AssetContainer as AssetContainerAPI;
 
@@ -88,8 +90,15 @@ class DefaultNav
 
         Nav::content('Taxonomies')
             ->route('taxonomies.index')
-            ->icon('tags');
-            // ->can() // TODO: Permission to manage taxonomies?
+            ->icon('tags')
+            ->can('index', Taxonomy::class)
+            ->children(function () {
+                return TaxonomyAPI::all()->map(function ($taxonomy) {
+                    return Nav::item($taxonomy->title())
+                              ->url($taxonomy->showUrl())
+                              ->can('view', $taxonomy);
+                });
+            });
 
         Nav::content('Assets')
             ->route('assets.index')
