@@ -55,7 +55,7 @@ export default {
     data() {
         return {
             date: this.parseDate(),
-            time: this.value ? Vue.moment(this.date).format('HH:mm') : null,
+            time: this.parseTime(),
             formats: {
                 title: 'MMMM YYYY',
                 weekdays: 'W',
@@ -71,7 +71,7 @@ export default {
                         label: __('Today'),
                     },
                     dates: new Date()
-                },
+                }
             ],
         }
     },
@@ -115,6 +115,9 @@ export default {
 
         addDate() {
             this.date = Vue.moment().format(this.format);
+            if (this.config.time_required) {
+                this.addTime();
+            }
         },
 
         addTime() {
@@ -141,6 +144,16 @@ export default {
              } else {
                  return (this.config.required) ?  Vue.moment().toDate() : null
              }
+        },
+
+        parseTime() {
+            if (this.value) {
+                return Vue.moment(this.date).format('HH:mm');
+            } else if (this.config.time_required) {
+                return Vue.moment().format('HH:mm');
+            } else {
+                return null;
+            }
         }
     },
 };

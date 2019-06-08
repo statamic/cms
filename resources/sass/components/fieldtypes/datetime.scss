@@ -38,7 +38,7 @@
 .time-fieldtype {
 	.time-fieldtype-container {
 		@apply flex items-center;
-		width: 140px;
+		max-width: 140px;
 	}
 
 	.input-time {
