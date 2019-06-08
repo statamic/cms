@@ -1,20 +1,20 @@
 <template>
     <div class="datetime">
 
-        <button type="button" class="btn flex mb-1 md:mb-0 items-center pl-1.5" v-if="!hasDate" @click="addDate" tabindex="0">
+        <button type="button" class="btn flex mb-1 md:mb-0 items-center pl-1.5" v-if="config.inline === false && !hasDate" @click="addDate" tabindex="0">
             <svg-icon name="calendar" class="w-4 h-4 mr-1"></svg-icon>
     		{{ __('Add Date') }}
     	</button>
 
-        <div class="date-time-container md:flex" v-if="hasDate">
+        <div class="date-time-container md:flex" v-if="hasDate || config.inline">
 
-            <div class="flex-1 input-group mb-1 md:mb-0">
-                <div class="input-group-prepend flex items-center">
+            <div class="flex-1 mb-1 md:mb-0" :class="{'input-group': !config.inline }">
+                <div class="input-group-prepend flex items-center" v-if="!config.inline">
                     <svg-icon name="calendar" class="w-4 h-4" />
                 </div>
                 <v-date-picker
                     v-model="date"
-                    class="input-text border border-grey-50 border-l-0"
+                    :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
                     :locale="$config.get('locale')"
                     :formats="formats"
