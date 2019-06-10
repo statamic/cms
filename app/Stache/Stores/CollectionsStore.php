@@ -105,6 +105,10 @@ class CollectionsStore extends BasicStore
 
     public function updateEntryUris($collection)
     {
+        if ($structure = $collection->structure()) {
+            $structure->updateEntryUris();
+        }
+
         Entry::whereCollection($collection->handle())->each(function ($entry) use ($collection) {
             $store = $this->stache->store('entries::'.$collection->handle());
 
