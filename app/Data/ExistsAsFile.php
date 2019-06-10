@@ -41,7 +41,7 @@ trait ExistsAsFile
 
         $content = array_pull($data, 'content');
 
-        return YAML::dump($data, $content);
+        return YAML::dumpFrontMatter($data, $content);
     }
 
     public function fileLastModified()

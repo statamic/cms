@@ -40,7 +40,26 @@ class YAML
      * @param string|bool  $content
      * @return string
      */
-    public function dump($data, $content = '')
+    public function dump($data, $content = false)
+    {
+        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        if ($content) {
+            $fenced = "---".PHP_EOL . $yaml . "---".PHP_EOL;
+            $yaml = $fenced . $content;
+        }
+
+        return $yaml ?: '';
+    }
+
+        /**
+     * Dump some YAML
+     *
+     * @param array        $data
+     * @param string|bool  $content
+     * @return string
+     */
+    public function dumpFrontMatter($data, $content = '')
     {
         $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
 
