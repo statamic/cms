@@ -47,6 +47,11 @@ class Collection
         return $this->repo()->findByMount($mount);
     }
 
+    public function updateEntryUris($collection)
+    {
+        return $this->repo()->updateEntryUris($collection);
+    }
+
     /**
      * Check if a collection exists by its handle
      *

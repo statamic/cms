@@ -204,6 +204,13 @@ class Collection implements Contract
         return $this;
     }
 
+    public function updateEntryUris()
+    {
+        API\Collection::updateEntryUris($this);
+
+        return $this;
+    }
+
     public function path()
     {
         return vsprintf('%s/%s.yaml', [

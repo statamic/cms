@@ -75,6 +75,17 @@ class EntryRepository implements RepositoryContract
             ->store($entry->collectionHandle())
             ->insert($entry);
 
+        // Inserting will not update the URI if this entry's collection is linked to a structure.
+        // In that case, we'll update this entry's URI the Structure store manually.
+        if ($entry->hasStructure()) {
+            $structures = $this->stache->store('structures');
+            $uris = $structures->getEntryUris();
+            $siteUris = $uris[$entry->locale()];
+            $siteUris['pages::'.$entry->id()] = $entry->uri();
+            $uris[$entry->locale()] = $siteUris;
+            $structures->setEntryUris($uris);
+        }
+
         $this->store->save($entry);
     }
 

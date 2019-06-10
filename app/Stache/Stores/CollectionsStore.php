@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\API\Site;
 use Statamic\API\YAML;
+use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
 
@@ -100,5 +101,16 @@ class CollectionsStore extends BasicStore
         }
 
         return parent::setItem($key, $item);
+    }
+
+    public function updateEntryUris($collection)
+    {
+        Entry::whereCollection($collection->handle())->each(function ($entry) use ($collection) {
+            $store = $this->stache->store('entries::'.$collection->handle());
+
+            foreach ($collection->sites() as $site) {
+                $store->setSiteUri($site, $entry->id(), $entry->in($site)->uri());
+            }
+        });
     }
 }
