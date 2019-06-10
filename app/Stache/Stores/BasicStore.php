@@ -13,6 +13,7 @@ abstract class BasicStore extends Store
     protected $stache;
     protected $paths;
     protected $uris;
+    protected $uriQueue = [];
     protected $items;
     protected $loaded = false;
     protected $updated = false;
@@ -33,6 +34,7 @@ abstract class BasicStore extends Store
             $this->forEachSite(function ($site) {
                 $this->setSitePaths($site, []);
                 $this->setSiteUris($site, []);
+                $this->uriQueue[$site] = [];
             });
         });
     }
@@ -107,6 +109,13 @@ abstract class BasicStore extends Store
         $this->uris->get($site)->put($key, $uri);
 
         $this->markAsUpdated();
+
+        return $this;
+    }
+
+    public function queueSiteUri($site, $key, $item)
+    {
+        $this->uriQueue[$site][$key] = $item;
 
         return $this;
     }
@@ -236,7 +245,16 @@ abstract class BasicStore extends Store
 
     protected function loadingComplete()
     {
-        //
+        $this->addQueuedUris();
+    }
+
+    protected function addQueuedUris()
+    {
+        foreach ($this->uriQueue as $site => $items) {
+            foreach ($items as $key => $item) {
+                $this->setSiteUri($site, $key, $item->uri());
+            }
+        }
     }
 
     public function load()
@@ -365,7 +383,7 @@ abstract class BasicStore extends Store
         $this->setSitePath($site, $key, $item->path());
 
         if ($this->shouldStoreUri($item)) {
-            $this->setSiteUri($site, $key, $item->uri());
+            $this->queueSiteUri($site, $key, $item);
         }
 
         $this->markAsUpdated();
