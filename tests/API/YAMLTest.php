@@ -33,10 +33,12 @@ this is the content';
     /** @test */
     function it_dumps_yaml()
     {
-        $expected = 'foo: bar
+        $expected = '---
+foo: bar
 baz: qux
 array:
   hello: world
+---
 ';
 
         $array = [
