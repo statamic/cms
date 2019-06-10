@@ -105,7 +105,7 @@ export default {
         },
 
         shouldShowSidebar() {
-            return this.containerWidth > 1010;
+            return this.containerWidth > 1000;
         },
 
         errors() {
