@@ -15,7 +15,7 @@
             @upload-complete="uploadCompleted"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="relative" :class="{ 'shadow': showContainerTabs }">
+            <div slot-scope="{ dragging }" class="relative">
                 <div class="drag-notification" v-show="dragging">
                     <svg-icon name="upload" class="h-12 w-12 mb-2" />
                     {{ __('Drop File to Upload') }}
@@ -33,6 +33,7 @@
                 </div>
 
                 <data-list
+                    :class="{ 'shadow': showContainerTabs }"
                     v-if="!initializing"
                     :rows="assets"
                     :columns="columns"
