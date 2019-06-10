@@ -5,6 +5,7 @@ namespace Statamic\Data\Entries;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Site;
+use Statamic\API\Entry;
 use Statamic\API\Search;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
@@ -20,6 +21,7 @@ class Collection implements Contract
 
     protected $handle;
     protected $route;
+    protected $mount;
     protected $title;
     protected $template;
     protected $layout;
@@ -356,5 +358,15 @@ class Collection implements Contract
         API\Collection::delete($this);
 
         return true;
+    }
+
+    public function mount($page = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('mount')
+            ->getter(function ($mount) {
+                return $this->mountedEntry = $this->mountedEntry ?? Entry::find($mount);
+            })
+            ->args(func_get_args());
     }
 }

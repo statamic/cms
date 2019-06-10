@@ -26,6 +26,13 @@ class CollectionRepository implements RepositoryContract
         return $this->store->getItem($handle);
     }
 
+    public function findByMount($mount): ?Collection
+    {
+        return $this->all()->first(function ($collection) use ($mount) {
+            return optional($collection->mount())->id() === $mount->reference();
+        });
+    }
+
     public function save(Collection $collection)
     {
         $this->store->setItem($collection->handle(), $collection);

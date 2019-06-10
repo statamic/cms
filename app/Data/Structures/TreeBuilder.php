@@ -50,6 +50,7 @@ class TreeBuilder
     {
         return collect($tree)->map(function ($item) {
             $page = $item['page'];
+            $collection = $page->collection();
 
             return [
                 'id'          => $page->id(),
@@ -57,6 +58,12 @@ class TreeBuilder
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
                 'slug'        => $page->slug(),
+                'collection'  => !$collection ? null : [
+                    'handle' => $collection->handle(),
+                    'title' => $collection->title(),
+                    'edit_url' => $collection->showUrl(),
+                    'create_url' => $collection->createEntryUrl(),
+                ],
                 'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : []
             ];
         })->values()->all();

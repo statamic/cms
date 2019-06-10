@@ -24,6 +24,7 @@ class CollectionsStore extends BasicStore
         $collection = Collection::create($handle)
             ->title(array_get($data, 'title'))
             ->route(array_get($data, 'route'))
+            ->mount(array_get($data, 'mount'))
             ->dated(array_get($data, 'date', false))
             ->ampable(array_get($data, 'amp', false))
             ->sites($sites)

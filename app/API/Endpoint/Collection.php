@@ -42,6 +42,11 @@ class Collection
         return $this->repo()->findByHandle($handle);
     }
 
+    public function findByMount($mount)
+    {
+        return $this->repo()->findByMount($mount);
+    }
+
     /**
      * Check if a collection exists by its handle
      *

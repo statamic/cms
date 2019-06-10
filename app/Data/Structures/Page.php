@@ -4,6 +4,7 @@ namespace Statamic\Data\Structures;
 
 use Statamic\API\URL;
 use Statamic\API\Site;
+use Statamic\API\Collection;
 use Statamic\Data\Augmentable;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Content\UrlBuilder;
@@ -291,5 +292,10 @@ class Page implements Entry, AugmentableContract, Responsable
     public function blueprint()
     {
         return $this->entry()->blueprint();
+    }
+
+    public function collection()
+    {
+        return Collection::findByMount($this);
     }
 }
