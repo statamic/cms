@@ -99,6 +99,11 @@ class Collection implements Contract
             ->args(func_get_args());
     }
 
+    public function url()
+    {
+        return optional($this->mount())->url();
+    }
+
     public function showUrl()
     {
         return cp_route('collections.show', $this->handle());

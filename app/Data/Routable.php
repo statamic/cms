@@ -61,6 +61,7 @@ trait Routable
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
+            'mount' => $this->collection()->url(),
         ]);
 
         if ($this->hasDate()) {
