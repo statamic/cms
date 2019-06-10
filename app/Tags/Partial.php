@@ -10,8 +10,8 @@ class Partial extends Tags
         // an argument, but fall back to the studly version just in case.
         $partial = $this->get('src', array_get_colon($arguments, 0, $this->method));
 
-        $variables = array_merge($this->context, $this->parameters, [
-            '__frontmatter' => $this->parameters
+        $variables = array_merge($this->context->all(), $this->parameters->all(), [
+            '__frontmatter' => $this->parameters->all()
         ]);
 
         return view($this->viewName($partial), $variables)->render();
