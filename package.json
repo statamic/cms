@@ -17,7 +17,6 @@
     "@simonwep/pickr": "^0.6.4",
     "autosize": "~3.0.12",
     "axios": "^0.19.0",
-    "baremetrics-calendar": "^1.0.14",
     "body-scroll-lock": "^2.6.1",
     "codemirror": "^5.35.0",
     "cookies-js": "^1.2.2",
