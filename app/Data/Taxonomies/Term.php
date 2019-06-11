@@ -156,7 +156,26 @@ class Term implements TermContract, Responsable, AugmentableContract
     public function augmentedArrayData()
     {
         return array_merge($this->values(), [
-            'entries' => \Statamic\API\Entry::all(),
+            'entries' => $this->entries(),
         ]);
+    }
+
+    public function collection($collection = null)
+    {
+        return $this->fluentlyGetOrSet('collection')->args(func_get_args());
+    }
+
+    protected function entries()
+    {
+        $entries = Entry::all();
+        // todo: get actual associated entries instead of just grabbing them all.
+
+        if ($this->collection) {
+            $entries = $entries->filter(function ($entry) {
+                return $entry->collection() === $this->collection;
+            });
+        }
+
+        return $entries;
     }
 }
