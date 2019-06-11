@@ -15,6 +15,7 @@ use Statamic\Contracts\Data\Entries\Entry as EntryContract;
 class EntriesStore extends AggregateStore
 {
     protected $localizationQueue = [];
+    protected $updatedEntries = [];
 
     public function key()
     {
@@ -122,6 +123,8 @@ class EntriesStore extends AggregateStore
             $entry->save();
         }
 
+        $this->updatedEntries[] = $entry;
+
         return $entry;
     }
 
@@ -166,6 +169,48 @@ class EntriesStore extends AggregateStore
             $origin = Entry::find($item['origin'])->addLocalization($item['localization']);
             $this->setItem($this->getItemKey($origin, ''), $origin);
         }
+
+        $this->updateStructureBasedEntries();
+        $this->updateEntriesRelatedThroughMounting();
+    }
+
+    protected function updateStructureBasedEntries()
+    {
+        collect($this->updatedEntries)
+            ->filter->hasStructure()
+            ->each(function ($entry) {
+                // Inserting will not update the URI if this entry's collection is linked to a structure.
+                // In that case, we'll update this entry's URI the Structure store manually.
+                $structures = $this->stache->store('structures');
+                $uris = $structures->getEntryUris();
+                $siteUris = $uris[$entry->locale()];
+                $siteUris[$entry->collectionHandle().'::'.$entry->id()] = $entry->uri();
+                $uris[$entry->locale()] = $siteUris;
+                $structures->setEntryUris($uris);
+            });
+    }
+
+    protected function updateEntriesRelatedThroughMounting()
+    {
+        // Any entries that have been modified, we want to see if they correspond to any
+        // pages that a collection has been mounted onto. If so, the entries in that
+        // collection should have their URIs updated. More than likely, their
+        // route will be relying on the URI of the entry/page.
+        $mounts = Collection::all()
+            ->filter->mount()
+            ->mapWithKeys(function ($collection) {
+                return [$collection->mount()->id() => $collection];
+            });
+
+        collect($this->updatedEntries)
+            ->filter(function ($entry) use ($mounts) {
+                // Only entries that are mounting points.
+                return $mounts->has($entry->id());
+            })
+            ->each(function ($entry) use ($mounts) {
+                // Update the URIs for each collection.
+                $mounts[$entry->id()]->updateEntryUris();
+            });
     }
 
     public function shouldStoreUri($item)

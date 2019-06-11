@@ -8,6 +8,15 @@
             <div class="flex items-center flex-1">
                 <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
                 <a @click="edit" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
+
+                <div v-if="page.collection" class="ml-2 flex items-center">
+                    <svg-icon name="content-writing" class="w-4 h-4" />
+                    <div class="ml-sm">
+                        <a :href="page.collection.create_url">Add</a>
+                        <span class="text-grey">or</span>
+                        <a :href="page.collection.edit_url">Edit</a>
+                    </div>
+                </div>
             </div>
 
             <div class="pr-1 flex items-center">

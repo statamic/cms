@@ -9,4 +9,5 @@ interface CollectionRepository
 {
     public function all(): IlluminateCollection;
     public function findByHandle($handle): ?Collection;
+    public function findByMount($mount): ?Collection;
 }
