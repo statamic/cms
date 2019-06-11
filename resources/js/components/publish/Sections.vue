@@ -97,6 +97,10 @@ export default {
         mainSections() {
             if (! this.shouldShowSidebar) return this.sections;
 
+            if (this.active === "sidebar") {
+                this.active = this.state.fieldset.sections[0].handle
+            }
+
             return _.filter(this.sections, section => section.handle != 'sidebar');
         },
 
