@@ -99,7 +99,7 @@ class CollectionsController extends CpController
             'handle' => 'nullable|alpha_dash',
             'template' => 'nullable',
             'blueprints' => 'array',
-            'route' => 'nullable',
+            'route' => 'required_with:structure',
             'orderable' => 'boolean',
             'dated' => 'boolean',
             'dateBehavior' => 'nullable',

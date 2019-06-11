@@ -195,16 +195,11 @@
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
-                <template v-if="!collection.structure">
-                    <input type="text" v-model="collection.route" class="input-text">
-                    <div class="text-2xs text-grey-50 mt-1 flex items-center">
-                        <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                        Routes are optional. If you don't need a URL, you don't need a route.
-                    </div>
-                </template>
-                <div v-else class="text-2xs text-grey-50 mt-1 flex items-center">
+                <input type="text" v-model="collection.route" class="input-text">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The route will be derived from the structure.
+                    <template v-if="collection.structure">A route is required when choosing a structure. You can also use `parent_uri` and `depth`.</template>
+                    <template v-else>Routes are optional. If you don't need a URL, you don't need a route.</template>
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
