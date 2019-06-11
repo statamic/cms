@@ -3,12 +3,10 @@
 namespace Statamic\Http\Controllers;
 
 use Statamic\API\URL;
+use Statamic\API\Data;
 use Statamic\API\Site;
-use Statamic\API\Term;
 use Statamic\Statamic;
-use Statamic\API\Entry;
 use Statamic\API\Content;
-use Statamic\Routing\Router;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
 
@@ -17,21 +15,6 @@ use Statamic\Exceptions\NotFoundHttpException;
  */
 class FrontendController extends Controller
 {
-    /**
-     * @var Router
-     */
-    private $routeHelper;
-
-    /**
-     * Create a new StatamicController
-     *
-     * @param Router $router
-     */
-    public function __construct(Router $router)
-    {
-        $this->routeHelper = $router;
-    }
-
     /**
      * Handles all URLs
      *
@@ -57,48 +40,11 @@ class FrontendController extends Controller
             $url = substr($url, 0, strpos($url, '?'));
         }
 
-        if ($data = $this->getDataForUri($url)) {
+        if ($data = Data::findByUri($url, Site::current()->handle())) {
             return $data;
         }
 
         throw new NotFoundHttpException;
-    }
-
-    /**
-     * Get the data from this URI
-     *
-     * @param string $uri
-     * @return array|bool
-     */
-    private function getDataForUri($uri)
-    {
-        $requested_uri = $uri;
-
-        // First we'll attempt to find a matching route.
-        if ($route = $this->routeHelper->getRoute($uri)) {
-            return $route;
-        }
-
-        // Attempt to get the content at this URI
-        if ($content = $this->getContentForUri($uri)) {
-            return $content;
-        }
-
-        // Still nothing?
-        return false;
-    }
-
-    private function getContentForUri($uri)
-    {
-        $site = Site::current()->handle();
-
-        if ($entry = Entry::findByUri($uri, $site)) {
-            return $entry->in($site);
-        }
-
-        if ($term = Term::findByUri($uri, $site)) {
-            return $term->in($site);
-        }
     }
 
     public function removeIgnoredSegments($uri)

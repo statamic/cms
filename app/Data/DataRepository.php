@@ -4,15 +4,19 @@ namespace Statamic\Data;
 
 use Statamic\API\Arr;
 use Statamic\API\Str;
+use Statamic\Routing\RouteRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Contracts\Assets\AssetRepository;
+use Statamic\Contracts\Data\Repositories\TermRepository;
 use Statamic\Contracts\Data\Repositories\EntryRepository;
 use Statamic\Contracts\Data\Repositories\GlobalRepository;
 
 class DataRepository
 {
     protected $repositories = [
+        'route' => RouteRepository::class,
         'entry' => EntryRepository::class,
+        'term' => TermRepository::class,
         'global' => GlobalRepository::class,
         'asset' => AssetRepository::class,
         'user' => UserRepository::class,
@@ -40,9 +44,18 @@ class DataRepository
         return app($class)->find($id);
     }
 
+    public function findByUri($uri, $site = null)
+    {
+        return $this->attemptAllRepositories('findByUri', $uri, $site);
+    }
+
     protected function attemptAllRepositories($method, ...$args)
     {
         foreach ($this->repositories as $class) {
+            if (! method_exists($class, $method)) {
+                continue;
+            }
+
             if ($result = app($class)->$method(...$args)) {
                 return $result;
             }
