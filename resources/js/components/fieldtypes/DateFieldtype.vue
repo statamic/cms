@@ -12,7 +12,9 @@
                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                     <svg-icon name="calendar" class="w-4 h-4" />
                 </div>
+                <input type="text" class="input-text" readonly :value="value" v-if="isReadOnly">
                 <v-date-picker
+                    v-else
                     v-model="date"
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
@@ -35,7 +37,7 @@
             </div>
 
             <div v-if="config.time_enabled && config.mode === 'single'" class="time-container time-fieldtype">
-				<time-fieldtype ref="time" v-if="time" v-model="time" :required="config.time_required" :config="{}" name=""></time-fieldtype>
+				<time-fieldtype ref="time" v-if="time" v-model="time" :required="config.time_required" :read-only="isReadOnly" :config="{}" name=""></time-fieldtype>
 				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
 					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>
                     <span v-text="__('Add Time')"></span>
