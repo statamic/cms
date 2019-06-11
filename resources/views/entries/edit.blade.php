@@ -25,6 +25,7 @@
         :initial-is-root="{{ bool_str($isRoot) }}"
         :revisions-enabled="{{ bool_str($entry->revisionsEnabled()) }}"
         :amp="{{ bool_str($entry->ampable()) }}"
+        :initial-read-only="{{ bool_str($readOnly) }}"
     ></entry-publish-form>
 
 @endsection

@@ -4,6 +4,13 @@ namespace Statamic\Policies;
 
 class EntryPolicy
 {
+    public function before($user, $ability)
+    {
+        if ($user->hasPermission('configure collections')) {
+            return true;
+        }
+    }
+
     public function index($user)
     {
         //
@@ -17,12 +24,12 @@ class EntryPolicy
 
     public function edit($user, $entry)
     {
-        return $this->update($user, $entry);
+        return $user->hasPermission("edit {$entry->collectionHandle()} entries");
     }
 
     public function update($user, $entry)
     {
-        return $user->hasPermission("edit {$entry->collectionHandle()} entries");
+        return $this->edit($user, $entry);
     }
 
     public function create($user, $collection)
@@ -32,6 +39,11 @@ class EntryPolicy
 
     public function delete($user, $entry)
     {
-        //
+        return $user->hasPermission("delete {$entry->collectionHandle()} entries");
+    }
+
+    public function publish($user, $collection)
+    {
+        return $user->hasPermission("publish {$collection->handle()} entries");
     }
 }

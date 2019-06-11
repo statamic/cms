@@ -51,4 +51,20 @@ class YAML
 
         return $yaml ?: '';
     }
+
+        /**
+     * Dump some YAML
+     *
+     * @param array        $data
+     * @param string|bool  $content
+     * @return string
+     */
+    public function dumpFrontMatter($data, $content = '')
+    {
+        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+        $yaml = "---".PHP_EOL . $yaml . "---".PHP_EOL . $content;
+
+        return $yaml ?: '';
+    }
 }

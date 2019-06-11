@@ -20,6 +20,8 @@ class EntriesController extends CpController
 {
     public function index(FilteredSiteRequest $request, $collection)
     {
+        $this->authorize('view', $collection);
+
         $query = $this->indexQuery($collection);
 
         $this->filter($query, $request->filters);
@@ -39,7 +41,11 @@ class EntriesController extends CpController
         $paginator = $query->paginate(request('perPage'));
 
         $entries = $paginator->supplement(function ($entry) {
-            return ['deleteable' => me()->can('delete', $entry)];
+            return [
+                'viewable' => me()->can('view', $entry),
+                'editable' => me()->can('edit', $entry),
+                'deleteable' => me()->can('delete', $entry)
+            ];
         })->preProcessForIndex();
 
         if ($collection->dated()) {
@@ -153,7 +159,7 @@ class EntriesController extends CpController
 
     public function update(Request $request, $collection, $entry)
     {
-        $this->authorize('edit', $entry);
+        $this->authorize('update', $entry);
 
         $entry = $entry->fromWorkingCopy();
 
@@ -207,6 +213,8 @@ class EntriesController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
+        $this->authorize('create', [EntryContract::class, $collection]);
+
         $blueprint = $request->blueprint
             ? Blueprint::find($request->blueprint)
             : $collection->entryBlueprint();

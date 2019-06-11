@@ -1,6 +1,5 @@
 <!doctype html>
-{{-- TODO: Set lang with current translation --}}
-<html lang="en">
+<html lang="{{ config('app.locale') }}">
 <head>
     @include('statamic::partials.head')
 </head>

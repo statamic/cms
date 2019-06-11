@@ -13,7 +13,20 @@ class DeleteEntry extends Action
 
     public function visibleTo($key, $context)
     {
-        return $key === 'entries';
+        if ($key !== 'entries') {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function authorize($key, $context)
+    {
+        return user()->can("delete {$context['collection']} entries");
+
+        // TODO: Should this be?
+        // $collection = Collection::findByHandle($context['collection']);
+        // return user()->can('delete', [Entry::class, $collection]);
     }
 
     public function run($entries)

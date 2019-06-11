@@ -16,7 +16,6 @@ mix.js(`${src}/js/app.js`, `${dest}/js`);
 mix.extract([
     'autosize',
     'axios',
-    'baremetrics-calendar',
     'codemirror',
     'cookies-js',
     'dmuploader',
@@ -33,6 +32,7 @@ mix.extract([
     '@shopify/draggable',
     'speakingurl',
     'underscore',
+    'v-calendar',
     'vue',
     'vue-clickaway',
     'vue-js-modal',

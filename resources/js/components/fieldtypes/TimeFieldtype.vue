@@ -1,36 +1,41 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-text flex items-center px-sm w-auto" :class="{ 'read-only': isReadOnly }">
-            <input class="input-time input-hour"
-                type="number" min="00" max="23" v-model="hour" ref="hour"
-                placeholder="00"
-                @keydown.up.prevent="incrementHour(1)"
-                @keydown.down.prevent="incrementHour(-1)"
-                @keydown.esc="clear"
-                @keydown.186.prevent="focusMinute"
-                @keydown.190.prevent="focusMinute"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                :readonly="isReadOnly"
-                tabindex="0"
-            />
-            <span class="colon">:</span>
-            <input class="input-time input-minute"
-                type="number" min="00" max="59" v-model="minute" ref="minute"
-                placeholder="00"
-                @keydown.up.prevent="incrementMinute(1)"
-                @keydown.down.prevent="incrementMinute(-1)"
-                @keydown.esc="clear"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                :readonly="isReadOnly"
-                tabindex="0"
-            />
+        <div class="input-group">
+            <div class="input-group-prepend flex items-center">
+                <svg-icon name="time" class="w-4 h-4" />
+            </div>
+            <div class="input-text flex items-center px-sm w-auto" :class="{ 'read-only': isReadOnly }">
+                <input class="input-time input-hour"
+                    type="number" min="00" max="23" v-model="hour" ref="hour"
+                    placeholder="00"
+                    @keydown.up.prevent="incrementHour(1)"
+                    @keydown.down.prevent="incrementHour(-1)"
+                    @keydown.esc="clear"
+                    @keydown.186.prevent="focusMinute"
+                    @keydown.190.prevent="focusMinute"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')"
+                    :readonly="isReadOnly"
+                    tabindex="0"
+                />
+                <span class="colon">:</span>
+                <input class="input-time input-minute"
+                    type="number" min="00" max="59" v-model="minute" ref="minute"
+                    placeholder="00"
+                    @keydown.up.prevent="incrementMinute(1)"
+                    @keydown.down.prevent="incrementMinute(-1)"
+                    @keydown.esc="clear"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')"
+                    :readonly="isReadOnly"
+                    tabindex="0"
+                />
+            </div>
         </div>
-        <button class="text-blue text-xs ml-1" tabindex="0"
+        <button class="btn-close ml-sm" tabindex="0"
               v-if="! required && ! isReadOnly"
               @click="clear" @keyup.enter.space="clear">
-              {{ __('clear') }}
+              &times;
         </button>
     </div>
 </template>

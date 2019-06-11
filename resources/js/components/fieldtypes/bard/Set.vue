@@ -17,7 +17,8 @@
                 <toggle-fieldtype
                     name="set-enabled"
                     class="toggle-sm mr-2"
-                    v-model="enabled" />
+                    v-model="enabled"
+                    v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list>
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>

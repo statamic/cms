@@ -30,14 +30,14 @@ a {
         @apply pt-3;
     }
     #main .workspace {
-        padding-left: 14rem;
+        padding-left: 13rem;
         @apply pt-0;
     }
 }
 
 #main.nav-closed {
     .nav-main {
-        left: -14rem;
+        left: -13rem;
     }
 
     .workspace {

@@ -26,22 +26,22 @@ class CollectionPolicy
 
     public function create($user)
     {
-        //
+        return $user->hasPermission('configure collections');
     }
 
     public function store($user)
     {
-        //
+        return $this->create($user);
     }
 
     public function view($user, $collection)
     {
-        return $user->hasPermission("view {$collection->path()} collection");
+        return $user->hasPermission("view {$collection->handle()} entries");
     }
 
     public function edit($user, $collection)
     {
-        return $user->hasPermission("edit {$collection->path()} collection");
+        return $user->hasPermission('configure collections');
     }
 
     public function update($user, $collection)
@@ -51,7 +51,7 @@ class CollectionPolicy
 
     public function delete($user, $collection)
     {
-        //
+        return $user->hasPermission('configure collections');
     }
 
     public function reorder($user, $collection)

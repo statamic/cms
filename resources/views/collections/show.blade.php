@@ -11,8 +11,12 @@
             {{ $collection->title() }}
         </h1>
         <dropdown-list class="mr-2">
-            <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
-            <dropdown-item :text="__('Delete Collection')" class="warning"></dropdown-item>
+            @can('edit', $collection)
+                <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
+            @endcan
+            @can('delete', $collection)
+                <dropdown-item :text="__('Delete Collection')" class="warning"></dropdown-item>
+            @endcan
         </dropdown-list>
         @can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
             <create-entry-button
@@ -31,7 +35,7 @@
             :filters="{{ $filters->toJson() }}"
             :actions="{{ $actions->toJson() }}"
             action-url="{{ cp_route('collections.entries.action', $collection->handle()) }}"
-            :reorderable="{{ bool_str($collection->orderable()) }}"
+            :reorderable="{{ bool_str(user()->can('reorder', $collection)) }}"
             reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
             structure-url="{{ optional($collection->structure())->showUrl() }}"
         ></entry-list>

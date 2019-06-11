@@ -71,4 +71,26 @@ this is the content';
 
         $this->assertEquals($expected, YAML::dump($array, 'this is the content'));
     }
+
+    /** @test */
+    function it_dumps_front_matter()
+    {
+        $expected = '---
+foo: bar
+baz: qux
+array:
+  hello: world
+---
+';
+
+        $array = [
+            'foo' => 'bar',
+            'baz' => 'qux',
+            'array' => [
+                'hello' => 'world',
+            ]
+        ];
+
+        $this->assertEquals($expected, YAML::dumpFrontMatter($array));
+    }
 }

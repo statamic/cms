@@ -1,16 +1,51 @@
 <template>
-    <v-date-picker
-        v-model="date"
-        :attributes="attrs"
-        :formats="formats"
-        :mode="config.mode"
-        :input="value"
-        :is-required="config.required"
-        :is-inline="config.inline"
-        :is-expanded="name === 'date' || config.full_width"
-        :columns="$screens({ default: 1, lg: config.columns })"
-        :rows="$screens({ default: 1, lg: config.rows })"
-        @input="handleUpdate" />
+    <div class="datetime">
+
+        <button type="button" class="btn flex mb-1 md:mb-0 items-center pl-1.5" v-if="config.inline === false && !hasDate" @click="addDate" tabindex="0">
+            <svg-icon name="calendar" class="w-4 h-4 mr-1"></svg-icon>
+    		{{ __('Add Date') }}
+    	</button>
+
+        <div class="date-time-container" v-if="hasDate || config.inline">
+
+            <div class="flex-1 date-container" :class="{'input-group': !config.inline }">
+                <div class="input-group-prepend flex items-center" v-if="!config.inline">
+                    <svg-icon name="calendar" class="w-4 h-4" />
+                </div>
+                <input type="text" class="input-text" readonly :value="value" v-if="isReadOnly">
+                <v-date-picker
+                    v-else
+                    v-model="date"
+                    :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
+                    :attributes="attrs"
+                    :locale="$config.get('locale')"
+                    :formats="formats"
+                    :mode="config.mode"
+                    :input="value"
+                    :is-required="config.required"
+                    :is-inline="config.inline"
+                    :is-expanded="name === 'date' || config.full_width"
+                    :columns="$screens({ default: 1, lg: config.columns })"
+                    :rows="$screens({ default: 1, lg: config.rows })"
+                    @input="handleUpdate">
+                        <input
+                            slot-scope="{ inputProps, inputEvents }"
+                            class="bg-transparent leading-none w-full"
+                            v-bind="inputProps"
+                            v-on="inputEvents" />
+                </v-date-picker>
+            </div>
+
+            <div v-if="config.time_enabled && config.mode === 'single'" class="time-container time-fieldtype">
+				<time-fieldtype ref="time" v-if="time" v-model="time" :required="config.time_required" :read-only="isReadOnly" :config="{}" name=""></time-fieldtype>
+				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
+					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>
+                    <span v-text="__('Add Time')"></span>
+				</button>
+			</div>
+        </div>
+    </div>
+
 </template>
 
 <script>
@@ -21,7 +56,8 @@ export default {
 
     data() {
         return {
-            date: this.value ? Vue.moment(this.value).toDate() : (this.config.required) ? Vue.moment().toDate() : null,
+            date: this.parseDate(),
+            time: this.parseTime(),
             formats: {
                 title: 'MMMM YYYY',
                 weekdays: 'W',
@@ -37,28 +73,90 @@ export default {
                         label: __('Today'),
                     },
                     dates: new Date()
-                },
+                }
             ],
         }
     },
 
     computed: {
+        hasDate() {
+            return (this.config.required) ? true : this.date !== null;
+        },
 
+        dateTime() {
+            return Vue.moment(this.date).set({'hour': this.hour, 'minute': this.minutes}).format(this.format);
+        },
+
+        hour() {
+            return this.time ? this.time.split(':')[0] : 0;
+        },
+
+        minutes() {
+            return this.time ? this.time.split(':')[1] : 0;
+        },
+
+        format() {
+            return 'YYYY-MM-DD HH:mm';
+        }
+    },
+
+    watch: {
+        time(value) {
+            this.handleUpdate(value)
+        }
     },
 
     methods: {
         handleUpdate(value) {
-            if (this.mode === "multiple") {
-                this.update(value);
+            if (this.config.mode === "single") {
+                this.update(Vue.moment(this.dateTime).format(this.format))
             } else {
-                this.update(Vue.moment(value).format('YYYY-MM-DD HH:mm'))
+                this.update(this.date);
+            }
+        },
+
+        addDate() {
+            this.date = Vue.moment().format(this.format);
+            if (this.config.time_required) {
+                this.addTime();
+            }
+        },
+
+        addTime() {
+            this.time = Vue.moment().format('HH:mm');
+            this.$nextTick(function() {
+                $(this.$refs.time.$refs.hour).focus().select();
+            });
+        },
+
+        removeTime() {
+            this.time = null;
+        },
+
+        parseDate() {
+            if (this.value) {
+                if (this.config.mode === "single") {
+                    return Vue.moment(this.value).toDate()
+                } else if (this.config.mode === "range") {
+                    return {
+                        'start': Vue.moment(this.value.start).toDate(),
+                        'end': Vue.moment(this.value.end).toDate()
+                    }
+                }
+             } else {
+                 return (this.config.required) ?  Vue.moment().toDate() : null
+             }
+        },
+
+        parseTime() {
+            if (this.value) {
+                return Vue.moment(this.date).format('HH:mm');
+            } else if (this.config.time_required) {
+                return Vue.moment().format('HH:mm');
+            } else {
+                return null;
             }
         }
     },
-
-    mounted() {
-
-
-    }
 };
 </script>

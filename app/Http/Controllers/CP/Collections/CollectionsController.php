@@ -43,6 +43,8 @@ class CollectionsController extends CpController
 
     public function show($collection)
     {
+        $this->authorize('view', $collection, 'You are not authorized to view any collections.');
+
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
                 'handle' => $blueprint->handle(),
@@ -97,13 +99,14 @@ class CollectionsController extends CpController
             'handle' => 'nullable|alpha_dash',
             'template' => 'nullable',
             'blueprints' => 'array',
-            'route' => 'nullable',
+            'route' => 'required_with:structure',
             'orderable' => 'boolean',
             'dated' => 'boolean',
             'dateBehavior' => 'nullable',
             'sortDirection' => 'in:asc,desc',
             'amp' => 'boolean',
             'structure' => 'nullable',
+            'mount' => 'nullable',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -175,7 +178,8 @@ class CollectionsController extends CpController
             ->structure($structure = array_get($data, 'structure'))
             ->orderable($structure ? false : $data['orderable'])
             ->ampable($data['amp'])
-            ->entryBlueprints($data['blueprints']);
+            ->entryBlueprints($data['blueprints'])
+            ->mount($data['mount'] ?? null);
     }
 
     protected function editFormBlueprint()
@@ -260,6 +264,11 @@ class CollectionsController extends CpController
             'route' => [
                 'type' => 'text',
                 'instructions' => __('The route controls the URL pattern all entries in the collection will follow.'),
+            ],
+            'mount' => [
+                'type' => 'relationship',
+                'max_items' => 1,
+                'instructions' => __('Mounting to an entry will give you shortcuts to add and edit this collection\'s entries from within a Structure. It will also let you use the `mount` variable in your routes, which will be the URL of the entry.'),
             ],
             'amp' => [
                 'type' => 'toggle',

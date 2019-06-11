@@ -26,6 +26,13 @@ class CollectionRepository implements RepositoryContract
         return $this->store->getItem($handle);
     }
 
+    public function findByMount($mount): ?Collection
+    {
+        return $this->all()->first(function ($collection) use ($mount) {
+            return optional($collection->mount())->id() === $mount->id();
+        });
+    }
+
     public function save(Collection $collection)
     {
         $this->store->setItem($collection->handle(), $collection);
@@ -38,5 +45,10 @@ class CollectionRepository implements RepositoryContract
         $this->store->removeItem($collection->handle(), $collection);
 
         $this->store->delete($collection);
+    }
+
+    public function updateEntryUris(Collection $collection)
+    {
+        $this->store->updateEntryUris($collection);
     }
 }

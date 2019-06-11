@@ -238,7 +238,9 @@ class StructuresStore extends BasicStore
 
     public function getEntryUris($site = null)
     {
-        $site = $site ?? $this->stache->sites()->first();
+        if ($site === null) {
+            return collect($this->entryUris);
+        }
 
         return collect($this->entryUris->get($site));
     }

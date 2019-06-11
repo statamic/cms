@@ -9,6 +9,7 @@ use Statamic\API\User;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\Routable;
+use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
@@ -168,6 +169,8 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         }
 
         API\Entry::save($this);
+
+        optional(Collection::findByMount($this))->updateEntryUris();
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
@@ -431,6 +434,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
+            'mount' => $this->collection()->url(),
         ]);
 
         if ($this->hasDate()) {

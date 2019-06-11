@@ -22,6 +22,7 @@ class ActionRepository
     {
         return $this->all()
             ->filter->visibleTo($key, $context)
+            ->filter->authorize($key, $context)
             ->each->context($context)
             ->values();
     }
