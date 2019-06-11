@@ -263,7 +263,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function hasTime()
     {
-        return $this->hasDate() && !$this->date()->format('H:i:s') === '00:00:00';
+        return $this->hasDate() && $this->date()->format('H:i:s') !== '00:00:00';
     }
 
     public function sites()
