@@ -6,9 +6,9 @@
     		{{ __('Add Date') }}
     	</button>
 
-        <div class="date-time-container md:flex" v-if="hasDate || config.inline">
+        <div class="date-time-container" v-if="hasDate || config.inline">
 
-            <div class="flex-1 mb-1 md:mb-0" :class="{'input-group': !config.inline }">
+            <div class="flex-1 date-container" :class="{'input-group': !config.inline }">
                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                     <svg-icon name="calendar" class="w-4 h-4" />
                 </div>
@@ -34,7 +34,7 @@
                 </v-date-picker>
             </div>
 
-            <div v-if="config.time_enabled && config.mode === 'single'" class="md:ml-1 time-fieldtype">
+            <div v-if="config.time_enabled && config.mode === 'single'" class="time-container time-fieldtype">
 				<time-fieldtype ref="time" v-if="time" v-model="time" :required="config.time_required" :config="{}" name=""></time-fieldtype>
 				<button type="button" class="btn flex items-center pl-1.5" v-if="! time" @click="addTime" tabindex="0">
 					<svg-icon name="time" class="w-4 h-4 mr-1"></svg-icon>

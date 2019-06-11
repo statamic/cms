@@ -32,6 +32,24 @@
     min-width: 60px;
 }
 
+.date-time-container .date-container {
+	@apply mb-1;
+}
+
+@element .date-time-container and (min-width: 260px) {
+	:self {
+		@apply flex;
+
+		.date-container {
+			@apply mb-0;
+		}
+
+		.time-container {
+			@apply ml-1;
+		}
+	}
+}
+
 .date-time-container .vc-popover-content-wrapper {
 	left: -50px !important;
 }
