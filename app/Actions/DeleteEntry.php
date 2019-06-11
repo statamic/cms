@@ -23,6 +23,10 @@ class DeleteEntry extends Action
     public function authorize($key, $context)
     {
         return user()->can("delete {$context['collection']} entries");
+
+        // TODO: Should this be?
+        // $collection = Collection::findByHandle($context['collection']);
+        // return user()->can('delete', [Entry::class, $collection]);
     }
 
     public function run($entries)

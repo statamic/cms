@@ -70,9 +70,9 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
-                                <dropdown-item :text="__('View')" :redirect="entry.permalink" />
-                                <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" />
-                                <div class="divider" />
+                                <dropdown-item :text="__('View')" :redirect="entry.permalink" v-if="entry.viewable" />
+                                <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
+                                <div class="divider" v-if="actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
                                     :url="actionUrl"
