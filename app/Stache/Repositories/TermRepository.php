@@ -2,7 +2,9 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Statamic\API\Str;
 use Statamic\Stache\Stache;
+use Statamic\API\Collection;
 use Statamic\Data\Taxonomies\QueryBuilder;
 use Statamic\Data\Taxonomies\TermCollection;
 use Statamic\Contracts\Data\Taxonomies\Term;
@@ -50,7 +52,21 @@ class TermRepository implements RepositoryContract
 
     public function findByUri(string $uri, string $site = null): ?Term
     {
-        return $this->find($this->store->getIdFromUri($uri, $site));
+        $collection = Collection::all()
+            ->filter->url()
+            ->first(function ($collection) use ($uri) {
+                return Str::startsWith($uri, $collection->url());
+            });
+
+        if ($collection) {
+            $uri = Str::after($uri, $collection->url());
+        }
+
+        if (! $term = $this->find($this->store->getIdFromUri($uri, $site))) {
+            return null;
+        }
+
+        return $term->collection($collection);
     }
 
     public function findBySlug(string $slug, string $collection): ?Term
