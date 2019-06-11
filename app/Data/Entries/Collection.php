@@ -22,6 +22,7 @@ class Collection implements Contract
     protected $handle;
     protected $route;
     protected $mount;
+    protected $mountedEntry;
     protected $title;
     protected $template;
     protected $layout;
