@@ -330,6 +330,7 @@ class Collection implements Contract
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,
             'structure' => optional($this->structure())->handle(),
+            'mount' => $this->mount,
         ];
     }
 

@@ -194,6 +194,27 @@
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="mount">Mount to an Entry</label>
+                <publish-field-meta
+                    :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
+                    :initial-value="collection.mount ? [collection.mount] : []">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
+                            :value="value"
+                            :meta="meta"
+                            name="mount"
+                            @input="collection.mount = $event[0]" />
+                    </div>
+                </publish-field-meta>
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Mounting to an entry will give you shortcuts to add and edit this collection's entries from within a Structure.
+                    It will also let you use the `mount` variable in your routes, which will be the URL of the entry.
+                </div>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
                 <input type="text" v-model="collection.route" class="input-text">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
@@ -253,6 +274,7 @@ export default {
                 route: null,
                 amp: false,
                 structure: null,
+                mount: null,
             }
         }
     },
