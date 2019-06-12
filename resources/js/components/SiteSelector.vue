@@ -4,7 +4,7 @@
         <dropdown-list>
             <template v-slot:trigger>
                 <button class="flex outline-none items-center dropdown-toggle anti text-grey hover:text-grey-80">
-                    <i class="site-selector-icon"><slot name="icon" /></i><span>{{ activeName }}</span>
+                    <i class="site-selector-icon"><slot name="icon" /></i><span class="hidden md:block">{{ activeName }}</span>
                 </button>
             </template>
 
