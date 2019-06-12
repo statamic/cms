@@ -89,13 +89,11 @@ code.parent-url {
 
 .publish-sidebar {
     @apply ml-3 flex-no-shrink;
+    min-width: 240px;
     max-width: 300px;
 
     .publish-section-actions {
-        @apply bg-white border-b rounded-t;
-        // position: sticky;
-        // top: 0;
-        // z-index: 10;
+        @apply border-b;
     }
 
     .publish-fields .form-group {
@@ -125,7 +123,7 @@ code.parent-url {
     :self .publish-field { width: 100%; }
 }
 
-.publish-section {
+.publish-section:not(:empty) {
     @apply shadow bg-white rounded-md w-full;
 }
 
