@@ -117,9 +117,13 @@
 
                                 <div class="border-t p-2" v-if="revisionsEnabled">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
-                                    <div class="mb-sm flex items-center">
+                                    <div class="mb-sm flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
+                                    </div>
+                                    <div class="mb-sm flex items-center" v-else="published">
+                                        <span class="text-orange w-6 text-center">!</span>
+                                        <span class="text-2xs" v-text="__('Entry has not been published')"></span>
                                     </div>
                                     <div class="mb-sm flex items-center" v-if="isWorkingCopy && isDirty">
                                         <span class="text-orange w-6 text-center">!</span>
@@ -129,7 +133,7 @@
                                         <span class="text-orange w-6 text-center">!</span>
                                         <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
                                     </div>
-                                    <div class="mb-sm flex items-center" v-else>
+                                    <div class="mb-sm flex items-center" v-if="!isWorkingCopy && published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
                                     </div>
@@ -190,7 +194,7 @@
                 class="ml-1 btn btn-lg justify-center btn-primary flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
-                <span v-trans="'Publish'" />
+                <span v-text="__('Publish')" />
                 <svg-icon name="chevron-down-xs" class="ml-1" />
             </button>
         </div>
