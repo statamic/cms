@@ -62,15 +62,13 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function route()
     {
-        // todo
-        //
-        // allow terms to be associated with a collection on demand, eg from within a collection tag loop.
-        // once they are, the route should be adjusted to come from the collection.
-        // eg. /blog/tags/{tag}
-        // but when not associated with a collection, the default uri would be the "global" version
-        // eg. /tags/{tag}
+        $route = $this->taxonomy()->route();
 
-        return $this->taxonomy()->route();
+        if ($this->collection) {
+            $route = $this->collection()->url() . '/' . $route;
+        }
+
+        return $route;
     }
 
     public function routeData()
