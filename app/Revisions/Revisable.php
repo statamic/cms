@@ -97,6 +97,8 @@ trait Revisable
             ->save();
 
         $item->deleteWorkingCopy();
+
+        return $item;
     }
 
     public function unpublish($options = [])

@@ -128,6 +128,7 @@ class EntriesController extends CpController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? [],
             'originMeta' => $originMeta ?? [],
+            'permalink' => $entry->absoluteUrl(),
             'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
@@ -183,13 +184,7 @@ class EntriesController extends CpController
             ->slug($request->slug);
 
         if ($entry->collection()->dated()) {
-            // If there's a time, adjust the format into a datetime order string.
-            if (strlen($date = $request->date) > 10) {
-                $date = str_replace(':', '', $date);
-                $date = str_replace(' ', '-', $date);
-            }
-
-            $entry->date($date);
+            $entry->date($this->formatDateForSaving($request->date));
         }
 
         if ($entry->revisionsEnabled() && $entry->published()) {
@@ -282,7 +277,10 @@ class EntriesController extends CpController
             ->data($values);
 
         if ($collection->dated()) {
-            $entry->date($values['date'] ?? now()->format('Y-m-d-Hi'));
+            $date = $values['date']
+                ? $this->formatDateForSaving($values['date'])
+                : now()->format('Y-m-d-Hi');
+            $entry->date($date);
         }
 
         if ($entry->revisionsEnabled()) {
@@ -351,5 +349,16 @@ class EntriesController extends CpController
         }
 
         return [$values, $fields->meta()];
+    }
+
+    protected function formatDateForSaving($date)
+    {
+        // If there's a time, adjust the format into a datetime order string.
+        if (strlen($date) > 10) {
+            $date = str_replace(':', '', $date);
+            $date = str_replace(' ', '-', $date);
+        }
+
+        return $date;
     }
 }

@@ -51,7 +51,7 @@
             <portal-target name="outside"></portal-target>
       </div>
 
-      @include('statamic::partials.nav-mobile')
+      {{-- @include('statamic::partials.nav-mobile') --}}
 
   </div>
 

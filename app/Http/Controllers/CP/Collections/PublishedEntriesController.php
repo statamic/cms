@@ -12,10 +12,12 @@ class PublishedEntriesController extends CpController
     {
         $this->authorize('publish', $collection);
 
-        $entry->publish([
+        $entry = $entry->publish([
             'message' => $request->message,
             'user' => $request->user(),
         ]);
+
+        return $entry->toArray();
     }
 
     public function destroy(Request $request, $collection, $entry)

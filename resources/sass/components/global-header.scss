@@ -3,20 +3,20 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center justify-between hidden relative w-full px-2;
+    @apply bg-white shadow h-12 items-center hidden justify-between relative w-full px-2;
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
-@screen md {
+@screen sm {
     .global-header { @apply flex px-4; }
 }
 
 /* Search
    ========================================================================== */
 .global-search {
-    @apply rounded-md px-1 w-96 py-0 flex items-center relative border;
+    @apply rounded-md px-1 hidden py-0 flex items-center relative border;
     transition: .12s ease-out;
 
     .search-input {
@@ -85,6 +85,10 @@
         left: -3px;
         position: relative;
     }
+}
+
+@screen md {
+    .global-search { @apply w-96 }
 }
 
 .site-selector {

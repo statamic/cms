@@ -11,6 +11,7 @@ class Augmentor
     protected $fieldtype;
     protected $sets = [];
     protected $includeDisabledSets = false;
+    protected $augmentSets = true;
 
     public function __construct($fieldtype)
     {
@@ -30,7 +31,10 @@ class Augmentor
         $value = $this->addSetIndexes($value);
         $value = $this->convertToHtml($value);
         $value = $this->convertToSets($value);
-        $value = $this->augmentSets($value);
+
+        if ($this->augmentSets) {
+            $value = $this->augmentSets($value);
+        }
 
         return $value;
     }
@@ -38,6 +42,13 @@ class Augmentor
     public function withDisabledSets()
     {
         $this->includeDisabledSets = true;
+
+        return $this;
+    }
+
+    public function withoutAugmentingSets()
+    {
+        $this->augmentSets = false;
 
         return $this;
     }
