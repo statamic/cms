@@ -18,7 +18,7 @@ trait Augmentable
             : collect();
 
         return collect($this->augmentedArrayData())->map(function ($value, $handle) use ($fields) {
-            return new Value($value, $handle, optional($fields->get($handle))->fieldtype());
+            return new Value($value, $handle, optional($fields->get($handle))->fieldtype(), $this);
         })->all();
     }
 

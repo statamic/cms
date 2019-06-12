@@ -13,12 +13,14 @@ class Value implements IteratorAggregate
     protected $fieldtype;
     protected $parser;
     protected $context;
+    protected $augmentable;
 
-    public function __construct($value, $handle = null, $fieldtype = null)
+    public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null)
     {
         $this->raw = $value;
         $this->handle = $handle;
         $this->fieldtype = $fieldtype;
+        $this->augmentable = $augmentable;
     }
 
     public function raw()
@@ -32,7 +34,7 @@ class Value implements IteratorAggregate
             return $this->raw;
         }
 
-        $value = $this->fieldtype->augment($this->raw);
+        $value = $this->fieldtype->augment($this->raw, $this->augmentable);
 
         if ($this->shouldParse()) {
             $value = $this->parse($value);
