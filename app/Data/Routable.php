@@ -14,13 +14,7 @@ trait Routable
 
     public function slug($slug = null)
     {
-        if (is_null($slug)) {
-            return $this->slug;
-        }
-
-        $this->slug = $slug;
-
-        return $this;
+        return $this->fluentlyGetOrSet('slug')->args(func_get_args());
     }
 
     public function uri()

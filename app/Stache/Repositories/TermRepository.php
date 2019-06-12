@@ -99,8 +99,8 @@ class TermRepository implements RepositoryContract
         return new QueryBuilder;
     }
 
-    public function make(): Term
+    public function make($slug = null): Term
     {
-        return new \Statamic\Data\Taxonomies\Term;
+        return (new \Statamic\Data\Taxonomies\Term)->slug($slug);
     }
 }
