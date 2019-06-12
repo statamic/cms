@@ -4,7 +4,7 @@
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
-                <div class="flex items-center no-select" v-if="toolbarIsFixed">
+                <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
                     <component
                         v-for="button in buttons"
                         :key="button.name"
