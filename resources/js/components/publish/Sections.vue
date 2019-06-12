@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <portal-target :name="actionsPortal" />
+        <portal-target :name="actionsPortal" class="publish-section publish-section-actions-footer" />
 
     </div>
     </element-container>

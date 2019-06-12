@@ -1,11 +1,11 @@
 <template>
 
     <div>
+        <div class="subhead">
+            <a :href="collectionUrl" v-text="collectionTitle" class="font-bold hover:text-blue" />
+        </div>
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
-                <small class="subhead block">
-                    <a :href="collectionUrl" v-text="collectionTitle" class="text-grey hover:text-blue" />
-                </small>
                 <div class="flex items-center">
                     <span v-if="! isCreating"
                         class="little-dot mr-1"
@@ -17,9 +17,27 @@
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
-            <div class="pt-px text-2xs text-grey-60" v-if="isWorkingCopy" v-text="'Unpublished Changes'" />
-            <div class="pt-px text-2xs text-grey-60" v-else-if="isDirty" v-text="'Unsaved Changes'" />
-            <div class="pt-px text-2xs text-grey-60" v-else-if="!published" v-text="'Unpublished Entry'" />
+
+            <div class="hidden md:flex items-center">
+                <button
+                    v-if="!readOnly"
+                    class="btn"
+                    :class="{
+                        'btn-primary': ! revisionsEnabled,
+                    }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="saveText" />
+
+                <button
+                    v-if="revisionsEnabled"
+                    class="ml-2 btn btn-primary flex items-center"
+                    :disabled="!canPublish"
+                    @click="confirmingPublish = true">
+                    <span v-text="__('Publish')" />
+                    <svg-icon name="chevron-down-xs" class="ml-1" />
+                </button>
+            </div>
 
             <slot name="action-buttons-right" />
         </div>
@@ -71,58 +89,64 @@
                         >
                             <template #actions="{ shouldShowSidebar }">
 
-                                <div class="p-2" :class="{ 'flex flex-row-reverse justify-between items-center px-0': !shouldShowSidebar }">
+                                <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div :class="{ 'mb-2': shouldShowSidebar, 'min-w-xs': !shouldShowSidebar }">
+                                    <div class="p-2 flex items-center justify-between">
                                         <button
-                                            v-if="!readOnly && !canPublish"
-                                            class="btn btn-primary w-full"
-                                            :class="{ 'opacity-25': !canSave }"
-                                            :disabled="!canSave"
-                                            @click.prevent="save"
-                                            v-text="__('Save')" />
-
-                                        <button
-                                            v-if="canPublish"
-                                            class="btn btn-primary w-full"
-                                            :class="{ 'opacity-25': !canPublish }"
-                                            :disabled="!canPublish"
-                                            @click="confirmingPublish = true"
-                                            v-text="`${__('Publish')}...`" />
-                                    </div>
-
-                                    <div class="flex flex-wrap justify-center text-grey text-2xs">
-                                        <button
-                                            v-if="!revisionsEnabled"
-                                            class="flex items-center m-1 whitespace-no-wrap outline-none"
-                                            :class="{ 'text-green': published }"
-                                            @click="togglePublishState"
-                                        >
-                                            <span class="little-dot mr-sm" :class="{ 'bg-green': published, 'bg-grey-60': !published }" />
-                                            <span v-text="published ? __('Published') : __('Draft')" />
-                                        </button>
-
-                                        <button
-                                            class="flex items-center m-1 whitespace-no-wrap"
-                                            v-if="!isCreating && revisionsEnabled"
-                                            @click="showRevisionHistory = true">
-                                            <svg-icon name="time" class="w-4 mr-sm" /> {{ __('History') }}
-                                        </button>
-
-                                        <button
-                                            class="flex items-center m-1 hover:text-grey-90 whitespace-no-wrap"
+                                            class="flex items-center justify-center btn-flat w-1/2 mr-sm px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
-                                            <svg-icon name="search" class="w-4 mr-sm" /> {{ __('Preview') }}
+                                            <svg-icon name="syncronize" class="w-5 h-5 mr-1" />
+                                            <span>{{ __('Live Preview') }}</span>
                                         </button>
+                                        <a
+                                            class="flex items-center justify-center btn-flat w-1/2 ml-sm px-1"
+                                            :href="permalink"
+                                            target="_blank">
+                                            <svg-icon name="external-link" class="w-5 h-5 mr-1" />
+                                            <span>{{ __('Visit URL') }}</span>
+                                        </a>
                                     </div>
                                 </div>
 
-                                <div class="" v-if="localizations.length > 1">
+                                <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
+                                    <label v-text="__('Published')" class="publish-field-label font-medium" />
+                                    <toggle-input v-model="published" />
+                                </div>
+
+                                <div class="border-t p-2" v-if="revisionsEnabled">
+                                    <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
+                                    <div class="mb-sm flex items-center">
+                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-2xs" v-text="__('Entry has a published version')"></span>
+                                    </div>
+                                    <div class="mb-sm flex items-center" v-if="isWorkingCopy && isDirty">
+                                        <span class="text-orange w-6 text-center">!</span>
+                                        <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
+                                    </div>
+                                    <div class="mb-sm flex items-center" v-else-if="isWorkingCopy">
+                                        <span class="text-orange w-6 text-center">!</span>
+                                        <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
+                                    </div>
+                                    <div class="mb-sm flex items-center" v-else>
+                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-2xs" v-text="__('This is the published version')"></span>
+                                    </div>
+                                    <button
+                                            class="flex items-center justify-center mt-2 btn-flat px-1 w-full"
+                                            v-if="!isCreating && revisionsEnabled"
+                                            @click="showRevisionHistory = true">
+                                            <svg-icon name="history" class="w-5 h-5 mr-1" />
+                                            <span>{{ __('View History') }}</span>
+                                        </button>
+                                </div>
+
+                                <div class="p-2 site-list border-t" v-if="localizations.length > 1">
+                                    <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="revision-item flex items-center border-grey-30"
+                                        class="site-item flex items-center border-grey-30"
                                         :class="{ 'opacity-50': !option.active }"
                                         @click="localizationSelected(option)"
                                     >
@@ -135,9 +159,9 @@
                                             {{ option.name }}
                                             <loading-graphic :size="14" text="" class="ml-1" v-if="localizing === option.handle" />
                                         </div>
-                                        <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                                        <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
-                                        <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
+                                        <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                                        <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
+                                        <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
 
@@ -147,6 +171,28 @@
                 </div>
             </live-preview>
         </publish-container>
+
+        <div class="md:hidden mt-3 flex items-center">
+            <button
+                v-if="!readOnly"
+                class="btn btn-lg"
+                :class="{
+                    'btn-primary w-full': ! revisionsEnabled,
+                    'w-1/2 mr-2': revisionsEnabled,
+                }"
+                :disabled="!canSave"
+                @click.prevent="save"
+                v-text="__(revisionsEnabled ? 'Save Changes' : 'Save')" />
+
+            <button
+                v-if="revisionsEnabled"
+                class="ml-1 btn btn-lg justify-center btn-primary flex items-center w-1/2"
+                :disabled="!canPublish"
+                @click="confirmingPublish = true">
+                <span v-trans="'Publish'" />
+                <svg-icon name="chevron-down-xs" class="ml-1" />
+            </button>
+        </div>
 
         <stack name="revision-history" v-if="showRevisionHistory" @closed="showRevisionHistory = false" :narrow="true">
             <revision-history
@@ -204,6 +250,7 @@ export default {
         isCreating: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
+        initialPermalink: String,
         revisionsEnabled: Boolean
     },
 
@@ -234,6 +281,7 @@ export default {
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
+            permalink: this.initialPermalink
         }
     },
 
@@ -254,7 +302,7 @@ export default {
         canPublish() {
             if (!this.revisionsEnabled) return false;
 
-            return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading;
+            return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading && this.isWorkingCopy;
         },
 
         livePreviewUrl() {
@@ -271,11 +319,25 @@ export default {
 
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
+        },
+
+        saveText() {
+            if (this.revisionsEnabled) return __('Save Changes');
+
+            if (this.published) return __('Save & Publish');
+
+            if (!this.published && this.initialPublished) return __('Save & Unpublish');
+
+            return __('Save');
         }
 
     },
 
     watch: {
+
+        published(published) {
+            this.$refs.container.dirty();
+        },
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
@@ -305,6 +367,7 @@ export default {
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
+                this.permalink = response.data.permalink;
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$notify.success('Saved');
                 this.$refs.container.saved();
@@ -410,6 +473,7 @@ export default {
             if (published !== undefined) this.published = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
+            this.permalink = response.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 
@@ -437,12 +501,6 @@ export default {
 
             this.$refs.container.dirty();
         },
-
-        togglePublishState() {
-            this.published = !this.published;
-            this.$refs.container.dirty();
-        }
-
     },
 
     mounted() {

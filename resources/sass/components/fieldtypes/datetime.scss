@@ -32,20 +32,24 @@
     min-width: 60px;
 }
 
-.date-time-container .date-container {
-	@apply mb-1;
+.date-time-container {
+	@apply flex;
+
+	.time-container {
+		@apply ml-1;
+	}
 }
 
-@element .date-time-container and (min-width: 260px) {
+@element .date-time-container and (max-width: 260px) {
 	:self {
-		@apply flex;
+		@apply block;
 
 		.date-container {
-			@apply mb-0;
+			@apply mb-1;
 		}
 
 		.time-container {
-			@apply ml-1;
+			@apply ml-0;
 		}
 	}
 }
@@ -74,7 +78,7 @@
 
 	.colon {
 		@apply select-none;
-		margin: 0;
+		margin: 0 -2px;
 	}
 
 	input::-webkit-inner-spin-button,

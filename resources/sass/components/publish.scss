@@ -88,17 +88,23 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply ml-4 flex-no-shrink w-1/4 max-w-sm;
+    @apply ml-3 flex-no-shrink;
+    max-width: 300px;
 
     .publish-section-actions {
-        @apply bg-white border-b z-10 rounded-t;
-        position: sticky;
-        top: 0;
+        @apply bg-white border-b rounded-t;
+        // position: sticky;
+        // top: 0;
+        // z-index: 10;
     }
-    
+
     .publish-fields .form-group {
         @apply p-2;
     }
+}
+
+.publish-section-actions-footer {
+    @apply mt-3;
 }
 
 .sneak-peek-editing .publish-tabs {

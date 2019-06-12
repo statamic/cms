@@ -45,7 +45,7 @@ button, .btn, .btn-* {
     @apply shadow-none text-grey-80 bg-grey-30;
     position: inherit;
     &:hover {
-        @apply bg-grey-30;
+        @apply bg-grey-40;
         box-shadow: none !important;
     }
     &:focus {
