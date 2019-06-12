@@ -3,12 +3,14 @@
 namespace Statamic\Data\Entries;
 
 use Statamic\API\Entry;
+use Statamic\API\Stache;
 use Statamic\Data\QueryBuilder as BaseQueryBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
     protected $collections;
     protected $site;
+    protected $taxonomyTerm;
 
     public function where($column, $operator = null, $value = null)
     {
@@ -37,11 +39,13 @@ class QueryBuilder extends BaseQueryBuilder
 
     protected function getBaseItems()
     {
-        $entries = $this->collections
-            ? collect_entries($this->collections)->flatMap(function ($collection) {
-                return Entry::whereCollection($collection);
-            })->values()
-            : Entry::all()->values();
+        if ($this->taxonomyTerm) {
+            $entries = $this->getBaseTaxonomizedEntries();
+        } elseif ($this->collections) {
+            $entries = $this->getBaseCollectionEntries();
+        } else {
+            $entries = Entry::all()->values();
+        }
 
         if ($this->site) {
             $entries = $entries->localize($this->site);
@@ -50,8 +54,37 @@ class QueryBuilder extends BaseQueryBuilder
         return $entries;
     }
 
+    protected function getBaseCollectionEntries()
+    {
+        return collect_entries($this->collections)->flatMap(function ($collection) {
+            return Entry::whereCollection($collection);
+        })->values();
+    }
+
+    protected function getBaseTaxonomizedEntries()
+    {
+        $associations = Stache::store('terms')->getAssociations();
+
+        $ids = $associations[$this->taxonomyTerm] ?? [];
+
+        $query = Entry::query()->whereIn('id', $ids);
+
+        if ($this->collections) {
+            $query->whereIn('collection', $this->collections);
+        }
+
+        return $query->get();
+    }
+
     protected function collect($items = [])
     {
         return collect_entries($items);
+    }
+
+    public function whereTaxonomy($term)
+    {
+        $this->taxonomyTerm = $term;
+
+        return $this;
     }
 }

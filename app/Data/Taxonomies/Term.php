@@ -165,17 +165,17 @@ class Term implements TermContract, Responsable, AugmentableContract
         return $this->fluentlyGetOrSet('collection')->args(func_get_args());
     }
 
-    protected function entries()
+    public function entries()
     {
-        $entries = Entry::all();
-        // todo: get actual associated entries instead of just grabbing them all.
+        return $this->queryEntries()->get();
+    }
 
-        if ($this->collection) {
-            $entries = $entries->filter(function ($entry) {
-                return $entry->collection() === $this->collection;
-            });
-        }
+    protected function queryEntries()
+    {
+        $entries = $this->collection
+            ? $this->collection->queryEntries()
+            : Entry::query();
 
-        return $entries;
+        return $entries->whereTaxonomy($this->id());
     }
 }

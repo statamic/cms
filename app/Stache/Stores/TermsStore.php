@@ -12,6 +12,20 @@ use Statamic\Stache\Exceptions\StoreExpiredException;
 
 class TermsStore extends AggregateStore
 {
+    protected $associations = [
+        'tags::weird' => [
+            'd962e620-ebc8-45d3-99e9-2efe4a3f4576', // weird al
+        ],
+        'tags::accordion' => [
+            'd962e620-ebc8-45d3-99e9-2efe4a3f4576', // weird al
+        ],
+        'tags::eighties' => [
+            'd962e620-ebc8-45d3-99e9-2efe4a3f4576', // weird al
+            'ae10674b-d38c-49a9-b97a-a5d0d947c845', // basic
+            'c2b3d164-c953-4df2-9efc-f7f72673d0a2', // commodore 64
+        ],
+    ];
+
     public function key()
     {
         return 'terms';
@@ -96,5 +110,10 @@ class TermsStore extends AggregateStore
     public function delete($term)
     {
         File::delete($term->path());
+    }
+
+    public function getAssociations()
+    {
+        return $this->associations;
     }
 }
