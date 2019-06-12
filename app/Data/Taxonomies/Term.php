@@ -155,6 +155,11 @@ class Term implements TermContract, Responsable, AugmentableContract
     public function augmentedArrayData()
     {
         return array_merge($this->values(), [
+            'id' => $this->id(),
+            'slug' => $this->slug(),
+            'uri' => $this->uri(),
+            'url' => $this->url(),
+            'title' => $this->title(),
             'entries' => $this->entries(),
         ]);
     }
@@ -176,5 +181,15 @@ class Term implements TermContract, Responsable, AugmentableContract
             : Entry::query();
 
         return $entries->whereTaxonomy($this->id());
+    }
+
+    public function title($title = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('title')
+            ->getter(function ($title) {
+                return $title ?? $this->slug();
+            })
+            ->args(func_get_args());
     }
 }
