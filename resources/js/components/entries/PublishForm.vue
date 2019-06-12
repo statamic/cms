@@ -91,16 +91,17 @@
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-2 flex items-center justify-between">
+                                    <div class="p-2 flex items-center -mx-1">
                                         <button
-                                            class="flex items-center justify-center btn-flat w-1/2 mr-sm px-1"
+                                            class="flex items-center justify-center btn-flat w-full mx-1 px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
                                             <svg-icon name="syncronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn-flat w-1/2 ml-sm px-1"
+                                            class="flex items-center justify-center btn-flat w-full mx-1 px-1"
+                                            v-if="permalink"
                                             :href="permalink"
                                             target="_blank">
                                             <svg-icon name="external-link" class="w-5 h-5 mr-1" />
