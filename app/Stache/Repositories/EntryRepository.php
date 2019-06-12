@@ -100,4 +100,15 @@ class EntryRepository implements RepositoryContract
     {
         return $this->make();
     }
+
+    public function taxonomize($entry)
+    {
+        $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {
+            $this->stache->store('terms')->sync(
+                $entry->id(),
+                $taxonomy->handle(),
+                $entry->value($taxonomy->handle())
+            );
+        });
+    }
 }

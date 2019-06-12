@@ -137,6 +137,8 @@ abstract class AggregateStore extends Store
     public function load()
     {
         $this->stores->each->load();
+
+        return $this;
     }
 
 
@@ -153,6 +155,11 @@ abstract class AggregateStore extends Store
             }
         }
 
+        return false;
+    }
+
+    public function isExpired()
+    {
         return false;
     }
 
@@ -285,5 +292,10 @@ abstract class AggregateStore extends Store
     public function shouldStoreUri($item)
     {
         return true;
+    }
+
+    public function loadMeta($data)
+    {
+        //
     }
 }

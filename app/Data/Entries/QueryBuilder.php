@@ -65,7 +65,9 @@ class QueryBuilder extends BaseQueryBuilder
     {
         $associations = Stache::store('terms')->getAssociations();
 
-        $ids = $associations[$this->taxonomyTerm] ?? [];
+        [$taxonomy, $slug] = explode('::', $this->taxonomyTerm);
+
+        $ids = $associations[$taxonomy][$slug] ?? [];
 
         $query = Entry::query()->whereIn('id', $ids);
 

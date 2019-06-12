@@ -8,23 +8,14 @@ use Statamic\API\Path;
 use Statamic\API\Term;
 use Statamic\API\YAML;
 use Statamic\API\Taxonomy;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Stache\Exceptions\StoreExpiredException;
+use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
 class TermsStore extends AggregateStore
 {
-    protected $associations = [
-        'tags::weird' => [
-            'd962e620-ebc8-45d3-99e9-2efe4a3f4576', // weird al
-        ],
-        'tags::accordion' => [
-            'd962e620-ebc8-45d3-99e9-2efe4a3f4576', // weird al
-        ],
-        'tags::eighties' => [
-            'd962e620-ebc8-45d3-99e9-2efe4a3f4576', // weird al
-            'ae10674b-d38c-49a9-b97a-a5d0d947c845', // basic
-            'c2b3d164-c953-4df2-9efc-f7f72673d0a2', // commodore 64
-        ],
-    ];
+    protected $associations = [];
+    protected $uris = [];
 
     public function key()
     {
@@ -52,17 +43,6 @@ class TermsStore extends AggregateStore
                 ->data($item['data']);
         });
     }
-
-    public function getCacheableMeta()
-    {
-
-    }
-
-    public function getCacheableItems()
-    {
-
-    }
-
 
     public function createItemFromFile($path, $contents)
     {
@@ -112,8 +92,140 @@ class TermsStore extends AggregateStore
         File::delete($term->path());
     }
 
+    public function getStoreById($id)
+    {
+        return $this->store(explode('::', $id, 2)[0]);
+    }
+
+    public function getIdFromUri($uri, $site = null)
+    {
+        if ($id = parent::getIdFromUri($uri, $site)) {
+            return $id;
+        }
+
+        $site = $site ?? $this->stache->sites()->first();
+
+        $uris = array_flip($this->uris[$site]);
+
+        return $uris[$uri] ?? null;
+    }
+
+
+    public function loadMeta($data)
+    {
+        $this->associations = $data['associations'];
+        $this->uris = $data['uris'];
+    }
+
+    public function cache()
+    {
+        parent::cache();
+
+        Cache::forever($this->getMetaCacheKey(), $this->getCacheableMeta());
+    }
+
+    public function getCacheableMeta()
+    {
+        return [
+            'associations' => $this->associations,
+            'uris' => $this->uris,
+        ];
+    }
+
+    public function getMetaFromCache()
+    {
+        return array_merge(parent::getMetaFromCache(), [
+            $this->key() => Cache::get($this->getMetaCacheKey(), $this->getCacheableMeta())
+        ]);
+    }
+
     public function getAssociations()
     {
         return $this->associations;
+    }
+
+    public function sync($entry, $taxonomy, $terms)
+    {
+        $terms = collect(Arr::wrap($terms));
+
+        // todo: normalize term slugs
+
+        foreach ($terms as $slug) {
+            $this->associations[$taxonomy][$slug][] = $entry;
+
+            $term = $this->makeTerm($taxonomy, $slug);
+            foreach ($this->stache->sites() as $site) {
+                $this->uris[$site]["{$taxonomy}::{$slug}"] = $term->in($site)->uri();
+            }
+        }
+
+        // Remove any unused terms
+        foreach ($this->associations[$taxonomy] as $term => $associations) {
+            if ($terms->contains($term)) {
+                continue;
+            }
+
+            $associations = array_values(array_diff($associations, [$entry]));
+
+            if (empty($associations)) {
+                unset($this->associations[$taxonomy][$term]);
+            } else {
+                $this->associations[$taxonomy][$term] = $associations;
+            }
+        }
+    }
+
+    public function getTerm($id)
+    {
+        if ($term = $this->getStoreById($id)->getItem($id)) {
+            return $term;
+        }
+
+        [$taxonomy, $slug] = explode('::', $id);
+
+        if (Arr::has($this->associations[$taxonomy] ?? [], $slug)) {
+            return $this->makeTerm($taxonomy, $slug);
+        }
+
+        return null;
+    }
+
+    public function getAllTerms()
+    {
+        return $this->stores()->keys()->flatMap(function ($taxonomy) {
+            return $this->getTaxonomyTerms($taxonomy);
+        });
+    }
+
+    public function getTaxonomyTerms($handle)
+    {
+        $taxonomy = Taxonomy::findByHandle($handle);
+
+        // First get all the terms that exist on disk.
+        $terms = $this->store($handle)->getItems();
+
+        // Then add any on-the-fly terms that don't exist on disk.
+        foreach ($this->associations[$handle] ?? [] as $slug => $associations) {
+            if ($terms->has("{$handle}::{$slug}")) {
+                continue;
+            }
+
+            $term = $this->makeTerm($taxonomy, $slug);
+
+            $terms->put("{$handle}::{$slug}", $term);
+        }
+
+        return $terms;
+    }
+
+    protected function makeTerm($taxonomy, $slug)
+    {
+        $taxonomy = $taxonomy instanceof TaxonomyContract
+            ? $taxonomy
+            : Taxonomy::findByHandle($taxonomy);
+
+        return Term::make()
+            ->taxonomy($taxonomy)
+            ->slug($slug);
     }
 }

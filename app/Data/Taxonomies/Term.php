@@ -34,6 +34,7 @@ class Term implements TermContract, Responsable, AugmentableContract
     protected $taxonomy;
     protected $template;
     protected $layout;
+    protected $collection;
 
     public function id()
     {

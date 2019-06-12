@@ -41,6 +41,11 @@ class ChildStore extends BasicStore
         return $this->parent->getItemsFromCache($cache);
     }
 
+    protected function getMetaCacheKey()
+    {
+        return 'stache::meta/child/' . $this->key();
+    }
+
     public function cache()
     {
         parent::cache();

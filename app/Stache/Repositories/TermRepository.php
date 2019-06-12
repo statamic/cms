@@ -23,14 +23,12 @@ class TermRepository implements RepositoryContract
 
     public function all(): TermCollection
     {
-        return new TermCollection($this->store->getItems()->mapWithKeys(function ($item) {
-            return $item;
-        }));
+        return new TermCollection($this->store->getAllTerms());
     }
 
     public function whereTaxonomy(string $handle): TermCollection
     {
-        return new TermCollection($this->store->store($handle)->getItems());
+        return new TermCollection($this->store->getTaxonomyTerms($handle));
     }
 
     public function whereInTaxonomy(array $handles): TermCollection
@@ -42,12 +40,7 @@ class TermRepository implements RepositoryContract
 
     public function find($id): ?Term
     {
-        if (! $store = $this->store->getStoreById($id)) {
-            return null;
-        }
-
-
-        return $store->getItem($id);
+        return $this->store->getTerm($id);
     }
 
     public function findByUri(string $uri, string $site = null): ?Term
@@ -62,18 +55,16 @@ class TermRepository implements RepositoryContract
             $uri = Str::after($uri, $collection->url());
         }
 
-        if (! $term = $this->find($this->store->getIdFromUri($uri, $site))) {
+        if (! $id = $this->store->getIdFromUri($uri, $site)) {
             return null;
         }
 
-        return $term->collection($collection);
+        return $this->find($id)->collection($collection);
     }
 
-    public function findBySlug(string $slug, string $collection): ?Term
+    public function findBySlug(string $slug, string $taxonomy): ?Term
     {
-        $store = $this->store->store($collection);
-
-        return $store->getItems()->first(function ($term) use ($slug) {
+        return $this->whereTaxonomy($taxonomy)->first(function ($term) use ($slug) {
             return $term->slug() === $slug;
         });
     }

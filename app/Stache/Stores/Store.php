@@ -21,4 +21,9 @@ class Store
     {
         return $cache;
     }
+
+    protected function getMetaCacheKey()
+    {
+        return 'stache::meta/' . $this->key();
+    }
 }

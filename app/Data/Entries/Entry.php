@@ -170,11 +170,18 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
         API\Entry::save($this);
 
+        $this->taxonomize();
+
         optional(Collection::findByMount($this))->updateEntryUris();
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
         return true;
+    }
+
+    public function taxonomize()
+    {
+        API\Entry::taxonomize($this);
     }
 
     public function path()

@@ -41,9 +41,13 @@ class Persister
     protected function stores()
     {
         return $this->stache->stores()->flatMap(function ($store) {
-            // We are interested in updating individual stores. eg. If a "blog" collection entry was
-            // updated, we only want to update the "blog" store, and not the whole "entries" store.
-            return ($store instanceof AggregateStore) ? $store->stores() : [$store];
+            $stores = [$store];
+
+            if ($store instanceof AggregateStore) {
+                $stores = array_merge($stores, $store->stores()->all());
+            }
+
+            return $stores;
         });
     }
 }
