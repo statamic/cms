@@ -8,6 +8,7 @@ use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Search;
 use Statamic\API\Stache;
+use Statamic\API\Taxonomy;
 use Statamic\API\Blueprint;
 use Statamic\API\Structure;
 use Statamic\Data\ContainsData;
@@ -37,6 +38,7 @@ class Collection implements Contract
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
+    protected $taxonomies = [];
 
     public function handle($handle = null)
     {
@@ -161,6 +163,10 @@ class Collection implements Contract
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
+        }
+
+        foreach ($this->taxonomies() as $taxonomy) {
+            $blueprint->ensureField($taxonomy->handle(), ['type' => 'taxonomy', 'taxonomy' => $taxonomy->handle(), 'display' => $taxonomy->title()], 'sidebar');
         }
 
         return $blueprint;
@@ -332,6 +338,7 @@ class Collection implements Contract
             'orderable' => $this->orderable,
             'structure' => optional($this->structure())->handle(),
             'mount' => $this->mount,
+            'taxonomies' => $this->taxonomies,
         ];
     }
 
@@ -380,6 +387,18 @@ class Collection implements Contract
             ->fluentlyGetOrSet('mount')
             ->getter(function ($mount) {
                 return $this->mountedEntry = $this->mountedEntry ?? Entry::find($mount);
+            })
+            ->args(func_get_args());
+    }
+
+    public function taxonomies($taxonomies = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('taxonomies')
+            ->getter(function ($taxonomies) {
+                return collect($taxonomies)->map(function ($taxonomy) {
+                    return Taxonomy::findByHandle($taxonomy);
+                });
             })
             ->args(func_get_args());
     }

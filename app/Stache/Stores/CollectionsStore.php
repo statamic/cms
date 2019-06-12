@@ -35,7 +35,8 @@ class CollectionsStore extends BasicStore
             ->entryBlueprints(array_get($data, 'blueprints'))
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions'))
-            ->structure(array_get($data, 'structure'));
+            ->structure(array_get($data, 'structure'))
+            ->taxonomies(array_get($data, 'taxonomies'));
 
         if (array_get($data, 'orderable', false)) {
             $positions = array_get($data, 'entry_order', []);
