@@ -15,13 +15,13 @@
 }
 
 .bard-fixed-toolbar {
-    @apply .bg-white .shadow-none rounded-t .border-b .text-sm .p-1 flex items-center justify-between h-10 z-5;
+    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between z-5;
     position: sticky;
     top: 0;
     padding: 8px 12px;
 
      button {
-        @apply text-grey-80 px-1 flex items-center text-base;
+        @apply text-grey-80 px-1 flex items-center text-base h-6;
     }
 
     button:hover {

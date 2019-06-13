@@ -70,6 +70,7 @@
 	.input-time {
 		@apply inline-block text-center bg-transparent;
 		-moz-appearance: textfield;
+		width: 26px;
 
 		&:active, &:focus {
 			outline: none;

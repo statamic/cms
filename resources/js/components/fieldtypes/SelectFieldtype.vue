@@ -13,6 +13,7 @@
         :push-tags="config.push_tags"
         :multiple="config.multiple"
         :reset-on-options-change="config.reset_on_options_change || true"
+        :close-on-select="!config.taggable"
         :value="value" />
 </template>
 
