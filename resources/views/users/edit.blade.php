@@ -44,6 +44,7 @@
                         @updated="setValue"
                         @focus="container.$emit('focus', $event)"
                         @blur="container.$emit('blur', $event)"
+                        :enable-sidebar="false"
                     ></publish-sections>
                 </div>
             </publish-container>
