@@ -94,6 +94,8 @@ class Term implements TermContract, Responsable, AugmentableContract
         return array_merge($this->values(), [
             'id' => $this->id(),
             'slug' => $this->slug(),
+            'title' => $this->title(),
+            'taxonomy' => $this->taxonomyHandle(),
         ]);
     }
 
