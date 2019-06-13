@@ -7,8 +7,7 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <label class="publish-field-label" :class="{'font-bold': config.bold}">
-            <template v-if="config.display">{{ config.display }}</template>
-            <template v-else>{{ config.handle | deslugify | titleize }}</template>
+            <span class="cursor-pointer" :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle}" v-text="labelText" @click="toggleLabel" />
             <i class="required ml-sm" v-if="config.required">*</i>
             <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
             <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
@@ -86,6 +85,12 @@ export default {
         syncable: Boolean,
     },
 
+    data() {
+        return {
+            showHandle: false
+        }
+    },
+
     inject: {
         storeName: { default: null }
     },
@@ -139,6 +144,11 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        labelText() {
+            if (this.showHandle) return this.config.handle
+            return this.config.display || this.config.handle | deslugify | titleize;
         }
 
     },
@@ -155,6 +165,10 @@ export default {
             if (!this.isLocked) {
                 this.$emit('blur');
             }
+        },
+
+        toggleLabel() {
+            this.showHandle = ! this.showHandle
         }
 
     }
