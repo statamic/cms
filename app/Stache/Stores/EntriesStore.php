@@ -172,6 +172,7 @@ class EntriesStore extends AggregateStore
 
         $this->updateStructureBasedEntries();
         $this->updateEntriesRelatedThroughMounting();
+        $this->taxonomizeUpdatedEntries();
     }
 
     protected function updateStructureBasedEntries()
@@ -211,6 +212,11 @@ class EntriesStore extends AggregateStore
                 // Update the URIs for each collection.
                 $mounts[$entry->id()]->updateEntryUris();
             });
+    }
+
+    protected function taxonomizeUpdatedEntries()
+    {
+        collect($this->updatedEntries)->each->taxonomize();
     }
 
     public function shouldStoreUri($item)
