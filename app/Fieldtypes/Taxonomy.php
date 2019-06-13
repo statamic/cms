@@ -16,7 +16,7 @@ class Taxonomy extends Relationship
     public function augment($value, $entry = null)
     {
         $taxonomy = null;
-        $collection = $entry->collection();
+        $collection = optional($entry)->collection();
 
         if ($this->usingSingleTaxonomy()) {
             $taxonomy = API\Taxonomy::findByHandle($this->taxonomies()[0]);

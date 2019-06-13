@@ -194,4 +194,9 @@ class Term implements TermContract, Responsable, AugmentableContract
             })
             ->args(func_get_args());
     }
+
+    public function editUrl()
+    {
+        return cp_route('taxonomies.terms.edit', [$this->taxonomyHandle(), $this->slug()]);
+    }
 }
