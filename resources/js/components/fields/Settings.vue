@@ -8,11 +8,11 @@
 
         <div v-if="fieldtypesLoaded" class="flex items-center mb-3 -mt-1">
             <h1 class="flex-1">
-                {{ config.display || config.handle }}
-                <small class="block text-xs text-grey-40 font-medium leading-none mt-1 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-40 text-current" :name="fieldtype.icon"></svg-icon>
+                <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" :name="fieldtype.icon"></svg-icon>
                     {{ fieldtype.title }}
                 </small>
+                {{ config.display || config.handle }}
             </h1>
             <button
                 class="btn btn-primary"

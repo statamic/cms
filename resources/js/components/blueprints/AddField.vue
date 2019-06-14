@@ -7,13 +7,22 @@
 
                 <div>
                     <p class="text-sm font-medium mb-1">Select a field from an existing fieldset:</p>
-                    <suggest-fieldtype
-                        :config="{max_items: 1, placeholder: ''}"
+                    <v-select
+                        @input="addReferenceField"
                         name="field"
-                        :suggestions-prop="suggestions"
-                        :value="[fieldReference]"
-                        @input="addReferenceField($event[0])"
-                    />
+                        :placeholder="__('Existing fields')"
+                        :options="suggestions"
+                        :multiple="false"
+                        :searchable="true"
+                        :value="fieldReference">
+                        <template slot="option" slot-scope="option">
+                            <div class="flex items-center">
+                                <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-1" />
+                                <span v-text="option.label" />
+                            </div>
+                        </template>
+                    </v-select>
+
                 </div>
 
                 <div class="border-grey-30 border-t mt-2 pt-2 text-grey-40 text-xs">
@@ -35,11 +44,9 @@
 
             </div>
             </div>
-            <button
-                slot="reference"
-                class="btn btn-default btn-small"
-                v-text="`+ ${__('Add Field')}`"
-            />
+            <button slot="reference" class="btn-flat" v-text="__('Create Field')" />
+            <button slot="reference" class="btn-flat" v-text="__('Link Field')" />
+            <button slot="reference" class="btn-flat" v-text="__('Link Fieldset')" />
         </popper>
 
     </div>
@@ -68,8 +75,8 @@ export default {
             suggestions: Object.values(window.Statamic.$config.get('fieldsetFields')).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
-                    text: field.display,
-                    optgroup: field.fieldset.title
+                    label: field.display,
+                    fieldset: field.fieldset.title
                 };
             })
         }
@@ -90,7 +97,7 @@ export default {
 
             this.fieldReference = reference;
 
-            const field = JSON.parse(JSON.stringify(window.Statamic.$config.get('fieldsetFields')[reference]));
+            const field = JSON.parse(JSON.stringify(window.Statamic.$config.get('fieldsetFields')[reference.value]));
 
             this.$emit('added', {
                 _id: uniqid(),

@@ -17,7 +17,7 @@
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
-                        <div>Add Section</div>
+                        <div>{{ __('Add Section') }}</div>
                     </div>
 
                     <div class="blueprint-section-draggable-zone outline-none"></div>

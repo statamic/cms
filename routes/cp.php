@@ -87,7 +87,13 @@ Route::group([
         Route::get('thumbnails/{asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
     });
 
-    Route::group(['namespace' => 'Fields'], function () {
+    Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
+        Route::get('/', 'FieldsController@index')->name('fields.index');
+        Route::get('create', 'FieldsController@create')->name('fields.create');
+        Route::get('show', 'FieldsController@show')->name('fields.show');
+        Route::get('edit', 'FieldsController@edit')->name('fields.edit');
+        Route::post('store', 'FieldsController@store')->name('fields.store');
+        Route::post('update', 'FieldsController@update')->name('fields.update');
         Route::get('field-meta', 'MetaController@show');
         Route::resource('fieldsets', 'FieldsetController');
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');

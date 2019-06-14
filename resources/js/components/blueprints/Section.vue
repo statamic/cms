@@ -5,15 +5,18 @@
 
             <div class="bg-grey-20 border-b text-sm flex rounded-t;">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
-                <div class="px-2 py-1 flex-1">
+                <div class="p-1.5 py-1 flex-1">
                     <span class="font-medium mr-1">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
-                <div class="flex items-center px-1">
-                    <button v-show="!isEditing" @click.prevent="isEditing = true" class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-resize-full-screen" /></button>
-                    <button v-show="isEditing" @click.prevent="isEditing = false" class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-resize-100" /></button>
-                    <button @click.prevent="$emit('deleted')" class="opacity-50 hover:opacity-100"><span class="icon icon-cross" /></button>
+                <div class="flex items-center px-1.5">
+                    <button @click.prevent="toggleEditing" class="text-grey-60 hover:text-grey-100 mr-1">
+                        <svg-icon :name="isEditing ? 'shrink' : 'expand'" />
+                    </button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100">
+                        <svg-icon name="trash" />
+                    </button>
                 </div>
             </div>
 
@@ -117,6 +120,10 @@ export default {
 
         focus() {
             this.$refs.displayInput.select();
+        },
+
+        toggleEditing() {
+            this.isEditing = ! this.isEditing
         }
 
     }

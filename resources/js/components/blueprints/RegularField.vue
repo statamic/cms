@@ -4,16 +4,14 @@
         <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex-1 px-2 py-1 pl-1">
-                    <span v-if="isReferenceField" class="icon icon-link text-grey-40 mr-1"></span>
-                    <span v-if="isInlineField" class="icon icon-layers text-grey-40 mr-1"></span>
-                    <span class="font-medium mr-1">{{ field.config.display || field.handle }}</span>
-                    <span class="font-mono text-2xs text-grey-40">{{ field.handle }}</span>
+                <div class="flex items-center flex-1 px-2 py-1 pl-1">
+                    <svg-icon class="text-grey-70 mr-1" :name="field.config.type" v-tooltip="field.config.type" />
+                    <a v-text="labelText" @click="$emit('edit')" />
+                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference.fieldset" />
                 </div>
                 <div class="pr-1 flex">
                     <width-selector v-model="width" class="mr-1" v-show="isSectionExpanded" />
-                    <button @click.prevent="$emit('edit')" class="opacity-50 hover:opacity-100"><span class="icon icon-cog" /></button>
-                    <button @click.prevent="$emit('deleted')" class="opacity-50 hover:opacity-100"><span class="icon icon-cross" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
 
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
@@ -52,6 +50,12 @@ export default {
         'suggestableConditionFields'
     ],
 
+     data() {
+        return {
+            showHandle: false
+        }
+    },
+
     computed: {
 
         isReferenceField() {
@@ -66,6 +70,11 @@ export default {
             return Object.assign({}, this.field.config, {
                 handle: this.field.handle
             });
+        },
+
+        labelText() {
+            return this.field.display
+                || Vue.options.filters.titleize(Vue.options.filters.deslugify(this.field.handle));
         },
 
         width: {
