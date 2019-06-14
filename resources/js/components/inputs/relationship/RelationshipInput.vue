@@ -29,18 +29,13 @@
             <div v-if="canSelectOrCreate" class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
-                        <button v-if="canCreate" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
-                            <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                            {{ __('Create & Link Item') }}
-                        </button>
-                        <inline-create-form
-                            v-if="isCreating"
+                        <create-button
+                            v-if="canCreate"
+                            :creatables="creatables"
                             :site="site"
-                            :item-url="creatables[0].url"
                             :component="formComponent"
                             :component-props="formComponentProps"
                             @created="itemCreated"
-                            @closed="stopCreating"
                         />
                     </div>
                     <button ref="existing" class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
@@ -78,8 +73,8 @@
 import Popper from 'vue-popperjs';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
+import CreateButton from './CreateButton.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
-import InlineCreateForm from './InlineCreateForm.vue';
 
 export default {
 
@@ -113,7 +108,7 @@ export default {
         Popper,
         ItemSelector,
         RelatedItem,
-        InlineCreateForm
+        CreateButton,
     },
 
     data() {
@@ -239,12 +234,7 @@ export default {
         itemCreated(item) {
             this.selections.push(item.id);
             this.itemData.push(item);
-            this.stopCreating();
         },
-
-        stopCreating() {
-            this.isCreating = false;
-        }
 
     }
 
