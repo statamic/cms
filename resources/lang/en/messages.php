@@ -28,6 +28,13 @@ return [
     'permission_delete_{container}_assets' => 'Delete assets',
     'permission_view_{form}_form_submissions' => 'View :form submissions',
     'permission_delete_{form}_form_submissions' => 'Delete :form submissions',
+    'permission_view_users' => 'View users',
+    'permission_edit_users' => 'Edit users',
+    'permission_create_users' => 'Create users',
+    'permission_delete_users' => 'Delete users',
+    'permission_change_passwords' => 'Change passwords',
+    'permission_edit_user_groups' => 'Edit groups',
+    'permission_edit_roles' => 'Edit roles',
 
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
 

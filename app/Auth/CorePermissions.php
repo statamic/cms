@@ -143,6 +143,7 @@ class CorePermissions
                     Permission::make('create users'),
                     Permission::make('delete users'),
                     Permission::make('change passwords'),
+                    Permission::make('edit user groups'),
                     Permission::make('edit roles'),
                 ]),
             ]);

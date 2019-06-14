@@ -172,7 +172,7 @@ class DefaultNav
         Nav::users('Groups')
             ->route('user-groups.index')
             ->icon('users-multiple')
-            // ->can() // TODO: Permission to manage groups?
+            ->can('edit user groups')
             ->children(function () {
                 return UserGroupAPI::all()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
@@ -183,7 +183,7 @@ class DefaultNav
         Nav::users('Permissions')
             ->route('roles.index')
             ->icon('shield-key')
-            // ->can() // TODO: Permission to manage permissions?
+            ->can('edit roles')
             ->children(function () {
                 return RoleAPI::all()->map(function ($role) {
                     return Nav::item($role->title())
