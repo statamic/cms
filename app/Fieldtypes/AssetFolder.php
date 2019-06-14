@@ -10,7 +10,6 @@ class AssetFolder extends Relationship
     protected $statusIcons = false;
     protected $canEdit = false;
     protected $canCreate = false;
-    protected $selectable = false;
 
     protected function toItemArray($id, $site = null)
     {
