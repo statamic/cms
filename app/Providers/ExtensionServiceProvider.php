@@ -28,7 +28,7 @@ class ExtensionServiceProvider extends ServiceProvider
     protected $bundledFieldtypes = [
         'checkboxes',
         'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'radio', 'time', 'title', 'toggle', 'video', 'yaml',
+        'radio', 'time', 'title', 'toggle', 'yaml',
         'revealer', 'section', 'table', 'tags', 'template', 'textarea',
     ];
 
@@ -117,6 +117,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\UserGroups::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,
+        Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
     ];
