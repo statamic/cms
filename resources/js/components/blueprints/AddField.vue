@@ -4,49 +4,49 @@
         <popper ref="popper" trigger="click" :append-to-body="true" boundaries-selector="body" :options="{ placement: 'right' }">
             <div class="popover w-96">
                 <div class="popover-inner p-2">
+                    <div>
+                        <p class="text-sm font-medium mb-1">Select a field from an existing fieldset:</p>
+                        <v-select
+                            @input="addReferenceField"
+                            name="field"
+                            :placeholder="__('Existing fields')"
+                            :options="suggestions"
+                            :multiple="false"
+                            :searchable="true"
+                            :value="fieldReference">
+                            <template slot="option" slot-scope="option">
+                                <div class="flex items-center">
+                                    <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-1" />
+                                    <span v-text="option.label" />
+                                </div>
+                            </template>
+                        </v-select>
 
-                <div>
-                    <p class="text-sm font-medium mb-1">Select a field from an existing fieldset:</p>
-                    <v-select
-                        @input="addReferenceField"
-                        name="field"
-                        :placeholder="__('Existing fields')"
-                        :options="suggestions"
-                        :multiple="false"
-                        :searchable="true"
-                        :value="fieldReference">
-                        <template slot="option" slot-scope="option">
-                            <div class="flex items-center">
-                                <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-1" />
-                                <span v-text="option.label" />
-                            </div>
-                        </template>
-                    </v-select>
+                    </div>
+
+                    <div class="border-grey-30 border-t mt-2 pt-2 text-grey-40 text-xs">
+                        <div class="mb-1">More options:</div>
+                        <ul class="pl-2">
+                            <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>
+                            <li><button class="text-blue" @click.prevent="createFieldsetField">Create a new reusable field</button></li>
+                            <li><button class="text-blue" @click="addImportField">Import a fieldset</button></li>
+                        </ul>
+                    </div>
+
+                    <stack name="fieldtype-selector" v-if="selectingFieldtype" @closed="selectingFieldtype = false">
+                        <fieldtype-selector @selected="fieldtypeSelected" />
+                    </stack>
+
+                    <stack name="fieldset-field-form" v-if="creatingFieldsetField" @closed="creatingFieldsetField = false">
+                        <fieldset-field-form @created="fieldsetFieldCreated" />
+                    </stack>
 
                 </div>
-
-                <div class="border-grey-30 border-t mt-2 pt-2 text-grey-40 text-xs">
-                    <div class="mb-1">More options:</div>
-                    <ul class="pl-2">
-                        <li><button class="text-blue" @click="addInlineField">Create a one-time field</button></li>
-                        <li><button class="text-blue" @click.prevent="createFieldsetField">Create a new reusable field</button></li>
-                        <li><button class="text-blue" @click="addImportField">Import a fieldset</button></li>
-                    </ul>
-                </div>
-
-                <stack name="fieldtype-selector" v-if="selectingFieldtype" @closed="selectingFieldtype = false">
-                    <fieldtype-selector @selected="fieldtypeSelected" />
-                </stack>
-
-                <stack name="fieldset-field-form" v-if="creatingFieldsetField" @closed="creatingFieldsetField = false">
-                    <fieldset-field-form @created="fieldsetFieldCreated" />
-                </stack>
-
             </div>
-            </div>
-            <button slot="reference" class="btn-flat" v-text="__('Create Field')" />
-            <button slot="reference" class="btn-flat" v-text="__('Link Field')" />
-            <button slot="reference" class="btn-flat" v-text="__('Link Fieldset')" />
+            <button slot="reference" class="btn w-full flex justify-center items-center">
+                <svg-icon name="wireframe" class="mr-1" />
+                {{ __('Create Field') }}
+            </button>
         </popper>
 
     </div>

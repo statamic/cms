@@ -4,7 +4,7 @@
         <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex items-center flex-1 px-2 py-1 pl-1">
+                <div class="flex items-center flex-1 pr-2 py-1 pl-1">
                     <svg-icon class="text-grey-70 mr-1" :name="field.config.type" v-tooltip="field.config.type" />
                     <a v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference.fieldset" />
@@ -12,7 +12,6 @@
                 <div class="pr-1 flex">
                     <width-selector v-model="width" class="mr-1" v-show="isSectionExpanded" />
                     <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
-
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
@@ -96,6 +95,7 @@ export default {
     methods: {
 
         configFieldUpdated(handle, value) {
+            console.log(handle, value)
             if (handle === 'handle') {
                 Vue.set(this.field, handle, value);
             } else {

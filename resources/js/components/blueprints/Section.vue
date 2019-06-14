@@ -22,7 +22,7 @@
 
             <div class="flex flex-col">
 
-                <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-2 px-1 pt-2">
+                <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-1 px-1 pt-2">
                     <component
                         v-for="(field, i) in section.fields"
                         :is="fieldComponent(field)"
@@ -32,14 +32,17 @@
                         :is-section-expanded="isEditing"
                         :suggestable-condition-fields="suggestableConditionFields"
                         @edit="editingField = field._id"
-                        @editor-closed="editingField = null"
                         @updated="fieldUpdated(i, $event)"
                         @deleted="deleteField(i)"
                     />
                 </div>
 
-                <div class="p-2 pt-0">
-                    <add-field @added="fieldAdded" />
+                <div class="p-2 pt-0 flex items-center">
+                    <add-field @added="fieldAdded" class="flex-1" />
+                    <button class="btn ml-1 px-1 flex items-center">
+                        <svg-icon name="hyperlink" class="mr-sm" />
+                        <span>Link</span>
+                    </button>
                 </div>
 
             </div>

@@ -15,9 +15,14 @@
                 {{ config.display || config.handle }}
             </h1>
             <button
+                class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
+                @click.prevent="$emit('cancel')"
+                v-text="__('Cancel')"
+            ></button>
+            <button
                 class="btn btn-primary"
                 @click.prevent="$emit('closed')"
-                v-text="__('Done')"
+                v-text="__('Finish')"
             ></button>
         </div>
 
@@ -48,10 +53,10 @@
                 />
 
                 <form-group
-                    fieldtype="markdown"
+                    fieldtype="text"
                     handle="instructions"
                     :display="__('Instructions')"
-                    :instructions="__(`Basic Markdown is allowed. Encouraged, even.`)"
+                    :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
                     :value="config.instructions"
                     @input="updateField('instructions', $event)"
                 />
@@ -170,6 +175,7 @@ export default {
             this.$watch('config.display', function(display) {
                 if (! this.isHandleModified) {
                     this.config.handle = this.$slugify(display, '_');
+                    this.updateField('handle', this.config.handle);
                 }
             });
         }
