@@ -1,9 +1,20 @@
 <template>
 
     <div class="relationship-input">
+
+        <relationship-select-field
+            v-if="!initializing && usesSelectField"
+            :items="items"
+            :url="selectionsUrl"
+            :typeahead="mode === 'typeahead'"
+            :multiple="maxItems > 1"
+            :taggable="taggable"
+            @input="selectFieldSelected"
+        />
+
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <template v-if="!initializing">
+        <template v-if="!initializing && !usesSelectField">
             <div ref="items" class="relationship-input-items outline-none">
                 <component
                     :is="itemComponent"
@@ -75,6 +86,7 @@ import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import RelationshipSelectField from './SelectField.vue';
 
 export default {
 
@@ -102,6 +114,11 @@ export default {
         creatables: Array,
         formComponent: String,
         formComponentProps: Object,
+        mode: {
+            type: String,
+            default: 'default',
+        },
+        taggable: Boolean,
     },
 
     components: {
@@ -109,6 +126,7 @@ export default {
         ItemSelector,
         RelatedItem,
         CreateButton,
+        RelationshipSelectField,
     },
 
     data() {
@@ -141,6 +159,10 @@ export default {
 
         canSelectOrCreate() {
             return !this.readOnly && !this.maxItemsReached;
+        },
+
+        usesSelectField() {
+            return ['select', 'typeahead'].includes(this.mode);
         }
 
     },
@@ -235,6 +257,11 @@ export default {
             this.selections.push(item.id);
             this.itemData.push(item);
         },
+
+        selectFieldSelected(selectedItemData) {
+            this.itemData = selectedItemData.map(item => ({ id: item.id, title: item.title }));
+            this.selections = selectedItemData.map(item => item.id)
+        }
 
     }
 

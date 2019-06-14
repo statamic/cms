@@ -22,6 +22,7 @@ class Relationship extends Fieldtype
     protected $canCreate = true;
     protected $canSearch = true;
     protected $statusIcons = true;
+    protected $taggable = false;
     protected $defaultValue = [];
 
     protected $formComponentProps = [
@@ -49,6 +50,11 @@ class Relationship extends Fieldtype
     protected $configFields = [
         'max_items' => ['type' => 'integer'],
         'collections' => ['type' => 'collections'],
+        'mode' => ['type' => 'radio', 'options' => [
+            'default' => 'Default (Drag and drop UI with item selector in a stack)',
+            'select' => 'Select (A dropdown field with prepopulated options)',
+            'typeahead' => 'Typeahead (A dropdown field with options requested as you type)'
+        ]]
     ];
 
     public function preProcess($data)
@@ -115,6 +121,7 @@ class Relationship extends Fieldtype
             'creatables' => $this->getCreatables(),
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
+            'taggable' => $this->getTaggable(),
         ];
     }
 
@@ -278,5 +285,10 @@ class Relationship extends Fieldtype
         }
 
         return $query;
+    }
+
+    protected function getTaggable()
+    {
+        return $this->taggable;
     }
 }
