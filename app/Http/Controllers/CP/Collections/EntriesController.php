@@ -261,7 +261,11 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $fields = Blueprint::find($request->blueprint)->fields()->addValues($request->all())->process();
+        $blueprint = $collection->ensureEntryBlueprintFields(
+            Blueprint::find($request->blueprint)
+        );
+
+        $fields = $blueprint->fields()->addValues($request->all())->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
