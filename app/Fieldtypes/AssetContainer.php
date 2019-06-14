@@ -6,7 +6,6 @@ use Statamic\API;
 
 class AssetContainer extends Relationship
 {
-    protected $selectable = false;
     protected $statusIcons = false;
     protected $canEdit = false;
     protected $canCreate = false;
