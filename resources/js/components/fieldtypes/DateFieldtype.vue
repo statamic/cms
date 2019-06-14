@@ -16,6 +16,7 @@
                 <v-date-picker
                     v-else
                     v-model="date"
+                    :popover="{ visibility: 'click' }"
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
                     :locale="$config.get('locale')"
