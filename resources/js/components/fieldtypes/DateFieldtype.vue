@@ -96,7 +96,7 @@ export default {
         },
 
         format() {
-            return 'YYYY-MM-DD HH:mm';
+            return (this.time) ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD';
         }
     },
 
