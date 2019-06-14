@@ -3,6 +3,7 @@
     <relationship-input
         :name="name"
         v-model="selections"
+        :mode="config.mode"
         :can-edit="canEdit"
         :config="config"
         :can-create="canCreate"
@@ -20,6 +21,7 @@
         :columns="columns"
         :search="canSearch"
         :read-only="isReadOnly"
+        :taggable="taggable"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
     />
@@ -116,6 +118,10 @@ export default {
         formComponentProps() {
             return this.meta.formComponentProps;
         },
+
+        taggable() {
+            return this.meta.taggable;
+        }
 
     },
 
