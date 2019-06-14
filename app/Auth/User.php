@@ -74,6 +74,11 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return cp_route('users.edit', $this->id());
     }
 
+    public function updateUrl()
+    {
+        return cp_route('users.update', $this->id());
+    }
+
     /**
      * Add supplemental data to the attributes
      */
