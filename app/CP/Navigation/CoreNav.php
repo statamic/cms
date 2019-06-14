@@ -17,7 +17,7 @@ use Statamic\Contracts\Data\Entries\Collection;
 use Statamic\Contracts\Data\Structures\Structure;
 use Statamic\API\AssetContainer as AssetContainerAPI;
 
-class DefaultNav
+class CoreNav
 {
     const ALLOWED_TOP_LEVEL = [
         'Dashboard',

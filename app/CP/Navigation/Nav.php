@@ -5,8 +5,8 @@ namespace Statamic\CP\Navigation;
 use Closure;
 use Exception;
 use Statamic\API\Str;
+use Statamic\CP\Navigation\CoreNav;
 use Statamic\CP\Navigation\NavItem;
-use Statamic\CP\Navigation\DefaultNav;
 
 class Nav
 {
@@ -120,7 +120,7 @@ class Nav
      */
     protected function makeDefaultItems()
     {
-        DefaultNav::make();
+        CoreNav::make();
 
         return $this;
     }
@@ -285,7 +285,7 @@ class Nav
             })
             ->reject(function ($item) {
                 return $item->section() === 'Top Level'
-                    && ! in_array($item->name(), DefaultNav::ALLOWED_TOP_LEVEL);
+                    && ! in_array($item->name(), CoreNav::ALLOWED_TOP_LEVEL);
             })
             ->each(function ($item) use (&$sections) {
                 $sections[$item->section()][] = $item;
