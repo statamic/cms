@@ -73,6 +73,10 @@ export default {
     props: {
         readOnly: Boolean,
         syncable: Boolean,
+        enableSidebar: {
+            type: Boolean,
+            default: true
+        }
     },
 
     data() {
@@ -109,7 +113,7 @@ export default {
         },
 
         shouldShowSidebar() {
-            return this.containerWidth > 1000;
+            return this.enableSidebar && this.containerWidth > 1000;
         },
 
         errors() {

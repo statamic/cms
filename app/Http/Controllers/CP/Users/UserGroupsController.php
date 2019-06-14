@@ -14,7 +14,7 @@ class UserGroupsController extends CpController
 {
     public function index(Request $request)
     {
-        $this->authorize('super');
+        $this->authorize('edit user groups');
 
         $groups = UserGroup::all()->map(function ($group) {
             return [
@@ -38,7 +38,7 @@ class UserGroupsController extends CpController
 
     public function edit($group)
     {
-        $this->authorize('super');
+        $this->authorize('edit user groups');
 
         if (! $group = UserGroup::find($group)) {
             return $this->pageNotFound();
@@ -54,7 +54,7 @@ class UserGroupsController extends CpController
 
     public function update(Request $request, $group)
     {
-        $this->authorize('super');
+        $this->authorize('edit user groups');
 
         if (! $group = UserGroup::find($group)) {
             return $this->pageNotFound();
@@ -77,14 +77,14 @@ class UserGroupsController extends CpController
 
     public function create()
     {
-        $this->authorize('super');
+        $this->authorize('edit user groups');
 
         return view('statamic::usergroups.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('super');
+        $this->authorize('edit user groups');
 
         $request->validate([
             'title' => 'required',
@@ -103,7 +103,7 @@ class UserGroupsController extends CpController
 
     public function destroy($group)
     {
-        $this->authorize('super');
+        $this->authorize('edit user groups');
 
         if (! $group = UserGroup::find($group)) {
             return $this->pageNotFound();

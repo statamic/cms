@@ -117,9 +117,11 @@ class Collection implements Contract
         return cp_route('collections.edit', $this->handle());
     }
 
-    public function createEntryUrl()
+    public function createEntryUrl($site = null)
     {
-        return cp_route('collections.entries.create', [$this->handle(), $this->sites()->first()]);
+        $site = $site ?? $this->sites()->first();
+
+        return cp_route('collections.entries.create', [$this->handle(), $site]);
     }
 
     public function queryEntries()

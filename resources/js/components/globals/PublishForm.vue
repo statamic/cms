@@ -91,6 +91,7 @@
                 <publish-sections
                     :read-only="readOnly"
                     :syncable="hasOrigin"
+                    :enable-sidebar="false"
                     @updated="setValue"
                     @synced="syncField"
                     @desynced="desyncField"

@@ -12,7 +12,7 @@ class RolesController extends CpController
 {
     public function index(Request $request)
     {
-        $this->authorize('super');
+        $this->authorize('edit roles');
 
         $roles = Role::all()->map(function ($role) {
             return [
@@ -40,7 +40,7 @@ class RolesController extends CpController
 
     public function create()
     {
-        $this->authorize('super');
+        $this->authorize('edit roles');
 
         return view('statamic::roles.create', [
             'permissions' => $this->toTreeArray(Permission::tree()),
@@ -49,7 +49,7 @@ class RolesController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorize('super');
+        $this->authorize('edit roles');
 
         $request->validate([
             'title' => 'required',
@@ -69,7 +69,7 @@ class RolesController extends CpController
 
     public function edit($role)
     {
-        $this->authorize('super');
+        $this->authorize('edit roles');
 
         if (! $role = Role::find($role)) {
             return $this->pageNotFound();
@@ -84,7 +84,7 @@ class RolesController extends CpController
 
     public function update(Request $request, $role)
     {
-        $this->authorize('super');
+        $this->authorize('edit roles');
 
         if (! $role = Role::find($role)) {
             return $this->pageNotFound();
@@ -108,7 +108,7 @@ class RolesController extends CpController
 
     public function destroy($role)
     {
-        $this->authorize('super');
+        $this->authorize('edit roles');
 
         if (! $role = Role::find($role)) {
             return $this->pageNotFound();

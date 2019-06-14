@@ -18,6 +18,9 @@ return [
     'permission_delete_{collection}_entries' => 'Delete entries',
     'permission_publish_{collection}_entries' => 'Manage publish state',
     'permission_reorder_{collection}_entries' => 'Reorder entries',
+    'permission_configure_structures' => 'Configure structures',
+    'permission_view_{structure}_structure' => 'View :structure structure',
+    'permission_edit_{structure}_structure' => 'Edit structure',
     'permission_edit_{global}_globals' => 'Edit :global globals',
     'permission_view_{container}_assets' => 'View :container assets',
     'permission_upload_{container}_assets' => 'Upload new assets',
@@ -25,6 +28,13 @@ return [
     'permission_delete_{container}_assets' => 'Delete assets',
     'permission_view_{form}_form_submissions' => 'View :form submissions',
     'permission_delete_{form}_form_submissions' => 'Delete :form submissions',
+    'permission_view_users' => 'View users',
+    'permission_edit_users' => 'Edit users',
+    'permission_create_users' => 'Create users',
+    'permission_delete_users' => 'Delete users',
+    'permission_change_passwords' => 'Change passwords',
+    'permission_edit_user_groups' => 'Edit groups',
+    'permission_edit_roles' => 'Edit roles',
 
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
 

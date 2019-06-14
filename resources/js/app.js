@@ -121,7 +121,6 @@ Statamic.app({
         GlobalCreateForm: require('./components/globals/Create.vue'),
         FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
         UserListing: require('./components/users/Listing.vue'),
-        UserPublishForm: require('./components/users/PublishForm.vue'),
         UserWizard: require('./components/users/Wizard.vue'),
         RoleListing: require('./components/roles/Listing.vue'),
         RolePublishForm: require('./components/roles/PublishForm.vue'),

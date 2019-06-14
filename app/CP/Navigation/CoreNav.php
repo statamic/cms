@@ -19,7 +19,7 @@ use Statamic\Contracts\Data\Taxonomies\Taxonomy;
 use Statamic\Contracts\Data\Structures\Structure;
 use Statamic\API\AssetContainer as AssetContainerAPI;
 
-class DefaultNav
+class CoreNav
 {
     const ALLOWED_TOP_LEVEL = [
         'Dashboard',
@@ -181,7 +181,7 @@ class DefaultNav
         Nav::users('Groups')
             ->route('user-groups.index')
             ->icon('users-multiple')
-            // ->can() // TODO: Permission to manage groups?
+            ->can('edit user groups')
             ->children(function () {
                 return UserGroupAPI::all()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
@@ -192,7 +192,7 @@ class DefaultNav
         Nav::users('Permissions')
             ->route('roles.index')
             ->icon('shield-key')
-            // ->can() // TODO: Permission to manage permissions?
+            ->can('edit roles')
             ->children(function () {
                 return RoleAPI::all()->map(function ($role) {
                     return Nav::item($role->title())

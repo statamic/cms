@@ -122,6 +122,8 @@ class StructuresController extends CpController
 
         $structure = Structure::find($structure);
 
+        $this->authorize('update', $structure, 'You are not authorized to edit this structure.');
+
         $values = $fields->values();
 
         $structure
@@ -168,11 +170,15 @@ class StructuresController extends CpController
 
     public function create()
     {
+        $this->authorize('create', Structure::class, 'You are not authorized to create structures.');
+
         return view('statamic::structures.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorize('store', Structure::class, 'You are not authorized to create structures.');
+
         $values = $request->validate([
             'title' => 'required',
             'handle' => 'required|alpha_dash',

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
-            <div class="state-container w-4 h-4 text-grey-40" @click="focus">
+            <div class="state-container w-4 h-4 text-grey-50" @click="focus">
                 <svg-icon name="magnifying-glass"></svg-icon>
             </div>
 
@@ -31,7 +31,7 @@
                     <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
                         <template v-if="result.is_entry">{{ result.collection }}</template>
                         <template v-if="result.is_user">{{ __('User') }}</template>
-                        <template v-if="result.is_asset">{{ __('Asset') }}</template>
+                        <template v-if="result.is_asset">{{ result.container }}</template>
                     </span>
                 </div>
 
@@ -150,6 +150,9 @@ export default {
         },
 
         getResultIcon(result) {
+            console.log(result);
+            if (result.is_asset) return 'assets'
+            if (result.is_user) return 'user'
             return 'content-writing';
         }
     },

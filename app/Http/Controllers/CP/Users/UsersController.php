@@ -92,7 +92,7 @@ class UsersController extends CpController
      *
      * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
         $this->authorize('create', UserContract::class);
 
@@ -100,11 +100,21 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->preProcess();
 
-        return view('statamic::users.create', [
-            'blueprint' => $blueprint,
+        $viewData = [
+            'title' => __('Create'),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-        ]);
+            'blueprint' => $blueprint->toPublishArray(),
+            'actions' => [
+                'save' => cp_route('users.store'),
+            ],
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::users.create', $viewData);
     }
 
     public function store(Request $request)
@@ -136,10 +146,12 @@ class UsersController extends CpController
 
         $user->generateTokenAndSendPasswordResetNotification();
 
-        return ['redirect' => cp_route('users.index')];
+        return array_merge($user->toArray(), [
+            'redirect' => $user->editUrl(),
+        ]);
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $user = User::find($id);
 
@@ -150,11 +162,24 @@ class UsersController extends CpController
             ->addValues(array_merge($user->data(), ['email' => $user->email()]))
             ->preProcess();
 
-        return view('statamic::users.edit', [
-            'user' => $user,
+        $viewData = [
+            'title' => $user->email(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
-        ]);
+            'blueprint' => $user->blueprint()->toPublishArray(),
+            'reference' => $user->reference(),
+            'actions' => [
+                'save' => $user->updateUrl(),
+                'password' => cp_route('users.password.update', $user->id()),
+            ],
+            'canEditPassword' => $request->user()->can('editPassword', $user)
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::users.edit', $viewData);
     }
 
     public function update(Request $request, $id)
@@ -183,7 +208,7 @@ class UsersController extends CpController
             ->groups($request->groups)
             ->save();
 
-        return response('', 204);
+        return $user->toArray();
     }
 
     public function destroy($user)
