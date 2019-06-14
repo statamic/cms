@@ -2,6 +2,11 @@
    ICONS
    ========================================================================== */
 
+svg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 .heroicon-component-accent {
     fill: config('colors.blue');
 }
@@ -58,6 +63,8 @@
 }
 
 .svg-icon {
+    @apply w-4 h-4;
+
 	&.using-svg {
 		@apply .flex .items-center;
 	}
