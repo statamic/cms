@@ -15,6 +15,8 @@
                     :editable="canEdit"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
+                    :form-component="formComponent"
+                    :form-component-props="formComponentProps"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -34,6 +36,9 @@
                         <inline-create-form
                             v-if="isCreating"
                             :site="site"
+                            :item-url="creatables[0].url"
+                            :component="formComponent"
+                            :component-props="formComponentProps"
                             @created="itemCreated"
                             @closed="stopCreating"
                         />
@@ -99,6 +104,9 @@ export default {
         canReorder: Boolean,
         readOnly: Boolean,
         exclusions: Array,
+        creatables: Array,
+        formComponent: String,
+        formComponentProps: Object,
     },
 
     components: {

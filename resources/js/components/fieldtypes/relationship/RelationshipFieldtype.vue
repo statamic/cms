@@ -13,6 +13,9 @@
         :item-component="itemComponent"
         :item-data-url="itemDataUrl"
         :selections-url="selectionsUrl"
+        :creatables="creatables"
+        :form-component="formComponent"
+        :form-component-props="formComponentProps"
         :status-icons="statusIcons"
         :columns="columns"
         :search="canSearch"
@@ -100,7 +103,19 @@ export default {
 
         statusIcons() {
             return this.meta.statusIcons;
-        }
+        },
+
+        creatables() {
+            return this.meta.creatables;
+        },
+
+        formComponent() {
+            return this.meta.formComponent;
+        },
+
+        formComponentProps() {
+            return this.meta.formComponentProps;
+        },
 
     },
 
