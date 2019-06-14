@@ -38,11 +38,11 @@
                 </div>
 
                 <div class="p-2 pt-0 flex items-center">
-                    <add-field @added="fieldAdded" class="flex-1" />
-                    <button class="btn ml-1 px-1 flex items-center">
-                        <svg-icon name="hyperlink" class="mr-sm" />
-                        <span>Link</span>
+                    <button class="btn w-full flex justify-center items-center" @click="createField">
+                        <svg-icon name="wireframe" class="mr-1" />
+                        {{ __('Create Field') }}
                     </button>
+                    <link-fields @linked="fieldLinked" class="flex-1" />
                 </div>
 
             </div>
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import AddField from './AddField.vue';
+import LinkFields from './LinkFields.vue';
 import RegularField from './RegularField.vue';
 import ImportField from './ImportField.vue';
 
@@ -62,7 +62,7 @@ export default {
     components: {
         RegularField,
         ImportField,
-        AddField,
+        LinkFields,
     },
 
     props: {
@@ -103,7 +103,7 @@ export default {
 
     methods: {
 
-        fieldAdded(field) {
+        fieldLinked(field) {
             this.section.fields.push(field);
             this.$notify.success(__('Field added.'));
             this.$nextTick(() => this.editingField = field._id);
@@ -127,6 +127,10 @@ export default {
 
         toggleEditing() {
             this.isEditing = ! this.isEditing
+        },
+
+        createField() {
+            console.log('creating field...');
         }
 
     }
