@@ -117,7 +117,10 @@ export default {
         fieldLinked(field) {
             this.section.fields.push(field);
             this.$notify.success(__('Field added.'));
-            this.$nextTick(() => this.editingField = field._id);
+
+            if (field.type === 'reference') {
+                this.$nextTick(() => this.editingField = field._id);
+            }
         },
 
         fieldUpdated(i, field) {
