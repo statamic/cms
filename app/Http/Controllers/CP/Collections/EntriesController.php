@@ -230,7 +230,7 @@ class EntriesController extends CpController
         ]);
 
         $viewData = [
-            'title' => __('Create'),
+            'title' => __('Create Entry'),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
             ],
@@ -238,6 +238,7 @@ class EntriesController extends CpController
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
+            'published' => $collection->defaultStatus() === 'published',
             'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
                 return [
                     'handle' => $handle,
