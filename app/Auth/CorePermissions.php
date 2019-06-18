@@ -5,6 +5,7 @@ namespace Statamic\Auth;
 use Statamic\API\Form;
 use Statamic\API\Taxonomy;
 use Statamic\API\GlobalSet;
+use Statamic\API\Structure;
 use Statamic\API\Collection;
 use Statamic\API\Permission;
 use Statamic\API\AssetContainer;
@@ -17,6 +18,7 @@ class CorePermissions
             ->register('access cp')
             ->register('view drafts on frontend')
             ->registerCollections()
+            ->registerStructures()
             ->registerGlobals()
             ->registerTaxonomies()
             ->registerAssetContainers()
@@ -47,6 +49,23 @@ class CorePermissions
             ])->withReplacements('collection', function () {
                 return Collection::all()->map(function ($collection) {
                     return ['value' => $collection->handle(), 'label' => $collection->title()];
+                });
+            });
+        });
+
+        return $this;
+    }
+
+    protected function registerStructures()
+    {
+        Permission::register('configure structures');
+
+        Permission::register('view {structure} structure', function ($permission) {
+            $permission->withChildren([
+                Permission::make('edit {structure} structure')
+            ])->withReplacements('structure', function () {
+                return Structure::all()->map(function ($structure) {
+                    return ['value' => $structure->handle(), 'label' => $structure->title()];
                 });
             });
         });
@@ -124,6 +143,7 @@ class CorePermissions
                     Permission::make('create users'),
                     Permission::make('delete users'),
                     Permission::make('change passwords'),
+                    Permission::make('edit user groups'),
                     Permission::make('edit roles'),
                 ]),
             ]);

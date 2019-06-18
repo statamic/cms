@@ -7,6 +7,7 @@ use Statamic\API\Entry;
 use Statamic\CP\Column;
 use Statamic\API\Content;
 use Illuminate\Support\Arr;
+use Statamic\API\Collection;
 use Statamic\Fields\Fieldtype;
 
 class Relationship extends Fieldtype
@@ -15,16 +16,45 @@ class Relationship extends Fieldtype
     protected $component = 'relationship';
     protected $indexComponent = 'relationship';
     protected $itemComponent = 'related-item';
+    protected $formComponent = 'entry-publish-form';
     protected $categories = ['relationship'];
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
     protected $statusIcons = true;
+    protected $taggable = false;
     protected $defaultValue = [];
+
+    protected $formComponentProps = [
+        'initialActions' => 'actions',
+        'collectionTitle' => 'collection.title',
+        'collectionUrl' => 'collection.url',
+        'initialTitle' => 'title',
+        'initialReference' => 'reference',
+        'initialFieldset' => 'blueprint',
+        'initialValues' => 'values',
+        'initialLocalizedFields' => 'localizedFields',
+        'initialMeta' => 'meta',
+        'initialPublished' => 'published',
+        'initialPermalink' => 'permalink',
+        'initialLocalizations' => 'localizations',
+        'initialHasOrigin' => 'hasOrigin',
+        'initialOriginValues' => 'originValues',
+        'initialOriginMeta' => 'originMeta',
+        'initialSite' => 'locale',
+        'initialIsWorkingCopy' => 'hasWorkingCopy',
+        'initialIsRoot' => 'isRoot',
+        'initialReadOnly' => 'readOnly',
+    ];
 
     protected $configFields = [
         'max_items' => ['type' => 'integer'],
         'collections' => ['type' => 'collections'],
+        'mode' => ['type' => 'radio', 'options' => [
+            'default' => 'Default (Drag and drop UI with item selector in a stack)',
+            'select' => 'Select (A dropdown field with prepopulated options)',
+            'typeahead' => 'Typeahead (A dropdown field with options requested as you type)'
+        ]]
     ];
 
     public function preProcess($data)
@@ -88,6 +118,10 @@ class Relationship extends Fieldtype
             'canCreate' => $this->canCreate(),
             'canSearch' => $this->canSearch(),
             'statusIcons' => $this->statusIcons,
+            'creatables' => $this->getCreatables(),
+            'formComponent' => $this->getFormComponent(),
+            'formComponentProps' => $this->getFormComponentProps(),
+            'taggable' => $this->getTaggable(),
         ];
     }
 
@@ -119,6 +153,16 @@ class Relationship extends Fieldtype
         return $this->itemComponent;
     }
 
+    protected function getFormComponent()
+    {
+        return $this->formComponent;
+    }
+
+    protected function getFormComponentProps()
+    {
+        return $this->formComponentProps;
+    }
+
     protected function getColumns()
     {
         return [
@@ -143,6 +187,29 @@ class Relationship extends Fieldtype
         return [
             'collections' => $this->config('collections'),
         ];
+    }
+
+    protected function getCreatables()
+    {
+        if ($url = $this->getCreateItemUrl()) {
+            return [['url' => $url]];
+        }
+
+        $collections = $this->config('collections', Collection::handles());
+
+        return collect($collections)->map(function ($collection) {
+            $collection = Collection::findByHandle($collection);
+
+            return [
+                'title' => $collection->title(),
+                'url' => $collection->createEntryUrl(Site::selected()->handle()),
+            ];
+        })->all();
+    }
+
+    protected function getCreateItemUrl()
+    {
+        //
     }
 
     public function getItemData($values)
@@ -218,5 +285,10 @@ class Relationship extends Fieldtype
         }
 
         return $query;
+    }
+
+    protected function getTaggable()
+    {
+        return $this->taggable;
     }
 }

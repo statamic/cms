@@ -7,6 +7,7 @@ export default {
 
     props: {
         site: String,
+        itemUrl: String,
     },
 
     data() {
@@ -15,7 +16,6 @@ export default {
             method: 'post',
             action: 'store',
             title: __('Create'),
-            itemUrl: cp_url(`collections/blog/entries/create/${this.site}`)
         }
     },
 
@@ -24,7 +24,7 @@ export default {
     methods: {
 
         saved(response) {
-            this.$emit('created', response.data.entry);
+            this.$emit('created', response.data);
             this.$nextTick(() => this.close());
         }
 

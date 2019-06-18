@@ -59,6 +59,7 @@ Statamic.booting(Statamic => {
 Vue.prototype.$axios = axios;
 Vue.prototype.$mousetrap = require('mousetrap');
 require('mousetrap/plugins/global-bind/mousetrap-global-bind');
+
 Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
 
@@ -121,7 +122,6 @@ Statamic.app({
         GlobalCreateForm: require('./components/globals/Create.vue'),
         FormsetBuilder: require('./components/formset-builder/FormsetBuilder.vue'),
         UserListing: require('./components/users/Listing.vue'),
-        UserPublishForm: require('./components/users/PublishForm.vue'),
         UserWizard: require('./components/users/Wizard.vue'),
         RoleListing: require('./components/roles/Listing.vue'),
         RolePublishForm: require('./components/roles/PublishForm.vue'),
@@ -175,6 +175,11 @@ Statamic.app({
         if (this.$config.get('broadcasting.enabled')) {
             this.$echo.start();
         }
+
+        // Set moment locale
+        window.moment.locale(Statamic.$config.get('locale'))
+        Vue.moment.locale(Statamic.$config.get('locale'))
+        Vue.prototype.$moment.locale(Statamic.$config.get('locale'))
     },
 
     created() {

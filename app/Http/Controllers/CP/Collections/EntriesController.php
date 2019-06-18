@@ -108,6 +108,7 @@ class EntriesController extends CpController
         }
 
         $viewData = [
+            'title' => $entry->value('title'),
             'reference' => $entry->reference(),
             'editing' => true,
             'actions' => [
@@ -142,7 +143,8 @@ class EntriesController extends CpController
                     'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];
-            })->all()
+            })->all(),
+            'hasWorkingCopy' => $entry->hasWorkingCopy(),
         ];
 
         if ($request->wantsJson()) {
@@ -228,6 +230,7 @@ class EntriesController extends CpController
         ]);
 
         $viewData = [
+            'title' => __('Create'),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
             ],
@@ -258,7 +261,11 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $fields = Blueprint::find($request->blueprint)->fields()->addValues($request->all())->process();
+        $blueprint = $collection->ensureEntryBlueprintFields(
+            Blueprint::find($request->blueprint)
+        );
+
+        $fields = $blueprint->fields()->addValues($request->all())->process();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'title' => 'required',
@@ -302,10 +309,9 @@ class EntriesController extends CpController
                 ->save();
         }
 
-        return [
+        return array_merge($entry->toArray(), [
             'redirect' => $entry->editUrl(),
-            'entry' => $entry->toArray()
-        ];
+        ]);
     }
 
     public function destroy($collection, $entry)

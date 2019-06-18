@@ -26,7 +26,12 @@ class StructurePolicy
 
     public function create($user)
     {
-        //
+        return $user->hasPermission("configure structures");
+    }
+
+    public function store($user)
+    {
+        return $this->create($user);
     }
 
     public function view($user, $structure)
@@ -39,8 +44,13 @@ class StructurePolicy
         return $user->hasPermission("edit {$structure->handle()} structure");
     }
 
+    public function update($user, $structure)
+    {
+        return $this->edit($user, $structure);
+    }
+
     public function delete($user, $structure)
     {
-        //
+        return $user->hasPermission("configure structures");
     }
 }

@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
+use Scrumpy\ProseMirrorToHtml\Renderer;
 use Statamic\Fieldtypes\Bard\Augmentor;
 
 class Bard extends Replicator
@@ -150,6 +151,20 @@ class Bard extends Replicator
                 'values' => $processed,
             ]
         ];
+    }
+
+    public function preProcessIndex($value)
+    {
+        $data = collect($value)->reject(function ($value) {
+            return $value['type'] === 'set';
+        });
+
+        $renderer = new Renderer;
+
+        return $renderer->render([
+            'type' => 'doc',
+            'content' => $data
+        ]);
     }
 
     public function extraRules(): array
