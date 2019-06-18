@@ -296,7 +296,7 @@ export default {
          * Load the fieldset
          */
         getFieldset() {
-            const url = cp_url(`publish-blueprints/${this.asset.blueprint}`);
+            const url = cp_url(`fields/publish-blueprints/${this.asset.blueprint}`);
 
             this.$axios.get(url).then(response => {
                 this.fieldset = response.data;
