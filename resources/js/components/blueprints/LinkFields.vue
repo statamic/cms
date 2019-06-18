@@ -89,21 +89,27 @@ import uniqid from 'uniqid';
 export default {
 
     data() {
+        let fields = this.$config.get('fieldsetFields');
+        let fieldsets = this.$config.get('fieldsets');
+
         return {
             open: false,
             reference: null,
             fieldset: null,
             importPrefix: null,
-            fieldSuggestions: Object.values(window.Statamic.$config.get('fieldsetFields')).map(field => {
+            fieldSuggestions: Object.values(fields).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
                     label: field.display,
-                    fieldset: field.fieldset.title
+                    fieldset: fieldsets[field.fieldset.handle].title
                 };
             }),
-            fieldsetSuggestions: [
-                { value: 'generic', label: 'Generic' }
-            ]
+            fieldsetSuggestions: Object.values(fieldsets).map(fieldset => {
+                return {
+                    value: fieldset.handle,
+                    label: fieldset.title,
+                };
+            })
         }
     },
 

@@ -60,7 +60,10 @@ class BlueprintController extends CpController
 
         $this->authorize('edit', $blueprint);
 
-        \Statamic::provideToScript(['fieldsetFields' => $this->fieldsetFields()]);
+        \Statamic::provideToScript([
+            'fieldsets' => $this->fieldsets(),
+            'fieldsetFields' => $this->fieldsetFields()
+        ]);
 
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
@@ -207,6 +210,16 @@ class BlueprintController extends CpController
             'fieldset' => $field['import'],
             'prefix' => $field['prefix'],
         ];
+    }
+
+    private function fieldsets()
+    {
+        return \Statamic\API\Fieldset::all()->mapWithKeys(function ($fieldset) {
+            return [$fieldset->handle() => [
+                'handle' => $fieldset->handle(),
+                'title' => $fieldset->title(),
+            ]];
+        });
     }
 
     private function fieldsetFields()
