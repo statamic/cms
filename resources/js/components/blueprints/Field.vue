@@ -12,14 +12,6 @@ export default {
         },
         isEditing: Boolean,
         isSectionExpanded: Boolean
-    },
-
-    watch: {
-
-        isEditing(isEditing) {
-            if (isEditing) this.$nextTick(() => this.$modal.show('field-settings'))
-        }
-
     }
 
 }
