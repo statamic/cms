@@ -208,7 +208,7 @@ class BlueprintController extends CpController
         return [
             'type' => 'import',
             'fieldset' => $field['import'],
-            'prefix' => $field['prefix'],
+            'prefix' => $field['prefix'] ?? null,
         ];
     }
 
