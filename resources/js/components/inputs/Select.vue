@@ -5,7 +5,7 @@
             <option
                 v-for="option in options"
                 :key="option.value"
-                v-text="option.text"
+                v-text="option.label"
                 :value="option.value"
                 :selected="isOptionSelected(option)"
             ></option>
