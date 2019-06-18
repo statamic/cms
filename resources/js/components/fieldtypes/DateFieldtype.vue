@@ -150,7 +150,7 @@ export default {
         },
 
         parseTime() {
-            if (this.value) {
+            if (this.value && this.config.time_enabled) {
                 return Vue.moment(this.date).format('HH:mm');
             } else if (this.config.time_required) {
                 return Vue.moment().format('HH:mm');
