@@ -1,13 +1,28 @@
 <template>
 
-    <div class="flex flex-col h-full">
+    <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
 
-        <div class="flex items-center p-3 bg-grey-20 border-b text-center">
-            <svg-icon class="h-6 w-6 mr-2 inline-block opacity-50" name="template"></svg-icon>
-            <span>Import</span>
+        <div class="flex items-center mb-3 -mt-1">
+            <h1 class="flex-1">
+                <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" name="paperclip"></svg-icon>
+                    linked fieldset
+                </small>
+                Fieldset
+            </h1>
+            <button
+                class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
+                @click.prevent="close"
+                v-text="__('Cancel')"
+            ></button>
+            <button
+                class="btn btn-primary"
+                @click.prevent="commit"
+                v-text="__('Finish')"
+            ></button>
         </div>
 
-        <div class="flex-1 overflow-scroll">
+        <div class="card">
 
             <div class="publish-fields">
 
@@ -35,13 +50,7 @@
 </template>
 
 <script>
-import PublishField from '../publish/Field.vue';
-
 export default {
-
-    components: {
-        PublishField,
-    },
 
     props: ['config'],
 
@@ -52,7 +61,7 @@ export default {
 
     data: function() {
         return {
-            values: this.config,
+            values: clone(this.config),
         };
     },
 
@@ -63,10 +72,16 @@ export default {
         },
 
         updateField(handle, value) {
-            const values = this.values;
-            values[handle] = value;
-            this.$emit('input', values);
-            this.$emit('updated', handle, value);
+            this.values[handle] = value;
+        },
+
+        commit() {
+            this.$emit('committed', this.values);
+            this.close();
+        },
+
+        close() {
+            this.$emit('closed');
         }
 
     }
