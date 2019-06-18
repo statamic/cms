@@ -7,7 +7,7 @@
             <span>Link</span>
         </button>
 
-        <stack narrow v-if="open" @closed="open = false">
+        <stack narrow v-if="open" @closed="open = false" name="field-linker">
             <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
@@ -23,7 +23,7 @@
 
                     <div>
                         <p class="text-sm font-medium mb-1">Link a single field</p>
-                        <p class="text-2xs text-grey mb-1">When you make changes to that field it will be reflected in this blueprint.</p>
+                        <p class="text-2xs text-grey mb-1">Changes to this field will stay in sync.</p>
                         <v-select
                             name="field"
                             :placeholder="__('Fields')"
@@ -53,7 +53,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium mb-1">Link a fieldset</p>
-                        <p class="text-2xs text-grey mb-1">When you add or edit any fields in that fieldset, it will be reflected in this blueprint.</p>
+                        <p class="text-2xs text-grey mb-1">Changes to this fieldset will stay in sync.</p>
                         <v-select
                             name="field"
                             :placeholder="__('Fieldsets')"
