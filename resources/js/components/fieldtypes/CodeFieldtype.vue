@@ -81,7 +81,7 @@ export default {
         });
 
         // Refresh to ensure proper size
-        // Most applicaable when loaded by another field like Bard, etc
+        // Most applicable when loaded by another field like Bard, etc
         this.$nextTick(function() {
             this.codemirror.refresh();
         })
