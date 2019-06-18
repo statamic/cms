@@ -34,6 +34,7 @@
                         @edit="editingField = field._id"
                         @updated="fieldUpdated(i, $event)"
                         @deleted="deleteField(i)"
+                        @editor-closed="editingField = null"
                     />
                 </div>
 

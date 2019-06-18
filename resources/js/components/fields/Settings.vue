@@ -16,12 +16,12 @@
             </h1>
             <button
                 class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
-                @click.prevent="$emit('cancel')"
+                @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
             <button
                 class="btn btn-primary"
-                @click.prevent="$emit('closed')"
+                @click.prevent="commit"
                 v-text="__('Finish')"
             ></button>
         </div>
@@ -74,7 +74,7 @@
 
                 <field-validation-builder
                     :config="config"
-                    @updated="updateFieldValidation" />
+                    @updated="updateField('validate', $event)" />
 
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
@@ -106,7 +106,7 @@ export default {
 
     mixins: [ProvidesFieldtypes],
 
-    props: ['config', 'type', 'root', 'suggestableConditionFields'],
+    props: ['config', 'overrides', 'type', 'root', 'suggestableConditionFields'],
 
     model: {
         prop: 'config',
@@ -115,7 +115,8 @@ export default {
 
     data: function() {
         return {
-            values: this.config,
+            values: clone(this.config),
+            editedFields: clone(this.overrides),
             isHandleModified: true,
             activeTab: 'basics'
         };
@@ -129,7 +130,7 @@ export default {
         },
 
         fieldtype: function() {
-            return _.findWhere(this.fieldtypes, { handle: this.type });
+            return _.findWhere(this.fieldtypes, { handle: this.type || 'text' })
         },
 
         fieldtypeConfig() {
@@ -195,10 +196,8 @@ export default {
         },
 
         updateField(handle, value) {
-            const values = this.values;
-            values[handle] = value;
-            this.$emit('input', values);
-            this.$emit('updated', handle, value);
+            this.values[handle] = value;
+            this.markFieldEdited(handle);
         },
 
         updateFieldConditions(conditions) {
@@ -210,19 +209,26 @@ export default {
                 }
             });
 
-            this.$emit('input', {...values, ...conditions});
+            this.values = {...values, ...conditions};
+
+            if (Object.keys(conditions).length > 0) {
+                this.markFieldEdited(Object.keys(conditions)[0]);
+            }
         },
 
-        updateFieldValidation(rules) {
-            const values = clone(this.values);
-
-            if (rules) {
-                values.validate = rules;
-            } else {
-                delete values.validate;
+        markFieldEdited(handle) {
+            if (this.editedFields.indexOf(handle) === -1) {
+                this.editedFields.push(handle);
             }
+        },
 
-            this.$emit('input', values);
+        commit() {
+            this.$emit('committed', this.values, this.editedFields);
+            this.close();
+        },
+
+        close() {
+            this.$emit('closed');
         }
 
     }

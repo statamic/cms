@@ -5,7 +5,7 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" :name="field.config.type" v-tooltip="field.config.type" />
+                    <!-- <svg-icon class="text-grey-70 mr-1" :name="field.config.type" v-tooltip="field.config.type" /> -->
                     <a v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
@@ -18,9 +18,9 @@
                             :type="field.config.type"
                             :root="isRoot"
                             :config="fieldConfig"
+                            :overrides="field.config_overrides || []"
                             :suggestable-condition-fields="suggestableConditionFields"
-                            @updated="configFieldUpdated"
-                            @input="configUpdated"
+                            @committed="settingsUpdated"
                             @closed="editorClosed"
                         />
                     </stack>
@@ -94,26 +94,20 @@ export default {
 
     methods: {
 
-        configFieldUpdated(handle, value) {
-            console.log(handle, value)
-            if (handle === 'handle') {
-                Vue.set(this.field, handle, value);
-            } else {
-                Vue.set(this.field.config, handle, value);
+        settingsUpdated(settings, editedFields) {
+            let field = this.field;
 
-                if (this.field.type === 'reference' && this.field.config_overrides.indexOf(handle) === -1) {
-                    this.field.config_overrides.push(handle);
-                }
+            // Handle is stored separately from the config.
+            field.handle = settings.handle;
+            delete settings.handle;
+
+            field.config = settings;
+
+            if (field.type === 'reference') {
+                field.config_overrides = editedFields;
             }
 
-            this.$emit('updated', this.field);
-        },
-
-        configUpdated(config) {
-            delete config.handle;
-            this.field.config = config;
-
-            this.$emit('updated', this.field);
+            this.$emit('updated', field);
         },
 
         editorClosed() {
