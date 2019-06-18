@@ -36,7 +36,7 @@
                     :instructions="__(`The field's label shown in the Control Panel.`)"
                     width="50"
                     autofocus
-                    :value="config.display"
+                    :value="values.display"
                     @input="updateField('display', $event)"
                 />
 
@@ -45,7 +45,7 @@
                     :display="__('Handle')"
                     :instructions="__(`The field's template variable.`)"
                     width="50"
-                    :value="config.handle"
+                    :value="values.handle"
                     @input="(field) => {
                         this.isHandleModified = true;
                         this.updateField('handle', field);
@@ -57,7 +57,7 @@
                     handle="instructions"
                     :display="__('Instructions')"
                     :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
-                    :value="config.instructions"
+                    :value="values.instructions"
                     @input="updateField('instructions', $event)"
                 />
 
@@ -177,12 +177,11 @@ export default {
         // If they edit the handle, we'll stop.
         if (this.config.isNew && !this.config.isMeta) {
             this.isHandleModified = false;
-            delete this.config.isNew;
 
-            this.$watch('config.display', function(display) {
+            this.$watch('values.display', function(display) {
                 if (! this.isHandleModified) {
-                    this.config.handle = this.$slugify(display, '_');
-                    this.updateField('handle', this.config.handle);
+                    const handle = this.$slugify(display, '_');
+                    this.updateField('handle', handle);
                 }
             });
         }

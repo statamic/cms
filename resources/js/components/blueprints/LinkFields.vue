@@ -117,7 +117,7 @@ export default {
                 type: 'reference',
                 field_reference: this.reference,
                 handle: field.handle,
-                config: field.config,
+                config: { ...field.config, isNew: true },
                 config_overrides: []
             });
         },
