@@ -52,7 +52,7 @@
                 v-if="isSelectingNewFieldtype"
                 @closed="isSelectingNewFieldtype = false"
             >
-                <fieldtype-selector @selected="fieldtypeSelected" />
+                <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
             </stack>
 
             <stack name="field-settings"
