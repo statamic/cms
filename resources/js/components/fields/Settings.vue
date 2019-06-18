@@ -106,7 +106,13 @@ export default {
 
     mixins: [ProvidesFieldtypes],
 
-    props: ['config', 'overrides', 'type', 'root', 'suggestableConditionFields'],
+    props: {
+        config: Object,
+        overrides: { type: Array, default: () => [] },
+        type: String,
+        root: Boolean,
+        suggestableConditionFields: Array,
+    },
 
     model: {
         prop: 'config',

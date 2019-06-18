@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="p-2 pt-0 flex items-center">
-                    <button class="btn w-full flex justify-center items-center" @click="isCreating = true;">
+                    <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
                         <svg-icon name="wireframe" class="mr-1" />
                         {{ __('Create Field') }}
                     </button>
@@ -49,10 +49,26 @@
             </div>
 
             <stack name="fieldtype-selector"
-                v-if="isCreating"
-                @closed="isCreating = false"
+                v-if="isSelectingNewFieldtype"
+                @closed="isSelectingNewFieldtype = false"
             >
                 <fieldtype-selector @selected="fieldtypeSelected" />
+            </stack>
+
+            <stack name="field-settings"
+                v-if="pendingCreatedField != null"
+                @closed="pendingCreatedField = null"
+            >
+                <field-settings
+                    slot-scope="{ close }"
+                    ref="settings"
+                    :type="pendingCreatedField.config.type"
+                    :root="true"
+                    :config="pendingCreatedField.config"
+                    :suggestable-condition-fields="suggestableConditionFields"
+                    @committed="fieldCreated"
+                    @closed="close"
+                />
             </stack>
 
         </div>
@@ -65,6 +81,7 @@ import uniqid from 'uniqid';
 import LinkFields from './LinkFields.vue';
 import RegularField from './RegularField.vue';
 import ImportField from './ImportField.vue';
+import FieldSettings from '../fields/Settings.vue';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 
 export default {
@@ -74,6 +91,7 @@ export default {
         ImportField,
         LinkFields,
         FieldtypeSelector,
+        FieldSettings,
     },
 
     props: {
@@ -86,8 +104,9 @@ export default {
     data() {
         return {
             isEditing: false,
-            isCreating: false,
-            editingField: null
+            isSelectingNewFieldtype: false,
+            editingField: null,
+            pendingCreatedField: null,
         }
     },
 
@@ -144,21 +163,34 @@ export default {
         },
 
         fieldtypeSelected(field) {
-            const id = uniqid();
+            this.isSelectingNewFieldtype = false;
 
-            this.section.fields.push({
-                _id: id,
+            const pending = {
+                _id: uniqid(),
                 type: 'inline',
                 handle: field.type,
                 config: {
                     ...field,
                     display: field.type,
                 }
-            });
+            };
 
+            this.$nextTick(() => this.pendingCreatedField = pending);
+        },
+
+        fieldCreated(created) {
+            let handle = created.handle;
+            delete created.handle;
+
+            let field = {
+                ...this.pendingCreatedField,
+                ...{ handle },
+                config: created
+            };
+
+            this.section.fields.push(field);
             this.$notify.success(__('Field added.'));
-            this.isCreating = false;
-            this.$nextTick(() => this.editingField = id);
+            this.pendingCreatedField = null;
         }
 
     }
