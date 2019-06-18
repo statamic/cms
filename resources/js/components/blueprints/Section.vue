@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="p-2 pt-0 flex items-center">
-                    <button class="btn w-full flex justify-center items-center" @click="createField">
+                    <button class="btn w-full flex justify-center items-center" @click="isCreating = true;">
                         <svg-icon name="wireframe" class="mr-1" />
                         {{ __('Create Field') }}
                     </button>
@@ -48,15 +48,24 @@
 
             </div>
 
+            <stack name="fieldtype-selector"
+                v-if="isCreating"
+                @closed="isCreating = false"
+            >
+                <fieldtype-selector @selected="fieldtypeSelected" />
+            </stack>
+
         </div>
     </div>
 
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import LinkFields from './LinkFields.vue';
 import RegularField from './RegularField.vue';
 import ImportField from './ImportField.vue';
+import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 
 export default {
 
@@ -64,6 +73,7 @@ export default {
         RegularField,
         ImportField,
         LinkFields,
+        FieldtypeSelector,
     },
 
     props: {
@@ -76,7 +86,7 @@ export default {
     data() {
         return {
             isEditing: false,
-            isAddingField: true,
+            isCreating: false,
             editingField: null
         }
     },
@@ -130,8 +140,22 @@ export default {
             this.isEditing = ! this.isEditing
         },
 
-        createField() {
-            console.log('creating field...');
+        fieldtypeSelected(field) {
+            const id = uniqid();
+
+            this.section.fields.push({
+                _id: id,
+                type: 'inline',
+                handle: field.type,
+                config: {
+                    ...field,
+                    display: field.type,
+                }
+            });
+
+            this.$notify.success(__('Field added.'));
+            this.isCreating = false;
+            this.$nextTick(() => this.editingField = id);
         }
 
     }
