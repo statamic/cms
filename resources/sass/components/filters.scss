@@ -3,31 +3,23 @@
    ========================================================================== */
 
 .filter {
-    background: $bg;
+    @apply bg-grey-20 mb-3 rounded-full text-center;
     padding: 10px 8px 14px;
-    margin-bottom: 24px;
-    text-align: center;
-    border-radius: 9999px;
 
     a {
-        color: $color_gray_upload;
-        font-size: 13px;
-        margin: 0 4px;
-        padding: 8px;
-        position: relative;
+        @apply text-xs text-grey-70 mx-sm p-1 relative;
     }
 
     a.active, a:hover {
-        color: $color_gray_dark;
+        @apply text-grey-100;
     }
 
     a.active:after {
+        @apply bg-red block;
         content: "";
-        display: block;
         width: 4px;
         height: 4px;
         border-radius: 50%;
-        background: $color_red;
         opacity: .9;
         position: absolute;
         left: 50%;

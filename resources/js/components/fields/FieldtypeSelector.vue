@@ -1,6 +1,10 @@
 <template>
 
     <div class="h-full bg-white overflow-auto">
+        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+            {{ __('Fieldtypes') }}
+            <button type="button" class="btn-close" @click="close">×</button>
+        </div>
 
         <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
