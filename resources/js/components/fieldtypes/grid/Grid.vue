@@ -102,6 +102,8 @@ export default {
         value: {
             immediate: true,
             handler(value) {
+                if (value === null) value = [];
+
                 if (value.length === 0) {
                     this.rows = value;
                     return;
