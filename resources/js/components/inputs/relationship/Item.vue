@@ -20,6 +20,8 @@
             <inline-edit-form
                 v-if="isEditing"
                 :item="item"
+                :component="formComponent"
+                :component-props="formComponentProps"
                 @updated="item.title = $event.title"
                 @closed="isEditing = false"
             />
@@ -54,6 +56,8 @@ export default {
         editable: Boolean,
         sortable: Boolean,
         readOnly: Boolean,
+        formComponent: String,
+        formComponentProps: Object,
     },
 
     data() {

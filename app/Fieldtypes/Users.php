@@ -8,8 +8,17 @@ use Statamic\CP\Column;
 class Users extends Relationship
 {
     protected $statusIcons = false;
-    protected $canEdit = false;
-    protected $canCreate = false;
+    protected $formComponent = 'user-publish-form';
+
+    protected $formComponentProps = [
+        'initialTitle' => 'title',
+        'initialReference' => 'reference',
+        'initialFieldset' => 'blueprint',
+        'initialValues' => 'values',
+        'initialMeta' => 'meta',
+        'actions' => 'actions',
+        'canEditPassword' => 'canEditPassword',
+    ];
 
     public function preProcess($data)
     {
@@ -26,6 +35,7 @@ class Users extends Relationship
             return [
                 'title' => $user->email(),
                 'id' => $id,
+                'edit_url' => $user->editUrl(),
             ];
         }
 
@@ -66,5 +76,10 @@ class Users extends Relationship
     protected function augmentValue($value)
     {
         return User::find($value);
+    }
+
+    protected function getCreateItemUrl()
+    {
+        return cp_route('users.create');
     }
 }

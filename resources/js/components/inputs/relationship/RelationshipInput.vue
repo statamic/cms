@@ -1,9 +1,20 @@
 <template>
 
     <div class="relationship-input">
+
+        <relationship-select-field
+            v-if="!initializing && usesSelectField"
+            :items="items"
+            :url="selectionsUrl"
+            :typeahead="mode === 'typeahead'"
+            :multiple="maxItems > 1"
+            :taggable="taggable"
+            @input="selectFieldSelected"
+        />
+
         <loading-graphic v-if="initializing" :inline="true" />
 
-        <template v-if="!initializing">
+        <template v-if="!initializing && !usesSelectField">
             <div ref="items" class="relationship-input-items outline-none">
                 <component
                     :is="itemComponent"
@@ -15,6 +26,8 @@
                     :editable="canEdit"
                     :sortable="!readOnly && canReorder"
                     :read-only="readOnly"
+                    :form-component="formComponent"
+                    :form-component-props="formComponentProps"
                     class="item outline-none"
                     @removed="remove(i)"
                 />
@@ -27,15 +40,13 @@
             <div v-if="canSelectOrCreate" class="relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
-                        <button v-if="canCreate" class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none" @click="isCreating = true">
-                            <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
-                            {{ __('Create & Link Item') }}
-                        </button>
-                        <inline-create-form
-                            v-if="isCreating"
+                        <create-button
+                            v-if="canCreate"
+                            :creatables="creatables"
                             :site="site"
+                            :component="formComponent"
+                            :component-props="formComponentProps"
                             @created="itemCreated"
-                            @closed="stopCreating"
                         />
                     </div>
                     <button ref="existing" class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
@@ -73,8 +84,9 @@
 import Popper from 'vue-popperjs';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
+import CreateButton from './CreateButton.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
-import InlineCreateForm from './InlineCreateForm.vue';
+import RelationshipSelectField from './SelectField.vue';
 
 export default {
 
@@ -99,13 +111,22 @@ export default {
         canReorder: Boolean,
         readOnly: Boolean,
         exclusions: Array,
+        creatables: Array,
+        formComponent: String,
+        formComponentProps: Object,
+        mode: {
+            type: String,
+            default: 'default',
+        },
+        taggable: Boolean,
     },
 
     components: {
         Popper,
         ItemSelector,
         RelatedItem,
-        InlineCreateForm
+        CreateButton,
+        RelationshipSelectField,
     },
 
     data() {
@@ -138,6 +159,10 @@ export default {
 
         canSelectOrCreate() {
             return !this.readOnly && !this.maxItemsReached;
+        },
+
+        usesSelectField() {
+            return ['select', 'typeahead'].includes(this.mode);
         }
 
     },
@@ -231,11 +256,11 @@ export default {
         itemCreated(item) {
             this.selections.push(item.id);
             this.itemData.push(item);
-            this.stopCreating();
         },
 
-        stopCreating() {
-            this.isCreating = false;
+        selectFieldSelected(selectedItemData) {
+            this.itemData = selectedItemData.map(item => ({ id: item.id, title: item.title }));
+            this.selections = selectedItemData.map(item => item.id)
         }
 
     }

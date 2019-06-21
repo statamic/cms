@@ -34,7 +34,7 @@
             initial-sort-direction="{{ $collection->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
             action-url="{{ cp_route('collections.entries.actions', $collection->handle()) }}"
-            :reorderable="{{ bool_str(user()->can('reorder', $collection)) }}"
+            :reorderable="{{ bool_str($collection->orderable() && user()->can('reorder', $collection)) }}"
             reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
             structure-url="{{ optional($collection->structure())->showUrl() }}"
         ></entry-list>

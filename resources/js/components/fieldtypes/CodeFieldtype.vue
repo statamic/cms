@@ -79,6 +79,12 @@ export default {
         this.codemirror.on('change', (cm) => {
             this.update(cm.doc.getValue());
         });
+
+        // Refresh to ensure proper size
+        // Most applicable when loaded by another field like Bard, etc
+        this.$nextTick(function() {
+            this.codemirror.refresh();
+        })
     },
 
     watch: {

@@ -11,22 +11,13 @@
             <loading-graphic />
         </div>
 
-        <entry-publish-form
-            v-if="blueprint"
-            :is-creating="creating"
-            :initial-actions="initialActions"
+        <component
+            :is="component"
+            v-if="!loading"
+            v-bind="componentPropValues"
             :method="method"
+            :is-creating="creating"
             :publish-container="publishContainer"
-            :collection-title="collection.title"
-            :collection-url="collection.url"
-            :initial-reference="initialReference"
-            :initial-title="title"
-            :initial-fieldset="blueprint"
-            :initial-values="initialValues"
-            :initial-meta="initialMeta"
-            :initial-localizations="initialLocalizations"
-            :initial-read-only="readOnly"
-            :initial-site="initialSite"
             @saved="saved"
         >
             <template slot="action-buttons-right">
@@ -37,7 +28,7 @@
                     @click="confirmClose"
                     v-html="'&times'" />
             </template>
-        </entry-publish-form>
+        </component>
 
     </div>
     </stack>
@@ -48,19 +39,16 @@
 <script>
 export default {
 
+    props: {
+        component: String,
+        componentProps: Object,
+    },
+
     data() {
         return {
             loading: true,
-            blueprint: null,
-            values: null,
-            initialReference: null,
-            initialValues: null,
-            initialMeta: null,
-            initialLocalizations: null,
-            initialActions: null,
-            initialSite: null,
-            collection: Object,
             readOnly: false,
+            componentPropValues: {},
         }
     },
 
@@ -80,15 +68,11 @@ export default {
 
         getItem() {
             this.$axios.get(this.itemUrl).then(response => {
-                const data = response.data;
-                this.blueprint = data.blueprint;
-                this.values = this.initialValues = data.values;
-                this.initialReference = data.reference;
-                this.initialMeta = data.meta;
-                this.initialLocalizations = data.localizations;
-                this.initialActions = data.actions;
-                this.initialSite = data.locale;
-                this.collection = data.collection;
+                for (const prop in this.componentProps) {
+                    const value = data_get(response.data, this.componentProps[prop]);
+                    this.$set(this.componentPropValues, prop, value);
+                }
+
                 this.loading = false;
             });
         },

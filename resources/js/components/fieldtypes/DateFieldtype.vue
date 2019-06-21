@@ -12,10 +12,11 @@
                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                     <svg-icon name="calendar" class="w-4 h-4" />
                 </div>
-                <input type="text" class="input-text" readonly :value="value" v-if="isReadOnly">
+                <input type="text" class="input-text" readonly :value="$moment(value).format('L')" v-if="isReadOnly">
                 <v-date-picker
                     v-else
                     v-model="date"
+                    :popover="{ visibility: 'click' }"
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
                     :locale="$config.get('locale')"
@@ -96,7 +97,7 @@ export default {
         },
 
         format() {
-            return 'YYYY-MM-DD HH:mm';
+            return (this.time) ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD';
         }
     },
 
@@ -149,8 +150,8 @@ export default {
         },
 
         parseTime() {
-            if (this.value) {
-                return Vue.moment(this.date).format('HH:mm');
+            if (this.value && this.config.time_enabled) {
+                return Vue.moment(this.value).format('HH:mm');
             } else if (this.config.time_required) {
                 return Vue.moment().format('HH:mm');
             } else {
