@@ -8,7 +8,6 @@ export default {
     },
 
     props: {
-        actions: Array,
         url: String
     },
 
@@ -39,6 +38,7 @@ export default {
                 this.$emit('completed');
             }).catch(error => {
                 this.$notify.error(error.response.data.message);
+                this.$emit('completed');
             });
         }
 

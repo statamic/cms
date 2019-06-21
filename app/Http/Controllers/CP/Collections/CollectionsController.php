@@ -60,7 +60,6 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'actions' => Action::for('entries', $context),
         ]);
     }
 

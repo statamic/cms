@@ -16,6 +16,10 @@ class UserPolicy
 
     public function edit($authed, $user)
     {
+        if ($authed === $user) {
+            return true; // Users may edit their own profiles.
+        }
+
         return $authed->hasPermission('edit users');
     }
 
@@ -36,5 +40,10 @@ class UserPolicy
         }
 
         return $authed->hasPermission('change passwords');
+    }
+
+    public function sendActivationEmail($authed, $user)
+    {
+        return $this->edit($authed, $user);
     }
 }

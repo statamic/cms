@@ -42,7 +42,6 @@ class UsersController extends CpController
             'filters' => Scope::filters('users', $context = [
                 'blueprints' => ['user'],
             ]),
-            'actions' => Action::for('users', $context),
         ]);
     }
 
@@ -60,9 +59,11 @@ class UsersController extends CpController
             ->supplement(function ($user) use ($request) {
                 return [
                     'edit_url' => $user->editUrl(),
-                    'deleteable' => $request->user()->can('delete', $user),
+                    'editable' => me()->can('edit', $user),
+                    'deleteable' => me()->can('delete', $user),
                     'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
-                    'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never")
+                    'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never"),
+                    'actions' => Action::for('users', [], $user),
                 ];
             });
 

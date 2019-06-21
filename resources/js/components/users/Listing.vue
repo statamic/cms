@@ -13,17 +13,26 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div slot-scope="{ }">
+            <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
                     <div class="data-list-header">
                         <data-list-toggle-all ref="toggleAll" />
                         <div class="flex-1" />
-                        <data-list-filters
-                            :filters="filters"
-                            :active-filters="activeFilters"
-                            :per-page="perPage"
-                            @filters-changed="filtersChanged"
-                            @per-page-changed="perPageChanged" />
+                        <data-list-bulk-actions
+                            class="rounded-b"
+                            :url="actionUrl"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
+                        <template v-if="!hasSelections">
+                            <data-list-filters
+                                :filters="filters"
+                                :active-filters="activeFilters"
+                                :per-page="perPage"
+                                @filters-changed="filtersChanged"
+                                @per-page-changed="perPageChanged"
+                            />
+                        </template>
                     </div>
                     <data-list-table :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-email" slot-scope="{ row: user, value }">
@@ -38,23 +47,17 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
-                                <dropdown-item :text="__('Edit')" :redirect="user.edit_url" />
+                                <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
+                                <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
                                 <data-list-inline-actions
                                     :item="user.id"
                                     :url="actionUrl"
-                                    :actions="actions"
+                                    :actions="user.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
                                 />
                             </dropdown-list>
                         </template>
-                        <data-list-bulk-actions
-                            class="rounded-b"
-                            :url="actionUrl"
-                            :actions="actions"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
                     </data-list-table>
                 </div>
 
