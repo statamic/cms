@@ -12,6 +12,11 @@ class SendActivationEmail extends Action
         return $key === 'users';
     }
 
+    public function authorize($user)
+    {
+        return user()->can('sendActivationEmail', $user);
+    }
+
     public function run($users)
     {
         $users->each->generateTokenAndSendPasswordResetNotification();

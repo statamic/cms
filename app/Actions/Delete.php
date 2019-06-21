@@ -17,13 +17,9 @@ class Delete extends Action
         return true;
     }
 
-    public function authorize($key, $context)
+    public function authorize($item)
     {
-        if ($key === 'users') {
-            return user()->can('delete users');
-        }
-
-        return true;
+        return user()->can('delete', $item);
     }
 
     public function run($items)
