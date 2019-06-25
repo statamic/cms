@@ -198,7 +198,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
             Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug(),
-            'md'
+            $this->fileExtension()
         ]);
     }
 
@@ -462,5 +462,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         }
 
         return $this->routableUri();
+    }
+
+    public function fileExtension()
+    {
+        return 'md';
     }
 }

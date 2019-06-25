@@ -4,32 +4,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Smartypants
-    |--------------------------------------------------------------------------
-    |
-    | With this enabled, the "content" field will automatically be run through
-    | the smartypants modifier which translates typographical elements into
-    | their "smart" versions, eg. straight quotes (") into curly ones (”)
-    |
-    */
-
-    'smartypants' => false,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Markdown Hard Wrapping
-    |--------------------------------------------------------------------------
-    |
-    | Normally, line breaks are created in Markdown by ending lines
-    | with two spaces. You can enable this option to get a more
-    | traditional experience seen on websites like Github.
-    |
-    */
-
-    'markdown_hard_wrap' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Default view names
     |--------------------------------------------------------------------------
     |

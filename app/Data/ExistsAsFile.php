@@ -41,7 +41,9 @@ trait ExistsAsFile
 
         $content = array_pull($data, 'content');
 
-        return YAML::dumpFrontMatter($data, $content);
+        return $this->fileExtension() === 'yaml'
+            ? YAML::dump($data, $content)
+            : YAML::dumpFrontMatter($data, $content);
     }
 
     public function fileLastModified()
@@ -51,5 +53,10 @@ trait ExistsAsFile
         }
 
         return Carbon::createFromTimestamp(File::lastModified($this->path()));
+    }
+
+    public function fileExtension()
+    {
+        return 'yaml';
     }
 }
