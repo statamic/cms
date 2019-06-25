@@ -7,7 +7,7 @@
 <script>
 export default {
 
-    props: ['text', 'redirect', 'external_link'],
+    props: ['text', 'redirect', 'externalLink'],
 
     methods: {
         selectAndClose() {
@@ -16,8 +16,8 @@ export default {
                 return;
             }
 
-            if (this.external_link) {
-                window.open(this.external_link, '_blank');
+            if (this.externalLink) {
+                window.open(this.externalLink, '_blank');
                 return;
             }
 
