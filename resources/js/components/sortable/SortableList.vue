@@ -38,8 +38,8 @@ export default {
 
         computedOptions() {
             let options = Object.assign({}, {
-                draggable: `.${this.itemClass}`,
-                handle: `.${this.handleClass}`,
+                draggable: `.${CSS.escape(this.itemClass)}`,
+                handle: `.${CSS.escape(this.handleClass)}`,
                 delay: 200,
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],

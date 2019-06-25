@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\CP\Column;
+use Statamic\API\Action;
 use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
@@ -44,7 +45,7 @@ class EntriesController extends CpController
             return [
                 'viewable' => me()->can('view', $entry),
                 'editable' => me()->can('edit', $entry),
-                'deleteable' => me()->can('delete', $entry)
+                'actions' => Action::for('entries', [], $entry),
             ];
         })->preProcessForIndex();
 
@@ -230,7 +231,7 @@ class EntriesController extends CpController
         ]);
 
         $viewData = [
-            'title' => __('Create'),
+            'title' => __('Create Entry'),
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
             ],
@@ -238,6 +239,7 @@ class EntriesController extends CpController
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
+            'published' => $collection->defaultStatus() === 'published',
             'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
                 return [
                     'handle' => $handle,

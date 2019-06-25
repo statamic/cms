@@ -35,7 +35,8 @@ Route::group([
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
-            Route::post('action', 'EntryActionController')->name('collections.entries.action');
+            Route::get('actions', 'EntryActionController@index')->name('collections.entries.actions');
+            Route::post('actions', 'EntryActionController@run');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
@@ -129,7 +130,8 @@ Route::group([
     });
 
     Route::group(['namespace' => 'Users'], function () {
-        Route::post('users/action', 'UserActionController')->name('users.action');
+        Route::get('users/actions', 'UserActionController@index')->name('users.actions');
+        Route::post('users/actions', 'UserActionController@run');
         Route::resource('users', 'UsersController');
         Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');

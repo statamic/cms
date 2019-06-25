@@ -22,7 +22,6 @@
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
-                            :actions="entryActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -72,11 +71,11 @@
                             <dropdown-list>
                                 <dropdown-item :text="__('View')" :redirect="entry.permalink" v-if="entry.viewable" />
                                 <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
-                                <div class="divider" v-if="actions.length" />
+                                <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
                                     :url="actionUrl"
-                                    :actions="actions"
+                                    :actions="entry.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
                                 />
@@ -120,12 +119,6 @@ export default {
     },
 
     computed: {
-        entryActions() {
-            this.actions.forEach(action => action.context.site = data_get(this.activeFilters, 'site.value', null));
-
-            return this.actions;
-        },
-
         showReorderButton() {
             if (this.structureUrl) return true;
 
@@ -180,7 +173,8 @@ export default {
 
         reordered(items) {
             this.items = items;
-        }
+        },
+
     }
 
 }

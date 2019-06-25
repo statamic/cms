@@ -60,7 +60,6 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'actions' => Action::for('entries', $context),
         ]);
     }
 
@@ -258,6 +257,15 @@ class CollectionsController extends CpController
                 'type' => 'text',
                 'instructions' => __('The default layout, unless otherwise specified.'),
                 'width' => 50
+            ],
+            'default_status' => [
+                'type' => 'radio',
+                'instructions' => __('The default publish status when creating new entries.'),
+                'width' => 100,
+                 'options' => [
+                    'published' => 'Published',
+                    'draft' => 'Draft'
+                 ]
             ],
 
             'routing' => ['type' => 'section'],

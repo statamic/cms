@@ -33,7 +33,10 @@
             bottom: 1px;
         }
     }
+}
 
+.replicator-set-body {
+    @apply flex flex-wrap;
 }
 
 // Extra contrast when full width

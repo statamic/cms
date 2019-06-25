@@ -42,16 +42,16 @@
 
             <div class="max-w-md mx-auto px-2 pb-6">
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" :value="null" />
-                    <p><strong class="text-md ml-2 font-bold">No dates</strong> &ndash; Entries will not have any dates.</p>
-                </label>
-                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
                     <input type="radio" v-model="collection.dateBehavior" value="articles" />
                     <p><strong class="text-md ml-2 font-bold">Articles</strong> &ndash; Entries with dates in the future will be private.</p>
                 </label>
-                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
                     <input type="radio" v-model="collection.dateBehavior" value="events" />
                     <p><strong class="text-md ml-2 font-bold">Events</strong> &ndash; Entries with dates in the past will be private.</p>
+                </label>
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
+                    <input type="radio" v-model="collection.dateBehavior" :value="null" />
+                    <p><strong class="text-md ml-2 font-bold">No dates</strong> &ndash; Entries will not have any dates.</p>
                 </label>
             </div>
         </div>
@@ -148,7 +148,6 @@
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Template</label>
-                <!-- <template-fieldtype v-model="collection.template" name="collection.template" /> -->
                 <publish-field-meta
                     :config="{ handle: 'template', type: 'template' }"
                     :initial-value="collection.template">
@@ -165,6 +164,17 @@
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default template.
                 </div>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-6">
+                <label class="font-bold text-base mb-sm" for="defaultStatus">Default Status</label>
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-2">
+                    <input type="radio" v-model="collection.defaultStatus" value="published" />
+                    <p><strong class="text-md ml-2 font-bold">Published</strong> &ndash; Entries will default to <span class="text-green">published</span> status.</p>
+                </label>
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
+                    <input type="radio" v-model="collection.defaultStatus" value="draft" />
+                    <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash; Entries will default to <span class="text-grey-50">draft</span> status.</p>
+                </label>
             </div>
         </div>
 
@@ -266,8 +276,8 @@ export default {
                 title: null,
                 handle: null,
                 orderable: false,
-                dated: false,
-                dateBehavior: null,
+                dated: true,
+                dateBehavior: 'articles',
                 sortDirection: 'asc',
                 blueprints: [],
                 template: null,
@@ -275,6 +285,7 @@ export default {
                 amp: false,
                 structure: null,
                 mount: null,
+                defaultStatus: 'published',
             }
         }
     },
