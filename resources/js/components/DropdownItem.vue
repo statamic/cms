@@ -7,12 +7,17 @@
 <script>
 export default {
 
-    props: ['text', 'redirect'],
+    props: ['text', 'redirect', 'external_link'],
 
     methods: {
         selectAndClose() {
             if (this.redirect) {
                 location.href = this.redirect;
+                return;
+            }
+
+            if (this.external_link) {
+                window.open(this.external_link, '_blank');
                 return;
             }
 
