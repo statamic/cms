@@ -5,6 +5,7 @@ use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\Config;
+use Michelf\SmartyPants;
 use Statamic\Extend\Addon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -176,6 +177,17 @@ function markdown($content)
     $markdown = new \ParsedownExtra();
 
     return $markdown->text($content);
+}
+
+/**
+ * Run through Smartypants
+ *
+ * @param $content
+ * @return mixed
+ */
+function smartypants($content)
+{
+    return SmartyPants::defaultTransform($content);
 }
 
 /**
