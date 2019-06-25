@@ -13,6 +13,10 @@ class ImageNode extends Node
         return $this->node->type === 'image';
     }
 
+    public function selfClosing() {
+        return true;
+    }
+
     public function tag()
     {
         $attrs = $this->node->attrs;
