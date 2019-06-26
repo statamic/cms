@@ -77,12 +77,8 @@ class Augmentor
     {
         $renderer = new Renderer;
         $renderer->addNodes([
-            BlockquoteNode::class,
             ImageNode::class,
-            ListItemNode::class,
-            OrderedListNode::class,
             SetNode::class,
-            UnorderedListNode::class,
         ]);
 
         return $renderer->render([
