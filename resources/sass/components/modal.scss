@@ -9,3 +9,7 @@
 .confirmation-modal .publish-fields .form-group {
     @apply p-0;
 }
+
+.v--modal-overlay.disable-overflow .v--modal {
+    overflow: initial;
+}

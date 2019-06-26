@@ -1,7 +1,7 @@
 <template>
 
     <portal :to="portal">
-        <vue-modal v-bind="modalProps" @closed="modalClosed">
+        <vue-modal v-bind="modalProps" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
             <slot :close="close" />
         </vue-modal>
     </portal>
@@ -17,7 +17,8 @@ export default {
         draggable: { type: Boolean, default: false },
         pivotY: { type: Number, default: 0.1 },
         height: { default: 'auto' },
-        width: {}
+        width: {},
+        overflow: { type: Boolean, default: true}
     },
 
     data() {
