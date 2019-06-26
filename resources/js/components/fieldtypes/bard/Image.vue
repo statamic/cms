@@ -164,6 +164,7 @@ export default {
                 this.asset = response.data[0];
                 this.alt = this.asset.alt || this.alt;
                 this.loading = false;
+                this.updateAttrs({ src: this.actualSrc });
             });
         },
 
