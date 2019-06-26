@@ -89,7 +89,7 @@
                             />
 
                             <data-list-table
-                                v-if="mode === 'table'"
+                                v-if="mode === 'table' && ! containerIsEmpty"
                                 :allow-bulk-actions="true"
                                 :loading="loadingAssets"
                                 :rows="rows"
@@ -159,7 +159,7 @@
                             </data-list-table>
 
                             <!-- Grid Mode -->
-                            <div class="data-grid" v-if="mode === 'grid'">
+                            <div class="data-grid" v-if="mode === 'grid' && ! containerIsEmpty">
                                 <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
                                     <!-- Parent Folder -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
@@ -191,6 +191,8 @@
                                 </div>
                             </div>
 
+                            <div class="p-2 text-grey-70" v-if="containerIsEmpty">{{ __('This container is empty.') }}</div>
+
                         </div>
 
                         <data-list-pagination
@@ -198,10 +200,6 @@
                             :resource-meta="meta"
                             @page-selected="page = $event"
                         />
-
-                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-70">
-                            There are no assets.
-                        </div>
 
                     </div>
                 </data-list>
@@ -350,6 +348,12 @@ export default {
 
         hasSelections() {
             return this.selectedAssets.length > 0;
+        },
+
+        containerIsEmpty() {
+            return this.assets.length === 0
+                && this.folders.length === 0
+                && ! this.folder.parent_path;
         }
 
     },
