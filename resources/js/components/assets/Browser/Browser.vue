@@ -335,6 +335,10 @@ export default {
             return this.maxFiles !== undefined && this.maxFiles !== Infinity;
         },
 
+        reachedSelectionLimit() {
+            return this.selectedAssets.length >= this.maxFiles;
+        },
+
         hasSelections() {
             return this.selectedAssets.length > 0;
         }
