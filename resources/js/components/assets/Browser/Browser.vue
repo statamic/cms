@@ -53,9 +53,8 @@
                                 <data-list-search v-model="searchQuery" />
 
                                 <data-list-bulk-actions
-                                    v-if="hasSelections && hasActions"
                                     :url="actionUrl"
-                                    :actions="actions"
+                                    :context="actionContext"
                                     @started="actionStarted"
                                     @completed="bulkActionsCompleted"
                                 />
@@ -137,11 +136,11 @@
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
                                         <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
-                                        <div class="divider" />
+                                        <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
                                             :url="actionUrl"
-                                            :actions="actions"
+                                            :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
                                         />
@@ -290,6 +289,10 @@ export default {
             return (typeof this.initialContainer === 'object')
                 ? this.initialContainer.id
                 : this.initialContainer;
+        },
+
+        actionContext() {
+            return {container: this.selectedContainer};
         },
 
         showContainerTabs() {

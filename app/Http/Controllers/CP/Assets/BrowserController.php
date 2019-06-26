@@ -37,7 +37,6 @@ class BrowserController extends CpController
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),
             'folder' => $path,
-            'actions' => Action::for('asset-browser', ['container' => $containerHandle]),
         ]);
     }
 
@@ -98,6 +97,9 @@ class BrowserController extends CpController
             $asset->setSupplement('size_formatted', Str::fileSizeForHumans($asset->size(), 0));
             $asset->setSupplement('last_modified_formatted', $asset->lastModified()->format(config('statamic.cp.date_format')));
             $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
+
+            // Pass authorized actions in with each asset.
+            $asset->setSupplement('actions', Action::for('asset-browser', ['container' => $asset->container()->handle()], $asset));
         }
 
         return $assets;

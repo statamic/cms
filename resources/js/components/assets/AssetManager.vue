@@ -14,7 +14,6 @@
             :initial-container="container"
             :selected-path="path"
             :selected-assets="selectedAssets"
-            :actions="actions"
             :action-url="actionUrl"
             @navigated="navigate"
             @selections-updated="updateSelections"
@@ -147,6 +146,7 @@ export default {
         editAsset(asset) {
             this.$refs.browser.edit(asset.id);
         }
+
     }
 
 }
