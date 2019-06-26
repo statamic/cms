@@ -70,7 +70,7 @@
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
                                 <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable" />
-                                <dropdown-item :text="__('Edit')" :external-link="entry.edit_url" v-if="entry.editable" />
+                                <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
                                 <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
