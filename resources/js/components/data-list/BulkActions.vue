@@ -36,7 +36,7 @@ export default {
     props: {
         context: {
             type: Object,
-            default: false
+            default: () => {}
         }
     },
 
