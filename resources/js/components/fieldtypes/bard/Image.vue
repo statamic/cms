@@ -142,7 +142,10 @@ export default {
         },
 
         remove() {
-            alert('make for to many much deletings')
+            let tr = this.view.state.tr;
+            let pos = this.getPos();
+            tr.delete(pos, pos + this.node.nodeSize);
+            this.view.dispatch(tr);
         },
 
         closeSelector() {
