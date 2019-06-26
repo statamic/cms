@@ -17,7 +17,7 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
-                    <div class="data-list-header">
+                    <div class="data-list-header min-h-16">
                         <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
@@ -51,17 +51,18 @@
 
                     <data-list-table
                         v-show="items.length"
-                        :loading="loading"
                         :allow-bulk-actions="true"
-                        :sortable="!reordering"
+                        :loading="loading"
                         :reorderable="reordering"
+                        :sortable="!reordering"
+                        :toggle-selection-on-row-click="true"
                         @sorted="sorted"
                         @reordered="reordered"
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
-                                <a :href="entry.edit_url">{{ entry.title }}</a>
+                                <a @click.stop="redirect(entry.edit_url)">{{ entry.title }}</a>
                             </div>
                         </template>
                         <template slot="cell-slug" slot-scope="{ row: entry }">
@@ -174,6 +175,11 @@ export default {
         reordered(items) {
             this.items = items;
         },
+
+        redirect(url) {
+            location.href = url;
+            return;
+        }
 
     }
 

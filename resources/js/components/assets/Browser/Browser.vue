@@ -88,7 +88,14 @@
                                 class="-mt-px"
                             />
 
-                            <data-list-table v-if="mode === 'table'" :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true" @sorted="sorted">
+                            <data-list-table
+                                v-if="mode === 'table'"
+                                :allow-bulk-actions="true"
+                                :loading="loadingAssets"
+                                :rows="rows"
+                                :toggle-selection-on-row-click="true"
+                                @sorted="sorted"
+                            >
 
                                 <template slot="tbody-start">
                                     <tr v-if="folder.parent_path && !restrictFolderNavigation">
@@ -127,9 +134,11 @@
                                 </template>
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
-                                    <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1" />
-                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.basename }}</label>
+                                    <div class="flex items-center w-fit-content group">
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue" @click.stop="$emit('edit-asset', asset)">
+                                            {{ asset.basename }}
+                                        </label>
                                     </div>
                                 </template>
 
@@ -172,7 +181,7 @@
                                     </div>
                                     <!-- Assets -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
-                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('asset-doubleclicked', asset)">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('edit-asset', asset)">
                                             <div class="absolute pin flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>

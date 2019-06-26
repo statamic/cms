@@ -18,6 +18,7 @@
             @navigated="navigate"
             @selections-updated="updateSelections"
             @asset-doubleclicked="editAsset"
+            @edit-asset="editAsset"
         >
 
             <template slot="actions" slot-scope="{ ids }">
@@ -144,6 +145,7 @@ export default {
         },
 
         editAsset(asset) {
+            event.preventDefault()
             this.$refs.browser.edit(asset.id);
         }
 
