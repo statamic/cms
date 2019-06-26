@@ -4,6 +4,7 @@ namespace Statamic\API\Endpoint;
 
 use Statamic\API\Pattern;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
+use Statamic\Exceptions\WhoopsHandler as Whoops;
 
 /**
  * Parsing and dumping YAML
@@ -24,13 +25,20 @@ class YAML
 
         if (Pattern::startsWith($str, '---')) {
             $split = preg_split("/\n---/", $str, 2, PREG_SPLIT_NO_EMPTY);
-            $yaml = $split[0];
+            $str = $split[0];
             $content = ltrim(array_get($split, 1, ''));
-
-            return SymfonyYaml::parse($yaml) + ['content' => $content];
         }
 
-        return SymfonyYaml::parse($str);
+        try {
+            $yaml = SymfonyYaml::parse($str);
+        } catch (\Exception $e) {
+            Whoops::addDataTable('YAML', ['string' => $str]);
+            throw $e;
+        };
+
+        return isset($content)
+            ? $yaml + ['content' => $content]
+            : $yaml;
     }
 
     /**
