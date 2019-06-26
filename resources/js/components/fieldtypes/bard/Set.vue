@@ -45,6 +45,7 @@
 
 <script>
 import SetField from '../replicator/Field.vue';
+import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
 
@@ -59,6 +60,8 @@ export default {
     ],
 
     components: { SetField },
+
+    mixins: [ValidatesFieldConditions],
 
     inject: ['setConfigs'],
 
@@ -108,10 +111,6 @@ export default {
             values.type = this.config.handle;
             values[handle] = value;
             this.updateAttrs({ values });
-        },
-
-        showField(field) {
-            return true; // todo, send this through fieldconditions mixin
         },
 
         destroy() {
