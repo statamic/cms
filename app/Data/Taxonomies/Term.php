@@ -191,14 +191,9 @@ class Term implements TermContract, Responsable, AugmentableContract
         return $entries->whereTaxonomy($this->id());
     }
 
-    public function title($title = null)
+    public function title()
     {
-        return $this
-            ->fluentlyGetOrSet('title')
-            ->getter(function ($title) {
-                return $title ?? $this->slug();
-            })
-            ->args(func_get_args());
+        return $this->get('title', $this->slug());
     }
 
     public function editUrl()
