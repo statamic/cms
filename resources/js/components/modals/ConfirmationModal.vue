@@ -1,10 +1,10 @@
 <template>
-    <modal name="confirmation-modal" :pivotY="0.1">
+    <modal name="confirmation-modal" :pivotY="0.1" :overflow="false">
         <div class="confirmation-modal flex flex-col h-full">
             <div class="text-lg font-medium p-2 pb-0">
                 {{ __(title) }}
             </div>
-            <div class="flex-1 overflow-scroll px-2 py-3 text-grey">
+            <div class="flex-1 px-2 py-3 text-grey">
                 <p v-if="bodyText" v-text="bodyText" />
                 <slot v-else>
                     <p>{{ __('Are you sure?') }}</p>

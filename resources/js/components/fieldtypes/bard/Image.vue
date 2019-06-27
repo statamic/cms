@@ -105,30 +105,30 @@ export default {
     },
 
     created() {
-        if (! this.node.attrs.src) {
+        let src = this.node.attrs.src;
+
+        if (! src) {
             this.openSelector();
         }
 
-        let src = this.node.attrs.src;
         if (src.startsWith('asset:')) {
             this.assetId = src.substr(7);
         }
+
+        this.loadAsset(this.assetId);
 
         this.options.bard.$on('image-deselected', () => this.showingToolbar = false);
     },
 
     watch: {
 
-        assetId(id) {
-            this.loadAsset(id);
-        },
-
         actualSrc(src) {
-            this.updateAttrs({ src, asset: !!this.assetId });
+            if ( !this.node.attrs.src) {
+                this.updateAttrs({ src, asset: !!this.assetId });
+            }
         },
 
         alt(alt) {
-            console.log(alt);
             this.updateAttrs({ alt });
         }
 
@@ -142,7 +142,10 @@ export default {
         },
 
         remove() {
-            alert('make for to many much deletings')
+            let tr = this.view.state.tr;
+            let pos = this.getPos();
+            tr.delete(pos, pos + this.node.nodeSize);
+            this.view.dispatch(tr);
         },
 
         closeSelector() {
@@ -153,15 +156,18 @@ export default {
         assetsSelected(selections) {
             this.loading = true;
             this.assetId = selections[0];
+            this.loadAsset(this.assetId);
         },
 
         loadAsset(id) {
+            console.log('loading asset: ' + id);
             this.$axios.get(cp_url('assets-fieldtype'), {
                 params: { assets: [id] }
             }).then(response => {
                 this.asset = response.data[0];
                 this.alt = this.asset.alt || this.alt;
                 this.loading = false;
+                this.updateAttrs({ src: this.actualSrc });
             });
         },
 

@@ -19,11 +19,14 @@ abstract class ActionController extends CpController
     {
         $data = $request->validate([
             'selections' => 'required|array',
+            'context' => 'sometimes'
         ]);
+
+        $context = isset($data['context']) ? json_decode($data['context'], true) : [];
 
         $items = $this->getSelectedItems(collect($data['selections']));
 
-        $actions = Action::for($this->getKey(), $data['context'] ?? [], $items);
+        $actions = Action::for($this->getKey(), $context, $items);
 
         return $actions;
     }

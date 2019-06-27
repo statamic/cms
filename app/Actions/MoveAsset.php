@@ -4,6 +4,7 @@ namespace Statamic\Actions;
 
 use Statamic\API;
 use Statamic\API\AssetContainer;
+use Statamic\Contracts\Assets\Asset;
 
 class MoveAsset extends Action
 {
@@ -14,9 +15,14 @@ class MoveAsset extends Action
         return $key === 'asset-browser';
     }
 
-    public function run($items, $values)
+    public function authorize($asset)
     {
-        $items->each->move($values['folder']);
+        return user()->can('move', $asset);
+    }
+
+    public function run($assets, $values)
+    {
+        $assets->each->move($values['folder']);
     }
 
     protected function fieldItems()

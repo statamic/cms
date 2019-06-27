@@ -33,6 +33,13 @@ export default {
 
     inject: ['sharedState'],
 
+    props: {
+        context: {
+            type: Object,
+            default: () => {}
+        }
+    },
+
     data() {
         return {
             actions: []
@@ -66,7 +73,13 @@ export default {
                 return;
             }
 
-            this.$axios.get(this.url, {params: {selections}}).then(response => {
+            let params = {selections};
+
+            if (this.context) {
+                params.context = this.context;
+            }
+
+            this.$axios.get(this.url, {params}).then(response => {
                 this.actions = response.data;
             });
         },

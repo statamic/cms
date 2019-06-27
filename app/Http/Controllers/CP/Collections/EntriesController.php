@@ -261,7 +261,7 @@ class EntriesController extends CpController
 
     public function store(Request $request, $collection, $site)
     {
-        $this->authorize('create', [EntryContract::class, $collection]);
+        $this->authorize('store', [EntryContract::class, $collection]);
 
         $blueprint = $collection->ensureEntryBlueprintFields(
             Blueprint::find($request->blueprint)
