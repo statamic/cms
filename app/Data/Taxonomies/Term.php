@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Taxonomies;
 
+use Statamic\API;
 use Statamic\API\Str;
 use Statamic\API\Data;
 use Statamic\API\File;
@@ -97,6 +98,11 @@ class Term implements TermContract, Responsable, AugmentableContract
             'title' => $this->title(),
             'taxonomy' => $this->taxonomyHandle(),
         ]);
+    }
+
+    public function fileData()
+    {
+        return $this->data();
     }
 
     public function toCacheableArray()
@@ -198,5 +204,12 @@ class Term implements TermContract, Responsable, AugmentableContract
     public function editUrl()
     {
         return cp_route('taxonomies.terms.edit', [$this->taxonomyHandle(), $this->slug()]);
+    }
+
+    public function save()
+    {
+        API\Term::save($this);
+
+        return true;
     }
 }
