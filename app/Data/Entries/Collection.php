@@ -169,7 +169,12 @@ class Collection implements Contract
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
-            $blueprint->ensureField($taxonomy->handle(), ['type' => 'taxonomy', 'taxonomy' => $taxonomy->handle(), 'display' => $taxonomy->title()], 'sidebar');
+            $blueprint->ensureField($taxonomy->handle(), [
+                'type' => 'taxonomy',
+                'taxonomy' => $taxonomy->handle(),
+                'display' => $taxonomy->title(),
+                'mode' => 'select',
+            ], 'sidebar');
         }
 
         return $blueprint;

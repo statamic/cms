@@ -12,6 +12,7 @@ use Statamic\Data\Taxonomies\TermCollection;
 class Taxonomy extends Relationship
 {
     protected $statusIcons = false;
+    protected $taggable = true;
 
     public function augment($value, $entry = null)
     {
@@ -42,6 +43,10 @@ class Taxonomy extends Relationship
         if ($this->usingSingleTaxonomy()) {
             $taxonomy = $this->taxonomies()[0];
             $data = collect($data)->map(function ($id) use ($taxonomy) {
+                if (! Str::contains($id, '::')) {
+                    $id = $this->createTermFromString($id, $taxonomy);
+                }
+
                 return explode('::', $id, 2)[1];
             })->all();
         }
@@ -125,5 +130,23 @@ class Taxonomy extends Relationship
     protected function usingSingleTaxonomy()
     {
         return count($this->taxonomies()) === 1;
+    }
+
+    protected function createTermFromString($string, $taxonomy)
+    {
+        // The entered string will be treated as the term's title. If it's the same
+        // as the slug, an actual term object/file won't need to be created.
+        if ($string === ($slug = Str::slug($string))) {
+            return "{$taxonomy}::{$slug}";
+        }
+
+        $term = API\Term::make()
+            ->slug($slug)
+            ->taxonomy(API\Taxonomy::findByHandle($taxonomy))
+            ->set('title', $string);
+
+        $term->save();
+
+        return $term->id();
     }
 }
