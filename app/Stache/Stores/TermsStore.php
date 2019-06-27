@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\API\Arr;
+use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Term;
@@ -16,6 +17,7 @@ class TermsStore extends AggregateStore
 {
     protected $associations = [];
     protected $uris = [];
+    protected $titles = [];
 
     public function key()
     {
@@ -115,6 +117,7 @@ class TermsStore extends AggregateStore
     {
         $this->associations = $data['associations'];
         $this->uris = $data['uris'];
+        $this->titles = $data['titles'];
     }
 
     public function cache()
@@ -129,6 +132,7 @@ class TermsStore extends AggregateStore
         return [
             'associations' => $this->associations,
             'uris' => $this->uris,
+            'titles' => $this->titles,
         ];
     }
 
@@ -146,22 +150,25 @@ class TermsStore extends AggregateStore
 
     public function sync($entry, $taxonomy, $terms)
     {
-        $terms = collect(Arr::wrap($terms));
+        $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) {
+            return [Str::slug($value) => $value];
+        });
 
-        // todo: normalize term slugs
+        foreach ($terms as $slug => $value) {
+            $key = "{$taxonomy}::{$slug}";
 
-        foreach ($terms as $slug) {
             $this->associations[$taxonomy][$slug][] = $entry;
+            $this->titles[$key] = $value;
 
             $term = $this->makeTerm($taxonomy, $slug);
             foreach ($this->stache->sites() as $site) {
-                $this->uris[$site]["{$taxonomy}::{$slug}"] = $term->in($site)->uri();
+                $this->uris[$site][$key] = $term->in($site)->uri();
             }
         }
 
         // Remove any unused terms
         foreach ($this->associations[$taxonomy] ?? [] as $term => $associations) {
-            if ($terms->contains($term)) {
+            if ($terms->has($term)) {
                 continue;
             }
 
@@ -224,8 +231,8 @@ class TermsStore extends AggregateStore
             ? $taxonomy
             : Taxonomy::findByHandle($taxonomy);
 
-        return Term::make()
+        return Term::make($slug)
             ->taxonomy($taxonomy)
-            ->slug($slug);
+            ->set('title', $this->titles["{$taxonomy->handle()}::{$slug}"]);
     }
 }
