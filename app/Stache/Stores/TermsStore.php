@@ -160,7 +160,7 @@ class TermsStore extends AggregateStore
         }
 
         // Remove any unused terms
-        foreach ($this->associations[$taxonomy] as $term => $associations) {
+        foreach ($this->associations[$taxonomy] ?? [] as $term => $associations) {
             if ($terms->contains($term)) {
                 continue;
             }
