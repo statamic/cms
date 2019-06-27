@@ -16,21 +16,29 @@ class Taxonomy extends Relationship
 
     public function augment($value, $entry = null)
     {
-        $taxonomy = null;
+        $handle = $taxonomy = null;
         $collection = optional($entry)->collection();
 
         if ($this->usingSingleTaxonomy()) {
-            $taxonomy = API\Taxonomy::findByHandle($this->taxonomies()[0]);
+            $handle = $this->taxonomies()[0];
+            $taxonomy = API\Taxonomy::findByHandle($handle);
         }
 
         return (new TermCollection(Arr::wrap($value)))
-            ->map(function ($slug) use ($taxonomy, $collection) {
-                if (! $taxonomy) {
-                    [$taxonomy, $slug] = explode('::', $slug, 2);
-                    $taxonomy = API\Taxonomy::findByHandle($taxonomy);
+            ->map(function ($value) use ($handle, $taxonomy, $collection) {
+                if ($taxonomy) {
+                    $slug = $value;
+                    $id = "{$handle}::{$slug}";
+                } else {
+                    if (! Str::contains($value, '::')) {
+                        throw new \Exception("Ambigious taxonomy term value [$value]. Field [{$this->field->handle()}] is configured with multiple taxonomies.");
+                    }
+                    $id = $value;
+                    [$handle, $slug] = explode('::', $id, 2);
+                    $taxonomy = API\Taxonomy::findByHandle($handle);
                 }
 
-                return Term::make($slug)
+                return Term::find($id) ?? Term::make($slug)
                     ->taxonomy($taxonomy)
                     ->collection($collection);
             });
