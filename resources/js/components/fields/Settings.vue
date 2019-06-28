@@ -81,7 +81,7 @@
                     :key="configField.handle"
                     :config="configField"
                     :value="values[configField.handle]"
-                    @input="updateField"
+                    @input="updateField(configField.handle, $event)"
                 />
 
             </div>
