@@ -16,6 +16,74 @@ class Str extends \Illuminate\Support\Str
         return call_user_func_array([StaticStringy::class, $method], $parameters);
     }
 
+    /**
+     * Creates a sentence list from the given $list
+     *
+     * @param array  $list  List of items to list
+     * @param string  $glue  Joining string before the last item when more than one item
+     * @param bool  $oxford_comma  Include a comma before $glue?
+     * @return string
+     */
+    public function makeSentenceList(Array $list, $glue = "and", $oxford_comma = true)
+    {
+        $length = count($list);
+
+        switch ($length) {
+            case 0:
+            case 1:
+                return join("", $list);
+                break;
+
+            case 2:
+                return join(" " . $glue . " ", $list);
+                break;
+
+            default:
+                $last = array_pop($list);
+                $sentence  = join(", ", $list);
+                $sentence .= ($oxford_comma) ? "," : "";
+
+                return $sentence . " " . $glue . " " . $last;
+        }
+    }
+
+    public function stripTags($html, $tags_list = [])
+    {
+        if (count($tags_list) > 0) {
+            $all_tags = [
+                "a", "abbr", "acronym", "address", "applet",
+                "area", "article", "aside", "audio", "b",
+                "base", "basefont", "bdi", "bdo", "big",
+                "blockquote", "body", "br", "button", "canvas",
+                "caption", "center", "cite", "code", "col",
+                "colgroup", "command", "data", "datagrid", "datalist",
+                "dd", "del", "details", "dfn", "dir", "div", "dl",
+                "dt", "em", "embed", "eventsource", "fieldset",
+                "figcaption", "figure", "font", "footer", "form",
+                "frame", "frameset", "h1", "h2", "h3", "h4", "h5",
+                "h6", "head", "header", "hgroup", "hr", "html", "i",
+                "iframe", "img", "input", "isindex", "ins", "kbd",
+                "keygen", "label", "legend", "li", "link", "main",
+                "mark", "map", "menu", "meta", "meter", "nav",
+                "noframes", "noscript", "object", "ol", "optgroup",
+                "option", "output", "p", "param", "pre", "progress",
+                "q", "ruby", "rp", "rt", "s", "samp", "script",
+                "section", "select", "small", "source", "span",
+                "strike", "strong", "style", "sub", "summary", "sup",
+                "table", "tbody", "td", "textarea", "tfoot", "th",
+                "thead", "time", "title", "tr", "track", "tt", "u",
+                "ul", "var", "video", "wbr"
+            ];
+
+            $allowed_tags = array_diff($all_tags, $tags_list);
+            $allowed_tag_string = "<" . join("><", $allowed_tags) . ">";
+
+            return strip_tags($html, $allowed_tag_string);
+        }
+
+        return strip_tags($html);
+    }
+
     public static function studlyToSlug($string)
     {
         return Str::slug(Str::snake($string));
@@ -74,6 +142,37 @@ class Str extends \Illuminate\Support\Str
         }
 
         return $ms * 60 . 'sec';
+    }
+
+    /**
+     * Attempts to prevent widows in a string by adding a
+     * &nbsp; between the last two words of each paragraph.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function widont($value)
+    {
+        // thanks to Shaun Inman for inspiration here
+        // http://www.shauninman.com/archive/2008/08/25/widont_2_1_1
+
+        // if there are content tags
+        if (preg_match("/<\/(?:p|li|h1|h2|h3|h4|h5|h6|figcaption)>/ism", $value)) {
+            // step 1, replace spaces in HTML tags with a code
+            $value = preg_replace_callback("/<.*?>/ism", function($matches) {
+                return str_replace(' ', '%###%##%', $matches[0]);
+            }, $value);
+
+            // step 2, replace last space with &nbsp;
+            $value = preg_replace("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s])[ \t]+([^\s]+(?:[\s]*<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>))$/im", "$1&nbsp;$2", rtrim($value));
+
+            // step 3, re-replace the code from step 1 with spaces
+            return str_replace("%###%##%", " ", $value);
+
+            // otherwise
+        } else {
+            return preg_replace("/([^\s])\s+([^\s]+)\s*$/im", "$1&nbsp;$2", rtrim($value));
+        }
     }
 
     /**

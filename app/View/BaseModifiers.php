@@ -3,6 +3,7 @@
 namespace Statamic\View;
 
 use Statamic\API\Arr;
+use Statamic\API\Str;
 use Statamic\API\Data;
 use Statamic\API\File;
 use Statamic\API\Path;
@@ -14,7 +15,6 @@ use Statamic\API\Parse;
 use Statamic\API\Theme;
 use Statamic\API\Config;
 use Statamic\API\Helper;
-use Statamic\API\Str;
 use Statamic\Extend\Modifier;
 use Statamic\API\Localization;
 use Stringy\StaticStringy as Stringy;
@@ -47,7 +47,7 @@ class BaseModifiers extends Modifier
         $glue         = array_get_colon($params, 0, '&');
         $oxford_comma = array_get_colon($params, 1, false);
 
-        return Helper::makeSentenceList($value, $glue, $oxford_comma);
+        return Str::makeSentenceList($value, $glue, $oxford_comma);
     }
 
     /**
@@ -821,7 +821,7 @@ class BaseModifiers extends Modifier
      */
     public function isEmpty($value)
     {
-        return Helper::isEmptyArray($value);
+        return Arr::isEmpty($value);
     }
 
     /**
@@ -1538,7 +1538,7 @@ class BaseModifiers extends Modifier
         $glue         = array_get_colon($params, 0, 'and');
         $oxford_comma = array_get_colon($params, 1, true);
 
-        return Helper::makeSentenceList($value, $glue, $oxford_comma);
+        return Str::makeSentenceList($value, $glue, $oxford_comma);
     }
 
     /**
@@ -1665,7 +1665,7 @@ class BaseModifiers extends Modifier
             $tags = ($tag_var) ? array_get_colon($context, $tag_var, $params) : $params;
         }
 
-        return Helper::stripTags($value, (array) $tags);
+        return Str::stripTags($value, (array) $tags);
     }
 
     /**
@@ -2019,7 +2019,7 @@ class BaseModifiers extends Modifier
      */
     public function widont($value)
     {
-        return Helper::widont($value);
+        return Str::widont($value);
     }
 
     /**
