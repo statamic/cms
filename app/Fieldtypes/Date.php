@@ -37,14 +37,14 @@ class Date extends Fieldtype
             'type' => 'integer',
             'default' => 1
         ],
-        // @TODO hook up multiple and range modes
+        // @TODO hook up multiple mode
         'mode' => [
             'type' => 'select',
             'default' => 'single',
             'options' => [
-                ['text' => 'Single', 'value' => 'single'],
-                ['text' => 'Multiple', 'value' => 'multiple'],
-                ['text' => 'Range', 'value' => 'range'],
+                'single' => 'Single',
+                // 'multiple' => 'Multiple',
+                'range' => 'Range',
             ]
         ]
     ];

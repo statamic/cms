@@ -25,6 +25,7 @@ class Assets extends Fieldtype
         ],
         'mode' => [
             'type' => 'select',
+            'default' => 'grid',
             'options' => [
                 'grid' => 'Grid',
                 'list' => 'List',
