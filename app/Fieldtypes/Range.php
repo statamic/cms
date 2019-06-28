@@ -9,17 +9,20 @@ class Range extends Fieldtype
     protected $configFields = [
         'min' => [
             'type' => 'integer',
-            'default' => 0
+            'default' => 0,
+            'width' => 33
         ],
         'max' => [
             'type' => 'integer',
-            'default' => 100
+            'default' => 100,
+            'width' => 33
         ],
         'step' => [
             'type' => 'integer',
-            'default' => 1
+            'default' => 1,
+            'width' => 33
         ],
-        'prepend' => ['type' => 'text'],
-        'append' => ['type' => 'text'],
+        'prepend' => ['type' => 'text', 'width' => 50],
+        'append' => ['type' => 'text', 'width' => 50]
     ];
 }
