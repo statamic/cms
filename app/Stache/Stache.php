@@ -184,7 +184,7 @@ class Stache
 
     public function generateId()
     {
-        return (string) Str::orderedUuid();
+        return (string) Str::uuid();
     }
 
     public function idMap()
