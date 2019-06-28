@@ -5,7 +5,7 @@ namespace Statamic\Data;
 use Closure;
 use Carbon\Carbon;
 use Statamic\API\Str;
-use Statamic\API\Helper;
+use Statamic\API\Compare;
 use Statamic\Exceptions\MethodNotFoundException;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -53,7 +53,7 @@ class DataCollection extends IlluminateCollection
 
                 list($one, $two) = $this->getSortableValues($sort_by, $a, $b);
 
-                $result = Helper::compareValues($one, $two);
+                $result = Compare::values($one, $two);
 
                 if ($result !== 0) {
                     return ($sort_dir === 'desc') ? $result * -1 : $result;

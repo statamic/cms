@@ -2,12 +2,7 @@
 
 namespace Statamic\API\Endpoint;
 
-use Statamic\API\Str;
-
-/**
- * Miscellaneous helper methods
- */
-class Helper
+class Compare
 {
 
     /**
@@ -19,7 +14,7 @@ class Helper
      * @param mixed $two Value 2 to compare
      * @return int
      */
-    public function compareValues($one, $two)
+    public function values($one, $two)
     {
         // something is null
         if (is_null($one) || is_null($two)) {
