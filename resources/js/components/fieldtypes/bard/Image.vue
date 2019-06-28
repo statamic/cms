@@ -160,7 +160,6 @@ export default {
         },
 
         loadAsset(id) {
-            console.log('loading asset: ' + id);
             this.$axios.get(cp_url('assets-fieldtype'), {
                 params: { assets: [id] }
             }).then(response => {
