@@ -6,16 +6,20 @@ use Statamic\Fields\Fieldtype;
 
 class Yaml extends Fieldtype
 {
+    // Turn the YAML back into a string
     public function preProcess($data)
     {
-        // Turn the YAML back into a string
-        return \Statamic\API\YAML::dump($data);
+        if (is_array($data)) {
+            return count($data) > 0 ? \Statamic\Api\Yaml::dump($data) : '';
+        }
+
+        return $data;
     }
 
     public function process($data)
     {
         if (substr_count($data, "\n") > 0 || substr_count($data, ': ') > 0) {
-            $data = \Statamic\API\YAML::parse($data);
+            $data = \Statamic\Api\Yaml::parse($data);
         }
 
         if (empty($data)) {
