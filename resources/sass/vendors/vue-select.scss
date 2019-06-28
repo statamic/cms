@@ -42,7 +42,8 @@
 
 .vs__dropdown-toggle {
     @include button(#fff, config('colors.grey-80'));
-    @apply block appearance-none bg-white shadow-button flex;
+    @apply block appearance-none bg-white shadow-button flex h-auto;
+	min-height: 37px;
     padding: 0 4px 4px;
     white-space: normal;
 

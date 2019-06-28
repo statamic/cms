@@ -10,7 +10,7 @@
                     <span v-if="! isCreating"
                         class="little-dot mr-1"
                         :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
-                    {{ title }}
+                    <span v-html="$options.filters.striptags(title)" />
                 </div>
             </h1>
 
@@ -505,7 +505,7 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
-        },
+        }
     },
 
     mounted() {

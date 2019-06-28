@@ -55,7 +55,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function avatar($size = 64)
     {
-        if ($this->has('avatar')) {
+        if ($this->has('avatar') && $this->augment('avatar')->value()) {
             return $this->augment('avatar')->value()->url();
         }
 

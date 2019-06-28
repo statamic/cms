@@ -18,8 +18,7 @@
         initial-sort-column="email"
         initial-sort-direction="asc"
         :filters="{{ $filters->toJson() }}"
-        :actions="{{ $actions->toJson() }}"
-        action-url="{{ cp_route('users.action') }}"
+        action-url="{{ cp_route('users.actions') }}"
     ></user-listing>
 
 @endsection

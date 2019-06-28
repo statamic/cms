@@ -18,12 +18,14 @@
                 <dropdown-item :text="__('Link to Entry')" @click="createEntries" />
             </dropdown-list>
 
+            <a v-if="hasCollection" class="btn ml-2" v-text="`${__('Create Page')}`" :href="createUrl" />
+
             <button
-                class="btn btn-primary min-w-100 ml-2"
+                class="btn btn-primary ml-2"
                 :class="{ 'disabled': !changed }"
                 :disabled="!changed"
                 @click="save"
-                v-text="__('Save')" />
+                v-text="__('Save Changes')" />
         </div>
 
         <loading-graphic v-if="loading"></loading-graphic>
@@ -128,6 +130,7 @@ export default {
         pagesUrl: String,
         submitUrl: String,
         editUrl: String,
+        createUrl: String,
         soundDropUrl: String,
         site: String,
         localizations: Array,

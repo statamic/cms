@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\API\Arr;
 use Statamic\Tags\Tags;
 use Statamic\API\Folder;
 use Statamic\API\Helper;
@@ -44,7 +45,7 @@ class GetFiles extends Tags
 
         $this->files = new FileCollection;
 
-        foreach (Helper::explodeOptions($folders) as $folder) {
+        foreach (Arr::explodeOptions($folders) as $folder) {
             $folder_files = [];
 
             if ($depth > 1) {
@@ -114,7 +115,7 @@ class GetFiles extends Tags
     private function filterExtension()
     {
         if ($extensions = $this->get(['extension', 'ext'])) {
-            $extensions = Helper::explodeOptions($extensions);
+            $extensions = Arr::explodeOptions($extensions);
 
             $this->files = $this->files->filterByExtension($extensions);
         }

@@ -28,6 +28,7 @@ export default {
     mixins: [Actions],
 
     props: {
+        actions: Array,
         item: { required: true }
     },
 

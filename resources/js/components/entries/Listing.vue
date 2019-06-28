@@ -17,12 +17,11 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
-                    <div class="data-list-header">
+                    <div class="data-list-header min-h-16">
                         <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
-                            :actions="entryActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -52,17 +51,18 @@
 
                     <data-list-table
                         v-show="items.length"
-                        :loading="loading"
                         :allow-bulk-actions="true"
-                        :sortable="!reordering"
+                        :loading="loading"
                         :reorderable="reordering"
+                        :sortable="!reordering"
+                        :toggle-selection-on-row-click="true"
                         @sorted="sorted"
                         @reordered="reordered"
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
-                                <a :href="entry.edit_url">{{ entry.title }}</a>
+                                <a @click.stop="redirect(entry.edit_url)">{{ entry.title }}</a>
                             </div>
                         </template>
                         <template slot="cell-slug" slot-scope="{ row: entry }">
@@ -70,13 +70,13 @@
                         </template>
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
-                                <dropdown-item :text="__('View')" :redirect="entry.permalink" v-if="entry.viewable" />
+                                <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable" />
                                 <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
-                                <div class="divider" v-if="actions.length" />
+                                <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
                                     :url="actionUrl"
-                                    :actions="actions"
+                                    :actions="entry.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
                                 />
@@ -120,12 +120,6 @@ export default {
     },
 
     computed: {
-        entryActions() {
-            this.actions.forEach(action => action.context.site = data_get(this.activeFilters, 'site.value', null));
-
-            return this.actions;
-        },
-
         showReorderButton() {
             if (this.structureUrl) return true;
 
@@ -180,7 +174,13 @@ export default {
 
         reordered(items) {
             this.items = items;
+        },
+
+        redirect(url) {
+            location.href = url;
+            return;
         }
+
     }
 
 }

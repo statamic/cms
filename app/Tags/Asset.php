@@ -26,7 +26,7 @@ class Asset extends Assets
     public function __call($method, $arguments)
     {
         $value = array_get_colon($this->context, $this->method);
-        $value = Helper::ensureArray($value);
+        $value = (array) $value;
         $value = current($value);
 
         return $this->assets($value);

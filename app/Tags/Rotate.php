@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\API\Arr;
 use Statamic\Tags\Tags;
 use Statamic\API\Helper;
 
@@ -33,7 +34,7 @@ class Rotate extends Tags
             $this->blink->put($hash, 0);
         }
 
-        $switch_vars = Helper::explodeOptions($between);
+        $switch_vars = Arr::explodeOptions($between);
 
         if ($expanded_mode) {
             $switch_vars = $this->expand($switch_vars);

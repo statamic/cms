@@ -54,7 +54,7 @@ class UploadedFilePresenter
             return;
         }
 
-        return collect(Helper::ensureArray($this->value))->map(function ($value) {
+        return collect((array) $this->value)->map(function ($value) {
             return call_user_func([$this, "buildHtmlFor{$this->type}"], $value);
         })->implode('<br>');
     }

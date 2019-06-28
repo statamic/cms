@@ -24,7 +24,7 @@
                 <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections @updated="setValue" />
+            <publish-sections @updated="setValue" :enable-sidebar="false"/>
         </div>
     </publish-container>
 

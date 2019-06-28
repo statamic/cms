@@ -53,9 +53,8 @@
                                 <data-list-search v-model="searchQuery" />
 
                                 <data-list-bulk-actions
-                                    v-if="hasSelections && hasActions"
                                     :url="actionUrl"
-                                    :actions="actions"
+                                    :context="actionContext"
                                     @started="actionStarted"
                                     @completed="bulkActionsCompleted"
                                 />
@@ -89,7 +88,14 @@
                                 class="-mt-px"
                             />
 
-                            <data-list-table v-if="mode === 'table'" :loading="loadingAssets" :rows="rows" :allow-bulk-actions="true" @sorted="sorted">
+                            <data-list-table
+                                v-if="mode === 'table' && ! containerIsEmpty"
+                                :allow-bulk-actions="true"
+                                :loading="loadingAssets"
+                                :rows="rows"
+                                :toggle-selection-on-row-click="true"
+                                @sorted="sorted"
+                            >
 
                                 <template slot="tbody-start">
                                     <tr v-if="folder.parent_path && !restrictFolderNavigation">
@@ -128,20 +134,22 @@
                                 </template>
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
-                                    <div class="flex items-center" @dblclick="$emit('asset-doubleclicked', asset)">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1" />
-                                        <label :for="checkboxId" class="cursor-pointer select-none">{{ asset.basename }}</label>
+                                    <div class="flex items-center w-fit-content group">
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue" @click.stop="$emit('edit-asset', asset)">
+                                            {{ asset.basename }}
+                                        </label>
                                     </div>
                                 </template>
 
                                 <template slot="actions" slot-scope="{ row: asset }">
                                     <dropdown-list>
                                         <dropdown-item :text="__('Edit')" @click="edit(asset.id)" />
-                                        <div class="divider" />
+                                        <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
                                             :url="actionUrl"
-                                            :actions="actions"
+                                            :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
                                         />
@@ -151,7 +159,7 @@
                             </data-list-table>
 
                             <!-- Grid Mode -->
-                            <div class="data-grid" v-if="mode === 'grid'">
+                            <div class="data-grid" v-if="mode === 'grid' && ! containerIsEmpty">
                                 <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
                                     <!-- Parent Folder -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
@@ -173,7 +181,7 @@
                                     </div>
                                     <!-- Assets -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
-                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('asset-doubleclicked', asset)">
+                                        <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('edit-asset', asset)">
                                             <div class="absolute pin flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>
@@ -183,6 +191,8 @@
                                 </div>
                             </div>
 
+                            <div class="p-2 text-grey-70" v-if="containerIsEmpty">{{ __('This container is empty.') }}</div>
+
                         </div>
 
                         <data-list-pagination
@@ -190,10 +200,6 @@
                             :resource-meta="meta"
                             @page-selected="page = $event"
                         />
-
-                        <div v-if="assets.length === 0" class="border-t p-2 pl-4 text-sm text-grey-70">
-                            There are no assets.
-                        </div>
 
                     </div>
                 </data-list>
@@ -292,6 +298,10 @@ export default {
                 : this.initialContainer;
         },
 
+        actionContext() {
+            return {container: this.selectedContainer};
+        },
+
         showContainerTabs() {
             return !this.restrictContainerNavigation && Object.keys(this.containers).length > 1
         },
@@ -332,8 +342,18 @@ export default {
             return this.maxFiles !== undefined && this.maxFiles !== Infinity;
         },
 
+        reachedSelectionLimit() {
+            return this.selectedAssets.length >= this.maxFiles;
+        },
+
         hasSelections() {
             return this.selectedAssets.length > 0;
+        },
+
+        containerIsEmpty() {
+            return this.assets.length === 0
+                && this.folders.length === 0
+                && ! this.folder.parent_path;
         }
 
     },

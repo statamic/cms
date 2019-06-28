@@ -2,11 +2,12 @@
 
 namespace Statamic\Data;
 
-use Statamic\API\Config;
-use Statamic\API\Helper;
-use Statamic\API\Parse;
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Term;
+use Statamic\API\Parse;
+use Statamic\API\Config;
+use Statamic\API\Helper;
 use Statamic\API\Taxonomy;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Exceptions\UuidExistsException;
@@ -282,7 +283,7 @@ abstract class Data implements DataContract, Responsable
      */
     public function getWithDefaultLocale($key, $default = null)
     {
-        return Helper::pick(
+        return Arr::pick(
             $this->get($key),
             array_get($this->defaultData(), $key),
             $default
@@ -304,7 +305,7 @@ abstract class Data implements DataContract, Responsable
 
         $cascade = array_merge($this->cascadingData(), $this->defaultData());
 
-        return Helper::pick(
+        return Arr::pick(
             array_get($cascade, $key),
             $default
         );
@@ -561,7 +562,7 @@ abstract class Data implements DataContract, Responsable
         }
 
         // If true is passed in, we'll generate a UUID. Otherwise just use what was passed.
-        $id = ($id === true) ? Helper::makeUuid() : $id;
+        $id = ($id === true) ? (string) Str::uuid() : $id;
         $this->set('id', $id);
 
         return $this;

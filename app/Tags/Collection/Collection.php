@@ -47,6 +47,8 @@ class Collection extends Tags
      */
     public function next()
     {
+        $this->parameters['from'] = $this->parameters['from'] ?? $this->currentEntry()->collection()->handle();
+
         $entries = $this->entries()->next($this->currentEntry());
 
         return $this->output($entries);
@@ -57,6 +59,8 @@ class Collection extends Tags
      */
     public function previous()
     {
+        $this->parameters['from'] = $this->parameters['from'] ?? $this->currentEntry()->collection()->handle();
+
         $entries = $this->entries()->previous($this->currentEntry());
 
         return $this->output($entries);

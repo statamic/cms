@@ -44,6 +44,107 @@ class Arr extends IlluminateArr
     }
 
     /**
+     * Explodes options into an array
+     *
+     * @param string  $string  String to explode
+     * @param bool $keyed  Are options keyed?
+     * @return array
+     */
+    public function explodeOptions($string, $keyed = false)
+    {
+        $options = explode('|', $string);
+
+        if ($keyed) {
+
+            $temp_options = array();
+            foreach ($options as $value) {
+
+                if (strpos($value, ':')) {
+                    # key:value pair present
+                    list($option_key, $option_value) = explode(':', $value);
+                } else {
+                    # default value is false
+                    $option_key = $value;
+                    $option_value = false;
+                }
+
+                # set the main options array
+                $temp_options[$option_key] = $option_value;
+            }
+            # reassign and override
+            $options = $temp_options;
+        }
+
+        return $options;
+    }
+
+    /**
+     * Checks if $value is an empty array
+     *
+     * @param mixed  $value  Value to check
+     * @return bool
+     */
+    public function isEmpty($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $subvalue) {
+                if (!self::isEmptyArray($subvalue)) {
+                    return false;
+                }
+            }
+        } elseif (!empty($value) || $value !== '') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Normalize arguments
+     *
+     * Ensures both ['one', 'two'] or 'one|two' ends up as the former
+     *
+     * @param mixed
+     * @return array
+     */
+    public function normalizeArguments($args)
+    {
+        $output = [];
+
+        foreach ($args as $arg) {
+            if (! is_array($arg)) {
+                $arg = explode('|', $arg);
+            }
+
+            $output = array_merge($output, $arg);
+        }
+
+        return array_unique($output);
+    }
+
+    /**
+     * Picks the first value that isn't null
+     *
+     * @return mixed
+     */
+    public function pick()
+    {
+        $args = func_get_args();
+
+        if (!is_array($args) || !count($args)) {
+            return null;
+        }
+
+        foreach ($args as $arg) {
+            if (!is_null($arg)) {
+                return $arg;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Sort an array by an array of keys
      *
      * @param  array  $array The array to be sorted

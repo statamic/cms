@@ -33,6 +33,25 @@ export default {
 
     inject: ['sharedState'],
 
+    props: {
+        context: {
+            type: Object,
+            default: () => {}
+        }
+    },
+
+    data() {
+        return {
+            actions: []
+        }
+    },
+
+    watch: {
+        selections(selections) {
+            this.getActions(selections);
+        }
+    },
+
     computed: {
 
         selections() {
@@ -41,7 +60,29 @@ export default {
 
         hasSelections() {
             return this.selections.length > 0;
-        }
+        },
+
+    },
+
+    methods: {
+
+        getActions(selections) {
+            if (selections.length === 0) {
+                this.actions = [];
+
+                return;
+            }
+
+            let params = {selections};
+
+            if (this.context) {
+                params.context = this.context;
+            }
+
+            this.$axios.get(this.url, {params}).then(response => {
+                this.actions = response.data;
+            });
+        },
 
     }
 

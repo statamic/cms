@@ -81,7 +81,7 @@ return [
     |
     */
 
-    'date_format' => 'F, jS Y',
+    'date_format' => 'F jS, Y',
 
     'charset' => 'UTF-8',
     // 'parser_backtrack_limit' => null,

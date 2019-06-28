@@ -34,6 +34,7 @@ class Collection implements Contract
     protected $ampable = false;
     protected $revisions = false;
     protected $positions = [];
+    protected $defaultStatus = 'published';
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -288,6 +289,7 @@ class Collection implements Contract
             'amp' => $array['amp'] ?: null,
             'date' => $array['dated'] ?: null,
             'orderable' => $array['orderable'] ?: null,
+            'default_status' => $this->defaultStatus,
             'date_behavior' => [
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
@@ -315,6 +317,12 @@ class Collection implements Contract
             ->args(func_get_args());
     }
 
+
+    public function defaultStatus($status = null)
+    {
+        return $this->fluentlyGetOrSet('defaultStatus')->args(func_get_args());
+    }
+
     public function toArray()
     {
         return [
@@ -324,6 +332,7 @@ class Collection implements Contract
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
+            'default_status' => $this->defaultStatus(),
             'amp' => $this->ampable,
             'sites' => $this->sites,
             'template' => $this->template,

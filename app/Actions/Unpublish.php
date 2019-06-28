@@ -13,16 +13,14 @@ class Unpublish extends Action
         return $key === 'entries';
     }
 
-    public function authorize($key, $context)
+    public function authorize($entry)
     {
-        $collection = Collection::findByHandle($context['collection']);
-
-        return user()->can('publish', [Entry::class, $collection]);
+        return user()->can('publish', [Entry::class, $entry->collection()]);
     }
 
-    public function run($items)
+    public function run($entries)
     {
-        $items->each(function ($entry) {
+        $entries->each(function ($entry) {
             $entry->unpublish(['user' => request()->user()]);
         });
     }

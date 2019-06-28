@@ -117,6 +117,7 @@
     position: absolute;
     left: -20px;
     margin-top: -6px;
+    z-index: 2;
     // transition: all .15s ease-in-out;
 
     .dropdown-menu {
@@ -130,21 +131,25 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply .fixed .bg-white .pin .min-h-screen .overflow-scroll rounded-none;
+    @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
     z-index: 2; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
-        @apply bg-white shadow-none max-w-xl mx-auto rounded relative;
+        @apply bg-white shadow max-w-xl mx-auto rounded relative my-3 px-4;
     }
 
     .bard-fixed-toolbar {
-        @apply shadow-sm;
+        @apply shadow h-12 py-1.5 justify-center;
+
+        button {
+            @apply px-1.5;
+        }
     }
 
     .ProseMirror {
-        @apply .px-3 py-6 flex flex-col justify-center;
-        min-height: calc(100vh - 40px);
+        @apply .px-3 py-6 flex flex-col;
+        min-height: calc(100vh - 120px);
     }
 
     .bard-set-selector {

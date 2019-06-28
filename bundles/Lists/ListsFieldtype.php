@@ -15,7 +15,7 @@ class ListsFieldtype extends Fieldtype
             return [];
         }
 
-        return Helper::ensureArray($data);
+        return (array) $data;
     }
 
     public function process($data)

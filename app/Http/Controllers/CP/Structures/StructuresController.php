@@ -78,7 +78,7 @@ class StructuresController extends CpController
         $structure = Structure::find($structure);
         $site = $request->site ?? Site::selected()->handle();
 
-        if (! $tree = $structure->in($site)) {
+        if (! $structure || ! $tree = $structure->in($site)) {
             return abort(404);
         }
 

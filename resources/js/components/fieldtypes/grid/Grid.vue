@@ -97,11 +97,21 @@ export default {
         include: ['config', 'isReorderable', 'isReadOnly']
     },
 
+    created() {
+        let rows = this.value || [];
+
+        this.rows.map((row, index) => {
+            this.metas[row._id] = this.meta.existing[index] || this.meta.new;
+        });
+    },
+
     watch: {
 
         value: {
             immediate: true,
             handler(value) {
+                if (value === null) value = [];
+
                 if (value.length === 0) {
                     this.rows = value;
                     return;
@@ -184,9 +194,10 @@ export default {
 
         duplicate(index) {
             const row = _.clone(this.rows[index]);
-
+            const old_id = row._id;
             row._id = uniqid();
 
+            this.metas[row._id] = this.metas[old_id];
             this.rows.push(row);
         },
 
