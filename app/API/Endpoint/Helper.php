@@ -36,37 +36,6 @@ class Helper
         return $last;
     }
 
-    /**
-     * Grabs the first value from an array. If a string is provided it will return it.
-     *
-     * @param mixed $value
-     * @return mixed
-     */
-    public function grab($value)
-    {
-        $arr = self::ensureArray($value);
-
-        return reset($arr);
-    }
-
-    /**
-     * Ensures that a given variable is an array
-     *
-     * @param mixed $value  Variable to check
-     * @return array
-     **/
-    public function ensureArray($value)
-    {
-        if ($value === null) {
-            return [];
-        }
-
-        if (! is_array($value)) {
-            return array($value);
-        }
-
-        return $value;
-    }
 
     /**
      * Ensure that a given value is one of the options. Otherwise return the first option.

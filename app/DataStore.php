@@ -162,7 +162,7 @@ class DataStore
         $is_array = (is_array($value));
 
         // Make it into an array so we can keep things consistent
-        $array = Helper::ensureArray($value);
+        $array = (array) $value;
 
         foreach ($array as $key => $val) {
             if (is_array($val)) {

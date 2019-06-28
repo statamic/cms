@@ -36,7 +36,7 @@ class FileCollection extends Collection
      */
     public function filterByExtension($extensions)
     {
-        $extensions = Helper::ensureArray($extensions);
+        $extensions = (array) $extensions;
 
         return $this->filter(function($path) use ($extensions) {
             return in_array(File::extension($path), $extensions);
@@ -51,7 +51,7 @@ class FileCollection extends Collection
      */
     public function rejectByExtension($extensions)
     {
-        $extensions = Helper::ensureArray($extensions);
+        $extensions = (array) $extensions;
 
         return $this->reject(function($path) use ($extensions) {
             return in_array(File::extension($path), $extensions);

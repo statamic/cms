@@ -193,7 +193,7 @@ class ContentCollection extends DataCollection
         $group = Term::find($id)->taxonomyName();
 
         return $this->filter(function($entry) use ($id, $group) {
-            $taxonomies = Helper::ensureArray($entry->get($group, []));
+            $taxonomies = (array) $entry->get($group, []);
 
             return in_array($id, $taxonomies);
         });

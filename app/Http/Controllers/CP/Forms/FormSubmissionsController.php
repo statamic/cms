@@ -91,7 +91,7 @@ class FormSubmissionsController extends CpController
     {
         $is_arr = is_array($value);
 
-        $values = Helper::ensureArray($value);
+        $values = (array) $value;
 
         foreach ($values as &$value) {
             if (is_array($value)) {
