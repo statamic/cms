@@ -36,23 +36,6 @@ class Helper
         return $last;
     }
 
-
-    /**
-     * Ensure that a given value is one of the options. Otherwise return the first option.
-     *
-     * @param mixed $value  The value being checked.
-     * @param array $options  An array of options the value is allowed to be.
-     * @return mixed
-     */
-    public function ensureInArray($value, array $options)
-    {
-        if (! in_array($value, $options)) {
-            return reset($options);
-        }
-
-        return $value;
-    }
-
     /**
      * Checks whether the given $value is an empty array or not
      *
