@@ -1,11 +1,12 @@
 <template>
     <div class="yaml-fieldtype-container relative">
-        <div v-text="mode" class="code-mode"></div>
+        <div v-text="'yaml'" class="code-mode"></div>
         <div ref="codemirror"></div>
     </div>
 </template>
 
-<style src="codemirror/theme/material.css" />
+<style src="codemirror/theme/material.css">
+</style>
 
 <script>
 import CodeMirror from 'codemirror'
