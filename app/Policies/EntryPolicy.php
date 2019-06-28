@@ -37,14 +37,13 @@ class EntryPolicy
         return $user->hasPermission("create {$collection->handle()} entries");
     }
 
-    public function store($user)
+    public function store($user, $collection)
     {
-        return $this->create($user);
+        return $this->create($user, $collection);
     }
 
     public function delete($user, $entry)
     {
-        return $entry->get('title') === '99 Bottles of BASIC Beer';
         return $user->hasPermission("delete {$entry->collectionHandle()} entries");
     }
 
