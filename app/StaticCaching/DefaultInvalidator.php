@@ -22,6 +22,8 @@ class DefaultInvalidator implements Invalidator
         }
 
         // Invalidate the item's own URL.
-        $this->cacher->invalidateUrl($item->url());
+        if ($url = $item->url()) {
+            $this->cacher->invalidateUrl($url);
+        }
     }
 }
