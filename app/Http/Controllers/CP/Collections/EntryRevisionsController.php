@@ -63,6 +63,7 @@ class EntryRevisionsController extends CpController
         }
 
         return [
+            'title' => $entry->value('title'),
             'editing' => true,
             'actions' => [
                 'save' => $entry->updateUrl(),
