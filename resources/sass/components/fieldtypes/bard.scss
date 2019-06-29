@@ -303,6 +303,10 @@
     blockquote:last-child {
         margin-bottom: 0;
     }
+
+    code, p > code {
+        @apply font-mono bg-grey-40 text-sm p-1 block w-full;
+    }
 }
 
 /* Link toolbar
