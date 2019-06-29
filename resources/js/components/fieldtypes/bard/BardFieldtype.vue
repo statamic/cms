@@ -98,7 +98,8 @@ import {
     Italic,
     Strike,
     Underline,
-    History
+    History,
+    CodeBlockHighlight
 } from 'tiptap-extensions';
 import Set from './Set';
 import BardSource from './Source.vue';
@@ -109,6 +110,10 @@ import LinkToolbarButton from './LinkToolbarButton.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
+import javascript from 'highlight.js/lib/languages/javascript'
+import css from 'highlight.js/lib/languages/css'
+import hljs from 'highlight.js/lib/highlight';
+import 'highlight.js/styles/github.css';
 
 export default {
 
@@ -206,6 +211,9 @@ export default {
                 new Link({ vm: this }),
                 new RemoveFormat(),
                 new Image({ bard: this }),
+                new CodeBlockHighlight({
+                    languages: { javascript, css }
+                })
             ],
             content: this.content,
             editable: !this.readOnly,

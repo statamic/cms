@@ -130,7 +130,7 @@
 /* Fullscreen mode
    ========================================================================== */
 
-.bard-fullscreen {
+.bard-fieldtype .bard-fullscreen {
     @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
     z-index: 11; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
@@ -150,6 +150,10 @@
     .ProseMirror {
         @apply .px-3 py-6 flex flex-col;
         min-height: calc(100vh - 120px);
+
+        > p > code, > pre code {
+            @apply bg-grey-30;
+        }
     }
 
     .bard-set-selector {
@@ -304,8 +308,15 @@
         margin-bottom: 0;
     }
 
-    code, p > code {
-        @apply font-mono bg-grey-40 text-sm p-1 block w-full;
+    p > code {
+        @apply font-mono bg-grey-40 rounded text-xs relative;
+        padding: 2px 4px;
+        top: -1px;
+    }
+
+    pre code {
+        @apply font-mono bg-grey-40 text-xs p-2 block w-full rounded;
+        line-height: 1.8;
     }
 }
 
