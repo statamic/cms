@@ -115,7 +115,7 @@ export default {
         },
 
         submitButtonText() {
-            return _.findWhere(this.options, { value: this.action }).text;
+            return _.findWhere(this.options, { value: this.action }).label;
         }
 
     },
