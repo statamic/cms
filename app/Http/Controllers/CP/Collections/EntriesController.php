@@ -124,6 +124,7 @@ class EntriesController extends CpController
             'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
+            'published' => $entry->published(),
             'locale' => $entry->locale(),
             'localizedFields' => array_keys($entry->data()),
             'isRoot' => $entry->isRoot(),
