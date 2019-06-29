@@ -14,16 +14,16 @@ class Grid extends Fieldtype
     protected $defaultable = false;
 
     protected $configFields = [
-        'mode'        => [
-            'type'    => 'select',
+        'mode' => [
+            'type' => 'select',
             'default' => 'table',
             'options' => ['table' => 'Table', 'stacked' => 'Stacked'],
         ],
-        'max_rows'    => ['type' => 'integer'],
-        'min_rows'    => ['type' => 'integer'],
-        'add_row'     => ['type' => 'text'],
+        'max_rows' => ['type' => 'integer', 'width' => '50'],
+        'min_rows' => ['type' => 'integer', 'width' => '50'],
+        'add_row' => ['type' => 'text'],
         'reorderable' => ['type' => 'toggle', 'default' => true],
-        'fields'      => ['type' => 'fields'],
+        'fields' => ['type' => 'fields'],
     ];
 
     public function process($data)
