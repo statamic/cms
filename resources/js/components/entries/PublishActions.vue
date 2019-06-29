@@ -89,16 +89,16 @@ export default {
 
         options() {
             let options = [
-                { value: 'publish', text: 'Publish Now', },
-                { value: 'schedule', text: 'Schedule', },
+                { value: 'publish', label: 'Publish Now', },
+                { value: 'schedule', label: 'Schedule', },
             ];
 
             if (this.published) {
-                options.push({ value: 'unpublish', text: 'Unpublish' });
+                options.push({ value: 'unpublish', label: 'Unpublish' });
             }
 
             return options.concat([
-                { value: 'revision', text: 'Create Revision', },
+                { value: 'revision', label: 'Create Revision', },
             ]);
         },
 
