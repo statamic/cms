@@ -55,6 +55,10 @@ export default {
 
     created() {
         this.addIds();
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     },
 
     watch: {
