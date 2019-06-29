@@ -18,10 +18,13 @@
     @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between z-5;
     position: sticky;
     top: 0;
-    padding: 8px 12px;
+    padding: 4px 8px;
 
      button {
-        @apply text-grey-80 px-1 flex items-center text-base h-6;
+        @apply text-grey-80 px-sm flex items-center justify-center text-base text-center;
+        height: 32px;
+        width: 32px;
+        margin: 0 2px;
     }
 
     button:hover {
@@ -29,7 +32,7 @@
     }
 
     button.active {
-        @apply .text-blue;
+        @apply bg-grey-30 rounded text-black;
     }
 
     button:focus {
@@ -69,7 +72,7 @@
     }
 
     button {
-        @apply text-grey-20 h-10 px-1 bg-black rounded-lg;
+        @apply text-grey-20 h-12 w-16 bg-black rounded-lg flex items-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
     }
@@ -140,10 +143,11 @@
     }
 
     .bard-fixed-toolbar {
-        @apply shadow h-12 py-1.5 justify-center;
+        @apply shadow h-12 justify-center;
+        padding: 7px 8px;
 
         button {
-            @apply px-1.5;
+            @apply mx-sm;
         }
     }
 
