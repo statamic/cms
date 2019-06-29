@@ -90,7 +90,6 @@ export default {
         options() {
             let options = [
                 { value: 'publish', label: 'Publish Now', },
-                { value: 'schedule', label: 'Schedule', },
             ];
 
             if (this.published) {
