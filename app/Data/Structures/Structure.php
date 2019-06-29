@@ -198,11 +198,12 @@ class Structure implements StructureContract
 
     public function entryUri($entry)
     {
-        return $this->in($entry->locale())
+        $page = $this->in($entry->locale())
             ->flattenedPages()
             ->keyBy->reference()
-            ->get($entry->id())
-            ->uri();
+            ->get($entry->id());
+
+        return optional($page)->uri();
     }
 
     public function updateEntryUris()
