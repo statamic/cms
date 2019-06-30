@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Integer;
+namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class IntegerFieldtype extends Fieldtype
+class Integer extends Fieldtype
 {
     public function preProcess($data)
     {

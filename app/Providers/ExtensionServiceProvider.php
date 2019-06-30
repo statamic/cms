@@ -26,7 +26,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'fieldset', 'hidden', 'integer', 'lists', 'locale_settings',
+        'fieldset', 'hidden', 'lists', 'locale_settings',
         'revealer', 'table', 'tags',
     ];
 
@@ -97,6 +97,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Integer::class,
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
