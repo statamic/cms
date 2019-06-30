@@ -11,7 +11,8 @@ class Arr extends Fieldtype
     protected $configFields = [
         'keys' => [
             'type' => 'array',
-            'value_header' => 'Label'
+            'value_header' => 'Label',
+            'instructions' => 'Set the array keys and corresponding, optional labels.'
         ]
     ];
 

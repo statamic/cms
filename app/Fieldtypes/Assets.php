@@ -15,13 +15,32 @@ class Assets extends Fieldtype
     protected $defaultValue = [];
 
     protected $configFields = [
-        'container' => ['type' => 'asset_container', 'max_items' => 1],
-        'folder' => ['type' => 'asset_folder', 'max_items' => 1],
-        'restrict' => ['type' => 'toggle'],
-        'max_files' => ['type' => 'integer'],
+        'container' => [
+            'type' => 'asset_container',
+            'max_items' => 1,
+            'instructions' => 'Choose which asset container to work in.'
+        ],
+        'folder' => [
+            'type' => 'asset_folder',
+            'max_items' => 1,
+            'instructions' => 'Set the default folder to begin in.',
+            'width' => 50
+        ],
+        'restrict' => [
+            'type' => 'toggle',
+            'instructions' => 'Prevent from users from navigating into other folders.',
+            'width' => 50
+        ],
+        'max_files' => [
+            'type' => 'integer',
+            'instructions' => 'Set a maximum number of selectable assets.',
+            'width' => 50
+        ],
         'allow_uploads' => [
             'type' => 'toggle',
-            'default' => true
+            'default' => true,
+            'instructions' => 'Allow new files to be uploaded?',
+            'width' => 50
         ],
         'mode' => [
             'type' => 'select',
@@ -30,6 +49,7 @@ class Assets extends Fieldtype
                 'grid' => 'Grid',
                 'list' => 'List',
             ],
+            'instructions' => 'Set the default layout style.'
         ],
     ];
 

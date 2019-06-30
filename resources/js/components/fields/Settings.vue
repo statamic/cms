@@ -27,9 +27,9 @@
         </div>
 
         <div class="publish-tabs tabs">
-            <a :class="{ 'active': activeTab === 'main' }"
-                @click="activeTab = 'main'"
-                v-text="__('Main')"
+            <a :class="{ 'active': activeTab === 'settings' }"
+                @click="activeTab = 'settings'"
+                v-text="__('Settings')"
             ></a>
             <a class="z-5" :class="{ 'active': activeTab === 'conditions' }"
                 @click="activeTab = 'conditions'"
@@ -43,7 +43,7 @@
 
         <div class="card rounded-tl-none" v-if="fieldtypesLoaded">
 
-            <div class="publish-fields" v-show="activeTab === 'main'">
+            <div class="publish-fields" v-show="activeTab === 'settings'">
 
                 <form-group
                     handle="display"
@@ -80,6 +80,7 @@
                     v-for="configField in filteredFieldtypeConfig"
                     :key="configField.handle"
                     :config="configField"
+                    :instructions="__(configField.instructions)"
                     :value="values[configField.handle]"
                     @input="updateField(configField.handle, $event)"
                 />
@@ -88,6 +89,7 @@
                     TODO:
                     - Default value
                 -->
+
             </div>
 
             <div class="publish-fields" v-show="activeTab === 'conditions'">
@@ -142,7 +144,7 @@ export default {
             values: clone(this.config),
             editedFields: clone(this.overrides),
             isHandleModified: true,
-            activeTab: 'main'
+            activeTab: 'settings'
         };
     },
 
