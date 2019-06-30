@@ -26,10 +26,8 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'checkboxes',
-        'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'radio', 'time', 'title', 'toggle', 'yaml',
-        'revealer', 'section', 'table', 'tags', 'template', 'textarea',
+        'fieldset', 'hidden', 'integer', 'lists', 'locale_settings',
+        'revealer', 'table', 'tags',
     ];
 
     /**
@@ -105,6 +103,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Range::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Replicator::class,
+        Fieldtypes\Section::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
         Fieldtypes\Structures::class,
@@ -114,6 +113,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
+        Fieldtypes\Toggle::class,
         Fieldtypes\UserGroups::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,

@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Toggle;
+namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class ToggleFieldtype extends Fieldtype
+class Toggle extends Fieldtype
 {
     public function process($data)
     {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Section;
+namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class SectionFieldtype extends Fieldtype
+class Section extends Fieldtype
 {
     public function canBeLocalized()
     {
