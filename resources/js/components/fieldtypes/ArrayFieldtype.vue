@@ -130,7 +130,7 @@ export default {
         },
 
         addButton() {
-            return __(this.config.add_button || 'Add Value');
+            return __(this.config.add_button || 'Add Row');
         },
 
         keyHeader() {

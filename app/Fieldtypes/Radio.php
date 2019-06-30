@@ -9,6 +9,7 @@ class Radio extends Fieldtype
     protected $configFields = [
         'options' => [
             'type' => 'array',
+            'value_header' => 'Label'
         ],
         'inline' => ['type' => 'toggle']
     ];

@@ -9,6 +9,7 @@ class Checkboxes extends Fieldtype
     protected $configFields = [
         'options' => [
             'type' => 'array',
+            'value_header' => 'Label'
         ],
         'inline' => ['type' => 'toggle']
     ];

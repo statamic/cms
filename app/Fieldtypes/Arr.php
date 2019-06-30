@@ -10,7 +10,8 @@ class Arr extends Fieldtype
 
     protected $configFields = [
         'keys' => [
-            'type' => 'array'
+            'type' => 'array',
+            'value_header' => 'Label'
         ]
     ];
 
