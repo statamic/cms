@@ -4,7 +4,7 @@
 
 .markdown-fieldtype-wrapper {
 
-    @apply .border .rounded .overflow-hidden;
+    @apply .border .rounded .overflow-hidden relative;
 
     &:focus-within {
         @apply focus-outline;
@@ -31,7 +31,7 @@
         }
 
         a {
-            @apply text-grey-40 outline-none;
+            @apply text-grey-50 outline-none;
 
             &:hover {
                 @apply text-blue;
@@ -59,7 +59,6 @@
     .CodeMirror-code { min-height: 100px; }
 
     .CodeMirror-lines {
-        @apply border-r border-grey-30;
         max-width: 860px;
     }
 
@@ -131,28 +130,29 @@
     @apply px-2 py-4 mx-auto max-w-md;
 }
 
-// TODO: Needs serious love.
-.markdown-fullscreen {
-    background: #fff;
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    padding: 0;
-    z-index: 1000;
+.markdown-fieldtype-wrapper.markdown-fullscreen {
+    @apply fixed bg-white pin h-screen rounded-none;
+    z-index: 11;
     will-change: transform;
-    height: 100vh;
+
+    .markdown-toolbar {
+        @apply shadow-sm bg-white;
+    }
 
     .CodeMirror {
-        @apply border-r border-grey-20;
+        @apply bg-white max-w-xl mx-auto relative my-3 px-4 text-base overflow-scroll;
         box-shadow: none !important;
-        background: #fff;
-        padding: 64px 32px;
-        max-width: 860px;
+        min-height: calc(100vh - 100px);
+
+        .CodeMirror-code {
+            min-height: calc(100vh - 100px);
+        }
+    }
+
+    .helpers {
+        @apply absolute pin-b pin-l pin-r bg-white;
     }
 }
-
 
 
 /* @TODO make sure Sneak Peek mode looks good

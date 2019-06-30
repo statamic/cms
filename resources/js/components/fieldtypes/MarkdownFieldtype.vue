@@ -1,5 +1,5 @@
 <template>
-    <div class="markdown-fieldtype-wrapper relative" :class="{'markdown-fullscreen': fullScreenMode}">
+    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode}">
 
         <uploader
             ref="uploader"
@@ -161,15 +161,30 @@ export default {
 
         data(data) {
             this.update(data);
+        },
+
+        fullScreenMode: {
+            immediate: true,
+            handler: fullscreen => {
+                if (fullscreen) {
+                    document.body.style.setProperty("overflow", "hidden")
+                } else {
+                    document.body.style.removeProperty("overflow")
+                }
+            }
         }
 
     },
 
     methods: {
 
-        toggleFullScreen: function() {
+        toggleFullScreen() {
             this.fullScreenMode = ! this.fullScreenMode;
-            this.$root.hideOverflow = ! this.$root.hideOverflow;
+            this.trackHeightUpdates();
+        },
+
+        closeFullScreen() {
+            this.fullScreenMode = false;
         },
 
         /**
@@ -538,6 +553,8 @@ export default {
                 self.codemirror.doc.setValue(val);
             }
         });
+
+        this.$mousetrap.bind('esc', this.closeFullScreen)
 
         this.trackHeightUpdates();
     }
