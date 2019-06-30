@@ -26,9 +26,24 @@
             ></button>
         </div>
 
-        <div class="card" v-if="fieldtypesLoaded">
+        <div class="publish-tabs tabs">
+            <a :class="{ 'active': activeTab === 'main' }"
+                @click="activeTab = 'main'"
+                v-text="__('Main')"
+            ></a>
+            <a class="z-5" :class="{ 'active': activeTab === 'conditions' }"
+                @click="activeTab = 'conditions'"
+                v-text="__('Conditions')"
+            ></a>
+            <a :class="{ 'active': activeTab === 'validation' }"
+                @click="activeTab = 'validation'"
+                v-text="__('Validation')"
+            ></a>
+        </div>
 
-            <div class="publish-fields">
+        <div class="card rounded-tl-none" v-if="fieldtypesLoaded">
+
+            <div class="publish-fields" v-show="activeTab === 'main'">
 
                 <form-group
                     handle="display"
@@ -61,21 +76,6 @@
                     @input="updateField('instructions', $event)"
                 />
 
-                <!--
-                    TODO:
-                    - Validation
-                    - Default value
-                -->
-
-                <field-conditions-builder
-                    :config="config"
-                    :suggestable-fields="suggestableConditionFields"
-                    @updated="updateFieldConditions" />
-
-                <field-validation-builder
-                    :config="config"
-                    @updated="updateField('validate', $event)" />
-
                 <publish-field
                     v-for="configField in filteredFieldtypeConfig"
                     :key="configField.handle"
@@ -83,6 +83,24 @@
                     :value="values[configField.handle]"
                     @input="updateField(configField.handle, $event)"
                 />
+
+                <!--
+                    TODO:
+                    - Default value
+                -->
+            </div>
+
+            <div class="publish-fields" v-show="activeTab === 'conditions'">
+                <field-conditions-builder
+                    :config="config"
+                    :suggestable-fields="suggestableConditionFields"
+                    @updated="updateFieldConditions" />
+            </div>
+
+            <div class="publish-fields" v-show="activeTab === 'validation'">
+                <field-validation-builder
+                    :config="config"
+                    @updated="updateField('validate', $event)" />
 
             </div>
         </div>
@@ -124,7 +142,7 @@ export default {
             values: clone(this.config),
             editedFields: clone(this.overrides),
             isHandleModified: true,
-            activeTab: 'basics'
+            activeTab: 'main'
         };
     },
 
