@@ -85,13 +85,13 @@ textarea.input-text:read-only,
     .input-group-prepend {
         @apply rounded-l bg-grey-30 px-1 border border-grey-50 text-sm;
         height: 38px;
-        line-height: 38px;
+        line-height: 36px;
     }
 
     .input-group-append {
         @apply rounded-r bg-grey-30 px-1 border border-grey-50 text-sm;
         height: 38px;
-        line-height: 38px;
+        line-height: 36px;
     }
 }
 
