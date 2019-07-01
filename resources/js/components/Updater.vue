@@ -7,7 +7,7 @@
                     Current Version: {{ currentVersion }}
                 </span>
             </h1>
-            <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="$modal.show('output-modal')">
+            <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
                 <template v-if="composer.processing">
                     {{ composer.status }}
                     <span class="icon icon-circular-graph animation-spin ml-1"></span>
@@ -69,19 +69,19 @@
             </div>
         </div>
 
-        <portal to="modals">
-            <modal
-                name="output-modal"
-                height="auto"
-                :scrollable="true"
-                :pivotY=".1"
-                width="760px"
-                @opened="modalOpen = true; $events.$emit('start-composer')"
-                @closed="modalOpen = false"
-            >
-                <composer-output :package="package" class="m-3"></composer-output>
-            </modal>
-        </portal>
+        <modal
+            v-if="modalOpen"
+            name="output-modal"
+            height="auto"
+            :scrollable="true"
+            :pivotY=".1"
+            width="760px"
+            :click-to-close="true"
+            @opened="$events.$emit('start-composer')"
+            @closed="modalOpen = false"
+        >
+            <composer-output :package="package" class="m-3"></composer-output>
+        </modal>
     </div>
 </template>
 
@@ -146,7 +146,7 @@
                     package: this.package,
                 });
 
-                this.$modal.show('output-modal');
+                this.modalOpen = true;
             },
 
             updateToLatest() {
@@ -158,7 +158,7 @@
                     package: this.package,
                 });
 
-                this.$modal.show('output-modal');
+                this.modalOpen = true;
             },
 
             installExplicitVersion(version) {
@@ -170,7 +170,7 @@
                     package: this.package,
                 });
 
-                this.$modal.show('output-modal');
+                this.modalOpen = true;
             },
 
             composerFinished() {
