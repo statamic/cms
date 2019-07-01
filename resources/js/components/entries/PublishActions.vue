@@ -89,16 +89,15 @@ export default {
 
         options() {
             let options = [
-                { value: 'publish', text: 'Publish Now', },
-                { value: 'schedule', text: 'Schedule', },
+                { value: 'publish', label: 'Publish Now', },
             ];
 
             if (this.published) {
-                options.push({ value: 'unpublish', text: 'Unpublish' });
+                options.push({ value: 'unpublish', label: 'Unpublish' });
             }
 
             return options.concat([
-                { value: 'revision', text: 'Create Revision', },
+                { value: 'revision', label: 'Create Revision', },
             ]);
         },
 
@@ -116,7 +115,7 @@ export default {
         },
 
         submitButtonText() {
-            return _.findWhere(this.options, { value: this.action }).text;
+            return _.findWhere(this.options, { value: this.action }).label;
         }
 
     },

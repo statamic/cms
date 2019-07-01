@@ -15,7 +15,7 @@
         :initial-values="{{ json_encode($values) }}"
         :initial-localized-fields="{{ json_encode($localizedFields) }}"
         :initial-meta="{{ json_encode($meta) }}"
-        :initial-published="{{ bool_str($entry->published()) }}"
+        :initial-published="{{ bool_str($published) }}"
         initial-permalink="{{ $permalink }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         :initial-has-origin="{{ bool_str($hasOrigin) }}"
