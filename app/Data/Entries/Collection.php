@@ -358,7 +358,16 @@ class Collection implements Contract
 
     public function revisionsEnabled($enabled = null)
     {
-        return $this->fluentlyGetOrSet('revisions')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($enabled) {
+                if (! config('statamic.revisions.enabled')) {
+                    return false;
+                }
+
+                return $enabled;
+            })
+            ->args(func_get_args());
     }
 
     public function structure($structure = null)
