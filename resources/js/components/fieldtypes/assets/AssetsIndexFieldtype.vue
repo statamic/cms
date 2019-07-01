@@ -7,7 +7,7 @@
             :href="asset.url"
             target="_blank"
         >
-            <asset-thumbnail :asset="asset" class="w-6 h-6 mr-1" />
+            <asset-thumbnail :asset="asset" class="h-8 max-w-3xs -mx-sm" />
         </a>
     </div>
 
