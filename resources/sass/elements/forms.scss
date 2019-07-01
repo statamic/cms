@@ -140,7 +140,7 @@ textarea.input-text:read-only,
 
       select {
           @include button(#fff, config('colors.grey-80'));
-          @apply block appearance-none pl-1.5 pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
+          @apply block appearance-none pl-1.5 text-left pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
       }
 
       .select-input-toggle {
