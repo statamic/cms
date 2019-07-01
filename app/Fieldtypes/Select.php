@@ -12,31 +12,38 @@ class Select extends Fieldtype
             'field' => [
                 'key_header' => 'Value',
                 'value_header' => 'Label'
-            ]
+            ],
+            'instructions' => 'Set the keys and their optional labels.'
         ],
         'placeholder' => [
             'type' => 'text',
-            'default' => ''
+            'default' => '',
+            'instructions' => 'Set default, non-selectable placeholder text.'
         ],
         'clearable' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Enable to allow deselecting your option.'
         ],
         'multiple' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Allow multiple selections.'
         ],
         'searchable' => [
             'type' => 'toggle',
-            'default' => true
+            'default' => true,
+            'instructions' => 'Enable searching through possible options.'
         ],
         'taggable' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Use a "tag" style interface for multiple selections.'
         ],
         'push_tags' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Add newly created tags to the options list.'
         ],
     ];
 }

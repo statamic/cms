@@ -7,6 +7,9 @@ use Statamic\Fields\Fieldtype;
 class Textarea extends Fieldtype
 {
     protected $configFields = [
-        'character_limit' => ['type' => 'text'],
+        'character_limit' => [
+            'type' => 'text',
+            'instructions' => 'Set the maximum number of enterable characters.'
+        ],
     ];
 }

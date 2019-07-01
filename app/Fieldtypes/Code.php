@@ -13,11 +13,13 @@ class Code extends Fieldtype
             'options' => [
                 'material' => 'Dark',
                 'light' => 'Light'
-            ]
+            ],
+            'instructions' => 'Choose your prefered theme.'
         ],
         'mode' => [
             'type' => 'select',
             'default' => 'htmlmixed',
+            'instructions' => 'Choose language for syntax highlighting.',
             'options' => [
                 'clike' => 'C-Like',
                 'css' => 'CSS',
@@ -53,22 +55,26 @@ class Code extends Fieldtype
                 'tabs' => 'Tabs',
                 'spaces' => 'Spaces',
             ],
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Set your preferred type of indentation.'
         ],
         'indent_size' => [
             'type' => 'integer',
             'default' => 4,
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Set your preferred indentation size (in spaces).'
         ],
         'line_numbers' => [
             'type' => 'toggle',
             'default' => true,
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Show line numbers.'
         ],
         'line_wrapping' => [
             'type' => 'toggle',
             'default' => true,
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Wrap long lines of code.'
         ],
         'key_map' => [
             'type' => 'select',
@@ -78,6 +84,7 @@ class Code extends Fieldtype
                 'sublime' => 'Sublime',
                 'vim' => 'Vim'
             ],
+            'instructions' => 'Choose preferred set of keyboard shortcuts.'
         ]
     ];
 }

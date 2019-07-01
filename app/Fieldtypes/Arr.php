@@ -12,7 +12,7 @@ class Arr extends Fieldtype
         'keys' => [
             'type' => 'array',
             'value_header' => 'Label',
-            'instructions' => 'Set the array keys and corresponding, optional labels.'
+            'instructions' => 'Set the array keys and their optional labels.'
         ]
     ];
 

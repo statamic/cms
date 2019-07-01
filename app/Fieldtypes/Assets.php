@@ -18,22 +18,22 @@ class Assets extends Fieldtype
         'container' => [
             'type' => 'asset_container',
             'max_items' => 1,
-            'instructions' => 'Choose which asset container to work in.'
+            'instructions' => 'The asset container to work with.'
         ],
         'folder' => [
             'type' => 'asset_folder',
             'max_items' => 1,
-            'instructions' => 'Set the default folder to begin in.',
+            'instructions' => 'The folder to begin browsing in.',
             'width' => 50
         ],
         'restrict' => [
             'type' => 'toggle',
-            'instructions' => 'Prevent from users from navigating into other folders.',
+            'instructions' => 'Prevent users from navigating to other folders.',
             'width' => 50
         ],
         'max_files' => [
             'type' => 'integer',
-            'instructions' => 'Set a maximum number of selectable assets.',
+            'instructions' => 'The maximum number of selectable assets.',
             'width' => 50
         ],
         'allow_uploads' => [
@@ -49,7 +49,7 @@ class Assets extends Fieldtype
                 'grid' => 'Grid',
                 'list' => 'List',
             ],
-            'instructions' => 'Set the default layout style.'
+            'instructions' => 'Default layout interface.'
         ],
     ];
 

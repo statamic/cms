@@ -9,8 +9,12 @@ class Radio extends Fieldtype
     protected $configFields = [
         'options' => [
             'type' => 'array',
-            'value_header' => 'Label'
+            'value_header' => 'Label',
+            'instructions' => 'Set the array keys and their optional labels.'
         ],
-        'inline' => ['type' => 'toggle']
+        'inline' => [
+            'type' => 'toggle',
+            'instructions' => 'Show the radio buttons in a row.'
+        ]
     ];
 }

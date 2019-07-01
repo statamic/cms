@@ -14,6 +14,7 @@ class Bard extends Replicator
         'sets' => ['type' => 'sets'],
         'buttons' => [
             'type' => 'bard_buttons_setting',
+            'instructions' => 'Choose which buttons to show in the toolbar.',
             'default' => [
                 'h2',
                 'h3',
@@ -27,7 +28,11 @@ class Bard extends Replicator
                 'image',
             ]
         ],
-        'save_html' => ['type' => 'toggle'],
+        'save_html' => [
+            'type' => 'toggle',
+            'display' => 'Save HTML',
+            'instructions' => 'Save HTML instead of structured data. This simplifies but limits control of your template markup.'
+        ],
         'toolbar_mode' => [
             'type' => 'select',
             'default' => 'fixed',
@@ -35,33 +40,40 @@ class Bard extends Replicator
                 'fixed' => 'Fixed',
                 'floating' => 'Floating',
             ],
+            'instructions' => 'Choose which style of toolbar you prefer.'
         ],
         'link_noopener' => [
             'type' => 'toggle',
             'default' => false,
             'width' => 50,
+            'instructions' => 'Set `rel="noopener` on all links.'
         ],
         'link_noreferrer' => [
             'type' => 'toggle',
             'default' => false,
             'width' => 50,
+            'instructions' => 'Set `rel="noreferrer` on all links.'
         ],
         'target_blank' => [
             'type' => 'toggle',
             'default' => false,
             'width' => 50,
+            'instructions' => 'Set `target="_blank` on all links.'
         ],
         'reading_time' => [
             'type' => 'toggle',
             'default' => false,
+            'instructions' => 'Show estimated reading time at the bottom of the field.'
         ],
         'fullscreen' => [
             'type' => 'toggle',
             'default' => true,
+            'instructions' => 'Enable the option to toggle into fullscreen mode'
         ],
         'allow_source' => [
             'type' => 'toggle',
             'default' => true,
+            'instructions' => 'Enable the option to view the HTML source code while writing.'
         ]
     ];
 

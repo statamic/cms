@@ -17,13 +17,34 @@ class Grid extends Fieldtype
         'mode' => [
             'type' => 'select',
             'default' => 'table',
-            'options' => ['table' => 'Table', 'stacked' => 'Stacked'],
+            'instructions' => 'Choose the layout style you wish to use by default.',
+            'options' => [
+                'table' => 'Table',
+                'stacked' => 'Stacked'
+            ],
         ],
-        'max_rows' => ['type' => 'integer', 'width' => '50'],
-        'min_rows' => ['type' => 'integer', 'width' => '50'],
-        'add_row' => ['type' => 'text'],
-        'reorderable' => ['type' => 'toggle', 'default' => true],
-        'fields' => ['type' => 'fields'],
+        'max_rows' => [
+            'type' => 'integer',
+            'width' => '50',
+            'instructions' => 'Set a maximum number of rows that can be created.',
+        ],
+        'min_rows' => [
+            'type' => 'integer',
+            'width' => '50',
+            'instructions' => 'Set a minimum number of rows that must be created.',
+        ],
+        'add_row' => [
+            'type' => 'text',
+            'instructions' => 'Set the label of the "Add Row" button.',
+        ],
+        'reorderable' => [
+            'type' => 'toggle',
+            'default' => true,
+            'instructions' => 'Enable to allow row reordering.',
+        ],
+        'fields' => [
+            'type' => 'fields'
+        ],
     ];
 
     public function process($data)

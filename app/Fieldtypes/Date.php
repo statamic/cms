@@ -10,37 +10,50 @@ class Date extends Fieldtype
     protected $configFields = [
         'time_enabled'  => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Enable the timepicker.'
         ],
         'time_required' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Require time in addition to date.'
         ],
         'earliest_date' => [
             'type' => 'text',
-            'default' => '1900-01-01'
+            'default' => '1900-01-01',
+            'instructions' => 'Set the earliest date you would like selectable.'
         ],
-        'format' => ['type' => 'text'],
+        'format' => [
+            'type' => 'text',
+            'instructions' => 'Optionally format the date string using moment.js. See the [formatting arguments](https://momentjs.com/docs/#/displaying/format/).'
+        ],
         'full_width' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Stretch the calender to use up the full width.'
         ],
         'inline' => [
             'type' => 'toggle',
-            'default' => false
+            'default' => false,
+            'instructions' => 'Skip the dropdown input field and show the calendar directly.'
         ],
         'columns' => [
             'type' => 'integer',
-            'default' => 1
+            'default' => 1,
+            'instructions' => 'Show multiple months at one time, in rows and columns',
+            'width' => 50,
         ],
         'rows' => [
             'type' => 'integer',
-            'default' => 1
+            'default' => 1,
+            'instructions' => 'Show multiple months at one time, in rows and columns',
+            'width' => 50,
         ],
         // @TODO hook up multiple mode
         'mode' => [
             'type' => 'select',
             'default' => 'single',
+            'instructions' => 'Choose a single date or range of dates. Note: Ranges disable the time picker.',
             'options' => [
                 'single' => 'Single',
                 // 'multiple' => 'Multiple',

@@ -101,6 +101,14 @@ sup {
     @apply .list-reset;
 }
 
+code {
+    @apply font-mono rounded;
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #c7254e;
+    background-color: #f9f2f4;
+}
+
 .clean-content {
 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
