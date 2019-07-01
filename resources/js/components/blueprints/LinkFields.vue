@@ -2,9 +2,9 @@
 
     <div>
 
-        <button class="btn ml-1 px-1 flex items-center" @click="open = true">
-            <svg-icon name="hyperlink" class="mr-sm" />
-            <span>Link</span>
+        <button class="btn flex w-full justify-center items-center" @click="open = true">
+            <svg-icon name="hyperlink" class="mr-1" />
+            <span>{{ __('Link Existing') }}</span>
         </button>
 
         <stack narrow v-if="open" @closed="open = false" name="field-linker">

@@ -38,12 +38,16 @@
                     />
                 </div>
 
-                <div class="p-2 pt-0 flex items-center">
-                    <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                        <svg-icon name="wireframe" class="mr-1" />
-                        {{ __('Create Field') }}
-                    </button>
-                    <link-fields @linked="fieldLinked" class="flex-1" />
+                <div class="p-2 pt-0 flex items-center -mx-sm">
+                    <div class="w-1/2 px-sm">
+                        <link-fields @linked="fieldLinked" />
+                    </div>
+                    <div class="w-1/2 px-sm">
+                        <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
+                            <svg-icon name="wireframe" class="mr-1" />
+                            {{ __('Create Field') }}
+                        </button>
+                    </div>
                 </div>
 
             </div>
