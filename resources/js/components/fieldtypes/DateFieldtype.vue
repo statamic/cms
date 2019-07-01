@@ -27,8 +27,7 @@
                     :is-inline="config.inline"
                     :is-expanded="name === 'date' || config.full_width"
                     :columns="$screens({ default: 1, lg: config.columns })"
-                    :rows="$screens({ default: 1, lg: config.rows })"
-                    @input="handleUpdate">
+                    :rows="$screens({ default: 1, lg: config.rows })">
                         <input
                             slot-scope="{ inputProps, inputEvents }"
                             class="bg-transparent leading-none w-full"
@@ -102,9 +101,15 @@ export default {
     },
 
     watch: {
+
+        date(value) {
+            this.handleUpdate(value)
+        },
+
         time(value) {
             this.handleUpdate(value)
         }
+
     },
 
     methods: {
