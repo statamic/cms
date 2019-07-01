@@ -1,7 +1,7 @@
 <template>
 
     <portal :to="portal">
-        <vue-modal v-bind="modalProps" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
+        <vue-modal v-bind="modalProps" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
             <slot :close="close" />
         </vue-modal>
     </portal>
@@ -53,6 +53,10 @@ export default {
     },
 
     methods: {
+
+        modalOpened(event) {
+            this.$emit('opened');
+        },
 
         modalClosed(event) {
             this.close();
