@@ -184,7 +184,7 @@ class EntriesController extends CpController
         }
 
         $entry
-            ->data($values)
+            ->merge($values)
             ->slug($request->slug);
 
         if ($entry->collection()->dated()) {
