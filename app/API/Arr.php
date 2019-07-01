@@ -210,6 +210,19 @@ class Arr extends IlluminateArr
         });
     }
 
+    public static function filterRecursive($input)
+    {
+        foreach ($input as &$value) {
+           if (is_array($value)) {
+               $value = self::filterRecursive($value);
+           }
+        }
+
+        return array_filter($input, function($var) {
+            return !is_null($var);
+        });
+    }
+
     /**
      * Get the first item from an array using a list of keys.
      *

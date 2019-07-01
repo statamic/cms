@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
@@ -73,6 +74,7 @@ class BlueprintController extends CpController
 
     public function update(Request $request, $blueprint)
     {
+
         $blueprint = API\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
@@ -85,10 +87,9 @@ class BlueprintController extends CpController
         $sections = collect($request->sections)->mapWithKeys(function ($section) {
             return [array_pull($section, 'handle') => [
                 'display' => $section['display'],
-                'fields' => $this->sectionFields($section['fields'])
+                'fields' => Arr::filterRecursive($this->sectionFields($section['fields']))
             ]];
         })->all();
-
         $blueprint->setContents([
             'title' => $request->title,
             'sections' => $sections
