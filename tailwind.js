@@ -371,6 +371,8 @@ module.exports = {
         'xs': '10rem',
         '100': '100px',
         '120': '120px',
+        'md':  '160px',
+        'lg':  '200px',
         // 'md': '30rem',
         // 'lg': '40rem',
         // 'xl': '50rem',

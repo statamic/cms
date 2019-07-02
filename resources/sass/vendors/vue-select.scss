@@ -44,6 +44,7 @@
     @include button(#fff, config('colors.grey-80'));
     @apply block appearance-none bg-white shadow-button flex h-auto;
 	min-height: 37px;
+	line-height: 1;
     padding: 0 4px 4px;
     white-space: normal;
 
@@ -83,6 +84,8 @@
 
 .vs__open-indicator {
 	@apply flex items-center text-grey-90;
+	height: 16px;
+	width: 16px;
 	-webkit-transform: scale(1);
 	transform: scale(1);
 	transition: -webkit-transform .15s cubic-bezier(1, -.115, .975, .855);

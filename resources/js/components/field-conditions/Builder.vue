@@ -29,10 +29,14 @@
             :key="condition._id"
             class="flex items-center py-2 border-t"
         >
-            <select-input
+            <v-select
                 v-model="conditions[index].field"
+                class="min-w-md"
                 :options="fieldOptions"
-                :placeholder="__('Select Field')" />
+                :reduce="field => field.value"
+                :placeholder="__('Select Field')"
+                :taggable="true"
+                :create-option="field => ({value: field, label: field })" />
 
             <select-input
                 v-model="conditions[index].operator"
@@ -44,7 +48,7 @@
                 v-model="conditions[index].value"
                 class="ml-2" />
 
-            <button v-if="canRemove" @click="remove(index)" class="btn-close ml-1 group">
+            <button @click="remove(index)" class="btn-close ml-1 group">
                 <svg-icon name="trash" class="w-auto group-hover:text-red" />
             </button>
         </div>
@@ -127,10 +131,6 @@ export default {
 
         isCustom() {
             return this.type === 'custom';
-        },
-
-        canRemove() {
-            return this.conditions.length > 1;
         },
 
         saveableConditions() {
