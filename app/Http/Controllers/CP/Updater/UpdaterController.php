@@ -21,10 +21,12 @@ class UpdaterController extends CpController
         $addons = $this->getUpdatableAddons();
 
         if ($addons->isEmpty()) {
-            return redirect()->route('statamic.cp.updater.products.index', ['statamic']);
+            return redirect()->route('statamic.cp.updater.products.index', Statamic::CORE_SLUG);
         }
 
-        return view('statamic::updater.index', ['addons' => $addons]);
+        $statamicChangelog = Changelog::product(Statamic::CORE_SLUG);
+
+        return view('statamic::updater.index', compact('statamicChangelog', 'addons'));
     }
 
     /**
@@ -46,6 +48,6 @@ class UpdaterController extends CpController
      */
     private function getUpdatableAddons()
     {
-        return Addon::all()->map->marketplaceSlug()->filter();
+        return Addon::all()->filter->marketplaceSlug();
     }
 }
