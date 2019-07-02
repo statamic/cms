@@ -4,7 +4,7 @@
             <h1 class="flex-1">
                 <small class="subhead block" v-if="currentVersion">
                     {{ __('Current') }}: {{ currentVersion }}</small>
-                {{ __('Updates') }}
+                {{ name }}
             </h1>
             <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
                 <template v-if="composer.processing">
@@ -70,6 +70,7 @@
         props: [
             'slug',
             'package',
+            'name',
         ],
 
         data() {

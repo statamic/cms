@@ -13,21 +13,27 @@ use Facades\Statamic\Console\Processes\Composer;
 class UpdateProductController extends CpController
 {
     /**
-     * Product updates overview.
+     * Show product updates overview.
      *
      * @param string $product
      */
-    public function index($product)
+    public function show($product)
     {
         $this->authorize('view updates');
 
-        $package = $this->getPackage($product);
+        if ($addon = $this->getAddon($product)) {
+            $data['package'] = $addon->package();
+            $data['name'] = $addon->name();
+        } elseif ($product === Statamic::CORE_SLUG) {
+            $data['package'] = Statamic::CORE_REPO;
+            $data['name'] = 'Statamic';
+        } else {
+            abort(404);
+        }
 
-        return view('statamic::updater.show', [
-            'title' => 'Updates',
-            'slug' => $product,
-            'package' => $package,
-        ]);
+        return view('statamic::updater.show', array_merge($data, [
+            'slug' => $product
+        ]));
     }
 
     /**
@@ -91,18 +97,19 @@ class UpdateProductController extends CpController
      * @param string $product
      * @return string
      */
-    private function getPackage(string $product)
+    private function getPackage($addon)
     {
         if ($product === Statamic::CORE_SLUG) {
             return Statamic::CORE_REPO;
         }
 
-        $package = Addon::all()->first(function ($addon) use ($product) {
+        // return
+    }
+
+    private function getAddon($product)
+    {
+        return Addon::all()->first(function ($addon) use ($product) {
             return $addon->marketplaceSlug() === $product;
         });
-
-        abort_unless($package, 404);
-
-        return $package->package();
     }
 }

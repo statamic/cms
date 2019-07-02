@@ -19,7 +19,10 @@ class UpdaterController extends CpController
         $this->authorize('view updates');
 
         $addons = $this->getUpdatableAddons();
-        $statamic = Changelog::product(Statamic::CORE_REPO);
+
+        if ($addons->isEmpty()) {
+            return redirect()->route('statamic.cp.updater.products.index', ['statamic']);
+        }
 
         return view('statamic::updater.index', ['addons' => $addons]);
     }

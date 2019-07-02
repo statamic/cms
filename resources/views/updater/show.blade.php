@@ -2,5 +2,9 @@
 @section('title', __('Updater'))
 
 @section('content')
-    <updater slug="{{ $slug }}" package="{{ $package }}"></updater>
+
+    @include('statamic::updater.partials.header')
+
+    <updater slug="{{ $slug }}" package="{{ $package }}" name="{{ $name }}"></updater>
+
 @endsection
