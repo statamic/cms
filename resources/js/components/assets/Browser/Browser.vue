@@ -119,7 +119,8 @@
 
                                         <td class="text-right" :colspan="columns.length">
                                             <dropdown-list>
-                                                <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" />
+                                                <!-- TODO: Do we want folder edit functionality for launch? -->
+                                                <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
