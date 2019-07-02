@@ -7,10 +7,10 @@ use Statamic\API\Path;
 use Statamic\API\YAML;
 use Statamic\API\Action;
 use Statamic\Data\DataFolder;
+use Statamic\API\AssetContainer;
 use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
-use Statamic\API\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 
 class AssetFolder implements Contract, Arrayable
@@ -20,6 +20,15 @@ class AssetFolder implements Contract, Arrayable
     protected $container;
     protected $path;
     protected $withActions = false;
+
+    public static function find($reference)
+    {
+        list($container, $path) = explode('::', $reference);
+
+        return (new static)
+            ->container(AssetContainer::find($container))
+            ->path($path);
+    }
 
     public function container($container = null)
     {
