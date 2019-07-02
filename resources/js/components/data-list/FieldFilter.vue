@@ -8,9 +8,9 @@
                 name="operator"
                 v-model="value.operator"
                 :options="[
-                    { text: 'Equal to', value: '=' },
-                    { text: 'Not equal to', value: '<>' },
-                    { text: 'Like', value: 'like' },
+                    { label: 'Equal to', value: '=' },
+                    { label: 'Not equal to', value: '<>' },
+                    { label: 'Like', value: 'like' },
                 ]" />
 
             <div class="flex-1">
