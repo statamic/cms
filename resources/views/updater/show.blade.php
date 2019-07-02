@@ -3,7 +3,7 @@
 
 @section('content')
 
-    @include('statamic::updater.partials.header')
+    @include('statamic::updater.partials.header', ['product' => $name])
 
     <updater slug="{{ $slug }}" package="{{ $package }}" name="{{ $name }}"></updater>
 

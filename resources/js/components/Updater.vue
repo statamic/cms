@@ -1,10 +1,8 @@
 <template>
     <div>
         <div class="flex mb-3">
-            <h1 class="flex-1">
-                <small class="subhead block" v-if="currentVersion">
-                    {{ __('Current') }}: {{ currentVersion }}</small>
-                {{ name }}
+            <h1 v-if="currentVersion" class="flex-1">
+                {{ __('Current') }}: <span class="font-normal">{{ currentVersion }}</span>
             </h1>
             <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
                 <template v-if="composer.processing">
