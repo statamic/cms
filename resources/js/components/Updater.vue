@@ -7,7 +7,7 @@
             <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
                 <template v-if="composer.processing">
                     {{ composer.status }}
-                    <span class="icon icon-circular-graph animation-spin ml-1"></span>
+                    <loading-graphic />
                 </template>
                 <template v-else>Last Install Log</template>
             </button>
