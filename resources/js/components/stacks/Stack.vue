@@ -35,6 +35,9 @@ export default {
         },
         narrow: {
             type: Boolean
+        },
+        half: {
+            type: Boolean
         }
     },
 
@@ -56,6 +59,8 @@ export default {
         offset() {
             if (this.isTopStack && this.narrow) {
                 return window.innerWidth - 400;
+            } else if (this.isTopStack && this.half) {
+                return window.innerWidth/ 2 ;
             }
 
             // max of 200px, min of 80px
@@ -63,7 +68,7 @@ export default {
         },
 
         leftOffset() {
-            if (this.isTopStack && this.narrow) {
+            if (this.isTopStack && (this.narrow || this.half)) {
                 return this.offset;
             }
 
