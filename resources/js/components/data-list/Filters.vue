@@ -5,8 +5,8 @@
             <span>{{ __('Filters') }}</span>
             <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
         </button>
-        <pane name="filters" v-if="filtering" @closed="dismiss">
-            <div>
+        <stack half name="filters" v-if="filtering" @closed="dismiss">
+            <div class="h-full overflow-auto bg-white">
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
                     {{ __('Filters') }}
@@ -42,18 +42,18 @@
                     <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
                 </div>
 
-                <div v-if="preferencesKey" class="p-3 pt-0">
+                <div v-if="preferencesKey" class="mx-3 border-t">
                     <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                     <template v-else>
-                        <div class="flex justify-center mt-3">
-                            <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
-                            <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
+                        <div class="flex mt-3">
+                            <button class="btn mr-2" @click="reset">{{ __('Reset All') }}</button>
+                            <button class="btn-primary" @click="save">{{ __('Save Filters') }}</button>
                         </div>
                     </template>
                 </div>
 
             </div>
-        </pane>
+        </stack>
     </div>
 </template>
 
@@ -79,7 +79,7 @@ export default {
         return {
             filtering: false,
             perPageOptions: [2, 25, 50, 100],
-            saving: false,
+            saving: false, // dummy var to stub out Add Filter button
         }
     },
 

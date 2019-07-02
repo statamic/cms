@@ -1,6 +1,7 @@
 <template>
 
-    <div class="publish-fields">
+    <div class="p-3">
+
         <field-filter
             v-for="field in selectedFields"
             :key="field.handle"
@@ -10,16 +11,31 @@
             @removed="removeField(field.handle)"
         />
 
-        <div class="p-3" v-show="unselectedFields.length">
-            <h6>Add filter...</h6>
+        <div class="border-b mb-3 pb-3" v-show="creating">
 
-            <button
+            <v-select
+                class="inline-block min-w-120"
+                label="display"
+                name="createFilter"
+                @input="selectField(handle)"
+                :clearable="false"
+                :placeholder="__('Select Field')"
+                :options="unselectedFields"
+                :searchable="false" />
+
+            <!-- <button
                 v-for="field in unselectedFields"
                 :key="field.handle"
                 class="btn btn-flat mt-1 mr-1 text-xs"
                 @click="selectField(field.handle)"
-                v-text="field.display" />
+                v-text="field.display" /> -->
+
         </div>
+
+        <div class="" v-show="unselectedFields.length">
+            <button class="btn" v-text="__('Add Filter')" @click="creating = true" />
+        </div>
+
     </div>
 
 </template>
@@ -45,6 +61,7 @@ export default {
     data() {
         return {
             values: this.initialValue,
+            creating: false,
         }
     },
 
