@@ -9,12 +9,6 @@ use Statamic\Fields\Validation;
 
 abstract class ActionController extends CpController
 {
-    // TODO: Remove!
-    public function __invoke(Request $request)
-    {
-        return $this->run($request);
-    }
-
     public function index(Request $request)
     {
         $data = $request->validate([
