@@ -57,7 +57,7 @@ class BrowserController extends CpController
 
         return Resource::collection($paginator)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
-            'folders' => $container->assetFolders($path)->values()->toArray(),
+            'folders' => $container->assetFolders($path)->values()->each->withActions()->toArray(),
             'folder' => $container->assetFolder($path)->toArray()
         ]]);
     }
