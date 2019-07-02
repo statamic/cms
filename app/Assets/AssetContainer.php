@@ -17,6 +17,7 @@ use Statamic\API\Asset as AssetAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -90,8 +91,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
             'handle' => $this->handle(),
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
-            'allow_uploads' => $this->allowUploads(),
-            'create_folders' => $this->createFolders(),
+            'allow_uploads' => user()->can('store', [AssetContract::class, $this]),
+            'create_folders' => user()->can('create', [AssetFolder::class, $this]),
             'search_index' => $this->searchIndex,
         ];
     }
