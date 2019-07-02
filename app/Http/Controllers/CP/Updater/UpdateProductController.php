@@ -92,20 +92,11 @@ class UpdateProductController extends CpController
     }
 
     /**
-     * Get updatable package from product slug.
+     * Get updatable addon from product slug.
      *
      * @param string $product
-     * @return string
+     * @return \Illuminate\Support\Collection
      */
-    private function getPackage($addon)
-    {
-        if ($product === Statamic::CORE_SLUG) {
-            return Statamic::CORE_REPO;
-        }
-
-        // return
-    }
-
     private function getAddon($product)
     {
         return Addon::all()->first(function ($addon) use ($product) {
