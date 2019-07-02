@@ -118,14 +118,14 @@
                                         </td>
 
                                         <td class="text-right" :colspan="columns.length">
-                                            <dropdown-list v-if="folder.actions.length">
+                                            <dropdown-list v-if="folderActions(folder).length">
                                                 <!-- TODO: Do we want folder edit functionality for launch? -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
                                                     :url="folderActionUrl"
-                                                    :actions="folder.actions"
+                                                    :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
                                                 />
@@ -530,6 +530,10 @@ export default {
                 this.selectedAssets.push(id);
             }
             this.$emit('selections-updated', this.selectedAssets);
+        },
+
+        folderActions(folder) {
+            return folder.actions || this.folder.actions || [];
         }
     }
 
