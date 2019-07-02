@@ -8,6 +8,7 @@ use Statamic\API\Str;
 use Statamic\API\Path;
 use Statamic\API\File;
 use Statamic\API\YAML;
+use Statamic\Updater\Changelog;
 
 final class Addon
 {
@@ -317,6 +318,16 @@ final class Addon
     public function licenseKey()
     {
         return array_get($this->config(), 'license_key');
+    }
+
+    /**
+     * Get addon changelog.
+     *
+     * @return Changelog|null
+     */
+    public function changelog()
+    {
+        return Changelog::product($this->marketplaceSlug());
     }
 
     public function toComposerJson()
