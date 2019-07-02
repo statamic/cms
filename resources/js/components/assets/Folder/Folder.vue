@@ -70,6 +70,10 @@ export default {
     },
 
     created() {
+        // Allow key commands with a focused input
+        this.$mousetrap.prototype.stopCallback = function () { return false; }
+
+        this.$mousetrap.bind('enter', this.submit)
         this.$mousetrap.bind('esc', this.cancel)
     },
 
