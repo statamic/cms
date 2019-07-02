@@ -86,15 +86,22 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function toArray()
     {
-        return [
+        $array = [
             'title' => $this->title(),
             'handle' => $this->handle(),
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
-            'allow_uploads' => user()->can('store', [AssetContract::class, $this]),
-            'create_folders' => user()->can('create', [AssetFolder::class, $this]),
             'search_index' => $this->searchIndex,
+            'allow_uploads' => $this->allowUploads(),
+            'create_folders' => $this->createFolders(),
         ];
+
+        if ($user = user()) {
+            $array['allow_uploads'] = user()->can('store', [AssetContract::class, $this]);
+            $array['create_folders'] = user()->can('create', [AssetFolder::class, $this]);
+        }
+
+        return $array;
     }
 
     public function toAugmentedArray()
