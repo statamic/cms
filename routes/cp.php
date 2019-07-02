@@ -110,9 +110,9 @@ Route::group([
     Route::get('composer/check', 'ComposerOutputController@check');
 
     Route::group(['namespace' => 'Updater'], function () {
-        Route::get('updater', 'UpdaterController@index')->name('updater.index');
+        Route::get('updater', 'UpdaterController@index')->name('updater');
         Route::get('updater/count', 'UpdaterController@count');
-        Route::get('updater/{product}', 'UpdateProductController@index')->name('updater.products.index');
+        Route::get('updater/{product}', 'UpdateProductController@index')->name('updater.product');
         Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
         Route::post('updater/{product}/update', 'UpdateProductController@update');
         Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');

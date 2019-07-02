@@ -23,7 +23,7 @@ class UpdateProductController extends CpController
 
         $package = $this->getPackage($product);
 
-        return view('statamic::updater.index', [
+        return view('statamic::updater.show', [
             'title' => 'Updates',
             'slug' => $product,
             'package' => $package,
