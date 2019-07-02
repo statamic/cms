@@ -118,7 +118,7 @@
                                         </td>
 
                                         <td class="text-right" :colspan="columns.length">
-                                            <dropdown-list>
+                                            <dropdown-list v-if="folder.actions.length">
                                                 <!-- TODO: Do we want folder edit functionality for launch? -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
