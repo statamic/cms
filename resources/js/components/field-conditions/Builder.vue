@@ -27,12 +27,12 @@
             v-if="hasConditions && isStandard"
             v-for="(condition, index) in conditions"
             :key="condition._id"
-            class="flex items-center mt-2"
+            class="flex items-center py-2 border-t"
         >
             <select-input
                 v-model="conditions[index].field"
                 :options="fieldOptions"
-                :placeholder="false" />
+                :placeholder="__('Select Field')" />
 
             <select-input
                 v-model="conditions[index].operator"
@@ -42,16 +42,18 @@
 
             <text-input
                 v-model="conditions[index].value"
-                class="w-1/2 ml-2" />
+                class="ml-2" />
 
-            <button v-if="canRemove" @click="remove(index)" class="btn-close ml-1">&times;</button>
+            <button v-if="canRemove" @click="remove(index)" class="btn-close ml-1 group">
+                <svg-icon name="trash" class="w-auto group-hover:text-red" />
+            </button>
         </div>
-
-        <button
-            v-if="hasConditions && isStandard"
-            v-text="__('Add Condition')"
-            @click="add"
-            class="btn mt-3" />
+        <div class="border-t pt-3" v-if="hasConditions && isStandard">
+            <button
+                v-text="__('Add Condition')"
+                @click="add"
+                class="btn-primary" />
+        </div>
 
     </div>
 
