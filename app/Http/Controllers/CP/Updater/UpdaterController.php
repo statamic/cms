@@ -21,7 +21,7 @@ class UpdaterController extends CpController
         $addons = $this->getUpdatableAddons();
 
         if ($addons->isEmpty()) {
-            return redirect()->route('statamic.cp.updater.products.index', Statamic::CORE_SLUG);
+            return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
         }
 
         $statamicChangelog = Changelog::product(Statamic::CORE_SLUG);
