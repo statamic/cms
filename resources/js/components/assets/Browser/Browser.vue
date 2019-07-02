@@ -116,9 +116,18 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
+
                                         <td class="text-right" :colspan="columns.length">
                                             <dropdown-list>
                                                 <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" />
+
+                                                <data-list-inline-actions
+                                                    :item="folder.path"
+                                                    :url="folderActionUrl"
+                                                    :actions="folder.actions"
+                                                    @started="actionStarted"
+                                                    @completed="actionCompleted"
+                                                />
                                             </dropdown-list>
 
                                             <folder-editor
@@ -259,6 +268,7 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
+        folderActionUrl: String,
     },
 
     data() {
