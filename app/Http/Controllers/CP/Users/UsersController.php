@@ -230,7 +230,7 @@ class UsersController extends CpController
         $user = User::whereUsername($username);
 
         // Users can reset their own password
-        if ($user !== User::getCurrent()) {
+        if ($user !== me()) {
             $this->authorize('super');
         }
 

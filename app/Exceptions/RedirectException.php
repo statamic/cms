@@ -28,26 +28,6 @@ class RedirectException extends \Exception
         return $this;
     }
 
-    /**
-     * @return mixed
-     * @deprecated Use getCode
-     */
-    public function getStatusCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * @param int $code
-     * @deprecated Use setCode
-     */
-    public function setStatusCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
-
     public function setCode($code)
     {
         $this->code = $code;

@@ -64,7 +64,7 @@ class UserTags extends Tags
 
         // No user found? Get the current one.
         if (! $user) {
-            if (! $user = User::getCurrent()) {
+            if (! me()) {
                 return $this->parseNoResults();
             }
         }

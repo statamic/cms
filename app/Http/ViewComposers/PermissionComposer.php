@@ -10,7 +10,7 @@ class PermissionComposer
 {
     public function compose(View $view)
     {
-        $permissions = User::getCurrent()->permissions();
+        $permissions = me()->permissions();
 
         \Statamic::provideToScript([
             'permissions' => base64_encode(json_encode($permissions))

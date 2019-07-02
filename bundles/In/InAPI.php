@@ -11,7 +11,7 @@ class InAPI extends API
     public function in($groups)
     {
         // Not logged in? This is the end of the road.
-        if (! $user = User::getCurrent()) {
+        if (! $user = me()) {
             return;
         }
 
