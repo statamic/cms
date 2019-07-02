@@ -150,7 +150,7 @@ export default {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
-                    this.$notify.success(__('Columns reset'));
+                    this.$notify.success(__('Filters reset'));
                 })
                 .catch(error => {
                     this.saving = false;
