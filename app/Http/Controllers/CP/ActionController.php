@@ -18,7 +18,7 @@ abstract class ActionController extends CpController
 
         $context = isset($data['context']) ? json_decode($data['context'], true) : [];
 
-        $items = $this->getSelectedItems(collect($data['selections']));
+        $items = $this->getSelectedItems(collect($data['selections']), $context);
 
         $actions = Action::for($this->getKey(), $context, $items);
 
@@ -39,7 +39,7 @@ abstract class ActionController extends CpController
 
         $request->replace($request->values)->validate($validation->rules());
 
-        $items = $this->getSelectedItems(collect($data['selections']));
+        $items = $this->getSelectedItems(collect($data['selections']), $data['context']);
 
         $unauthorized = $items->reject(function ($item) use ($action) {
             return $action->authorize($item);
@@ -50,7 +50,7 @@ abstract class ActionController extends CpController
         $action->run($items, $request->all());
     }
 
-    abstract protected function getSelectedItems($items);
+    abstract protected function getSelectedItems($items, $context);
 
     protected function getKey()
     {

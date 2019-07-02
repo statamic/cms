@@ -9,7 +9,7 @@ class UserActionController extends ActionController
 {
     protected static $key = 'users';
 
-    protected function getSelectedItems($items)
+    protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {
             return User::find($item);
