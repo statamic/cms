@@ -334,10 +334,6 @@ export default {
                 return Boolean(this.collection.title && this.collection.handle);
             }
 
-            if (step === 4) {
-                return this.collection.blueprints.length > 0;
-            }
-
             return true;
         },
         submit() {
