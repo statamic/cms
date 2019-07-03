@@ -17,11 +17,10 @@
                 <text-input name="value" v-model="value.value" />
             </div>
 
-            <button
-                type="button"
-                class="btn-close"
-                @click="$emit('removed')"
-                v-html="'&times'" />
+            <button @click="$emit('removed')" class="btn-close group">
+                <svg-icon name="trash" class="w-auto group-hover:text-red" />
+            </button>
+
         </div>
     </div>
 
