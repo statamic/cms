@@ -31,19 +31,6 @@
                     @changed="filterChanged('fields', $event)"
                 />
 
-                <!-- Moving out of filters stack?
-                <div class="p-3 pt-0">
-                    <select class="w-auto mt-3" :value="perPage" @change="$emit('per-page-changed', parseInt($event.target.value))">
-                        <option
-                            v-for="value in perPageOptions"
-                            :key="value"
-                            :value="value"
-                            v-text="value" />
-                    </select>
-                    <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
-                </div>
-                -->
-
                 <div v-if="preferencesKey" class="mx-3 mt-1 pb-3 border-t">
                     <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                     <template v-else>
@@ -71,7 +58,6 @@ export default {
     },
 
     props: {
-        perPage: Number,
         filters: Array,
         activeFilters: Object,
         preferencesKey: String
@@ -80,7 +66,6 @@ export default {
     data() {
         return {
             filtering: false,
-            perPageOptions: [2, 25, 50, 100],
             saving: false, // dummy var to stub out Add Filter button
         }
     },

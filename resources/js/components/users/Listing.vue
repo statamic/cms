@@ -28,9 +28,7 @@
                             <data-list-filters
                                 :filters="filters"
                                 :active-filters="activeFilters"
-                                :per-page="perPage"
                                 @filters-changed="filtersChanged"
-                                @per-page-changed="perPageChanged"
                             />
                         </template>
                     </div>
