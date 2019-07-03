@@ -10,6 +10,10 @@ export default {
         }
     },
 
+    created() {
+        this.$events.$on('filters-changed', this.filtersChanged);
+    },
+
     methods: {
 
         filtersChanged(filters) {

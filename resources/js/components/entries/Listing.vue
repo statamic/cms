@@ -39,8 +39,7 @@
                                 class="ml-1"
                                 :filters="filters"
                                 :active-filters="activeFilters"
-                                :preferences-key="preferencesKey('filters')"
-                                @filters-changed="filtersChanged" />
+                                :preferences-key="preferencesKey('filters')" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>
                     </div>

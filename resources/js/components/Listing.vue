@@ -57,7 +57,6 @@ export default {
 
     created() {
         this.request();
-        this.$events.$on('filters-reset', this.perPageReset);
     },
 
     watch: {
@@ -79,9 +78,9 @@ export default {
         },
 
         searchQuery(query) {
-            this.page = 1;
             this.sortColumn = null;
             this.sortDirection = null;
+            this.pageReset();
             this.request();
         }
 
@@ -124,13 +123,17 @@ export default {
             this.sortDirection = direction;
         },
 
-        perPageChanged(perPage) {
-            this.perPage = perPage;
+        pageReset() {
             this.page = 1;
         },
 
         perPageReset() {
             this.perPageChanged(this.initialPerPage);
+        },
+
+        perPageChanged(perPage) {
+            this.perPage = perPage;
+            this.pageReset();
         }
 
     }

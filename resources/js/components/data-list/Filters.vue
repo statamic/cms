@@ -109,7 +109,7 @@ export default {
             } else {
                 Vue.delete(filters, handle);
             }
-            this.$emit('filters-changed', filters);
+            this.$events.$emit('filters-changed', filters);
         },
 
         save() {

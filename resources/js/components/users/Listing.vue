@@ -28,7 +28,6 @@
                             <data-list-filters
                                 :filters="filters"
                                 :active-filters="activeFilters"
-                                @filters-changed="filtersChanged"
                             />
                         </template>
                     </div>
