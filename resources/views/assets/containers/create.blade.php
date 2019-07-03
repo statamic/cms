@@ -9,6 +9,7 @@
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"
         url="{{ cp_route('asset-containers.store') }}"
+        listing-url="{{ cp_route('assets.browse.index') }}"
         action="post"
     ></asset-container-create-form>
 
