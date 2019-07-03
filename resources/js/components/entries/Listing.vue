@@ -116,7 +116,6 @@ export default {
             reordering: false,
             reorderingRequested: false,
             initialOrder: null,
-            activeFilters: {}
         }
     },
 
@@ -133,7 +132,7 @@ export default {
     },
 
     created() {
-        this.activeFilters = this.$preferences.get(this.preferencesKey('filters'));
+        this.filtersChanged(this.$preferences.get(this.preferencesKey('filters')));
     },
 
     methods: {

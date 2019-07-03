@@ -106,10 +106,7 @@ export default {
         },
 
         preferencesPayload() {
-            return {
-                ...(this.activeFilterCount ? clone(this.activeFilters) : {}),
-                perPage: this.perPage
-            };
+            return this.activeFilterCount ? clone(this.activeFilters) : {};
         }
 
     },

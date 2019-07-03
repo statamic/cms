@@ -24,6 +24,7 @@
                 v-if="adding"
                 :options="fieldOptions"
                 :placeholder="__('Select Field')"
+                :value="null"
                 class="w-1/5"
                 @input="add" />
         </div>
