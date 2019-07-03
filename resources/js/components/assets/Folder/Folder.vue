@@ -1,10 +1,15 @@
 <template>
 
-    <modal name="folder-editor" :pivotY="0.1">
+    <modal name="folder-editor">
 
         <div class="flex items-center justify-between px-3 py-2 bg-grey-20 border-b text-center">
             {{ modalTitle }}
-            <button class="text-grey-60 hover:text-grey-90 text-lg" @click="cancel">&times;</button>
+            <button type="button"
+                tabindex="-1"
+                class="btn-close"
+                aria-label="Close"
+                @click="cancel"
+                v-html="'&times'" />
         </div>
 
         <div class="publish-fields">
