@@ -14,7 +14,9 @@ export default {
         initialSortDirection: String,
         initialPerPage: {
             type: Number,
-            default: 25
+            default() {
+                return Statamic.$config.get('paginationSize');
+            }
         }
     },
 
