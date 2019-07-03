@@ -57,6 +57,7 @@ export default {
 
     created() {
         this.request();
+        this.$events.$on('filters-changed', this.pageReset);
     },
 
     watch: {
