@@ -3,12 +3,13 @@
     <div>
         <v-select
             ref="input"
+            label="title"
+            :close-on-select="true"
+            :multiple="multiple"
+            :options="options"
+            :placeholder="config.placeholder"
             :searchable="true"
             :taggable="taggable"
-            :multiple="multiple"
-            :close-on-select="true"
-            :options="options"
-            label="title"
             :value="items"
             @input="input"
             @search="search"
@@ -26,6 +27,7 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
+        config: Object
     },
 
     data() {
