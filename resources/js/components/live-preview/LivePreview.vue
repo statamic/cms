@@ -36,7 +36,7 @@
                     </div>
                 </transition>
 
-                <div class="live-preview-main flex flex-1">
+                <div class="live-preview-main">
 
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
