@@ -42,7 +42,7 @@
                     <span class='ml-1 text-2xs font-medium' v-text="__('Per Page')" />
                 </div>
 
-                <div v-if="preferencesKey" class="mx-3 border-t">
+                <div v-if="preferencesKey" class="mx-3 pb-3 border-t">
                     <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                     <template v-else>
                         <div class="flex mt-3">
