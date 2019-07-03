@@ -116,6 +116,10 @@ class AssetContainersController extends CpController
 
         $values = $fields->values();
 
+        if (AssetContainer::find($values['handle'])) {
+            throw new \Exception('Asset container already exists');
+        }
+
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
@@ -125,7 +129,7 @@ class AssetContainersController extends CpController
 
         $container->save();
 
-        session()->flash('success', 'Container saved');
+        session()->flash('success', 'Asset container created');
 
         return ['redirect' => $container->showUrl()];
     }

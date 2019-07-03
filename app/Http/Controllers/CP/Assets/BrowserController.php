@@ -29,10 +29,12 @@ class BrowserController extends CpController
 
     public function show($containerHandle, $path = '/')
     {
-        // TODO: Handle invalid $container in url
         // TODO: Auth
-
         $container = AssetContainer::find($containerHandle);
+
+        if (! $container) {
+            return $this->pageNotFound();
+        }
 
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),
@@ -42,10 +44,13 @@ class BrowserController extends CpController
 
     public function folder(Request $request, $container, $path = '/')
     {
-        // TODO: Handle invalid $container in url
         // TODO: Auth
 
         $container = AssetContainer::find($container);
+
+        if (! $container) {
+            return $this->pageNotFound();
+        }
 
         $paginator = $container
             ->queryAssets()
@@ -64,10 +69,13 @@ class BrowserController extends CpController
 
     public function search(Request $request, $container)
     {
-        // TODO: Handle invalid $container in url
         // TODO: Auth
 
         $container = AssetContainer::find($container);
+
+        if (! $container) {
+            return $this->pageNotFound();
+        }
 
         $query = $container->hasSearchIndex()
             ? $container->searchIndex()->ensureExists()->search($request->search)
