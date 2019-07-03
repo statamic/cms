@@ -28,7 +28,7 @@ class GithubReleasePresenter
      */
     public function toHtml()
     {
-        $string = markdown($this->githubRelease);
+        $string = markdown($this->githubRelease ?: '- [na] Changelog unavailable.');
 
         // TODO: Create tailwind classes for these labels.
         $string = Str::replace($string, '[new]', '<span class="label block text-center text-white rounded" style="background: #5bc0de; padding: 2px; padding-bottom: 1px;">NEW</span>');
