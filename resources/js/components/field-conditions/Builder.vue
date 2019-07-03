@@ -52,6 +52,7 @@
                 <svg-icon name="trash" class="w-auto group-hover:text-red" />
             </button>
         </div>
+
         <div class="border-t pt-3" v-if="hasConditions && isStandard">
             <button
                 v-text="__('Add Condition')"

@@ -116,6 +116,7 @@ export default {
             reordering: false,
             reorderingRequested: false,
             initialOrder: null,
+            activeFilters: {}
         }
     },
 
@@ -129,6 +130,10 @@ export default {
         reorderingDisabled() {
             return this.sortColumn !== 'order';
         }
+    },
+
+    created() {
+        this.activeFilters = this.$preferences.get(this.preferencesKey('filters'));
     },
 
     methods: {

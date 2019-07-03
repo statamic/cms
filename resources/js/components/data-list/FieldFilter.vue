@@ -1,10 +1,10 @@
 <template>
 
-    <div class="form-group">
-        <label>{{ field.display }}</label>
+    <div>
+        <label class="mb-1">{{ field.display }}</label>
         <div class="flex items-center text-sm">
             <select-input
-                class="w-1/5 mr-1"
+                class="w-1/5 mr-2"
                 name="operator"
                 v-model="value.operator"
                 :options="[
