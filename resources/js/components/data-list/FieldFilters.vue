@@ -6,7 +6,7 @@
             <div class="flex items-center mb-3">
 
                 <select-input
-                    class="w-1/4 mr-2"
+                    class="mr-2"
                     name="operator"
                     :options="fieldOptions(filter)"
                     v-model="filter.field"
@@ -31,8 +31,8 @@
         <button
             v-if="canAdd"
             v-text="__('Add Filter')"
-            class="btn mt-2"
-            @click="add(null)" />
+            class="btn"
+            @click="add()" />
 
     </div>
 

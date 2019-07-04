@@ -5,7 +5,7 @@
         <div class="flex items-center text-sm">
 
             <select-input
-                class="w-1/4 mr-2"
+                class="w-1/3 mr-2"
                 name="operator"
                 v-model="filter.operator"
                 :placeholder="__('Select Operator')"
