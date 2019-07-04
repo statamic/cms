@@ -19,13 +19,14 @@ class PreferenceController extends CpController
 
         $request->validate([
             'key' => 'required',
-            'value' => 'required',
+            'value' => 'sometimes',
         ]);
 
         $method = $request->has('append') ? 'appendPreference' : 'setPreference';
 
         auth()->user()
             ->{$method}($request->key, $request->value)
+            ->cleanupPreference($request->key)
             ->save();
 
         return Preference::all();
