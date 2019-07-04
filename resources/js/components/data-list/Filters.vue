@@ -127,14 +127,13 @@ export default {
         },
 
         reset() {
-            this.$events.$emit('filters-reset');
-
             this.saving = true;
 
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
                     this.$notify.success(__('Filters reset'));
+                    this.$events.$emit('filters-reset');
                 })
                 .catch(error => {
                     this.saving = false;
