@@ -32,22 +32,13 @@ export default {
         field: Object,
         filter: {
             type: Object,
-            required: true,
-            default() {
-                return {
-                    value: null,
-                    operator: '='
-                };
-            }
+            required: true
         }
     },
 
     computed: {
         value() {
-            return {
-                value: this.filter.value || null,
-                operator: this.filter.operator || '='
-            };
+            return this.filter;
         }
     },
 
@@ -55,7 +46,20 @@ export default {
         value: {
             deep: true,
             handler(value) {
+                this.ensureDefaults();
                 this.$emit('updated', value);
+            }
+        }
+    },
+
+    created() {
+        this.ensureDefaults();
+    },
+
+    methods: {
+        ensureDefaults() {
+            if (! this.filter.operator) {
+                this.filter.operator = '=';
             }
         }
     }
