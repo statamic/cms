@@ -42,7 +42,7 @@ export default {
     },
 
     methods: {
-        confirm(id) {
+        confirm() {
             this.deleting = true;
         },
 
