@@ -1,12 +1,14 @@
 <template>
 
     <div>
-        <label class="mb-1">{{ field.display }}</label>
+
         <div class="flex items-center text-sm">
+
             <select-input
-                class="w-1/5 mr-2"
+                class="w-1/4 mr-2"
                 name="operator"
-                v-model="value.operator"
+                v-model="filter.operator"
+                :placeholder="__('Select Operator')"
                 :options="[
                     { label: 'Equal to', value: '=' },
                     { label: 'Not equal to', value: '<>' },
@@ -14,14 +16,11 @@
                 ]" />
 
             <div class="flex-1">
-                <text-input name="value" v-model="value.value" />
+                <text-input name="value" v-model="filter.value" />
             </div>
 
-            <button @click="$emit('removed')" class="btn-close group">
-                <svg-icon name="trash" class="w-auto group-hover:text-red" />
-            </button>
-
         </div>
+
     </div>
 
 </template>
@@ -31,26 +30,34 @@ export default {
 
     props: {
         field: Object,
-        value: {
+        filter: {
             type: Object,
-            default: () => {
+            required: true,
+            default() {
                 return {
                     value: null,
-                    operator: '=',
-                }
+                    operator: '='
+                };
             }
         }
     },
 
-    watch: {
+    computed: {
+        value() {
+            return {
+                value: this.filter.value || null,
+                operator: this.filter.operator || '='
+            };
+        }
+    },
 
+    watch: {
         value: {
             deep: true,
             handler(value) {
                 this.$emit('updated', value);
             }
         }
-
     }
 
 }

@@ -2,38 +2,44 @@
 
     <div class="p-3">
 
-        <div v-if="selectedFields.length">
-            <field-filter
-                v-for="field in selectedFields"
-                :key="field.handle"
-                :field="field"
-                :value="values[field.handle]"
-                class="mb-3"
-                @updated="updateField(field.handle, $event)"
-                @removed="removeField(field.handle)" />
+        <div v-if="hasFilters" v-for="(filter, index) in filters">
+            <div class="flex items-center mb-3">
+
+                <select-input
+                    class="w-1/4 mr-2"
+                    name="operator"
+                    :options="fieldOptions(filter)"
+                    v-model="filter.field"
+                    :placeholder="__('Select Field')"
+                    @input="reset(index, $event)" />
+
+                <!-- TODO: Check filter.type -->
+                <!-- For example, if field type is `date`, then use <date-filter> with 'before' and 'after' operators, etc. -->
+                <!-- Otherwise, use this generic <field-filter> -->
+                <field-filter
+                    :filter="filter"
+                    class="flex-1"
+                    @updated="update(index, $event)" />
+
+                <button @click="remove(index)" class="btn-close ml-1 group">
+                    <svg-icon name="trash" class="w-auto group-hover:text-red" />
+                </button>
+
+            </div>
         </div>
 
-        <div v-show="unselectedFields.length" class="mt-2">
-            <button
-                v-text="__('Add Filter')"
-                v-if="! adding"
-                @click="adding = true"
-                class="btn" />
-
-            <select-input
-                v-if="adding"
-                :options="fieldOptions"
-                :placeholder="__('Select Field')"
-                :value="null"
-                class="w-1/5"
-                @input="add" />
-        </div>
+        <button
+            v-if="canAdd"
+            v-text="__('Add Filter')"
+            class="btn mt-2"
+            @click="add(null)" />
 
     </div>
 
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import FieldFilter from './FieldFilter.vue';
 
 export default {
@@ -44,7 +50,7 @@ export default {
 
     props: {
         filter: {},
-        initialValue: {
+        initialFilters: {
             default() {
                 return {};
             }
@@ -53,32 +59,67 @@ export default {
 
     data() {
         return {
-            values: this.initialValue,
-            adding: false,
+            filters: [],
         }
     },
 
     computed: {
 
         fields() {
-            return this.filter.extra;
-        },
+            let fields = {};
 
-        selectedFields() {
-            return this.fields.filter(field => this.values.hasOwnProperty(field.handle));
-        },
-
-        unselectedFields() {
-            return this.fields.filter(field => !this.values.hasOwnProperty(field.handle));
-        },
-
-        fieldOptions() {
-            return this.unselectedFields.map(field => {
-                return {
-                    value: field.handle,
-                    label: field.display
+            this.filter.extra.forEach(field => {
+                fields[field.handle] = {
+                    handle: field.handle,
+                    display: field.display,
+                    type: field.type
                 };
             });
+
+            return fields;
+        },
+
+        unselectedFieldOptions() {
+            let fields = _.map(this.fields, (field, handle) => handle);
+            let selectedFields = this.filters.map(filter => filter.field);
+
+            return fields
+                .filter(field => ! selectedFields.includes(field))
+                .map(field => {
+                    return {
+                        value: this.fields[field].handle,
+                        label: this.fields[field].display
+                    };
+                });
+        },
+
+        hasFilters() {
+            return this.filters.length;
+        },
+
+        incompleteFilters() {
+            return this.filters.filter(filter => {
+                return ! (filter.field !== null && filter.operator !== null && filter.value !== null);
+            });
+        },
+
+        canAdd() {
+            return this.incompleteFilters.length === 0 && this.unselectedFieldOptions.length;
+        },
+
+        values() {
+            let values = {};
+
+            this.filters
+                .filter(filter => filter.field)
+                .forEach(filter => {
+                    values[filter.field] = {
+                        operator: filter.operator,
+                        value: filter.value
+                    };
+                });
+
+            return values;
         }
 
     },
@@ -95,31 +136,55 @@ export default {
     },
 
     created() {
-        this.$events.$on('filters-reset', this.removeAll);
+        this.setInitialFilters();
+
+        this.$events.$on('filters-reset', this.resetAll);
     },
 
     methods: {
 
-        add(handle) {
-            this.selectField(handle);
-
-            this.adding = false;
+        setInitialFilters() {
+            _.each(this.initialFilters, (filter, field) => {
+                this.add(field, filter.operator, filter.value);
+            });
         },
 
-        selectField(handle) {
-            this.updateField(handle, { value: '', operator: '=' });
+        fieldOptions(filter) {
+            if (! filter.field) {
+                return this.unselectedFieldOptions;
+            }
+
+            return [{
+                value: filter.field,
+                label: this.fields[filter.field].display
+            }].concat(this.unselectedFieldOptions);
         },
 
-        updateField(handle, value) {
-            Vue.set(this.values, handle, value);
+        add(handle=null, operator=null, value=null) {
+            this.filters.push({
+                _id: uniqid(),
+                field: handle,
+                operator,
+                value
+            });
         },
 
-        removeField(handle) {
-            Vue.delete(this.values, handle);
+        update(index, event) {
+            this.filters[index].operator = event.operator;
+            this.filters[index].value = event.value;
         },
 
-        removeAll() {
-            this.values = {};
+        reset(index) {
+            this.filters[index].operator = null;
+            this.filters[index].value = null;
+        },
+
+        remove(index) {
+            this.filters.splice(index, 1);
+        },
+
+        resetAll() {
+            this.filters = [];
         }
 
     }

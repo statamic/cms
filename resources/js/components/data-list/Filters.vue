@@ -27,7 +27,7 @@
 
                 <field-filters
                     :filter="fieldsFilter"
-                    :initial-value="activeFilters['fields']"
+                    :initial-filters="activeFilters['fields']"
                     @changed="filterChanged('fields', $event)"
                 />
 
