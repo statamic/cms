@@ -98,9 +98,7 @@ export default {
         },
 
         incompleteFilters() {
-            return this.filters.filter(filter => {
-                return ! (filter.field !== null && filter.operator !== null && filter.value !== null);
-            });
+            return this.filters.filter(filter => ! this.isFilterComplete(filter));
         },
 
         canAdd() {
@@ -111,7 +109,7 @@ export default {
             let values = {};
 
             this.filters
-                .filter(filter => filter.field)
+                .filter(filter => this.isFilterComplete(filter))
                 .forEach(filter => {
                     values[filter.field] = {
                         operator: filter.operator,
@@ -158,6 +156,12 @@ export default {
                 value: filter.field,
                 label: this.fields[filter.field].display
             }].concat(this.unselectedFieldOptions);
+        },
+
+        isFilterComplete(filter) {
+            return filter.field !== null
+                && filter.operator !== null
+                && filter.value !== null;
         },
 
         add(handle=null, operator=null, value=null) {
