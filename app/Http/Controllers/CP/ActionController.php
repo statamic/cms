@@ -13,7 +13,7 @@ abstract class ActionController extends CpController
     {
         $data = $request->validate([
             'selections' => 'required|array',
-            'context' => 'sometimes'
+            'context' => 'sometimes',
         ]);
 
         $context = isset($data['context']) ? json_decode($data['context'], true) : [];
@@ -29,17 +29,19 @@ abstract class ActionController extends CpController
     {
         $data = $request->validate([
             'action' => 'required',
-            'context' => 'required',
             'selections' => 'required|array',
+            'context' => 'sometimes',
         ]);
 
-        $action = Action::get($request->action)->context($request->context);
+        $context = $data['context'] ?? [];
+
+        $action = Action::get($request->action)->context($context);
 
         $validation = (new Validation)->fields($action->fields());
 
         $request->replace($request->values)->validate($validation->rules());
 
-        $items = $this->getSelectedItems(collect($data['selections']), $data['context']);
+        $items = $this->getSelectedItems(collect($data['selections']), $context);
 
         $unauthorized = $items->reject(function ($item) use ($action) {
             return $action->authorize($item);
