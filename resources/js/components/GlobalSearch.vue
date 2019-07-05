@@ -13,7 +13,8 @@
                 v-model="query"
                 @keydown.up.prevent="moveUp"
                 @keydown.down.prevent="moveDown"
-                @keydown.enter.prevent="hit"
+                @keydown.meta.enter.prevent="hitNewWindow"
+                @keyup.enter.prevent="hit"
                 @keydown.esc.prevent="reset"
                 @focus="focused = true"
                 :placeholder="placeholder"
@@ -134,6 +135,14 @@ export default {
                 window.location.href = this.results[this.current].edit_url;
             } else {
                 window.location.href = this.favorites[this.current].url;
+            }
+        },
+
+        hitNewWindow() {
+            if (this.hasResults) {
+                var win = window.open(this.results[this.current].edit_url, '_blank').focus();
+            } else {
+                window.open(this.results[this.current].url, '_blank').focus();
             }
         },
 
