@@ -140,9 +140,6 @@ export default {
 
     created() {
         this.setInitialFilters();
-        if (this.filters.length === 0) {
-            this.add()
-        }
 
         this.$events.$on('filters-reset', this.resetAll);
     },
@@ -153,6 +150,10 @@ export default {
             _.each(this.initialFilters, (filter, field) => {
                 this.add(field, filter.operator, filter.value);
             });
+
+            if (this.filters.length === 0) {
+                this.add();
+            }
         },
 
         fieldOptions(filter) {
