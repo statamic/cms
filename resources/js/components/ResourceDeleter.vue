@@ -22,6 +22,9 @@ export default {
         route: {
             type: String,
             required: true
+        },
+        redirect: {
+            type: String
         }
     },
 
@@ -49,11 +52,20 @@ export default {
         confirmed() {
             this.$axios.delete(this.route)
                 .then(() => {
-                    location.reload();
+                    this.success();
                 })
                 .catch(() => {
                     this.$notify.error(__('Something went wrong'));
                 });
+        },
+
+        success() {
+            if (this.redirect) {
+                location.href = this.redirect;
+                return;
+            }
+
+            location.reload();
         },
 
         cancel() {

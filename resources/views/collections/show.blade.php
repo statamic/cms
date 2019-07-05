@@ -20,6 +20,7 @@
                         ref="deleter"
                         :resource-title="__('Collection')"
                         route="{{ cp_route('collections.destroy', $collection->handle()) }}"
+                        redirect="{{ cp_route('collections.index') }}"
                     ></resource-deleter>
                 </dropdown-item>
             @endcan
