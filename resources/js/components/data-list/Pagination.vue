@@ -28,12 +28,12 @@
             <div class="flex-1"></div>
 
             <select-input
-                v-if="isPerPageEvenUseful"
+                v-if="perPage && isPerPageEvenUseful"
                 class="ml-3"
                 name="perPage"
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"
-                :reset-on-change="true"
+                :value="perPage"
                 @input="$events.$emit('per-page-changed', $event)" />
         </div>
 
@@ -54,6 +54,9 @@ export default {
         resourceMeta: {
             type: Object,
             required: true
+        },
+        perPage: {
+            type: Number
         }
     },
 

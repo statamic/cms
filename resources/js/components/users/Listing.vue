@@ -61,6 +61,7 @@
                 <data-list-pagination
                     class="mt-3"
                     :resource-meta="meta"
+                    :per-page="perPage"
                     @page-selected="page = $event"
                 />
             </div>
