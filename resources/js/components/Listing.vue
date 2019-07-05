@@ -57,6 +57,10 @@ export default {
 
     },
 
+    mounted() {
+        this.setInitialPerPage();
+    },
+
     created() {
         this.request();
         this.$events.$on('filters-changed', this.pageReset);
@@ -131,13 +135,31 @@ export default {
             this.page = 1;
         },
 
-        perPageReset() {
-            this.perPageChanged(this.initialPerPage);
+        setInitialPerPage() {
+            if (! this.hasPreferences) {
+                return;
+            }
+
+            this.perPage = this.getPreference('per_page') || this.initialPerPage;
+
+            // TODO: Remove
+            console.log('Preferred Per Page: ' + this.getPreference('per_page'));
+            console.log('Initial Per Page: ' + this.initialPerPage);
+            console.log('Set Per Page: ' + this.perPage);
         },
 
         perPageChanged(perPage) {
             this.perPage = perPage;
             this.pageReset();
+
+            // TODO: Why is there caching issues with this, but not when filter preferences are saved?
+            if (this.hasPreferences) {
+                this.setPreference('per_page', this.perPage != this.initialPerPage ? this.perPage : null);
+            }
+        },
+
+        perPageReset() {
+            this.perPageChanged(this.initialPerPage);
         }
 
     }
