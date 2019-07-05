@@ -109,6 +109,7 @@ export default {
     data() {
         return {
             listingKey: 'entries',
+            preferencesPrefix: `collections.${this.collection}`,
             requestUrl: cp_url(`collections/${this.collection}/entries`),
             reordering: false,
             reorderingRequested: false,
@@ -133,9 +134,6 @@ export default {
     },
 
     methods: {
-        preferencesKey(type) {
-            return `collections.${this.collection}.${type}`;
-        },
 
         afterRequestCompleted(response) {
             if (this.reorderingRequested) this.reorder();

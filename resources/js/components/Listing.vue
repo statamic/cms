@@ -1,12 +1,14 @@
 <script>
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
+import HasPreferences from './data-list/HasPreferences';
 
 export default {
 
     mixins: [
         HasActions,
         HasFilters,
+        HasPreferences,
     ],
 
     props: {
