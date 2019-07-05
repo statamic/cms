@@ -31,6 +31,7 @@
             <button
                 v-text="__('Add Filter')"
                 class="btn"
+                :disabled="! canAdd"
                 @click="add()" />
         </div>
 
@@ -79,6 +80,10 @@ export default {
             return fields;
         },
 
+        fieldCount() {
+            return Object.keys(this.fields).length;
+        },
+
         unselectedFieldOptions() {
             let fields = _.map(this.fields, (field, handle) => handle);
             let selectedFields = this.filters.map(filter => filter.field);
@@ -101,9 +106,9 @@ export default {
             return this.filters.filter(filter => ! this.isFilterComplete(filter));
         },
 
-        // canAdd() {
-        //     return this.incompleteFilters.length === 0 && this.unselectedFieldOptions.length;
-        // },
+        canAdd() {
+            return this.filters.length < this.fieldCount;
+        },
 
         values() {
             let values = {};
