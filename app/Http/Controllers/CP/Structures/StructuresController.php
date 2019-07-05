@@ -195,7 +195,7 @@ class StructuresController extends CpController
             ->maxDepth($values['max_depth']);
 
         $sites = [ // todo: change to the structuresites fieldtype
-            ['handle' => 'english', 'route' => $values['route']],
+            ['handle' => Site::default()->handle(), 'route' => $values['route']],
         ];
 
         foreach ($sites as $site) {
