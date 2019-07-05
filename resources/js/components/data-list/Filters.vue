@@ -31,14 +31,12 @@
                     @changed="filterChanged('fields', $event)"
                 />
 
-                <div v-if="preferencesKey" class="mx-3 mt-1 pb-3 border-t">
-                    <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                    <template v-else>
-                        <div class="flex mt-3">
-                            <button class="btn mr-2" @click="reset">{{ __('Reset All') }}</button>
-                            <button class="btn-primary" @click="save">{{ __('Save Filters') }}</button>
-                        </div>
-                    </template>
+                <div v-if="preferencesKey" class="p-3 border-t">
+                    <div class="flex">
+                        <button class="btn mr-2" @click="reset">{{ __('Reset All') }}</button>
+                        <button class="btn-primary" @click="save">{{ __('Save Filters') }}</button>
+                        <loading-graphic v-if="saving" class="ml-1" :inline="true" :text="__('Saving')" />
+                    </div>
                 </div>
 
             </div>

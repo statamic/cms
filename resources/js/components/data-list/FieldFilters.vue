@@ -27,12 +27,12 @@
 
             </div>
         </div>
-
-        <button
-            v-if="canAdd"
-            v-text="__('Add Filter')"
-            class="btn"
-            @click="add()" />
+        <div class="border-t pt-3">
+            <button
+                v-text="__('Add Filter')"
+                class="btn"
+                @click="add()" />
+        </div>
 
     </div>
 
@@ -101,9 +101,9 @@ export default {
             return this.filters.filter(filter => ! this.isFilterComplete(filter));
         },
 
-        canAdd() {
-            return this.incompleteFilters.length === 0 && this.unselectedFieldOptions.length;
-        },
+        // canAdd() {
+        //     return this.incompleteFilters.length === 0 && this.unselectedFieldOptions.length;
+        // },
 
         values() {
             let values = {};
@@ -135,6 +135,9 @@ export default {
 
     created() {
         this.setInitialFilters();
+        if (this.filters.length === 0) {
+            this.add()
+        }
 
         this.$events.$on('filters-reset', this.resetAll);
     },
