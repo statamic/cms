@@ -9,11 +9,10 @@ class Select extends Fieldtype
     protected $configFields = [
         'options' => [
             'type' => 'array',
-            'field' => [
-                'key_header' => 'Value',
-                'value_header' => 'Label'
-            ],
-            'instructions' => 'Set the keys and their optional labels.'
+            'key_header' => 'Key',
+            'value_header' => 'Label',
+            'instructions' => 'Set the keys and their optional labels.',
+            'add_button' => 'Add Option'
         ],
         'placeholder' => [
             'type' => 'text',
