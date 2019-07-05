@@ -278,11 +278,10 @@ class EntriesController extends CpController
         $request->validate($validation->rules());
 
         $values = array_except($fields->values(), ['slug']);
-
         $entry = Entry::make()
             ->collection($collection)
             ->locale($site->handle())
-            ->published(false)
+            ->published($request->get('published'))
             ->slug($request->slug)
             ->data($values);
 
