@@ -22,7 +22,9 @@ export default {
         },
 
         unselectAllItems() {
-            this.$refs.toggleAll.uncheckAllItems();
+            if (this.$refs.toggleAll) {
+                this.$refs.toggleAll.uncheckAllItems();
+            }
         }
 
     }
