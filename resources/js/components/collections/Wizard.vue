@@ -90,31 +90,31 @@
             </div>
 
             <div class="max-w-md mx-auto pb-4">
-                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-asc">
-                    <input type="radio" v-model="collection.sortDirection" value="asc" id="direction-asc">
-                    <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash;
-                        <template v-if="collection.orderable">
-                            Entries will be sorted from lowest to highest.
-                        </template>
-                        <template v-else-if="collection.dated">
-                            Entries will be sorted from newest to oldest.
-                        </template>
-                        <template v-else>
-                            Entries will be sorted from A to Z.
-                        </template>
-                    </p>
-                </label>
-                <label class="border-2 mt-4 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-desc">
+                <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-desc">
                     <input type="radio" v-model="collection.sortDirection" value="desc" id="direction-desc">
                     <p><strong class="text-md ml-2 font-bold">Descending</strong> &ndash;
                         <template v-if="collection.orderable">
                             Entries will be sorted from highest to lowest.
                         </template>
                         <template v-else-if="collection.dated">
-                            Entries will be sorted from oldest to newest.
+                            Entries will be sorted from newest to oldest.
                         </template>
                         <template v-else>
                             Entries will be sorted from Z to A.
+                        </template>
+                    </p>
+                </label>
+                <label class="border-2 mt-4 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-asc">
+                    <input type="radio" v-model="collection.sortDirection" value="asc" id="direction-asc">
+                    <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash;
+                        <template v-if="collection.orderable">
+                            Entries will be sorted from lowest to highest.
+                        </template>
+                        <template v-else-if="collection.dated">
+                            Entries will be sorted from oldest to newest (unusual).
+                        </template>
+                        <template v-else>
+                            Entries will be sorted from A to Z.
                         </template>
                     </p>
                 </label>
@@ -278,7 +278,7 @@ export default {
                 orderable: false,
                 dated: true,
                 dateBehavior: 'articles',
-                sortDirection: 'asc',
+                sortDirection: 'desc',
                 blueprints: [],
                 template: null,
                 route: null,
