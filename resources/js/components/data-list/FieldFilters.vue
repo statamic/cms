@@ -159,9 +159,7 @@ export default {
         },
 
         isFilterComplete(filter) {
-            return filter.field !== null
-                && filter.operator !== null
-                && filter.value !== null;
+            return filter.field !== null && filter.operator !== null && filter.value;
         },
 
         add(handle=null, operator=null, value=null) {
