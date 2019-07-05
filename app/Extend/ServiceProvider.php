@@ -155,7 +155,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         }
 
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace($this->namespace())->group($routes);
+            Route::namespace('\\'.$this->namespace())->group($routes);
         });
     }
 
@@ -172,7 +172,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         }
 
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace($this->namespace())->group($routes);
+            Route::namespace('\\'.$this->namespace())->group($routes);
         });
     }
 
@@ -189,7 +189,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
         }
 
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace($this->namespace())
+            Route::namespace('\\'.$this->namespace())
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
