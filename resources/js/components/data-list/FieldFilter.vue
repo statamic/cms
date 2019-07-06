@@ -8,12 +8,7 @@
                 class="w-1/3 mr-2"
                 name="operator"
                 v-model="filter.operator"
-                :placeholder="__('Select Operator')"
-                :options="[
-                    { label: 'Equal to', value: '=' },
-                    { label: 'Not equal to', value: '<>' },
-                    { label: 'Like', value: 'like' },
-                ]" />
+                :options="operatorOptions" />
 
             <div class="flex-1">
                 <text-input name="value" v-model="filter.value" />
@@ -26,10 +21,17 @@
 </template>
 
 <script>
+import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+
 export default {
 
+    mixins: [HasInputOptions],
+
     props: {
-        field: Object,
+        operators: {
+            type: Object,
+            required: true
+        },
         filter: {
             type: Object,
             required: true
@@ -37,6 +39,10 @@ export default {
     },
 
     computed: {
+        operatorOptions() {
+            return this.normalizeInputOptions(this.operators);
+        },
+
         value() {
             return this.filter;
         }

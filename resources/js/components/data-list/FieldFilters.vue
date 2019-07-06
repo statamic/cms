@@ -13,11 +13,9 @@
                     :placeholder="__('Select Field')"
                     @input="reset(index, $event)" />
 
-                <!-- TODO: Check filter.type -->
-                <!-- For example, if field type is `date`, then use <date-filter> with 'before' and 'after' operators, etc. -->
-                <!-- Otherwise, use this generic <field-filter> -->
                 <field-filter
                     :filter="filter"
+                    :operators="fieldOperators(filter)"
                     class="flex-1"
                     @updated="update(index, $event)" />
 
@@ -70,11 +68,7 @@ export default {
             let fields = {};
 
             this.filter.extra.forEach(field => {
-                fields[field.handle] = {
-                    handle: field.handle,
-                    display: field.display,
-                    type: field.type
-                };
+                fields[field.handle] = field;
             });
 
             return fields;
@@ -165,6 +159,10 @@ export default {
                 value: filter.field,
                 label: this.fields[filter.field].display
             }].concat(this.unselectedFieldOptions);
+        },
+
+        fieldOperators(filter) {
+            return filter.field ? this.fields[filter.field].operators : {};
         },
 
         isFilterComplete(filter) {
