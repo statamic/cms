@@ -62,6 +62,11 @@ class Date extends Fieldtype
         ]
     ];
 
+    protected $queryOperators = [
+        '<' => 'Before',
+        '>' => 'After',
+    ];
+
     public function preProcess($data)
     {
         if (! $data) {
