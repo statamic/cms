@@ -25,7 +25,7 @@
 
             </div>
         </div>
-        <div class="border-t pt-3">
+        <div :class="{ 'border-t': hasFilters, 'pt-3': hasFilters }">
             <button
                 v-text="__('Add Filter')"
                 class="btn"
