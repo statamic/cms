@@ -28,6 +28,12 @@ abstract class Fieldtype implements Arrayable
     protected $configFields = [];
     protected $icon;
 
+    protected $queryOperators = [
+        '=' => 'Equal to',
+        '<>' => 'Not equal to',
+        'like' => 'Like',
+    ];
+
     public function setField(Field $field)
     {
         $this->field = $field;
@@ -78,6 +84,11 @@ abstract class Fieldtype implements Arrayable
     public function categories(): array
     {
         return $this->categories;
+    }
+
+    public function queryOperators(): array
+    {
+        return $this->queryOperators;
     }
 
     public function rules(): array
