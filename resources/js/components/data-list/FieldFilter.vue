@@ -58,14 +58,10 @@ export default {
         }
     },
 
-    created() {
-        this.ensureDefaults();
-    },
-
     methods: {
         ensureDefaults() {
-            if (! this.filter.operator) {
-                this.filter.operator = '=';
+            if (this.filter.field && ! this.filter.operator) {
+                this.filter.operator = this.operatorOptions[0].value;
             }
         }
     }
