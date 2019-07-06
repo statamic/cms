@@ -8,6 +8,7 @@
                 class="w-1/3 mr-2"
                 name="operator"
                 v-model="filter.operator"
+                placeholder=""
                 :options="operatorOptions" />
 
             <div class="flex-1">
