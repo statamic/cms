@@ -26,7 +26,7 @@ trait HasParameters
 
     public function getParam($keys, $default = null)
     {
-        return $this->get($keys);
+        return $this->get($keys, $default);
     }
 
     public function getList($keys, $default = null)
