@@ -123,7 +123,7 @@ class Entries
 
     protected function parseParameters($params)
     {
-        $this->parameters = Arr::except($params, $this->ignoredParams);
+        $this->parameters = Arr::except($params->all(), $this->ignoredParams);
         $this->collections = $this->parseCollections();
         $this->orderBys = $this->parseOrderBys();
         $this->site = Arr::getFirst($this->parameters, ['site', 'locale']);
