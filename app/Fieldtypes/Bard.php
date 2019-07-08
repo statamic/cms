@@ -201,6 +201,9 @@ class Bard extends Replicator
     {
         return collect($value)->flatMap(function ($set) {
             if ($set['type'] === 'text') {
+                if (empty($set['text'])) {
+                    return;
+                }
                 $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
                 return $doc['content'];
             }
