@@ -51,7 +51,7 @@ class Cache
             return;
         }
 
-        if ($response->getCode() !== 200 || $response->getContent() == '') {
+        if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
             return;
         }
 
