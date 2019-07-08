@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <button v-if="! isRevealed" @click="reveal" class="btn" v-tip :tip-text="config.instructions">{{ config.display }}</button>
+        <button v-if="! isRevealed" @click="reveal" class="btn" :v-tooltip="config.instructions">{{ config.display }}</button>
     </div>
 
 </template>
@@ -14,7 +14,7 @@ export default {
     computed: {
 
         isRevealed() {
-            return this.data === true;
+            return this.value;
         }
 
     },
@@ -22,7 +22,7 @@ export default {
     methods: {
 
         reveal() {
-            this.data = true;
+            this.update(true)
         }
 
     }
