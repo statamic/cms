@@ -91,7 +91,7 @@ class Assets extends Fieldtype
 
     public function preload()
     {
-        $data = $this->getItemData($this->field->value());
+        $data = $this->getItemData($this->field->value() ?? $this->defaultValue);
 
         return compact('data');
     }
