@@ -55,7 +55,7 @@
                 <p class="text-grey mb-3">
                     {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
                 </p>
-                <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
+                <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="makeFirstPage" />
             </div>
         </div>
 
@@ -361,6 +361,14 @@ export default {
         pageUpdated(tree) {
             this.pages = tree.getPureData();
             this.changed = true;
+        },
+
+        makeFirstPage() {
+            if (this.hasCollection) {
+                return window.location = this.createUrl
+            } else {
+                this.openPageCreator()
+            }
         }
 
     }
