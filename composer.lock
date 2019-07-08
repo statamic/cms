@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3be5ed3f590c5a4a27a61d6df32f7838",
+    "content-hash": "c172352ecb8a6c3115b0c976a396fb05",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -4584,6 +4584,57 @@
                 "yui"
             ],
             "time": "2018-01-15T15:26:51+00:00"
+        },
+        {
+            "name": "twistor/flysystem-guzzle",
+            "version": "v6.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twistor/flysystem-guzzle.git",
+                "reference": "5b50bed57e81d07ec6d22ed3e117f0e87bdace4c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twistor/flysystem-guzzle/zipball/5b50bed57e81d07ec6d22ed3e117f0e87bdace4c",
+                "reference": "5b50bed57e81d07ec6d22ed3e117f0e87bdace4c",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.0",
+                "league/flysystem": "~1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Twistor\\Flysystem\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Leppanen",
+                    "email": "chris.leppanen@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "An HTTP adapter for Flysystem that uses Guzzle.",
+            "homepage": "https://github.com/twistor/flysystem-guzzle",
+            "keywords": [
+                "Flysystem",
+                "Guzzle"
+            ],
+            "time": "2015-12-22T12:59:30+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
