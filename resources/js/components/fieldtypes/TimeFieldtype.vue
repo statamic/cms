@@ -6,7 +6,7 @@
             </div>
             <div class="input-text flex items-center px-sm w-auto" :class="{ 'read-only': isReadOnly }">
                 <input class="input-time input-hour"
-                    type="number" min="00" max="23" v-model="hour" ref="hour"
+                    type="text" pattern="[0-5][0-9]" min="00" max="23" v-model="hour" ref="hour"
                     placeholder="00"
                     @keydown.up.prevent="incrementHour(1)"
                     @keydown.down.prevent="incrementHour(-1)"
@@ -20,7 +20,7 @@
                 />
                 <span class="colon">:</span>
                 <input class="input-time input-minute"
-                    type="number" min="00" max="59" v-model="minute" ref="minute"
+                    type="text" pattern="[0-5][0-9]" min="00" max="59" v-model="minute" ref="minute"
                     placeholder="00"
                     @keydown.up.prevent="incrementMinute(1)"
                     @keydown.down.prevent="incrementMinute(-1)"
