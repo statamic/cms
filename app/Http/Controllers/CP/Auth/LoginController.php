@@ -58,4 +58,14 @@ class LoginController extends CpController
             ? response('Authenticated')
             : redirect()->intended($this->redirectPath());
     }
+
+    protected function credentials(Request $request)
+    {
+        $credentials = [
+            $this->username() => strtolower($request->get($this->username())),
+            'password' => $request->get('password')
+        ];
+
+        return $credentials;
+    }
 }
