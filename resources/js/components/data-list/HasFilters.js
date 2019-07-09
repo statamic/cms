@@ -22,6 +22,10 @@ export default {
             return count;
         },
 
+        hasActiveFilters() {
+            return this.activeFilterCount > 0;
+        }
+
     },
 
     created() {

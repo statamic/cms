@@ -123,6 +123,7 @@ export default {
     computed: {
         showReorderButton() {
             if (this.structureUrl) return true;
+            if (this.hasActiveFilters) return false;
 
             return this.reorderable && !this.reordering;
         },
