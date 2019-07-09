@@ -1,6 +1,7 @@
 <script>
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
+import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
 
 export default {
@@ -8,18 +9,13 @@ export default {
     mixins: [
         HasActions,
         HasFilters,
+        HasPagination,
         HasPreferences,
     ],
 
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        initialPerPage: {
-            type: Number,
-            default() {
-                return Statamic.$config.get('paginationSize');
-            }
-        }
     },
 
     data() {
@@ -31,8 +27,6 @@ export default {
             columns: [],
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
-            page: 1,
-            perPage: this.initialPerPage,
             meta: null,
             searchQuery: '',
         }
@@ -57,14 +51,8 @@ export default {
 
     },
 
-    mounted() {
-        this.setInitialPerPage();
-    },
-
     created() {
         this.request();
-        this.$events.$on('filters-changed', this.pageReset);
-        this.$events.$on('per-page-changed', this.perPageChanged);
     },
 
     watch: {
@@ -129,37 +117,6 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
-        },
-
-        pageReset() {
-            this.page = 1;
-        },
-
-        setInitialPerPage() {
-            if (! this.hasPreferences) {
-                return;
-            }
-
-            this.perPage = this.getPreference('per_page') || this.initialPerPage;
-
-            // TODO: Remove
-            console.log('Preferred Per Page: ' + this.getPreference('per_page'));
-            console.log('Initial Per Page: ' + this.initialPerPage);
-            console.log('Set Per Page: ' + this.perPage);
-        },
-
-        perPageChanged(perPage) {
-            this.perPage = perPage;
-            this.pageReset();
-
-            // TODO: Why is there caching issues with this, but not when filter preferences are saved?
-            if (this.hasPreferences) {
-                this.setPreference('per_page', this.perPage != this.initialPerPage ? this.perPage : null);
-            }
-        },
-
-        perPageReset() {
-            this.perPageChanged(this.initialPerPage);
         }
 
     }
