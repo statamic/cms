@@ -28,6 +28,7 @@
                             <data-list-filters
                                 :filters="filters"
                                 :active-filters="activeFilters"
+                                :active-count="activeFilterCount"
                             />
                         </template>
                     </div>

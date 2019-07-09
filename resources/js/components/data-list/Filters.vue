@@ -3,7 +3,7 @@
         <button class="btn btn-flat btn-icon-only dropdown-toggle relative" @click="filtering = !filtering">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
-            <div v-if="activeFilterCount" class="badge ml-1 bg-grey-40" v-text="activeFilterCount" />
+            <div v-if="activeCount" class="badge ml-1 bg-grey-40" v-text="activeCount" />
         </button>
         <stack half name="filters" v-if="filtering" @closed="dismiss">
             <div class="h-full overflow-auto bg-white">
@@ -58,6 +58,7 @@ export default {
     props: {
         filters: Array,
         activeFilters: Object,
+        activeCount: Number,
         preferencesKey: String
     },
 
@@ -78,18 +79,8 @@ export default {
             return this.filters.filter(filter => filter.handle === 'fields')[0];
         },
 
-        activeFilterCount() {
-            let count = Object.keys(this.activeFilters).length;
-
-            if (this.activeFilters.hasOwnProperty('fields')) {
-                count = count + Object.keys(this.activeFilters.fields).length - 1;
-            }
-
-            return count;
-        },
-
         preferencesPayload() {
-            return this.activeFilterCount ? clone(this.activeFilters) : {};
+            return this.activeCount ? clone(this.activeFilters) : {};
         }
 
     },

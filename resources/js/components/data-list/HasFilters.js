@@ -10,6 +10,20 @@ export default {
         }
     },
 
+    computed: {
+
+        activeFilterCount() {
+            let count = Object.keys(this.activeFilters).length;
+
+            if (this.activeFilters.hasOwnProperty('fields')) {
+                count = count + Object.keys(this.activeFilters.fields).length - 1;
+            }
+
+            return count;
+        },
+
+    },
+
     created() {
         this.$events.$on('filters-changed', this.filtersChanged);
     },

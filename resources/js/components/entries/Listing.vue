@@ -39,6 +39,7 @@
                                 class="ml-1"
                                 :filters="filters"
                                 :active-filters="activeFilters"
+                                :active-count="activeFilterCount"
                                 :preferences-key="preferencesKey('filters')" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>
@@ -82,6 +83,7 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
+                    v-if="! reordering"
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
