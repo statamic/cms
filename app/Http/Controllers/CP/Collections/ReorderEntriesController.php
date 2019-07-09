@@ -17,15 +17,17 @@ class ReorderEntriesController extends CpController
             'new' => 'required|array',
         ]);
 
-        $entries = $ids->mapWithKeys(function ($id) {
+        $entries = collect($order['initial'])->mapWithKeys(function ($id) {
             $entry = Entry::find($id);
             return [$id => $entry];
         });
 
-        $oldOrders = $entries->map->order()->sort()->values();
+        $initialOrderPositions = $entries->map(function ($entry) use ($collection) {
+            return $collection->getEntryPosition($entry->id());
+        })->values();
 
-        foreach ($ids as $index => $id) {
-            $entries[$id]->order($oldOrders[$index])->save();
+        foreach ($order['new'] as $index => $id) {
+            $entries[$id]->order($initialOrderPositions[$index])->save();
         }
     }
 }
