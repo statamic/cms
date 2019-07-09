@@ -161,9 +161,19 @@ export default {
         },
 
         saveOrder() {
-            const ids = this.items.map(item => item.id);
-            this.$axios.post(this.reorderUrl, { ids });
-            this.reordering = false;
+            let data = {
+                initial: this.initialOrder,
+                new: this.items.map(item => item.id)
+            };
+
+            this.$axios.post(this.reorderUrl, data)
+                .then(response => {
+                    this.reordering = false;
+                    this.$notify.success(__('Entries successfully reordered'))
+                })
+                .catch(e => {
+                    this.$notify.error('Something went wrong');
+                });
         },
 
         cancelReordering() {
