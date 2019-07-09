@@ -50,10 +50,6 @@ export default {
             }
         },
 
-        perPageReset() {
-            this.perPageChanged(this.initialPerPage);
-        },
-
         pageReset() {
             this.page = 1;
         }
