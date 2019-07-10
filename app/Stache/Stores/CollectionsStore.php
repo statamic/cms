@@ -36,18 +36,18 @@ class CollectionsStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions'))
             ->defaultStatus(array_get($data, 'default_status'))
-            ->structure(array_get($data, 'structure'));
-
-        $collection
-            ->orderable(array_get($data, 'orderable', false))
-            ->setEntryPositions($this->getEntryPositions($data, $collection))
-            ->save();
+            ->structure(array_get($data, 'structure'))
+            ->orderable(array_get($data, 'orderable', false));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
                 ->futureDateBehavior($dateBehavior['future'] ?? null)
                 ->pastDateBehavior($dateBehavior['past'] ?? null);
         }
+
+        $collection
+            ->setEntryPositions($this->getEntryPositions($data, $collection))
+            ->save();
 
         return $collection;
     }
