@@ -212,7 +212,7 @@ class Outpost
      */
     private function cacheResponse()
     {
-        Cache::put(self::RESPONSE_CACHE_KEY, $this->response, 60);
+        Cache::put(self::RESPONSE_CACHE_KEY, $this->response, now()->addMinutes(60));
     }
 
     /**

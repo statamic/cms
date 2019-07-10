@@ -9,15 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class Dimensions
 {
+    const CACHE_EXPIRY_MINUTES = 60;
+
     /**
      * @var Asset
      */
     private $asset;
-
-    /**
-     * @var int
-     */
-    private $cacheLength = 60;
 
     /**
      * @param $generator ImageGenerator
@@ -117,7 +114,7 @@ class Dimensions
      */
     private function cache($dimensions)
     {
-        Cache::put($this->cacheKey(), $dimensions, $this->cacheLength);
+        Cache::put($this->cacheKey(), $dimensions, now()->addMinutes(self::CACHE_EXPIRY_MINUTES));
     }
 
     private function cacheKey()
