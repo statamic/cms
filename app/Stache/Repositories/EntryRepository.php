@@ -69,6 +69,10 @@ class EntryRepository implements RepositoryContract
             $entry->id($this->stache->generateId());
         }
 
+        if ($entry->collection()->orderable()) {
+            $this->ensureEntryHasPosition($entry);
+        }
+
         // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
 
         $this->store
@@ -99,5 +103,12 @@ class EntryRepository implements RepositoryContract
     public function create()
     {
         return $this->make();
+    }
+
+    protected function ensureEntryHasPosition($entry)
+    {
+        if (! $entry->collection()->getEntryPosition($entry->id())) {
+            $entry->collection()->appendEntryPosition($entry->id())->save();
+        }
     }
 }

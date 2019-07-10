@@ -258,6 +258,13 @@ class Collection implements Contract
         return $this;
     }
 
+    public function appendEntryPosition($id)
+    {
+        $position = collect($this->positions)->keys()->sort()->last() + 1;
+
+        return $this->setEntryPosition($id, $position);
+    }
+
     public function getEntryPosition($id)
     {
         return array_flip($this->positions)[$id] ?? null;
