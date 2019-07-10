@@ -115,11 +115,16 @@ class EntriesStore extends AggregateStore
             ->published(array_pull($data, 'published', true))
             ->data($data);
 
+        if ($collection->orderable() && ! $collection->getEntryPosition($id)) {
+            $positionGenerated = true;
+            $collection->appendEntryPosition($id)->save();
+        }
+
         if ($collection->dated()) {
             $entry->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
         }
 
-        if (isset($idGenerated)) {
+        if (isset($idGenerated, $positionGenerated)) {
             $entry->save();
         }
 
