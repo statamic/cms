@@ -355,7 +355,7 @@ class Collection implements Contract
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,
-            'structure' => optional($this->structure())->handle(),
+            'structure' => $this->structure,
             'mount' => $this->mount,
         ];
     }
