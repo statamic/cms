@@ -155,7 +155,10 @@ class GlobalSet implements Contract
 
     public function toArray()
     {
-        throw new \Exception('GlobalSet toArray');
+        return [
+            'title' => $this->title,
+            'handle' => $this->handle,
+        ];
     }
 
     public function editUrl()
