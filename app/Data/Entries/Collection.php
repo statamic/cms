@@ -265,6 +265,13 @@ class Collection implements Contract
         return $this->setEntryPosition($id, $position);
     }
 
+    public function removeEntryPosition($id)
+    {
+        unset($this->positions[$this->getEntryPosition($id)]);
+
+        return $this;
+    }
+
     public function getEntryPosition($id)
     {
         return array_flip($this->positions)[$id] ?? null;
