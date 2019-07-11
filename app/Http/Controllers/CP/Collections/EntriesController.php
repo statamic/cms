@@ -369,7 +369,7 @@ class EntriesController extends CpController
             })
             ->map(function ($value) {
                 preg_match_all('/"asset::([^"]+)"/', $value, $matches);
-                return $matches[1] ?? null;
+                return str_replace('\/', '/', $matches[1]) ?? null;
             })
             ->flatten(2)
             ->unique()
