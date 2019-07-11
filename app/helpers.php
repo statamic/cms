@@ -168,7 +168,7 @@ function cp_route($route, $params = [])
     // TODO: This is a temporary workaround to routes like
     // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
     // Can it be fixed with route regex, or is it a laravel bug?
-    $route = str_replace('//', '/', $route);
+    $route = preg_replace('/(?<!:)\/\//', '/', $route);
 
     return $route;
 }
