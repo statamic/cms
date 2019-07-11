@@ -366,6 +366,12 @@ export default {
             return this.assets.length === 0
                 && this.folders.length === 0
                 && ! this.folder.parent_path;
+        },
+
+        editedAssetBasename() {
+            let asset = _.find(this.assets, asset => asset.id == this.editedAssetId);
+
+            return asset ? asset.basename : null;
         }
 
     },
@@ -395,6 +401,14 @@ export default {
 
         loading(loading) {
             this.$progress.loading('asset-browser', loading);
+        },
+
+        editedAssetId(editedAssetId) {
+            let path = editedAssetId
+                ? [this.path, this.editedAssetBasename].filter(value => value != '/').join('/') + '/edit'
+                : this.path;
+
+            this.$emit('navigated', this.container, path);
         }
 
     },
