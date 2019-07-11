@@ -33,21 +33,17 @@ export default {
             }
 
             this.perPage = this.getPreference('per_page') || this.initialPerPage;
-
-            // TODO: Remove after figuring out below caching issue
-            console.log('Preferred Per Page: ' + this.getPreference('per_page'));
-            console.log('Initial Per Page: ' + this.initialPerPage);
-            console.log('Set Per Page: ' + this.perPage);
         },
 
         perPageChanged(perPage) {
-            this.perPage = perPage;
-            this.pageReset();
+            let promise = this.hasPreferences
+                ? this.setPreference('per_page', perPage != this.initialPerPage ? perPage : null)
+                : Promise.resolve();
 
-            // TODO: Why is there caching issues with this, but not when filter preferences are saved?
-            if (this.hasPreferences) {
-                this.setPreference('per_page', this.perPage != this.initialPerPage ? this.perPage : null);
-            }
+            promise.then(response => {
+                this.perPage = perPage;
+                this.pageReset();
+            });
         },
 
         pageReset() {
