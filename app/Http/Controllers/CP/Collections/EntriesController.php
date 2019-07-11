@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Statamic\API\Site;
+use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\CP\Column;
 use Statamic\API\Action;
@@ -147,6 +148,7 @@ class EntriesController extends CpController
                 ];
             })->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
+            'preloadedAssets' => $this->extractAssetsFromValues($values),
         ];
 
         if ($request->wantsJson()) {
@@ -357,6 +359,25 @@ class EntriesController extends CpController
         }
 
         return [$values, $fields->meta()];
+    }
+
+    protected function extractAssetsFromValues($values)
+    {
+        return collect($values)
+            ->filter(function ($value) {
+                return is_string($value);
+            })
+            ->map(function ($value) {
+                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
+                return $matches[1] ?? null;
+            })
+            ->flatten(2)
+            ->unique()
+            ->map(function ($id) {
+                return Asset::find($id);
+            })
+            ->filter()
+            ->values();
     }
 
     protected function formatDateForSaving($date)

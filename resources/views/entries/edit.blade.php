@@ -27,6 +27,7 @@
         :revisions-enabled="{{ bool_str($entry->revisionsEnabled()) }}"
         :amp="{{ bool_str($entry->ampable()) }}"
         :initial-read-only="{{ bool_str($readOnly) }}"
+        :preloaded-assets="{{ json_encode($preloadedAssets) }}"
     ></entry-publish-form>
 
 @endsection
