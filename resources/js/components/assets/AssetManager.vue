@@ -12,6 +12,7 @@
         <asset-browser
             ref="browser"
             :initial-container="container"
+            :initial-editing-asset-id="initialEditingAssetId"
             :selected-path="path"
             :selected-assets="selectedAssets"
             :action-url="actionUrl"
@@ -53,6 +54,7 @@ export default {
     props: {
         initialContainer: Object,
         initialPath: String,
+        initialEditingAssetId: String,
         actions: Array,
         actionUrl: String,
         folderActionUrl: String,

@@ -270,6 +270,7 @@ export default {
         selectedAssets: Array,
         maxFiles: Number,
         folderActionUrl: String,
+        initialEditingAssetId: String,
     },
 
     data() {
@@ -288,7 +289,7 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
-            editedAssetId: null,
+            editedAssetId: this.initialEditingAssetId,
             editedFolderPath: null,
             creatingFolder: false,
             uploads: [],
