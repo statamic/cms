@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Statamic\API\Asset;
 use Statamic\API\Str;
 use Statamic\API\Action;
 use Illuminate\Http\Request;
@@ -30,15 +31,30 @@ class BrowserController extends CpController
     public function show($containerHandle, $path = '/')
     {
         // TODO: Auth
+
         $container = AssetContainer::find($containerHandle);
 
-        if (! $container) {
-            return $this->pageNotFound();
-        }
+        abort_unless($container, 404);
 
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),
             'folder' => $path,
+        ]);
+    }
+
+    public function edit($containerHandle, $path)
+    {
+        // TODO: Auth
+
+        $container = AssetContainer::find($containerHandle);
+        $asset = Asset::find("{$containerHandle}::{$path}");
+
+        abort_unless($container && $asset, 404);
+
+        return view('statamic::assets.browse', [
+            'container' => $this->toContainerArray($container),
+            'folder' => $asset->folder(),
+            'editing' => $asset->id(),
         ]);
     }
 

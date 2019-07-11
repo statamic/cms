@@ -84,6 +84,7 @@ Route::group([
         Route::get('assets/browse/folders/{container}/actions', 'FolderActionController@index')->name('assets.folders.actions');
         Route::post('assets/browse/folders/{container}/actions', 'FolderActionController@run');
         Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');
+        Route::get('assets/browse/{container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
         Route::get('assets/browse/{container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
         Route::get('assets-fieldtype', 'FieldtypeController@index');
         Route::resource('assets', 'AssetsController');
