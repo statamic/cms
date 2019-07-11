@@ -12,21 +12,15 @@ class ReorderEntriesController extends CpController
     {
         $this->authorize('reorder', $collection);
 
-        $order = $request->validate([
-            'initial' => 'required|array',
-            'new' => 'required|array',
-        ]);
+        $request->validate(['ids' => 'required|array']);
 
-        $entries = collect($order['initial'])->mapWithKeys(function ($id) {
-            $entry = Entry::find($id);
-            return [$id => $entry];
+        $entries = collect($request->ids)->mapWithKeys(function ($id) {
+            return [$id => Entry::find($id)];
         });
 
-        $initialOrderPositions = $entries->map(function ($entry) use ($collection) {
-            return $collection->getEntryPosition($entry->id());
-        })->values();
+        $initialOrderPositions = $entries->map->order()->sort()->values();
 
-        foreach ($order['new'] as $index => $id) {
+        foreach ($request->ids as $index => $id) {
             $entries[$id]->order($initialOrderPositions[$index])->save();
         }
     }

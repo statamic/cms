@@ -164,12 +164,9 @@ export default {
         },
 
         saveOrder() {
-            let data = {
-                initial: this.initialOrder,
-                new: this.items.map(item => item.id)
-            };
+            let ids = this.items.map(item => item.id);
 
-            this.$axios.post(this.reorderUrl, data)
+            this.$axios.post(this.reorderUrl, {ids})
                 .then(response => {
                     this.reordering = false;
                     this.$notify.success(__('Entries successfully reordered'))
