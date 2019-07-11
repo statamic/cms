@@ -13,6 +13,7 @@ class Blueprint
     protected $handle;
     protected $contents = [];
     protected $extraFields = [];
+    protected $fieldsCache;
 
     public function setHandle(string $handle)
     {
@@ -64,9 +65,17 @@ class Blueprint
 
     public function fields(): Fields
     {
-        return $this->sections()->map->fields()->reduce(function ($carry, $fields) {
+        if ($this->fieldsCache) {
+            return $this->fieldsCache;
+        }
+
+        $fields = $this->sections()->map->fields()->reduce(function ($carry, $fields) {
             return $carry->merge($fields);
         }, new Fields);
+
+        $this->fieldsCache = $fields;
+
+        return $fields;
     }
 
     public function hasField($field)
