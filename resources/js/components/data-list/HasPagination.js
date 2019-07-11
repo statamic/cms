@@ -36,6 +36,8 @@ export default {
         },
 
         perPageChanged(perPage) {
+            perPage = parseInt(perPage);
+
             let promise = this.hasPreferences
                 ? this.setPreference('per_page', perPage != this.initialPerPage ? perPage : null)
                 : Promise.resolve();
