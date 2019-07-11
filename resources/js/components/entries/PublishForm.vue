@@ -256,7 +256,8 @@ export default {
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
-        revisionsEnabled: Boolean
+        revisionsEnabled: Boolean,
+        preloadedAssets: Array,
     },
 
     data() {
@@ -514,6 +515,8 @@ export default {
             if (this.confirmingPublish) return;
             this.canPublish ? this.confirmPublish() : this.save();
         });
+
+        this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
     },
 
     created() {
