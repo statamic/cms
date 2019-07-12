@@ -18,7 +18,8 @@ class Assets extends Fieldtype
         'container' => [
             'type' => 'asset_container',
             'max_items' => 1,
-            'instructions' => 'The asset container to work with.'
+            'instructions' => 'The asset container to work with.',
+            'width' => 50
         ],
         'folder' => [
             'type' => 'asset_folder',
