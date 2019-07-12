@@ -80,6 +80,7 @@
                     />
 
                     <publish-field
+                        v-show="showField(configField)"
                         v-for="configField in filteredFieldtypeConfig"
                         :key="configField.handle"
                         :config="configField"
@@ -117,7 +118,7 @@
 <script>
 import PublishField from '../publish/Field.vue';
 import ProvidesFieldtypes from './ProvidesFieldtypes';
-import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
+import { ValidatesFieldConditions, FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
@@ -128,7 +129,10 @@ export default {
         FieldValidationBuilder,
     },
 
-    mixins: [ProvidesFieldtypes],
+    mixins: [
+        ProvidesFieldtypes,
+        ValidatesFieldConditions,
+    ],
 
     props: {
         config: Object,
