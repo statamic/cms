@@ -4,13 +4,10 @@ namespace Statamic\Console\Commands;
 
 use Statamic\API\File;
 use Illuminate\Console\Command;
-use Statamic\Console\RunsInPlease;
 use Illuminate\Filesystem\Filesystem;
 
 class Install extends Command
 {
-    use RunsInPlease;
-
     /**
      * The name and signature of the console command.
      *
