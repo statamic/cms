@@ -30,7 +30,10 @@ class Bard extends Replicator
         ],
         'container' => [
             'type' => 'asset_container',
-            'instructions' => 'Set the asset container used with the Image button'
+            'instructions' => 'Set the asset container used with the Image button',
+            'if' => [
+                'buttons' => 'contains image'
+            ]
         ],
         'save_html' => [
             'type' => 'toggle',
