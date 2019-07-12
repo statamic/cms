@@ -31,6 +31,7 @@ class Bard extends Replicator
         'container' => [
             'type' => 'asset_container',
             'instructions' => 'Set the asset container used with the Image button',
+            'max_items' => 1,
             'if' => [
                 'buttons' => 'contains image'
             ]
