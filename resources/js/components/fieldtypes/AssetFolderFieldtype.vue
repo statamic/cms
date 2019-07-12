@@ -23,7 +23,7 @@ export default {
     computed: {
 
         container() {
-            return this.$store.state.publish[this.storeName].values.container[0];
+            return data_get(this.$store.state.publish[this.storeName].values.container, '0', null);
         },
 
         relationshipMeta() {
