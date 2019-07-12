@@ -43,54 +43,58 @@
 
         <div class="card rounded-tl-none" v-if="fieldtypesLoaded">
 
-            <div class="publish-fields" v-show="activeTab === 'settings'">
+            <publish-container
+                name="base"
+                :values="values"
+                :is-root="true"
+                @updated="values = $event"
+            >
+                <div class="publish-fields" v-show="activeTab === 'settings'" slot-scope="{ setValue }">
 
-                <form-group
-                    handle="display"
-                    :display="__('Display')"
-                    :instructions="__(`The field's label shown in the Control Panel.`)"
-                    width="50"
-                    autofocus
-                    :value="values.display"
-                    @input="updateField('display', $event)"
-                />
+                    <form-group
+                        handle="display"
+                        :display="__('Display')"
+                        :instructions="__(`The field's label shown in the Control Panel.`)"
+                        width="50"
+                        autofocus
+                        :value="values.display"
+                        @input="updateField('display', $event, setValue)"
+                    />
 
-                <form-group
-                    handle="handle"
-                    :display="__('Handle')"
-                    :instructions="__(`The field's template variable.`)"
-                    width="50"
-                    :value="values.handle"
-                    @input="(field) => {
-                        this.isHandleModified = true;
-                        this.updateField('handle', field);
-                    }"
-                />
+                    <form-group
+                        handle="handle"
+                        :display="__('Handle')"
+                        :instructions="__(`The field's template variable.`)"
+                        width="50"
+                        :value="values.handle"
+                        @input="updateField('handle', $event, setValue); isHandleModified = true"
+                    />
 
-                <form-group
-                    fieldtype="text"
-                    handle="instructions"
-                    :display="__('Instructions')"
-                    :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
-                    :value="values.instructions"
-                    @input="updateField('instructions', $event)"
-                />
+                    <form-group
+                        fieldtype="text"
+                        handle="instructions"
+                        :display="__('Instructions')"
+                        :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
+                        :value="values.instructions"
+                        @input="updateField('instructions', $event, setValue)"
+                    />
 
-                <publish-field
-                    v-for="configField in filteredFieldtypeConfig"
-                    :key="configField.handle"
-                    :config="configField"
-                    :instructions="__(configField.instructions)"
-                    :value="values[configField.handle]"
-                    @input="updateField(configField.handle, $event)"
-                />
+                    <publish-field
+                        v-for="configField in filteredFieldtypeConfig"
+                        :key="configField.handle"
+                        :config="configField"
+                        :instructions="__(configField.instructions)"
+                        :value="values[configField.handle]"
+                        @input="updateField(configField.handle, $event, setValue)"
+                    />
 
-                <!--
-                    TODO:
-                    - Default value
-                -->
+                    <!--
+                        TODO:
+                        - Default value
+                    -->
 
-            </div>
+                </div>
+            </publish-container>
 
             <div class="publish-fields" v-show="activeTab === 'conditions'">
                 <field-conditions-builder
@@ -144,7 +148,8 @@ export default {
             values: clone(this.config),
             editedFields: clone(this.overrides),
             isHandleModified: true,
-            activeTab: 'settings'
+            activeTab: 'settings',
+            storeName: 'base',
         };
     },
 
@@ -220,9 +225,13 @@ export default {
             ];
         },
 
-        updateField(handle, value) {
+        updateField(handle, value, setStoreValue=null) {
             this.values[handle] = value;
             this.markFieldEdited(handle);
+
+            if (setStoreValue) {
+                setStoreValue(handle, value);
+            }
         },
 
         updateFieldConditions(conditions) {
