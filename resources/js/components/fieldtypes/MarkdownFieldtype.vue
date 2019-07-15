@@ -531,7 +531,7 @@ export default {
             viewportMargin: Infinity,
             tabindex: 0,
             autoRefresh: true,
-            readOnly: this.isReadOnly ? 'nocursor' : false,
+            readOnly: self.isReadOnly ? 'nocursor' : false,
             extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
         });
 
