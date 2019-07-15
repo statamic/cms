@@ -38,6 +38,9 @@ class AssetContainersStore extends BasicStore
             ->disk(array_get($data, 'disk'))
             ->title(array_get($data, 'title'))
             ->blueprint(array_get($data, 'blueprint'))
+            ->allowDownloading(array_get($data, 'allow_downloading'))
+            ->allowMoving(array_get($data, 'allow_moving'))
+            ->allowRenaming(array_get($data, 'allow_renaming'))
             ->allowUploads(array_get($data, 'allow_uploads'))
             ->createFolders(array_get($data, 'create_folders'))
             ->searchIndex(array_get($data, 'search_index'));
