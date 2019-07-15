@@ -14,6 +14,7 @@ export default {
     mounted() {
         const pickr = Pickr.create({
             el: '.color-picker',
+            disabled: this.isReadOnly,
             components: {
 
                 // Main components
