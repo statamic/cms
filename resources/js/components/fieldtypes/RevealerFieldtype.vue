@@ -1,7 +1,13 @@
 <template>
 
     <div>
-        <button v-if="! isRevealed" @click="reveal" class="btn" :v-tooltip="config.instructions">{{ config.display }}</button>
+        <button
+            v-if="! isRevealed"
+            @click="reveal"
+            class="btn"
+            :disabled="isReadOnly"
+            :v-tooltip="config.instructions"
+            v-text="config.display" />
     </div>
 
 </template>
@@ -22,7 +28,9 @@ export default {
     methods: {
 
         reveal() {
-            this.update(true)
+            if (! this.isReadOnly) {
+                this.update(true)
+            }
         }
 
     }
