@@ -48,7 +48,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click="download" :title="__('Download')">
+                    <a @click="download" :title="__('Download')" v-if="container.allow_downloading">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="23" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
                             <path d="M21.1219828 6.85714286C21.1219828 6.85714286 20.0297414 6.69642857 18.9655172 6.85714286M3.01724138 6C3.01724138 4.10657143 4.5612069 2.57142857 6.46551724 2.57142857 8.36982759 2.57142857 9.9137931 4.10657143 9.9137931 6"/>
@@ -97,15 +97,17 @@
                         <button
                             v-if="isImage"
                             type="button" class="btn"
-                            @click.prevent="openFocalPointEditor">{{ __('Focal Point') }}
+                            @click.prevent="openFocalPointEditor">{{ __('Set Focal Point') }}
                         </button>
 
                         <button
+                            v-if="container.allow_renaming"
                             type="button" class="btn"
                             @click.prevent="openRenamer">{{ __('Rename File') }}
                         </button>
 
                         <button
+                        v-if="container.allow_moving"
                             type="button" class="btn"
                             @click.prevent="openMover">{{ __('Move File') }}
                         </button>
@@ -218,6 +220,7 @@ export default {
             loading: true,
             saving: false,
             asset: null,
+            container: null,
             publishContainer: 'asset',
             values: {},
             meta: {},
@@ -288,6 +291,7 @@ export default {
                 this.asset = response.data.asset;
                 this.values = response.data.values;
                 this.meta = response.data.meta;
+                this.container = response.data.container;
                 this.getFieldset();
             });
         },

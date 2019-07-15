@@ -31,6 +31,7 @@ class AssetsController extends CpController
 
         return [
             'asset' => $asset->toArray(),
+            'container' => $asset->container()->toArray(),
             'values' => array_merge($asset->data(), $fields->values()),
             'meta' => $fields->meta(),
         ];
