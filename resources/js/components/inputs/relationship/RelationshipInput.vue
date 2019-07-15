@@ -9,6 +9,7 @@
             :multiple="maxItems > 1"
             :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :read-only="readOnly"
             :url="selectionsUrl"
             @input="selectFieldSelected"
         />
