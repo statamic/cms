@@ -357,6 +357,7 @@ class Collection implements Contract
             'orderable' => $this->orderable,
             'structure' => $this->structure,
             'mount' => $this->mount,
+            'revisions' => $this->revisions,
         ];
     }
 
