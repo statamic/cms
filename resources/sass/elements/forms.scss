@@ -38,13 +38,6 @@ select {
 
 }
 
-// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
-input.input-text:read-only,
-textarea.input-text:read-only,
-.input-text.read-only {
-    @apply bg-grey-30 text-grey-70;
-}
-
 // Used inside tables, grids, and so on
 .input-text-minimal {
     @apply appearance-none shadow-none bg-white w-full p-1;
@@ -54,6 +47,14 @@ textarea.input-text:read-only,
     }
 }
 
+
+// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
+input.input-text:read-only,
+textarea.input-text:read-only,
+input.input-text-minimal:read-only,
+.input-text.read-only {
+    @apply bg-grey-30 text-grey-70;
+}
 
 /* Input Groups
   ========================================================================== */
