@@ -387,8 +387,10 @@ class Asset implements AssetContract, Arrayable
      * @param string $filename
      * @return void
      */
-    public function rename($filename)
+    public function rename($filename, $unique = false)
     {
+        $filename = $unique ? $this->ensureUniqueFilename($this->folder(), $filename) : $filename;
+
         return $this->move($this->folder(), $filename);
     }
 
@@ -652,6 +654,27 @@ class Asset implements AssetContract, Arrayable
     public function __toString()
     {
         return $this->url() ?? $this->id();
+    }
+
+    /**
+     * Ensure and return unique filename, incrementing as necessary.
+     *
+     * @param string $folder
+     * @param string $filename
+     * @param int $count
+     * @return string
+     */
+    protected function ensureUniqueFilename($folder, $filename, $count = 0)
+    {
+        $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
+        $suffix = $count ? " ({$count})" : '';
+        $newPath = Str::removeLeft(Path::tidy($folder . '/' . $filename . $suffix . '.' . $extension), '/');
+
+        if ($this->disk()->exists($newPath)) {
+            return $this->ensureUniqueFilename($folder, $filename, $count + 1);
+        }
+
+        return $filename . $suffix;
     }
 
     public static function __callStatic($method, $parameters)
