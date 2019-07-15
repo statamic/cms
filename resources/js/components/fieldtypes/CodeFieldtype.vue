@@ -73,6 +73,7 @@ export default {
             lineNumbers: this.config.line_numbers,
             lineWrapping: this.config.line_wrapping,
             matchBrackets: true,
+            readOnly: this.isReadOnly ? 'nocursor' : false,
             theme: this.exactTheme,
         });
 
