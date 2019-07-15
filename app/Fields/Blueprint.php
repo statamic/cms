@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Statamic\API;
 use Statamic\API\Str;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
@@ -165,5 +166,10 @@ class Blueprint
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Blueprint::{$method}(...$parameters);
     }
 }

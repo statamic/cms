@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Statamic\API;
 use Statamic\API\Str;
 use Facades\Statamic\Fields\FieldsetRepository;
 
@@ -63,5 +64,10 @@ class Fieldset
         FieldsetRepository::save($this);
 
         return $this;
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Fieldset::{$method}(...$parameters);
     }
 }

@@ -653,4 +653,9 @@ class Asset implements AssetContract, Arrayable
     {
         return $this->url() ?? $this->id();
     }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Asset::{$method}(...$parameters);
+    }
 }

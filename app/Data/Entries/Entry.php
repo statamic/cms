@@ -428,4 +428,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         return 'md';
     }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Entry::{$method}(...$parameters);
+    }
 }

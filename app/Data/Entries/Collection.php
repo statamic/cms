@@ -418,4 +418,9 @@ class Collection implements Contract
             })
             ->args(func_get_args());
     }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Collection::{$method}(...$parameters);
+    }
 }

@@ -165,4 +165,9 @@ class GlobalSet implements Contract
     {
         return cp_route('globals.edit', [$this->id(), $this->handle()]);
     }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\GlobalSet::{$method}(...$parameters);
+    }
 }

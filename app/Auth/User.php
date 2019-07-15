@@ -197,4 +197,9 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     {
         return $this->email();
     }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\User::{$method}(...$parameters);
+    }
 }

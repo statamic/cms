@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Structures;
 
+use Statamic\API;
 use Statamic\API\Str;
 use Statamic\API\Site;
 use Statamic\API\Entry;
@@ -211,5 +212,10 @@ class Structure implements StructureContract
         StructureAPI::updateEntryUris($this);
 
         return $this;
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Structure::{$method}(...$parameters);
     }
 }

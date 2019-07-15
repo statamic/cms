@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Taxonomies;
 
+use Statamic\API;
 use Statamic\API\File;
 use Statamic\API\Term as TermAPI;
 use Statamic\API\YAML;
@@ -221,5 +222,10 @@ class Taxonomy extends DataFolder implements TaxonomyContract
         } else {
             $this->set('slugs', $slugs);
         }
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Taxonomy::{$method}(...$parameters);
     }
 }
