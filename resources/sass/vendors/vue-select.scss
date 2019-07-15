@@ -19,7 +19,7 @@
 .vs--disabled .vs__search,
 .vs--disabled .vs__selected {
 	cursor: not-allowed;
-	background-color: #f8f8f8
+	@apply bg-grey-20;
 }
 
 .v-select[dir=rtl] .vs__actions {
@@ -46,11 +46,15 @@
 	min-height: 37px;
 	line-height: 1;
     padding: 0 4px 4px;
-    white-space: normal;
+	white-space: normal;
 
     &:active, &:focus:active {
         bottom: 0px;
-    }
+	}
+
+	.vs--disabled & {
+		@apply bg-grey-20;
+	}
 }
 
 .vs__selected-options {

@@ -86,7 +86,7 @@
 /* Read Only
   ========================================================================== */
 
-.read-only-field .CodeMirror {
+.markdown-fieldtype.read-only-field .CodeMirror {
     @apply bg-grey-30 text-grey-70;
 }
 
