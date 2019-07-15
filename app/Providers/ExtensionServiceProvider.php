@@ -322,6 +322,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Unpublish::class,
             Actions\SendActivationEmail::class,
             Actions\MoveAsset::class,
+            Actions\RenameAsset::class,
             Actions\DeleteEntry::class,
         ];
 
