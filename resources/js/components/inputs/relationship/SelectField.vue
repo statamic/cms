@@ -5,6 +5,7 @@
             ref="input"
             label="title"
             :close-on-select="true"
+            :disabled="readOnly"
             :multiple="multiple"
             :options="options"
             :placeholder="config.placeholder"
@@ -27,7 +28,8 @@ export default {
         typeahead: Boolean,
         multiple: Boolean,
         taggable: Boolean,
-        config: Object
+        config: Object,
+        readOnly: Boolean
     },
 
     data() {
