@@ -31,6 +31,7 @@ export default {
             indentWithTabs: false,
             lineNumbers: true,
             lineWrapping: true,
+            readOnly: this.isReadOnly ? 'nocursor' : false,
             theme: this.config.theme || 'material',
         });
 
