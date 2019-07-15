@@ -1,6 +1,6 @@
 <template>
     <div class="toggle-fieldtype-wrapper">
-        <toggle-input :value="value" @input="update" />
+        <toggle-input :value="value" @input="update" :read-only="isReadOnly" />
     </div>
 </template>
 
