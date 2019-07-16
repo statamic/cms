@@ -221,7 +221,6 @@
             :id="editedAssetId"
             @closed="closeAssetEditor"
             @saved="assetSaved"
-            @deleted="assetDeleted"
         />
 
         <folder-creator
@@ -378,6 +377,11 @@ export default {
 
     mounted() {
         this.loadContainers();
+    },
+
+    created() {
+        this.$events.$on('editor-action-started', this.actionStarted);
+        this.$events.$on('editor-action-completed', this.actionCompleted);
     },
 
     watch: {
@@ -550,6 +554,7 @@ export default {
         folderActions(folder) {
             return folder.actions || this.folder.actions || [];
         }
+
     }
 
 }

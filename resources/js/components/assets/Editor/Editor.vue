@@ -94,22 +94,16 @@
                     </div>
 
                     <div class="editor-file-actions">
-                        <button
-                            v-if="isImage"
-                            type="button" class="btn"
-                            @click.prevent="openFocalPointEditor">{{ __('Set Focal Point') }}
+                        <button v-if="isImage" type="button" class="btn" @click.prevent="openFocalPointEditor">
+                            {{ __('Set Focal Point') }}
                         </button>
 
-                        <button
-                            v-if="container.allow_renaming"
-                            type="button" class="btn"
-                            @click.prevent="openRenamer">{{ __('Rename File') }}
+                        <button v-if="container.allow_renaming" type="button" class="btn" @click.prevent="runAction('rename_asset')">
+                            {{ __('Rename File') }}
                         </button>
 
-                        <button
-                        v-if="container.allow_moving"
-                            type="button" class="btn"
-                            @click.prevent="openMover">{{ __('Move File') }}
+                        <button v-if="container.allow_moving" type="button" class="btn" @click.prevent="runAction('move_asset')">
+                            {{ __('Move File') }}
                         </button>
 
                         <!--
@@ -143,7 +137,7 @@
                         </div>
 
                         <div class="editor-form-actions text-right">
-                            <button type="button" class="btn-danger mr-1" @click="destroy" v-if="allowDeleting">
+                            <button type="button" class="btn-danger mr-1" @click="runAction('delete')" v-if="allowDeleting">
                                 {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn-primary" @click="save">
@@ -167,6 +161,16 @@
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor">
             </focal-point-editor>
+
+            <editor-actions
+                v-if="actions.length"
+                :id="id"
+                :actions="actions"
+                :url="actionUrl"
+                @started="actionStarted"
+                @completed="actionCompleted"
+                >
+            </editor-actions>
         </portal>
 
     </div>
@@ -180,10 +184,10 @@
 export default {
 
     components: {
+        EditorActions: require('./EditorActions.vue'),
         FocalPointEditor: require('./FocalPointEditor.vue'),
         PublishFields: require('../../publish/Fields.vue'),
     },
-
 
     props: {
         id: {
@@ -210,10 +214,9 @@ export default {
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
-            showRenamer: false,
-            showMover: false,
             error: null,
-            errors: {}
+            errors: {},
+            actions: [],
         }
     },
 
@@ -354,24 +357,6 @@ export default {
         },
 
         /**
-         * Delete the asset
-         */
-        destroy() {
-            if (! confirm(__('Are you sure?'))) {
-                return;
-            }
-
-            this.saving = true;
-
-            const url = cp_url(`assets/${btoa(this.id)}`);
-
-            this.$axios.delete(url).then(response => {
-                this.$emit('deleted', this.asset.id);
-                this.saving = false;
-            });
-        },
-
-        /**
          * Close the editor
          */
         close() {
@@ -389,42 +374,36 @@ export default {
             return true;
         },
 
-        openRenamer() {
-            this.showRenamer = true;
-        },
-
-        closeRenamer() {
-            this.showRenamer = false;
-        },
-
-        assetRenamed(asset) {
-            this.asset = asset;
-            this.$emit('saved', asset);
-        },
-
-        openMover() {
-            this.showMover = true;
-        },
-
-        closeMover() {
-            this.showMover = false;
-        },
-
-        /**
-         * When an asset has been moved to another folder
-         */
-        assetMoved(asset, folder) {
-            this.asset = asset;
-            this.$emit('moved', asset, folder)
-        },
-
         open() {
             window.open(this.asset.url, '_blank');
         },
 
         download() {
             window.open(this.asset.download_url);
+        },
+
+        findAction(handle) {
+            return _.find(this.actions, action => action.handle == handle);
+        },
+
+        runAction(handle) {
+            let selectedAction = this.findAction(handle);
+
+            this.$events.$emit('editor-action-selected', {
+                action: selectedAction,
+                selection: this.id,
+            });
+        },
+
+        actionStarted(event) {
+            this.$events.$emit('editor-action-started');
+        },
+
+        actionCompleted(event) {
+            this.$events.$emit('editor-action-completed');
+            this.close();
         }
+
     }
 
 }

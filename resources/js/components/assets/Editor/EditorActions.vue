@@ -1,0 +1,58 @@
+<template>
+
+    <div>
+        <data-list-action
+            ref="actions"
+            v-for="action in actions"
+            :key="action.handle"
+            :action="action"
+            :selections="1"
+            @selected="run"
+            @started="started"
+            @completed="completed" />
+    </div>
+
+</template>
+
+<script>
+import Actions from '../../data-list/Actions.vue';
+
+export default {
+
+    mixins: [Actions],
+
+    props: {
+        actions: {
+            type: Array,
+            required: true
+        },
+        id: {
+            type: String,
+            required: true
+        },
+    },
+
+    computed: {
+        selections() {
+            return [this.id];
+        }
+    },
+
+    created() {
+        this.$events.$on('editor-action-selected', this.actionSelected);
+    },
+
+    methods: {
+
+        findActionComponent(selectedAction) {
+            return _.find(this.$refs.actions, component => component.action.handle === selectedAction.handle);
+        },
+
+        actionSelected(event) {
+            this.findActionComponent(event.action).confirming = true;
+        },
+
+    }
+
+}
+</script>
