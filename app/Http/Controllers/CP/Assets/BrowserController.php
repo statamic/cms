@@ -79,7 +79,9 @@ class BrowserController extends CpController
         return Resource::collection($paginator)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
             'folders' => $container->assetFolders($path)->values()->each->withActions()->toArray(),
-            'folder' => $container->assetFolder($path)->withActions()->toArray()
+            'folder' => $container->assetFolder($path)->withActions()->toArray(),
+            'actionUrl' => cp_route('assets.actions'),
+            'folderActionUrl' => cp_route('assets.folders.actions', $container->id()),
         ]]);
     }
 

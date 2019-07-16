@@ -240,15 +240,10 @@ import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
-import HasActions from '../../data-list/HasActions';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 
 export default {
-
-    mixins: [
-        HasActions,
-    ],
 
     components: {
         AssetThumbnail,
@@ -268,7 +263,6 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
-        folderActionUrl: String,
         initialEditingAssetId: String,
     },
 
@@ -297,7 +291,8 @@ export default {
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
-            mode: 'table'
+            mode: 'table',
+            folderActionUrl: null,
         }
     },
 
@@ -451,6 +446,8 @@ export default {
                 this.assets = response.data.data;
                 this.folders = response.data.meta.folders;
                 this.folder = response.data.meta.folder;
+                this.actionUrl = response.data.meta.actionUrl;
+                this.folderActionUrl = response.data.meta.folderActionUrl;
                 this.meta = response.data.meta;
                 this.loadingAssets = false;
                 this.initializing = false;

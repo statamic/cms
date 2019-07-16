@@ -15,8 +15,6 @@
             :initial-editing-asset-id="initialEditingAssetId"
             :selected-path="path"
             :selected-assets="selectedAssets"
-            :action-url="actionUrl"
-            :folder-action-url="folderActionUrl"
             @navigated="navigate"
             @selections-updated="updateSelections"
             @asset-doubleclicked="editAsset"
@@ -34,8 +32,6 @@ export default {
         initialPath: String,
         initialEditingAssetId: String,
         actions: Array,
-        actionUrl: String,
-        folderActionUrl: String,
         canCreateContainers: Boolean,
         createContainerUrl: String,
     },
