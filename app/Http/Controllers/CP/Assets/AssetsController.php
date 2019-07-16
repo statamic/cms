@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Statamic\API\Asset;
+use Statamic\API\Action;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\API\AssetContainer;
@@ -34,6 +35,8 @@ class AssetsController extends CpController
             'container' => $asset->container()->toArray(),
             'values' => array_merge($asset->data(), $fields->values()),
             'meta' => $fields->meta(),
+            'actionUrl' => cp_route('assets.actions'),
+            'actions' => Action::for('asset-browser', ['container' => $asset->container()->handle()], $asset),
         ];
     }
 

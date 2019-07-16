@@ -275,6 +275,8 @@ export default {
                 this.values = response.data.values;
                 this.meta = response.data.meta;
                 this.container = response.data.container;
+                this.actionUrl = response.data.actionUrl;
+                this.actions = response.data.actions;
                 this.getFieldset();
             });
         },
