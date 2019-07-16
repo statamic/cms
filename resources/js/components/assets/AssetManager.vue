@@ -20,24 +20,7 @@
             @navigated="navigate"
             @selections-updated="updateSelections"
             @asset-doubleclicked="editAsset"
-            @edit-asset="editAsset"
-        >
-
-            <template slot="actions" slot-scope="{ ids }">
-                <button class="btn ml-1" @click="openAssetMover">{{ __('Move') }}</button>
-                <button class="btn btn-danger ml-1" @click="destroyMultiple(ids)">{{ __('Delete') }}</button>
-            </template>
-
-        </asset-browser>
-
-        <mover
-            v-if="showAssetMover"
-            :assets="selectedAssets"
-            :container="container"
-            :folder="path"
-            @saved="assetsMoved"
-            @closed="closeAssetMover">
-        </mover>
+            @edit-asset="editAsset" />
 
     </div>
 
@@ -45,11 +28,6 @@
 
 <script>
 export default {
-
-    components: {
-        Mover: require('./Mover.vue')
-    },
-
 
     props: {
         initialContainer: Object,
@@ -62,21 +40,17 @@ export default {
         createContainerUrl: String,
     },
 
-
     data() {
         return {
             container: this.initialContainer,
             path: this.initialPath,
             selectedAssets: [],
-            showAssetMover: false
         }
     },
-
 
     mounted() {
         this.bindBrowserNavigation();
     },
-
 
     methods: {
 
@@ -129,23 +103,6 @@ export default {
          */
         updateSelections(selections) {
             this.selectedAssets = selections;
-        },
-
-        destroyMultiple(ids) {
-            this.$refs.browser.destroyMultiple(ids);
-        },
-
-        openAssetMover() {
-            this.showAssetMover = true;
-        },
-
-        closeAssetMover() {
-            this.showAssetMover = false;
-        },
-
-        assetsMoved(folder) {
-            this.closeAssetMover();
-            this.navigate(this.container, folder);
         },
 
         editAsset(asset) {

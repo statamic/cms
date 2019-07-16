@@ -169,21 +169,6 @@
             </focal-point-editor>
         </portal>
 
-        <renamer
-            v-if="showRenamer"
-            :asset="asset"
-            @saved="assetRenamed"
-            @closed="closeRenamer">
-        </renamer>
-
-        <mover
-            v-if="showMover"
-            :assets="[asset.id]"
-            :folder="asset.folder"
-            :container="asset.container"
-            @saved="assetMoved"
-            @closed="closeMover">
-        </mover>
     </div>
 
     </stack>
@@ -196,8 +181,6 @@ export default {
 
     components: {
         FocalPointEditor: require('./FocalPointEditor.vue'),
-        Renamer: require('./Renamer.vue'),
-        Mover: require('../Mover.vue'),
         PublishFields: require('../../publish/Fields.vue'),
     },
 
