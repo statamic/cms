@@ -98,11 +98,11 @@
                             {{ __('Set Focal Point') }}
                         </button>
 
-                        <button v-if="container.allow_renaming" type="button" class="btn" @click.prevent="runAction('rename_asset')">
+                        <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
                             {{ __('Rename File') }}
                         </button>
 
-                        <button v-if="container.allow_moving" type="button" class="btn" @click.prevent="runAction('move_asset')">
+                        <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
                             {{ __('Move File') }}
                         </button>
 
@@ -137,7 +137,7 @@
                         </div>
 
                         <div class="editor-form-actions text-right">
-                            <button type="button" class="btn-danger mr-1" @click="runAction('delete')" v-if="allowDeleting">
+                            <button v-if="canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
                                 {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn-primary" @click="save">
@@ -382,7 +382,7 @@ export default {
             window.open(this.asset.download_url);
         },
 
-        findAction(handle) {
+        canRunAction(handle) {
             return _.find(this.actions, action => action.handle == handle);
         },
 

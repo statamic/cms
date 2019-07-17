@@ -15,7 +15,20 @@ class AssetPolicy
 
     public function move($user, $asset)
     {
-        return $user->hasPermission("move {$asset->container()->handle()} assets");
+        if (! $user->hasPermission("move {$asset->container()->handle()} assets")) {
+            return false;
+        }
+
+        return $asset->container()->allowMoving();
+    }
+
+    public function rename($user, $asset)
+    {
+        if (! $user->hasPermission("rename {$asset->container()->handle()} assets")) {
+            return false;
+        }
+
+        return $asset->container()->allowRenaming();
     }
 
     public function delete($user, $asset)

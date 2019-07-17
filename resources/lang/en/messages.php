@@ -26,6 +26,7 @@ return [
     'permission_upload_{container}_assets' => 'Upload new assets',
     'permission_edit_{container}_assets' => 'Edit assets',
     'permission_move_{container}_assets' => 'Move assets',
+    'permission_rename_{container}_assets' => 'Rename assets',
     'permission_delete_{container}_assets' => 'Delete assets',
     'permission_configure_forms' => 'Configure forms',
     'permission_view_{form}_form_submissions' => 'View :form submissions',
