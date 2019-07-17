@@ -31,6 +31,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     protected $id;
     protected $collection;
+    protected $blueprint;
     protected $date;
     protected $locale;
     protected $localizations;
@@ -53,6 +54,18 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     public function collection($collection = null)
     {
         return $this->fluentlyGetOrSet('collection')->args(func_get_args());
+    }
+
+    public function blueprint()
+    {
+        return $this->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return Blueprint::find($blueprint) ?? $this->defaultBlueprint();
+            })
+            ->setter(function ($blueprint) {
+                return $blueprint !== $this->defaultBlueprint()->handle() ? $blueprint : null;
+            })
+            ->args(func_get_args());
     }
 
     public function collectionHandle()
@@ -141,7 +154,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         return "entry::{$this->id()}";
     }
 
-    public function blueprint()
+    public function defaultBlueprint()
     {
         if ($blueprint = $this->value('blueprint')) {
             return $this->collection()->ensureEntryBlueprintFields(
@@ -267,11 +280,17 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function fileData()
     {
-        return array_merge($this->data(), [
+        $array = array_merge($this->data(), [
             'id' => $this->id(),
             'origin' => optional($this->origin)->id(),
-            'published' => $this->published === false ? false : null
+            'published' => $this->published === false ? false : null,
         ]);
+
+        if ($this->blueprint) {
+            $array['blueprint'] = $this->blueprint;
+        }
+
+        return $array;
     }
 
     public function ampable()
