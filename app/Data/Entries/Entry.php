@@ -52,13 +52,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function collection($collection = null)
     {
-        if (is_null($collection)) {
-            return $this->collection;
-        }
-
-        $this->collection = $collection;
-
-        return $this;
+        return $this->fluentlyGetOrSet('collection')->args(func_get_args());
     }
 
     public function collectionHandle()
