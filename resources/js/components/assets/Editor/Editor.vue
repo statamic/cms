@@ -159,8 +159,7 @@
                 :data="values.focus"
                 :image="asset.preview"
                 @selected="selectFocalPoint"
-                @closed="closeFocalPointEditor">
-            </focal-point-editor>
+                @closed="closeFocalPointEditor" />
 
             <editor-actions
                 v-if="actions.length"
@@ -168,9 +167,7 @@
                 :actions="actions"
                 :url="actionUrl"
                 @started="actionStarted"
-                @completed="actionCompleted"
-                >
-            </editor-actions>
+                @completed="actionCompleted" />
         </portal>
 
     </div>

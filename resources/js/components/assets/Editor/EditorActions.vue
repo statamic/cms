@@ -7,9 +7,7 @@
             :key="action.handle"
             :action="action"
             :selections="1"
-            @selected="run"
-            @started="started"
-            @completed="completed" />
+            @selected="run" />
     </div>
 
 </template>
