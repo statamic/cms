@@ -387,10 +387,8 @@ export default {
         },
 
         runAction(handle) {
-            let selectedAction = this.findAction(handle);
-
             this.$events.$emit('editor-action-selected', {
-                action: selectedAction,
+                action: handle,
                 selection: this.id,
             });
         },

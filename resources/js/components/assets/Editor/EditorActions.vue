@@ -44,8 +44,8 @@ export default {
 
     methods: {
 
-        findActionComponent(selectedAction) {
-            return _.find(this.$refs.actions, component => component.action.handle === selectedAction.handle);
+        findActionComponent(handle) {
+            return _.find(this.$refs.actions, component => component.action.handle === handle);
         },
 
         actionSelected(event) {
