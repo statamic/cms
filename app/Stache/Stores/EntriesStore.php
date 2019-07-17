@@ -109,6 +109,7 @@ class EntriesStore extends AggregateStore
         }
 
         $entry
+            ->blueprint($data['blueprint'] ?? null)
             ->locale($site)
             ->slug($slug)
             ->initialPath($path)

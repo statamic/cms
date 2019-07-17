@@ -279,9 +279,11 @@ class EntriesController extends CpController
 
         $request->validate($validation->rules());
 
-        $values = array_except($fields->values(), ['slug']);
+        $values = array_except($fields->values(), ['slug', 'blueprint']);
+
         $entry = Entry::make()
             ->collection($collection)
+            ->blueprint($request->blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
             ->slug($request->slug)
