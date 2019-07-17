@@ -204,7 +204,7 @@ input.slug {
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply .p-3 .m-0;
+    @apply .p-1.5 .m-0;
 
     label {
         font-weight: 500;
@@ -243,4 +243,10 @@ input.slug {
     .form-group { flex-basis: auto; }
 
     .major { flex: 1; }
+}
+
+@screen md {
+    .form-group {
+        @apply .p-3;
+    }
 }
