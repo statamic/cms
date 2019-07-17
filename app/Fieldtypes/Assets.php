@@ -128,7 +128,9 @@ class Assets extends Fieldtype
 
     protected function container()
     {
-        return AssetContainer::find($this->config('container'));
+        $handle = collect($this->config('container'))->first();
+
+        return AssetContainer::find($handle);
     }
 
     public function rules(): array
