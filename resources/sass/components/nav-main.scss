@@ -3,7 +3,10 @@
    ========================================================================== */
 
 .nav-main {
-    @apply select-none pl-3 pb-3 relative hidden;
+    @apply select-none bg-white shadow h-screen p-2 absolute pin-l overflow-scroll w-full;
+    transition: all .3s;
+    z-index: 9998;
+
 
     ul {
         @apply list-reset mt-0 mb-3;
@@ -48,6 +51,17 @@
             @apply text-grey;
         }
     }
+
+    .nav-closed & {
+        left: -110%;
+    }
+}
+
+@screen md {
+    .nav-main {
+        @apply block bg-transparent shadow-none h-auto pt-0 pl-4 pb-3 overflow-auto w-54;
+        z-index: 1;
+    }
 }
 
 .nav-toggle {
@@ -63,10 +77,6 @@
 
 /* Responsive Wangjangling
   ========================================================================== */
-
-@screen md {
-    .nav-main { @apply block; }
-}
 
 @media (min-height: 720px) {
     .nav-main-wrapper {

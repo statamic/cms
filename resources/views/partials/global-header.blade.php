@@ -1,8 +1,8 @@
 <div class="global-header">
-    <div class="w-54 flex items-center">
+    <div class="md:w-54 flex items-center">
         <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
-            <div v-tooltip="version">
+            <div v-tooltip="version" class="hidden md:block">
                 @svg('statamic-wordmark')
             </div>
         </a>
@@ -11,7 +11,7 @@
     <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
     </global-search>
 
-    <div class="head-link h-full pl-3 flex items-center">
+    <div class="head-link h-full md:pl-3 flex items-center">
 
         @if (Statamic\API\Site::hasMultiple())
             <site-selector>
@@ -21,17 +21,17 @@
 
         <favorite-creator
             current-url="{{ request()->fullUrl() }}"
+            class="hidden md:block"
         ></favorite-creator>
 
         @if (config('telescope.enabled'))
-            <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-tooltip="'Laravel Telescope'">
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @svg('telescope')
             </a>
         @endif
-
         <dropdown-list>
             <template v-slot:trigger>
-                <a class="h-6 w-6 block ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')">
+                <a class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')">
                     @svg('book-open')
                 </a>
             </template>
@@ -51,7 +51,7 @@
             </dropdown-item>
         </dropdown-list>
 
-        <a class="h-6 w-6 block p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('statamic.site') }}" target="_blank" v-tooltip="'{{ __('View Site') }}'">
+        <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('statamic.site') }}" target="_blank" v-tooltip="'{{ __('View Site') }}'">
             @svg('browser-com')
         </a>
         <dropdown-list>

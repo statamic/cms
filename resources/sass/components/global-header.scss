@@ -3,14 +3,19 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center hidden justify-between relative w-full px-2;
+    @apply bg-white shadow h-12 items-center flex justify-between relative w-full px-2;
+    z-index: 9999;
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
 @screen sm {
-    .global-header { @apply flex px-4; }
+    .global-header { @apply px-4; }
+}
+
+@screen md {
+    .global-header { z-index: 1; }
 }
 
 /* Search
