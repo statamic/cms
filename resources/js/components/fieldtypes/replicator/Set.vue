@@ -4,7 +4,7 @@
 
         <div class="replicator-set-header" :class="{ 'p-1': isReadOnly }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-            <div class="flex-1 ml-1 flex items-center">
+            <div class="flex-1 ml-1 flex items-center" @dblclick="toggleCollapsedState">
                 <label v-text="config.display" class="text-xs"/>
                 <div
                     v-if="config.instructions"
@@ -15,11 +15,12 @@
                 <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @input="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
+                    <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
                 </dropdown-list>
             </div>
         </div>
 
-        <div class="replicator-set-body">
+        <div class="replicator-set-body" v-show="!collapsed">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field)"
@@ -90,6 +91,12 @@ export default {
         isReadOnly: Boolean,
     },
 
+     data() {
+        return {
+            collapsed: false
+        }
+    },
+
     computed: {
 
         fields() {
@@ -136,13 +143,9 @@ export default {
             Vue.set(this.values, 'enabled', ! this.values.enabled);
         },
 
-        expand() {
-            Vue.set(this.values, '#hidden', false);
+        toggleCollapsedState() {
+            this.collapsed = ! this.collapsed;
         },
-
-        collapse() {
-            Vue.set(this.values, '#hidden', true);
-        }
 
     }
 
