@@ -70,7 +70,7 @@ class Date extends Fieldtype
     public function preProcess($data)
     {
         if (! $data) {
-            return Carbon::now();
+            return;
         }
 
         if ($this->config('mode') === "range") {
