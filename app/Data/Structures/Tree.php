@@ -209,7 +209,7 @@ class Tree implements Localization
         }
     }
 
-    protected function getEntryIdsFromTree($tree, $flatten = true)
+    protected function getEntryIdsFromTree($tree)
     {
         return collect($tree)
             ->map(function ($item) {
