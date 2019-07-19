@@ -9,7 +9,7 @@ fields:
   -
     handle: author
     field:
-      type: user
+      type: users
       display: Author
       localizable: true
   -
