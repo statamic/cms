@@ -51,6 +51,10 @@
     }
 }
 
+.bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+    position: relative;
+}
+
 .bard-floating-toolbar {
     @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
     transform: translateX(-50%) translateY(-10px);
