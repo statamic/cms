@@ -162,6 +162,8 @@ class Blueprint
 
         $this->extraFields[$section][$handle] = compact('prepend', 'field');
 
+        $this->fieldsCache = null;
+
         return $this;
     }
 
