@@ -253,8 +253,13 @@ export default {
         },
 
         commit() {
-            this.$emit('committed', this.values, this.editedFields);
-            this.close();
+            this.$axios.post(cp_url('fields/update'), {
+                type: this.type,
+                values: this.values
+            }).then(response => {
+                this.$emit('committed', response.data, this.editedFields);
+                this.close();
+            });
         },
 
         close() {

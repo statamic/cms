@@ -39,6 +39,20 @@ class FieldsController extends CpController
 
     public function update(Request $request)
     {
+        $request->validate([
+            'type' => 'required',
+            'values' => 'required|array',
+        ]);
 
+        $fieldtype = FieldtypeRepository::find($request->type);
+
+        $blueprint = $fieldtype->configBlueprint();
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($request->values)
+            ->process();
+
+        return array_merge($request->values, $fields->values());
     }
 }
