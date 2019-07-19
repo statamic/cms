@@ -3,7 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Tags\Tags;
-use Statamic\Exceptions\UrlNotFoundException;
+use Statamic\Exceptions\NotFoundHttpException;
 
 class NotFound extends Tags
 {
@@ -11,6 +11,6 @@ class NotFound extends Tags
 
     public function index()
     {
-        throw new UrlNotFoundException;
+        throw new NotFoundHttpException();
     }
 }

@@ -478,15 +478,8 @@
     cursor: pointer;
 
     .field-width-label {
-        position: absolute;
-        top: 2px;
-        font-size: 11px;
-        font-weight: bold;
-        width: 100%;
-        text-align: center;
-        z-index: 10;
-        color: #999;
-        text-shadow: 0 1px 1px white;
+        @apply absolute text-4xs font-bold w-full text-center z-10 text-grey-70;
+        top: 3px;
         pointer-events: none;
     }
 
@@ -495,29 +488,20 @@
     }
 
     .field-width-notch {
+        @apply relative border border-grey-40 border-l-0;
         width: 8px;
-        position: relative;
-        border: 1px solid $color_border;
-        border-left: 0;
 
         &.notch-25 {
-            border-left: 1px solid #ccc;
-            border-top-left-radius: 2px;
-            border-bottom-left-radius: 2px;
+            @apply border-l rounded-l-sm;
         }
 
         &.filled {
-            border-top-color: #ccc;
-            border-bottom-color: #ccc;
-            border-right: 0;
+            @apply border-grey-40 border-r-0 bg-white;
             margin: -1px 0;
-            background: rgba(black, 0.04);
         }
 
         &.selected {
-            border-right: 1px solid #ccc;
-            border-top-right-radius: 2px;
-            border-bottom-right-radius: 2px;
+            @apply border-r rounded-r-sm;
         }
     }
 

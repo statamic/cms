@@ -176,10 +176,9 @@ class GlobalsStore extends BasicStore
     {
         File::put($path = $global->path(), $global->fileContents());
 
-        // TODO:
-        // if (($initial = $global->initialPath()) && $path !== $initial) {
-        //     File::delete($global->initialPath());
-        // }
+        if (($initial = $global->initialPath()) && $path !== $initial) {
+            File::delete($global->initialPath());
+        }
     }
 
 

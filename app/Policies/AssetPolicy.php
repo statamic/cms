@@ -4,14 +4,31 @@ namespace Statamic\Policies;
 
 class AssetPolicy
 {
-    public function store($user, $asset)
+    public function store($user, $assetContainer)
     {
-        return $user->hasPermission("upload {$asset->container()->handle()} assets");
+        if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
+            return false;
+        }
+
+        return $assetContainer->allowUploads();
     }
 
     public function move($user, $asset)
     {
-        return $user->hasPermission("move {$asset->container()->handle()} assets");
+        if (! $user->hasPermission("move {$asset->container()->handle()} assets")) {
+            return false;
+        }
+
+        return $asset->container()->allowMoving();
+    }
+
+    public function rename($user, $asset)
+    {
+        if (! $user->hasPermission("rename {$asset->container()->handle()} assets")) {
+            return false;
+        }
+
+        return $asset->container()->allowRenaming();
     }
 
     public function delete($user, $asset)

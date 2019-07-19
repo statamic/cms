@@ -28,9 +28,7 @@
                             <data-list-filters
                                 :filters="filters"
                                 :active-filters="activeFilters"
-                                :per-page="perPage"
-                                @filters-changed="filtersChanged"
-                                @per-page-changed="perPageChanged"
+                                :active-count="activeFilterCount"
                             />
                         </template>
                     </div>
@@ -64,6 +62,7 @@
                 <data-list-pagination
                     class="mt-3"
                     :resource-meta="meta"
+                    :per-page="perPage"
                     @page-selected="page = $event"
                 />
             </div>

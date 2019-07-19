@@ -1,6 +1,8 @@
 <template>
     <button @click="selectAndClose">
-        <slot>{{ text }}</slot>
+        <!-- Pass prop text OR child component into slot -->
+        <template v-if="text">{{ text }}</template>
+        <slot></slot>
     </button>
 </template>
 

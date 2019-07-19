@@ -179,7 +179,7 @@ class Submission implements SubmissionContract
 
         })->map(function ($arr, $field) use ($request) {
             // Add the uploaded files to our data array
-            $files = collect(array_filter(Helper::ensureArray($request->file($field))));
+            $files = collect(array_filter((array) $request->file($field)));
             $arr['files'] = $files;
             return $arr;
 

@@ -26,10 +26,8 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledFieldtypes = [
-        'checkboxes',
-        'date', 'fieldset', 'hidden', 'integer', 'lists', 'locale_settings', 'markdown',
-        'radio', 'time', 'title', 'toggle', 'yaml',
-        'revealer', 'section', 'table', 'tags', 'template', 'textarea',
+        'fieldset', 'hidden', 'lists', 'locale_settings',
+        'revealer', 'table', 'tags',
     ];
 
     /**
@@ -99,12 +97,14 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Integer::class,
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Range::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Replicator::class,
+        Fieldtypes\Section::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
         Fieldtypes\Structures::class,
@@ -115,6 +115,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
+        Fieldtypes\Toggle::class,
         Fieldtypes\UserGroups::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,
@@ -322,6 +323,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Unpublish::class,
             Actions\SendActivationEmail::class,
             Actions\MoveAsset::class,
+            Actions\RenameAsset::class,
             Actions\DeleteEntry::class,
         ];
 

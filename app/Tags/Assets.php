@@ -78,7 +78,7 @@ class Assets extends Tags
             return;
         }
 
-        $urls = Helper::ensureArray($urls);
+        $urls = (array) $urls;
 
         $this->assets = collect_assets();
 

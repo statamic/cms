@@ -10,6 +10,8 @@
                 :max="config.max"
                 :step="config.step"
                 :width="config.width"
+                :readonly="isReadOnly"
+                :disabled="isReadOnly"
                 class="flex-1"
             />
             <div class="rounded border px-1 py-sm mx-1 bg-grey-10">{{ val }}</div>

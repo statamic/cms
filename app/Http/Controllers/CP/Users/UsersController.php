@@ -202,12 +202,17 @@ class UsersController extends CpController
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
+        $user->email($request->email);
 
-        $user
-            ->email($request->email)
-            ->roles($request->roles)
-            ->groups($request->groups)
-            ->save();
+        if ($request->roles) {
+            $user->roles($request->roles);
+        }
+
+        if ($request->groups) {
+            $user->groups($request->groups);
+        }
+
+        $user->save();
 
         return $user->toArray();
     }
@@ -230,7 +235,7 @@ class UsersController extends CpController
         $user = User::whereUsername($username);
 
         // Users can reset their own password
-        if ($user !== User::getCurrent()) {
+        if ($user !== me()) {
             $this->authorize('super');
         }
 

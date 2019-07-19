@@ -18,18 +18,21 @@
     @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between z-5;
     position: sticky;
     top: 0;
-    padding: 8px 12px;
+    padding: 4px 8px;
 
      button {
-        @apply text-grey-80 px-1 flex items-center text-base h-6;
+        @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
+        height: 32px;
+        width: 32px;
+        margin: 0 2px;
     }
 
     button:hover {
-        @apply .text-black;
+        @apply bg-grey-20;
     }
 
     button.active {
-        @apply .text-blue;
+        @apply bg-grey-30 text-black;
     }
 
     button:focus {
@@ -46,6 +49,10 @@
     button sup {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
+}
+
+.bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
+    position: relative;
 }
 
 .bard-floating-toolbar {
@@ -69,7 +76,7 @@
     }
 
     button {
-        @apply text-grey-20 h-10 px-1 bg-black rounded-lg;
+        @apply text-grey-20 h-12 w-16 bg-black rounded-lg flex items-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
     }
@@ -130,22 +137,31 @@
 /* Fullscreen mode
    ========================================================================== */
 
-.bard-fullscreen {
-    @apply .fixed .bg-white .pin .min-h-screen .overflow-scroll rounded-none;
-    z-index: 2; // to appear over the top of the rest of the stuff on the page.
+.bard-fieldtype .bard-fullscreen {
+    @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
+    z-index: 11; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
-        @apply bg-white shadow-none max-w-xl mx-auto rounded relative;
+        @apply bg-white shadow max-w-xl mx-auto rounded relative my-3 px-4;
     }
 
     .bard-fixed-toolbar {
-        @apply shadow-sm;
+        @apply shadow h-12 justify-center;
+        padding: 7px 8px;
+
+        button {
+            @apply mx-sm;
+        }
     }
 
     .ProseMirror {
-        @apply .px-3 py-6 flex flex-col justify-center;
-        min-height: calc(100vh - 40px);
+        @apply .px-3 py-6 flex flex-col;
+        min-height: calc(100vh - 120px);
+
+        > p > code, > pre code {
+            @apply bg-grey-30;
+        }
     }
 
     .bard-set-selector {
@@ -298,6 +314,17 @@
 
     blockquote:last-child {
         margin-bottom: 0;
+    }
+
+    p > code {
+        @apply font-mono bg-grey-40 rounded text-xs relative;
+        padding: 2px 4px;
+        top: -1px;
+    }
+
+    pre code {
+        @apply font-mono bg-grey-40 text-xs p-2 block w-full rounded;
+        line-height: 1.8;
     }
 }
 

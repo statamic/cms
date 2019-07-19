@@ -21,9 +21,7 @@ class HasConditionsTest extends TestCase
 
     protected function makeEntry()
     {
-        $entry = API\Entry::make()->collection($this->collection);
-
-        return $entry->makeAndAddLocalization('en', function ($loc) { });
+        return API\Entry::make()->locale('en')->collection($this->collection);
     }
 
     protected function getEntries($params = [])
@@ -319,21 +317,21 @@ class HasConditionsTest extends TestCase
     /** @test */
     function it_filters_by_is_url_condition()
     {
-        $this->makeEntry()->set('url', 'https://domain.tld')->save();
-        $this->makeEntry()->set('url', 'http://domain.tld')->save();
-        $this->makeEntry()->set('url', 'https://www.domain.tld/uri/segment.extension?param=one&two=true')->save();
-        $this->makeEntry()->set('url', 'http://www.domain.tld/uri/segment.extension?param=one&two=true')->save();
-        $this->makeEntry()->set('url', 'http://')->save();
-        $this->makeEntry()->set('url', ' http://')->save();
-        $this->makeEntry()->set('url', 'http://domain with space.tld')->save();
-        $this->makeEntry()->set('url', 'domain-only.tld')->save();
-        $this->makeEntry()->set('url', 'definitely not a url')->save();
+        $this->makeEntry()->set('website', 'https://domain.tld')->save();
+        $this->makeEntry()->set('website', 'http://domain.tld')->save();
+        $this->makeEntry()->set('website', 'https://www.domain.tld/uri/segment.extension?param=one&two=true')->save();
+        $this->makeEntry()->set('website', 'http://www.domain.tld/uri/segment.extension?param=one&two=true')->save();
+        $this->makeEntry()->set('website', 'http://')->save();
+        $this->makeEntry()->set('website', ' http://')->save();
+        $this->makeEntry()->set('website', 'http://domain with space.tld')->save();
+        $this->makeEntry()->set('website', 'domain-only.tld')->save();
+        $this->makeEntry()->set('website', 'definitely not a url')->save();
 
         $this->assertCount(9, $this->getEntries());
-        $this->assertCount(4, $this->getEntries(['url:is_url' => true]));
-        $this->assertCount(5, $this->getEntries(['url:is_url' => false]));
+        $this->assertCount(4, $this->getEntries(['website:is_url' => true]));
+        $this->assertCount(5, $this->getEntries(['website:is_url' => false]));
 
-        $this->getEntries(['url:is_url' => true])->map->get('url')->each(function ($url) {
+        $this->getEntries(['website:is_url' => true])->map->get('website')->each(function ($url) {
             $this->assertContains('domain.tld', $url);
         });
     }
@@ -341,26 +339,26 @@ class HasConditionsTest extends TestCase
     /** @test */
     function it_filters_by_is_embeddable_condition()
     {
-        $this->makeEntry()->set('url', 'https://youtube.com/id')->save(); // valid
-        $this->makeEntry()->set('url', 'http://youtube.com/some/id')->save(); // valid
-        $this->makeEntry()->set('url', 'youtube.com/id')->save(); // not url
-        $this->makeEntry()->set('url', 'http://youtube.com/')->save(); // no id
+        $this->makeEntry()->set('video', 'https://youtube.com/id')->save(); // valid
+        $this->makeEntry()->set('video', 'http://youtube.com/some/id')->save(); // valid
+        $this->makeEntry()->set('video', 'youtube.com/id')->save(); // not url
+        $this->makeEntry()->set('video', 'http://youtube.com/')->save(); // no id
 
-        $this->makeEntry()->set('url', 'https://vimeo.com/id')->save();
-        $this->makeEntry()->set('url', 'http://vimeo.com/some/id')->save();
-        $this->makeEntry()->set('url', 'vimeo.com/id')->save();
-        $this->makeEntry()->set('url', 'http://vimeo.com/')->save();
+        $this->makeEntry()->set('video', 'https://vimeo.com/id')->save();
+        $this->makeEntry()->set('video', 'http://vimeo.com/some/id')->save();
+        $this->makeEntry()->set('video', 'vimeo.com/id')->save();
+        $this->makeEntry()->set('video', 'http://vimeo.com/')->save();
 
-        $this->makeEntry()->set('url', 'https://youtu.be/id')->save();
-        $this->makeEntry()->set('url', 'http://youtu.be/some/id')->save();
-        $this->makeEntry()->set('url', 'youtu.be/id')->save();
-        $this->makeEntry()->set('url', 'http://youtu.be/')->save();
+        $this->makeEntry()->set('video', 'https://youtu.be/id')->save();
+        $this->makeEntry()->set('video', 'http://youtu.be/some/id')->save();
+        $this->makeEntry()->set('video', 'youtu.be/id')->save();
+        $this->makeEntry()->set('video', 'http://youtu.be/')->save();
 
         $this->assertCount(12, $this->getEntries());
-        $this->assertCount(6, $this->getEntries(['url:is_embeddable' => true]));
-        $this->assertCount(6, $this->getEntries(['url:is_embeddable' => false]));
+        $this->assertCount(6, $this->getEntries(['video:is_embeddable' => true]));
+        $this->assertCount(6, $this->getEntries(['video:is_embeddable' => false]));
 
-        $this->getEntries(['url:is_embeddable' => true])->map->get('url')->each(function ($url) {
+        $this->getEntries(['video:is_embeddable' => true])->map->get('video')->each(function ($url) {
             $this->assertContains('http', $url);
             $this->assertContains('/id', $url);
         });

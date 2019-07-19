@@ -1,30 +1,44 @@
 <template>
 
-    <div class="publish-fields">
-        <field-filter
-            v-for="field in selectedFields"
-            :key="field.handle"
-            :field="field"
-            :value="values[field.handle]"
-            @updated="updateField(field.handle, $event)"
-            @removed="removeField(field.handle)"
-        />
+    <div class="p-3">
 
-        <div class="p-3" v-show="unselectedFields.length">
-            <h6>Add filter...</h6>
+        <div v-if="hasFilters" v-for="(filter, index) in filters">
+            <div class="flex items-center mb-3">
 
-            <button
-                v-for="field in unselectedFields"
-                :key="field.handle"
-                class="btn btn-flat mt-1 mr-1 text-xs"
-                @click="selectField(field.handle)"
-                v-text="field.display" />
+                <select-input
+                    class="mr-2"
+                    name="operator"
+                    :options="fieldOptions(filter)"
+                    v-model="filter.field"
+                    :placeholder="__('Select Field')"
+                    @input="reset(index, $event)" />
+
+                <field-filter
+                    :filter="filter"
+                    :operators="fieldOperators(filter)"
+                    class="flex-1"
+                    @updated="update(index, $event)" />
+
+                <button @click="remove(index)" class="btn-close ml-1 group">
+                    <svg-icon name="trash" class="w-auto group-hover:text-red" />
+                </button>
+
+            </div>
         </div>
+        <div :class="{ 'border-t': hasFilters, 'pt-3': hasFilters }">
+            <button
+                v-text="__('Add Filter')"
+                class="btn"
+                :disabled="! canAdd"
+                @click="add()" />
+        </div>
+
     </div>
 
 </template>
 
 <script>
+import uniqid from 'uniqid';
 import FieldFilter from './FieldFilter.vue';
 
 export default {
@@ -35,7 +49,7 @@ export default {
 
     props: {
         filter: {},
-        initialValue: {
+        initialFilters: {
             default() {
                 return {};
             }
@@ -44,22 +58,65 @@ export default {
 
     data() {
         return {
-            values: this.initialValue,
+            filters: [],
         }
     },
 
     computed: {
 
         fields() {
-            return this.filter.extra;
+            let fields = {};
+
+            this.filter.extra.forEach(field => {
+                fields[field.handle] = field;
+            });
+
+            return fields;
         },
 
-        selectedFields() {
-            return this.fields.filter(field => this.values.hasOwnProperty(field.handle));
+        fieldCount() {
+            return Object.keys(this.fields).length;
         },
 
-        unselectedFields() {
-            return this.fields.filter(field => !this.values.hasOwnProperty(field.handle));
+        unselectedFieldOptions() {
+            let fields = _.map(this.fields, (field, handle) => handle);
+            let selectedFields = this.filters.map(filter => filter.field);
+
+            return fields
+                .filter(field => ! selectedFields.includes(field))
+                .map(field => {
+                    return {
+                        value: this.fields[field].handle,
+                        label: this.fields[field].display
+                    };
+                });
+        },
+
+        hasFilters() {
+            return this.filters.length;
+        },
+
+        incompleteFilters() {
+            return this.filters.filter(filter => ! this.isFilterComplete(filter));
+        },
+
+        canAdd() {
+            return this.filters.length < this.fieldCount;
+        },
+
+        values() {
+            let values = {};
+
+            this.filters
+                .filter(filter => this.isFilterComplete(filter))
+                .forEach(filter => {
+                    values[filter.field] = {
+                        operator: filter.operator,
+                        value: filter.value
+                    };
+                });
+
+            return values;
         }
 
     },
@@ -76,25 +133,67 @@ export default {
     },
 
     created() {
-        this.$events.$on('filters-reset', this.removeAll);
+        this.setInitialFilters();
+
+        this.$events.$on('filters-reset', this.resetAll);
     },
 
     methods: {
 
-        selectField(handle) {
-            this.updateField(handle, { value: '', operator: '=' });
+        setInitialFilters() {
+            _.each(this.initialFilters, (filter, field) => {
+                this.add(field, filter.operator, filter.value);
+            });
+
+            if (this.filters.length === 0) {
+                this.add();
+            }
         },
 
-        updateField(handle, value) {
-            Vue.set(this.values, handle, value);
+        fieldOptions(filter) {
+            if (! filter.field) {
+                return this.unselectedFieldOptions;
+            }
+
+            return [{
+                value: filter.field,
+                label: this.fields[filter.field].display
+            }].concat(this.unselectedFieldOptions);
         },
 
-        removeField(handle) {
-            Vue.delete(this.values, handle);
+        fieldOperators(filter) {
+            return filter.field ? this.fields[filter.field].operators : {};
         },
 
-        removeAll() {
-            this.values = {};
+        isFilterComplete(filter) {
+            return filter.field !== null && filter.operator !== null && filter.value;
+        },
+
+        add(handle=null, operator=null, value=null) {
+            this.filters.push({
+                _id: uniqid(),
+                field: handle,
+                operator,
+                value
+            });
+        },
+
+        update(index, event) {
+            this.filters[index].operator = event.operator;
+            this.filters[index].value = event.value;
+        },
+
+        reset(index) {
+            this.filters[index].operator = null;
+            this.filters[index].value = null;
+        },
+
+        remove(index) {
+            this.filters.splice(index, 1);
+        },
+
+        resetAll() {
+            this.filters = [];
         }
 
     }

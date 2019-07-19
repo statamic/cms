@@ -143,7 +143,7 @@ class Cascade
         return [
             // Constants
             'environment' => app()->environment(),
-            'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>',
+            'xml_header' => '<?xml version="1.0" encoding="utf-8" ?>', // @TODO remove and document new best practice
             'csrf_token' => csrf_token(),
             'csrf_field' => csrf_field(),
             'config' => config()->all(),

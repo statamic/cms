@@ -19,7 +19,7 @@
 .vs--disabled .vs__search,
 .vs--disabled .vs__selected {
 	cursor: not-allowed;
-	background-color: #f8f8f8
+	@apply bg-grey-20;
 }
 
 .v-select[dir=rtl] .vs__actions {
@@ -42,13 +42,19 @@
 
 .vs__dropdown-toggle {
     @include button(#fff, config('colors.grey-80'));
-    @apply block appearance-none bg-white shadow-button flex;
+    @apply block appearance-none bg-white shadow-button flex h-auto;
+	min-height: 37px;
+	line-height: 1;
     padding: 0 4px 4px;
-    white-space: normal;
+	white-space: normal;
 
     &:active, &:focus:active {
         bottom: 0px;
-    }
+	}
+
+	.vs--disabled & {
+		@apply bg-grey-20;
+	}
 }
 
 .vs__selected-options {
@@ -82,6 +88,8 @@
 
 .vs__open-indicator {
 	@apply flex items-center text-grey-90;
+	height: 16px;
+	width: 16px;
 	-webkit-transform: scale(1);
 	transform: scale(1);
 	transition: -webkit-transform .15s cubic-bezier(1, -.115, .975, .855);

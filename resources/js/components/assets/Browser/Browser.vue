@@ -116,9 +116,19 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
+
                                         <td class="text-right" :colspan="columns.length">
-                                            <dropdown-list>
-                                                <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" />
+                                            <dropdown-list v-if="folderActions(folder).length">
+                                                <!-- TODO: Do we want folder edit functionality for launch? -->
+                                                <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
+
+                                                <data-list-inline-actions
+                                                    :item="folder.path"
+                                                    :url="folderActionUrl"
+                                                    :actions="folderActions(folder)"
+                                                    @started="actionStarted"
+                                                    @completed="actionCompleted"
+                                                />
                                             </dropdown-list>
 
                                             <folder-editor
@@ -211,7 +221,6 @@
             :id="editedAssetId"
             @closed="closeAssetEditor"
             @saved="assetSaved"
-            @deleted="assetDeleted"
         />
 
         <folder-creator
@@ -231,15 +240,10 @@ import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
-import HasActions from '../../data-list/HasActions';
 import Uploader from '../Uploader.vue';
 import Uploads from '../Uploads.vue';
 
 export default {
-
-    mixins: [
-        HasActions,
-    ],
 
     components: {
         AssetThumbnail,
@@ -259,6 +263,7 @@ export default {
         restrictFolderNavigation: Boolean,  // Whether to restrict to a single folder and prevent navigation.
         selectedAssets: Array,
         maxFiles: Number,
+        initialEditingAssetId: String,
     },
 
     data() {
@@ -277,7 +282,7 @@ export default {
             folders: [],
             folder: {},
             searchQuery: '',
-            editedAssetId: null,
+            editedAssetId: this.initialEditingAssetId,
             editedFolderPath: null,
             creatingFolder: false,
             uploads: [],
@@ -286,7 +291,8 @@ export default {
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
-            mode: 'table'
+            mode: 'table',
+            folderActionUrl: null,
         }
     },
 
@@ -354,12 +360,23 @@ export default {
             return this.assets.length === 0
                 && this.folders.length === 0
                 && ! this.folder.parent_path;
+        },
+
+        editedAssetBasename() {
+            let asset = _.find(this.assets, asset => asset.id == this.editedAssetId);
+
+            return asset ? asset.basename : null;
         }
 
     },
 
     mounted() {
         this.loadContainers();
+    },
+
+    created() {
+        this.$events.$on('editor-action-started', this.actionStarted);
+        this.$events.$on('editor-action-completed', this.actionCompleted);
     },
 
     watch: {
@@ -383,6 +400,14 @@ export default {
 
         loading(loading) {
             this.$progress.loading('asset-browser', loading);
+        },
+
+        editedAssetId(editedAssetId) {
+            let path = editedAssetId
+                ? [this.path, this.editedAssetBasename].filter(value => value != '/').join('/') + '/edit'
+                : this.path;
+
+            this.$emit('navigated', this.container, path);
         }
 
     },
@@ -421,6 +446,8 @@ export default {
                 this.assets = response.data.data;
                 this.folders = response.data.meta.folders;
                 this.folder = response.data.meta.folder;
+                this.actionUrl = response.data.meta.actionUrl;
+                this.folderActionUrl = response.data.meta.folderActionUrl;
                 this.meta = response.data.meta;
                 this.loadingAssets = false;
                 this.initializing = false;
@@ -519,7 +546,12 @@ export default {
                 this.selectedAssets.push(id);
             }
             this.$emit('selections-updated', this.selectedAssets);
+        },
+
+        folderActions(folder) {
+            return folder.actions || this.folder.actions || [];
         }
+
     }
 
 }

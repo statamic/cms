@@ -1,57 +1,70 @@
 <template>
 
-    <div class="form-group">
-        <label>{{ field.display }}</label>
+    <div>
+
         <div class="flex items-center text-sm">
+
             <select-input
-                class="w-1/5 mr-1"
+                class="w-1/3 mr-2"
                 name="operator"
-                v-model="value.operator"
-                :options="[
-                    { text: 'Equal to', value: '=' },
-                    { text: 'Not equal to', value: '<>' },
-                    { text: 'Like', value: 'like' },
-                ]" />
+                v-model="filter.operator"
+                placeholder=""
+                :options="operatorOptions" />
 
             <div class="flex-1">
-                <text-input name="value" v-model="value.value" />
+                <text-input name="value" v-model="filter.value" />
             </div>
 
-            <button
-                type="button"
-                class="btn-close"
-                @click="$emit('removed')"
-                v-html="'&times'" />
         </div>
+
     </div>
 
 </template>
 
 <script>
+import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+
 export default {
 
+    mixins: [HasInputOptions],
+
     props: {
-        field: Object,
-        value: {
+        operators: {
             type: Object,
-            default: () => {
-                return {
-                    value: null,
-                    operator: '=',
-                }
-            }
+            required: true
+        },
+        filter: {
+            type: Object,
+            required: true
+        }
+    },
+
+    computed: {
+        operatorOptions() {
+            return this.normalizeInputOptions(this.operators);
+        },
+
+        value() {
+            return this.filter;
         }
     },
 
     watch: {
-
         value: {
             deep: true,
             handler(value) {
+                this.ensureDefaults();
                 this.$emit('updated', value);
             }
         }
+    },
 
+    methods: {
+        ensureDefaults() {
+            if (this.filter.field && ! this.filter.operator) {
+                this.filter.operator = this.operatorOptions[0].value;
+            }
+        }
     }
 
 }

@@ -1,21 +1,21 @@
 <script>
 import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
+import HasPagination from './data-list/HasPagination';
+import HasPreferences from './data-list/HasPreferences';
 
 export default {
 
     mixins: [
         HasActions,
         HasFilters,
+        HasPagination,
+        HasPreferences,
     ],
 
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        initialPerPage: {
-            type: Number,
-            default: 25
-        }
     },
 
     data() {
@@ -27,8 +27,6 @@ export default {
             columns: [],
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
-            page: 1,
-            perPage: this.initialPerPage,
             meta: null,
             searchQuery: '',
         }
@@ -55,7 +53,6 @@ export default {
 
     created() {
         this.request();
-        this.$events.$on('filters-reset', this.perPageReset);
     },
 
     watch: {
@@ -77,9 +74,9 @@ export default {
         },
 
         searchQuery(query) {
-            this.page = 1;
             this.sortColumn = null;
             this.sortDirection = null;
+            this.pageReset();
             this.request();
         }
 
@@ -120,15 +117,6 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
-        },
-
-        perPageChanged(perPage) {
-            this.perPage = perPage;
-            this.page = 1;
-        },
-
-        perPageReset() {
-            this.perPageChanged(this.initialPerPage);
         }
 
     }

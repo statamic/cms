@@ -40,6 +40,7 @@
         >
             <div slot-scope="{ container, setValue }">
                 <publish-sections
+                    :enable-sidebar="false"
                     @updated="setValue"
                     @focus="container.$emit('focus', $event)"
                     @blur="container.$emit('blur', $event)"

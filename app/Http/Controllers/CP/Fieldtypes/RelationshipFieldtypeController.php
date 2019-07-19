@@ -30,7 +30,7 @@ class RelationshipFieldtypeController extends CpController
 
     protected function fieldtype($request)
     {
-        $config = json_decode(base64_decode($request->config), true);
+        $config = json_decode(utf8_encode(base64_decode($request->config)), true);
 
         return Fieldtype::find($config['type'])->setField(
             new Field('relationship', $config)

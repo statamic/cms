@@ -106,7 +106,14 @@ export default {
         },
 
         updated(index, set) {
-            this.values.splice(index, 1, set);
+            let oldValues = clone(this.values);
+            let newValues = clone(this.values);
+
+            newValues.splice(index, 1, set);
+
+            if (JSON.stringify(oldValues) !== JSON.stringify(newValues)) {
+                this.values = newValues;
+            }
         },
 
         removed(set, index) {
@@ -142,7 +149,7 @@ export default {
 
     watch: {
 
-        value(value, oldValue) {
+        value(value) {
             this.values = value;
         },
 

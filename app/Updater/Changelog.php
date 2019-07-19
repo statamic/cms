@@ -91,6 +91,18 @@ class Changelog
     }
 
     /**
+     * Get available updates count.
+     *
+     * @return int
+     */
+    public function availableUpdatesCount()
+    {
+        return $this->get()->filter(function ($release) {
+            return $release->type === 'upgrade';
+        })->count();
+    }
+
+    /**
      * Get latest release.
      *
      * @return \stdClass

@@ -4,7 +4,7 @@
         @input="update"
         :name="name"
         :clearable="config.clearable"
-        :disabled="config.disabled"
+        :disabled="config.disabled || isReadOnly"
         :options="options"
         :placeholder="config.placeholder"
         :reduce="selection => selection.value"

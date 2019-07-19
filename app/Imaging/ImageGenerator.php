@@ -116,6 +116,16 @@ class ImageGenerator
     }
 
     /**
+     * This one goes to eleven
+     */
+    public function toEleven()
+    {
+        @ini_set('memory_limit', config('statamic.system.php_memory_limit'));
+
+        @set_time_limit(config('statamic.system.php_max_execution_time'));
+    }
+
+    /**
      * Generate the image
      *
      * @param string $image The filename of the image
@@ -126,7 +136,7 @@ class ImageGenerator
      */
     private function generate($image)
     {
-        Helper::toEleven();
+        $this->toEleven();
 
         $this->applyDefaultManipulations();
 

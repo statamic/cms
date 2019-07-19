@@ -111,7 +111,7 @@ abstract class Tags
 
         $this->wildcardHandled = true;
 
-        return $this->{$this->wildcardMethod}($this->tag);
+        return $this->{$this->wildcardMethod}($this->method);
     }
 
     /**

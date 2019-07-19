@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Carbon\Carbon;
+use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
@@ -183,7 +184,7 @@ class Stache
 
     public function generateId()
     {
-        return Helper::makeUuid(); // TODO: Get prettier, or incremental IDs.
+        return (string) Str::uuid();
     }
 
     public function idMap()

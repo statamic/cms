@@ -55,7 +55,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function avatar($size = 64)
     {
-        if ($this->has('avatar') && $this->augment('avatar')->value()) {
+        if ($this->blueprint()->hasField('avatar') && $this->has('avatar') && $this->augment('avatar')->value()) {
             return $this->augment('avatar')->value()->url();
         }
 
@@ -196,5 +196,10 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public function routeNotificationForMail($notification = null)
     {
         return $this->email();
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\User::{$method}(...$parameters);
     }
 }

@@ -2,18 +2,9 @@
     <div class="color-picker"></div>
 </template>
 
-
-<style>
-/* Temporary CSS patch */
-.pcr-app .pcr-swatches {
-    justify-content: start !important;
-    grid-gap: 10px;
-}
-</style>
-
-
 <script>
-import '@simonwep/pickr/dist/pickr.min.css';
+import '@simonwep/pickr/dist/themes/classic.min.css';
+import '@simonwep/pickr/dist/themes/nano.min.css';
 import Pickr from '@simonwep/pickr';
 
 export default {
@@ -23,6 +14,7 @@ export default {
     mounted() {
         const pickr = Pickr.create({
             el: '.color-picker',
+            disabled: this.isReadOnly,
             components: {
 
                 // Main components
@@ -32,11 +24,11 @@ export default {
 
                 // Input / output Options
                 interaction: {
-                    hex: true,
-                    rgba: true,
-                    hsla: true,
-                    hsva: true,
-                    cmyk: true,
+                    hex: this.config.color_modes.includes('hex'),
+                    rgba: this.config.color_modes.includes('rgba'),
+                    hsla: this.config.color_modes.includes('hsla'),
+                    hsva: this.config.color_modes.includes('hsva'),
+                    cmyk: this.config.color_modes.includes('cmyk'),
                     input: true,
                     clear: true,
                     save: true
@@ -46,13 +38,14 @@ export default {
                 save: __('Save'),
                 clear: __('Clear')
             },
-            swatches: this.config.swatches
+            swatches: this.config.swatches,
+            theme: this.config.theme || 'classic'
         });
 
-        pickr.setColorRepresentation(this.config.default_mode);
+        pickr.setColorRepresentation(this.config.default_color_mode);
 
         pickr.on('init', (...args) => {
-            pickr.setColorRepresentation(this.config.default_mode);
+            pickr.setColorRepresentation(this.config.default_color_mode);
             pickr.setColor(this.value);
         });
 

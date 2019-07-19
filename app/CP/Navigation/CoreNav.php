@@ -50,9 +50,9 @@ class CoreNav
             ->route('dashboard')
             ->icon('charts');
 
-        Nav::topLevel('Playground')
-            ->route('playground')
-            ->icon('playground');
+        // Nav::topLevel('Playground')
+        //     ->route('playground')
+        //     ->icon('playground');
 
         return $this;
     }
@@ -147,7 +147,7 @@ class CoreNav
             });
 
         Nav::tools('Updates')
-            ->route('updater.index')
+            ->route('updater')
             ->icon('loading-bar')
             ->view('statamic::nav.updates')
             ->can('view updates');
@@ -214,17 +214,17 @@ class CoreNav
             ->route('addons.index')
             ->icon('addons');
 
+        Nav::site('Fields')
+            ->route('fields.index')
+            ->icon('wireframe')
+            ->children([
+                Nav::item('Blueprints')->route('blueprints.index'),
+                Nav::item('Fieldsets')->route('fieldsets.index'),
+            ]);
+
         Nav::site('Preferences')
             ->route('')
             ->icon('hammer-wrench');
-
-        Nav::site('Blueprints')
-            ->route('blueprints.index')
-            ->icon('blueprints');
-
-        Nav::site('Fieldsets')
-            ->route('fieldsets.index')
-            ->icon('wireframe');
 
         return $this;
     }

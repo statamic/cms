@@ -15,7 +15,7 @@
         :initial-values="{{ json_encode($values) }}"
         :initial-localized-fields="{{ json_encode($localizedFields) }}"
         :initial-meta="{{ json_encode($meta) }}"
-        :initial-published="{{ bool_str($entry->published()) }}"
+        :initial-published="{{ bool_str($published) }}"
         initial-permalink="{{ $permalink }}"
         :initial-localizations="{{ json_encode($localizations) }}"
         :initial-has-origin="{{ bool_str($hasOrigin) }}"
@@ -27,6 +27,7 @@
         :revisions-enabled="{{ bool_str($entry->revisionsEnabled()) }}"
         :amp="{{ bool_str($entry->ampable()) }}"
         :initial-read-only="{{ bool_str($readOnly) }}"
+        :preloaded-assets="{{ json_encode($preloadedAssets) }}"
     ></entry-publish-form>
 
 @endsection

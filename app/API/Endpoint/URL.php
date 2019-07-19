@@ -41,19 +41,6 @@ class URL
     }
 
     /**
-     * Takes a localized URL and returns the unlocalized, default version
-     *
-     * @param string      $url    The localized URL to transform
-     * @param string|null $locale Optional locale to transform from
-     * @return string
-     * @deprecated since 2.1
-     */
-    public function unlocalize($url, $locale = null)
-    {
-        return self::getDefaultUri($locale, $url);
-    }
-
-    /**
      * Get the slug of a URL
      *
      * @param string $url  URL to parse

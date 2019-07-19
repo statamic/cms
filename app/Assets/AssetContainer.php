@@ -17,6 +17,7 @@ use Statamic\API\Asset as AssetAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -53,8 +54,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
             ->args(func_get_args());
     }
 
-
-
     public function diskPath()
     {
         return rtrim($this->disk()->path('/'), '/');
@@ -85,15 +84,25 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function toArray()
     {
-        return [
-            'title' => $this->title(),
-            'handle' => $this->handle(),
+        $array = [
+            'title' => $this->title,
+            'handle' => $this->handle,
             'disk' => $this->disk,
             'blueprint' => $this->blueprint,
-            'allow_uploads' => $this->allowUploads(),
-            'create_folders' => $this->createFolders(),
             'search_index' => $this->searchIndex,
+            'allow_uploads' => $this->allowUploads,
+            'allow_downloading' => $this->allowDownloading,
+            'allow_renaming' => $this->allowRenaming,
+            'allow_moving' => $this->allowMoving,
+            'create_folders' => $this->createFolders,
         ];
+
+        // if ($user = user()) {
+        //     $array['allow_uploads'] = user()->can('store', [AssetContract::class, $this]);
+        //     $array['create_folders'] = user()->can('create', [AssetFolder::class, $this]);
+        // }
+
+        return $array;
     }
 
     public function toAugmentedArray()
@@ -337,6 +346,54 @@ class AssetContainer implements AssetContainerContract, Augmentable
             ->args(func_get_args());
     }
 
+     /**
+     * Enable the quick download button when editing files in this container
+     *
+     * @param bool|null $allowDownloading
+     * @return bool|$this
+     */
+    public function allowDownloading($allowDownloading = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('allowDownloading')
+            ->getter(function ($allowDownloading) {
+                return (bool) ($allowDownloading ?? true);
+            })
+            ->args(func_get_args());
+    }
+
+    /**
+     * The ability to move files around within this container.
+     *
+     * @param bool|null $allowMoving
+     * @return bool|$this
+     */
+    public function allowMoving($allowMoving = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('allowMoving')
+            ->getter(function ($allowMoving) {
+                return (bool) ($allowMoving ?? true);
+            })
+            ->args(func_get_args());
+    }
+
+    /**
+     * The ability to rename files in this container.
+     *
+     * @param bool|null $allowRenaming
+     * @return bool|$this
+     */
+    public function allowRenaming($allowRenaming = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('allowRenaming')
+            ->getter(function ($allowRenaming) {
+                return (bool) ($allowRenaming ?? true);
+            })
+            ->args(func_get_args());
+    }
+
     /**
      * The ability to upload into this container.
      *
@@ -373,13 +430,15 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         $data = array_except($this->toArray(), 'handle');
 
-        if ($data['allow_uploads'] === true) {
-            unset($data['allow_uploads']);
-        }
+        // @TODO: Determine why we were explicity unsetting this data
 
-        if ($data['create_folders'] === true) {
-            unset($data['create_folders']);
-        }
+        // if ($data['allow_uploads'] === true) {
+        //     unset($data['allow_uploads']);
+        // }
+
+        // if ($data['create_folders'] === true) {
+        //     unset($data['create_folders']);
+        // }
 
         return $data;
     }
@@ -407,5 +466,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
                 return $index ? Search::index($index) : null;
             })
             ->args(func_get_args());
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\AssetContainer::{$method}(...$parameters);
     }
 }

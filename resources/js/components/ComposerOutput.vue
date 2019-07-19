@@ -1,8 +1,8 @@
 <template>
     <div>
-        <p class="mb-2">
+        <p class="mb-2 font-bold flex items-center justify-between">
             <template v-if="composer.status">{{ composer.status }}</template>
-            <span v-if="polling" class="icon icon-circular-graph animation-spin ml-1"></span>
+            <loading-graphic v-if="polling" text="" class="h-6 w-6"/>
         </p>
         <pre v-if="output" class="p-1 rounded bg-grey-30 text-grey text-sm clearfix">{{ output }}</pre>
     </div>
@@ -22,6 +22,12 @@
                 output: false,
                 polling: false,
             };
+        },
+
+        watch: {
+            polling(polling) {
+                this.$progress.loading('composer-installing', polling);
+            }
         },
 
         computed: {

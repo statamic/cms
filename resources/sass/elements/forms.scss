@@ -38,13 +38,6 @@ select {
 
 }
 
-// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
-input.input-text:read-only,
-textarea.input-text:read-only,
-.input-text.read-only {
-    @apply bg-grey-30 text-grey-70;
-}
-
 // Used inside tables, grids, and so on
 .input-text-minimal {
     @apply appearance-none shadow-none bg-white w-full p-1;
@@ -54,6 +47,14 @@ textarea.input-text:read-only,
     }
 }
 
+
+// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
+input.input-text:read-only,
+textarea.input-text:read-only,
+input.input-text-minimal:read-only,
+.input-text.read-only {
+    @apply bg-grey-30 text-grey-70;
+}
 
 /* Input Groups
   ========================================================================== */
@@ -85,13 +86,13 @@ textarea.input-text:read-only,
     .input-group-prepend {
         @apply rounded-l bg-grey-30 px-1 border border-grey-50 text-sm;
         height: 38px;
-        line-height: 38px;
+        line-height: 36px;
     }
 
     .input-group-append {
         @apply rounded-r bg-grey-30 px-1 border border-grey-50 text-sm;
         height: 38px;
-        line-height: 38px;
+        line-height: 36px;
     }
 }
 
@@ -140,7 +141,7 @@ textarea.input-text:read-only,
 
       select {
           @include button(#fff, config('colors.grey-80'));
-          @apply block appearance-none pl-1.5 pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
+          @apply block appearance-none pl-1.5 text-left pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
       }
 
       .select-input-toggle {
@@ -203,14 +204,14 @@ input.slug {
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply .p-3 .m-0;
+    @apply .p-1.5 .m-0;
 
     label {
         font-weight: 500;
     }
 
     .help-block {
-        @apply .block .mb-1 .text-grey-60 .text-xs;
+        @apply .block .mb-1 .text-grey-70 .text-xs;
         a {
             @apply .text-red;
             &:hover {
@@ -242,4 +243,10 @@ input.slug {
     .form-group { flex-basis: auto; }
 
     .major { flex: 1; }
+}
+
+@screen md {
+    .form-group {
+        @apply .p-3;
+    }
 }

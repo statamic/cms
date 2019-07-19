@@ -36,7 +36,7 @@
                     </div>
                 </transition>
 
-                <div class="live-preview-main flex flex-1">
+                <div class="live-preview-main">
 
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
@@ -125,7 +125,7 @@ export default {
 
         deviceSelectOptions() {
             return Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
-                return { value: device, text: __(device) };
+                return { value: device, label: __(device) };
             }));
         },
 

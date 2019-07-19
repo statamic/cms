@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Statamic\API\Asset;
+use Statamic\API\Action;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\API\AssetContainer;
@@ -31,8 +32,11 @@ class AssetsController extends CpController
 
         return [
             'asset' => $asset->toArray(),
+            'container' => $asset->container()->toArray(),
             'values' => array_merge($asset->data(), $fields->values()),
             'meta' => $fields->meta(),
+            'actionUrl' => cp_route('assets.actions'),
+            'actions' => Action::for('asset-browser', ['container' => $asset->container()->handle()], $asset),
         ];
     }
 
@@ -140,9 +144,6 @@ class AssetsController extends CpController
 
     private function thumbnail($asset, $preset = null)
     {
-        return cp_route('assets.thumbnails.show', [
-            'asset' => base64_encode($asset->id()),
-            'size' => $preset
-        ]);
+        return $asset->thumbnailUrl($preset);
     }
 }

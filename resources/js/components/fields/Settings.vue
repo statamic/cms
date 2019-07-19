@@ -2,82 +2,104 @@
 
     <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
 
-        <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="loading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
-        <div v-if="fieldtypesLoaded" class="flex items-center mb-3 -mt-1">
+        <div v-if="!loading" class="flex items-center mb-3 -mt-1">
             <h1 class="flex-1">
-                {{ config.display || config.handle }}
-                <small class="block text-xs text-grey-40 font-medium leading-none mt-1 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-40 text-current" :name="fieldtype.icon"></svg-icon>
+                <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" :name="fieldtype.icon"></svg-icon>
                     {{ fieldtype.title }}
                 </small>
+                {{ config.display || config.handle }}
             </h1>
             <button
+                class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
+                @click.prevent="close"
+                v-text="__('Cancel')"
+            ></button>
+            <button
                 class="btn btn-primary"
-                @click.prevent="$emit('closed')"
-                v-text="__('Done')"
+                @click.prevent="commit"
+                v-text="__('Finish')"
             ></button>
         </div>
 
-        <div class="card" v-if="fieldtypesLoaded">
+        <div class="publish-tabs tabs">
+            <a :class="{ 'active': activeTab === 'settings' }"
+                @click="activeTab = 'settings'"
+                v-text="__('Settings')"
+            ></a>
+            <a class="z-5" :class="{ 'active': activeTab === 'conditions' }"
+                @click="activeTab = 'conditions'"
+                v-text="__('Conditions')"
+            ></a>
+            <a :class="{ 'active': activeTab === 'validation' }"
+                @click="activeTab = 'validation'"
+                v-text="__('Validation')"
+            ></a>
+        </div>
 
-            <div class="publish-fields">
+        <div class="card rounded-tl-none" v-if="!loading">
 
-                <form-group
-                    handle="display"
-                    :display="__('Display')"
-                    :instructions="__(`The field's label shown in the Control Panel.`)"
-                    width="50"
-                    autofocus
-                    :value="config.display"
-                    @input="updateField('display', $event)"
-                />
+            <publish-container
+                name="base"
+                :fieldset="blueprint"
+                :values="values"
+                :meta="meta"
+                :is-root="true"
+                @updated="values = $event"
+            >
+                <div class="publish-fields" v-show="activeTab === 'settings'" slot-scope="{ setValue }">
 
-                <form-group
-                    handle="handle"
-                    :display="__('Handle')"
-                    :instructions="__(`The field's template variable.`)"
-                    width="50"
-                    :value="config.handle"
-                    @input="(field) => {
-                        this.isHandleModified = true;
-                        this.updateField('handle', field);
-                    }"
-                />
+                    <form-group
+                        handle="display"
+                        :display="__('Display')"
+                        :instructions="__(`The field's label shown in the Control Panel.`)"
+                        width="50"
+                        autofocus
+                        :value="values.display"
+                        @input="updateField('display', $event, setValue)"
+                    />
 
-                <form-group
-                    fieldtype="markdown"
-                    handle="instructions"
-                    :display="__('Instructions')"
-                    :instructions="__(`Basic Markdown is allowed. Encouraged, even.`)"
-                    :value="config.instructions"
-                    @input="updateField('instructions', $event)"
-                />
+                    <form-group
+                        handle="handle"
+                        :display="__('Handle')"
+                        :instructions="__(`The field's template variable.`)"
+                        width="50"
+                        :value="values.handle"
+                        @input="updateField('handle', $event, setValue); isHandleModified = true"
+                    />
 
-                <!--
-                    TODO:
-                    - Validation
-                    - Default value
-                -->
+                    <form-group
+                        fieldtype="text"
+                        handle="instructions"
+                        :display="__('Instructions')"
+                        :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
+                        :value="values.instructions"
+                        @input="updateField('instructions', $event, setValue)"
+                    />
 
+                    <publish-fields
+                        :fields="blueprint.sections[0].fields"
+                        @updated="(handle, value) => updateField(handle, value, setValue)"
+                    />
+
+                </div>
+            </publish-container>
+
+            <div class="publish-fields" v-show="activeTab === 'conditions'">
                 <field-conditions-builder
                     :config="config"
                     :suggestable-fields="suggestableConditionFields"
                     @updated="updateFieldConditions" />
+            </div>
 
+            <div class="publish-fields" v-show="activeTab === 'validation'">
                 <field-validation-builder
                     :config="config"
-                    @updated="updateFieldValidation" />
-
-                <publish-field
-                    v-for="configField in filteredFieldtypeConfig"
-                    :key="configField.handle"
-                    :config="configField"
-                    :value="values[configField.handle]"
-                    @input="updateField"
-                />
+                    @updated="updateField('validate', $event)" />
 
             </div>
         </div>
@@ -87,8 +109,7 @@
 
 <script>
 import PublishField from '../publish/Field.vue';
-import ProvidesFieldtypes from './ProvidesFieldtypes';
-import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
+import { ValidatesFieldConditions, FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 
 export default {
@@ -99,9 +120,17 @@ export default {
         FieldValidationBuilder,
     },
 
-    mixins: [ProvidesFieldtypes],
+    mixins: [
+        ValidatesFieldConditions,
+    ],
 
-    props: ['config', 'type', 'root', 'suggestableConditionFields'],
+    props: {
+        config: Object,
+        overrides: { type: Array, default: () => [] },
+        type: String,
+        root: Boolean,
+        suggestableConditionFields: Array,
+    },
 
     model: {
         prop: 'config',
@@ -110,9 +139,15 @@ export default {
 
     data: function() {
         return {
-            values: this.config,
+            values: null,
+            meta: null,
+            editedFields: clone(this.overrides),
             isHandleModified: true,
-            activeTab: 'basics'
+            activeTab: 'settings',
+            storeName: 'base',
+            fieldtype: null,
+            loading: true,
+            blueprint: null,
         };
     },
 
@@ -121,10 +156,6 @@ export default {
             var width = this.config.width || 100;
             var found = _.findWhere(this.widths, {value: width});
             return found.text;
-        },
-
-        fieldtype: function() {
-            return _.findWhere(this.fieldtypes, { handle: this.type });
         },
 
         fieldtypeConfig() {
@@ -165,14 +196,16 @@ export default {
         // If they edit the handle, we'll stop.
         if (this.config.isNew && !this.config.isMeta) {
             this.isHandleModified = false;
-            delete this.config.isNew;
 
-            this.$watch('config.display', function(display) {
+            this.$watch('values.display', function(display) {
                 if (! this.isHandleModified) {
-                    this.config.handle = this.$slugify(display, '_');
+                    const handle = this.$slugify(display, '_');
+                    this.updateField('handle', handle);
                 }
             });
         }
+
+        this.load();
     },
 
     methods: {
@@ -188,11 +221,13 @@ export default {
             ];
         },
 
-        updateField(handle, value) {
-            const values = this.values;
-            values[handle] = value;
-            this.$emit('input', values);
-            this.$emit('updated', handle, value);
+        updateField(handle, value, setStoreValue=null) {
+            this.values[handle] = value;
+            this.markFieldEdited(handle);
+
+            if (setStoreValue) {
+                setStoreValue(handle, value);
+            }
         },
 
         updateFieldConditions(conditions) {
@@ -204,19 +239,44 @@ export default {
                 }
             });
 
-            this.$emit('input', {...values, ...conditions});
+            this.values = {...values, ...conditions};
+
+            if (Object.keys(conditions).length > 0) {
+                this.markFieldEdited(Object.keys(conditions)[0]);
+            }
         },
 
-        updateFieldValidation(rules) {
-            const values = clone(this.values);
-
-            if (rules) {
-                values.validate = rules;
-            } else {
-                delete values.validate;
+        markFieldEdited(handle) {
+            if (this.editedFields.indexOf(handle) === -1) {
+                this.editedFields.push(handle);
             }
+        },
 
-            this.$emit('input', values);
+        commit() {
+            this.$axios.post(cp_url('fields/update'), {
+                type: this.type,
+                values: this.values
+            }).then(response => {
+                this.$emit('committed', response.data, this.editedFields);
+                this.close();
+            });
+        },
+
+        close() {
+            this.$emit('closed');
+        },
+
+        load() {
+            this.$axios.post(cp_url('fields/edit'), {
+                type: this.type,
+                values: this.config
+            }).then(response => {
+                this.loading = false;
+                this.fieldtype = response.data.fieldtype;
+                this.blueprint = response.data.blueprint;
+                this.values = response.data.values;
+                this.meta = response.data.meta;
+            })
         }
 
     }

@@ -135,7 +135,7 @@ class UserRegistrar
         })->filter()->all();
 
         if ($roles = Config::get('statamic.users.new_user_roles')) {
-            $data['roles'] = Helper::ensureArray($roles);
+            $data['roles'] = (array) $roles;
         }
 
         return $data;

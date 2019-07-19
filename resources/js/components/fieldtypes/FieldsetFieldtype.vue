@@ -73,7 +73,7 @@ export default {
 
         canAdd() {
             return true;
-            return Vue.can('super'); // TODO
+            // return Vue.can('super'); // TODO
         }
     },
 

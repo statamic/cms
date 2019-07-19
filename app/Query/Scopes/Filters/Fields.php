@@ -19,6 +19,7 @@ class Fields extends Filter
                         'handle' => $field->handle(),
                         'display' => $field->display(),
                         'type' => $field->type(),
+                        'operators' => $field->fieldtype()->queryOperators(),
                     ];
                 });
             })

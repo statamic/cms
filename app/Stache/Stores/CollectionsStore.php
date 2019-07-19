@@ -37,22 +37,18 @@ class CollectionsStore extends BasicStore
             ->revisionsEnabled(array_get($data, 'revisions'))
             ->defaultStatus(array_get($data, 'default_status'))
             ->structure(array_get($data, 'structure'))
+            ->orderable(array_get($data, 'orderable', false))
             ->taxonomies(array_get($data, 'taxonomies'));
-
-        if (array_get($data, 'orderable', false)) {
-            $positions = array_get($data, 'entry_order', []);
-            array_unshift($positions, null);
-            unset($positions[0]);
-            $collection
-                ->orderable(true)
-                ->setEntryPositions($positions);
-        }
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
                 ->futureDateBehavior($dateBehavior['future'] ?? null)
                 ->pastDateBehavior($dateBehavior['past'] ?? null);
         }
+
+        $collection
+            ->setEntryPositions($this->getEntryPositions($data, $collection))
+            ->save();
 
         return $collection;
     }
@@ -118,5 +114,20 @@ class CollectionsStore extends BasicStore
                 $store->setSiteUri($site, $entry->id(), $entry->in($site)->uri());
             }
         });
+    }
+
+    protected function getEntryPositions($data, $collection)
+    {
+        if (! array_get($data, 'orderable', false)) {
+            return [];
+        }
+
+        $positions = array_get($data, 'entry_order', function () use ($collection) {
+            return $collection->queryEntries()->get()->map->id()->all();
+        });
+
+        return collect($positions)->mapWithKeys(function ($id, $index) {
+            return [$index + 1 => $id];
+        })->all();
     }
 }

@@ -18,9 +18,8 @@
                 :values="values"
                 :meta="action.meta"
                 :errors="errors"
-                @updated="valuesUpdated"
             >
-                <publish-fields :fields="action.fields" />
+                <publish-fields :fields="action.fields" @updated="valueUpdated" />
             </publish-container>
 
             <div v-else v-text="confirmationText" />
@@ -90,8 +89,8 @@ export default {
             this.confirming = false;
         },
 
-        valuesUpdated(values) {
-            this.values = Object.assign({}, values);
+        valueUpdated(field, value) {
+            this.values[field] = value;
         }
     }
 

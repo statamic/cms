@@ -80,7 +80,7 @@ class TermTracker
         $this->taxonomyStache->syncAssociations(
             $item->id(),
             $taxonomy,
-            Helper::ensureArray($item->get($taxonomy))
+            (array) $item->get($taxonomy)
         );
     }
 
@@ -92,7 +92,7 @@ class TermTracker
 
         // Collect all the terms that have had their slugs localized.
         foreach ($taxonomy->get('slugs', []) as $locale => $slugs) {
-            foreach (Helper::ensureArray($slugs) as $slug => $localizedSlug) {
+            foreach ((array) $slugs as $slug => $localizedSlug) {
                 $terms[] = $slug;
             }
         }

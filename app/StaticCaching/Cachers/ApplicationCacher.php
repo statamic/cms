@@ -39,7 +39,7 @@ class ApplicationCacher extends AbstractCacher
         $value = $this->normalizeContent($content);
 
         if ($expiration = $this->getDefaultExpiration()) {
-            $this->cache->put($key, $value, $expiration);
+            $this->cache->put($key, $value, now()->addMinutes($expiration));
         } else {
             $this->cache->forever($key, $value);
         }

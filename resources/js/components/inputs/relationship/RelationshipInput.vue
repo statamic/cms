@@ -4,11 +4,13 @@
 
         <relationship-select-field
             v-if="!initializing && usesSelectField"
+            :config="config"
             :items="items"
-            :url="selectionsUrl"
-            :typeahead="mode === 'typeahead'"
             :multiple="maxItems > 1"
+            :typeahead="mode === 'typeahead'"
             :taggable="taggable"
+            :read-only="readOnly"
+            :url="selectionsUrl"
             @input="selectFieldSelected"
         />
 

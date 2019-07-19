@@ -48,6 +48,7 @@ class StructuresController extends CpController
             'purpose' => $structure->collection() ? 'collection' : 'navigation',
             'collection' => optional($structure->collection())->handle(),
             'collections' => $structure->collections()->map->handle()->all(),
+            'expects_root' => $structure->expectsRoot(),
             'sites' => Site::all()->map(function ($site) use ($structure) {
                 $tree = $structure->in($site->handle());
                 return [
@@ -129,6 +130,7 @@ class StructuresController extends CpController
         $structure
             ->title($values['title'])
             ->handle($values['handle'])
+            ->expectsRoot($values['expects_root'])
             ->sites(collect($values['sites'])->filter->enabled->map->handle->values()->all());
 
         foreach ($values['sites'] as $site) {
@@ -195,7 +197,7 @@ class StructuresController extends CpController
             ->maxDepth($values['max_depth']);
 
         $sites = [ // todo: change to the structuresites fieldtype
-            ['handle' => 'english', 'route' => $values['route']],
+            ['handle' => Site::default()->handle(), 'route' => $values['route']],
         ];
 
         foreach ($sites as $site) {

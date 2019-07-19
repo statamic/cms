@@ -4,9 +4,9 @@
         @mousedown="parentMousedown"
         @dragstart="parentDragStart"
     >
-        <div class="replicator-set-header">
+        <div class="replicator-set-header" @dblclick="toggleCollapsedState">
             <div class="item-move sortable-handle" ref="dragHandle"></div>
-            <div class="flex-1 ml-1 flex items-center">
+            <div class="flex-1 ml-1 flex items-center" @click="expand">
                 <label v-text="config.display" class="text-xs"/>
                 <div
                     v-if="config.instructions"
@@ -21,10 +21,11 @@
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list>
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
+                    <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
                 </dropdown-list>
             </div>
         </div>
-        <div class="replicator-set-body">
+        <div class="replicator-set-body" v-show="!collapsed">
             <set-field
                 v-for="field in config.fields"
                 v-show="showField(field)"
@@ -68,6 +69,7 @@ export default {
     data() {
         return {
             lastClicked: null,
+            collapsed: false
         }
     },
 
@@ -145,6 +147,16 @@ export default {
                 const bard = this.options.bard;
                 if (!bard.$el.contains(document.activeElement)) bard.$emit('blur');
             }, 1);
+        },
+
+        toggleCollapsedState() {
+            this.collapsed = ! this.collapsed;
+        },
+
+        expand() {
+            if (this.collapsed) {
+                this.collapsed = false
+            }
         }
 
     }

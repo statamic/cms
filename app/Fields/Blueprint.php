@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Statamic\API;
 use Statamic\API\Str;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
@@ -13,6 +14,7 @@ class Blueprint
     protected $handle;
     protected $contents = [];
     protected $extraFields = [];
+    protected $fieldsCache;
 
     public function setHandle(string $handle)
     {
@@ -64,9 +66,19 @@ class Blueprint
 
     public function fields(): Fields
     {
-        return $this->sections()->map->fields()->reduce(function ($carry, $fields) {
+        if ($this->fieldsCache) {
+            return $this->fieldsCache;
+        }
+
+        $this->validateUniqueHandles();
+
+        $fields = $this->sections()->map->fields()->reduce(function ($carry, $fields) {
             return $carry->merge($fields);
         }, new Fields);
+
+        $this->fieldsCache = $fields;
+
+        return $fields;
     }
 
     public function hasField($field)
@@ -156,5 +168,17 @@ class Blueprint
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
+    }
+
+    protected function validateUniqueHandles()
+    {
+        if ($field = $this->sections()->map->contents()->flatMap->fields->map->handle->duplicates()->first()) {
+            throw new \Exception("Duplicate field [{$field}] on blueprint [{$this->handle}].");
+        }
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Blueprint::{$method}(...$parameters);
     }
 }

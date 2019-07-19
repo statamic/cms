@@ -69,6 +69,10 @@ class EntryRepository implements RepositoryContract
             $entry->id($this->stache->generateId());
         }
 
+        if ($entry->collection()->orderable()) {
+            $this->ensureEntryPosition($entry);
+        }
+
         // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
 
         $this->store
@@ -80,6 +84,10 @@ class EntryRepository implements RepositoryContract
 
     public function delete($entry)
     {
+        if ($entry->collection()->orderable()) {
+            $this->removeEntryPosition($entry);
+        }
+
         $this->store->remove($entry->id());
 
         $this->store->delete($entry);
@@ -110,5 +118,19 @@ class EntryRepository implements RepositoryContract
                 $entry->value($taxonomy->handle())
             );
         });
+    }
+
+    protected function ensureEntryPosition($entry)
+    {
+        if (! $entry->collection()->getEntryPosition($entry->id())) {
+            $entry->collection()->appendEntryPosition($entry->id())->save();
+        }
+    }
+
+    protected function removeEntryPosition($entry)
+    {
+        if ($entry->collection()->getEntryPosition($entry->id())) {
+            $entry->collection()->removeEntryPosition($entry->id())->save();
+        }
     }
 }

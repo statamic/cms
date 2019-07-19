@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Statamic\API\Site;
+use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\CP\Column;
 use Statamic\API\Action;
@@ -124,6 +125,7 @@ class EntriesController extends CpController
             'collection' => $this->collectionToArray($collection),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
+            'published' => $entry->published(),
             'locale' => $entry->locale(),
             'localizedFields' => array_keys($entry->data()),
             'isRoot' => $entry->isRoot(),
@@ -146,6 +148,7 @@ class EntriesController extends CpController
                 ];
             })->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
+            'preloadedAssets' => $this->extractAssetsFromValues($values),
         ];
 
         if ($request->wantsJson()) {
@@ -183,7 +186,7 @@ class EntriesController extends CpController
         }
 
         $entry
-            ->data($values)
+            ->merge($values)
             ->slug($request->slug);
 
         if ($entry->collection()->dated()) {
@@ -276,12 +279,13 @@ class EntriesController extends CpController
 
         $request->validate($validation->rules());
 
-        $values = array_except($fields->values(), ['slug']);
+        $values = array_except($fields->values(), ['slug', 'blueprint']);
 
         $entry = Entry::make()
             ->collection($collection)
+            ->blueprint($request->blueprint)
             ->locale($site->handle())
-            ->published(false)
+            ->published($request->get('published'))
             ->slug($request->slug)
             ->data($values);
 
@@ -357,6 +361,25 @@ class EntriesController extends CpController
         }
 
         return [$values, $fields->meta()];
+    }
+
+    protected function extractAssetsFromValues($values)
+    {
+        return collect($values)
+            ->filter(function ($value) {
+                return is_string($value);
+            })
+            ->map(function ($value) {
+                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
+                return str_replace('\/', '/', $matches[1]) ?? null;
+            })
+            ->flatten(2)
+            ->unique()
+            ->map(function ($id) {
+                return Asset::find($id);
+            })
+            ->filter()
+            ->values();
     }
 
     protected function formatDateForSaving($date)

@@ -98,7 +98,8 @@ import {
     Italic,
     Strike,
     Underline,
-    History
+    History,
+    CodeBlockHighlight
 } from 'tiptap-extensions';
 import Set from './Set';
 import BardSource from './Source.vue';
@@ -109,6 +110,10 @@ import LinkToolbarButton from './LinkToolbarButton.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
+import javascript from 'highlight.js/lib/languages/javascript'
+import css from 'highlight.js/lib/languages/css'
+import hljs from 'highlight.js/lib/highlight';
+import 'highlight.js/styles/github.css';
 
 export default {
 
@@ -130,6 +135,8 @@ export default {
         }
     },
 
+    inject: ['storeName'],
+
     data() {
         return {
             content: null,
@@ -139,7 +146,6 @@ export default {
             showSource: false,
             fullScreenMode: false,
             buttons: [],
-            metas: {},
         }
     },
 
@@ -164,23 +170,52 @@ export default {
 
                 return moment.utc(duration.asMilliseconds()).format("mm:ss");
             }
+        },
+
+        metas: {
+            get() {
+                return this.$config.get('bard.meta')[this.id] || {};
+            },
+            set(value) {
+                const meta = this.$config.get('bard.meta');
+                meta[this.id] = value;
+                this.$config.set('bard.meta', meta);
+            }
+        },
+
+        isFirstCreation() {
+            return !this.$config.get('bard.meta').hasOwnProperty(this.id);
+        },
+
+        id() {
+            return `${this.storeName}.${this.name}`;
         }
 
     },
 
     created() {
         let content = this.valueToContent(clone(this.value));
+
         if (content) {
+            let setIndex = 0;
             content.content = content.content.map((item, i) => {
-                if (item.type === 'set') {
-                    const id = uniqid();
-                    item.attrs.id = id;
-                    this.metas[id] = this.meta.existing[i];
+                if (item.type !== 'set') return item;
+
+                let id;
+                if (this.isFirstCreation) {
+                    id = uniqid();
+                    this.saveMeta(id, this.meta.existing[i]);
+                } else {
+                    id = Object.keys(this.metas)[setIndex];
                 }
+
+                item.attrs.id = id;
+                setIndex++;
                 return item;
             });
-            this.content = content;
         }
+
+        this.content = content;
     },
 
     mounted() {
@@ -206,6 +241,9 @@ export default {
                 new Link({ vm: this }),
                 new RemoveFormat(),
                 new Image({ bard: this }),
+                new CodeBlockHighlight({
+                    languages: { javascript, css }
+                })
             ],
             content: this.content,
             editable: !this.readOnly,
@@ -228,6 +266,8 @@ export default {
         });
 
         this.html = this.editor.getHTML();
+
+        this.$mousetrap.bind('esc', this.closeFullscreen)
     },
 
     beforeDestroy() {
@@ -258,14 +298,25 @@ export default {
         addSet(handle) {
             const id = uniqid();
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-            this.metas[id] = this.meta.new[handle];
+            this.saveMeta(id, this.meta.new[handle]);
             this.editor.commands.set({ id, values });
             this.$refs.setSelectorDropdown.close();
+        },
+
+        saveMeta(id, value) {
+            let meta = this.metas;
+            meta[id] = value;
+            this.metas = meta;
         },
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
             this.$root.hideOverflow = ! this.$root.hideOverflow;
+        },
+
+        closeFullscreen() {
+            this.fullScreenMode = false;
+            this.$root.hideOverflow = false;
         },
 
         initToolbarButtons() {

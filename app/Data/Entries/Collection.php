@@ -269,6 +269,20 @@ class Collection implements Contract
         return $this;
     }
 
+    public function appendEntryPosition($id)
+    {
+        $position = collect($this->positions)->keys()->sort()->last() + 1;
+
+        return $this->setEntryPosition($id, $position);
+    }
+
+    public function removeEntryPosition($id)
+    {
+        unset($this->positions[$this->getEntryPosition($id)]);
+
+        return $this;
+    }
+
     public function getEntryPosition($id)
     {
         return array_flip($this->positions)[$id] ?? null;
@@ -292,13 +306,14 @@ class Collection implements Contract
         $array = Arr::except($this->toArray(), [
             'handle',
             'past_date_behavior',
-            'future_date_behavior'
+            'future_date_behavior',
+            'dated',
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
             'entry_order' => $this->getEntryOrder(),
             'amp' => $array['amp'] ?: null,
-            'date' => $array['dated'] ?: null,
+            'date' => $this->dated,
             'orderable' => $array['orderable'] ?: null,
             'default_status' => $this->defaultStatus,
             'date_behavior' => [
@@ -352,9 +367,10 @@ class Collection implements Contract
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,
-            'structure' => optional($this->structure())->handle(),
+            'structure' => $this->structure,
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
+            'revisions' => $this->revisions,
         ];
     }
 
@@ -370,7 +386,16 @@ class Collection implements Contract
 
     public function revisionsEnabled($enabled = null)
     {
-        return $this->fluentlyGetOrSet('revisions')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($enabled) {
+                if (! config('statamic.revisions.enabled')) {
+                    return false;
+                }
+
+                return $enabled;
+            })
+            ->args(func_get_args());
     }
 
     public function structure($structure = null)
@@ -417,5 +442,10 @@ class Collection implements Contract
                 });
             })
             ->args(func_get_args());
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\Collection::{$method}(...$parameters);
     }
 }

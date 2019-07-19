@@ -48,7 +48,7 @@
                           </g>
                         </svg>
                     </a>
-                    <a @click="download" :title="__('Download')">
+                    <a @click="download" :title="__('Download')" v-if="container.allow_downloading">
                         <svg xmlns="http://www.w3.org/2000/svg" width="27" height="23" viewBox="0 0 27 23">
                           <g fill="none" fill-rule="evenodd" stroke="#676767" stroke-width="2" transform="translate(1 1.045)">
                             <path d="M21.1219828 6.85714286C21.1219828 6.85714286 20.0297414 6.69642857 18.9655172 6.85714286M3.01724138 6C3.01724138 4.10657143 4.5612069 2.57142857 6.46551724 2.57142857 8.36982759 2.57142857 9.9137931 4.10657143 9.9137931 6"/>
@@ -94,20 +94,16 @@
                     </div>
 
                     <div class="editor-file-actions">
-                        <button
-                            v-if="isImage"
-                            type="button" class="btn"
-                            @click.prevent="openFocalPointEditor">{{ __('Focal Point') }}
+                        <button v-if="isImage" type="button" class="btn" @click.prevent="openFocalPointEditor">
+                            {{ __('Set Focal Point') }}
                         </button>
 
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="openRenamer">{{ __('Rename File') }}
+                        <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
+                            {{ __('Rename File') }}
                         </button>
 
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="openMover">{{ __('Move File') }}
+                        <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
+                            {{ __('Move File') }}
                         </button>
 
                         <!--
@@ -141,7 +137,7 @@
                         </div>
 
                         <div class="editor-form-actions text-right">
-                            <button type="button" class="btn-danger mr-1" @click="destroy" v-if="allowDeleting">
+                            <button v-if="canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
                                 {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn-primary" @click="save">
@@ -163,25 +159,17 @@
                 :data="values.focus"
                 :image="asset.preview"
                 @selected="selectFocalPoint"
-                @closed="closeFocalPointEditor">
-            </focal-point-editor>
+                @closed="closeFocalPointEditor" />
+
+            <editor-actions
+                v-if="actions.length"
+                :id="id"
+                :actions="actions"
+                :url="actionUrl"
+                @started="actionStarted"
+                @completed="actionCompleted" />
         </portal>
 
-        <renamer
-            v-if="showRenamer"
-            :asset="asset"
-            @saved="assetRenamed"
-            @closed="closeRenamer">
-        </renamer>
-
-        <mover
-            v-if="showMover"
-            :assets="[asset.id]"
-            :folder="asset.folder"
-            :container="asset.container"
-            @saved="assetMoved"
-            @closed="closeMover">
-        </mover>
     </div>
 
     </stack>
@@ -193,12 +181,10 @@
 export default {
 
     components: {
+        EditorActions: require('./EditorActions.vue'),
         FocalPointEditor: require('./FocalPointEditor.vue'),
-        Renamer: require('./Renamer.vue'),
-        Mover: require('../Mover.vue'),
         PublishFields: require('../../publish/Fields.vue'),
     },
-
 
     props: {
         id: {
@@ -218,16 +204,16 @@ export default {
             loading: true,
             saving: false,
             asset: null,
+            container: null,
             publishContainer: 'asset',
             values: {},
             meta: {},
             fields: null,
             fieldset: null,
             showFocalPointEditor: false,
-            showRenamer: false,
-            showMover: false,
             error: null,
-            errors: {}
+            errors: {},
+            actions: [],
         }
     },
 
@@ -288,6 +274,9 @@ export default {
                 this.asset = response.data.asset;
                 this.values = response.data.values;
                 this.meta = response.data.meta;
+                this.container = response.data.container;
+                this.actionUrl = response.data.actionUrl;
+                this.actions = response.data.actions;
                 this.getFieldset();
             });
         },
@@ -296,7 +285,7 @@ export default {
          * Load the fieldset
          */
         getFieldset() {
-            const url = cp_url(`publish-blueprints/${this.asset.blueprint}`);
+            const url = cp_url(`fields/publish-blueprints/${this.asset.blueprint}`);
 
             this.$axios.get(url).then(response => {
                 this.fieldset = response.data;
@@ -365,24 +354,6 @@ export default {
         },
 
         /**
-         * Delete the asset
-         */
-        destroy() {
-            if (! confirm(__('Are you sure?'))) {
-                return;
-            }
-
-            this.saving = true;
-
-            const url = cp_url(`assets/${btoa(this.id)}`);
-
-            this.$axios.delete(url).then(response => {
-                this.$emit('deleted', this.asset.id);
-                this.saving = false;
-            });
-        },
-
-        /**
          * Close the editor
          */
         close() {
@@ -400,42 +371,34 @@ export default {
             return true;
         },
 
-        openRenamer() {
-            this.showRenamer = true;
-        },
-
-        closeRenamer() {
-            this.showRenamer = false;
-        },
-
-        assetRenamed(asset) {
-            this.asset = asset;
-            this.$emit('saved', asset);
-        },
-
-        openMover() {
-            this.showMover = true;
-        },
-
-        closeMover() {
-            this.showMover = false;
-        },
-
-        /**
-         * When an asset has been moved to another folder
-         */
-        assetMoved(asset, folder) {
-            this.asset = asset;
-            this.$emit('moved', asset, folder)
-        },
-
         open() {
             window.open(this.asset.url, '_blank');
         },
 
         download() {
             window.open(this.asset.download_url);
+        },
+
+        canRunAction(handle) {
+            return _.find(this.actions, action => action.handle == handle);
+        },
+
+        runAction(handle) {
+            this.$events.$emit('editor-action-selected', {
+                action: handle,
+                selection: this.id,
+            });
+        },
+
+        actionStarted(event) {
+            this.$events.$emit('editor-action-started');
+        },
+
+        actionCompleted(event) {
+            this.$events.$emit('editor-action-completed');
+            this.close();
         }
+
     }
 
 }

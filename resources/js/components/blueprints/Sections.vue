@@ -17,7 +17,7 @@
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
-                        <div>Add Section</div>
+                        <div>{{ __('Add Section') }}</div>
                     </div>
 
                     <div class="blueprint-section-draggable-zone outline-none"></div>
@@ -97,7 +97,7 @@ export default {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
-                // plugins: [Plugins.SwapAnimation]
+                plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
                 if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {
                     this.moveFieldToNewSection(e);

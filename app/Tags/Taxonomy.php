@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Page;
 use Statamic\API\Term;
@@ -99,7 +100,7 @@ class Taxonomy extends Tags
             return;
         }
 
-        $collections = Helper::explodeOptions($collections);
+        $collections = Arr::explodeOptions($collections);
 
         $this->terms = $this->terms->filterContent(function ($content) use ($collections) {
             return $content->filter(function ($item) use ($collections) {
@@ -116,7 +117,7 @@ class Taxonomy extends Tags
             return;
         }
 
-        $pages = Helper::explodeOptions($pages);
+        $pages = Arr::explodeOptions($pages);
         $collections = [];
 
         foreach ($pages as $page) {

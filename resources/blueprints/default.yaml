@@ -6,3 +6,15 @@ fields:
       type: markdown
       display: Content
       localizable: true
+  -
+    handle: author
+    field:
+      type: users
+      display: Author
+      localizable: true
+  -
+    handle: template
+    field:
+      type: template
+      display: Template
+      localizable: true

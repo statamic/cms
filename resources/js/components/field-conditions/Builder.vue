@@ -27,12 +27,16 @@
             v-if="hasConditions && isStandard"
             v-for="(condition, index) in conditions"
             :key="condition._id"
-            class="flex items-center mt-2"
+            class="flex items-center py-2 border-t"
         >
-            <select-input
+            <v-select
                 v-model="conditions[index].field"
+                class="min-w-md"
                 :options="fieldOptions"
-                :placeholder="false" />
+                :reduce="field => field.value"
+                :placeholder="__('Select Field')"
+                :taggable="true"
+                :create-option="field => ({value: field, label: field })" />
 
             <select-input
                 v-model="conditions[index].operator"
@@ -42,16 +46,19 @@
 
             <text-input
                 v-model="conditions[index].value"
-                class="w-1/2 ml-2" />
+                class="ml-2" />
 
-            <button v-if="canRemove" @click="remove(index)" class="btn-close ml-1">&times;</button>
+            <button @click="remove(index)" class="btn-close ml-1 group">
+                <svg-icon name="trash" class="w-auto group-hover:text-red" />
+            </button>
         </div>
 
-        <button
-            v-if="hasConditions && isStandard"
-            v-text="__('Add Condition')"
-            @click="add"
-            class="btn mt-3" />
+        <div class="border-t pt-3" v-if="hasConditions && isStandard">
+            <button
+                v-text="__('Add Condition')"
+                @click="add"
+                class="btn-primary" />
+        </div>
 
     </div>
 
@@ -125,10 +132,6 @@ export default {
 
         isCustom() {
             return this.type === 'custom';
-        },
-
-        canRemove() {
-            return this.conditions.length > 1;
         },
 
         saveableConditions() {

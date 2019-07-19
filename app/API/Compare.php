@@ -4,10 +4,10 @@ namespace Statamic\API;
 
 use Illuminate\Support\Facades\Facade;
 
-class Helper extends Facade
+class Compare extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Endpoint\Helper::class;
+        return Endpoint\Compare::class;
     }
 }

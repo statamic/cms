@@ -131,6 +131,7 @@ class Statamic
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'user' => auth()->check() ? user()->toJavascriptArray() : [],
+            'paginationSize' => config('statamic.cp.pagination_size'),
         ];
 
         $vars = array_merge($defaults, static::$jsonVariables);

@@ -113,6 +113,7 @@ class CorePermissions
                 Permission::make('upload {container} assets'),
                 Permission::make('edit {container} assets')->withChildren([
                     Permission::make('move {container} assets'),
+                    Permission::make('rename {container} assets'),
                     Permission::make('delete {container} assets')
                 ])
             ])->withReplacements('container', function () {

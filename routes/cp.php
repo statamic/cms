@@ -90,7 +90,10 @@ Route::group([
         Route::post('assets/actions', 'ActionController@run');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
         Route::get('assets/browse/search/{container}', 'BrowserController@search');
+        Route::get('assets/browse/folders/{container}/actions', 'FolderActionController@index')->name('assets.folders.actions');
+        Route::post('assets/browse/folders/{container}/actions', 'FolderActionController@run');
         Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');
+        Route::get('assets/browse/{container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
         Route::get('assets/browse/{container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
         Route::get('assets-fieldtype', 'FieldtypeController@index');
         Route::resource('assets', 'AssetsController');
@@ -98,7 +101,10 @@ Route::group([
         Route::get('thumbnails/{asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
     });
 
-    Route::group(['namespace' => 'Fields'], function () {
+    Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
+        Route::get('/', 'FieldsController@index')->name('fields.index');
+        Route::post('edit', 'FieldsController@edit')->name('fields.edit');
+        Route::post('update', 'FieldsController@update')->name('fields.update');
         Route::get('field-meta', 'MetaController@show');
         Route::resource('fieldsets', 'FieldsetController');
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');
@@ -111,9 +117,9 @@ Route::group([
     Route::get('composer/check', 'ComposerOutputController@check');
 
     Route::group(['namespace' => 'Updater'], function () {
-        Route::get('updater', 'UpdaterController@index')->name('updater.index');
+        Route::get('updater', 'UpdaterController@index')->name('updater');
         Route::get('updater/count', 'UpdaterController@count');
-        Route::get('updater/{product}', 'UpdateProductController@index')->name('updater.products.index');
+        Route::get('updater/{product}', 'UpdateProductController@show')->name('updater.product');
         Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
         Route::post('updater/{product}/update', 'UpdateProductController@update');
         Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');

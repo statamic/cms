@@ -3,9 +3,10 @@
 namespace Statamic\Data\Content;
 
 use Carbon\Carbon;
+use Statamic\API\Arr;
 use Statamic\API\Str;
-use Statamic\API\Helper;
 use Statamic\API\Term;
+use Statamic\API\Helper;
 use Statamic\Data\DataCollection;
 use Statamic\Contracts\Data\Localizable;
 use Statamic\Contracts\Data\Entries\Entry;
@@ -36,7 +37,7 @@ class ContentCollection extends DataCollection
      */
     public function from($folders = null)
     {
-        $folders = Helper::normalizeArguments(func_get_args());
+        $folders = Arr::normalizeArguments(func_get_args());
 
         return new static($this->filter(function($item) use ($folders) {
             foreach ($folders as $folder) {
@@ -193,7 +194,7 @@ class ContentCollection extends DataCollection
         $group = Term::find($id)->taxonomyName();
 
         return $this->filter(function($entry) use ($id, $group) {
-            $taxonomies = Helper::ensureArray($entry->get($group, []));
+            $taxonomies = (array) $entry->get($group, []);
 
             return in_array($id, $taxonomies);
         });

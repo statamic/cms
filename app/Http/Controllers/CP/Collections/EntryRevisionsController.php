@@ -63,6 +63,7 @@ class EntryRevisionsController extends CpController
         }
 
         return [
+            'title' => $entry->value('title'),
             'editing' => true,
             'actions' => [
                 'save' => $entry->updateUrl(),
@@ -76,6 +77,7 @@ class EntryRevisionsController extends CpController
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
+            'published' => $entry->published(),
             'locale' => $entry->locale(),
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);

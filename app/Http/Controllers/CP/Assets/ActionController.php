@@ -9,7 +9,7 @@ class ActionController extends Controller
 {
     protected static $key = 'asset-browser';
 
-    protected function getSelectedItems($items)
+    protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {
             return Asset::find($item);

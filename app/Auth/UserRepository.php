@@ -13,14 +13,6 @@ abstract class UserRepository implements RepositoryContract
         return app(UserFactory::class);
     }
 
-    /**
-     * @deprecated
-     */
-    public function getCurrent()
-    {
-        return me();
-    }
-
     public function roleRepository()
     {
         return app($this->roleRepository)->path(

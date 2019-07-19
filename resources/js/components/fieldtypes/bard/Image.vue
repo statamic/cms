@@ -60,6 +60,8 @@ export default {
         Selector,
     },
 
+    inject: ['storeName'],
+
     props: [
         'node', // Prosemirror Node Object
         'view', // Prosemirror EditorView Object
@@ -160,15 +162,25 @@ export default {
         },
 
         loadAsset(id) {
-            console.log('loading asset: ' + id);
+            let preloaded = _.find(this.$store.state.publish[this.storeName].preloadedAssets, asset => asset.id === id);
+
+            if (preloaded) {
+                this.setAsset(preloaded);
+                return;
+            }
+
             this.$axios.get(cp_url('assets-fieldtype'), {
                 params: { assets: [id] }
             }).then(response => {
-                this.asset = response.data[0];
-                this.alt = this.asset.alt || this.alt;
-                this.loading = false;
-                this.updateAttrs({ src: this.actualSrc });
+                this.setAsset(response.data[0]);
             });
+        },
+
+        setAsset(asset) {
+            this.asset = asset;
+            this.alt = asset.alt || this.alt;
+            this.loading = false;
+            this.updateAttrs({ src: this.actualSrc });
         },
 
         parentMousedown(e) {

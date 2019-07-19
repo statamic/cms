@@ -2,8 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Updater;
 
+use Statamic\Statamic;
 use Statamic\API\Addon;
 use Illuminate\Http\Request;
+use Statamic\Updater\Changelog;
 use Facades\Statamic\Updater\UpdatesOverview;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -16,17 +18,15 @@ class UpdaterController extends CpController
     {
         $this->authorize('view updates');
 
-        $updatableAddons = $this->getUpdatableAddons();
+        $addons = $this->getUpdatableAddons();
 
-        if ($updatableAddons->isEmpty()) {
-            return redirect()->route('statamic.cp.updater.products.index', ['statamic']);
+        if ($addons->isEmpty()) {
+            return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
         }
 
-        // TODO: Proper view instead of this inline html.
-        echo '<a href="' . route('statamic.cp.updater.products.index', 'statamic') . '">statamic core</a><br><br>';
-        $updatableAddons->each(function ($addon) {
-            echo '<a href="' . route('statamic.cp.updater.products.index', $addon) . '">' . $addon . '</a><br>';
-        });
+        $statamicChangelog = Changelog::product(Statamic::CORE_SLUG);
+
+        return view('statamic::updater.index', compact('statamicChangelog', 'addons'));
     }
 
     /**
@@ -48,6 +48,6 @@ class UpdaterController extends CpController
      */
     private function getUpdatableAddons()
     {
-        return Addon::all()->map->marketplaceSlug()->filter();
+        return Addon::all()->filter->marketplaceSlug();
     }
 }

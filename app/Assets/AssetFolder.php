@@ -5,11 +5,12 @@ namespace Statamic\Assets;
 use Statamic\API\Arr;
 use Statamic\API\Path;
 use Statamic\API\YAML;
+use Statamic\API\Action;
 use Statamic\Data\DataFolder;
+use Statamic\API\AssetContainer;
 use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
-use Statamic\API\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 
 class AssetFolder implements Contract, Arrayable
@@ -18,6 +19,16 @@ class AssetFolder implements Contract, Arrayable
 
     protected $container;
     protected $path;
+    protected $withActions = false;
+
+    public static function find($reference)
+    {
+        list($container, $path) = explode('::', $reference);
+
+        return (new static)
+            ->container(AssetContainer::find($container))
+            ->path($path);
+    }
 
     public function container($container = null)
     {
@@ -27,6 +38,13 @@ class AssetFolder implements Contract, Arrayable
     public function path($path = null)
     {
         return $this->fluentlyGetOrSet('path')->args(func_get_args());
+    }
+
+    public function withActions()
+    {
+        $this->withActions = true;
+
+        return $this;
     }
 
     public function basename()
@@ -151,11 +169,18 @@ class AssetFolder implements Contract, Arrayable
      */
     public function toArray()
     {
-        return [
+        $array = [
             'title' => $this->title(),
             'path' => $this->path(),
             'parent_path' => optional($this->parent())->path(),
-            'basename' => $this->basename()
+            'basename' => $this->basename(),
         ];
+
+        if ($this->withActions) {
+            $this->withActions = false; // This is necessary to prevent infinite recursion.
+            $array['actions'] = Action::for('asset-folders', ['container' => $this->container()->handle()], $this);
+        }
+
+        return $array;
     }
 }

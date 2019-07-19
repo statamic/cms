@@ -15,7 +15,14 @@
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
             @endcan
             @can('delete', $collection)
-                <dropdown-item :text="__('Delete Collection')" class="warning"></dropdown-item>
+                <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
+                    <resource-deleter
+                        ref="deleter"
+                        :resource-title="__('Collection')"
+                        route="{{ cp_route('collections.destroy', $collection->handle()) }}"
+                        redirect="{{ cp_route('collections.index') }}"
+                    ></resource-deleter>
+                </dropdown-item>
             @endcan
         </dropdown-list>
         @can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])

@@ -90,6 +90,7 @@ export default {
                     fieldLocks: {},
                     errors: {},
                     isRoot: initial.isRoot,
+                    preloadedAssets: [],
                 },
                 mutations: {
                     setValue(state, payload) {
@@ -128,6 +129,9 @@ export default {
                         state.values = payload.values;
                         state.meta = payload.meta;
                         state.site = payload.site;
+                    },
+                    setPreloadedAssets(state, assets) {
+                        state.preloadedAssets = assets;
                     }
                 },
                 actions: {

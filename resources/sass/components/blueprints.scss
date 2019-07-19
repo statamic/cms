@@ -20,7 +20,7 @@
 }
 
 .blueprint-section-field {
-    @apply relative mb-1 mx-1 z-10;
+    @apply relative mb-1 mx-1 z-10 outline-none;
 
     .blueprint-section-field-inner {
         @apply relative border rounded bg-grey-20 shadow-sm flex outline-none z-10;
@@ -61,10 +61,10 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative w-full border border-dashed rounded-l flex justify-center items-center text-grey-40;
+    @apply relative w-full border border-grey-50 border-dashed rounded flex justify-center items-center text-grey-70;
 
     &:hover {
-        @apply border-grey text-grey;
+        @apply border-grey text-grey-100;
     }
 
     .blueprint-section-draggable-zone {

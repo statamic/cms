@@ -1,6 +1,10 @@
 <template>
 
     <div class="h-full bg-white overflow-auto">
+        <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+            {{ __('Fieldtypes') }}
+            <button type="button" class="btn-close" @click="close">×</button>
+        </div>
 
         <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
@@ -25,8 +29,8 @@
                     <div class="w-1/2 sm:w-1/3 md:w-1/4 p-1" v-for="option in fieldtypeOptions">
                         <a class="border flex items-center group w-full rounded shadow-sm py-1 px-2"
                             @click="select(option)">
-                            <svg-icon class="h-4 w-4 opacity-50 group-hover:opacity-100" :name="option.icon"></svg-icon>
-                            <span class="pl-2 text-grey-80 group-hover:text-grey-100">{{ option.text }}</span>
+                            <svg-icon class="h-4 w-4 text-grey-80 group-hover:text-blue" :name="option.icon"></svg-icon>
+                            <span class="pl-2 text-grey-80 group-hover:text-blue">{{ option.text }}</span>
                         </a>
                     </div>
                 </div>

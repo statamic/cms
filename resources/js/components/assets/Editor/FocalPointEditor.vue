@@ -22,7 +22,7 @@
                     <div class="mb-2">
                         <button type="button" class="btn" @click.prevent="close">{{ __('Cancel') }}</button>
                         <button type="button" class="btn btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
-                        <button type="button" class="btn btn-primary" @click="select">{{ __('Save') }}</button>
+                        <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
                     </div>
                     <div>
                         <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full" />

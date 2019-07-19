@@ -237,6 +237,7 @@ module.exports = {
         '0':     '0',
         '2':     '2px',
         '4':     '4px',
+        '6':     '6px',
         '8':     '8px',
     },
 
@@ -349,6 +350,7 @@ module.exports = {
         '24':     '80px',
         '48':     '160px',
         '64':     '192px',
+        '80':     '220px',
         '96':     '24rem',
         'full':   '100%',
         'screen': '100vh',
@@ -368,6 +370,9 @@ module.exports = {
         '0':    '0',
         'xs': '10rem',
         '100': '100px',
+        '120': '120px',
+        'md':  '160px',
+        'lg':  '200px',
         // 'md': '30rem',
         // 'lg': '40rem',
         // 'xl': '50rem',
@@ -409,6 +414,7 @@ module.exports = {
     */
 
     maxWidth: {
+        '3xs':  '5rem',
         '2xs':  '10rem',
         'xs':   '20rem',
         'sm':   '30rem',

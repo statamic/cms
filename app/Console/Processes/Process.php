@@ -122,7 +122,7 @@ class Process
         Cache::put($cacheKey, [
             'completed' => false,
             'output' => $this->output .= $output,
-        ], self::CACHE_EXPIRY_MINUTES);
+        ], now()->addMinutes(self::CACHE_EXPIRY_MINUTES));
     }
 
     /**
@@ -135,7 +135,7 @@ class Process
         Cache::put($cacheKey, [
             'completed' => true,
             'output' => $this->output,
-        ], self::CACHE_EXPIRY_MINUTES);
+        ], now()->addMinutes(self::CACHE_EXPIRY_MINUTES));
     }
 
     /**

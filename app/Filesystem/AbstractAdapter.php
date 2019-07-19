@@ -138,7 +138,7 @@ abstract class AbstractAdapter implements Filesystem
 
     public function getFilesByType($folder, $extension, $recursive = false)
     {
-        $extensions = Helper::ensureArray($extension);
+        $extensions = (array) $extension;
 
         $files = $this->getFiles($folder, $recursive);
 

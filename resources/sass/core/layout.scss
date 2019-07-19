@@ -15,11 +15,6 @@ a {
     @apply flex;
 }
 
-#main .nav-main {
-    @apply w-54 absolute pin-l;
-    transition: all .3s;
-}
-
 #main .workspace {
     transition: padding .3s;
     @apply w-full pt-2;
@@ -33,17 +28,19 @@ a {
         padding-left: 13rem;
         @apply pt-0;
     }
+
+    #main.nav-closed {
+        .nav-main {
+            left: -13rem;
+        }
+
+        .workspace {
+            padding-left: 0;
+        }
+    }
 }
 
-#main.nav-closed {
-    .nav-main {
-        left: -13rem;
-    }
 
-    .workspace {
-        padding-left: 0;
-    }
-}
 
 .site-warning-stripe {
     background: $color_red;
@@ -70,7 +67,7 @@ a {
 /* Page Wrapper
   ========================================================================== */
 .page-wrapper {
-    @apply p-3 pt-0 .w-full;
+    @apply p-1.5 pt-0 .w-full;
 }
 
 @screen md {

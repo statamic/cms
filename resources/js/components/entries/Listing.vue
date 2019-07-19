@@ -39,10 +39,8 @@
                                 class="ml-1"
                                 :filters="filters"
                                 :active-filters="activeFilters"
-                                :per-page="perPage"
-                                :preferences-key="preferencesKey('filters')"
-                                @filters-changed="filtersChanged"
-                                @per-page-changed="perPageChanged" />
+                                :active-count="activeFilterCount"
+                                :preferences-key="preferencesKey('filters')" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>
                     </div>
@@ -85,8 +83,10 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
+                    v-if="! reordering"
                     class="mt-3"
                     :resource-meta="meta"
+                    :per-page="perPage"
                     @page-selected="page = $event"
                 />
             </div>
@@ -112,6 +112,7 @@ export default {
     data() {
         return {
             listingKey: 'entries',
+            preferencesPrefix: `collections.${this.collection}`,
             requestUrl: cp_url(`collections/${this.collection}/entries`),
             reordering: false,
             reorderingRequested: false,
@@ -122,6 +123,7 @@ export default {
     computed: {
         showReorderButton() {
             if (this.structureUrl) return true;
+            if (this.hasActiveFilters) return false;
 
             return this.reorderable && !this.reordering;
         },
@@ -131,10 +133,11 @@ export default {
         }
     },
 
+    created() {
+        this.filtersChanged(this.$preferences.get(this.preferencesKey('filters')));
+    },
+
     methods: {
-        preferencesKey(type) {
-            return `collections.${this.collection}.${type}`;
-        },
 
         afterRequestCompleted(response) {
             if (this.reorderingRequested) this.reorder();
@@ -161,9 +164,16 @@ export default {
         },
 
         saveOrder() {
-            const ids = this.items.map(item => item.id);
-            this.$axios.post(this.reorderUrl, { ids });
-            this.reordering = false;
+            let ids = this.items.map(item => item.id);
+
+            this.$axios.post(this.reorderUrl, {ids})
+                .then(response => {
+                    this.reordering = false;
+                    this.$notify.success(__('Entries successfully reordered'))
+                })
+                .catch(e => {
+                    this.$notify.error('Something went wrong');
+                });
         },
 
         cancelReordering() {

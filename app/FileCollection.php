@@ -3,10 +3,10 @@
 namespace Statamic;
 
 use Carbon\Carbon;
-use Statamic\API\URL;
-use Statamic\API\Helper;
 use Statamic\API\Str;
+use Statamic\API\URL;
 use Statamic\API\File;
+use Statamic\API\Compare;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
@@ -36,7 +36,7 @@ class FileCollection extends Collection
      */
     public function filterByExtension($extensions)
     {
-        $extensions = Helper::ensureArray($extensions);
+        $extensions = (array) $extensions;
 
         return $this->filter(function($path) use ($extensions) {
             return in_array(File::extension($path), $extensions);
@@ -51,7 +51,7 @@ class FileCollection extends Collection
      */
     public function rejectByExtension($extensions)
     {
-        $extensions = Helper::ensureArray($extensions);
+        $extensions = (array) $extensions;
 
         return $this->reject(function($path) use ($extensions) {
             return in_array(File::extension($path), $extensions);
@@ -128,7 +128,7 @@ class FileCollection extends Collection
 
                 list($one, $two) = $this->getSortableValues($sort_by, $a, $b);
 
-                $result = Helper::compareValues($one, $two);
+                $result = Compare::values($one, $two);
 
                 if ($result !== 0) {
                     return ($sort_dir === 'desc') ? $result * -1 : $result;

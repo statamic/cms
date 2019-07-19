@@ -48,4 +48,10 @@
     td:focus-within {
         @apply bg-grey-20;
     }
+
+    // Read Only
+    .read-only-field & {
+        th { @apply text-grey-50; }
+        tr td { @apply bg-grey-20; }
+    }
 }

@@ -3,7 +3,8 @@
    ========================================================================== */
 
 .section-fieldtype {
-    @apply .border-t .border-b .bg-grey-30;
+    @apply .border-t .border-b .bg-grey-20;
+    top: -1px; // Avoid adjacent borders just in case they're stacked
 
     &.form-group {
         position: relative;
@@ -13,13 +14,15 @@
     }
 
     label {
-        @apply .uppercase .text-sm .font-bold;
-        margin-bottom: 0 !important;
+        @apply .uppercase .text-sm .font-bold mb-2;
     }
 
-    .help-block { @apply .mb-0 mt-sm; }
+    .help-block {
+        @apply .mb-0;
 
-    p { @apply .m-0; }
+        p { margin: 0; }
+    }
+
 
     .read-only-overlay {
         display: none;

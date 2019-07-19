@@ -20,6 +20,9 @@ class AssetContainersController extends CpController
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
+                'allow_downloading' => $container->allowDownloading(),
+                'allow_moving' => $container->allowMoving(),
+                'allow_renaming' => $container->allowRenaming(),
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
@@ -77,6 +80,9 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->blueprint($values['blueprint'])
+            ->allowDownloading($values['allow_downloading'])
+            ->allowRenaming($values['allow_renaming'])
+            ->allowMoving($values['allow_moving'])
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders']);
 
@@ -116,6 +122,10 @@ class AssetContainersController extends CpController
 
         $values = $fields->values();
 
+        if (AssetContainer::find($values['handle'])) {
+            throw new \Exception('Asset container already exists');
+        }
+
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
@@ -125,7 +135,7 @@ class AssetContainersController extends CpController
 
         $container->save();
 
-        session()->flash('success', 'Container saved');
+        session()->flash('success', 'Asset container created');
 
         return ['redirect' => $container->showUrl()];
     }
@@ -183,7 +193,25 @@ class AssetContainersController extends CpController
             ],
             'create_folders' => [
                 'type' => 'toggle',
-                'instructions' => __('The ability to create folders within this container.'),
+                'instructions' => __('The ability to create folders in this container.'),
+                'default' => true,
+                'width' => 50,
+            ],
+            'allow_renaming' => [
+                'type' => 'toggle',
+                'instructions' => __('The ability to rename files in this container.'),
+                'default' => true,
+                'width' => 50,
+            ],
+            'allow_moving' => [
+                'type' => 'toggle',
+                'instructions' => __('The ability to move files around in this container.'),
+                'default' => true,
+                'width' => 50,
+            ],
+            'allow_downloading' => [
+                'type' => 'toggle',
+                'instructions' => __('Enable the quick download button when editing files.'),
                 'default' => true,
                 'width' => 50,
             ],

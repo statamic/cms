@@ -5,21 +5,24 @@
 
             <div class="bg-grey-20 border-b text-sm flex rounded-t;">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
-                <div class="px-2 py-1 flex-1">
+                <div class="p-1.5 py-1 flex-1">
                     <span class="font-medium mr-1">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
-                <div class="flex items-center px-1">
-                    <button v-show="!isEditing" @click.prevent="isEditing = true" class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-resize-full-screen" /></button>
-                    <button v-show="isEditing" @click.prevent="isEditing = false" class="opacity-50 hover:opacity-100 mr-1"><span class="icon icon-resize-100" /></button>
-                    <button @click.prevent="$emit('deleted')" class="opacity-50 hover:opacity-100"><span class="icon icon-cross" /></button>
+                <div class="flex items-center px-1.5">
+                    <button @click.prevent="toggleEditing" class="text-grey-60 hover:text-grey-100 mr-1">
+                        <svg-icon :name="isEditing ? 'shrink' : 'expand'" />
+                    </button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100">
+                        <svg-icon name="trash" />
+                    </button>
                 </div>
             </div>
 
             <div class="flex flex-col">
 
-                <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-2 px-1 pt-2">
+                <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-1 px-1 pt-2">
                     <component
                         v-for="(field, i) in section.fields"
                         :is="fieldComponent(field)"
@@ -29,17 +32,48 @@
                         :is-section-expanded="isEditing"
                         :suggestable-condition-fields="suggestableConditionFields"
                         @edit="editingField = field._id"
-                        @editor-closed="editingField = null"
                         @updated="fieldUpdated(i, $event)"
                         @deleted="deleteField(i)"
+                        @editor-closed="editingField = null"
                     />
                 </div>
 
-                <div class="p-2 pt-0">
-                    <add-field @added="fieldAdded" />
+                <div class="p-2 pt-0 flex items-center -mx-sm">
+                    <div class="w-1/2 px-sm">
+                        <link-fields @linked="fieldLinked" />
+                    </div>
+                    <div class="w-1/2 px-sm">
+                        <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
+                            <svg-icon name="wireframe" class="mr-1" />
+                            {{ __('Create Field') }}
+                        </button>
+                    </div>
                 </div>
 
             </div>
+
+            <stack name="fieldtype-selector"
+                v-if="isSelectingNewFieldtype"
+                @closed="isSelectingNewFieldtype = false"
+            >
+                <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
+            </stack>
+
+            <stack name="field-settings"
+                v-if="pendingCreatedField != null"
+                @closed="pendingCreatedField = null"
+            >
+                <field-settings
+                    slot-scope="{ close }"
+                    ref="settings"
+                    :type="pendingCreatedField.config.type"
+                    :root="true"
+                    :config="pendingCreatedField.config"
+                    :suggestable-condition-fields="suggestableConditionFields"
+                    @committed="fieldCreated"
+                    @closed="close"
+                />
+            </stack>
 
         </div>
     </div>
@@ -47,16 +81,21 @@
 </template>
 
 <script>
-import AddField from './AddField.vue';
+import uniqid from 'uniqid';
+import LinkFields from './LinkFields.vue';
 import RegularField from './RegularField.vue';
 import ImportField from './ImportField.vue';
+import FieldSettings from '../fields/Settings.vue';
+import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 
 export default {
 
     components: {
         RegularField,
         ImportField,
-        AddField,
+        LinkFields,
+        FieldtypeSelector,
+        FieldSettings,
     },
 
     props: {
@@ -69,8 +108,9 @@ export default {
     data() {
         return {
             isEditing: false,
-            isAddingField: true,
-            editingField: null
+            isSelectingNewFieldtype: false,
+            editingField: null,
+            pendingCreatedField: null,
         }
     },
 
@@ -97,10 +137,13 @@ export default {
 
     methods: {
 
-        fieldAdded(field) {
+        fieldLinked(field) {
             this.section.fields.push(field);
             this.$notify.success(__('Field added.'));
-            this.$nextTick(() => this.editingField = field._id);
+
+            if (field.type === 'reference') {
+                this.$nextTick(() => this.editingField = field._id);
+            }
         },
 
         fieldUpdated(i, field) {
@@ -117,6 +160,45 @@ export default {
 
         focus() {
             this.$refs.displayInput.select();
+        },
+
+        toggleEditing() {
+            this.isEditing = ! this.isEditing
+        },
+
+        fieldtypeSelected(field) {
+            this.isSelectingNewFieldtype = false;
+
+            const handle = field.type;
+
+            const pending = {
+                _id: uniqid(),
+                type: 'inline',
+                handle,
+                config: {
+                    ...field,
+                    isNew: true,
+                    handle,
+                    display: field.type,
+                }
+            };
+
+            this.$nextTick(() => this.pendingCreatedField = pending);
+        },
+
+        fieldCreated(created) {
+            let handle = created.handle;
+            delete created.handle;
+
+            let field = {
+                ...this.pendingCreatedField,
+                ...{ handle },
+                config: created
+            };
+
+            this.section.fields.push(field);
+            this.$notify.success(__('Field added.'));
+            this.pendingCreatedField = null;
         }
 
     }

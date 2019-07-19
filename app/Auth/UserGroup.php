@@ -196,4 +196,9 @@ class UserGroup implements UserGroupContract
     {
         return cp_route('user-groups.edit', $this->handle());
     }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return API\UserGroup::{$method}(...$parameters);
+    }
 }

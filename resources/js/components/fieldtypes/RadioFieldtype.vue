@@ -10,9 +10,10 @@
                 @input="update($event.target.value)"
                 :value="option.value"
                 :id="name + $index"
+                :disabled="isReadOnly"
                 :checked="value === option.value"
             />
-            <label :for="name + $index">{{ option.label }}</label>
+            <label :for="name + $index">{{ option.label || option.value }}</label>
         </div>
     </div>
 </template>

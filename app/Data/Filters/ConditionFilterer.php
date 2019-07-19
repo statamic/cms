@@ -16,7 +16,7 @@ class ConditionFilterer implements ConditionFiltererContract
     public function filter($collection, $conditions)
     {
         foreach ($conditions as $parameter => $needles) {
-            $needles = Helper::ensureArray($needles);
+            $needles = (array) $needles;
 
             $collection = $collection->filter(function($item) use ($needles, $parameter) {
                 foreach ($needles as $needle) {

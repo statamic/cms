@@ -148,7 +148,8 @@ export default {
 
         labelText() {
             if (this.showHandle) return this.config.handle
-            return this.config.display || this.config.handle | deslugify | titleize;
+            return this.config.display
+                || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
         }
 
     },

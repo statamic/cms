@@ -6,7 +6,7 @@
                 <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
                     <th>{{ config.keys[element.key] }}</th>
                     <td>
-                        <input type="text" class="input-text-minimal" v-model="data[index].value" />
+                        <input type="text" class="input-text-minimal" v-model="data[index].value" :readonly="isReadOnly" />
                     </td>
                 </tr>
             </tbody>
@@ -34,10 +34,10 @@
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                                 <td class="table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
-                                    <input type="text" class="input-text font-bold" v-model="element.key" />
+                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" />
                                 </td>
                                 <td>
-                                    <input type="text" class="input-text" v-model="element.value" />
+                                    <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
                                 </td>
                                 <td class="row-controls">
                                     <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
@@ -130,7 +130,7 @@ export default {
         },
 
         addButton() {
-            return __(this.config.add_button || 'Add Value');
+            return __(this.config.add_button || 'Add Row');
         },
 
         keyHeader() {

@@ -8,7 +8,6 @@
 
     a {
         @apply .bg-grey-10 .py-sm .px-2 .leading-tight .text-xs .w-auto .relative .flex .items-center .justify-center rounded-t-md shadow border-b border-grey-30 select-none;
-        min-width: 140px;
         height: 94%;
         min-height: 94%;
 
@@ -16,7 +15,7 @@
 
     a.active {
         @apply bg-white text-blue border-t-2 border-blue relative .h-full .min-h-full border-b-0;
-        z-index: 2;
+        z-index: 10;
     }
 
     a.ghost {
@@ -33,6 +32,12 @@
         &.active {
             box-shadow: config('colors.red') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
         }
+    }
+}
+
+@screen md {
+    .tabs a {
+        min-width: 140px;
     }
 }
 

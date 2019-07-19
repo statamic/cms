@@ -11,72 +11,80 @@ class Code extends Fieldtype
             'type' => 'select',
             'default' => 'material',
             'options' => [
-                ['text' => 'Dark', 'value' => 'dark'],
-                ['text' => 'Light', 'value' => 'light']
-            ]
+                'material' => 'Dark',
+                'light' => 'Light'
+            ],
+            'instructions' => 'Choose your prefered theme.'
         ],
         'mode' => [
             'type' => 'select',
-            'default' => 'html',
+            'default' => 'htmlmixed',
+            'instructions' => 'Choose language for syntax highlighting.',
             'options' => [
-                ['text' => 'C-Like', 'value' => 'clike'],
-                ['text' => 'CSS', 'value' => 'css'],
-                ['text' => 'Diff', 'value' => 'diff'],
-                ['text' => 'Go', 'value' => 'go'],
-                ['text' => 'HAML', 'value' => 'haml'],
-                ['text' => 'Handlebars', 'value' => 'handlebars'],
-                ['text' => 'HTML', 'value' => 'htmlmixed'],
-                ['text' => 'LESS', 'value' => 'less'],
-                ['text' => 'Markdown', 'value' => 'markdown'],
-                ['text' => 'Markdown (Github Flavored)', 'value' => 'gfm'],
-                ['text' => 'Nginx', 'value' => 'nginx'],
-                ['text' => 'Java', 'value' => 'text/x-java'],
-                ['text' => 'JavaScript', 'value' => 'javascript'],
-                ['text' => 'JSX', 'value' => 'jsx'],
-                ['text' => 'Objective-C', 'value' => 'text/x-objectivec'],
-                ['text' => 'PHP', 'value' => 'php'],
-                ['text' => 'Python', 'value' => 'python'],
-                ['text' => 'Ruby', 'value' => 'ruby'],
-                ['text' => 'SCSS', 'value' => 'scss'],
-                ['text' => 'Shell', 'value' => 'shell'],
-                ['text' => 'SQL', 'value' => 'sql'],
-                ['text' => 'Twig', 'value' => 'twig'],
-                ['text' => 'Vue', 'value' => 'vue'],
-                ['text' => 'XML', 'value' => 'xml'],
-                ['text' => 'YAML', 'value' => 'yaml-frontmatter'],
+                'clike' => 'C-Like',
+                'css' => 'CSS',
+                'diff' => 'Diff',
+                'go' => 'Go',
+                'haml' => 'HAML',
+                'handlebars' => 'Handlebars',
+                'htmlmixed' => 'HTML',
+                'less' => 'LESS',
+                'markdown' => 'Markdown',
+                'gfm' => 'Markdown (Github Flavored)',
+                'nginx' => 'Nginx',
+                'text/x-java' => 'Java',
+                'javascript' => 'JavaScript',
+                'jsx' => 'JSX',
+                'text/x-objectivec' => 'Objective-C',
+                'php' => 'PHP',
+                'python' => 'Python',
+                'ruby' => 'Ruby',
+                'scss' => 'SCSS',
+                'shell' => 'Shell',
+                'sql' => 'SQL',
+                'twig' => 'Twig',
+                'vue' => 'Vue',
+                'xml' => 'XML',
+                'yaml-frontmatter' => 'YAML',
             ]
         ],
         'indent_type' => [
             'type' => 'select',
             'default' => 'tabs',
             'options' => [
-                ['text' => 'Tabs', 'value' => 'tabs'],
-                ['text' => 'Spaces', 'value' => 'spaces']
+                'tabs' => 'Tabs',
+                'spaces' => 'Spaces',
             ],
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Set your preferred type of indentation.'
         ],
         'indent_size' => [
             'type' => 'integer',
             'default' => 4,
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Set your preferred indentation size (in spaces).'
         ],
         'line_numbers' => [
             'type' => 'toggle',
             'default' => true,
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Show line numbers.'
         ],
         'line_wrapping' => [
             'type' => 'toggle',
             'default' => true,
-            'width' => 50
+            'width' => 50,
+            'instructions' => 'Wrap long lines of code.'
         ],
         'key_map' => [
-            'default' => 'sublime',
+            'type' => 'select',
+            'default' => 'default',
             'options' => [
-                ['text' => 'Default', 'value' => 'default'],
-                ['text' => 'Sublime', 'value' => 'sublime'],
-                ['text' => 'Vim', 'value' => 'vim']
+                'default' => 'Default',
+                'sublime' => 'Sublime',
+                'vim' => 'Vim'
             ],
+            'instructions' => 'Choose preferred set of keyboard shortcuts.'
         ]
     ];
 }

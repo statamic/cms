@@ -27,6 +27,8 @@
                 <revision-preview
                     v-if="showDetails"
                     :revision="revision"
+                    component="entry-publish-form"
+                    :component-props="componentProps"
                     @closed="showDetails = false"
                 >
                     <template slot="action-buttons-right">
@@ -58,6 +60,27 @@ export default {
     data() {
         return {
             showDetails: false,
+            componentProps: {
+                initialActions: 'actions',
+                collectionTitle: 'collection.title',
+                collectionUrl: 'collection.url',
+                initialTitle: 'title',
+                initialReference: 'reference',
+                initialFieldset: 'blueprint',
+                initialValues: 'values',
+                initialLocalizedFields: 'localizedFields',
+                initialMeta: 'meta',
+                initialPublished: 'published',
+                initialPermalink: 'permalink',
+                initialLocalizations: 'localizations',
+                initialHasOrigin: 'hasOrigin',
+                initialOriginValues: 'originValues',
+                initialOriginMeta: 'originMeta',
+                initialSite: 'locale',
+                initialIsWorkingCopy: 'hasWorkingCopy',
+                initialIsRoot: 'isRoot',
+                initialReadOnly: 'readOnly',
+            }
         }
     },
 

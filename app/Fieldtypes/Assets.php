@@ -15,20 +15,42 @@ class Assets extends Fieldtype
     protected $defaultValue = [];
 
     protected $configFields = [
-        'container' => ['type' => 'asset_container', 'max_items' => 1],
-        'folder' => ['type' => 'asset_folder', 'max_items' => 1],
-        'restrict' => ['type' => 'toggle'],
-        'max_files' => ['type' => 'integer'],
+        'container' => [
+            'type' => 'asset_container',
+            'max_items' => 1,
+            'instructions' => 'The asset container to work with.',
+            'width' => 50
+        ],
+        'folder' => [
+            'type' => 'asset_folder',
+            'max_items' => 1,
+            'instructions' => 'The folder to begin browsing in.',
+            'width' => 50
+        ],
+        'restrict' => [
+            'type' => 'toggle',
+            'instructions' => 'Prevent users from navigating to other folders.',
+            'width' => 50
+        ],
+        'max_files' => [
+            'type' => 'integer',
+            'instructions' => 'The maximum number of selectable assets.',
+            'width' => 50
+        ],
         'allow_uploads' => [
             'type' => 'toggle',
-            'default' => true
+            'default' => true,
+            'instructions' => 'Allow new files to be uploaded?',
+            'width' => 50
         ],
         'mode' => [
             'type' => 'select',
+            'default' => 'grid',
             'options' => [
                 'grid' => 'Grid',
                 'list' => 'List',
             ],
+            'instructions' => 'Default layout interface.'
         ],
     ];
 
@@ -70,7 +92,7 @@ class Assets extends Fieldtype
 
     public function preload()
     {
-        $data = $this->getItemData($this->field->value());
+        $data = $this->getItemData($this->field->value() ?? $this->defaultValue);
 
         return compact('data');
     }

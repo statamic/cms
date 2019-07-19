@@ -9,6 +9,7 @@
 }
 
 .live-preview-main {
+    @apply flex flex-1 overflow-scroll;
     z-index: 1;
 }
 

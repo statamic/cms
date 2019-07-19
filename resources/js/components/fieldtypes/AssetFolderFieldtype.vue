@@ -1,6 +1,6 @@
 <template>
     <div class="asset-folder-fieldtype-wrapper">
-        <small class="help-block" v-if="!container">{{ __('Select asset container') }}</small>
+        <small class="help-block text-grey-60" v-if="!container">{{ __('Select asset container') }}</small>
 
         <relationship-fieldtype
             v-if="container"
@@ -23,7 +23,7 @@ export default {
     computed: {
 
         container() {
-            return this.$store.state.publish[this.storeName].values.container[0];
+            return data_get(this.$store.state.publish[this.storeName].values.container, '0', null);
         },
 
         relationshipMeta() {

@@ -14,6 +14,13 @@ class Fieldtype extends Relationship
     protected $canEdit = false;
     protected $canSearch = false;
 
+    protected $configFields = [
+        'placeholder' => [
+            'type' => 'text',
+            'instructions' => 'Set default placeholder text.'
+        ],
+    ];
+
     public function fieldsetContents()
     {
         return [];

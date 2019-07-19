@@ -11,7 +11,7 @@ class EntryActionController extends ActionController
 {
     protected static $key = 'entries';
 
-    protected function getSelectedItems($items)
+    protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {
             return Entry::find($item);

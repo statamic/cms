@@ -23,6 +23,9 @@ class RevealerFieldtype extends Fieldtype
 
     public function process($data)
     {
-        return null;
+        // Don't set as null because it can
+        // masquerade as lost data.
+
+        // return null;
     }
 }

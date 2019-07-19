@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
@@ -60,7 +61,10 @@ class BlueprintController extends CpController
 
         $this->authorize('edit', $blueprint);
 
-        \Statamic::provideToScript(['fieldsetFields' => $this->fieldsetFields()]);
+        \Statamic::provideToScript([
+            'fieldsets' => $this->fieldsets(),
+            'fieldsetFields' => $this->fieldsetFields()
+        ]);
 
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
@@ -70,6 +74,7 @@ class BlueprintController extends CpController
 
     public function update(Request $request, $blueprint)
     {
+
         $blueprint = API\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
@@ -82,10 +87,9 @@ class BlueprintController extends CpController
         $sections = collect($request->sections)->mapWithKeys(function ($section) {
             return [array_pull($section, 'handle') => [
                 'display' => $section['display'],
-                'fields' => $this->sectionFields($section['fields'])
+                'fields' => Arr::filterRecursive($this->sectionFields($section['fields']))
             ]];
         })->all();
-
         $blueprint->setContents([
             'title' => $request->title,
             'sections' => $sections
@@ -204,8 +208,19 @@ class BlueprintController extends CpController
     {
         return [
             'type' => 'import',
-            'fieldset' => $field['import']
+            'fieldset' => $field['import'],
+            'prefix' => $field['prefix'] ?? null,
         ];
+    }
+
+    private function fieldsets()
+    {
+        return \Statamic\API\Fieldset::all()->mapWithKeys(function ($fieldset) {
+            return [$fieldset->handle() => [
+                'handle' => $fieldset->handle(),
+                'title' => $fieldset->title(),
+            ]];
+        });
     }
 
     private function fieldsetFields()

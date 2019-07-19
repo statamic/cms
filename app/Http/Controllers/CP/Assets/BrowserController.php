@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
+use Statamic\API\Asset;
 use Statamic\API\Str;
 use Statamic\API\Action;
 use Illuminate\Http\Request;
@@ -29,10 +30,11 @@ class BrowserController extends CpController
 
     public function show($containerHandle, $path = '/')
     {
-        // TODO: Handle invalid $container in url
         // TODO: Auth
 
         $container = AssetContainer::find($containerHandle);
+
+        abort_unless($container, 404);
 
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),
@@ -40,12 +42,31 @@ class BrowserController extends CpController
         ]);
     }
 
+    public function edit($containerHandle, $path)
+    {
+        // TODO: Auth
+
+        $container = AssetContainer::find($containerHandle);
+        $asset = Asset::find("{$containerHandle}::{$path}");
+
+        abort_unless($container && $asset, 404);
+
+        return view('statamic::assets.browse', [
+            'container' => $this->toContainerArray($container),
+            'folder' => $asset->folder(),
+            'editing' => $asset->id(),
+        ]);
+    }
+
     public function folder(Request $request, $container, $path = '/')
     {
-        // TODO: Handle invalid $container in url
         // TODO: Auth
 
         $container = AssetContainer::find($container);
+
+        if (! $container) {
+            return $this->pageNotFound();
+        }
 
         $paginator = $container
             ->queryAssets()
@@ -57,17 +78,22 @@ class BrowserController extends CpController
 
         return Resource::collection($paginator)->additional(['meta' => [
             'container' => $this->toContainerArray($container),
-            'folders' => $container->assetFolders($path)->values()->toArray(),
-            'folder' => $container->assetFolder($path)->toArray()
+            'folders' => $container->assetFolders($path)->values()->each->withActions()->toArray(),
+            'folder' => $container->assetFolder($path)->withActions()->toArray(),
+            'actionUrl' => cp_route('assets.actions'),
+            'folderActionUrl' => cp_route('assets.folders.actions', $container->id()),
         ]]);
     }
 
     public function search(Request $request, $container)
     {
-        // TODO: Handle invalid $container in url
         // TODO: Auth
 
         $container = AssetContainer::find($container);
+
+        if (! $container) {
+            return $this->pageNotFound();
+        }
 
         $query = $container->hasSearchIndex()
             ? $container->searchIndex()->ensureExists()->search($request->search)

@@ -1,7 +1,7 @@
 <template>
 
     <portal :to="portal">
-        <vue-modal v-bind="modalProps" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
+        <vue-modal v-bind="modalProps" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
             <slot :close="close" />
         </vue-modal>
     </portal>
@@ -15,6 +15,7 @@ export default {
         name: { type: String, required: true },
         adaptive: { type: Boolean, default: true },
         draggable: { type: Boolean, default: false },
+        clickToClose: { type: Boolean, default: false },
         pivotY: { type: Number, default: 0.1 },
         height: { default: 'auto' },
         width: {},
@@ -33,7 +34,7 @@ export default {
             return {
                 name: this.name,
                 adaptive: this.adaptive,
-                clickToClose: false,
+                clickToClose: this.clickToClose,
                 draggable: this.draggable,
                 height: this.height,
                 pivotY: this.pivotY,
@@ -53,6 +54,10 @@ export default {
     },
 
     methods: {
+
+        modalOpened(event) {
+            this.$emit('opened');
+        },
 
         modalClosed(event) {
             this.close();

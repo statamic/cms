@@ -8,7 +8,7 @@
                    :disabled="isReadOnly"
                    v-model="values"
             />
-            <label :for="name + $index">{{ option.label }}</label>
+            <label :for="name + $index">{{ option.label || option.value }}</label>
         </div>
     </div>
 </template>

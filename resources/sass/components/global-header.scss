@@ -3,14 +3,19 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center hidden justify-between relative w-full px-2;
+    @apply bg-white shadow h-12 items-center flex justify-between relative w-full px-2;
+    z-index: 9999;
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
 @screen sm {
-    .global-header { @apply flex px-4; }
+    .global-header { @apply px-4; }
+}
+
+@screen md {
+    .global-header { z-index: 1; }
 }
 
 /* Search
@@ -22,6 +27,7 @@
     .search-input {
         @apply .text-sm .w-full;
         padding-left: 5px;
+        padding-right: 20px;
         height: 32px;
         max-width: 400px;
 		&:focus {
@@ -34,6 +40,11 @@
         top: 36px;
         left: -1px; // border offset
         z-index: 999;
+    }
+
+    .global-search-loading-indicator {
+        position: absolute;
+        right: 8px;
     }
 
     .global-search-result-item {
