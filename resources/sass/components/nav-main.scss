@@ -59,7 +59,7 @@
 
 @screen md {
     .nav-main {
-        @apply block bg-transparent shadow-none h-auto pt-0 pl-4 pb-3 overflow-auto w-54;
+        @apply flex bg-transparent shadow-none h-auto pt-0 pl-4 pb-3 overflow-auto w-54;
         z-index: 1;
     }
 }
