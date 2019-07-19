@@ -32,10 +32,6 @@ export default {
     },
 
     mounted() {
-        if ( ! this.data) {
-            this.data = this.config.default || [];
-        }
-
         this.initButtons();
         this.initSortable();
     },
