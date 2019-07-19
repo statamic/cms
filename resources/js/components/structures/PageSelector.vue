@@ -47,13 +47,13 @@ export default {
     computed: {
 
         itemDataUrl() {
-            return cp_url('fields.fieldtypes/relationship/data') + '?' + qs.stringify({
+            return cp_url('fieldtypes/relationship/data') + '?' + qs.stringify({
                 config: this.configParameter
             });
         },
 
         selectionsUrl() {
-            return cp_url('fields.fieldtypes/relationship') + '?' + qs.stringify({
+            return cp_url('fieldtypes/relationship') + '?' + qs.stringify({
                 config: this.configParameter,
                 collections: this.collections,
             });
