@@ -125,7 +125,7 @@ export default {
 
         deviceSelectOptions() {
             return Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
-                return { value: device, text: __(device) };
+                return { value: device, label: __(device) };
             }));
         },
 
