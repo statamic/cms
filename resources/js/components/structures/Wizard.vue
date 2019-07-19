@@ -210,12 +210,6 @@ export default {
                 return Boolean(this.purpose);
             }
 
-            if (step === 3) {
-                if (this.purpose === 'navigation' && this.structure.collections.length === 0) return false;
-
-                return true;
-            }
-
             return true;
         },
         submit() {
