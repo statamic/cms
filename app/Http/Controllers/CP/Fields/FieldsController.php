@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldsController extends CpController
 {
@@ -12,19 +13,28 @@ class FieldsController extends CpController
         return view('statamic::fields.index');
     }
 
-    public function show(Request $request)
-    {
-        return view('statamic::fields.create');
-    }
-
-    public function create(Request $request)
-    {
-        return view('statamic::fields.create');
-    }
-
     public function edit(Request $request)
     {
-        return view('statamic::fields.edit');
+        $request->validate([
+            'type' => 'required',
+            'values' => 'array',
+        ]);
+
+        $fieldtype = FieldtypeRepository::find($request->type);
+
+        $blueprint = $fieldtype->configBlueprint();
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($request->values)
+            ->preProcess();
+
+        return [
+            'fieldtype' => $fieldtype->toArray(),
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => array_merge($request->values, $fields->values()),
+            'meta' => $fields->meta()
+        ];
     }
 
     public function update(Request $request)

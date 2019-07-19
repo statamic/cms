@@ -2,11 +2,11 @@
 
     <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
 
-        <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="loading" class="absolute pin z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
-        <div v-if="fieldtypesLoaded" class="flex items-center mb-3 -mt-1">
+        <div v-if="!loading" class="flex items-center mb-3 -mt-1">
             <h1 class="flex-1">
                 <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
                     <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" :name="fieldtype.icon"></svg-icon>
@@ -41,11 +41,13 @@
             ></a>
         </div>
 
-        <div class="card rounded-tl-none" v-if="fieldtypesLoaded">
+        <div class="card rounded-tl-none" v-if="!loading">
 
             <publish-container
                 name="base"
+                :fieldset="blueprint"
                 :values="values"
+                :meta="meta"
                 :is-root="true"
                 @updated="values = $event"
             >
@@ -79,20 +81,10 @@
                         @input="updateField('instructions', $event, setValue)"
                     />
 
-                    <publish-field
-                        v-show="showField(configField)"
-                        v-for="configField in filteredFieldtypeConfig"
-                        :key="configField.handle"
-                        :config="configField"
-                        :instructions="__(configField.instructions)"
-                        :value="values[configField.handle]"
-                        @input="updateField(configField.handle, $event, setValue)"
+                    <publish-fields
+                        :fields="blueprint.sections[0].fields"
+                        @updated="(handle, value) => updateField(handle, value, setValue)"
                     />
-
-                    <!--
-                        TODO:
-                        - Default value
-                    -->
 
                 </div>
             </publish-container>
@@ -117,7 +109,6 @@
 
 <script>
 import PublishField from '../publish/Field.vue';
-import ProvidesFieldtypes from './ProvidesFieldtypes';
 import { ValidatesFieldConditions, FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditions/FieldConditions.js';
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 
@@ -130,7 +121,6 @@ export default {
     },
 
     mixins: [
-        ProvidesFieldtypes,
         ValidatesFieldConditions,
     ],
 
@@ -149,11 +139,15 @@ export default {
 
     data: function() {
         return {
-            values: clone(this.config),
+            values: null,
+            meta: null,
             editedFields: clone(this.overrides),
             isHandleModified: true,
             activeTab: 'settings',
             storeName: 'base',
+            fieldtype: null,
+            loading: true,
+            blueprint: null,
         };
     },
 
@@ -162,10 +156,6 @@ export default {
             var width = this.config.width || 100;
             var found = _.findWhere(this.widths, {value: width});
             return found.text;
-        },
-
-        fieldtype: function() {
-            return _.findWhere(this.fieldtypes, { handle: this.type || 'text' })
         },
 
         fieldtypeConfig() {
@@ -214,6 +204,8 @@ export default {
                 }
             });
         }
+
+        this.load();
     },
 
     methods: {
@@ -267,6 +259,19 @@ export default {
 
         close() {
             this.$emit('closed');
+        },
+
+        load() {
+            this.$axios.post(cp_url('fields/edit'), {
+                type: this.type,
+                values: this.config
+            }).then(response => {
+                this.loading = false;
+                this.fieldtype = response.data.fieldtype;
+                this.blueprint = response.data.blueprint;
+                this.values = response.data.values;
+                this.meta = response.data.meta;
+            })
         }
 
     }

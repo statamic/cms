@@ -126,6 +126,13 @@ abstract class Fieldtype implements Arrayable
         ];
     }
 
+    public function configBlueprint(): Blueprint
+    {
+        return (new Blueprint)->setContents([
+            'fields' => $this->configFields()->items()->all()
+        ]);
+    }
+
     public function configFields(): Fields
     {
         $fields = collect($this->configFieldItems())->map(function ($field, $handle) {
