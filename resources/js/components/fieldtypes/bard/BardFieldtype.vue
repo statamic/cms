@@ -135,6 +135,8 @@ export default {
         }
     },
 
+    inject: ['storeName'],
+
     data() {
         return {
             content: null,
@@ -144,7 +146,6 @@ export default {
             showSource: false,
             fullScreenMode: false,
             buttons: [],
-            metas: {},
         }
     },
 
@@ -169,23 +170,52 @@ export default {
 
                 return moment.utc(duration.asMilliseconds()).format("mm:ss");
             }
+        },
+
+        metas: {
+            get() {
+                return this.$config.get('bard.meta')[this.id] || {};
+            },
+            set(value) {
+                const meta = this.$config.get('bard.meta');
+                meta[this.id] = value;
+                this.$config.set('bard.meta', meta);
+            }
+        },
+
+        isFirstCreation() {
+            return !this.$config.get('bard.meta').hasOwnProperty(this.id);
+        },
+
+        id() {
+            return `${this.storeName}.${this.name}`;
         }
 
     },
 
     created() {
         let content = this.valueToContent(clone(this.value));
+
         if (content) {
+            let setIndex = 0;
             content.content = content.content.map((item, i) => {
-                if (item.type === 'set') {
-                    const id = uniqid();
-                    item.attrs.id = id;
-                    this.metas[id] = this.meta.existing[i];
+                if (item.type !== 'set') return item;
+
+                let id;
+                if (this.isFirstCreation) {
+                    id = uniqid();
+                    this.saveMeta(id, this.meta.existing[i]);
+                } else {
+                    id = Object.keys(this.metas)[setIndex];
                 }
+
+                item.attrs.id = id;
+                setIndex++;
                 return item;
             });
-            this.content = content;
         }
+
+        this.content = content;
     },
 
     mounted() {
@@ -268,9 +298,15 @@ export default {
         addSet(handle) {
             const id = uniqid();
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-            this.metas[id] = this.meta.new[handle];
+            this.saveMeta(id, this.meta.new[handle]);
             this.editor.commands.set({ id, values });
             this.$refs.setSelectorDropdown.close();
+        },
+
+        saveMeta(id, value) {
+            let meta = this.metas;
+            meta[id] = value;
+            this.metas = meta;
         },
 
         toggleFullscreen() {
