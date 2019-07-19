@@ -64,7 +64,7 @@ export default {
 
     mounted() {
         this.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: this.value || this.config.default || '',
+            value: this.value || '',
             mode: this.config.mode,
             addModeClass: true,
             keyMap: this.config.key_map,
