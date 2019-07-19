@@ -144,9 +144,6 @@ class AssetsController extends CpController
 
     private function thumbnail($asset, $preset = null)
     {
-        return cp_route('assets.thumbnails.show', [
-            'asset' => base64_encode($asset->id()),
-            'size' => $preset
-        ]);
+        return $asset->thumbnailUrl($preset);
     }
 }
