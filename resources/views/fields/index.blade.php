@@ -10,7 +10,6 @@
                     <p class="text-base text-grey-80 mb-3">Fields are used to structure your content. This helps you to maintain your content, control output, reuse content, and create relationships <em>between</em> content.</p>
                     <p class="text-base text-grey-80 mb-3">Each field uses a <b>Field type</b>, which determines what the field's input interface will look like, what type of data it stores, and how you can interact with its data in your templates.</p>
                      <div class="flex items-center mt-2">
-                        <a href="{{ cp_route('fields.create') }}" class="btn-primary mr-2">Create Field</a>
                         <p><a href="" class="font-bold text-blue">Learn more about fields in the docs</a><span class="inline-block text-blue w-4 h-4 ml-1">@svg('external-link')</span></p>
                     </div>
                 </div>
