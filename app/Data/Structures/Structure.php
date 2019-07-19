@@ -181,6 +181,14 @@ class Structure implements StructureContract
         });
     }
 
+    public function isCollectionBased()
+    {
+        return true;
+
+        // TODO: Having trouble with this
+        // return $this->collection();
+    }
+
     public function maxDepth($maxDepth = null)
     {
         return $this

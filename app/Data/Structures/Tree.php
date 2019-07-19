@@ -32,12 +32,20 @@ class Tree implements Localization
 
     public function tree($tree = null)
     {
-        return $this->fluentlyGetOrSet('tree')->args(func_get_args());
+        return $this->fluentlyGetOrSet('tree')
+            ->setter(function ($tree) {
+                return $this->validateTree($tree);
+            })
+            ->args(func_get_args());
     }
 
     public function root($root = null)
     {
-        return $this->fluentlyGetOrSet('root')->args(func_get_args());
+        return $this->fluentlyGetOrSet('root')
+            ->setter(function ($root) {
+                return $this->validateRoot($root);
+            })
+            ->args(func_get_args());
     }
 
     public function sites()
@@ -174,5 +182,43 @@ class Tree implements Localization
         $this->tree[] = ['entry' => $entry->id()];
 
         return $this;
+    }
+
+    protected function validateRoot($root)
+    {
+        if ($this->structure->isCollectionBased()) {
+            $this->validateUniqueEntries($root, $this->tree);
+        }
+
+        return $root;
+    }
+
+    protected function validateTree($tree)
+    {
+        if ($this->structure->isCollectionBased()) {
+            $this->validateUniqueEntries($this->root, $tree);
+        }
+
+        return $tree;
+    }
+
+    protected function validateUniqueEntries($root, $tree)
+    {
+        if ($entryId = $this->getEntryIdsFromTree($tree)->push($root)->filter()->duplicates()->first()) {
+            throw new \Exception("Duplicate entry [{$entryId}] in [{$this->structure->handle()}] structure.");
+        }
+    }
+
+    protected function getEntryIdsFromTree($tree, $flatten = true)
+    {
+        return collect($tree)
+            ->map(function ($item) {
+                return [
+                    'entry' => $item['entry'] ?? null,
+                    'children' => isset($item['children']) ? $this->getEntryIdsFromTree($item['children']) : null
+                ];
+            })
+            ->flatten()
+            ->filter();
     }
 }
