@@ -295,7 +295,8 @@ class Collection implements Contract
         $array = Arr::except($this->toArray(), [
             'handle',
             'past_date_behavior',
-            'future_date_behavior'
+            'future_date_behavior',
+            'dated',
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
