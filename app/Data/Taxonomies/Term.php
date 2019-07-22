@@ -97,7 +97,9 @@ class Term implements TermContract, Responsable, AugmentableContract
             'slug' => $this->slug(),
             'title' => $this->title(),
             'taxonomy' => $this->taxonomyHandle(),
-        ]);
+            'edit_url' => $this->editUrl(),
+            'permalink' => $this->absoluteUrl(),
+        ], $this->supplements);
     }
 
     public function fileData()
