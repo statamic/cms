@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\CP\Column;
+use Statamic\API\Action;
 use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
@@ -39,7 +40,11 @@ class TermsController extends CpController
         $paginator = $query->paginate(request('perPage'));
 
         $paginator->supplement(function ($term) {
-            return ['deleteable' => me()->can('delete', $term)];
+            return [
+                'viewable' => me()->can('view', $term),
+                'editable' => me()->can('edit', $term),
+                'actions' => Action::for('terms', [], $term),
+            ];
         })->preProcessForIndex();
 
         $columns = $taxonomy->termBlueprint()

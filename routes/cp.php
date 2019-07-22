@@ -66,7 +66,8 @@ Route::group([
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
-            Route::post('action', 'TermActionController')->name('taxonomies.terms.action');
+            Route::get('actions', 'TermActionController@index')->name('taxonomies.terms.actions');
+            Route::post('actions', 'TermActionController@run');
 
             Route::group(['prefix' => '{term}'], function () {
                 Route::get('/', 'TermsController@edit')->name('taxonomies.terms.edit');

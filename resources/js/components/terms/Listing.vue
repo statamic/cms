@@ -22,7 +22,6 @@
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
-                            :actions="termActions"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
@@ -63,7 +62,7 @@
                                 <data-list-inline-actions
                                     :item="term.id"
                                     :url="actionUrl"
-                                    :actions="actions"
+                                    :actions="term.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
                                 />
@@ -97,14 +96,6 @@ export default {
         return {
             listingKey: 'terms',
             requestUrl: cp_url(`taxonomies/${this.taxonomy}/terms`),
-        }
-    },
-
-    computed: {
-        termActions() {
-            this.actions.forEach(action => action.context.site = data_get(this.activeFilters, 'site.value', null));
-
-            return this.actions;
         }
     },
 

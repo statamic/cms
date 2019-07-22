@@ -9,7 +9,7 @@ use Statamic\Http\Controllers\CP\ActionController;
 
 class TermActionController extends ActionController
 {
-    protected function getSelectedItems($items)
+    protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {
             return Term::find($item);
