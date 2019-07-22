@@ -21,7 +21,6 @@ class Entries
     protected $ignoredParams = ['as'];
     protected $parameters;
     protected $collections;
-    protected $orderBys;
     protected $site;
     protected $showPublished;
     protected $showUnpublished;

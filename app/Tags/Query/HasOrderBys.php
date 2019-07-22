@@ -7,6 +7,8 @@ use Statamic\Query\OrderBy;
 
 trait HasOrderBys
 {
+    protected $orderBys;
+
     public function queryOrderBys($query)
     {
         $this->parseOrderBys()->each(function ($orderBy) use ($query) {
