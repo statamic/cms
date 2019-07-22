@@ -88,7 +88,7 @@ class CacheController extends CpController
 
     protected function clearStacheCache()
     {
-        Stache::clear();
+        Stache::refresh();
 
         return back()->withSuccess('Stache cleared.');
     }
