@@ -24,6 +24,7 @@ class Structure implements StructureContract
     protected $collections;
     protected $maxDepth;
     protected $expectsRoot = false;
+    protected $collection;
 
     public function id()
     {
@@ -176,17 +177,20 @@ class Structure implements StructureContract
 
     public function collection()
     {
-        return Collection::all()->first(function ($collection) {
-            return $collection->structure() === $this;
+        if ($this->collection !== null) {
+            return $this->collection;
+        }
+
+        $collection = Collection::all()->first(function ($collection) {
+            return $collection->structureHandle() === $this->handle();
         });
+
+        return $this->collection = $collection ?: false;
     }
 
     public function isCollectionBased()
     {
-        return true;
-
-        // TODO: Having trouble with this
-        // return $this->collection();
+        return $this->collection();
     }
 
     public function maxDepth($maxDepth = null)
