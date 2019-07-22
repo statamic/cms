@@ -177,16 +177,14 @@ class Structure implements StructureContract
     public function collection()
     {
         return Collection::all()->first(function ($collection) {
-            return $collection->structure() === $this;
+            return $collection->structureHandle() === $this->handle();
         });
     }
 
     public function isCollectionBased()
     {
-        return true;
-
         // TODO: Having trouble with this
-        // return $this->collection();
+        return $this->collection();
     }
 
     public function maxDepth($maxDepth = null)

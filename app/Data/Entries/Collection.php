@@ -396,6 +396,15 @@ class Collection implements Contract
             ->args(func_get_args());
     }
 
+    public function structureHandle()
+    {
+        if (! $this->hasStructure()) {
+            return null;
+        }
+
+        return is_string($this->structure) ? $this->structure : $this->structure->handle();
+    }
+
     public function hasStructure()
     {
         return $this->structure !== null;
