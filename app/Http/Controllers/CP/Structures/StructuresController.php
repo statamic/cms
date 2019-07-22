@@ -94,7 +94,7 @@ class StructuresController extends CpController
             'structure' => $structure,
             'pages' => $pages,
             'expectsRoot' => $structure->expectsRoot(),
-            'hasCollection' => $structure->collection() !== null,
+            'hasCollection' => $structure->collection(),
             'collections' => $structure->collections()->map->handle()->all(),
             'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
                 $localized = $structure->in($handle);
