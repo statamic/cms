@@ -38,9 +38,9 @@ class Taxonomy extends Relationship
                     $taxonomy = API\Taxonomy::findByHandle($handle);
                 }
 
-                return Term::find($id) ?? Term::make($slug)
-                    ->taxonomy($taxonomy)
-                    ->collection($collection);
+                $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
+
+                return $term->collection($collection);
             });
     }
 
