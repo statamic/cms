@@ -157,7 +157,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Set::class,
         Tags\Section::class,
         Tags\Structure::class,
-        Tags\Taxonomy::class,
+        Tags\Taxonomy\Taxonomy::class,
         Tags\Theme::class,
         Tags\Trans::class,
         Tags\TransChoice::class,
