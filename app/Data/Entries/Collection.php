@@ -313,7 +313,7 @@ class Collection implements Contract
         $array = Arr::removeNullValues(array_merge($array, [
             'entry_order' => $this->getEntryOrder(),
             'amp' => $array['amp'] ?: null,
-            'date' => $this->dated,
+            'date' => $this->dated ?: null,
             'orderable' => $array['orderable'] ?: null,
             'default_status' => $this->defaultStatus,
             'date_behavior' => [

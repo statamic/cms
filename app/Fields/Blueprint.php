@@ -162,6 +162,8 @@ class Blueprint
 
         $this->extraFields[$section][$handle] = compact('prepend', 'field');
 
+        $this->fieldsCache = null;
+
         return $this;
     }
 
@@ -172,7 +174,11 @@ class Blueprint
 
     protected function validateUniqueHandles()
     {
-        if ($field = $this->sections()->map->contents()->flatMap->fields->map->handle->duplicates()->first()) {
+        $handles = $this->sections()->map->contents()->flatMap(function ($contents) {
+            return array_get($contents, 'fields', []);
+        })->map->handle;
+
+        if ($field = $handles->duplicates()->first()) {
             throw new \Exception("Duplicate field [{$field}] on blueprint [{$this->handle}].");
         }
     }
