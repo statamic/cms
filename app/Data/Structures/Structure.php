@@ -190,7 +190,6 @@ class Structure implements StructureContract
 
     public function isCollectionBased()
     {
-        // TODO: Having trouble with this
         return $this->collection();
     }
 
