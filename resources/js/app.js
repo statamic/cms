@@ -139,6 +139,7 @@ Statamic.app({
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue'),
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue'),
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue'),
+        FormWizard: require('./components/forms/Wizard.vue'),
     },
 
     data: {
