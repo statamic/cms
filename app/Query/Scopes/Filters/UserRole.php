@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\API\Role;
+use Statamic\Query\Scopes\Filter;
 
 class UserRole extends Filter
 {

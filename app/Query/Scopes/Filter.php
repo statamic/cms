@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Query\Scopes\Filters;
+namespace Statamic\Query\Scopes;
 
 use Statamic\Fields\Fields;
 use Statamic\Extend\HasTitle;

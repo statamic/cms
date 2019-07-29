@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\API;
+use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
