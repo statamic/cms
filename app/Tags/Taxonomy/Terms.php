@@ -37,7 +37,16 @@ class Terms
             return collect_terms();
         }
 
-        return $this->results($query);
+        $terms = $this->results($query);
+
+        // If we can infer which collection is being targeted, we'll add it so
+        // that the term URLs resolve to their collection equivalents.
+        // eg. /blog/tags/tag instead of just /tags/tag
+        if ($this->collections->count() === 1) {
+            $terms->each->collection($this->collections[0]);
+        }
+
+        return $terms;
     }
 
     public function count()
