@@ -14,7 +14,7 @@ final class Addon
 {
     /**
      * The identifier.
-     * Typically the class name without the namespace. eg. "Bloodhound"
+     * Typically a composer package name. eg. statamic/bloodhound
      *
      * @var string
      */
@@ -69,6 +69,13 @@ final class Addon
      * @var string
      */
     protected $name;
+
+    /**
+     * The addon slug, if overridden.
+     *
+     * @var string
+     */
+    protected $slug;
 
     /**
      * The addon description.
@@ -148,7 +155,7 @@ final class Addon
         $instance = self::create($package['id']);
 
         $keys = [
-            'id', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
+            'id', 'slug', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
             'autoload', 'description', 'package', 'version', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
@@ -161,9 +168,8 @@ final class Addon
     }
 
     /**
-     * The ID (or un-prefixed namespace)
-     *
-     * eg. Statamic\Addons\Bacon, would be "Bacon"
+     * The ID (in a vendor/package format)
+     * eg. statamic/bloodhound
      *
      * @return string
      */
@@ -220,7 +226,7 @@ final class Addon
      */
     public function handle()
     {
-        return Str::snake($this->id);
+        return str_replace('-', '_', explode('/', $this->id)[1]);
     }
 
     /**
@@ -228,11 +234,14 @@ final class Addon
      *
      * For referencing in URLs.
      *
+     * @param string $slug
      * @return string
      */
-    public function slug()
+    public function slug($slug = null)
     {
-        return Str::studlyToSlug($this->id);
+        return $slug
+            ? $this->slug = $slug
+            : ($this->slug ?? Str::slug($this->handle()));
     }
 
     /**

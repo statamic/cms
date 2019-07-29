@@ -20,8 +20,8 @@ class AddonTest extends TestCase
     public function it_gets_the_id()
     {
         $this->assertEquals(
-            'TestAddon',
-            Addon::create('TestAddon')->id()
+            'vendor/foo-bar',
+            Addon::create('vendor/foo-bar')->id()
         );
     }
 
@@ -29,8 +29,8 @@ class AddonTest extends TestCase
     public function it_gets_the_handle()
     {
         $this->assertEquals(
-            'test_addon',
-            Addon::create('TestAddon')->handle()
+            'foo_bar',
+            Addon::create('vendor/foo-bar')->handle()
         );
     }
 
@@ -38,8 +38,8 @@ class AddonTest extends TestCase
     public function it_gets_the_slug()
     {
         $this->assertEquals(
-            'test-addon',
-            Addon::create('test addon')->slug()
+            'foo-bar',
+            Addon::create('vendor/foo-bar')->slug()
         );
     }
 
@@ -49,10 +49,9 @@ class AddonTest extends TestCase
         $addon = $this->createFromPackage([]);
 
         $this->assertInstanceOf(Addon::class, $addon);
-        $this->assertEquals('TestAddon', $addon->id());
+        $this->assertEquals('vendor/test-addon', $addon->id());
         $this->assertEquals('Test Addon', $addon->name());
         $this->assertEquals('Test description', $addon->description());
-        $this->assertEquals('test-vendor/test-addon', $addon->package());
         $this->assertEquals('Vendor\\TestAddon', $addon->namespace());
         $this->assertEquals('/path/to/addon', $addon->directory());
         $this->assertEquals('http://test-url.com', $addon->url());
@@ -170,7 +169,7 @@ class AddonTest extends TestCase
     {
         config(['test_addon' => ['license_key' => 'TESTLICENSEKEY']]);
 
-        $this->assertEquals('TESTLICENSEKEY', Addon::create('TestAddon')->licenseKey());
+        $this->assertEquals('TESTLICENSEKEY', Addon::create('vendor/test-addon')->licenseKey());
     }
 
     public function it_gets_the_autoloaded_directory()
@@ -183,8 +182,7 @@ class AddonTest extends TestCase
     private function createFromPackage($attributes)
     {
         return Addon::createFromPackage(array_merge([
-            'id' => 'TestAddon',
-            'package' => 'test-vendor/test-addon',
+            'id' => 'vendor/test-addon',
             'name' => 'Test Addon',
             'description' => 'Test description',
             'namespace' => 'Vendor\\TestAddon',
