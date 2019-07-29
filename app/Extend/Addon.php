@@ -330,39 +330,6 @@ final class Addon
         return Changelog::product($this->marketplaceSlug());
     }
 
-    public function toComposerJson()
-    {
-        return json_encode($this->toComposerJsonArray(), JSON_PRETTY_PRINT);
-    }
-
-    public function toComposerJsonArray()
-    {
-        return [
-            'name' => $this->package,
-            'description' => $this->description,
-            'version' => $this->version,
-            'type' => 'statamic-addon',
-            'autoload' => [
-                'psr-4' => [
-                    $this->namespace.'\\' => $this->autoload,
-                ]
-            ],
-            'extra' => [
-                'statamic' => [
-                    'name' => $this->name,
-                    'description' => $this->description,
-                    'developer' => $this->developer,
-                    'developer-url' => $this->developerUrl,
-                ],
-                'laravel' => [
-                    'providers' => [
-                        $this->namespace.'\\'.$this->id.'ServiceProvider'
-                    ]
-                ],
-            ]
-        ];
-    }
-
     /**
      * Handle method calls.
      * Typically will get or set property values.

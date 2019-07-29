@@ -180,40 +180,6 @@ class AddonTest extends TestCase
         $this->assertEquals('src', $addon->autoload());
     }
 
-    /** @test */
-    public function it_creates_a_composer_json_file()
-    {
-        $addon = $this->createFromPackage([]);
-
-        $expected = [
-            'name' => 'test-vendor/test-addon',
-            'description' => 'Test description',
-            'version' => '1.0',
-            'type' => 'statamic-addon',
-            'autoload' => [
-                'psr-4' => [
-                    'Vendor\\TestAddon\\' => 'src',
-                ]
-            ],
-            'extra' => [
-                'statamic' => [
-                    'name' => 'Test Addon',
-                    'description' => 'Test description',
-                    'developer' => 'Test Developer LLC',
-                    'developer-url' => 'http://test-developer.com',
-                ],
-                'laravel' => [
-                    'providers' => [
-                        'Vendor\\TestAddon\\TestAddonServiceProvider'
-                    ]
-                ],
-            ]
-        ];
-
-        $this->assertEquals($expected, $addon->toComposerJsonArray());
-        $this->assertEquals(json_encode($expected, JSON_PRETTY_PRINT), $addon->toComposerJson());
-    }
-
     private function createFromPackage($attributes)
     {
         return Addon::createFromPackage(array_merge([
