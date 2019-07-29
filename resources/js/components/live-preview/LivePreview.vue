@@ -284,7 +284,7 @@ export default {
         },
 
         closePopout() {
-            this.popoutWindow.close();
+            if (this.poppedOut) this.popoutWindow.close();
         },
 
         sendPayloadToPoppedOutWindow() {

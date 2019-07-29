@@ -1,5 +1,13 @@
 <template>
-    <textarea-input :name="name" :value="value" @input="update" :limit="config.character_limit || null" :isReadOnly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
+    <textarea-input
+        :name="name"
+        :isReadOnly="isReadOnly"
+        :limit="config.character_limit || null"
+        :placeholder="config.placeholder"
+        :value="value"
+        @blur="$emit('blur')"
+        @focus="$emit('focus')"
+        @input="update" />
 </template>
 
 <script>

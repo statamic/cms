@@ -30,6 +30,9 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $blueprint;
     protected $private;
     protected $allowUploads;
+    protected $allowDownloading;
+    protected $allowMoving;
+    protected $allowRenaming;
     protected $createFolders;
     protected $searchIndex;
 

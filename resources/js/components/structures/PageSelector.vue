@@ -13,8 +13,8 @@
             :exclusions="exclusions"
             :search="true"
             :columns="columns"
-            :can-create="true"
-            :can-reorder="true"
+            :can-create="false"
+            :can-reorder="false"
             @item-data-updated="itemDataUpdated"
         />
 
