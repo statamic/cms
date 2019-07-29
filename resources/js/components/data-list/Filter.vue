@@ -27,14 +27,13 @@ export default {
 
     props: {
         filter: Object,
-        initialValue: {}
+        initialValues: Object
     },
 
     data() {
         return {
-            value: this.initialValue,
             fieldset: {sections:[{fields:this.filter.fields}]},
-            values: {},
+            values: this.initialValues || {},
             errors: {},
         }
     },

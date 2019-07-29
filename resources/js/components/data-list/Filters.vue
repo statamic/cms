@@ -21,7 +21,7 @@
                     v-for="filter in standardFilters"
                     :key="filter.handle"
                     :filter="filter"
-                    :initial-value="activeFilters[filter.handle]"
+                    :initial-values="activeFilters[filter.handle]"
                     @changed="filterChanged(filter.handle, $event)"
                 />
 
