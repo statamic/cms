@@ -150,6 +150,9 @@ class TermsStore extends AggregateStore
 
     public function sync($entry, $taxonomy, $terms)
     {
+        $entryId = $entry->id();
+        $collection = $entry->collectionHandle();
+
         $terms = collect(Arr::wrap($terms))->mapWithKeys(function ($value) {
             return [Str::slug($value) => $value];
         });
@@ -157,7 +160,7 @@ class TermsStore extends AggregateStore
         foreach ($terms as $slug => $value) {
             $key = "{$taxonomy}::{$slug}";
 
-            $this->associations[$taxonomy][$slug][] = $entry;
+            $this->associations[$taxonomy][$slug][] = ['id' => $entryId, 'collection' => $collection];
             $this->titles[$key] = $value;
 
             $term = $this->makeTerm($taxonomy, $slug);
@@ -172,7 +175,10 @@ class TermsStore extends AggregateStore
                 continue;
             }
 
-            $associations = array_values(array_diff($associations, [$entry]));
+            $associations = collect($associations)
+                ->reject(function ($association) use ($entryId) {
+                    return $association['id'] === $entryId;
+                })->values()->all();
 
             if (empty($associations)) {
                 unset($this->associations[$taxonomy][$term]);
@@ -223,6 +229,23 @@ class TermsStore extends AggregateStore
         }
 
         return $terms;
+    }
+
+    public function getCollectionTermIds($taxonomy, $collections)
+    {
+        $collections = Arr::wrap($collections);
+
+        if (! $associations = Arr::get($this->associations, $taxonomy, [])) {
+            return [];
+        }
+
+        return collect($associations)->filter(function ($entries) use ($collections) {
+            return !collect($entries)->filter(function ($entry) use ($collections) {
+                return in_array($entry['collection'], $collections);
+            })->isEmpty();
+        })->map(function ($entries, $term) use ($taxonomy) {
+            return "{$taxonomy}::{$term}";
+        })->values()->all();
     }
 
     protected function makeTerm($taxonomy, $slug)

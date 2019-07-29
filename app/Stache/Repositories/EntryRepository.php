@@ -113,7 +113,7 @@ class EntryRepository implements RepositoryContract
     {
         $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {
             $this->stache->store('terms')->sync(
-                $entry->id(),
+                $entry,
                 $taxonomy->handle(),
                 $entry->value($taxonomy->handle())
             );

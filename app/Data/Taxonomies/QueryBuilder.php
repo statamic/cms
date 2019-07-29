@@ -3,12 +3,14 @@
 namespace Statamic\Data\Taxonomies;
 
 use Statamic\API\Term;
+use Statamic\API\Taxonomy;
 use Statamic\Data\QueryBuilder as BaseQueryBuilder;
 
 class QueryBuilder extends BaseQueryBuilder
 {
     protected $taxonomies;
     protected $site;
+    protected $collections;
 
     public function where($column, $operator = null, $value = null)
     {
@@ -33,22 +35,42 @@ class QueryBuilder extends BaseQueryBuilder
             return $this;
         }
 
+        if (in_array($column, ['collection', 'collections'])) {
+            $this->collections = array_merge($this->collections ?? [], $values);
+            return $this;
+        }
+
         return parent::whereIn($column, $values);
     }
 
     protected function getBaseItems()
     {
-        $terms = $this->taxonomies
-            ? collect_terms($this->taxonomies)->flatMap(function ($taxonomy) {
-                return Term::whereTaxonomy($taxonomy);
-            })->values()
-            : Term::all()->values();
+        if ($this->collections) {
+            $terms = $this->getTermsFromCollections();
+        } elseif ($this->taxonomies) {
+            $terms = Term::whereInTaxonomy($this->taxonomies);
+        } else {
+            $terms = Term::all();
+        }
 
         if ($this->site) {
             $terms = $terms->localize($this->site);
         }
 
-        return $terms;
+        return $terms->values();
+    }
+
+    protected function getTermsFromCollections()
+    {
+        $stache = app('stache')->store('terms');
+        $taxonomies = $this->taxonomies ?? Taxonomy::all();
+
+        return $this->collect($taxonomies)->flatMap(function ($taxonomy) use ($stache) {
+            $termIds = $stache->getCollectionTermIds($taxonomy, $this->collections);
+            return $this->collect($termIds)->map(function ($id) {
+                return Term::find($id);
+            });
+        });
     }
 
     protected function collect($items = [])

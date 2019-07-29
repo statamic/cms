@@ -22,6 +22,7 @@ class Terms
     protected $ignoredParams = ['as'];
     protected $parameters;
     protected $taxonomies;
+    protected $collections;
 
     public function __construct($parameters)
     {
@@ -53,6 +54,10 @@ class Terms
         $query = Term::query()
             ->whereIn('taxonomy', $this->taxonomies->map->handle()->all());
 
+        if ($this->collections) {
+            $query->whereIn('collections', $this->collections->map->handle()->all());
+        }
+
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -65,6 +70,7 @@ class Terms
         $this->parameters = Arr::except($params->all(), $this->ignoredParams);
         $this->taxonomies = $this->parseTaxonomies();
         $this->orderBys = $this->parseOrderBys();
+        $this->collections = $this->parseCollections();
     }
 
     protected function parseTaxonomies()
@@ -84,6 +90,23 @@ class Terms
                 $taxonomy = Taxonomy::findByHandle($handle);
                 throw_unless($taxonomy, new \Exception("Taxonomy [{$handle}] does not exist."));
                 return $taxonomy;
+            })
+            ->values();
+    }
+
+    protected function parseCollections()
+    {
+        $collections = Arr::getFirst($this->parameters, ['collection', 'collections']);
+
+        if (! $collections) {
+            return collect();
+        }
+
+        return collect(explode('|', $collections))
+            ->map(function ($handle) {
+                $collection = Collection::findByHandle($handle);
+                throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
+                return $collection;
             })
             ->values();
     }
