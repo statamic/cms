@@ -10,11 +10,11 @@ class DummyClass extends Scope
     /**
      * Apply the scope to a given query builder.
      *
-     * @param \Statamic\Query\Builder $builder
+     * @param \Statamic\Query\Builder $query
      * @param array $values
      * @return void
      */
-    public function apply($builder, $values)
+    public function apply($query, $values)
     {
         //
     }
