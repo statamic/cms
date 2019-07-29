@@ -49,11 +49,13 @@ abstract class Filter extends Scope implements Arrayable
 
     protected function fieldItems()
     {
-        if ($this->field) {
-            return ['value' => $this->field];
+        if ($this->fields) {
+            return $this->fields;
         }
 
-        return $this->fields;
+        $field = $this->field ?? ['type' => 'text', 'display' => static::title()];
+
+        return ['value' => $field];
     }
 
     public function toArray()
