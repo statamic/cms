@@ -7,7 +7,9 @@ use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
 use Statamic\API\Taxonomy;
+use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
 class TaxonomiesController extends CpController
 {
@@ -62,5 +64,39 @@ class TaxonomiesController extends CpController
     public function create()
     {
         return view('statamic::taxonomies.create');
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorize('store', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+
+        $data = $request->validate([
+            'title' => 'required',
+            'handle' => 'nullable|alpha_dash',
+            'template' => 'nullable',
+            'route' => 'nullable',
+            'blueprint' => 'nullable',
+        ]);
+
+        $handle = $request->handle ?? snake_case($request->title);
+
+        $taxonomy = $this->updateTaxonomy(Taxonomy::make($handle), $data);
+
+        $taxonomy->save();
+
+        session()->flash('success', __('Taxonomy created'));
+
+        return [
+            'redirect' => $taxonomy->showUrl()
+        ];
+    }
+
+    protected function updateTaxonomy($taxonomy, $data)
+    {
+        return $taxonomy
+            ->title($data['title'])
+            ->route($data['route'])
+            ->template($data['template'])
+            ->termBlueprint($data['blueprint']);
     }
 }

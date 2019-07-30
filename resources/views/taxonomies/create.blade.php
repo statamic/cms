@@ -3,6 +3,8 @@
 
 @section('content')
 
-    TODO
+    <taxonomy-wizard
+        route="{{ cp_route('taxonomies.store') }}">
+    </taxonomy-wizard>
 
 @endsection

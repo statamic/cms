@@ -5,18 +5,20 @@ namespace Statamic\Data\Taxonomies;
 use Statamic\API;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
+use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as Contract;
 
 class Taxonomy implements Contract
 {
-    use FluentlyGetsAndSets;
+    use FluentlyGetsAndSets, ExistsAsFile;
 
     protected $handle;
     protected $route;
     protected $title;
     protected $template;
     protected $layout;
+    protected $termBlueprint;
 
     public function handle($handle = null)
     {
@@ -56,11 +58,16 @@ class Taxonomy implements Contract
         ]);
     }
 
-    public function termBlueprint()
+    public function termBlueprint($blueprint = null)
     {
-        return $this->ensureTermBlueprintFields(
-            Blueprint::find(config('statamic.theming.blueprints.default'))
-        );
+        return $this
+            ->fluentlyGetOrSet('termBlueprint')
+            ->getter(function ($blueprint) {
+                return $this->ensureTermBlueprintFields(
+                    $blueprint ? Blueprint::find($blueprint) : $this->fallbackTermBlueprint()
+                );
+            })
+            ->args(func_get_args());
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -70,6 +77,11 @@ class Taxonomy implements Contract
             ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
 
         return $blueprint;
+    }
+
+    public function fallbackTermBlueprint()
+    {
+        return Blueprint::find(config('statamic.theming.blueprints.default'));
     }
 
     public function sortField()
@@ -105,6 +117,23 @@ class Taxonomy implements Contract
                 return $layout ?? config('statamic.theming.views.layout');
             })
             ->args(func_get_args());
+    }
+
+    public function save()
+    {
+        API\Taxonomy::save($this);
+
+        return true;
+    }
+
+    public function fileData()
+    {
+        return [
+            'title' => $this->title,
+            'route' => $this->route,
+            'template' => $this->template,
+            'blueprint' => $this->termBlueprint,
+        ];
     }
 
     public static function __callStatic($method, $parameters)

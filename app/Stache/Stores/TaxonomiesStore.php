@@ -43,9 +43,6 @@ class TaxonomiesStore extends BasicStore
 
     public function save(TaxonomyContract $taxonomy)
     {
-        $path = $this->directory . '/' . $taxonomy->path() . '.yaml';
-        $contents = YAML::dump($taxonomy->data());
-
-        $this->files->put($path, $contents);
+        $this->files->put($taxonomy->path(), $taxonomy->fileContents());
     }
 }
