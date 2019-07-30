@@ -28,7 +28,7 @@ class TaxonomyRepository implements RepositoryContract
 
     public function save(Taxonomy $taxonomy)
     {
-        $this->store->setItem($taxonomy->path(), $taxonomy);
+        $this->store->setItem($taxonomy->handle(), $taxonomy);
 
         $this->store->save($taxonomy);
     }
