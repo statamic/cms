@@ -7,8 +7,10 @@ use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
 use Statamic\API\Taxonomy;
+use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
+use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
@@ -100,12 +102,88 @@ class TaxonomiesController extends CpController
         ];
     }
 
+    public function edit($taxonomy)
+    {
+        $this->authorize('edit', $taxonomy, 'You are not authorized to edit taxonomies.');
+
+        $values = $taxonomy->toArray();
+
+        $fields = ($blueprint = $this->editFormBlueprint())
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        return view('statamic::taxonomies.edit', [
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+            'taxonomy' => $taxonomy,
+        ]);
+    }
+
+    public function update(Request $request, $taxonomy)
+    {
+        $this->authorize('update', $taxonomy, 'You are not authorized to edit taxonomies.');
+
+        $validation = (new Validation)->fields(
+            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
+        );
+
+        $request->validate($validation->rules());
+
+        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->values());
+
+        $taxonomy->save();
+
+        return $taxonomy->toArray();
+    }
+
     protected function updateTaxonomy($taxonomy, $data)
     {
         return $taxonomy
             ->title($data['title'])
             ->route($data['route'])
             ->template($data['template'])
-            ->termBlueprint($data['blueprint']);
+            ->layout($data['layout'])
+            ->termBlueprint($data['term_blueprint']);
+    }
+
+    protected function editFormBlueprint()
+    {
+        return Blueprint::makeFromFields([
+            'title' => [
+                'type' => 'text',
+                'validate' => 'required',
+                'width' => 50,
+            ],
+            'handle' => [
+                'type' => 'text',
+                'validate' => 'required|alpha_dash',
+                'width' => 50,
+            ],
+
+            'content_model' => ['type' => 'section'],
+            'term_blueprint' => [
+                'type' => 'blueprints',
+                'instructions' => __('Terms in this taxonomy will use this blueprint.'),
+                'max_items' => 1,
+            ],
+            'template' => [
+                'type' => 'text',
+                'instructions' => __('The default template, unless otherwise specified.'),
+                'width' => 50
+            ],
+            'layout' => [
+                'type' => 'text',
+                'instructions' => __('The default layout, unless otherwise specified.'),
+                'width' => 50
+            ],
+
+            'routing' => ['type' => 'section'],
+            'route' => [
+                'type' => 'text',
+                'instructions' => __('The route controls the URL pattern all terms in the taxonomy will follow.'),
+            ],
+        ]);
     }
 }

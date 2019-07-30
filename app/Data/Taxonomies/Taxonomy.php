@@ -3,6 +3,7 @@
 namespace Statamic\Data\Taxonomies;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
@@ -128,11 +129,20 @@ class Taxonomy implements Contract
 
     public function fileData()
     {
+        return Arr::except($this->toArray(), [
+            'handle',
+        ]);
+    }
+
+    public function toArray()
+    {
         return [
             'title' => $this->title,
+            'handle' => $this->handle,
             'route' => $this->route,
             'template' => $this->template,
-            'blueprint' => $this->termBlueprint,
+            'layout' => $this->layout,
+            'term_blueprint' => $this->termBlueprint,
         ];
     }
 
