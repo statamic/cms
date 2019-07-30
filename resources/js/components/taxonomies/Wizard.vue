@@ -91,6 +91,33 @@
             </div>
         </div>
 
+        <div v-if="currentStep === 3">
+            <div class="max-w-md mx-auto px-2 py-6 text-center">
+                <h1 class="mb-3">Collections</h1>
+                <p class="text-grey">Create the links between taxonomy and collection.</p>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Collections</label>
+                <publish-field-meta
+                    :config="{ handle: 'collections', type: 'collections' }"
+                    :initial-value="taxonomy.collections">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            :config="{ handle: 'collections', type: 'collections' }"
+                            :value="value"
+                            :meta="meta"
+                            name="collections"
+                            @input="taxonomy.collections = $event" />
+                    </div>
+                </publish-field-meta>
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    When a collection is linked to a taxonomy, its entries will automatically get fields added to their forms.
+                </div>
+            </div>
+        </div>
+
         <div class="border-t p-2">
             <div class="max-w-md mx-auto flex items-center justify-center">
                 <button tabindex="3" class="btn mx-2 w-32" @click="previous" v-if="! onFirstStep">
@@ -118,7 +145,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Content Model', 'Routing'],
+            steps: ['Naming', 'Content Model', 'Routing', 'Collections'],
             currentStep: 0,
             taxonomy: {
                 title: null,
@@ -126,6 +153,7 @@ export default {
                 blueprint: null,
                 template: null,
                 route: null,
+                collections: [],
             }
         }
     },

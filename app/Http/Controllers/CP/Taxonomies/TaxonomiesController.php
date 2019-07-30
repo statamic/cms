@@ -8,6 +8,7 @@ use Statamic\CP\Column;
 use Statamic\API\Action;
 use Statamic\API\Taxonomy;
 use Illuminate\Http\Request;
+use Statamic\API\Collection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
@@ -76,6 +77,7 @@ class TaxonomiesController extends CpController
             'template' => 'nullable',
             'route' => 'nullable',
             'blueprint' => 'nullable',
+            'collections' => 'array',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -83,6 +85,13 @@ class TaxonomiesController extends CpController
         $taxonomy = $this->updateTaxonomy(Taxonomy::make($handle), $data);
 
         $taxonomy->save();
+
+        foreach ($request->collections as $collection) {
+            $collection = Collection::findByHandle($collection);
+            $collection->taxonomies(
+                $collection->taxonomies()->map->handle()->push($handle)->unique()->all()
+            )->save();
+        }
 
         session()->flash('success', __('Taxonomy created'));
 
