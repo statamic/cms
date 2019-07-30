@@ -141,7 +141,13 @@
 
 <script>
 // Yer a wizard Harry
+
+import HasWizardSteps from '../HasWizardSteps.js';
+
 export default {
+
+    mixins: [HasWizardSteps],
+
     props: {
         route: {
             type: String
@@ -151,7 +157,6 @@ export default {
     data() {
         return {
             steps: ['Naming', 'Purpose', 'Settings'],
-            currentStep: 0,
             purpose: null,
             structure: {
                 title: null,
@@ -165,15 +170,6 @@ export default {
     },
 
     computed: {
-        onFirstStep() {
-            return this.currentStep === 0;
-        },
-        onLastStep() {
-            return this.currentStep === this.steps.length - 1;
-        },
-        canContinue() {
-            return this.canGoToStep(this.currentStep + 1);
-        },
         canComplete() {
             return this.canGoToStep(3);
         }
@@ -186,21 +182,6 @@ export default {
     },
 
     methods: {
-        goToStep(n) {
-            if (this.canGoToStep(n)) {
-                this.currentStep = n;
-            }
-        },
-        next() {
-            if (! this.onLastStep) {
-                this.goToStep(this.currentStep + 1);
-            }
-        },
-        previous() {
-            if (! this.onFirstStep) {
-                this.goToStep(this.currentStep - 1);
-            }
-        },
         canGoToStep(step) {
             if (step === 1) {
                 return Boolean(this.structure.title && this.structure.handle);

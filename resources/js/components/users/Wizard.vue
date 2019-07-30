@@ -141,8 +141,12 @@ Username: {{ user.email }}
 // Yer a wizard Harry
 
 import isEmail from 'validator/lib/isEmail';
+import HasWizardSteps from '../HasWizardSteps.js';
 
 export default {
+
+    mixins: [HasWizardSteps],
+
     props: {
         route: {
             type: String
@@ -152,7 +156,6 @@ export default {
     data() {
         return {
             steps: ['User Information', 'Roles & Groups', 'Customize Invitation'],
-            currentStep: 0,
             user: {
                 email: null,
                 super_admin: true,
@@ -166,15 +169,6 @@ export default {
     },
 
     computed: {
-        onFirstStep() {
-            return this.currentStep === 0;
-        },
-        onLastStep() {
-            return this.currentStep === this.steps.length - 1;
-        },
-        canContinue() {
-            return this.canGoToStep(this.currentStep + 1);
-        },
         message: {
             get() {
                 return this.customizedMessage || `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.
@@ -194,21 +188,6 @@ For your security, the link below expires after 48 hours. After that, please con
     },
 
     methods: {
-        goToStep(n) {
-            if (this.canGoToStep(n)) {
-                this.currentStep = n;
-            }
-        },
-        next() {
-            if (! this.onLastStep) {
-                this.goToStep(this.currentStep + 1);
-            }
-        },
-        previous() {
-            if (! this.onFirstStep) {
-                this.goToStep(this.currentStep - 1);
-            }
-        },
         canGoToStep(step) {
             if (step === 1) {
                 return this.isValidEmail && ! this.userExists;
