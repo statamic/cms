@@ -15,10 +15,7 @@
             <dropdown-item :text="__('Delete Taxonomy')" class="warning"></dropdown-item>
         </dropdown-list>
         @can('create', ['Statamic\Contracts\Data\Taxonomies\Term', $taxonomy])
-            {{-- <create-term-button
-                url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
-                :blueprints="{{ $blueprints->toJson() }}">
-            </create-term-button> --}}
+            <a href="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}" class="btn btn-primary">{{ __('Create Term') }}</a>
         @endcan
     </div>
 
