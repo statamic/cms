@@ -105,6 +105,7 @@ class CollectionsController extends CpController
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
             'template' => 'nullable',
+            'layout' => 'nullable',
             'blueprints' => 'array',
             'route' => 'required_with:structure',
             'orderable' => 'boolean',
@@ -182,6 +183,7 @@ class CollectionsController extends CpController
             ->route($data['route'])
             ->dated($data['dated'])
             ->template($data['template'])
+            ->layout($data['layout'])
             ->structure($structure = array_get($data, 'structure'))
             ->orderable($structure ? false : $data['orderable'])
             ->ampable($data['amp'])

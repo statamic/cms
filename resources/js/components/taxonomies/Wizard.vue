@@ -42,16 +42,16 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
                 <publish-field-meta
-                    :config="{ handle: 'blueprint', type: 'blueprints' }"
-                    :initial-value="taxonomy.blueprint ? [taxonomy.blueprint] : []">
+                    :config="{ handle: 'term_blueprint', type: 'blueprints' }"
+                    :initial-value="taxonomy.term_blueprint ? [taxonomy.term_blueprint] : []">
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'blueprints', type: 'blueprints', max_items: 1 }"
+                            :config="{ handle: 'term_blueprint', type: 'blueprints', max_items: 1 }"
                             :value="value"
                             :meta="meta"
-                            name="blueprint"
-                            @input="taxonomy.blueprint = $event[0]" />
+                            name="term_blueprint"
+                            @input="taxonomy.term_blueprint = $event[0]" />
                     </div>
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
@@ -76,6 +76,25 @@
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default template.
+                </div>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Layout</label>
+                <publish-field-meta
+                    :config="{ handle: 'layout', type: 'template' }"
+                    :initial-value="taxonomy.layout">
+                    <div slot-scope="{ meta, value, loading }">
+                        <template-fieldtype
+                            :config="{ handle: 'layout', type: 'template' }"
+                            :value="value"
+                            :meta="meta"
+                            name="layout"
+                            @input="taxonomy.layout = $event" />
+                    </div>
+                </publish-field-meta>
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Set your default layout.
                 </div>
             </div>
         </div>
@@ -150,8 +169,9 @@ export default {
             taxonomy: {
                 title: null,
                 handle: null,
-                blueprint: null,
+                term_blueprint: null,
                 template: null,
+                layout: null,
                 route: null,
                 collections: [],
             }

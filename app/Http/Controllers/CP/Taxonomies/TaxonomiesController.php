@@ -77,8 +77,9 @@ class TaxonomiesController extends CpController
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
             'template' => 'nullable',
+            'layout' => 'nullable',
             'route' => 'nullable',
-            'blueprint' => 'nullable',
+            'term_blueprint' => 'nullable',
             'collections' => 'array',
         ]);
 

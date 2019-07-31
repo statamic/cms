@@ -165,6 +165,25 @@
                     Set your default template.
                 </div>
             </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Layout</label>
+                <publish-field-meta
+                    :config="{ handle: 'layout', type: 'template' }"
+                    :initial-value="collection.layout">
+                    <div slot-scope="{ meta, value, loading }">
+                        <template-fieldtype
+                            :config="{ handle: 'layout', type: 'template' }"
+                            :value="value"
+                            :meta="meta"
+                            name="layout"
+                            @input="collection.layout = $event" />
+                    </div>
+                </publish-field-meta>
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Set your default layout.
+                </div>
+            </div>
             <div class="max-w-md mx-auto px-2 pb-6">
                 <label class="font-bold text-base mb-sm" for="defaultStatus">Default Status</label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-2">
@@ -281,6 +300,7 @@ export default {
                 sortDirection: 'desc',
                 blueprints: [],
                 template: null,
+                layout: null,
                 route: null,
                 amp: false,
                 structure: null,
