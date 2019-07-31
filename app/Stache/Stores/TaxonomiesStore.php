@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Taxonomy;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
@@ -18,12 +19,16 @@ class TaxonomiesStore extends BasicStore
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
 
+        $sites = array_get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
+
         return Taxonomy::make($handle)
             ->title(array_get($data, 'title'))
             ->route(array_get($data, 'route'))
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
-            ->termBlueprint(array_get($data, 'blueprint'));
+            ->termBlueprint(array_get($data, 'blueprint'))
+            ->revisionsEnabled(array_get($data, 'revisions'))
+            ->sites($sites);
     }
 
     public function getItemKey($item, $path)

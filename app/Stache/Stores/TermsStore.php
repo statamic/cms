@@ -6,6 +6,7 @@ use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Path;
+use Statamic\API\Site;
 use Statamic\API\Term;
 use Statamic\API\YAML;
 use Statamic\API\Taxonomy;
@@ -37,30 +38,55 @@ class TermsStore extends AggregateStore
         // The taxonomy has been deleted.
         throw_unless($taxonomy, new StoreExpiredException);
 
-        return $cache->map(function ($item, $id) use ($taxonomy) {
-            return Term::make()
+        return $cache->map(function ($item) use ($taxonomy) {
+            $term = Term::make()
                 ->taxonomy($taxonomy)
+                ->locale($item['locale'])
                 ->slug($item['slug'])
                 ->initialPath($item['path'])
                 ->data($item['data']);
+
+            if ($item['origin']) {
+                $this->localizationQueue[] = [
+                    'origin' => $item['origin'],
+                    'localization' => $term,
+                ];
+            }
+
+            return $term;
         });
     }
 
     public function createItemFromFile($path, $contents)
     {
+        $site = Site::default()->handle();
         $taxonomy = pathinfo($path, PATHINFO_DIRNAME);
         $taxonomy = str_after($taxonomy, $this->directory);
+
+        if (Site::hasMultiple()) {
+            list($taxonomy, $site) = explode('/', $taxonomy);
+        }
 
         // Support terms within subdirectories at any level.
         if (str_contains($taxonomy, '/')) {
             $taxonomy = str_before($taxonomy, '/');
         }
 
-        return Term::make()
+        $term = Term::make()
             ->taxonomy(Taxonomy::findByHandle($taxonomy))
             ->slug(pathinfo(Path::clean($path), PATHINFO_FILENAME))
             ->initialPath($path)
-            ->data(YAML::parse($contents));
+            ->locale($site)
+            ->data(Arr::except($data = YAML::parse($contents), 'origin'));
+
+        if ($origin = Arr::pull($data, 'origin')) {
+            $this->localizationQueue[] = [
+                'origin' => $origin,
+                'localization' => $term,
+            ];
+        }
+
+        return $term;
     }
 
     public function getItemKey($item, $path)

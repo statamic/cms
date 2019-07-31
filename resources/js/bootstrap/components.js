@@ -23,6 +23,7 @@ Vue.component('live-preview', require('../components/live-preview/LivePreview.vu
 Vue.component('live-preview-popout', require('../components/live-preview/Popout.vue'));
 
 Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue'));
+Vue.component('TermPublishForm', require('../components/terms/PublishForm.vue'));
 Vue.component('UserPublishForm', require('../components/users/PublishForm.vue'));
 
 // Data List

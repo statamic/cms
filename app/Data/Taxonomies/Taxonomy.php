@@ -20,6 +20,7 @@ class Taxonomy implements Contract
     protected $template;
     protected $layout;
     protected $termBlueprint;
+    protected $sites = [];
 
     public function handle($handle = null)
     {
@@ -144,6 +145,30 @@ class Taxonomy implements Contract
             'layout' => $this->layout,
             'term_blueprint' => $this->termBlueprint,
         ];
+    }
+
+    public function sites($sites = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sites')
+            ->getter(function ($sites) {
+                return collect($sites);
+            })
+            ->args(func_get_args());
+    }
+
+    public function revisionsEnabled($enabled = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($enabled) {
+                if (! config('statamic.revisions.enabled')) {
+                    return false;
+                }
+
+                return $enabled;
+            })
+            ->args(func_get_args());
     }
 
     public static function __callStatic($method, $parameters)

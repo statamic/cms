@@ -3,6 +3,7 @@
 namespace Statamic\Data\Taxonomies;
 
 use Statamic\API;
+use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Data;
 use Statamic\API\File;
@@ -14,10 +15,12 @@ use Statamic\API\Config;
 use Statamic\API\Stache;
 use Statamic\API\Fieldset;
 use Statamic\Data\Routable;
+use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
+use Statamic\Revisions\Revisable;
 use Statamic\Data\Content\Content;
 use Statamic\Data\Services\TermsService;
 use Statamic\API\Taxonomy as TaxonomyAPI;
@@ -30,16 +33,22 @@ use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
 class Term implements TermContract, Responsable, AugmentableContract
 {
-    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable;
+    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable, Revisable, HasOrigin;
 
     protected $taxonomy;
     protected $template;
     protected $layout;
+    protected $locale;
     protected $collection;
 
     public function id()
     {
         return $this->taxonomyHandle() . '::' . $this->slug();
+    }
+
+    public function locale($locale = null)
+    {
+        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
     public function taxonomy($taxonomy = null)
@@ -80,11 +89,6 @@ class Term implements TermContract, Responsable, AugmentableContract
         ]);
     }
 
-    public function values()
-    {
-        return $this->data();
-    }
-
     public function blueprint()
     {
         return $this->taxonomy->termBlueprint();
@@ -104,22 +108,28 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function fileData()
     {
-        return $this->data();
+        $array = array_merge($this->data(), [
+            'origin' => optional($this->origin)->id(),
+            'published' => $this->published === false ? false : null,
+        ]);
+
+        if ($this->blueprint) {
+            $array['blueprint'] = $this->blueprint;
+        }
+
+        return $array;
     }
 
     public function toCacheableArray()
     {
         return [
             'taxonomy' => $this->taxonomyHandle(),
+            'locale' => $this->locale,
+            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
             'slug' => $this->slug(),
             'path' => $this->initialPath() ?? $this->path(),
             'data' => $this->data(),
         ];
-    }
-
-    public function published()
-    {
-        return true;
     }
 
     public function private()
@@ -200,7 +210,7 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function editUrl()
     {
-        return cp_route('taxonomies.terms.edit', [$this->taxonomyHandle(), $this->slug()]);
+        return $this->cpUrl('taxonomies.terms.edit');
     }
 
     public function save()
@@ -209,4 +219,80 @@ class Term implements TermContract, Responsable, AugmentableContract
 
         return true;
     }
+
+    public function reference()
+    {
+        return "term::{$this->id()}";
+    }
+
+    public function updateUrl()
+    {
+        return $this->cpUrl('taxonomies.terms.update');
+    }
+
+    public function publishUrl()
+    {
+        return $this->cpUrl('taxonomies.terms.published.store');
+    }
+
+    public function revisionsUrl()
+    {
+        return $this->cpUrl('taxonomies.terms.revisions.index');
+    }
+
+    public function createRevisionUrl()
+    {
+        return $this->cpUrl('taxonomies.terms.revisions.store');
+    }
+
+    public function restoreRevisionUrl()
+    {
+        return $this->cpUrl('taxonomies.terms.restore-revision');
+    }
+
+    protected function cpUrl($route)
+    {
+        return cp_route($route, [$this->taxonomyHandle(), $this->slug(), $this->locale()]);
+    }
+
+    public function revisionsEnabled()
+    {
+        return $this->taxonomy()->revisionsEnabled();
+    }
+
+    protected function revisionKey()
+    {
+        return vsprintf('taxonomies/%s/%s/%s', [
+            $this->taxonomyHandle(),
+            $this->locale(),
+            $this->slug()
+        ]);
+    }
+
+    protected function revisionAttributes()
+    {
+        return [
+            'id' => $this->id(),
+            'slug' => $this->slug(),
+            'published' => $this->published(),
+            'data' => Arr::except($this->data(), ['updated_by', 'updated_at']),
+        ];
+    }
+
+    public function makeFromRevision($revision)
+    {
+        $entry = clone $this;
+
+        if (! $revision) {
+            return $entry;
+        }
+
+        $attrs = $revision->attributes();
+
+        return $entry
+            ->published($attrs['published'])
+            ->data($attrs['data'])
+            ->slug($attrs['slug']);
+    }
+
 }

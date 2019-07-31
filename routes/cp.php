@@ -70,8 +70,18 @@ Route::group([
             Route::get('actions', 'TermActionController@index')->name('taxonomies.terms.actions');
             Route::post('actions', 'TermActionController@run');
 
-            Route::group(['prefix' => '{term}'], function () {
+            Route::group(['prefix' => '{term}/{site}'], function () {
                 Route::get('/', 'TermsController@edit')->name('taxonomies.terms.edit');
+                Route::post('/', 'PublishedTermsController@store')->name('taxonomies.terms.published.store');
+                Route::delete('/', 'PublishedTermsController@destroy')->name('taxonomies.terms.published.destroy');
+
+                Route::resource('revisions', 'TermRevisionsController', [
+                    'as' => 'taxonomies.terms',
+                    'only' => ['index', 'store', 'show'],
+                ]);
+
+                Route::post('restore-revision', 'RestoreTermRevisionController')->name('taxonomies.terms.restore-revision');
+                Route::patch('/', 'TermsController@update')->name('taxonomies.terms.update');
             });
         });
     });

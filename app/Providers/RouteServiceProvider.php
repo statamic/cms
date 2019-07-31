@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\API\Site;
+use Statamic\API\Term;
 use Statamic\API\Entry;
 use Statamic\API\Taxonomy;
 use Statamic\API\Collection;
@@ -51,7 +52,15 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindTerms()
     {
-        
+        Route::bind('term', function ($term, $route) {
+            $id = $route->parameter('taxonomy')->handle() . '::' . $term;
+            abort_if(
+                ! ($term = Term::find($id))
+                || $term->taxonomy() !== $route->parameter('taxonomy')
+            , 404);
+
+            return $term;
+        });
     }
 
     protected function bindSites()
@@ -65,10 +74,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindRevisions()
     {
         Route::bind('revision', function ($revision, $route) {
-            abort_if(
-                ! ($entry = $route->parameter('entry'))
-                || ! $revision = $entry->revision($revision)
-            , 404);
+            if ($route->hasParameter('entry')) {
+                $content = $route->parameter('entry');
+            } elseif ($route->hasParameter('term')) {
+                $content = $route->parameter('term');
+            } else {
+                abort(404);
+            }
+
+            abort_if(! $revision = $content->revision($revision), 404);
 
             return $revision;
         });
