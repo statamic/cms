@@ -7,6 +7,7 @@ use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\View\Modify;
 use Statamic\Fields\Value;
+use Statamic\Query\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -256,9 +257,10 @@ class Parser
 
             $value = $this->getVariable($var = trim($match[1][0]), $data);
 
-            if (! $value) {
+            if (! $value || $value instanceof Builder) {
                 // Must be a callback block. Extract it so it doesn't
                 // conflict with local scope variables in the next step.
+                // Also, treat it like a callback if it's a query builder so it can be sent through the query tag.
                 $text = $this->createExtraction('callback_blocks', $match[0][0], $match[0][0], $text);
                 continue;
             }
@@ -554,7 +556,15 @@ class Parser
 
             $replacement = null; // oh look, another temporary variable.
 
-            $replacement = call_user_func_array($this->callback, [$this, $name, $parameters, $content, $data]);
+            // If there's a matching value in the context, we would have intentionally treated it as
+            // a callback. If it's a query builder instance, we want to use the Query tag's index
+            // method to handle the logic. We'll pass the builder into the builder parameter.
+            if (isset($data[$name]) && $data[$name] instanceof Builder) {
+                $parameters['builder'] = $data[$name];
+                $name = 'query';
+            }
+
+            $replacement = call_user_func_array($this->callback, [$this, $name, $parameters,$content, $data]);
 
             // Commenting out this line makes no change to parser test coverage.
             // TODO: Work out what it's supposed to be doing and write a test.
