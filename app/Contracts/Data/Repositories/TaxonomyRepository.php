@@ -9,4 +9,5 @@ interface TaxonomyRepository
 {
     public function all(): Collection;
     public function findByHandle($handle): ?Taxonomy;
+    public function findByUri(string $uri): ?Taxonomy;
 }

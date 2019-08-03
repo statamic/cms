@@ -10,6 +10,7 @@ use Statamic\Contracts\Assets\AssetRepository;
 use Statamic\Contracts\Data\Repositories\TermRepository;
 use Statamic\Contracts\Data\Repositories\EntryRepository;
 use Statamic\Contracts\Data\Repositories\GlobalRepository;
+use Statamic\Contracts\Data\Repositories\TaxonomyRepository;
 
 class DataRepository
 {
@@ -17,6 +18,7 @@ class DataRepository
         'route' => RouteRepository::class,
         'entry' => EntryRepository::class,
         'term' => TermRepository::class,
+        'taxonomy' => TaxonomyRepository::class,
         'global' => GlobalRepository::class,
         'asset' => AssetRepository::class,
         'user' => UserRepository::class,

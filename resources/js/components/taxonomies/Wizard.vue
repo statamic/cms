@@ -59,58 +59,9 @@
                     You can pick an existing Blueprint or creates a new one.
                 </div>
             </div>
-            <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Template</label>
-                <publish-field-meta
-                    :config="{ handle: 'template', type: 'template' }"
-                    :initial-value="taxonomy.template">
-                    <div slot-scope="{ meta, value, loading }">
-                        <template-fieldtype
-                            :config="{ handle: 'template', type: 'template' }"
-                            :value="value"
-                            :meta="meta"
-                            name="template"
-                            @input="taxonomy.template = $event" />
-                    </div>
-                </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Set your default template.
-                </div>
-            </div>
-            <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Layout</label>
-                <publish-field-meta
-                    :config="{ handle: 'layout', type: 'template' }"
-                    :initial-value="taxonomy.layout">
-                    <div slot-scope="{ meta, value, loading }">
-                        <template-fieldtype
-                            :config="{ handle: 'layout', type: 'template' }"
-                            :value="value"
-                            :meta="meta"
-                            name="layout"
-                            @input="taxonomy.layout = $event" />
-                    </div>
-                </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Set your default layout.
-                </div>
-            </div>
         </div>
 
         <div v-if="currentStep === 2">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Routing</h1>
-                <p class="text-grey">Route rules determine the URL pattern of your taxonomy's entries.</p>
-            </div>
-            <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
-                <input type="text" v-model="taxonomy.route" class="input-text">
-            </div>
-        </div>
-
-        <div v-if="currentStep === 3">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Collections</h1>
                 <p class="text-grey">Create the links between taxonomy and collection.</p>
@@ -164,7 +115,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Content Model', 'Routing', 'Collections'],
+            steps: ['Naming', 'Content Model', 'Collections'],
             currentStep: 0,
             taxonomy: {
                 title: null,

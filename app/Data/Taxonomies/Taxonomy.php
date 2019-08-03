@@ -8,28 +8,22 @@ use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
+use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as Contract;
 
-class Taxonomy implements Contract
+class Taxonomy implements Contract, Responsable
 {
     use FluentlyGetsAndSets, ExistsAsFile;
 
     protected $handle;
-    protected $route;
     protected $title;
-    protected $template;
-    protected $layout;
     protected $termBlueprint;
     protected $sites = [];
+    protected $collection;
 
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
-    }
-
-    public function route($route = null)
-    {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args());
     }
 
     public function title($title = null)
@@ -101,26 +95,6 @@ class Taxonomy implements Contract
         return API\Term::query()->where('taxonomy', $this->handle());
     }
 
-    public function template($template = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('template')
-            ->getter(function ($template) {
-                return $template ?? config('statamic.theming.views.term');
-            })
-            ->args(func_get_args());
-    }
-
-    public function layout($layout = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('layout')
-            ->getter(function ($layout) {
-                return $layout ?? config('statamic.theming.views.layout');
-            })
-            ->args(func_get_args());
-    }
-
     public function save()
     {
         API\Taxonomy::save($this);
@@ -140,9 +114,6 @@ class Taxonomy implements Contract
         return [
             'title' => $this->title,
             'handle' => $this->handle,
-            'route' => $this->route,
-            'template' => $this->template,
-            'layout' => $this->layout,
             'term_blueprint' => $this->termBlueprint,
         ];
     }
@@ -169,6 +140,39 @@ class Taxonomy implements Contract
                 return $enabled;
             })
             ->args(func_get_args());
+    }
+
+    public function uri()
+    {
+        return '/' . $this->handle;
+    }
+
+    public function collection($collection = null)
+    {
+        return $this->fluentlyGetOrSet('collection')->args(func_get_args());
+    }
+
+    public function toResponse($request)
+    {
+        return (new \Statamic\Http\Responses\DataResponse($this))
+            ->with([$this->handle() => $this->queryTerms()])
+            ->toResponse($request);
+    }
+
+    public function get($key, $fallback = null)
+    {
+        // todo: Only used in DataResponse, added this method to prevent errors.
+        return $fallback;
+    }
+
+    public function template()
+    {
+        return 'taxonomy'; // todo: get it from the collection
+    }
+
+    public function layout()
+    {
+        return config('statamic.theming.views.layout');
     }
 
     public static function __callStatic($method, $parameters)

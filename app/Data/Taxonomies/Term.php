@@ -72,10 +72,10 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function route()
     {
-        $route = $this->taxonomy()->route();
+        $route = '/' . str_replace('_', '-', $this->taxonomyHandle()) . '/{slug}';
 
         if ($this->collection) {
-            $route = $this->collection()->url() . '/' . $route;
+            $route = $this->collection()->url() . $route;
         }
 
         return $route;
@@ -157,7 +157,7 @@ class Term implements TermContract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                return $template ?? $this->taxonomy()->template();
+                return $template ?? config('statamic.theming.views.term'); // todo: get the fallback template from the collection
             })
             ->args(func_get_args());
     }
@@ -167,7 +167,7 @@ class Term implements TermContract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? $this->taxonomy()->layout();
+                return $layout ?? config('statamic.theming.views.layout');
             })
             ->args(func_get_args());
     }

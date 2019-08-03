@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Responses;
 
+use Statamic\API\Site;
 use Statamic\Statamic;
 use Statamic\View\View;
 use Facades\Statamic\View\Cascade;
@@ -15,6 +16,7 @@ class DataResponse implements Responsable
     protected $data;
     protected $request;
     protected $headers = [];
+    protected $with = [];
 
     public function __construct($data)
     {
@@ -51,7 +53,10 @@ class DataResponse implements Responsable
     {
         $finder = view()->getFinder();
         $amp = Statamic::isAmpRequest();
-        $site = $this->data->site()->handle();
+
+        $site = method_exists($this->data, 'site')
+            ? $this->data->site()->handle()
+            : Site::current()->handle();
 
         $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
             return [
@@ -100,6 +105,10 @@ class DataResponse implements Responsable
 
     protected function handleDraft()
     {
+        if (! method_exists($this->data, 'published')) {
+            return $this;
+        }
+
         if ($this->data->published()) {
             return $this;
         }
@@ -117,6 +126,10 @@ class DataResponse implements Responsable
 
     protected function handlePrivateEntries()
     {
+        if (! method_exists($this->data, 'private')) {
+            return $this;
+        }
+
         throw_if($this->data->private(), new NotFoundHttpException);
 
         return $this;
@@ -127,6 +140,7 @@ class DataResponse implements Responsable
         return (new View)
             ->template($this->data->template())
             ->layout($this->data->layout())
+            ->with($this->with)
             ->cascadeContent($this->data)
             ->render();
     }
@@ -173,6 +187,13 @@ class DataResponse implements Responsable
         foreach ($this->data->get('headers', []) as $header => $value) {
             $this->headers[$header] = $value;
         }
+
+        return $this;
+    }
+
+    public function with($data)
+    {
+        $this->with = $data;
 
         return $this;
     }

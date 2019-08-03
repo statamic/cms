@@ -76,9 +76,6 @@ class TaxonomiesController extends CpController
         $data = $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'template' => 'nullable',
-            'layout' => 'nullable',
-            'route' => 'nullable',
             'term_blueprint' => 'nullable',
             'collections' => 'array',
         ]);
@@ -143,9 +140,6 @@ class TaxonomiesController extends CpController
     {
         return $taxonomy
             ->title($data['title'])
-            ->route($data['route'])
-            ->template($data['template'])
-            ->layout($data['layout'])
             ->termBlueprint($data['term_blueprint']);
     }
 
@@ -168,22 +162,6 @@ class TaxonomiesController extends CpController
                 'type' => 'blueprints',
                 'instructions' => __('Terms in this taxonomy will use this blueprint.'),
                 'max_items' => 1,
-            ],
-            'template' => [
-                'type' => 'text',
-                'instructions' => __('The default template, unless otherwise specified.'),
-                'width' => 50
-            ],
-            'layout' => [
-                'type' => 'text',
-                'instructions' => __('The default layout, unless otherwise specified.'),
-                'width' => 50
-            ],
-
-            'routing' => ['type' => 'section'],
-            'route' => [
-                'type' => 'text',
-                'instructions' => __('The route controls the URL pattern all terms in the taxonomy will follow.'),
             ],
         ]);
     }

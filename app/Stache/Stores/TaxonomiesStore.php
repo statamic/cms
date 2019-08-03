@@ -23,9 +23,6 @@ class TaxonomiesStore extends BasicStore
 
         return Taxonomy::make($handle)
             ->title(array_get($data, 'title'))
-            ->route(array_get($data, 'route'))
-            ->template(array_get($data, 'template'))
-            ->layout(array_get($data, 'layout'))
             ->termBlueprint(array_get($data, 'blueprint'))
             ->revisionsEnabled(array_get($data, 'revisions'))
             ->sites($sites);
