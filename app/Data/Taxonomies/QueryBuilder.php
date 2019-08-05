@@ -19,6 +19,11 @@ class QueryBuilder extends BaseQueryBuilder
             return $this;
         }
 
+        if ($column === 'collection') {
+            $this->collections[] = $operator;
+            return $this;
+        }
+
         if ($column === 'site') {
             throw new \Exception('handle querying terms by site');
             $this->site = $operator;
