@@ -67,7 +67,7 @@ class QueryBuilder extends BaseQueryBuilder
 
         [$taxonomy, $slug] = explode('::', $this->taxonomyTerm);
 
-        $ids = $associations[$taxonomy][$slug] ?? [];
+        $ids = collect($associations[$taxonomy][$slug] ?? [])->pluck('id')->all();
 
         $query = Entry::query()->whereIn('id', $ids);
 
