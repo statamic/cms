@@ -7,14 +7,14 @@ use Statamic\Tags\OutputsItems;
 
 class Query extends Tags
 {
-    use GetsResults, OutputsItems;
+    use GetsResults, OutputsItems, HasConditions;
 
     /**
      * {{ query builder="" }} ... {{ /query }}
      */
     public function index()
     {
-        return $this->output($this->results($this->parameters->get('builder')));
+        return $this->evaluate($this->parameters->get('builder'));
     }
 
     /**
@@ -22,6 +22,13 @@ class Query extends Tags
      */
     public function wildcard($tag)
     {
-        return $this->output($this->results($this->context->get($tag)));
+        return $this->evaluate($this->context->get($tag));
+    }
+
+    protected function evaluate($builder)
+    {
+        $this->queryConditions($builder);
+
+        return $this->output($this->results($builder));
     }
 }
