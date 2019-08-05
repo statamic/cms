@@ -265,12 +265,16 @@ class Parser
                 continue;
             }
 
+            if ($value instanceof Collection) {
+                $value = $value->values();
+            }
+
             if ($value instanceof Augmentable || $value instanceof Collection) {
-                $value = $value->values()->toAugmentedArray();
+                $value = $value->toAugmentedArray();
             }
 
             if ($value instanceof Arrayable) {
-                $value = $value->values()->toArray();
+                $value = $value->toArray();
             }
 
             // If it's not an array, the user is trying to loop over something unloopable.
