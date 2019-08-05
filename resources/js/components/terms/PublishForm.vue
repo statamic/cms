@@ -2,7 +2,7 @@
 
     <div>
         <div class="subhead">
-            <a :href="collectionUrl" v-text="collectionTitle" class="font-bold hover:text-blue" />
+            <a :href="taxonomyUrl" v-text="taxonomyTitle" class="font-bold hover:text-blue" />
         </div>
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
@@ -246,8 +246,8 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         initialIsWorkingCopy: Boolean,
-        collectionTitle: String,
-        collectionUrl: String,
+        taxonomyTitle: String,
+        taxonomyUrl: String,
         initialActions: Object,
         method: String,
         amp: Boolean,
@@ -432,7 +432,7 @@ export default {
                 this.localizedFields = data.localizedFields;
                 this.hasOrigin = data.hasOrigin;
                 this.publishUrl = data.actions[this.action];
-                this.collection = data.collection;
+                this.taxonomy = data.taxonomy;
                 this.title = data.editing ? data.values.title : this.title;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
