@@ -180,7 +180,8 @@ class Term implements TermContract, Responsable, AugmentableContract
             'uri' => $this->uri(),
             'url' => $this->url(),
             'title' => $this->title(),
-            'entries' => $this->entries(),
+            'entries' => $entryQuery = $this->queryEntries(),
+            'entries_count' => $entryQuery->count(),
         ]);
     }
 
