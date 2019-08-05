@@ -93,7 +93,13 @@ class Taxonomy implements Contract, Responsable
 
     public function queryTerms()
     {
-        return API\Term::query()->where('taxonomy', $this->handle());
+        $query = API\Term::query()->where('taxonomy', $this->handle());
+
+        if ($this->collection) {
+            $query->where('collection', $this->collection->handle());
+        }
+
+        return $query;
     }
 
     public function save()
