@@ -15,6 +15,7 @@ abstract class AggregateStore extends Store
     protected $stores;
     protected $files;
     protected $childStoreCreator;
+    protected $updated = false;
 
     public function __construct(Stache $stache, Filesystem $files)
     {
@@ -129,7 +130,7 @@ abstract class AggregateStore extends Store
 
     public function markAsUpdated()
     {
-        $this->stores->each->markAsUpdated();
+        $this->updated = true;
 
         return $this;
     }
@@ -149,13 +150,7 @@ abstract class AggregateStore extends Store
 
     public function isUpdated()
     {
-        foreach ($this->stores as $store) {
-            if ($store->isUpdated()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->updated;
     }
 
     public function isExpired()
