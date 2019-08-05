@@ -392,7 +392,8 @@ class Parser
                     // we only want to continue if:
                     //   - $val has no value according to the parser
                     //   - $val *does* have a value, it's falsey, there are multiple options, *and* we're not on the last one
-                    if ($val == '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1))) {
+                    // a $val that's literally a zero should be considered a value.
+                    if ($val !== 0 && ($val == '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1)))) {
                         continue;
                     } else {
                         // prevent arrays trying to be printed as a string
