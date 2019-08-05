@@ -559,9 +559,14 @@ class Parser
             // If there's a matching value in the context, we would have intentionally treated it as
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
-            if (isset($data[$name]) && $data[$name] instanceof Builder) {
-                $parameters['builder'] = $data[$name];
-                $name = 'query';
+            if (isset($data[$name])) {
+                if ($data[$name] instanceof Value) {
+                    $data[$name] = $data[$name]->raw();
+                }
+                if ($data[$name] instanceof Builder) {
+                    $parameters['builder'] = $data[$name];
+                    $name = 'query';
+                }
             }
 
             $replacement = call_user_func_array($this->callback, [$this, $name, $parameters,$content, $data]);
