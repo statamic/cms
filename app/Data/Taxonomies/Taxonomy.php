@@ -161,7 +161,10 @@ class Taxonomy implements Contract, Responsable
     public function toResponse($request)
     {
         return (new \Statamic\Http\Responses\DataResponse($this))
-            ->with([$this->handle() => $this->queryTerms()])
+            ->with([
+                'terms' => $termQuery = $this->queryTerms(),
+                $this->handle() => $termQuery,
+            ])
             ->toResponse($request);
     }
 
