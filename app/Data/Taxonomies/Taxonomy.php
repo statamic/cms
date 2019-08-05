@@ -20,6 +20,7 @@ class Taxonomy implements Contract, Responsable
     protected $termBlueprint;
     protected $sites = [];
     protected $collection;
+    protected $defaultStatus = 'published';
 
     public function handle($handle = null)
     {
@@ -107,6 +108,11 @@ class Taxonomy implements Contract, Responsable
         return Arr::except($this->toArray(), [
             'handle',
         ]);
+    }
+
+    public function defaultStatus($status = null)
+    {
+        return $this->fluentlyGetOrSet('defaultStatus')->args(func_get_args());
     }
 
     public function toArray()

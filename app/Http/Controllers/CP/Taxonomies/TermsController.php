@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Statamic\API\Site;
+use Statamic\API\Term;
 use Statamic\API\Asset;
 use Statamic\API\Entry;
 use Statamic\CP\Column;
@@ -200,6 +201,97 @@ class TermsController extends CpController
         }
 
         return $term->toArray();
+    }
+
+    public function create(Request $request, $taxonomy, $site)
+    {
+        $this->authorize('create', [TermContract::class, $taxonomy]);
+
+        $blueprint = $request->blueprint
+            ? Blueprint::find($request->blueprint)
+            : $taxonomy->termBlueprint();
+
+        if (! $blueprint) {
+            throw new \Exception('A valid blueprint is required.');
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->preProcess();
+
+        $values = array_merge($fields->values(), [
+            'title' => null,
+            'slug' => null
+        ]);
+
+        $viewData = [
+            'title' => __('Create Term'),
+            'actions' => [
+                'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()])
+            ],
+            'values' => $values,
+            'meta' => $fields->meta(),
+            'taxonomy' => $this->taxonomyToArray($taxonomy),
+            'blueprint' => $blueprint->toPublishArray(),
+            'published' => $taxonomy->defaultStatus() === 'published',
+            'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $site->handle(),
+                    'exists' => false,
+                    'published' => false,
+                    'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
+                ];
+            })->all()
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::terms.create', $viewData);
+    }
+
+    public function store(Request $request, $taxonomy, $site)
+    {
+        $this->authorize('store', [TermContract::class, $taxonomy]);
+
+        $blueprint = $taxonomy->termBlueprint();
+
+        $fields = $blueprint->fields()->addValues($request->all())->process();
+
+        $validation = (new Validation)->fields($fields)->withRules([
+            'title' => 'required',
+            'slug' => 'required',
+        ]);
+
+        $request->validate($validation->rules());
+
+        $values = array_except($fields->values(), ['slug', 'blueprint']);
+
+        $term = Term::make()
+            ->taxonomy($taxonomy)
+            ->locale($site->handle())
+            ->published($request->get('published'))
+            ->slug($request->slug)
+            ->data($values);
+
+        if ($term->revisionsEnabled()) {
+            $term->store([
+                'message' => $request->message,
+                'user' => $request->user(),
+            ]);
+        } else {
+            $term
+                ->set('updated_by', $request->user()->id())
+                ->set('updated_at', now()->timestamp)
+                ->save();
+        }
+
+        return array_merge($term->toArray(), [
+            'redirect' => $term->editUrl(),
+        ]);
     }
 
     // TODO: Change to $taxonomy->toArray()

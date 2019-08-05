@@ -66,9 +66,10 @@ Route::group([
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
-            Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::get('actions', 'TermActionController@index')->name('taxonomies.terms.actions');
             Route::post('actions', 'TermActionController@run');
+            Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
+            Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
 
             Route::group(['prefix' => '{term}/{site}'], function () {
                 Route::get('/', 'TermsController@edit')->name('taxonomies.terms.edit');
