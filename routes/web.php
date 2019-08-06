@@ -33,7 +33,7 @@ Route::name('statamic.')->group(function () {
     });
 
     if (OAuth::enabled()) {
-        Route::get(config('statamic.oauth.routes.redirect'), 'OAuthController@redirectToProvider')->name('oauth.redirect');
+        Route::get(config('statamic.oauth.routes.login'), 'OAuthController@redirectToProvider')->name('oauth.login');
         Route::get(config('statamic.oauth.routes.callback'), 'OAuthController@handleProviderCallback')->name('oauth.callback');
     }
 });

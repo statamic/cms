@@ -9,7 +9,7 @@ return [
     ],
 
     'routes' => [
-        'redirect' => 'oauth/{provider}',
+        'login' => 'oauth/{provider}',
         'callback' => 'oauth/{provider}/callback'
     ],
 

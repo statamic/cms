@@ -47,9 +47,9 @@ class Provider
         return $user;
     }
 
-    public function redirectUrl()
+    public function loginUrl()
     {
-        return route('statamic.oauth.redirect', $this->name);
+        return route('statamic.oauth.login', $this->name);
     }
 
     public function label()

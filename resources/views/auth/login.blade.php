@@ -14,7 +14,7 @@
             <div class="login-oauth-providers">
                 @foreach ($providers as $provider)
                     <div class="provider">
-                        <a href="{{ $provider->redirectUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
+                        <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
                             {{ __('Login with :provider', ['provider' => $provider->label()]) }}
                         </a>
                     </div>

@@ -39,7 +39,7 @@ class Tags extends BaseTags
      */
     protected function generateLoginUrl($provider)
     {
-        $url = OAuth::provider($provider)->redirectUrl();
+        $url = OAuth::provider($provider)->loginUrl();
 
         if ($redirect = $this->get('redirect')) {
             $url .= "?redirect=$redirect";
