@@ -144,7 +144,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Mix::class,
         Tags\Nav::class,
         Tags\NotFound::class,
-        Tags\OAuth::class,
         Tags\Obfuscate::class,
         Tags\ParentTags::class,
         Tags\Partial::class,
@@ -168,6 +167,7 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Tags::class,
         \Statamic\Auth\UserTags::class,
         \Statamic\Auth\Protect\Tags::class,
+        \Statamic\OAuth\Tags::class,
         \Statamic\Search\Tags::class,
     ];
 

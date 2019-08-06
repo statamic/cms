@@ -46,6 +46,11 @@ class Provider
         return $user;
     }
 
+    public function redirectUrl()
+    {
+        return route('statamic.oauth.redirect', $this->name);
+    }
+
     protected function getIds()
     {
         if (! File::exists($path = $this->storagePath())) {

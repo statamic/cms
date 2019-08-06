@@ -1,24 +1,22 @@
 <?php
 
-namespace Statamic\Tags;
+namespace Statamic\OAuth;
 
-use Statamic\Tags\Tags;
-use Statamic\API\OAuth as OAuthAPI;
+use Statamic\API\OAuth;
+use Statamic\Tags\Tags as BaseTags;
 
-class OAuth extends Tags
+class Tags extends BaseTags
 {
+    public static $handle = 'oauth';
+
     /**
      * Shorthand for generating an OAuth login URL
      *
      * Maps to {{ oauth:[provider] }}
-     *
-     * @param string $method
-     * @param array $args
-     * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        return $this->generateLoginUrl($method);
+        return $this->generateLoginUrl($tag);
     }
 
     /**
@@ -41,7 +39,7 @@ class OAuth extends Tags
      */
     protected function generateLoginUrl($provider)
     {
-        $url = OAuthAPI::route($provider);
+        $url = OAuth::provider($provider)->redirectUrl();
 
         if ($redirect = $this->get('redirect')) {
             $url .= "?redirect=$redirect";
