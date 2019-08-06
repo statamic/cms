@@ -12,9 +12,9 @@ interface UserRepository
     // public function find($id): ?User;
 
     public function findByEmail(string $email): ?User;
+    public function findByOAuthId(string $provider, string $id): ?User;
 
     // current/logged in
-    // oauth
 
     public function save(User $user);
     public function delete(User $user);

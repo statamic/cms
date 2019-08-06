@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
+use Statamic\OAuth\Provider;
 use Statamic\Auth\UserFactory;
 use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Auth\User;
@@ -71,5 +72,12 @@ class UserRepository extends BaseRepository
         $this->store->remove($user);
 
         $this->store->delete($user);
+    }
+
+    public function findByOAuthId(string $provider, string $id): ?User
+    {
+        return $this->find(
+            (new Provider($provider))->getUserId($id)
+        );
     }
 }
