@@ -30,6 +30,7 @@ export default {
 
     created() {
         this.$events.$on('filters-changed', this.filtersChanged);
+        this.$events.$on('filters-reset', this.filtersReset);
     },
 
     methods: {
@@ -37,6 +38,10 @@ export default {
         filtersChanged(filters) {
             this.activeFilters = filters;
             this.unselectAllItems();
+        },
+
+        filtersReset() {
+            this.activeFilters = {};
         },
 
         unselectAllItems() {

@@ -40,6 +40,10 @@ export default {
 
     watch: {
 
+        initialValues() {
+            this.values = this.initialValues || {};
+        },
+
         value(value) {
             this.$emit('changed', value);
         }
