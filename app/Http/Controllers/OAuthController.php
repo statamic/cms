@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Statamic\API\User;
+use Statamic\API\OAuth;
 use Statamic\OAuth\Provider;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -23,20 +24,11 @@ class OAuthController
             return $this->redirectToProvider($provider);
         }
 
-        $user = $this->findOrCreateUser($provider, $providerUser);
+        $user = OAuth::provider($provider)->findOrCreateUser($providerUser);
 
         Auth::login($user, true);
 
         return redirect()->to($this->successRedirectUrl());
-    }
-
-    protected function findOrCreateUser($provider, $providerUser)
-    {
-        if ($user = User::findByOAuthId($provider, $providerUser->getId())) {
-            return $user;
-        }
-
-        return (new Provider($provider))->createUser($providerUser);
     }
 
     protected function successRedirectUrl()

@@ -4,6 +4,8 @@ namespace Statamic\OAuth;
 
 class Manager
 {
+    protected static $providers = [];
+
     public function enabled()
     {
         return config('statamic.oauth.enabled')
@@ -12,7 +14,7 @@ class Manager
 
     public function provider($provider)
     {
-        return new Provider($provider);
+        return static::$providers[$provider] = static::$providers[$provider] ?? new Provider($provider);
     }
 
     public function providers()

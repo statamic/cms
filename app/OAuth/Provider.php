@@ -2,6 +2,7 @@
 
 namespace Statamic\OAuth;
 
+use Closure;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\User;
@@ -11,6 +12,8 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 class Provider
 {
     protected $name;
+    protected $userCallback;
+    protected $userDataCallback;
 
     public function __construct(string $name)
     {
@@ -28,6 +31,15 @@ class Provider
         return array_flip($this->getIds())[$id] ?? null;
     }
 
+    public function findOrCreateUser($socialite): StatamicUser
+    {
+        if ($user = User::findByOAuthId($this->name, $socialite->getId())) {
+            return $user;
+        }
+
+        return $this->createUser($socialite);
+    }
+
     /**
      * Create a Statamic user from a Socialite user
      *
@@ -36,15 +48,43 @@ class Provider
      */
     public function createUser($socialite): StatamicUser
     {
-        $user = User::make()
-            ->email($socialite->getEmail())
-            ->set('name', $socialite->getName());
+        $user = $this->makeUser($socialite);
 
         $user->save();
 
         $this->setUserProviderId($user, $socialite->getId());
 
         return $user;
+    }
+
+    public function makeUser($socialite): StatamicUser
+    {
+        if ($this->userCallback) {
+            return call_user_func($this->userCallback, $socialite);
+        }
+
+        return User::make()
+            ->email($socialite->getEmail())
+            ->data($this->userData($socialite));
+    }
+
+    public function userData($socialite)
+    {
+        if ($this->userDataCallback) {
+            return call_user_func($this->userDataCallback, $socialite);
+        }
+
+        return ['name' => $socialite->getName()];
+    }
+
+    public function withUserData(Closure $callback)
+    {
+        $this->userDataCallback = $callback;
+    }
+
+    public function withUser(Closure $callback)
+    {
+        $this->userCallback = $callback;
     }
 
     public function loginUrl()
