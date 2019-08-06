@@ -30,7 +30,7 @@
             </div>
         @endif
 
-        <form method="POST" v-show="showEmailLogin" class="email-login select-none" v-cloak>
+        <form method="POST" v-show="showEmailLogin" class="email-login select-none" @if ($oauth) v-cloak @endif>
             {!! csrf_field() !!}
 
             <input type="hidden" name="referer" value="{{ $referer }}" />
