@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Auth;
 
 use Statamic\API\Str;
+use Statamic\API\OAuth;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -31,8 +32,8 @@ class LoginController extends CpController
     {
         $data = [
             'title' => __('Login'),
-            // 'oauth' => OAuth::enabled() && !empty(OAuth::providers()),
-            'oauth' => false,
+            'oauth' => $enabled = OAuth::enabled(),
+            'providers' => $enabled ? OAuth::providers() : [],
             'referer' => url()->previous()
         ];
 

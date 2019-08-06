@@ -2,6 +2,7 @@
 
 namespace Statamic\OAuth;
 
+use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\User;
 use Statamic\Contracts\Auth\User as StatamicUser;
@@ -49,6 +50,11 @@ class Provider
     public function redirectUrl()
     {
         return route('statamic.oauth.redirect', $this->name);
+    }
+
+    public function label()
+    {
+        return Str::title($this->name);
     }
 
     protected function getIds()

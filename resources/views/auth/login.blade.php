@@ -9,28 +9,28 @@
 
 <div class="card auth-card mx-auto">
     <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
-
+    <div>
         @if ($oauth)
             <div class="login-oauth-providers">
-                @foreach (Statamic\API\OAuth::providers() as $provider => $data)
+                @foreach ($providers as $provider)
                     <div class="provider">
-                        <a href="{{ Statamic\API\OAuth::route($provider) }}?redirect={{ parse_url(route('cp'))['path'] }}" class="btn btn-block btn-primary">
-                            {{ t('login_with', ['provider' => array_get($data, 'label', \Statamic\API\Str::title($provider))]) }}
+                        <a href="{{ $provider->redirectUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
+                            {{ __('Login with :provider', ['provider' => $provider->label()]) }}
                         </a>
                     </div>
                 @endforeach
             </div>
 
-            <div class="text-center italic mx-1">or</div>
+            <div class="text-center italic my-3">or</div>
 
             <div class="login-with-email" v-if="! showEmailLogin">
-                <a class="btn btn-block" @click.prevent="showEmailLogin = true">
-                    {{ t('login_with', ['provider' => t(\Statamic\API\Config::get('users.login_type'))]) }}
+                <a class="btn block" @click.prevent="showEmailLogin = true">
+                    {{ __('Login with email') }}
                 </a>
             </div>
         @endif
 
-        <form method="POST" v-show="showEmailLogin" class="email-login select-none">
+        <form method="POST" v-show="showEmailLogin" class="email-login select-none" v-cloak>
             {!! csrf_field() !!}
 
             <input type="hidden" name="referer" value="{{ $referer }}" />
@@ -52,6 +52,7 @@
                 <button type="submit" class="btn btn-primary">{{ __('Login') }}</button>
             </div>
         </form>
+    </div>
     </login>
 </div>
 @if (! $oauth)
