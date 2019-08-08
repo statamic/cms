@@ -4,14 +4,23 @@ namespace Statamic\Providers;
 
 use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Broadcasting\BroadcastController;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Statamic::provideToScript([
+        $this->app->booted(function () {
+            $this->provideToScript();
+        });
+    }
+
+    protected function provideToScript()
+    {
+        return Statamic::provideToScript([
             'broadcasting' => [
                 'enabled' => in_array(\App\Providers\BroadcastServiceProvider::class, array_keys($this->app->getLoadedProviders())),
+                'endpoint' => $this->authEndpoint(),
                 'pusher' => [
                     'key' => config('broadcasting.connections.pusher.key'),
                     'cluster' => config('broadcasting.connections.pusher.options.cluster'),
@@ -19,5 +28,10 @@ class BroadcastServiceProvider extends ServiceProvider
                 ]
             ]
         ]);
+    }
+
+    protected function authEndpoint()
+    {
+        return $this->app['url']->action([BroadcastController::class, 'authenticate']);
     }
 }
