@@ -19,7 +19,7 @@ class BroadcastServiceProvider extends ServiceProvider
     {
         return Statamic::provideToScript([
             'broadcasting' => [
-                'enabled' => in_array(\App\Providers\BroadcastServiceProvider::class, array_keys($this->app->getLoadedProviders())),
+                'enabled' => $this->enabled(),
                 'endpoint' => $this->authEndpoint(),
                 'pusher' => [
                     'key' => config('broadcasting.connections.pusher.key'),
@@ -28,6 +28,14 @@ class BroadcastServiceProvider extends ServiceProvider
                 ]
             ]
         ]);
+    }
+
+    protected function enabled()
+    {
+        return in_array(
+            \App\Providers\BroadcastServiceProvider::class,
+            array_keys($this->app->getLoadedProviders())
+        );
     }
 
     protected function authEndpoint()
