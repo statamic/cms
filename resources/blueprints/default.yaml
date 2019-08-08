@@ -12,6 +12,7 @@ fields:
       type: users
       display: Author
       localizable: true
+      max_items: 1
   -
     handle: template
     field:
