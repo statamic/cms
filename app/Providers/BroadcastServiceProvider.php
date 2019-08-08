@@ -11,23 +11,22 @@ class BroadcastServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->booted(function () {
-            $this->provideToScript();
+            $variables = $this->enabled() ? $this->variables() : ['enabled' => false];
+            Statamic::provideToScript(['broadcasting' => $variables]);
         });
     }
 
-    protected function provideToScript()
+    protected function variables()
     {
-        return Statamic::provideToScript([
-            'broadcasting' => [
-                'enabled' => $this->enabled(),
-                'endpoint' => $this->authEndpoint(),
-                'pusher' => [
-                    'key' => config('broadcasting.connections.pusher.key'),
-                    'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-                    'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
-                ]
+        return [
+            'enabled' => true,
+            'endpoint' => $this->authEndpoint(),
+            'pusher' => [
+                'key' => config('broadcasting.connections.pusher.key'),
+                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+                'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
             ]
-        ]);
+        ];
     }
 
     protected function enabled()
