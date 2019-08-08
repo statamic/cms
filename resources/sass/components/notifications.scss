@@ -3,6 +3,11 @@
     right: 32px !important;
 }
 
+.toasted-container.bottom-left {
+    bottom: 32px !important;
+    left: 32px !important;
+}
+
 .toasted-container .toasted.statamic {
     @apply bg-grey-90 text-white px-2 mt-2 rounded shadow;
 

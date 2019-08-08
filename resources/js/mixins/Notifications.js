@@ -1,7 +1,7 @@
 import Toasted from 'vue-toasted';
 
 Vue.use(Toasted, {
-    position: 'bottom-right',
+    position: 'bottom-left',
     duration: 3500,
     theme: 'statamic',
     action: {
