@@ -12,6 +12,7 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 class Provider
 {
     protected $name;
+    protected $label;
     protected $userCallback;
     protected $userDataCallback;
 
@@ -92,9 +93,15 @@ class Provider
         return route('statamic.oauth.login', $this->name);
     }
 
-    public function label()
+    public function label($label = null)
     {
-        return Str::title($this->name);
+        if (func_num_args() === 0) {
+            return $this->label ?? Str::title($this->name);
+        }
+
+        $this->label = $label;
+
+        return $this;
     }
 
     protected function getIds()

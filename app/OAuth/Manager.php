@@ -20,8 +20,14 @@ class Manager
     public function providers()
     {
         return collect(config('statamic.oauth.providers'))
-            ->map(function ($provider) {
-                return $this->provider($provider);
+            ->map(function ($provider, $key) {
+                // Allow users to specify just the name as a string, or as a name/label pair.
+                // eg. ['github' => 'GitHub', 'facebook']
+                $expanded = is_string($key);
+
+                return $this
+                    ->provider($expanded ? $key : $provider)
+                    ->label($expanded ? $provider : null);
             });
     }
 }
