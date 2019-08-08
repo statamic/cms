@@ -68,9 +68,8 @@ class ExtensionServiceProvider extends ServiceProvider
         'l10n' => 'formatLocalized',
         'lowercase' => 'lower',
         'tz' => 'timezone',
-        'in_future' => 'isFuture',
+        'inFuture' => 'isFuture',
         'inPast' => 'isPast',
-        'in_past' => 'isPast',
         'as' => 'scopeAs',
     ];
 
