@@ -11,13 +11,13 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setValue }">
+        <div slot-scope="{ setFieldValue }">
             <div class="flex items-center mb-3">
                 <h1 class="flex-1" v-text="title" />
                 <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections @updated="setValue" />
+            <publish-sections @updated="setFieldValue" />
         </div>
     </publish-container>
 

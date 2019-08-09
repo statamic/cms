@@ -38,10 +38,10 @@
             :errors="errors"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, setValue }">
+            <div slot-scope="{ container, setFieldValue }">
                 <publish-sections
                     :enable-sidebar="false"
-                    @updated="setValue"
+                    @updated="setFieldValue"
                     @focus="container.$emit('focus', $event)"
                     @blur="container.$emit('blur', $event)"
                 ></publish-sections>

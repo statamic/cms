@@ -93,7 +93,7 @@ export default {
                     preloadedAssets: [],
                 },
                 mutations: {
-                    setValue(state, payload) {
+                    setFieldValue(state, payload) {
                         const { handle, value } = payload;
                         state.values[handle] = value;
                     },
@@ -135,8 +135,8 @@ export default {
                     }
                 },
                 actions: {
-                    setValue(context, payload) {
-                        context.commit('setValue', payload);
+                    setFieldValue(context, payload) {
+                        context.commit('setFieldValue', payload);
                         vm.emitUpdatedEvent(context.state.values);
                     },
                     setValues(context, payload) {
@@ -168,8 +168,8 @@ export default {
             this.components.push(component);
         },
 
-        setValue(handle, value) {
-            this.$store.dispatch(`publish/${this.name}/setValue`, {
+        setFieldValue(handle, value) {
+            this.$store.dispatch(`publish/${this.name}/setFieldValue`, {
                 handle, value,
                 user: Statamic.user.id
             });
@@ -228,7 +228,7 @@ export default {
             values: this.$store.state.publish[this.name].values,
             container: this._self,
             components: this.components,
-            setValue: this.setValue,
+            setFieldValue: this.setFieldValue,
         });
     }
 

@@ -51,7 +51,7 @@
                 :is-root="true"
                 @updated="values = $event"
             >
-                <div class="publish-fields" v-show="activeTab === 'settings'" slot-scope="{ setValue }">
+                <div class="publish-fields" v-show="activeTab === 'settings'" slot-scope="{ setFieldValue }">
 
                     <form-group
                         handle="display"
@@ -60,7 +60,7 @@
                         width="50"
                         autofocus
                         :value="values.display"
-                        @input="updateField('display', $event, setValue)"
+                        @input="updateField('display', $event, setFieldValue)"
                     />
 
                     <form-group
@@ -69,7 +69,7 @@
                         :instructions="__(`The field's template variable.`)"
                         width="50"
                         :value="values.handle"
-                        @input="updateField('handle', $event, setValue); isHandleModified = true"
+                        @input="updateField('handle', $event, setFieldValue); isHandleModified = true"
                     />
 
                     <form-group
@@ -78,12 +78,12 @@
                         :display="__('Instructions')"
                         :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
                         :value="values.instructions"
-                        @input="updateField('instructions', $event, setValue)"
+                        @input="updateField('instructions', $event, setFieldValue)"
                     />
 
                     <publish-fields
                         :fields="blueprint.sections[0].fields"
-                        @updated="(handle, value) => updateField(handle, value, setValue)"
+                        @updated="(handle, value) => updateField(handle, value, setFieldValue)"
                     />
 
                 </div>

@@ -92,7 +92,7 @@
                     :read-only="readOnly"
                     :syncable="hasOrigin"
                     :enable-sidebar="false"
-                    @updated="setValue"
+                    @updated="setFieldValue"
                     @synced="syncField"
                     @desynced="desyncField"
                     @focus="container.$emit('focus', $event)"
@@ -294,10 +294,10 @@ export default {
                 : 'This global set does not exist for this site.';
         },
 
-        setValue(handle, value) {
+        setFieldValue(handle, value) {
             if (this.hasOrigin) this.desyncField(handle);
 
-            this.$refs.container.setValue(handle, value);
+            this.$refs.container.setFieldValue(handle, value);
         },
 
         syncField(handle) {
@@ -305,7 +305,7 @@ export default {
                 return;
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);
-            this.$refs.container.setValue(handle, this.originValues[handle]);
+            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
         },
 
         desyncField(handle) {

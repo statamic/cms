@@ -81,7 +81,7 @@
                             v-show="sectionsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
-                            @updated="setValue"
+                            @updated="setFieldValue"
                             @synced="syncField"
                             @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
@@ -483,10 +483,10 @@ export default {
             this.$nextTick(() => this.$emit('saved', response));
         },
 
-        setValue(handle, value) {
+        setFieldValue(handle, value) {
             if (this.hasOrigin) this.desyncField(handle);
 
-            this.$refs.container.setValue(handle, value);
+            this.$refs.container.setFieldValue(handle, value);
         },
 
         syncField(handle) {
@@ -494,7 +494,7 @@ export default {
                 return;
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);
-            this.$refs.container.setValue(handle, this.originValues[handle]);
+            this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
             // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
