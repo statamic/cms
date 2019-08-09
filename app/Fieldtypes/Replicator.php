@@ -31,16 +31,19 @@ class Replicator extends Fieldtype
 
     public function preProcess($data)
     {
-        return collect($data)->map(function ($row) {
-            return $this->preProcessRow($row);
+        return collect($data)->map(function ($row, $i) {
+            return $this->preProcessRow($row, $i);
         })->all();
     }
 
-    protected function preProcessRow($row)
+    protected function preProcessRow($row, $index)
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values();
 
-        return array_merge($row, $fields);
+        return array_merge($row, $fields, [
+            '_id' => "set-$index",
+            'enabled' => $row['enabled'] ?? true,
+        ]);
     }
 
     protected function fields($set)
@@ -81,9 +84,9 @@ class Replicator extends Fieldtype
     public function preload()
     {
         return [
-            'existing' => collect($this->field->value())->map(function ($set) {
+            'existing' => collect($this->field->value())->mapWithKeys(function ($set) {
                 $config = $this->config("sets.{$set['type']}.fields", []);
-                return (new Fields($config))->addValues($set)->meta();
+                return [$set['_id'] => (new Fields($config))->addValues($set)->meta()];
             })->toArray(),
             'new' => collect($this->config('sets'))->map(function ($set, $handle) {
                 return (new Fields($set['fields']))->meta();

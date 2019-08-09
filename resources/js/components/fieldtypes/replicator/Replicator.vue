@@ -70,7 +70,7 @@ export default {
 
     data() {
         return {
-            values: null,
+            values: this.value,
             focused: false,
             collapsed: [],
         }
@@ -90,18 +90,6 @@ export default {
             return `${this.name}-sortable-handle`;
         }
 
-    },
-
-    created() {
-        // Values should be cloned so we don't unintentionally modify the prop.
-        let values = JSON.parse(JSON.stringify(this.value || []));
-
-        values = values.map((set, index) => {
-            let id = uniqid();
-            return Object.assign(set, { _id: id, enabled: true });
-        });
-
-        this.values = values;
     },
 
     methods: {
