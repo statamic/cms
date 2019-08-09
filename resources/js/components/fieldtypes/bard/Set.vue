@@ -36,6 +36,7 @@
                 :parent-name="parentName"
                 :set-index="index"
                 @updated="updated(field.handle, $event)"
+                @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
                 @blur="blurred"
             />
@@ -80,7 +81,7 @@ export default {
         },
 
         meta() {
-            return this.options.bard.metas[this.node.attrs.id];
+            return this.options.bard.meta.existing[this.node.attrs.id];
         },
 
         config() {
@@ -113,6 +114,12 @@ export default {
             values.type = this.config.handle;
             values[handle] = value;
             this.updateAttrs({ values });
+        },
+
+        metaUpdated(handle, value) {
+            let meta = clone(this.meta);
+            meta[handle] = value;
+            this.options.bard.updateSetMeta(this.node.attrs.id, meta);
         },
 
         destroy() {

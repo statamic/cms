@@ -108,6 +108,7 @@ import Image from './Image';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ConfirmSetDelete from './ConfirmSetDelete';
+import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import javascript from 'highlight.js/lib/languages/javascript'
@@ -117,7 +118,7 @@ import 'highlight.js/styles/github.css';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, ManagesSetMeta],
 
     components: {
         EditorContent,
@@ -139,7 +140,6 @@ export default {
 
     data() {
         return {
-            content: null,
             editor: null,
             html: null,
             json: null,
@@ -172,17 +172,6 @@ export default {
             }
         },
 
-        metas: {
-            get() {
-                return this.$config.get('bard.meta')[this.id] || {};
-            },
-            set(value) {
-                const meta = this.$config.get('bard.meta');
-                meta[this.id] = value;
-                this.$config.set('bard.meta', meta);
-            }
-        },
-
         isFirstCreation() {
             return !this.$config.get('bard.meta').hasOwnProperty(this.id);
         },
@@ -191,31 +180,6 @@ export default {
             return `${this.storeName}.${this.name}`;
         }
 
-    },
-
-    created() {
-        let content = this.valueToContent(clone(this.value));
-
-        if (content) {
-            let setIndex = 0;
-            content.content = content.content.map((item, i) => {
-                if (item.type !== 'set') return item;
-
-                let id;
-                if (this.isFirstCreation) {
-                    id = uniqid();
-                    this.saveMeta(id, this.meta.existing[i]);
-                } else {
-                    id = Object.keys(this.metas)[setIndex];
-                }
-
-                item.attrs.id = id;
-                setIndex++;
-                return item;
-            });
-        }
-
-        this.content = content;
     },
 
     mounted() {
@@ -245,7 +209,7 @@ export default {
                     languages: { javascript, css }
                 })
             ],
-            content: this.content,
+            content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
             onFocus: () => this.$emit('focus'),
             onBlur: () => {
@@ -296,17 +260,15 @@ export default {
     methods: {
 
         addSet(handle) {
-            const id = uniqid();
+            const id = `set-${uniqid()}`;
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
-            this.saveMeta(id, this.meta.new[handle]);
-            this.editor.commands.set({ id, values });
-            this.$refs.setSelectorDropdown.close();
-        },
+            this.updateSetMeta(id, this.meta.new[handle]);
 
-        saveMeta(id, value) {
-            let meta = this.metas;
-            meta[id] = value;
-            this.metas = meta;
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                this.editor.commands.set({ id, values });
+                this.$refs.setSelectorDropdown.close();
+            });
         },
 
         toggleFullscreen() {

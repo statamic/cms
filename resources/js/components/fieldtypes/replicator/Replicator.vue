@@ -31,7 +31,7 @@
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @updated="updated"
-                    @meta-updated="updateSetMeta(set, $event)"
+                    @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
@@ -57,11 +57,12 @@
 <script>
 import uniqid from 'uniqid';
 import ReplicatorSet from './Set.vue';
+import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, ManagesSetMeta],
 
     components: {
         ReplicatorSet,
@@ -110,7 +111,7 @@ export default {
         },
 
         removed(set, index) {
-            this.removeSetMeta(set);
+            this.removeSetMeta(set._id);
             this.values.splice(index, 1);
         },
 
@@ -121,7 +122,7 @@ export default {
                 enabled: true,
             });
 
-            this.updateSetMeta(set, this.meta.new[handle]);
+            this.updateSetMeta(set._id, this.meta.new[handle]);
             this.values.push(set);
         },
 
@@ -152,23 +153,6 @@ export default {
                     this.focused = false;
                 }
             }, 1);
-        },
-
-        updateSetMeta(set, value) {
-            const meta = clone(this.meta);
-
-            // If there were no existing sets, PHP would have supplied an empty
-            // array, but we need it to be an object so we can assign by key.
-            if (Array.isArray(meta.existing)) meta.existing = {};
-
-            meta.existing[set._id] = value;
-            this.updateMeta(meta);
-        },
-
-        removeSetMeta(set) {
-            const meta = clone(this.meta);
-            delete meta.existing[set._id];
-            this.updateMeta(meta);
         },
 
     },

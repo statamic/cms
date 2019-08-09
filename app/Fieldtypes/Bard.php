@@ -152,23 +152,26 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        return collect($value)->map(function ($row) {
+        return collect($value)->map(function ($row, $i) {
             if ($row['type'] !== 'set') {
                 return $row;
             }
 
-            return $this->preProcessRow($row);
+            return $this->preProcessRow($row, $i);
         })->toJson();
     }
 
     protected function preProcessRow($row, $index)
     {
-        $processed = parent::preProcessRow($row['attrs']['values']);
+        $values = parent::preProcessRow($row['attrs']['values'], $index);
+
+        unset($values['_id']);
 
         return [
             'type' => 'set',
             'attrs' => [
-                'values' => $processed,
+                'id' => "set-$index",
+                'values' => $values,
             ]
         ];
     }
@@ -207,7 +210,7 @@ class Bard extends Replicator
 
     protected function convertLegacyData($value)
     {
-        return collect($value)->flatMap(function ($set) {
+        return collect($value)->flatMap(function ($set, $i) {
             if ($set['type'] === 'text') {
                 if (empty($set['text'])) {
                     return;
@@ -220,6 +223,7 @@ class Bard extends Replicator
                 [
                     'type' => 'set',
                     'attrs' => [
+                        'id' => "set-$i",
                         'values' => $set,
                     ]
                 ]
@@ -233,10 +237,10 @@ class Bard extends Replicator
 
         $existing = collect($value)->filter(function ($item) {
             return $item['type'] === 'set';
-        })->map(function ($set) {
+        })->mapWithKeys(function ($set) {
             $values = $set['attrs']['values'];
             $config = $this->config("sets.{$values['type']}.fields", []);
-            return (new Fields($config))->addValues($values)->meta();
+            return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()];
         })->toArray();
 
         $defaults = collect($this->config('sets'))->map(function ($set) {
