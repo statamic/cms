@@ -13,6 +13,7 @@
             :read-only="readOnly"
             :syncable="syncable"
             @input="$emit('updated', field.handle, $event)"
+            @meta-updated="$emit('meta-updated', field.handle, $event)"
             @synced="$emit('synced', field.handle)"
             @desynced="$emit('desynced', field.handle)"
             @focus="$emit('focus', field.handle)"

@@ -57,7 +57,7 @@
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{ container, components }"
+                slot-scope="{ container, components, setFieldMeta }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -82,6 +82,7 @@
                             :read-only="readOnly"
                             :syncable="hasOrigin"
                             @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
                             @synced="syncField"
                             @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"

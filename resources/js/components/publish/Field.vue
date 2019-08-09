@@ -52,6 +52,7 @@
                 :name="config.handle"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
+                @meta-updated="$emit('meta-updated', $event)"
                 @focus="focused"
                 @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->

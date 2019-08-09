@@ -24,6 +24,7 @@
         :taggable="taggable"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
+        @item-data-updated="itemDataUpdated"
     />
 
 </template>
@@ -134,6 +135,16 @@ export default {
         value(value) {
             if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
             this.selections = value;
+        }
+
+    },
+
+    methods: {
+
+        itemDataUpdated(data) {
+            const meta = clone(this.meta);
+            meta.data = data;
+            this.updateMeta(meta);
         }
 
     }

@@ -103,6 +103,10 @@ export default {
                     setMeta(state, meta) {
                         state.meta = meta;
                     },
+                    setFieldMeta(state, payload) {
+                        const { handle, value } = payload;
+                        state.meta[handle] = value;
+                    },
                     setIsRoot(state, isRoot) {
                         state.isRoot = isRoot;
                     },
@@ -139,6 +143,9 @@ export default {
                         context.commit('setFieldValue', payload);
                         vm.emitUpdatedEvent(context.state.values);
                     },
+                    setFieldMeta(context, payload) {
+                        context.commit('setFieldMeta', payload);
+                    },
                     setValues(context, payload) {
                         context.commit('setValues', payload);
                         vm.emitUpdatedEvent(context.state.values);
@@ -170,6 +177,13 @@ export default {
 
         setFieldValue(handle, value) {
             this.$store.dispatch(`publish/${this.name}/setFieldValue`, {
+                handle, value,
+                user: Statamic.user.id
+            });
+        },
+
+        setFieldMeta(handle, value) {
+            this.$store.dispatch(`publish/${this.name}/setFieldMeta`, {
                 handle, value,
                 user: Statamic.user.id
             });
@@ -229,6 +243,7 @@ export default {
             container: this._self,
             components: this.components,
             setFieldValue: this.setFieldValue,
+            setFieldMeta: this.setFieldMeta,
         });
     }
 

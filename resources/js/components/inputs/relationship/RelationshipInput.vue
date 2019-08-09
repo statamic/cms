@@ -172,6 +172,8 @@ export default {
     mounted() {
         this.initializeData()
             .then(() => this.makeSortable());
+
+        this.$nextTick(() => this.initializing = false);
     },
 
     watch: {
@@ -196,7 +198,8 @@ export default {
             this.$emit(selecting ? 'focus' : 'blur');
         },
 
-        itemData(data) {
+        itemData(data, olddata) {
+            if (this.initializing) return;
             this.$emit('item-data-updated', data);
         }
 
@@ -219,7 +222,6 @@ export default {
 
             this.itemData = this.initialData;
             this.loading = false;
-            this.initializing = false;
             return Promise.resolve();
         },
 
@@ -229,7 +231,6 @@ export default {
 
             return this.$axios.get(this.itemDataUrl, { params }).then(response => {
                 this.loading = false;
-                this.initializing = false;
 
                 this.itemData = response.data.data;
                 this.selections = this.itemData.map(item => {

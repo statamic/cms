@@ -26,6 +26,10 @@ export default {
     methods: {
         update(value) {
             this.$emit('input', value);
+        },
+
+        updateMeta(value) {
+            this.$emit('meta-updated', value);
         }
     },
 
