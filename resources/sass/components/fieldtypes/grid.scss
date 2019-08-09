@@ -38,7 +38,7 @@
             @apply pl-1.5;
         }
 
-        &.grid-drag-handle {
+        &.drag-handle {
             @apply w-3 border-r h-full p-1;
             cursor: grab;
             background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
