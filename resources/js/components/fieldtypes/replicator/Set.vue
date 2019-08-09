@@ -125,7 +125,7 @@ export default {
         updated(handle, value) {
             let set = JSON.parse(JSON.stringify(this.values));
             set[handle] = value;
-            this.$emit('updated'.index, set);
+            this.$emit('updated', this.index, set);
         },
 
         metaUpdated(handle, value) {
