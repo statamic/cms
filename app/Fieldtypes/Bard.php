@@ -161,7 +161,7 @@ class Bard extends Replicator
         })->toJson();
     }
 
-    protected function preProcessRow($row)
+    protected function preProcessRow($row, $index)
     {
         $processed = parent::preProcessRow($row['attrs']['values']);
 
