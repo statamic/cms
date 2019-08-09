@@ -32,6 +32,7 @@
                 :set-index="index"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
+                @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />
@@ -125,6 +126,12 @@ export default {
             let set = JSON.parse(JSON.stringify(this.values));
             set[handle] = value;
             this.$emit('updated'.index, set);
+        },
+
+        metaUpdated(handle, value) {
+            let meta = clone(this.meta);
+            meta[handle] = value;
+            this.$emit('meta-updated', meta);
         },
 
         destroy() {

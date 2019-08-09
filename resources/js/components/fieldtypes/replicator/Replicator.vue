@@ -18,10 +18,10 @@
             <div slot-scope="{}" class="replicator-set-container">
                 <replicator-set
                     v-for="(set, index) in values"
-                    :key="`set-${set._id}`"
+                    :key="set._id"
                     :index="index"
                     :values="set"
-                    :meta="metas[set._id]"
+                    :meta="meta.existing[set._id]"
                     :config="setConfig(set.type)"
                     :parent-name="name"
                     :sortable-item-class="sortableItemClass"
@@ -31,6 +31,7 @@
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @updated="updated"
+                    @meta-updated="updateSetMeta(set, $event)"
                     @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
@@ -70,7 +71,6 @@ export default {
     data() {
         return {
             values: null,
-            metas: {},
             focused: false,
             collapsed: [],
         }
@@ -96,16 +96,12 @@ export default {
         // Values should be cloned so we don't unintentionally modify the prop.
         let values = JSON.parse(JSON.stringify(this.value || []));
 
-        let metas = {};
-
         values = values.map((set, index) => {
             let id = uniqid();
-            metas[id] = this.meta.existing[index];
             return Object.assign(set, { _id: id, enabled: true });
         });
 
         this.values = values;
-        this.metas = metas;
     },
 
     methods: {
@@ -126,20 +122,18 @@ export default {
         },
 
         removed(set, index) {
-            Vue.delete(this.metas, set._id);
+            this.removeSetMeta(set);
             this.values.splice(index, 1);
         },
 
         addSet(handle, index) {
-            const id = uniqid();
-
             let set = Object.assign({}, this.meta.defaults[handle], {
-                _id: id,
+                _id: `set-${uniqid()}`,
                 type: handle,
                 enabled: true,
             });
 
-            this.metas[id] = this.meta.new[handle];
+            this.updateSetMeta(set, this.meta.new[handle]);
             this.values.push(set);
         },
 
@@ -170,7 +164,19 @@ export default {
                     this.focused = false;
                 }
             }, 1);
-        }
+        },
+
+        updateSetMeta(set, value) {
+            const meta = clone(this.meta);
+            meta.existing[set._id] = value;
+            this.updateMeta(meta);
+        },
+
+        removeSetMeta(set) {
+            const meta = clone(this.meta);
+            delete meta.existing[set._id];
+            this.updateMeta(meta);
+        },
 
     },
 
