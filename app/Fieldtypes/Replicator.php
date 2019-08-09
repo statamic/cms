@@ -93,7 +93,8 @@ class Replicator extends Fieldtype
             })->toArray(),
             'defaults' => collect($this->config('sets'))->map(function ($set) {
                 return (new Fields($set['fields']))->all()->map->defaultValue();
-            })->all()
+            })->all(),
+            'collapsed' => [],
         ];
     }
 }

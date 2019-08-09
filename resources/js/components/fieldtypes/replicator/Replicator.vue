@@ -72,7 +72,7 @@ export default {
         return {
             values: this.value,
             focused: false,
-            collapsed: [],
+            collapsed: this.meta.collapsed,
         }
     },
 
@@ -196,6 +196,12 @@ export default {
                     this.$emit('blur');
                 }
             }, 1);
+        },
+
+        collapsed(value) {
+            const meta = this.meta;
+            meta.collapsed = value;
+            this.updateMeta(meta);
         }
 
     }
