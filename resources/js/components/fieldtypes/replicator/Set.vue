@@ -74,6 +74,10 @@ export default {
             type: Number,
             required: true
         },
+        collapsed: {
+            type: Boolean,
+            default: false
+        },
         values: {
             type: Object,
             required: true
@@ -89,12 +93,6 @@ export default {
             type: String
         },
         isReadOnly: Boolean,
-    },
-
-     data() {
-        return {
-            collapsed: false
-        }
     },
 
     computed: {
@@ -126,7 +124,7 @@ export default {
         updated(handle, value) {
             let set = JSON.parse(JSON.stringify(this.values));
             set[handle] = value;
-            this.$emit('updated', this.index, set);
+            this.$emit('updated'.index, set);
         },
 
         destroy() {
@@ -144,7 +142,19 @@ export default {
         },
 
         toggleCollapsedState() {
-            this.collapsed = ! this.collapsed;
+            if (this.collapsed) {
+                this.expand();
+            } else {
+                this.collapse();
+            }
+        },
+
+        collapse() {
+            this.$emit('collapsed');
+        },
+
+        expand() {
+            this.$emit('expanded');
         },
 
     }

@@ -2,6 +2,11 @@
 
     <div class="replicator-fieldtype-container">
 
+        <div class="absolute pin-t pin-r p-3 text-2xs" v-if="values.length > 0">
+            <button @click="collapseAll" class="text-blue hover:text-black mr-1" v-text="__('Collapse All')" />
+            <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
+        </div>
+
         <sortable-list
             v-model="values"
             :vertical="true"
@@ -22,6 +27,9 @@
                     :sortable-item-class="sortableItemClass"
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
+                    :collapsed="collapsed.includes(set._id)"
+                    @collapsed="collapseSet(set._id)"
+                    @expanded="expandSet(set._id)"
                     @updated="updated"
                     @removed="removed(set, index)"
                     @focus="focused = true"
@@ -64,6 +72,7 @@ export default {
             values: null,
             metas: {},
             focused: false,
+            collapsed: [],
         }
     },
 
@@ -134,8 +143,26 @@ export default {
             this.values.push(set);
         },
 
-        collapseAll() { },
-        expandAll() { },
+        collapseSet(id) {
+            if (!this.collapsed.includes(id)) {
+                this.collapsed.push(id)
+            }
+        },
+
+        expandSet(id) {
+            if (this.collapsed.includes(id)) {
+                var index = this.collapsed.indexOf(id);
+                this.collapsed.splice(index, 1);
+            }
+        },
+
+        collapseAll() {
+            this.collapsed = _.pluck(this.values, '_id');
+        },
+
+        expandAll() {
+            this.collapsed = [];
+        },
 
         blurred() {
             setTimeout(() => {
