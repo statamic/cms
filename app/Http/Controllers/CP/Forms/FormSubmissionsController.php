@@ -14,11 +14,11 @@ class FormSubmissionsController extends CpController
 {
     public function index($form)
     {
-        $form = Form::get($form);
+        $form = Form::find($form);
 
         $this->authorize('view', $form);
 
-        $columns = $form->columns()
+        $columns = $form->blueprint()->columns()
             ->setPreferred("forms.{$form->handle()}.columns")
             ->ensurePrepended(Column::make('datestamp')->label('date')->value('datestring'))
             ->rejectUnlisted()
@@ -30,7 +30,7 @@ class FormSubmissionsController extends CpController
             return array_merge($submission->toArray(), [
                 'datestring' => $submission->date()->format($form->dateFormat()),
                 'datestamp' => $submission->date()->timestamp,
-                'url' => cp_route('forms.submissions.show', [$form->name(), $submission->id()]),
+                'url' => cp_route('forms.submissions.show', [$form->handle(), $submission->id()]),
                 'deleteable' => me()->can('delete', $submission),
             ]);
         });
@@ -79,7 +79,7 @@ class FormSubmissionsController extends CpController
     private function sanitizeSubmission($submission)
     {
         collect($submission->data())->each(function ($value, $field) use ($submission) {
-            $sanitized = ($submission->formset()->isUploadableField($field))
+            $sanitized = ($submission->form()->isUploadableField($field))
                 ? UploadedFilePresenter::render($submission, $field)
                 : $this->sanitizeField($value, $submission);
 
@@ -96,7 +96,7 @@ class FormSubmissionsController extends CpController
         foreach ($values as &$value) {
             if (is_array($value)) {
                 $value = json_encode($value);
-            } elseif (! $submission->formset()->get('sanitize', true)) {
+            } elseif (! $submission->form()->sanitize()) {
                 $value = sanitize($value);
             }
         }
@@ -106,7 +106,7 @@ class FormSubmissionsController extends CpController
 
     public function destroy($form, $id)
     {
-        $submission = Form::get($form)->submission($id);
+        $submission = Form::find($form)->submission($id);
 
         $this->authorize('delete', $submission);
 
@@ -117,7 +117,7 @@ class FormSubmissionsController extends CpController
 
     public function show($form, $submission)
     {
-        $form = Form::get($form);
+        $form = Form::find($form);
 
         if (! $submission = $form->submission($submission)) {
             return $this->pageNotFound();
