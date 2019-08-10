@@ -141,7 +141,7 @@ class CoreNav
             ->children(function () {
                 return FormAPI::all()->map(function ($form) {
                     return Nav::item($form->title())
-                        ->url($form->url())
+                        ->url($form->showUrl())
                         ->can('view', $form);
                 });
             });
