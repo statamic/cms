@@ -13,7 +13,7 @@
         <div v-if="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Create a New Form') }}</h1>
-                <p class="text-grey">Create a new form description.</p>
+                <p class="text-grey">A Form is a group of fields used for collecting user input.</p>
             </div>
 
             <!-- Name -->
@@ -22,7 +22,7 @@
                 <input type="text" v-model="form.title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Form name help text.
+                    Usually a call to action, like "Contact Us" or "Vote for Your Favorite Porg".
                 </div>
             </div>
 
@@ -32,14 +32,68 @@
                 <input type="text" v-model="form.handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this form in your templates. Cannot be easily changed.
+                    How you'll reference to this form in your templates. Cannot easily be changed.
                 </div>
             </div>
         </div>
 
         <!-- Step 2 -->
+        <div v-if="currentStep === 1">
+            <div class="max-w-md mx-auto px-2 py-6 text-center">
+                <h1 class="mb-3">{{ __('Fields') }}</h1>
+                <p class="text-grey">Define fields for your formset.</p>
+            </div>
+
+            <!-- Fields -->
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
+                <publish-field-meta
+                    :config="blueprintFieldConfig"
+                    :initial-value="form.blueprint">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            :config="blueprintFieldConfig"
+                            :value="value"
+                            :meta="meta"
+                            name="blueprints"
+                            @input="form.blueprint = $event" />
+                    </div>
+                </publish-field-meta>
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    You can pick an existing Blueprint or create a new one.
+                </div>
+            </div>
+        </div>
 
         <!-- Step 3 -->
+        <div v-if="currentStep === 2">
+            <div class="max-w-md mx-auto px-2 py-6 text-center">
+                <h1 class="mb-3">{{ __('Submissions') }}</h1>
+                <p class="text-grey">Choose how you would like to handle form submissions.</p>
+            </div>
+
+            <!-- Name -->
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Store Submissions</label>
+                <toggle-input v-model="form.store" />
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Whether form submissions should be stored. Turn off if you only wish to get email notifications.
+                </div>
+            </div>
+
+            <!-- Email-->
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Email Notifications</label>
+                <input type="text" v-model="form.email" class="input-text" autofocus tabindex="1">
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Be notified of submissions by email. TODO: Customize email headers?
+                </div>
+            </div>
+        </div>
 
         <div class="border-t p-2">
             <div class="max-w-md mx-auto flex items-center justify-center">
@@ -50,7 +104,7 @@
                     {{ __('Next')}} &rarr;
                 </button>
                 <button tabindex="4" class="btn-primary mx-3" @click="submit" v-if="onLastStep">
-                    {{ finishButtonText }}
+                    {{ __('Create Form') }}
                 </button>
             </div>
         </div>
@@ -64,6 +118,9 @@ import isEmail from 'validator/lib/isEmail';
 import HasWizardSteps from '../HasWizardSteps.js';
 
 export default {
+
+    mixins: [HasWizardSteps],
+
     props: {
         route: {
             type: String
@@ -72,30 +129,22 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', '', ''],
+            currentStep: 0,
+            steps: ['Naming', 'Fields', 'Submissions'],
             form: {
                 title: null,
                 handle: null,
+                blueprint: null,
+                store: true,
+                email: null,
             },
-            customizedMessage: null,
-            userExists: false
         }
     },
 
     computed: {
-        message: {
-            get() {
-                return this.customizedMessage || `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.
-
-For your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`
-            },
-            set(message) {
-                this.customizedMessage = message;
-            }
-        },
-        // finishButtonText() {
-        //     return this.send_invite ? 'Create and Send Email' : 'Create User';
-        // },
+        blueprintFieldConfig() {
+            return { handle: 'blueprints', type: 'blueprints', max_items: 1 };
+        }
         // isValidEmail() {
         //     return this.user.email && isEmail(this.user.email)
         // }
@@ -104,24 +153,14 @@ For your security, the link below expires after 48 hours. After that, please con
     methods: {
         canGoToStep(step) {
             if (step === 1) {
-                return this.isValidEmail && ! this.userExists;
-            } else if (step === 2) {
-                return this.canGoToStep(1);
+                return Boolean(this.form.title && this.form.handle);
             }
 
             return true;
         },
-        checkIfUserExists() {
-            this.$axios.post(cp_url('user-exists'), {email: this.user.email}).then(response => {
-                this.userExists = response.data.exists
-            }).catch(error => {
-                this.$notify.error(error.response.data.message);
-            });
-        },
-        submit() {
-            let payload = {subject: this.email_subject, message: this.message, ...this.user};
 
-            this.$axios.post(this.route, payload).then(response => {
+        submit() {
+            this.$axios.post(this.route, this.form).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
                 this.$notify.error(error.response.data.message);
@@ -130,11 +169,9 @@ For your security, the link below expires after 48 hours. After that, please con
     },
 
     watch: {
-        'user.email': function(email) {
-            if (this.isValidEmail) {
-                this.checkIfUserExists()
-            }
-        }
+        'form.title': function(val) {
+            this.form.handle = this.$slugify(val, '_');
+        },
     },
 
     mounted() {
