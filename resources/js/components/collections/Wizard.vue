@@ -28,7 +28,7 @@
                 <input type="text" v-model="collection.handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this collection in your templates. Cannot be easily changed.
+                    How you'll reference to this collection in your templates. Cannot easily be changed.
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    You can pick an existing Blueprint or creates a new one.
+                    You can pick an existing Blueprint or create a new one.
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
@@ -352,5 +352,6 @@ export default {
             this.previous();
         });
     }
+
 }
 </script>

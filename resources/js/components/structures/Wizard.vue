@@ -30,7 +30,7 @@
                 <input type="text" v-model="structure.handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this structure in your templates. Cannot be easily changed.
+                    How you'll reference to this structure in your templates. Cannot easily be changed.
                 </div>
             </div>
         </div>
@@ -211,5 +211,6 @@ export default {
             this.previous();
         });
     }
+
 }
 </script>
