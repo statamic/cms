@@ -7,112 +7,53 @@ use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Folder;
 use Statamic\API\Metrics;
+use Statamic\Contracts\Forms\Form as FormContract;
 
 class Form
 {
-    public function find($id)
-    {
-        return $this->get($id);
-    }
-
     /**
-     * Get a Form
+     * Find a form.
      *
-     * @param  string $name
-     * @return Statamic\Contracts\Forms\Form
+     * @param string $handle
+     * @return FormContract
      */
-    public function get($name)
+    public function find($handle)
     {
-        $form = self::create($name);
+        $form = $this->make($handle);
 
-        $path = config('statamic.forms.formsets') . "/{$name}.yaml";
-
-        if (! File::exists($path)) {
+        if (! File::exists($form->path())) {
             return;
         }
 
-        $formset = $form->formset();
-        $formset->data(YAML::parse(File::get($path)));
-
-        $form->formset($formset);
-
-        return $form;
+        return $form->hydrate();
     }
 
     /**
-     * Get all Forms
+     * Get all forms.
      *
-     * @param  string $name
      * @return \Illuminate\Support\Collection
      */
     public function all()
     {
-        $forms = [];
-        $files = Folder::getFilesByType(config('statamic.forms.formsets'), 'yaml');
-
-        foreach ($files as $file) {
-            $filename = pathinfo($file)['filename'];
-
-            $forms[] = self::get($filename);
-        }
-
-        return collect($forms);
+        return collect(Folder::getFilesByType(config('statamic.forms.forms'), 'yaml'))->map(function ($file) {
+            return self::find(pathinfo($file)['filename']);
+        });
     }
 
     /**
-     * Get all Forms
+     * Make form instance.
      *
-     * @param  string $name
-     * @return array of Statamic\Contracts\Forms\Forms
+     * @param mixed $handle
+     * @return FormContract
      */
-    public function getAllFormsets()
+    public function make($handle = null)
     {
-        $forms = [];
-        $files = Folder::getFilesByType(config('statamic.forms.formsets'), 'yaml');
+        $form = app(FormContract::class);
 
-        foreach ($files as $file) {
-            $filename = pathinfo($file)['filename'];
-            $form = self::get($filename);
-            $form = $form->toArray();
-            $form['show_url'] = route('form.show', $form['name']);
-
-            $forms[] = $form;
+        if ($handle) {
+            $form->handle($handle);
         }
-
-        return $forms;
-    }
-
-    /**
-     * Create a form
-     *
-     * @param  [type] $name [description]
-     * @return [type]       [description]
-     */
-    public function create($name)
-    {
-        $formset = app('Statamic\Contracts\Forms\Formset');
-        $formset->name($name);
-
-        $form = app('Statamic\Contracts\Forms\Form');
-        $form->name($name);
-        $form->formset($formset);
 
         return $form;
-    }
-
-    public function fields($form)
-    {
-        $fields = [];
-        $form = self::get($form)->formset()->data();
-
-        foreach ($form['fields'] as $key => $field) {
-            $fields[] = [
-                'field' => $key,
-                'name' => $key, //
-                'old' => (Req::hasSession()) ? sanitize(old($key)) : ''
-            ] + $field;
-        }
-
-        return $fields;
     }
 }
