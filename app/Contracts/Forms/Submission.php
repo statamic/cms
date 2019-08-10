@@ -23,13 +23,6 @@ interface Submission extends Arrayable
     public function form($form = null);
 
     /**
-     * Get the formset
-     *
-     * @return Formset
-     */
-    public function formset();
-
-    /**
      * Get the fields in the formset
      *
      * @return array

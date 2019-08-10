@@ -2,18 +2,35 @@
 
 namespace Statamic\Contracts\Forms;
 
+use Statamic\Fields\Blueprint;
 use Statamic\Contracts\CP\Editable;
 use Illuminate\Contracts\Support\Arrayable;
 
 interface Form extends Arrayable, Editable
 {
     /**
+     * Get or set the handle
+     *
+     * @param  string|null $name
+     * @return string
+     */
+    public function handle($handle = null);
+
+    /**
+     * Get or set the title
+     *
+     * @param  string|null $title
+     * @return string
+     */
+    public function title($title = null);
+
+    /**
      * Get or set the Formset
      *
      * @param  Formset|null $formset
      * @return Formset
      */
-    public function formset($formset = null);
+    public function blueprint(Blueprint $blueprint = null);
 
     /**
      * Get the submissions
@@ -45,44 +62,12 @@ interface Form extends Arrayable, Editable
     public function deleteSubmission($id);
 
     /**
-     * Get or set the name
-     *
-     * @param  string|null $name
-     * @return string
-     */
-    public function name($name = null);
-
-    /**
-     * Get or set the title
-     *
-     * @param  string|null $title
-     * @return string
-     */
-    public function title($title = null);
-
-    /**
      * Get or set the honeypot field
      *
      * @param  string|null $honeypot
      * @return string
      */
     public function honeypot($honeypot = null);
-
-    /**
-     * Get or set the fields
-     *
-     * @param  array|null $fields
-     * @return array
-     */
-    public function fields($fields = null);
-
-    /**
-     * Get or set the columns
-     *
-     * @param  array|null $columns
-     * @return array
-     */
-    public function columns($columns = null);
 
     /**
      * Get all the metrics

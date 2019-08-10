@@ -15,7 +15,7 @@ use Statamic\Exceptions\FatalException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Contracts\Forms\Form as FormContract;
 
-class Form //implements FormContract
+class Form implements FormContract
 {
     use FluentlyGetsAndSets;
 
@@ -158,9 +158,14 @@ class Form //implements FormContract
         return $this;
     }
 
-    public function metrics()
+    public function metrics($metrics = null)
     {
         return collect();
+    }
+
+    public function email($email = null)
+    {
+        //
     }
 
     /**
@@ -340,19 +345,19 @@ class Form //implements FormContract
     //     $this->formset()->set('email', $email);
     // }
 
-    // /**
-    //  * Convert to an array
-    //  *
-    //  * @return array
-    //  */
-    // public function toArray()
-    // {
-    //     return [
-    //         'name' => $this->name(),
-    //         'title' => $this->title(),
-    //         'edit_url' => $this->editUrl()
-    //     ];
-    // }
-    //
-    //
+    /**
+     * Convert to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        // TODO: When is this used?
+
+        return [
+            'handle' => $this->handle(),
+            'title' => $this->title(),
+            'edit_url' => $this->editUrl()
+        ];
+    }
 }
