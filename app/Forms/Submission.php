@@ -3,15 +3,18 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
-use Statamic\API\YAML;
 use Statamic\API\File;
+use Statamic\API\YAML;
 use Statamic\API\Helper;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 
 class Submission implements SubmissionContract
 {
+    use FluentlyGetsAndSets;
+
     /**
      * @var bool
      */
@@ -40,11 +43,11 @@ class Submission implements SubmissionContract
      */
     public function id($id = null)
     {
-        if (is_null($id)) {
-            $id = $this->id ?: microtime(true);
-        }
-
-        return $this->id = $id;
+        return $this->fluentlyGetOrSet('id')
+            ->getter(function ($id) {
+                return $id ?: microtime(true);
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -55,21 +58,7 @@ class Submission implements SubmissionContract
      */
     public function form($form = null)
     {
-        if (is_null($form)) {
-            return $this->form;
-        }
-
-        $this->form = $form;
-    }
-
-    /**
-     * Get the formset
-     *
-     * @return Formset
-     */
-    public function formset()
-    {
-        return $this->form()->formset();
+        return $this->fluentlyGetOrSet('form')->args(func_get_args());
     }
 
     /**
@@ -79,7 +68,7 @@ class Submission implements SubmissionContract
      */
     public function fields()
     {
-        return $this->formset()->fields();
+        return $this->form()->blueprint()->fields();
     }
 
     /**
@@ -89,7 +78,7 @@ class Submission implements SubmissionContract
      */
     public function columns()
     {
-        return $this->formset()->columns();
+        return $this->form()->blueprint()->columns();
     }
 
     /**
@@ -144,7 +133,7 @@ class Submission implements SubmissionContract
         }
 
         // If a honeypot exists, throw an exception.
-        if (array_get($data, $this->formset()->get('honeypot', 'honeypot'))) {
+        if (array_get($data, $this->form()->honeypot())) {
             throw new SilentFormFailureException('Honeypot field has been populated.');
         }
 
@@ -283,7 +272,7 @@ class Submission implements SubmissionContract
      */
     public function getPath()
     {
-        return config('statamic.forms.submissions') . '/' . $this->formset()->name() . '/' . $this->id() . '.yaml';
+        return config('statamic.forms.submissions') . '/' . $this->form()->handle() . '/' . $this->id() . '.yaml';
     }
 
     /**
@@ -294,19 +283,18 @@ class Submission implements SubmissionContract
     public function toArray()
     {
         $data = $this->data();
-        $data['id'] = $this->id();
-        $data['date'] = $this->date();
-        $fields = $this->formset()->fields();
-        $field_names = array_keys($fields);
 
-        // Populate the missing fields with empty values.
-        foreach ($field_names as $field) {
-            $data[$field] = array_get($data, $field);
-        }
-
-        // Ensure the array is ordered the same way the fields are.
-        $data = array_merge(array_flip($field_names), $data);
-
-        return $data;
+        return $this->form()->fields()->keys()->flip()
+            ->reject(function ($field, $key) {
+                return in_array($key, ['id', 'date']);
+            })
+            ->map(function ($field, $key) use ($data) {
+                return $data[$key] ?? null;
+            })
+            ->merge([
+                'id' => $this->id(),
+                'date' => $this->date(),
+            ])
+            ->all();
     }
 }
