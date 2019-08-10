@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Statamic\API\Str;
 use Statamic\API\Form;
 use Statamic\CP\Column;
+use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Forms\Form as FormContract;
 
@@ -14,29 +15,28 @@ class FormsController extends CpController
     {
         $this->authorize('index', FormContract::class);
 
-        $forms = Form::all()->filter(function ($form) {
-            return request()->user()->can('view', $form);
-        })->map(function ($form) {
-            return [
-                'id' => $form->handle(),
-                'title' => $form->title(),
-                'submissions' => $form->submissions()->count(),
-                'show_url' => $form->url(),
-                'edit_url' => $form->editUrl(),
-                'deleteable' => me()->can('delete', $form)
-            ];
-        })->values();
+        $forms = Form::all()
+            ->filter(function ($form) {
+                return request()->user()->can('view', $form);
+            })
+            ->map(function ($form) {
+                return [
+                    'id' => $form->handle(),
+                    'title' => $form->title(),
+                    'submissions' => $form->submissions()->count(),
+                    'show_url' => $form->showUrl(),
+                    'edit_url' => $form->editUrl(),
+                    'deleteable' => me()->can('delete', $form)
+                ];
+            })
+            ->values();
 
-        return view('statamic::forms.index', [
-            'forms' => $forms
-        ]);
+        return view('statamic::forms.index', compact('forms'));
     }
 
     public function show($form)
     {
-        if (! $form = Form::get($form)) {
-            return $this->pageNotFound();
-        }
+        abort_unless($form = Form::find($form), 404);
 
         $this->authorize('view', $form);
 
@@ -105,36 +105,32 @@ class FormsController extends CpController
         ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
         $this->authorize('create', FormContract::class);
 
-        $slug = ($this->request->has('slug'))
-                ? $this->request->input('slug')
-                : Str::slug($this->request->input('formset.title'), '_');
+        $data = $request->validate([
+            'title' => 'required',
+            'handle' => 'nullable|alpha_dash',
+            'blueprint' => 'array',
+        ]);
 
-        $form = Form::create($slug);
+        $handle = $request->handle ?? snake_case($request->title);
 
-        $form->title($this->request->input('formset.title'));
-        $form->honeypot($this->request->input('formset.honeypot'));
-        $form->columns($this->prepareColumns());
-        $form->fields($this->prepareFields());
-        $form->metrics($this->prepareMetrics());
-        $form->email($this->prepareEmail());
-
+        $form = $this->hydrateForm(Form::make($handle), $data);
         $form->save();
 
         $this->success(__('Created'));
 
         return [
             'success' => true,
-            'redirect' => $form->editUrl()
+            'redirect' => $form->showUrl()
         ];
     }
 
     public function edit($form)
     {
-        $form = Form::get($form);
+        $form = Form::find($form);
 
         $this->authorize('edit', $form);
 
@@ -145,17 +141,11 @@ class FormsController extends CpController
 
     public function update($form)
     {
-        $form = Form::get($form);
+        $form = Form::find($form);
 
         $this->authorize('edit', $form);
 
-        $form->title($this->request->input('formset.title'));
-        $form->honeypot($this->request->input('formset.honeypot'));
-        $form->columns($this->prepareColumns());
-        $form->metrics($this->prepareMetrics());
-        $form->email($this->prepareEmail());
-        $form->fields($this->prepareFields());
-
+        $this->hydrateForm($form, $data);
         $form->save();
 
         $this->success(__('Saved'));
@@ -164,6 +154,14 @@ class FormsController extends CpController
             'success' => true,
             'redirect' => $form->editUrl()
         ];
+    }
+
+    protected function hydrateForm($form, $data)
+    {
+        return $form
+            ->title($data['title'])
+            ->handle($data['handle'])
+            ->blueprint(collect($data['blueprint'])->first());
     }
 
     /**
@@ -227,7 +225,7 @@ class FormsController extends CpController
     {
         $fields = [];
 
-        foreach ($this->request->input('formset.fields') as $field) {
+        foreach ($this->request->input('form.fields') as $field) {
             $field_name = $field['name'];
             unset($field['name'], $field['column']);
             $fields[$field_name] = $field;
