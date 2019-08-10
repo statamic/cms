@@ -2,56 +2,176 @@
 
 namespace Statamic\Forms;
 
+use Statamic\API;
 use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\CP\Column;
 use Statamic\API\Config;
 use Statamic\API\Folder;
-use Statamic\CP\Columns;
+use Statamic\Fields\Blueprint;
+use Statamic\FluentlyGetsAndSets;
 use Statamic\Exceptions\FatalException;
+use Statamic\Contracts\Forms\Submission;
 use Statamic\Contracts\Forms\Form as FormContract;
 
-class Form implements FormContract
+class Form //implements FormContract
 {
-    /**
-     * @var string
-     */
-    public $name;
+    use FluentlyGetsAndSets;
+
+    protected $handle;
+    protected $title;
+    protected $blueprint;
+    protected $honeypot = 'honeypot';
 
     /**
-     * @var Formset
-     */
-    private $formset;
-
-    /**
-     * Get the Formset
+     * Get or set the handle.
      *
-     * @return Formset
-     * @throws FatalException
+     * @param mixed $handle
+     * @return mixed
      */
-    public function formset($formset = null)
+    public function handle($handle = null)
     {
-        if (is_null($formset)) {
-            return $this->formset;
-        }
+        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
 
-        if (! $formset instanceof Formset) {
-            throw new FatalException('A Formset instance is required.');
-        }
+    /**
+     * Get or set the title.
+     *
+     * @param mixed $title
+     * @return mixed
+     */
+    public function title($title = null)
+    {
+        return $this->fluentlyGetOrSet('title')->args(func_get_args());
+    }
 
-        $this->formset = $formset;
+    /**
+     * Get or set the blueprint.
+     *
+     * @param mixed $blueprint
+     * @return mixed
+     */
+    public function blueprint($blueprint = null)
+    {
+        return $this->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return API\Blueprint::find($blueprint);
+            })
+            ->setter(function ($blueprint) {
+                return $blueprint instanceof Blueprint ? $blueprint->handle() : $blueprint;
+            })
+            ->args(func_get_args());
+    }
+
+    // /**
+    //  * Get or set an email.
+    //  *
+    //  * @param mixed $handle
+    //  * @return mixed
+    //  */
+    // public function email($email = null)
+    // {
+    //     return $this->fluentlyGetOrSet('email')->args(func_get_args());
+    // }
+
+    /**
+     * Get or set the honeypot field.
+     *
+     * @param mixed $honeypot
+     * @return mixed
+     */
+    public function honeypot($honeypot = null)
+    {
+        return $this->fluentlyGetOrSet('honeypot')
+            ->setter(function ($honeypot) {
+                return $honeypot === 'honeypot' ? null : $honeypot;
+            })
+            ->args(func_get_args());
+    }
+
+    /**
+     * Get the form fields off the blueprint.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function fields()
+    {
+        return $this->blueprint()->fields()->all();
+    }
+
+    /**
+     * Get path.
+     *
+     * @return string
+     */
+    public function path()
+    {
+        return config('statamic.forms.forms') . "/{$this->handle()}.yaml";
+    }
+
+    /**
+     * Save form.
+     */
+    public function save()
+    {
+        $data = collect([
+            'title' => $this->title,
+            'blueprint' => $this->blueprint,
+            'honeypot' => $this->honeypot,
+            // 'metrics' => $this->get('metrics'),
+            // 'email' => $this->get('email')
+        ])->filter()->all();
+
+        File::put($this->path(), YAML::dump($data));
+    }
+
+    /**
+     * Delete form and associated submissions.
+     */
+    public function delete()
+    {
+        // $this->submissions()->each->delete();
+
+        File::delete($this->path());
+    }
+
+    /**
+     * Hydrate form from file data.
+     *
+     * @return $this
+     */
+    public function hydrate()
+    {
+        collect(YAML::parse(File::get($this->path())))
+            ->filter(function ($value, $property) {
+                return in_array($property, [
+                    'title',
+                    'blueprint',
+                    'honeypot',
+                ]);
+            })
+            ->each(function ($value, $property) {
+                $this->{$property}($value);
+            });
+
+        return $this;
+    }
+
+    public function metrics()
+    {
+        return collect();
     }
 
     /**
      * Get the submissions
      *
-     * @return Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection
      */
     public function submissions()
     {
         $submissions = collect();
-        $directory = config('statamic.forms.submissions') . '/' . $this->name();
+        $directory = config('statamic.forms.submissions') . '/' . $this->handle();
 
         $files = Folder::getFilesByType($directory, 'yaml');
 
@@ -81,13 +201,13 @@ class Form implements FormContract
     }
 
     /**
-     * Create a form submission
+     * Create a form submission.
      *
-     * @return Statamic\Contracts\Forms\Submission
+     * @return Submission
      */
     public function createSubmission()
     {
-        $submission = app('Statamic\Contracts\Forms\Submission');
+        $submission = app(Submission::class);
 
         $submission->form($this);
 
@@ -95,9 +215,7 @@ class Form implements FormContract
     }
 
     /**
-     * Delete a form submission
-     *
-     * @return void
+     * Delete a form submission.
      */
     public function deleteSubmission($id)
     {
@@ -107,90 +225,50 @@ class Form implements FormContract
     }
 
     /**
-     * Get or set the name
+     * The URL to view form submissions in the CP.
      *
-     * @param  string|null $name
      * @return string
      */
-    public function name($name = null)
+    public function showUrl()
     {
-        if (is_null($name)) {
-            return $this->name;
-        }
-
-        $this->name = $name;
-    }
-
-    // TODO: Deprecate name and replace with this
-    public function handle($handle = null)
-    {
-        return $this->name($handle);
+        return cp_route('forms.show', $this->handle());
     }
 
     /**
-     * Get or set the title
+     * The URL to edit this in the CP.
      *
-     * @param  string|null $title
      * @return string
      */
-    public function title($title = null)
+    public function editUrl()
     {
-        return $this->formset()->title($title);
+        return cp_route('forms.edit', $this->handle());
     }
 
     /**
-     * Get or set the fields
+     * Is a field an uploadable type?
      *
-     * @param  array|null $fields
-     * @return array
+     * @param string $field
+     * @return mixed
      */
-    public function fields($fields = null)
+    public function isUploadableField($field)
     {
-        return $this->formset()->fields($fields);
+        return false;
+
+        // $field = collect($this->fields())->get($field);
+
+        // return in_array(array_get($field, 'type'), ['file', 'files', 'asset', 'assets']);
     }
 
-    /**
-     * Get or set the columns
-     *
-     * @param  array|null $columns
-     * @return array
-     */
-    public function columns($columns = null)
-    {
-        if (func_num_args()) {
-            return $this->formset()->columns($columns);
-        }
-
-        $columns = collect($this->formset()->columns())
-            ->map(function ($display, $handle) {
-                return Column::make()
-                    ->field($handle)
-                    ->label($display);
-            })
-            ->values();
-
-        return new Columns($columns);
-    }
-
-    /**
-     * Save the form
-     */
-    public function save()
-    {
-        $this->formset()->name($this->name());
-
-        $this->formset()->save();
-    }
-
-    /**
-     * Delete the form
-     */
-    public function delete()
-    {
-        $this->submissions()->each->delete();
-
-        $this->formset()->delete();
-    }
+    // /**
+    //  * Get or set the fields
+    //  *
+    //  * @param  array|null $fields
+    //  * @return array
+    //  */
+    // public function fields($fields = null)
+    // {
+    //     return $this->formset()->fields($fields);
+    // }
 
     /**
      * Get the date format
@@ -199,106 +277,82 @@ class Form implements FormContract
      */
     public function dateFormat()
     {
-        return $this->formset()->get('date_format', 'M j, Y @ h:m');
+        // TODO: Should this be a form.yaml config?  or a config/forms.php config?
+        // It used to be a form.yaml config, but feels like a weird place?
+        return 'M j, Y @ h:m';
+
+        // return $this->formset()->get('date_format', 'M j, Y @ h:m');
     }
 
-    /**
-     * Get or set the metrics
-     *
-     * @param array|null $metrics
-     * @return array
-     */
-    public function metrics($metrics = null)
+    public function sanitize()
     {
-        if (! is_null($metrics)) {
-            return $this->formset()->set('metrics', $metrics);
-        }
-
-        $metrics = [];
-
-        foreach ($this->formset()->get('metrics', []) as $config) {
-            $name = Str::studly($config['type']);
-
-            $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
-
-            if (! class_exists($class)) {
-                $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
-            }
-
-            if (! class_exists($class)) {
-                \Log::error("Metric [{$config['type']}] does not exist.");
-                continue;
-            }
-
-            $metrics[] = new $class($this, $config);
-        }
-
-        return $metrics;
+        // TODO: This was a form.yaml config option?
+        // ie. formset()->get('sanitize', true)
+        return true;
     }
 
-    /**
-     * Get or set the email config
-     *
-     * @param  array|null $email
-     * @return array
-     */
-    public function email($email = null)
-    {
-        if (is_null($email)) {
-            return $this->formset()->get('email', []);
-        }
+    // /**
+    //  * Get or set the metrics
+    //  *
+    //  * @param array|null $metrics
+    //  * @return array
+    //  */
+    // public function metrics($metrics = null)
+    // {
+    //     if (! is_null($metrics)) {
+    //         return $this->formset()->set('metrics', $metrics);
+    //     }
 
-        $this->formset()->set('email', $email);
-    }
+    //     $metrics = [];
 
-    /**
-     * Get or set the honeypot field
-     *
-     * @param string|null $honeypot
-     * @return string
-     */
-    public function honeypot($honeypot = null)
-    {
-        if (is_null($honeypot)) {
-            return $this->formset()->get('honeypot', 'honeypot');
-        }
+    //     foreach ($this->formset()->get('metrics', []) as $config) {
+    //         $name = Str::studly($config['type']);
 
-        $honeypot = ($honeypot === 'honeypot') ? null : $honeypot;
+    //         $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
 
-        $this->formset()->set('honeypot', $honeypot);
-    }
+    //         if (! class_exists($class)) {
+    //             $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
+    //         }
 
-    /**
-     * The URL to view submissions in the CP
-     *
-     * @return string
-     */
-    public function url()
-    {
-        return cp_route('forms.show', $this->name());
-    }
+    //         if (! class_exists($class)) {
+    //             \Log::error("Metric [{$config['type']}] does not exist.");
+    //             continue;
+    //         }
 
-    /**
-     * The URL to edit this in the CP
-     *
-     * @return string
-     */
-    public function editUrl()
-    {
-        return cp_route('forms.edit', $this->name());
-    }
+    //         $metrics[] = new $class($this, $config);
+    //     }
 
-    /**
-     * Convert to an array
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'name' => $this->name(),
-            'title' => $this->title(),
-            'edit_url' => $this->editUrl()
-        ];
-    }
+    //     return $metrics;
+    // }
+
+    // /**
+    //  * Get or set the email config
+    //  *
+    //  * @param  array|null $email
+    //  * @return array
+    //  */
+    // public function email($email = null)
+    // {
+    //     if (is_null($email)) {
+    //         return $this->formset()->get('email', []);
+    //     }
+
+    //     $this->formset()->set('email', $email);
+    // }
+
+    // /**
+    //  * Convert to an array
+    //  *
+    //  * @return array
+    //  */
+    // public function toArray()
+    // {
+    //     return [
+    //         'name' => $this->name(),
+    //         'title' => $this->title(),
+    //         'edit_url' => $this->editUrl()
+    //     ];
+    // }
+    //
+    //
 }
