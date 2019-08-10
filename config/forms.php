@@ -4,14 +4,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Formsets Path
+    | Forms Path
     |--------------------------------------------------------------------------
     |
-    | Where your formset YAML files are stored.
+    | Where your form YAML files are stored.
     |
     */
 
-    'formsets' => resource_path('formsets'),
+    'forms' => resource_path('forms'),
 
     /*
     |--------------------------------------------------------------------------
