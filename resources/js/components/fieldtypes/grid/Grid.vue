@@ -11,9 +11,10 @@
             :is="component"
             :fields="fields"
             :rows="rows"
-            :meta="metas"
+            :meta="meta.existing"
             :name="name"
             @updated="updated"
+            @meta-updated="updateRowMeta"
             @removed="removed"
             @duplicate="duplicate"
             @sorted="sorted"
@@ -36,10 +37,14 @@
 import uniqid from 'uniqid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
+import ManagesRowMeta from './ManagesRowMeta';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [
+        Fieldtype,
+        ManagesRowMeta
+    ],
 
     components: {
         GridTable,
@@ -48,10 +53,9 @@ export default {
 
     data() {
         return {
-            rows: null,
+            rows: this.value,
             containerWidth: null,
             focused: false,
-            metas: {}
         }
     },
 
@@ -97,49 +101,7 @@ export default {
         include: ['config', 'isReorderable', 'isReadOnly']
     },
 
-    created() {
-        let rows = this.value || [];
-
-        this.rows.map((row, index) => {
-            this.metas[row._id] = this.meta.existing[index] || this.meta.new;
-        });
-    },
-
     watch: {
-
-        value: {
-            immediate: true,
-            handler(value) {
-                if (value === null) value = [];
-
-                if (value.length === 0) {
-                    this.rows = value;
-                    return;
-                }
-
-                if (value[0].hasOwnProperty('_id')) {
-                    this.rows = value;
-                    return;
-                }
-
-                let rows = value || [];
-                let metas = {};
-
-                rows = rows.map((row, index) => {
-                    let id = uniqid();
-                    metas[id] = this.meta.existing[index];
-                    return Object.assign(row, { _id: id });
-                });
-
-                this.metas = metas;
-                this.rows = rows;
-
-                if (this.config.min_rows) {
-                    const rowsToAdd = this.config.min_rows - this.rows.length;
-                    for (var i = 1; i <= rowsToAdd; i++) this.addRow();
-                }
-            }
-        },
 
         rows(rows) {
             this.update(rows);
@@ -178,7 +140,7 @@ export default {
 
             row._id = id;
 
-            this.metas[id] = this.meta.new;
+            this.updateRowMeta(id, this.meta.new);
             this.rows.push(row);
         },
 
@@ -197,7 +159,7 @@ export default {
             const old_id = row._id;
             row._id = uniqid();
 
-            this.metas[row._id] = this.metas[old_id];
+            this.updateRowMeta(row._id, this.meta.existing[old_id]);
             this.rows.push(row);
         },
 
@@ -219,7 +181,7 @@ export default {
                     this.focused = false;
                 }
             }, 1);
-        }
+        },
 
     }
 

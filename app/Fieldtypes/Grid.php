@@ -65,16 +65,18 @@ class Grid extends Fieldtype
 
     public function preProcess($data)
     {
-        return collect($data)->map(function ($row) {
-            return $this->preProcessRow($row);
+        return collect($data)->map(function ($row, $i) {
+            return $this->preProcessRow($row, $i);
         })->all();
     }
 
-    private function preProcessRow($row)
+    private function preProcessRow($row, $index)
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values();
 
-        return array_merge($row, $fields);
+        return array_merge($row, $fields, [
+            '_id' => "row-$index",
+        ]);
     }
 
     private function fields()
@@ -111,8 +113,8 @@ class Grid extends Fieldtype
         return [
             'defaults' => $this->defaultRowData(),
             'new' => $this->fields()->meta(),
-            'existing' => collect($this->field->value())->map(function ($row) {
-                return $this->fields()->addValues($row)->meta();
+            'existing' => collect($this->field->value())->mapWithKeys(function ($row) {
+                return [$row['_id'] => $this->fields()->addValues($row)->meta()];
             })->toArray(),
         ];
     }

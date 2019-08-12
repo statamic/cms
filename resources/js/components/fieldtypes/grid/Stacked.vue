@@ -18,6 +18,7 @@
                 :meta="meta[row._id]"
                 :name="name"
                 @updated="(row, value) => $emit('updated', row, value)"
+                @meta-updated="$emit('meta-updated', row._id, $event)"
                 @removed="(row) => $emit('removed', row)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"

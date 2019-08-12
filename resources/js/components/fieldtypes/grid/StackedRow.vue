@@ -21,6 +21,7 @@
                 :read-only="grid.isReadOnly"
                 class="p-2"
                 @input="updated(field.handle, $event)"
+                @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />

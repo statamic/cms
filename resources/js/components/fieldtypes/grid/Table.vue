@@ -30,6 +30,7 @@
                     :meta="meta[row._id]"
                     :name="name"
                     @updated="(row, value) => $emit('updated', row, value)"
+                    @meta-updated="$emit('meta-updated', row._id, $event)"
                     @duplicate="(row) => $emit('duplicate', row)"
                     @removed="(row) => $emit('removed', row)"
                     @focus="$emit('focus')"
