@@ -26,6 +26,7 @@ class Bard extends Replicator
                 'quote',
                 'anchor',
                 'image',
+                'table',
             ]
         ],
         'container' => [

@@ -316,6 +316,21 @@
         margin-bottom: 0;
     }
 
+    .tableWrapper table {
+        @apply w-full overflow-hidden m-0 mb-2;
+        border-collapse: collapse;
+        table-layout: fixed;
+
+        th {
+            @apply font-bold text-left;
+        }
+
+        td, th {
+            @apply border align-top relative py-sm px-1 bg-white;
+            min-width: 1em;
+        }
+    }
+
     p > code {
         @apply font-mono bg-grey-40 rounded text-xs relative;
         padding: 2px 4px;

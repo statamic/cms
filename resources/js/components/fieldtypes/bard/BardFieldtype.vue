@@ -98,6 +98,10 @@ import {
     Italic,
     Strike,
     Underline,
+    Table,
+    TableHeader,
+    TableCell,
+    TableRow,
     History,
     CodeBlockHighlight
 } from 'tiptap-extensions';
@@ -199,6 +203,12 @@ export default {
                 new Italic(),
                 new Strike(),
                 new Underline(),
+                new Table({
+                    resizable: true,
+                }),
+                new TableHeader(),
+                new TableCell(),
+                new TableRow(),
                 new History(),
                 new Set({ bard: this }),
                 new ConfirmSetDelete(),
@@ -283,8 +293,21 @@ export default {
 
         initToolbarButtons() {
             const selectedButtons = this.config.buttons || [
-                'h2', 'h3', 'bold', 'italic', 'unorderedlist', 'orderedlist', 'removeformat', 'quote', 'anchor',
+                'h2', 'h3', 'bold', 'italic', 'unorderedlist', 'orderedlist', 'removeformat', 'quote', 'anchor', 'table'
             ];
+
+            if (selectedButtons.includes('table')) {
+                selectedButtons.push(
+                    'deletetable',
+                    'addcolumnbefore',
+                    'addcolumnafter',
+                    'deletecolumn',
+                    'addrowbefore',
+                    'addrowafter',
+                    'deleterow',
+                    'togglecellmerge'
+                );
+            }
 
             // Get the configured buttons and swap them with corresponding objects
             let buttons = selectedButtons.map(button => {
@@ -307,12 +330,32 @@ export default {
                 return (button.condition) ? button.condition.call(null, this.config) : true;
             });
 
+            if (_.findWhere(buttons, {name: 'table'})) {
+                buttons.push(
+                    { name: 'deletetable', text: __('Delete Table'), command: 'deleteTable', svg: 'delete-table', visibleWhenActive: 'table' },
+                    { name: 'addcolumnbefore', text: __('Add Column Before'), command: 'addColumnBefore', svg: 'add-col-before', visibleWhenActive: 'table' },
+                    { name: 'addcolumnafter', text: __('Add Column After'), command: 'addColumnAfter', svg: 'add-col-after', visibleWhenActive: 'table' },
+                    { name: 'deletecolumn', text: __('Delete Column'), command: 'deleteColumn', svg: 'delete-col', visibleWhenActive: 'table' },
+                    { name: 'addrowbefore', text: __('Add Row Before'), command: 'addRowBefore', svg: 'add-row-before', visibleWhenActive: 'table' },
+                    { name: 'addrowafter', text: __('Add Row After'), command: 'addRowAfter', svg: 'add-row-after', visibleWhenActive: 'table' },
+                    { name: 'deleterow', text: __('Delete Row'), command: 'deleteRow', svg: 'delete-row', visibleWhenActive: 'table' },
+                    { name: 'togglecellmerge', text: __('Merge Cells'), command: 'toggleCellMerge', svg: 'combine-cells', visibleWhenActive: 'table' },
+                )
+            }
+
             this.buttons = buttons;
         },
 
         buttonIsActive(isActive, button) {
-            if (! isActive.hasOwnProperty(button.command)) return false;
-            return isActive[button.command](button.args);
+            const commandProperty = button.hasOwnProperty('activeCommand') ? 'activeCommand' : 'command';
+            const command = button[commandProperty];
+            if (! isActive.hasOwnProperty(command)) return false;
+            return isActive[command](button.args);
+        },
+
+        buttonIsVisible(isActive, button) {
+            if (! button.hasOwnProperty('visibleWhenActive')) return true;
+            return isActive[button.visibleWhenActive](button.args);
         },
 
         valueToContent(value) {
