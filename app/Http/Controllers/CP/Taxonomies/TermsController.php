@@ -142,6 +142,7 @@ class TermsController extends CpController
             })->all(),
             'hasWorkingCopy' => $term->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
+            'revisionsEnabled' => $term->revisionsEnabled(),
         ];
 
         if ($request->wantsJson()) {

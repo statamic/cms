@@ -45,6 +45,7 @@ class Relationship extends Fieldtype
         'initialIsWorkingCopy' => 'hasWorkingCopy',
         'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
+        'revisionsEnabled' => 'revisionsEnabled',
     ];
 
     protected $configFields = [

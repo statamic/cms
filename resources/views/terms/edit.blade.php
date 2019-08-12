@@ -24,7 +24,7 @@
         initial-site="{{ $locale }}"
         :initial-is-working-copy="{{ bool_str($hasWorkingCopy) }}"
         :initial-is-root="{{ bool_str($isRoot) }}"
-        :revisions-enabled="{{ bool_str($term->revisionsEnabled()) }}"
+        :revisions-enabled="{{ bool_str($revisionsEnabled) }}"
         {{-- :amp="{{ bool_str($term->ampable()) }}" --}}
         :initial-read-only="{{ bool_str($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"

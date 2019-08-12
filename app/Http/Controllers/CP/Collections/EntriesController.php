@@ -149,6 +149,7 @@ class EntriesController extends CpController
             })->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
+            'revisionsEnabled' => $entry->revisionsEnabled(),
         ];
 
         if ($request->wantsJson()) {
