@@ -91,6 +91,10 @@ dropdown-list {
         overflow: hidden;
         margin: 6px -8px;
     }
+
+    .align-left & {
+        right: auto;
+    }
 }
 
 .dropdown-menu-checkboxes {

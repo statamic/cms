@@ -39,15 +39,18 @@
             </div>
         </sortable-list>
 
-        <div class="set-buttons" v-if="!isReadOnly">
-            <button
-                v-for="set in setConfigs"
-                :key="set.handle"
-                class="btn mr-1 mb-1"
-                @click.prevent="addSet(set.handle)"
-            >
-                {{ set.display }} <i class="icon icon-plus icon-right"></i>
-            </button>
+        <div class="replicator-set-picker inline-block">
+            <dropdown-list ref="setSelectorDropdown" v-if="!isReadOnly" class="align-left">
+                <template v-slot:trigger>
+                    <button type="button" class="btn btn-round">
+                        <span class="icon icon-plus text-grey-80 antialiased"></span>
+                    </button>
+                </template>
+
+                <div v-for="set in setConfigs" :key="set.handle">
+                    <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
+                </div>
+            </dropdown-list>
         </div>
 
     </div>
