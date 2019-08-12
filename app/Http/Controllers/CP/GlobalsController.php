@@ -53,12 +53,11 @@ class GlobalsController extends CpController
 
         event(new PublishBlueprintFound($blueprint, 'globals', $set));
 
-        $fields = $blueprint
-            ->fields()
-            ->addValues($set->values())
-            ->preProcess();
+        [$values, $meta] = $this->extractFromFields($set, $blueprint);
 
-        $values = $fields->values();
+        if ($hasOrigin = $set->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($set->origin(), $blueprint);
+        }
 
         $viewData = [
             'reference' => $set->reference(),
@@ -67,13 +66,14 @@ class GlobalsController extends CpController
                 'save' => $set->updateUrl(),
             ],
             'values' => $values,
-            'meta' => $fields->meta(),
+            'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $set),
             'locale' => $set->locale(),
             'localizedFields' => array_keys($set->data()),
-            'hasOrigin' => $hasOrigin = $set->hasOrigin(),
-            'originValues' => $hasOrigin ? $set->origin()->data() : [],
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
             'localizations' => $set->globalSet()->sites()->map(function ($handle) use ($set) {
                 $localized = $set->globalSet()->in($handle);
                 $exists = $localized !== null;
@@ -214,5 +214,15 @@ class GlobalsController extends CpController
         $set->delete();
 
         return response('', 204);
+    }
+
+    protected function extractFromFields($set, $blueprint)
+    {
+        $fields = $blueprint
+            ->fields()
+            ->addValues($set->values())
+            ->preProcess();
+
+        return [$fields->values(), $fields->meta()];
     }
 }

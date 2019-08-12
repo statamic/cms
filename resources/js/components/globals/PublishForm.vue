@@ -127,6 +127,7 @@ export default {
         initialLocalizedFields: Array,
         initialHasOrigin: Boolean,
         initialOriginValues: Object,
+        initialOriginMeta: Object,
         initialSite: String,
         globalsUrl: String,
         initialActions: Object,
@@ -148,7 +149,8 @@ export default {
             localizations: _.clone(this.initialLocalizations),
             localizedFields: this.initialLocalizedFields,
             hasOrigin: this.initialHasOrigin,
-            originValues: this.initialOriginValues,
+            originValues: this.initialOriginValues || {},
+            originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
             error: null,
             errors: {},
@@ -306,6 +308,10 @@ export default {
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
+
+            // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
+            // If you sync the field, the preloaded data would be outdated and an ID would show instead of the titles.
+            this.meta[handle] = this.originMeta[handle];
         },
 
         desyncField(handle) {
