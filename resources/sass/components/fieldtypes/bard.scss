@@ -51,6 +51,25 @@
     }
 }
 
+.bard-fixed-toolbar.dark {
+    @apply bg-black rounded-full shadow-lg px-2;
+
+    button {
+        @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center bg-transparent;
+        height: 32px;
+        width: 32px;
+        margin: 0 2px;
+    }
+
+    button:hover {
+        @apply text-blue;
+    }
+
+    button.active {
+        @apply text-white;
+    }
+}
+
 .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
     position: relative;
 }
