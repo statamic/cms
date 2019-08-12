@@ -147,6 +147,26 @@
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="name">Taxonomies</label>
+                <publish-field-meta
+                    :config="{ handle: 'taxonomies', type: 'taxonomies' }"
+                    :initial-value="collection.taxonomies">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            :config="{ handle: 'taxonomies', type: 'taxonomies' }"
+                            :value="value"
+                            :meta="meta"
+                            name="taxonomies"
+                            @input="collection.taxonomies = $event" />
+                    </div>
+                </publish-field-meta>
+                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Entries in this collection may be related to terms in these taxonomies. Fields will be automatically added to publish forms.
+                </div>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Template</label>
                 <publish-field-meta
                     :config="{ handle: 'template', type: 'template' }"
@@ -304,6 +324,7 @@ export default {
                 dateBehavior: 'articles',
                 sortDirection: 'desc',
                 blueprints: [],
+                taxonomies: [],
                 template: null,
                 layout: null,
                 route: null,

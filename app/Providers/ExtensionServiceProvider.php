@@ -110,6 +110,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\StructureSites::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Taxonomy::class,
+        Fieldtypes\Taxonomies::class,
         Fieldtypes\Template::class,
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,

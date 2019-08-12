@@ -115,6 +115,7 @@ class CollectionsController extends CpController
             'amp' => 'boolean',
             'structure' => 'nullable',
             'mount' => 'nullable',
+            'taxonomies' => 'array',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -188,7 +189,8 @@ class CollectionsController extends CpController
             ->orderable($structure ? false : $data['orderable'])
             ->ampable($data['amp'])
             ->entryBlueprints($data['blueprints'])
-            ->mount($data['mount'] ?? null);
+            ->mount($data['mount'] ?? null)
+            ->taxonomies($data['taxonomies'] ?? []);
     }
 
     protected function editFormBlueprint()
@@ -257,6 +259,10 @@ class CollectionsController extends CpController
                 'type' => 'blueprints',
                 'instructions' => __('Entries in this collection may use any of these blueprints.'),
                 'validate' => 'min:1',
+            ],
+            'taxonomies' => [
+                'type' => 'taxonomies',
+                'instructions' => __('Entries in this collection may be related to terms in these taxonomies. Fields will be automatically added to publish forms.'),
             ],
             'template' => [
                 'type' => 'text',
