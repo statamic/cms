@@ -33,7 +33,7 @@ export default {
     data() {
         return {
             fieldset: {sections:[{fields:this.filter.fields}]},
-            values: this.initialValues || {},
+            values: this.initialValues || this.filter.values || {},
             errors: {},
         }
     },
@@ -44,8 +44,11 @@ export default {
             this.values = this.initialValues || {};
         },
 
-        value(value) {
-            this.$emit('changed', value);
+        value: {
+            deep: true,
+            handler(value) {
+                this.$emit('changed', value);
+            }
         }
 
     }

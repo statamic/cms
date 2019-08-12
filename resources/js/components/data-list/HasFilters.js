@@ -41,7 +41,13 @@ export default {
         },
 
         filtersReset() {
-            this.activeFilters = {};
+            let activeFilters = {};
+
+            this.filters.forEach(filter => {
+                activeFilters[filter.handle] = filter.values;
+            });
+
+            this.activeFilters = activeFilters;
         },
 
         unselectAllItems() {
