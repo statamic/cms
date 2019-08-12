@@ -49,7 +49,12 @@ class BlueprintController extends CpController
             ->setHandle(snake_case($request->title))
             ->setContents([
                 'title' => $request->title,
-                'sections' => []
+                'sections' => [
+                    'main' => [
+                        'display' => 'Main',
+                        'fields' => []
+                    ]
+                ]
             ])->save();
 
         return redirect($blueprint->editUrl())->with('message', __('Saved'));
