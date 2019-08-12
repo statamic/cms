@@ -1,6 +1,6 @@
 <template>
     <div class="relative">
-        <div class="bard-fixed-toolbar bard-toolbar-setting border rounded" ref="buttons">
+        <div class="bard-fixed-toolbar bg-grey-100 text-white bard-toolbar-setting rounded-lg px-2 p-1" ref="buttons">
 
             <button
                 v-for="button in buttons"
@@ -8,8 +8,10 @@
                 v-tooltip="button.text"
                 :class="{'active': enabled(button.name)}"
                 @click="toggleButton(button.name)"
-                v-html="button.html"
-            ></button>
+            >
+                <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
+                <div class="flex items-center" v-html="button.html" v-if="button.html"></div>
+            </button>
 
         </div>
     </div>
