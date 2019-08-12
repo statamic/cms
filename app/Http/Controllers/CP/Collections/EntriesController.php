@@ -210,7 +210,7 @@ class EntriesController extends CpController
                 ->save();
         }
 
-        return $entry->toArray();
+        return $entry->fresh()->toArray();
     }
 
     public function create(Request $request, $collection, $site)

@@ -23,7 +23,6 @@ export default {
 
         saved(response) {
             this.$emit('updated', response.data);
-            this.$nextTick(() => this.close());
         }
 
     }
