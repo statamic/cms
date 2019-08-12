@@ -453,14 +453,14 @@ export default {
 
     watch: {
 
-        /**
-         * The components deal with passing around asset objects, however
-         * our fieldtype is only concerned with their respective IDs.
-         */
-        assets() {
+        assets(assets) {
             if (this.initializing) return;
 
-            this.update(_.pluck(this.assets, 'id'));
+            // The components deal with passing around asset objects, however
+            // our fieldtype is only concerned with their respective IDs.
+            this.update(_.pluck(assets, 'id'));
+
+            this.updateMeta({ data: assets });
         },
 
         loading(loading) {
