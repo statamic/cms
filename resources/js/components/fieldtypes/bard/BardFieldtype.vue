@@ -6,7 +6,7 @@
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
                 <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
                     <component
-                        v-for="button in buttons"
+                        v-for="button in visibleButtons(buttons, isActive)"
                         :key="button.name"
                         :is="button.component || 'BardToolbarButton'"
                         :button="button"
@@ -36,7 +36,7 @@
                     :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`"
                 >
                     <component
-                        v-for="button in buttons"
+                        v-for="button in visibleButtons(buttons, isActive)"
                         :key="button.name"
                         :is="button.component || 'BardToolbarButton'"
                         :button="button"
@@ -356,6 +356,10 @@ export default {
         buttonIsVisible(isActive, button) {
             if (! button.hasOwnProperty('visibleWhenActive')) return true;
             return isActive[button.visibleWhenActive](button.args);
+        },
+
+        visibleButtons(buttons, isActive) {
+            return buttons.filter(button => this.buttonIsVisible(isActive, button));
         },
 
         valueToContent(value) {
