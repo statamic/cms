@@ -65,7 +65,13 @@ class Grid extends Fieldtype
 
     public function preProcess($data)
     {
-        return collect($data)->map(function ($row, $i) {
+        $data = collect($data);
+
+        if ($minRows = $this->config('min_rows')) {
+            $data = $data->pad($minRows, []);
+        }
+
+        return $data->map(function ($row, $i) {
             return $this->preProcessRow($row, $i);
         })->all();
     }
