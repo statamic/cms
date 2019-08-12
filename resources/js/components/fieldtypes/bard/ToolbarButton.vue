@@ -1,11 +1,10 @@
 <template>
 
-    <button
-        :class="{ active }"
-        v-html="button.html"
-        v-tooltip="button.text"
-        @click="editor.commands[button.command](button.args)"
-    />
+    <button :class="{ active }" v-tooltip="button.text"  @click="editor.commands[button.command](button.args)">
+        <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
+        <div v-html="button.html" v-if="button.html"></div>
+    </button>
+
 
 </template>
 

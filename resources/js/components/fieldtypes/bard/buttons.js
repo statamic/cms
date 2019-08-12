@@ -24,7 +24,7 @@ const availableButtons = () => [
 const addButtonHtml = (buttons) => {
     return buttons.map(button => {
         if (!button.html) {
-            button.html = button.icon ? `<i class="fa fa-${button.icon}"></i>` : button.text;
+            button.html = button.icon ? `<i class="fa fa-${button.icon}"></i>` : false;
         }
         return button;
     });
