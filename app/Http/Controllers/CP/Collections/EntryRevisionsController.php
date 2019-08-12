@@ -76,7 +76,7 @@ class EntryRevisionsController extends CpController
             'meta' => $fields->meta(),
             'collection' => $this->collectionToArray($entry->collection()),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $entry),
+            'readOnly' => true,
             'published' => $entry->published(),
             'locale' => $entry->locale(),
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
