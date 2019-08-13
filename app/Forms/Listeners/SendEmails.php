@@ -10,7 +10,7 @@ class SendEmails
 {
     public function handle(Submission $submission)
     {
-        $config = $submission->formset()->get('email', []);
+        $config = $submission->form()->email() ?? [];
 
         // Ensure its an array of emails
         $config = (isset($config['to'])) ? [$config] : $config;
