@@ -64,17 +64,6 @@ class Form implements FormContract
             ->args(func_get_args());
     }
 
-    // /**
-    //  * Get or set an email.
-    //  *
-    //  * @param mixed $handle
-    //  * @return mixed
-    //  */
-    // public function email($email = null)
-    // {
-    //     return $this->fluentlyGetOrSet('email')->args(func_get_args());
-    // }
-
     /**
      * Get or set the honeypot field.
      *
@@ -161,14 +150,45 @@ class Form implements FormContract
         return $this;
     }
 
+    // TODO: Reimplement metrics()
     public function metrics($metrics = null)
     {
         return collect();
+
+        // if (! is_null($metrics)) {
+        //     return $this->formset()->set('metrics', $metrics);
+        // }
+
+        // $metrics = [];
+
+        // foreach ($this->formset()->get('metrics', []) as $config) {
+        //     $name = Str::studly($config['type']);
+
+        //     $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
+
+        //     if (! class_exists($class)) {
+        //         $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
+        //     }
+
+        //     if (! class_exists($class)) {
+        //         \Log::error("Metric [{$config['type']}] does not exist.");
+        //         continue;
+        //     }
+
+        //     $metrics[] = new $class($this, $config);
+        // }
+
+        // return $metrics;
     }
 
+    // TODO: Reimplement email()
     public function email($email = null)
     {
-        //
+        // if (is_null($email)) {
+        //     return $this->formset()->get('email', []);
+        // }
+
+        // $this->formset()->set('email', $email);
     }
 
     /**
@@ -253,6 +273,7 @@ class Form implements FormContract
      */
     public function isUploadableField($field)
     {
+        // TODO: Reimplement isUploadableField()
         return false;
 
         // $field = collect($this->fields())->get($field);
@@ -260,26 +281,14 @@ class Form implements FormContract
         // return in_array(array_get($field, 'type'), ['file', 'files', 'asset', 'assets']);
     }
 
-    // /**
-    //  * Get or set the fields
-    //  *
-    //  * @param  array|null $fields
-    //  * @return array
-    //  */
-    // public function fields($fields = null)
-    // {
-    //     return $this->formset()->fields($fields);
-    // }
-
     /**
-     * Get the date format
+     * Get the date format.
      *
      * @return string
      */
     public function dateFormat()
     {
-        // TODO: Should this be a form.yaml config?  or a config/forms.php config?
-        // It used to be a form.yaml config, but feels like a weird place?
+        // TODO: Should this be a form.yaml config, a config/forms.php config, or a global config?
         return 'M j, Y @ h:m';
 
         // return $this->formset()->get('date_format', 'M j, Y @ h:m');
@@ -291,55 +300,6 @@ class Form implements FormContract
         // ie. formset()->get('sanitize', true)
         return true;
     }
-
-    // /**
-    //  * Get or set the metrics
-    //  *
-    //  * @param array|null $metrics
-    //  * @return array
-    //  */
-    // public function metrics($metrics = null)
-    // {
-    //     if (! is_null($metrics)) {
-    //         return $this->formset()->set('metrics', $metrics);
-    //     }
-
-    //     $metrics = [];
-
-    //     foreach ($this->formset()->get('metrics', []) as $config) {
-    //         $name = Str::studly($config['type']);
-
-    //         $class = "Statamic\\Forms\\Metrics\\{$name}Metric";
-
-    //         if (! class_exists($class)) {
-    //             $class = "Statamic\\Addons\\{$name}\\{$name}Metric";
-    //         }
-
-    //         if (! class_exists($class)) {
-    //             \Log::error("Metric [{$config['type']}] does not exist.");
-    //             continue;
-    //         }
-
-    //         $metrics[] = new $class($this, $config);
-    //     }
-
-    //     return $metrics;
-    // }
-
-    // /**
-    //  * Get or set the email config
-    //  *
-    //  * @param  array|null $email
-    //  * @return array
-    //  */
-    // public function email($email = null)
-    // {
-    //     if (is_null($email)) {
-    //         return $this->formset()->get('email', []);
-    //     }
-
-    //     $this->formset()->set('email', $email);
-    // }
 
     /**
      * Convert to an array.
