@@ -8,6 +8,7 @@ use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 use Statamic\Revisions\Revision;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class RevisionsTest extends TestCase
@@ -21,12 +22,12 @@ class RevisionsTest extends TestCase
 
         Carbon::setTestNow($now = Carbon::parse('2019-03-25 13:15'));
 
-        $revision = Entry::make()
-            ->id('123')
+        $revision = EntryFactory::id('123')
             ->collection(Collection::make('test'))
-            ->in('default', function ($loc) {
-                $loc->slug('my-entry')->data(['foo' => 'bar']);
-            })->makeRevision();
+            ->slug('my-entry')
+            ->data(['foo' => 'bar'])
+            ->make()
+            ->makeRevision();
 
         $revision
             ->user($user = User::make())
@@ -36,9 +37,9 @@ class RevisionsTest extends TestCase
         $this->assertEquals('test', $revision->message());
         $this->assertEquals($user, $revision->user());
         $this->assertEquals($now, $revision->date());
-        $this->assertEquals('collections/test/default/123', $revision->key());
+        $this->assertEquals('collections/test/en/123', $revision->key());
         $this->assertEquals(['id' => '123', 'published' => true, 'slug' => 'my-entry', 'data' => ['foo' => 'bar']], $revision->attributes());
         $this->assertEquals('123', $revision->attribute('id'));
-        $this->assertEquals('/path/to/collections/test/default/123/'.$now->timestamp.'.yaml', $revision->path());
+        $this->assertEquals('/path/to/collections/test/en/123/'.$now->timestamp.'.yaml', $revision->path());
     }
 }
