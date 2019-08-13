@@ -22,7 +22,7 @@ class Form implements FormContract
     protected $handle;
     protected $title;
     protected $blueprint;
-    protected $honeypot = 'honeypot';
+    protected $honeypot;
 
     /**
      * Get or set the handle.
@@ -84,6 +84,9 @@ class Form implements FormContract
     public function honeypot($honeypot = null)
     {
         return $this->fluentlyGetOrSet('honeypot')
+            ->getter(function ($honeypot) {
+                return $honeypot ?? 'honeypot';
+            })
             ->setter(function ($honeypot) {
                 return $honeypot === 'honeypot' ? null : $honeypot;
             })
