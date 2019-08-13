@@ -2,10 +2,7 @@
 
 namespace Statamic\Forms;
 
-use Statamic\API\Str;
 use Statamic\API\Form;
-use Statamic\API\File;
-use Statamic\API\Metrics;
 use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget
@@ -14,22 +11,18 @@ class Widget extends BaseWidget
 
     public function html()
     {
-        $form = $this->get('form');
+        $form = Form::find($handle = $this->config('form'));
 
-        if (! Form::get($form)) {
-            return "Error: Form [$form] doesn't exist.";
+        if (! $form) {
+            return "Error: Form [$handle] doesn't exist.";
         }
 
-        $form = Form::get($form);
-
-        $data = [
+        return view('statamic::forms.widget', [
             'form'        => $form,
-            'format'      => $this->get('date_format', $form->dateFormat()),
-            'fields'      => $this->get('fields', []),
-            'submissions' => collect_content($form->submissions())->reverse()->limit($this->getInt('limit', 5))->toArray(),
-            'title'       => $this->get('title', $form->title())
-        ];
-
-        return view('statamic::forms.widget', $data);
+            'format'      => $this->config('date_format', $form->dateFormat()),
+            'fields'      => $this->config('fields', []),
+            'submissions' => collect_content($form->submissions())->reverse()->limit((int) $this->config('limit', 5))->toArray(),
+            'title'       => $this->config('title', $form->title())
+        ]);
     }
 }
