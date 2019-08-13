@@ -172,6 +172,7 @@ class Bard extends Replicator
             'type' => 'set',
             'attrs' => [
                 'id' => "set-$index",
+                'enabled' => array_pull($values, 'enabled', true),
                 'values' => $values,
             ]
         ];
@@ -202,6 +203,10 @@ class Bard extends Replicator
 
     public function isLegacyData($value)
     {
+        if (is_string($value)) {
+            return false;
+        }
+
         $configuredTypes = array_keys($this->config('sets', []));
         $configuredTypes[] = 'text';
         $dataTypes = collect($value)->map->type;

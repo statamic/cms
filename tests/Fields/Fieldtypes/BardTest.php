@@ -59,13 +59,13 @@ class BardTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, (new Bard)->augment($data));
+        $this->assertEquals($expected, $this->bard()->augment($data));
     }
 
     /** @test */
     function it_doesnt_augment_when_saved_as_html()
     {
-        $this->assertEquals('<p>Paragraph</p>', (new Bard)->augment('<p>Paragraph</p>'));
+        $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
     }
 
     /** @test */
@@ -118,7 +118,7 @@ class BardTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, (new Bard)->augment($data));
+        $this->assertEquals($expected, $this->bard()->augment($data));
     }
 
     /** @test */
@@ -143,7 +143,7 @@ class BardTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, json_decode((new Bard)->preProcess($data), true));
+        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
     }
 
     /** @test */
@@ -227,6 +227,8 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'set-2',
+                    'enabled' => true,
                     'values' => [
                         'type' => 'myset',
                         'foo' => 'bar',
@@ -242,12 +244,11 @@ class BardTest extends TestCase
             ]
         ];
 
-        $bard = new Bard;
-        $bard->setField(new Field('test', [
+        $bard = $this->bard([
             'sets' => [
                 'myset' => [],
             ]
-        ]));
+        ]);
 
         $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
     }
@@ -263,6 +264,8 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'set-0',
+                    'enabled' => true,
                     'values' => [
                         'type' => 'myset',
                         'foo' => 'bar',
@@ -280,5 +283,10 @@ class BardTest extends TestCase
         ]));
 
         $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
+    }
+
+    private function bard($config = [])
+    {
+        return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], $config)));
     }
 }
