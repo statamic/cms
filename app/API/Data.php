@@ -2,8 +2,8 @@
 
 namespace Statamic\API;
 
-use Statamic\Data\DataRepository;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Contracts\Data\Repositories\DataRepository;
 
 class Data extends Facade
 {

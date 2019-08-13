@@ -107,6 +107,17 @@ class AppServiceProvider extends ServiceProvider
             $this->app->singleton($abstract, $concrete);
         });
 
+        $this->app->singleton(\Statamic\Contracts\Data\Repositories\DataRepository::class, function ($app) {
+            return (new \Statamic\Data\DataRepository)
+                ->setRepository('route', \Statamic\Routing\RouteRepository::class)
+                ->setRepository('entry', \Statamic\Contracts\Data\Repositories\EntryRepository::class)
+                ->setRepository('term', \Statamic\Contracts\Data\Repositories\TermRepository::class)
+                ->setRepository('taxonomy', \Statamic\Contracts\Data\Repositories\TaxonomyRepository::class)
+                ->setRepository('global', \Statamic\Contracts\Data\Repositories\GlobalRepository::class)
+                ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
+                ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
+        });
+
         $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function ($app) {
             return (new \Statamic\Fields\BlueprintRepository($app['files']))
                 ->setDirectory(resource_path('blueprints'))

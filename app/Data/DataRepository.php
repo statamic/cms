@@ -14,15 +14,7 @@ use Statamic\Contracts\Data\Repositories\TaxonomyRepository;
 
 class DataRepository
 {
-    protected $repositories = [
-        'route' => RouteRepository::class,
-        'entry' => EntryRepository::class,
-        'term' => TermRepository::class,
-        'taxonomy' => TaxonomyRepository::class,
-        'global' => GlobalRepository::class,
-        'asset' => AssetRepository::class,
-        'user' => UserRepository::class,
-    ];
+    protected $repositories = [];
 
     public function setRepository($handle, $class)
     {
