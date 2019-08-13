@@ -10,7 +10,7 @@ class PublishedEntriesController extends CpController
 {
     public function store(Request $request, $collection, $entry)
     {
-        $this->authorize('publish', $collection);
+        $this->authorize('publish', $entry);
 
         $entry = $entry->publish([
             'message' => $request->message,
@@ -22,7 +22,7 @@ class PublishedEntriesController extends CpController
 
     public function destroy(Request $request, $collection, $entry)
     {
-        $this->authorize('publish', $collection);
+        $this->authorize('publish', $entry);
 
         $entry->unpublish([
             'message' => $request->message,

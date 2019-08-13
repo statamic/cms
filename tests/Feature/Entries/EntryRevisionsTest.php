@@ -9,6 +9,7 @@ use Statamic\API\User;
 use Statamic\API\Entry;
 use Statamic\API\Folder;
 use Statamic\Fields\Fields;
+use Statamic\API\Collection;
 use Statamic\Fields\Blueprint;
 use Illuminate\Support\Carbon;
 use Statamic\Revisions\Revision;
@@ -26,7 +27,10 @@ class EntryRevisionsTest extends TestCase
     {
         parent::setUp();
         $this->dir = __DIR__.'/tmp';
+        config(['statamic.revisions.enabled' => true]);
         config(['statamic.revisions.path' => $this->dir]);
+        $this->setTestUserBlueprint();
+        $this->collection = Collection::make('blog')->revisionsEnabled(true)->save();
     }
 
     public function tearDown(): void
@@ -41,7 +45,7 @@ class EntryRevisionsTest extends TestCase
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
-        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
         $entry = EntryFactory::id('1')
@@ -101,7 +105,7 @@ class EntryRevisionsTest extends TestCase
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
-        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
         $entry = EntryFactory::id('1')
@@ -332,5 +336,11 @@ class EntryRevisionsTest extends TestCase
         $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
 
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
+    }
+
+    private function setTestUserBlueprint()
+    {
+        $blueprint = \Statamic\API\Blueprint::find('user');
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
     }
 }

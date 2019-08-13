@@ -47,8 +47,8 @@ class EntryPolicy
         return $user->hasPermission("delete {$entry->collectionHandle()} entries");
     }
 
-    public function publish($user, $collection)
+    public function publish($user, $entry)
     {
-        return $user->hasPermission("publish {$collection->handle()} entries");
+        return $user->hasPermission("publish {$entry->collectionHandle()} entries");
     }
 }
