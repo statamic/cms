@@ -11,6 +11,7 @@ use Statamic\View\Cascade;
 use Statamic\API\GlobalSet;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Carbon;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class CascadeTest extends TestCase
@@ -299,12 +300,10 @@ class CascadeTest extends TestCase
     function it_hydrates_page_data()
     {
         $vars = ['foo' => 'bar', 'baz' => 'qux'];
-        $page = \Statamic\API\Entry::make()
-            ->id('test')
-            ->collection(\Statamic\API\Collection::create('example'))
-            ->in(function ($loc) use ($vars) {
-                $loc->data($vars);
-            });
+        $page = EntryFactory::id('test')
+            ->collection('example')
+            ->data($vars)
+            ->make();
         $cascade = $this->cascade()->withContent($page);
 
         $this->assertEquals($page, $cascade->content());
@@ -345,12 +344,10 @@ class CascadeTest extends TestCase
     {
         $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.
 
-        $page = \Statamic\API\Entry::make()
-            ->id('test')
-            ->collection(\Statamic\API\Collection::create('example'))
-            ->in(function ($loc) {
-                $loc->data(['foo' => 'foo defined in page']);
-            });
+        $page = EntryFactory::id('test')
+            ->collection('example')
+            ->data(['foo' => 'foo defined in page'])
+            ->make();
 
         $this->createGlobal('global', ['foo' => 'foo defined in global']);
 
@@ -366,15 +363,13 @@ class CascadeTest extends TestCase
     /** @test */
     function it_merges_view_model_data()
     {
-        $page = \Statamic\API\Entry::make()
-            ->id('test')
-            ->collection(\Statamic\API\Collection::create('example'))
-            ->in(function ($loc) {
-                $loc->data([
-                    'foo' => 'foo defined in page',
-                    'view_model' => 'Tests\View\FakeViewModel',
-                ]);
-            });
+        $page = EntryFactory::id('test')
+            ->collection('example')
+            ->data([
+                'foo' => 'foo defined in page',
+                'view_model' => 'Tests\View\FakeViewModel',
+            ])
+            ->make();
 
         $cascade = $this->cascade()->withContent($page);
 
@@ -399,9 +394,11 @@ class CascadeTest extends TestCase
 
     private function createGlobal($handle, $data)
     {
-        GlobalSet::make()->handle($handle)->in(function ($loc) use ($data) {
-            $loc->data($data);
-        })->save();
+        $global = GlobalSet::make()->handle($handle);
+        $global->addLocalization(
+            $global->makeLocalization('en')->data($data)
+        );
+        $global->save();
     }
 }
 
