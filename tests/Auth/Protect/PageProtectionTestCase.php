@@ -4,8 +4,8 @@ namespace Tests\Auth\Protect;
 
 use Tests\TestCase;
 use Tests\FakesViews;
-use Statamic\API\Entry;
 use Statamic\API\Collection;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class PageProtectionTestCase extends TestCase
@@ -33,11 +33,10 @@ class PageProtectionTestCase extends TestCase
             ->route('{slug}')
             ->template('default');
 
-        Entry::create()
+        EntryFactory::slug($slug)
             ->id($slug)
             ->collection($collection)
-            ->in(function ($loc) use ($slug, $attributes) {
-                $loc->slug($slug)->data($attributes['data']);
-            })->save();
+            ->data($attributes['data'])
+            ->create();
     }
 }

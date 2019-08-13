@@ -3,8 +3,8 @@
 namespace Tests\Auth\Protect;
 
 use Tests\TestCase;
-use Statamic\API\Entry;
 use Statamic\Auth\Protect\Protection;
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Statamic\Auth\Protect\Protectors\Protector;
@@ -112,11 +112,9 @@ class ProtectionTest extends TestCase
 
     private function createEntryWithScheme($scheme)
     {
-        return Entry::make()
-            ->id('test')
+        return EntryFactory::id('test')
             ->collection('test')
-            ->in(function ($loc) use ($scheme) {
-                $loc->set('protect', $scheme);
-            });
+            ->data(['protect' => $scheme])
+            ->make();
     }
 }
