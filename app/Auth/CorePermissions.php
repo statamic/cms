@@ -163,7 +163,7 @@ class CorePermissions
                 Permission::make('delete {form} form submissions')
             ])->withReplacements('form', function () {
                 return Form::all()->map(function ($form) {
-                    return ['value' => $form->name(), 'label' => $form->title()];
+                    return ['value' => $form->handle(), 'label' => $form->title()];
                 });
             });
         });
