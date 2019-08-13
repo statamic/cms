@@ -4,6 +4,7 @@ namespace Tests\Assets;
 
 use Tests\TestCase;
 use Statamic\Assets\Asset;
+use Illuminate\Support\Carbon;
 use Statamic\Assets\Dimensions;
 use Statamic\API\AssetContainer;
 use Illuminate\Http\UploadedFile;
@@ -62,6 +63,8 @@ class DimensionsTest extends TestCase
     /** @test */
     function it_gets_the_dimensions()
     {
+        Carbon::setTestNow(now());
+
         $asset = (new Asset)
             ->container(AssetContainer::make('test-container')->disk('test'))
             ->path('path/to/asset.jpg');
@@ -71,7 +74,9 @@ class DimensionsTest extends TestCase
             ->andReturnNull();
 
         Cache::shouldReceive('put')
-            ->with($cacheKey, [30, 60], 60);
+            ->with($cacheKey, [30, 60], \Mockery::on(function ($arg) {
+                return $arg->eq(now()->addHour());
+            }));
 
         $file = UploadedFile::fake()->image('asset.jpg', 30, 60);
         Storage::disk('test')->putFileAs('path/to', $file, 'asset.jpg');
