@@ -46,3 +46,13 @@ class NonSavingUsersStore extends \Statamic\Stache\Stores\UsersStore
 {
     public function save($user) { }
 }
+
+class NonSavingTaxonomiesStore extends \Statamic\Stache\Stores\TaxonomiesStore
+{
+    public function save($taxonomy) { }
+}
+
+class NonSavingTermsStore extends \Statamic\Stache\Stores\TermsStore
+{
+    public function save($term) { }
+}
