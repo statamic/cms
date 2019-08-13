@@ -169,13 +169,11 @@ class Entries
 
     protected function querySite($query)
     {
-        $site = Arr::getFirst($this->parameters, ['site', 'locale']);
+        $site = Arr::getFirst($this->parameters, ['site', 'locale'], Site::current()->handle());
 
         if ($site === '*') {
             return;
         }
-
-        $site = Site::current()->handle();
 
         return $query->where('site', $site);
     }
