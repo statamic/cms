@@ -38,7 +38,7 @@ class Blueprint
 
         $this->contents = $contents;
 
-        return $this;
+        return $this->resetFieldsCache();
     }
 
     public function contents(): array
@@ -149,7 +149,7 @@ class Blueprint
                             $field
                         );
 
-                        return $this;
+                        return $this->resetFieldsCache();
                     }
                 }
             }
@@ -162,9 +162,7 @@ class Blueprint
 
         $this->extraFields[$section][$handle] = compact('prepend', 'field');
 
-        $this->fieldsCache = null;
-
-        return $this;
+        return $this->resetFieldsCache();
     }
 
     public function ensureFieldPrepended($handle, $field, $section = null)
@@ -181,6 +179,13 @@ class Blueprint
         if ($field = $handles->duplicates()->first()) {
             throw new \Exception("Duplicate field [{$field}] on blueprint [{$this->handle}].");
         }
+    }
+
+    protected function resetFieldsCache()
+    {
+        $this->fieldsCache = null;
+
+        return $this;
     }
 
     public static function __callStatic($method, $parameters)
