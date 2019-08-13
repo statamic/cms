@@ -137,7 +137,7 @@ trait UserContractTests
             'foo' => 'bar',
             'content' => 'Lorem Ipsum',
             'email' => 'john@example.com',
-            'id' => 123,
+            'id' => '123',
             'roles' => [
                 'role_one',
                 'role_two'
@@ -157,6 +157,8 @@ trait UserContractTests
             'is_user' => true,
             'title' => 'john@example.com',
             'edit_url' => 'http://localhost/cp/users/123/edit',
+            'permissions' => [],
+            'last_login' => null,
         ], $this->user()->toArray());
     }
 
