@@ -45,11 +45,13 @@ class GridTest extends TestCase
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
+                '_id' => 'row-0',
             ],
             [
                 'numbers' => 3,
                 'words' => 'more test',
                 'foo' => 'more bar',
+                '_id' => 'row-1',
             ]
         ], $field->preProcess()->value());
     }
@@ -122,13 +124,16 @@ class GridTest extends TestCase
                         'nested_numbers' => 3,
                         'nested_words' => 'nested test one',
                         'nested_foo' => 'nested bar one',
+                        '_id' => 'row-0',
                     ],
                     [
                         'nested_numbers' => 4,
                         'nested_words' => 'nested test two',
                         'nested_foo' => 'nested bar two',
+                        '_id' => 'row-1',
                     ]
-                ]
+                ],
+                '_id' => 'row-0',
             ],
             [
                 'numbers' => 3,
@@ -139,13 +144,16 @@ class GridTest extends TestCase
                         'nested_numbers' => 5,
                         'nested_words' => 'more nested test one',
                         'nested_foo' => 'more nested bar one',
+                        '_id' => 'row-0',
                     ],
                     [
                         'nested_numbers' => 6,
                         'nested_words' => 'more nested test two',
                         'nested_foo' => 'more nested bar two',
+                        '_id' => 'row-1',
                     ]
-                ]
+                ],
+                '_id' => 'row-1',
             ]
         ], $field->preProcess()->value());
     }

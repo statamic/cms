@@ -58,12 +58,16 @@ class ReplicatorTest extends TestCase
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
+                '_id' => 'set-0',
+                'enabled' => true,
             ],
             [
                 'type' => 'two',
                 'age' => 13,
                 'food' => 'pizza',
                 'foo' => 'more bar',
+                '_id' => 'set-1',
+                'enabled' => true,
             ]
         ], $field->preProcess()->value());
     }
@@ -127,8 +131,12 @@ class ReplicatorTest extends TestCase
                         'nested_age' => 13,
                         'nested_food' => 'pizza',
                         'nested_foo' => 'more bar',
+                        '_id' => 'set-0',
+                        'enabled' => true,
                     ]
-                ]
+                ],
+                '_id' => 'set-0',
+                'enabled' => true,
             ]
         ], $field->preProcess()->value());
     }
