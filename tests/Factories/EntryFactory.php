@@ -4,6 +4,7 @@ namespace Tests\Factories;
 
 use Statamic\API\Entry;
 use Statamic\API\Collection;
+use Statamic\Contracts\Data\Entries\Collection as StatamicCollection;
 
 class EntryFactory
 {
@@ -51,22 +52,21 @@ class EntryFactory
 
     public function make()
     {
-        $entry = Entry::make()->collection($this->createCollection());
+        $entry = Entry::make()
+            ->locale('en')
+            ->collection($this->createCollection())
+            ->slug($this->slug)
+            ->data($this->data)
+            ->published($this->published);
+
 
         if ($this->id) {
             $entry->id($this->id);
         }
 
-        $entry->in('en', function ($localized) {
-            $localized
-                ->slug($this->slug)
-                ->data($this->data)
-                ->published($this->published);
-
-            if ($this->order) {
-                $localized->order($this->order);
-            }
-        });
+        if ($this->order) {
+            $entry->order($this->order);
+        }
 
         return $entry;
     }
@@ -78,6 +78,10 @@ class EntryFactory
 
     protected function createCollection()
     {
+        if ($this->collection instanceof StatamicCollection) {
+            return $this->collection;
+        }
+
         return Collection::findByHandle($this->collection)
             ?? Collection::make($this->collection)
                 ->sites(['en'])
