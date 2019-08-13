@@ -21,7 +21,7 @@ class FallbackProtectorTest extends TestCase
         try {
             $this->protector->protect();
         } catch (HttpException $e) {
-            $this->assertEquals(403, $e->getCode());
+            $this->assertEquals(403, $e->getStatusCode());
             return;
         }
 
