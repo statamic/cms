@@ -68,7 +68,7 @@ class Submission implements SubmissionContract
      */
     public function fields()
     {
-        return $this->form()->blueprint()->fields();
+        return $this->form()->fields()->map->toArray();
     }
 
     /**
