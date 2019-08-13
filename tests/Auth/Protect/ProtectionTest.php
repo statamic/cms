@@ -5,6 +5,7 @@ namespace Tests\Auth\Protect;
 use Tests\TestCase;
 use Statamic\Auth\Protect\Protection;
 use Facades\Tests\Factories\EntryFactory;
+use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Statamic\Auth\Protect\Protectors\Protector;
@@ -13,6 +14,8 @@ use Statamic\Auth\Protect\Protectors\Authenticated;
 
 class ProtectionTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public function setUp(): void
     {
         parent::setUp();
