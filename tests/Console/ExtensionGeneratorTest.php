@@ -39,16 +39,16 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_filter()
+    function it_can_make_a_scope()
     {
-        $path = $this->preparePath('app/Filters/Dog.php');
+        $path = $this->preparePath('app/Scopes/Dog.php');
 
         $this->assertFileNotExists($path);
 
-        $this->artisan('statamic:make:filter', ['name' => 'Dog']);
+        $this->artisan('statamic:make:scope', ['name' => 'Dog']);
 
         $this->assertFileExists($path);
-        $this->assertContains('namespace App\Filters;', $this->files->get($path));
+        $this->assertContains('namespace App\Scopes;', $this->files->get($path));
     }
 
     /** @test */
@@ -204,8 +204,8 @@ class ExtensionGeneratorTest extends TestCase
 
         $this->assertFileExists("$path/src/Fieldtypes/SanHolo.php");
         $this->assertContains('namespace Ford\SanHolo\Fieldtypes;', $this->files->get("$path/src/Fieldtypes/SanHolo.php"));
-        $this->assertFileExists("$path/src/Filters/SanHolo.php");
-        $this->assertContains('namespace Ford\SanHolo\Filters;', $this->files->get("$path/src/Filters/SanHolo.php"));
+        $this->assertFileExists("$path/src/Scopes/SanHolo.php");
+        $this->assertContains('namespace Ford\SanHolo\Scopes;', $this->files->get("$path/src/Scopes/SanHolo.php"));
         $this->assertFileExists("$path/src/Modifiers/SanHolo.php");
         $this->assertContains('namespace Ford\SanHolo\Modifiers;', $this->files->get("$path/src/Modifiers/SanHolo.php"));
         $this->assertFileExists("$path/src/Tags/SanHolo.php");

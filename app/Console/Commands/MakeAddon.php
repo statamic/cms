@@ -143,7 +143,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function generateOptional()
     {
-        collect(['fieldtype', 'filter', 'modifier', 'tag', 'widget'])
+        collect(['fieldtype', 'scope', 'modifier', 'tag', 'widget'])
             ->filter(function ($type) {
                 return $this->option($type) || $this->option('all');
             })
@@ -309,7 +309,7 @@ class MakeAddon extends GeneratorCommand
         return array_merge(parent::getOptions(), [
             ['all',       'a', InputOption::VALUE_NONE, 'Generate everything and the kitchen sink with the addon'],
             ['fieldtype', 'f', InputOption::VALUE_NONE, 'Create a new fieldtype with the addon'],
-            ['filter',    'r', InputOption::VALUE_NONE, 'Create a new filter with the addon'],
+            ['scope',     's', InputOption::VALUE_NONE, 'Create a new scope with the addon'],
             ['modifier',  'm', InputOption::VALUE_NONE, 'Create a new modifier with the addon'],
             ['tag',       't', InputOption::VALUE_NONE, 'Create a new tag with the addon'],
             ['widget',    'w', InputOption::VALUE_NONE, 'Create a new widget with the addon'],
