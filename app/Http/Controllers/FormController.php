@@ -33,13 +33,13 @@ class FormController extends Controller
 
         $params = Crypt::decrypt($params);
         unset($fields['_params']);
-        $formset = array_get($params, 'formset');
 
-        $form = Form::get($formset);
+        $handle = array_get($params, 'form');
+        $form = Form::find($handle);
 
         $submission = $form->createSubmission();
 
-        if ($form->formset()->get('sanitize', true)) {
+        if ($form->sanitize()) {
             $fields = sanitize_array($fields);
         }
 
@@ -51,13 +51,13 @@ class FormController extends Controller
             // their own errors, and modify the submission.
             list($errors, $submission) = $this->runCreatingEvent($submission);
         } catch (PublishException $e) {
-            return $this->formFailure($params, $e->getErrors(), $formset);
+            return $this->formFailure($params, $e->getErrors(), $handle);
         } catch (SilentFormFailureException $e) {
             return $this->formSuccess($params, $submission);
         }
 
         if ($errors) {
-            return $this->formFailure($params, $errors, $formset);
+            return $this->formFailure($params, $errors, $handle);
         }
 
         $submission->save();
@@ -90,7 +90,7 @@ class FormController extends Controller
 
         $response = ($redirect) ? redirect($redirect) : back();
 
-        session()->flash("form.{$submission->formset()->name()}.success", true);
+        session()->flash("form.{$submission->form()->handle()}.success", true);
         session()->flash('submission', $submission);
 
         return $response;
@@ -101,10 +101,10 @@ class FormController extends Controller
      *
      * @param array $params
      * @param array $submission
-     * @param string $formset
+     * @param string $form
      * @return Response|RedirectResponse
      */
-    private function formFailure($params, $errors, $formset)
+    private function formFailure($params, $errors, $form)
     {
         if (request()->ajax()) {
             return response([
@@ -119,7 +119,7 @@ class FormController extends Controller
             $error_redirect = back();
         }
 
-        return $error_redirect->withInput()->withErrors($errors, 'form.'.$formset);
+        return $error_redirect->withInput()->withErrors($errors, 'form.'.$form);
     }
 
     /**
