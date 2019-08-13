@@ -16,7 +16,7 @@ class Tags extends BaseTags
     /**
      * @var string
      */
-    private $formsetName;
+    private $formHandle;
 
     /**
      * @var object
@@ -32,7 +32,7 @@ class Tags extends BaseTags
      */
     public function set()
     {
-        $this->context['formset'] = $this->getParam(['in', 'is', 'formset']);
+        $this->context['form'] = $this->getParam(['in', 'is', 'form', 'formset']);
 
         return $this->parse($this->context);
     }
@@ -46,7 +46,7 @@ class Tags extends BaseTags
     {
         $data = [];
 
-        $this->formsetName = $formset = $this->getFormset();
+        $this->formHandle = $this->getForm();
         $this->errorBag = $this->getErrorBag();
 
         $html = $this->formOpen(route('statamic.forms.store'));
@@ -58,20 +58,19 @@ class Tags extends BaseTags
             $data['errors'] = [];
         }
 
-        if (session()->exists("form.{$this->formsetName}.success")) {
+        if (session()->exists("form.{$this->formHandle}.success")) {
             $data['success'] = true;
         }
 
-        // Make formset data available to the tag
-        $data['fields'] = collect(Form::fields($formset))->map(function ($item) use ($data) {
-            $errors = array_get($data, 'error', []);
-            $item['error'] = array_get($errors, $item['field']);
-            return $item;
+        $data['fields'] = Form::find($this->formHandle)->fields()->map(function ($field) use ($data) {
+            return array_merge($field->toArray(), [
+                'error' => array_get($data, "error.{$field->handle()}")
+            ]);
         })->all();
 
         $this->addToDebugBar($data);
 
-        $params = compact('formset');
+        $params = ['form' => $this->formHandle];
 
         if ($redirect = $this->get('redirect')) {
             $params['redirect'] = $redirect;
@@ -97,7 +96,7 @@ class Tags extends BaseTags
      */
     public function errors()
     {
-        if (! $formset = $this->getFormset()) {
+        if (! $formset = $this->getForm()) {
             return false;
         }
 
@@ -123,7 +122,7 @@ class Tags extends BaseTags
      */
     public function success()
     {
-        if (! $formset = $this->getFormset()) {
+        if (! $formset = $this->getForm()) {
             return false;
         }
 
@@ -149,7 +148,7 @@ class Tags extends BaseTags
      */
     public function submissions()
     {
-        $submissions = Form::get($this->getFormset())->submissions();
+        $submissions = Form::find($this->getForm())->submissions();
 
         $this->collection = collect_content($submissions);
 
@@ -173,13 +172,17 @@ class Tags extends BaseTags
      *
      * @return string
      */
-    private function getFormset()
+    private function getForm()
     {
-        if (! $formset = $this->get(['formset', 'in'], array_get($this->context, 'formset'))) {
-            throw new \Exception('A formset is required on Form tags. Please refer to the docs for more information.');
+        if (! $form = $this->get(['form', 'in'], array_get($this->context, 'form'))) {
+            throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 
-        return $formset;
+        if (! Form::find($form)) {
+            throw new \Exception("Form with handle [$form] cannot be found.");
+        }
+
+        return $form;
     }
 
     /**
@@ -189,7 +192,7 @@ class Tags extends BaseTags
      */
     private function hasErrors()
     {
-        if (! $formset = $this->getFormset()) {
+        if (! $formset = $this->getForm()) {
             return false;
         }
 
@@ -206,7 +209,7 @@ class Tags extends BaseTags
     private function getErrorBag()
     {
         if ($this->hasErrors()) {
-            return session('errors')->getBag('form.'.$this->formsetName);
+            return session('errors')->getBag('form.'.$this->formHandle);
         }
     }
 
@@ -246,7 +249,7 @@ class Tags extends BaseTags
         }
 
         $debug = [];
-        $debug[$this->formsetName] = $data;
+        $debug[$this->formHandle] = $data;
 
         if ($this->blink->exists('debug_bar_data')) {
             $debug = array_merge($debug, $this->blink->get('debug_bar_data'));
