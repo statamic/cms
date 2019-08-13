@@ -109,6 +109,8 @@ class Submission implements SubmissionContract
     public function unguard()
     {
         $this->guard = false;
+
+        return $this;
     }
 
     /**
@@ -117,6 +119,8 @@ class Submission implements SubmissionContract
     public function guard()
     {
         $this->guard = true;
+
+        return $this;
     }
 
     /**
@@ -145,6 +149,8 @@ class Submission implements SubmissionContract
         }
 
         $this->data = $data;
+
+        return $this;
     }
 
     /**
