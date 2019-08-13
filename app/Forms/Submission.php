@@ -145,7 +145,7 @@ class Submission implements SubmissionContract
             $this->validate($data);
 
             // Remove any fields that aren't present in the formset.
-            $data = array_intersect_key($data, array_flip(array_keys($this->fields())));
+            $data = collect($data)->intersectByKeys($this->fields())->all();
         }
 
         $this->data = $data;
