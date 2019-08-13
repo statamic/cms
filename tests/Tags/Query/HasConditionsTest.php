@@ -4,6 +4,9 @@ namespace Tests\Tags\Query;
 
 use Statamic\API;
 use Tests\TestCase;
+use Statamic\API\Antlers;
+use Statamic\Tags\Context;
+use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
 use Statamic\Tags\Collection\Entries;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -27,6 +30,8 @@ class HasConditionsTest extends TestCase
     protected function getEntries($params = [])
     {
         $params['from'] = 'test';
+
+        $params = new Parameters($params, new Context([], Antlers::parser()));
 
         return (new Entries($params))->get();
     }

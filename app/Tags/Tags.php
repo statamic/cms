@@ -88,14 +88,45 @@ abstract class Tags
 
     public function setProperties($properties)
     {
-        $this->parser      = $properties['parser'];
-        $this->content     = $properties['content'];
-        $this->context     = new Context($properties['context'], $this->parser);
-        $this->params      = new Parameters($properties['parameters'], $this->context);
-        $this->parameters  = $this->params; // TODO: Remove with HasParameters trait
-        $this->isPair      = $this->content !== '';
+        $this->setParser($properties['parser']);
+        $this->setContent($properties['content']);
+        $this->setContext($properties['context']);
+        $this->setParameters($properties['parameters']);
         $this->tag         = array_get($properties, 'tag');
         $this->method      = array_get($properties, 'tag_method');
+    }
+
+    public function setParser($parser)
+    {
+        $this->parser = $parser;
+
+        return $this;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+        $this->isPair = $content !== '';
+
+        return $this;
+    }
+
+    public function setContext($context)
+    {
+        $this->context = new Context($context, $this->parser);
+
+        return $this;
+    }
+
+    public function setParameters($parameters)
+    {
+        $this->params = new Parameters($parameters, $this->context);
+
+        // Temporary BC alias.
+        // TODO: Remove with HasParameters trait
+        $this->parameters = $this->params;
+
+        return $this;
     }
 
     /**

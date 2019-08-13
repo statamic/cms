@@ -4,9 +4,14 @@ namespace Tests\Tags\Collection;
 
 use Statamic\API;
 use Tests\TestCase;
+use Statamic\API\Site;
+use Statamic\API\Antlers;
+use Statamic\Tags\Context;
+use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Tags\Collection\Entries;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class EntriesTest extends TestCase
@@ -23,16 +28,29 @@ class EntriesTest extends TestCase
         app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;
     }
 
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app['config']->set('statamic.sites', [
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/',]
+            ]
+        ]);
+}
+
     protected function makeEntry()
     {
-        $entry = API\Entry::make()->collection($this->collection);
-
-        return $entry->makeAndAddLocalization('en', function ($loc) { });
+        return EntryFactory::collection($this->collection)->make();
     }
 
     protected function getEntries($params = [])
     {
         $params['from'] = 'test';
+
+        $params = new Parameters($params, new Context([], Antlers::parser()));
 
         return (new Entries($params))->get();
     }
@@ -73,18 +91,17 @@ class EntriesTest extends TestCase
         $this->makeEntry()->set('title', 'One')->save();
         $this->makeEntry()->set('title', 'Two')->save();
         $this->makeEntry()->set('title', 'Three')->save();
+        $this->makeEntry()->set('title', 'Quatre')->locale('fr')->save();
+        $this->makeEntry()->set('title', 'Cinq')->locale('fr')->save();
 
-        $entry = API\Entry::make()->collection($this->collection);
-        $entry->makeAndAddLocalization('fr', function ($loc) { })->set('title', 'Quatre')->save();
+        $this->assertCount(3, $this->getEntries(['site' => 'en']));
+        $this->assertCount(2, $this->getEntries(['site' => 'fr']));
+        $this->assertCount(5, $this->getEntries(['site' => '*']));
 
-        $entry = API\Entry::make()->collection($this->collection);
-        $entry->makeAndAddLocalization('fr', function ($loc) { })->set('title', 'Cinq')->save();
-
-        $this->assertCount(5, $this->getEntries());
-
-        // TODO: Come back and finish these assertions when we finish multi-site propagation stuff...
-        // $this->assertCount(3, $this->getEntries(['site' => 'en']));
-        // $this->assertCount(2, $this->getEntries(['site' => 'fr']));
+        Site::setCurrent('en');
+        $this->assertCount(3, $this->getEntries());
+        Site::setCurrent('fr');
+        $this->assertCount(2, $this->getEntries());
     }
 
     /** @test */

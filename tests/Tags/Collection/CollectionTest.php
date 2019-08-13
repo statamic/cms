@@ -4,9 +4,13 @@ namespace Tests\Tags\Collection;
 
 use Statamic\API;
 use Tests\TestCase;
+use Statamic\API\Antlers;
+use Statamic\Tags\Context;
+use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Collection\Collection;
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class CollectionTest extends TestCase
@@ -21,14 +25,15 @@ class CollectionTest extends TestCase
         $this->art = API\Collection::make('art')->save();
         $this->books = API\Collection::make('books')->save();
         $this->foods = API\Collection::make('foods')->save();
-        $this->collectionTag = new Collection;
+
+        $this->collectionTag = (new Collection)
+            ->setParser(Antlers::parser())
+            ->setContext([]);
     }
 
     protected function makeEntry($collection)
     {
-        $entry = API\Entry::make()->collection($collection);
-
-        return $entry->makeAndAddLocalization('en', function ($loc) { });
+        return EntryFactory::collection($collection)->make();
     }
 
     protected function makePosts()
@@ -51,7 +56,7 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => 'music|unknown'];
+        $this->setTagParameters(['from' => 'music|unknown']);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Collection [unknown] does not exist.');
@@ -64,19 +69,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => 'music|art'];
+        $this->setTagParameters(['from' => 'music|art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['in' => 'music|art'];
+        $this->setTagParameters(['in' => 'music|art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['folder' => 'music|art'];
+        $this->setTagParameters(['folder' => 'music|art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['use' => 'music|art'];
+        $this->setTagParameters(['use' => 'music|art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['collection' => 'music|art'];
+        $this->setTagParameters(['collection' => 'music|art']);
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -85,19 +90,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => '*'];
+        $this->setTagParameters(['from' => '*']);
         $this->assertCount(9, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['in' => '*'];
+        $this->setTagParameters(['in' => '*']);
         $this->assertCount(9, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['folder' => '*'];
+        $this->setTagParameters(['folder' => '*']);
         $this->assertCount(9, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['use' => '*'];
+        $this->setTagParameters(['use' => '*']);
         $this->assertCount(9, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['collection' => '*'];
+        $this->setTagParameters(['collection' => '*']);
         $this->assertCount(9, $this->collectionTag->index());
     }
 
@@ -106,19 +111,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => '*', 'not_from' => 'art'];
+        $this->setTagParameters(['from' => '*', 'not_from' => 'art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['in' => '*', 'not_in' => 'art'];
+        $this->setTagParameters(['in' => '*', 'not_in' => 'art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['folder' => '*', 'not_folder' => 'art'];
+        $this->setTagParameters(['folder' => '*', 'not_folder' => 'art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['use' => '*', 'dont_use' => 'art'];
+        $this->setTagParameters(['use' => '*', 'dont_use' => 'art']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['collection' => '*', 'dont_use' => 'art'];
+        $this->setTagParameters(['collection' => '*', 'dont_use' => 'art']);
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -127,19 +132,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => 'music|art', 'title:contains' => 'love'];
+        $this->setTagParameters(['from' => 'music|art', 'title:contains' => 'love']);
         $this->assertCount(4, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['in' => 'music|art', 'title:contains' => 'love'];
+        $this->setTagParameters(['in' => 'music|art', 'title:contains' => 'love']);
         $this->assertCount(4, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['folder' => 'music|art', 'title:contains' => 'love'];
+        $this->setTagParameters(['folder' => 'music|art', 'title:contains' => 'love']);
         $this->assertCount(4, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['use' => 'music|art', 'title:contains' => 'love'];
+        $this->setTagParameters(['use' => 'music|art', 'title:contains' => 'love']);
         $this->assertCount(4, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['collection' => 'music|art', 'title:contains' => 'love'];
+        $this->setTagParameters(['collection' => 'music|art', 'title:contains' => 'love']);
         $this->assertCount(4, $this->collectionTag->index());
     }
 
@@ -148,19 +153,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => '*', 'title:contains' => 'love'];
+        $this->setTagParameters(['from' => '*', 'title:contains' => 'love']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['in' => '*', 'title:contains' => 'love'];
+        $this->setTagParameters(['in' => '*', 'title:contains' => 'love']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['folder' => '*', 'title:contains' => 'love'];
+        $this->setTagParameters(['folder' => '*', 'title:contains' => 'love']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['use' => '*', 'title:contains' => 'love'];
+        $this->setTagParameters(['use' => '*', 'title:contains' => 'love']);
         $this->assertCount(6, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['collection' => '*', 'title:contains' => 'love'];
+        $this->setTagParameters(['collection' => '*', 'title:contains' => 'love']);
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -169,19 +174,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => '*', 'not_from' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['from' => '*', 'not_from' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['in' => '*', 'not_in' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['in' => '*', 'not_in' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['folder' => '*', 'not_folder' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['folder' => '*', 'not_folder' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['use' => '*', 'dont_use' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['use' => '*', 'dont_use' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
 
-        $this->collectionTag->parameters = ['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
     }
 
@@ -190,19 +195,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => '*'];
+        $this->setTagParameters(['from' => '*']);
         $this->assertEquals(9, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['in' => '*'];
+        $this->setTagParameters(['in' => '*']);
         $this->assertEquals(9, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['folder' => '*'];
+        $this->setTagParameters(['folder' => '*']);
         $this->assertEquals(9, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['use' => '*'];
+        $this->setTagParameters(['use' => '*']);
         $this->assertEquals(9, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['collection' => '*'];
+        $this->setTagParameters(['collection' => '*']);
         $this->assertEquals(9, $this->collectionTag->count());
     }
 
@@ -211,19 +216,19 @@ class CollectionTest extends TestCase
     {
         $this->makePosts();
 
-        $this->collectionTag->parameters = ['from' => '*', 'not_from' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['from' => '*', 'not_from' => 'art|music', 'title:contains' => 'love']);
         $this->assertEquals(2, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['in' => '*', 'not_in' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['in' => '*', 'not_in' => 'art|music', 'title:contains' => 'love']);
         $this->assertEquals(2, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['folder' => '*', 'not_folder' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['folder' => '*', 'not_folder' => 'art|music', 'title:contains' => 'love']);
         $this->assertEquals(2, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['use' => '*', 'dont_use' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['use' => '*', 'dont_use' => 'art|music', 'title:contains' => 'love']);
         $this->assertEquals(2, $this->collectionTag->count());
 
-        $this->collectionTag->parameters = ['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love'];
+        $this->setTagParameters(['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love']);
         $this->assertEquals(2, $this->collectionTag->count());
     }
 
@@ -247,12 +252,12 @@ class CollectionTest extends TestCase
             return $entry->get('title') === 'Egg';
         })->id();
 
-        $this->collectionTag->parameters = [
+        $this->setTagParameters([
             'in' => 'foods',
             'current' => $currentId,
             'order_by' => 'date|title:desc',
             'limit' => 2
-        ];
+        ]);
 
         $this->assertEquals(
             ['Fig', 'Hummus'],
@@ -280,24 +285,24 @@ class CollectionTest extends TestCase
             return $entry->get('title') === 'Egg';
         })->id();
 
-        $this->collectionTag->parameters = [
+        $this->setTagParameters([
             'in' => 'foods',
             'current' => $currentId,
             // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
             'limit' => 2
-        ];
+        ]);
 
         $this->assertEquals(
             ['Hummus', 'Fig'],
             $this->collectionTag->next()->map->get('title')->all()
         );
 
-        $this->collectionTag->parameters = [
+        $this->setTagParameters([
             'in' => 'foods',
             'current' => $currentId,
             'order_by' => 'date:asc|title:desc', // Intentionally reverse order.
             'limit' => 2
-        ];
+        ]);
 
         $this->assertEquals(
             ['Fig', 'Hummus'],
@@ -325,12 +330,12 @@ class CollectionTest extends TestCase
             return $entry->get('title') === 'Egg';
         })->id();
 
-        $this->collectionTag->parameters = [
+        $this->setTagParameters([
             'in' => 'foods',
             'current' => $currentId,
             'order_by' => 'date|title:desc',
             'limit' => 2
-        ];
+        ]);
 
         $this->assertEquals(
             ['Banana', 'Danish'],
@@ -358,28 +363,33 @@ class CollectionTest extends TestCase
             return $entry->get('title') === 'Egg';
         })->id();
 
-        $this->collectionTag->parameters = [
+        $this->setTagParameters([
             'in' => 'foods',
             'current' => $currentId,
             // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
             'limit' => 2
-        ];
+        ]);
 
         $this->assertEquals(
             ['Danish', 'Banana'],
             $this->collectionTag->previous()->map->get('title')->all()
         );
 
-        $this->collectionTag->parameters = [
+        $this->setTagParameters([
             'in' => 'foods',
             'current' => $currentId,
             'order_by' => 'date:asc|title:desc', // Intentionally reverse order.
             'limit' => 2
-        ];
+        ]);
 
         $this->assertEquals(
             ['Banana', 'Danish'],
             $this->collectionTag->previous()->map->get('title')->all()
         );
+    }
+
+    private function setTagParameters($parameters)
+    {
+        $this->collectionTag->setParameters($parameters);
     }
 }

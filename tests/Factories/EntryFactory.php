@@ -13,6 +13,7 @@ class EntryFactory
     protected $data = [];
     protected $published = true;
     protected $order;
+    protected $locale = 'en';
 
     public function id($id)
     {
@@ -50,10 +51,16 @@ class EntryFactory
         return $this;
     }
 
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
     public function make()
     {
         $entry = Entry::make()
-            ->locale('en')
+            ->locale($this->locale)
             ->collection($this->createCollection())
             ->slug($this->slug)
             ->data($this->data)
