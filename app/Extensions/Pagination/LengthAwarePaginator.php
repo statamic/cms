@@ -15,4 +15,18 @@ class LengthAwarePaginator extends BasePaginator
     {
         return (new Presenter($this))->render();
     }
+
+    /**
+     * Add a new key to each item of the collection
+     *
+     * @param string|callable $key       New key to add, or a function to return an array of new values
+     * @param mixed           $callable  Function to return the new value when specifying a key
+     * @return $this
+     */
+    public function supplement($key, $callable = null)
+    {
+        $this->forwardCallTo($this->getCollection(), 'supplement', [$key, $callable]);
+
+        return $this;
+    }
 }
