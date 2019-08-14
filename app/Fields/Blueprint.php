@@ -141,7 +141,7 @@ class Blueprint
     {
         if ($this->hasField($handle)) {
             // Loop through all sections looking for the handle so we can ensure the required config
-            foreach($this->contents['sections'] as $section_key => $blueprint_section) {
+            foreach($this->contents['sections'] ?? [] as $section_key => $blueprint_section) {
                 foreach ($blueprint_section['fields'] as $field_key => $blueprint_field) {
                     if (array_get($blueprint_field, 'handle') == $handle) {
                         $this->contents['sections'][$section_key]['fields'][$field_key]['field'] = array_merge(

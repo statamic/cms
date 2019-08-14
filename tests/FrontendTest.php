@@ -2,14 +2,16 @@
 
 namespace Tests;
 
-use Statamic\API\User;
 use Statamic\API\Site;
+use Statamic\API\User;
 use Statamic\API\Entry;
 use Statamic\API\Blueprint;
 use Statamic\API\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Statamic\Events\ResponseCreated;
 use Illuminate\Support\Facades\Event;
+use Facades\Tests\Factories\EntryFactory;
 
 class FrontendTest extends TestCase
 {
@@ -46,6 +48,7 @@ class FrontendTest extends TestCase
     /** @test */
     function page_is_displayed()
     {
+        $this->withoutExceptionHandling();
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
@@ -208,7 +211,7 @@ class FrontendTest extends TestCase
 
         $response = $this->get('about');
 
-        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
+        $this->assertEquals("<h1>Foo <em>Bar</em></h1># Foo *Bar*", trim($response->content()));
     }
 
     /** @test */
@@ -282,14 +285,13 @@ class FrontendTest extends TestCase
     /** @test */
     function event_is_emitted_when_response_is_created()
     {
-        $this->withoutExceptionHandling();
-        Event::fake();
+        Event::fake([ResponseCreated::class]);
 
         $this->createPage('about')->set('headers', ['X-Foo' => 'Bar'])->save();
 
         $this->get('about')->assertStatus(200);
 
-        Event::assertDispatched('Statamic\Events\ResponseCreated', function ($event) {
+        Event::assertDispatched(ResponseCreated::class, function ($event) {
             return $event->response instanceof Response
                 && $event->response->headers->has('X-Foo');
         });
@@ -368,15 +370,10 @@ class FrontendTest extends TestCase
             ->template('default')
             ->entryBlueprints(['empty']);
 
-        $entry = Entry::create()
+        return EntryFactory::slug($slug)
             ->id($slug)
             ->collection($collection)
-            ->in(function ($loc) use ($slug, $attributes) {
-                $loc->slug($slug)->data($attributes['with'] ?? []);
-            });
-
-        $entry->save();
-
-        return $entry;
+            ->data($attributes['with'] ?? [])
+            ->create();
     }
 }
