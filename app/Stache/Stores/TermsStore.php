@@ -133,7 +133,7 @@ class TermsStore extends AggregateStore
 
         $site = $site ?? $this->stache->sites()->first();
 
-        $uris = array_flip($this->uris[$site]);
+        $uris = array_flip($this->uris[$site] ?? []);
 
         return $uris[$uri] ?? null;
     }
