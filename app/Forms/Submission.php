@@ -62,7 +62,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get the fields in the formset
+     * Get the form fields
      *
      * @return array
      */
@@ -92,7 +92,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get the date, formatted by what's specified in the formset
+     * Get the date, formatted by what's specified in the form config
      *
      * @return string
      */
@@ -141,11 +141,9 @@ class Submission implements SubmissionContract
             throw new SilentFormFailureException('Honeypot field has been populated.');
         }
 
+        // Validate and remove any fields that aren't present in the form blueprint.
         if ($this->guard) {
-            $this->validate($data);
-
-            // Remove any fields that aren't present in the formset.
-            $data = collect($data)->intersectByKeys($this->fields())->all();
+            $data = collect($this->validate($data))->intersectByKeys($this->fields())->all();
         }
 
         $this->data = $data;
@@ -193,10 +191,11 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Validate an array of data against rules in the formset
+     * Validate an array of data against rules in the form blueprint
      *
      * @param  array $data       Data to validate
      * @throws PublishException  An exception will be thrown if it doesn't validate
+     * @return array
      */
     private function validate($data)
     {
@@ -220,6 +219,8 @@ class Submission implements SubmissionContract
             $e->setErrors($validator->errors()->toArray());
             throw $e;
         }
+
+        return $data;
     }
 
     /**

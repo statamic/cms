@@ -25,12 +25,12 @@ interface Form extends Arrayable, Editable
     public function title($title = null);
 
     /**
-     * Get or set the Formset
+     * Get or set the blueprint.
      *
-     * @param  Formset|null $formset
-     * @return Formset
+     * @param mixed $blueprint
+     * @return mixed
      */
-    public function blueprint(Blueprint $blueprint = null);
+    public function blueprint($blueprint = null);
 
     /**
      * Get the submissions
