@@ -53,10 +53,22 @@ class EditStructureTest extends TestCase
     private function createStructure($handle)
     {
         return tap(Mockery::mock(Structure::class), function ($s) use ($handle) {
+            $s->shouldReceive('in')->andReturn($this->createStructureTree($handle));
             $s->shouldReceive('title')->andReturn($handle);
             $s->shouldReceive('handle')->andReturn($handle);
             $s->shouldReceive('uris')->andReturn(collect());
+            $s->shouldReceive('collection')->andReturnFalse();
+            $s->shouldReceive('collections')->andReturn(collect());
+            $s->shouldReceive('expectsRoot')->andReturnTrue();
             $s->shouldReceive('flattenedPages')->andReturn(collect());
+        });
+    }
+
+    private function createStructureTree($handle)
+    {
+        return tap(Mockery::mock(Tree::class), function ($s) use ($handle) {
+            $s->shouldReceive('editUrl')->andReturn('/tree-edit-url');
+            $s->shouldReceive('route')->andReturn('/route');
         });
     }
 }

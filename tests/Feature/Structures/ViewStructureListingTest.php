@@ -6,6 +6,7 @@ use Mockery;
 use Statamic\API;
 use Tests\TestCase;
 use Statamic\Auth\User;
+use Statamic\Data\Structures\Tree;
 use Statamic\Data\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
 
@@ -166,10 +167,18 @@ class ViewStructureListingTest extends TestCase
     private function createStructure($handle)
     {
         return tap(Mockery::mock(Structure::class), function ($s) use ($handle) {
+            $s->shouldReceive('in')->andReturn($this->createStructureTree($handle));
             $s->shouldReceive('title')->andReturn($handle);
             $s->shouldReceive('handle')->andReturn($handle);
-            $s->shouldReceive('uris')->andReturn(collect());
-            $s->shouldReceive('flattenedPages')->andReturn(collect());
+            $s->shouldReceive('collection')->andReturnFalse();
+            $s->shouldReceive('editUrl')->andReturn('/structure-edit-url');
+        });
+    }
+
+    private function createStructureTree($handle)
+    {
+        return tap(Mockery::mock(Tree::class), function ($s) use ($handle) {
+            $s->shouldReceive('editUrl')->andReturn('/tree-edit-url');
         });
     }
 
