@@ -22,12 +22,12 @@ class GlobalSetTest extends TestCase
             ->id('123')
             ->title('The title');
 
-        $set->in('en', function ($loc) {
-            $loc->data([
-                'array' => ['first one', 'second one'],
-                'string' => 'The string'
-            ]);
-        });
+        $variables = $set->makeLocalization('en')->data([
+            'array' => ['first one', 'second one'],
+            'string' => 'The string'
+        ]);
+
+        $set->addLocalization($variables);
 
         $expected = <<<'EOT'
 id: '123'

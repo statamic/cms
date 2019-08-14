@@ -3,14 +3,14 @@
 namespace Tests\Data\Globals;
 
 use Tests\TestCase;
-use Statamic\Data\Globals\LocalizedGlobalSet;
+use Statamic\Data\Globals\Variables;
 
-class LocalizedGlobalSetTest extends TestCase
+class VariablesTest extends TestCase
 {
     /** @test */
     function it_gets_file_contents_for_saving()
     {
-        $entry = (new LocalizedGlobalSet)->data([
+        $entry = (new Variables)->data([
             'array' => ['first one', 'second one'],
             'string' => 'The string'
         ]);
