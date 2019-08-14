@@ -40,15 +40,16 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $paginator = $query->paginate(request('perPage'));
-
-        $entries = $paginator->supplement(function ($entry) {
-            return [
-                'viewable' => me()->can('view', $entry),
-                'editable' => me()->can('edit', $entry),
-                'actions' => Action::for('entries', [], $entry),
-            ];
-        })->preProcessForIndex();
+        $entries = $query
+            ->paginate(request('perPage'))
+            ->supplement(function ($entry) {
+                return [
+                    'viewable' => me()->can('view', $entry),
+                    'editable' => me()->can('edit', $entry),
+                    'actions' => Action::for('entries', [], $entry),
+                ];
+            })
+            ->preProcessForIndex();
 
         if ($collection->dated()) {
             $entries->supplement('date', function ($entry) {
@@ -62,7 +63,7 @@ class EntriesController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        return Resource::collection($paginator)->additional(['meta' => [
+        return Resource::collection($entries)->additional(['meta' => [
             'filters' => $request->filters,
             'sortColumn' => $sortField,
             'columns' => $columns,

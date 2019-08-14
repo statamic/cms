@@ -6,8 +6,13 @@ use Illuminate\Pagination\LengthAwarePaginator as BasePaginator;
 
 class LengthAwarePaginator extends BasePaginator
 {
+    const CHAINABLE_METHODS = [
+        'supplement',
+        'preProcessForIndex',
+    ];
+
     /**
-     * Render the paginator as an array
+     * Render the paginator as an array.
      *
      * @return array
      */
@@ -17,15 +22,19 @@ class LengthAwarePaginator extends BasePaginator
     }
 
     /**
-     * Add a new key to each item of the collection
+     * Make dynamic calls into the collection.
      *
-     * @param string|callable $key       New key to add, or a function to return an array of new values
-     * @param mixed           $callable  Function to return the new value when specifying a key
-     * @return $this
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    public function supplement($key, $callable = null)
+    public function __call($method, $parameters)
     {
-        $this->forwardCallTo($this->getCollection(), 'supplement', [$key, $callable]);
+        if (! in_array($method, static::CHAINABLE_METHODS)) {
+            return parent::__call($method, $parameters);
+        }
+
+        $this->forwardCallTo($this->getCollection(), $method, $parameters);
 
         return $this;
     }
