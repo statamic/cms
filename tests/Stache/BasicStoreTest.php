@@ -152,11 +152,11 @@ class BasicStoreTest extends TestCase
     function inserting_a_localizable_item_will_set_the_path_and_uri_for_each_site()
     {
         $entry = (new \Statamic\Data\Entries\Entry)->id('123');
-        $en = new class extends \Statamic\Data\Entries\LocalizedEntry {
+        $en = new class extends \Statamic\Data\Entries\Entry {
             public function path() { return '/path/to/en'; }
             public function uri() { return '/en'; }
         };
-        $fr = new class extends \Statamic\Data\Entries\LocalizedEntry {
+        $fr = new class extends \Statamic\Data\Entries\Entry {
             public function path() { return '/path/to/fr'; }
             public function uri() { return '/fr'; }
         };
@@ -183,7 +183,7 @@ class BasicStoreTest extends TestCase
 
         // an item that will remain at the end
         $firstItem = (new \Statamic\Data\Entries\Entry)->id('first')->collection($collection)
-            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+            ->addLocalization(new class extends \Statamic\Data\Entries\Entry {
                 public function locale($locale = null) { return 'en'; }
                 public function path() { return '/path/to/first/item'; }
                 public function uri() { return '/uri/of/first/item'; }
@@ -191,7 +191,7 @@ class BasicStoreTest extends TestCase
 
         // an item with 1 localization that will be removed
         $secondItem = (new \Statamic\Data\Entries\Entry)->id('second')->collection($collection)
-            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+            ->addLocalization(new class extends \Statamic\Data\Entries\Entry {
                 public function locale($locale = null) { return 'en'; }
                 public function path() { return '/path/to/second/item'; }
                 public function uri() { return '/uri/of/second/item'; }
@@ -199,12 +199,12 @@ class BasicStoreTest extends TestCase
 
         // an item with 2 localizations, one will be removed
         $thirdItem = (new \Statamic\Data\Entries\Entry)->id('third')->collection($collection)
-            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+            ->addLocalization(new class extends \Statamic\Data\Entries\Entry {
                 public function locale($locale = null) { return 'en'; }
                 public function path() { return '/path/to/third/item'; }
                 public function uri() { return '/uri/of/third/item'; }
             })
-            ->addLocalization(new class extends \Statamic\Data\Entries\LocalizedEntry {
+            ->addLocalization(new class extends \Statamic\Data\Entries\Entry {
                 public function locale($locale = null) { return 'fr'; }
                 public function path() { return '/path/to/third/item/in/french'; }
                 public function uri() { return '/uri/of/third/item/in/french'; }
