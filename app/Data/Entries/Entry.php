@@ -64,7 +64,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     {
         return $this->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint) ?? $this->defaultBlueprint();
+                return $blueprint ? Blueprint::find($blueprint) : $this->defaultBlueprint();
             })
             ->setter(function ($blueprint) {
                 return $blueprint !== $this->defaultBlueprint()->handle() ? $blueprint : null;
