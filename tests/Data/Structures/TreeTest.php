@@ -4,15 +4,18 @@ namespace Tests\Data\Structures;
 
 use Tests\TestCase;
 use Statamic\API\Entry;
-use Illuminate\Support\Collection;
+use Statamic\API\Collection;
 use Statamic\Data\Structures\Page;
 use Statamic\Data\Structures\Tree;
 use Statamic\Data\Structures\Pages;
 use Statamic\Data\Structures\Structure;
+use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\API\Structure as StructureAPI;
 
 class TreeTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -25,23 +28,34 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_route()
+    function it_gets_the_route_from_the_collection()
     {
-        $structure = new Tree;
-        $this->assertNull($structure->route());
+        Collection::make('test-collection')
+            ->structure('test-structure')
+            ->route('the-uri/{slug}')
+            ->save();
 
-        $return = $structure->route('test');
+        $structure = (new Structure)->handle('test-structure');
+        $tree = (new Tree)->structure($structure);
 
-        $this->assertEquals('test', $structure->route());
-        $this->assertEquals($structure, $return);
+        $this->assertEquals('the-uri/{slug}', $tree->route());
+    }
+
+    /** @test */
+    function a_structure_without_a_collection_has_no_route()
+    {
+        $structure = (new Structure)->handle('test-structure');
+        $tree = (new Tree)->structure($structure);
+
+        $this->assertNull($tree->route());
     }
 
     /** @test */
     function it_gets_the_parent()
     {
-        $structure = $this->tree();
+        $tree = $this->tree();
 
-        $parent = $structure->parent();
+        $parent = $tree->parent();
 
         $this->assertInstanceOf(Page::class, $parent);
         $this->assertEquals(Entry::find('pages-home'), $parent->entry());
@@ -76,7 +90,7 @@ class TreeTest extends TestCase
     protected function tree()
     {
         return (new Tree)
-            ->route('{parent_uri}/{slug}')
+            ->structure(new Structure)
             ->root('pages-home')
             ->tree([
                 [
