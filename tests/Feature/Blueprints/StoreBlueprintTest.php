@@ -45,14 +45,19 @@ class StoreBlueprintTest extends TestCase
         $this
             ->actingAs($user)
             ->submit(['title' => 'My Test Blueprint'])
-            ->assertRedirect('/cp/blueprints/my_test_blueprint/edit');
+            ->assertRedirect('/cp/fields/blueprints/my_test_blueprint/edit');
 
         $this->assertCount(1, API\Blueprint::all());
         $blueprint = API\Blueprint::all()->first();
         $this->assertEquals('my_test_blueprint', $blueprint->handle());
         $this->assertEquals([
             'title' => 'My Test Blueprint',
-            'sections' => []
+            'sections' => [
+                'main' => [
+                    'display' => 'Main',
+                    'fields' => [],
+                ],
+            ]
         ], $blueprint->contents());
     }
 

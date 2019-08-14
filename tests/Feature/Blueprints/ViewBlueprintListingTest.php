@@ -19,6 +19,9 @@ class ViewBlueprintListingTest extends TestCase
     /** @test */
     function it_shows_a_list_of_fieldsets()
     {
+        // When the CP header loads the avatar it reaches for the user blueprint.
+        API\Blueprint::shouldReceive('find')->with('user')->andReturn(new Blueprint);
+
         API\Blueprint::shouldReceive('all')->andReturn(collect([
             'foo' => $blueprintA = $this->createBlueprint('foo'),
             'bar' => $blueprintB = $this->createBlueprint('bar')
@@ -37,7 +40,7 @@ class ViewBlueprintListingTest extends TestCase
                     'title' => 'Foo',
                     'sections' => 0,
                     'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/blueprints/foo/edit'
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/foo/edit'
                 ],
                 [
                     'id' => 'bar',
@@ -45,7 +48,7 @@ class ViewBlueprintListingTest extends TestCase
                     'title' => 'Bar',
                     'sections' => 0,
                     'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/blueprints/bar/edit'
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/bar/edit'
                 ],
             ]))
             ->assertDontSee('no-results');

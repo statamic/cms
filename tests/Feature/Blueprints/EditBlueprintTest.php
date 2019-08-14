@@ -15,13 +15,6 @@ class EditBlueprintTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        BlueprintRepository::swap(new FakeBlueprintRepository);
-    }
-
     /** @test */
     function it_denies_access_if_you_dont_have_permission()
     {
