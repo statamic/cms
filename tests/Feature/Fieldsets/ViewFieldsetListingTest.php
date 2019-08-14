@@ -36,14 +36,14 @@ class ViewFieldsetListingTest extends TestCase
                     'handle' => 'foo',
                     'title' => 'Foo',
                     'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fieldsets/foo/edit'
+                    'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit'
                 ],
                 [
                     'id' => 'bar',
                     'handle' => 'bar',
                     'title' => 'Bar',
                     'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fieldsets/bar/edit'
+                    'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit'
                 ],
             ]))
             ->assertDontSee('no-results');
