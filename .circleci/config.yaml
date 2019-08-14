@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/php:7.1-node-browsers
+
+    steps:
+      - checkout
+
+      - run: sudo apt update
+      - run: sudo docker-php-ext-install zip
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "composer.lock" }}
+            - v1-dependencies-
+
+      - run: composer install -n --prefer-dist
+
+      - save_cache:
+          key: v1-dependencies-{{ checksum "composer.lock" }}
+          paths:
+            - ./vendor
+      - restore_cache:
+          keys:
+            - node-v1-{{ checksum "package.json" }}
+            - node-v1-
+      - run: npm install
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+
+      - run: ./vendor/bin/phpunit
