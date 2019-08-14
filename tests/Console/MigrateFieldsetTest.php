@@ -16,12 +16,16 @@ class MigrateFieldsetTest extends TestCase
 
         $this->files = app(Filesystem::class);
 
-        $this->files->makeDirectory(base_path('resources/blueprints'));
+        if (! $this->files->exists($this->path = base_path('resources/blueprints'))) {
+            $this->files->makeDirectory($this->path);
+        }
     }
 
     public function tearDown(): void
     {
-        $this->files->deleteDirectory(base_path('resources/blueprints'));
+        if ($this->files->exists($this->path)) {
+            $this->files->deleteDirectory($this->path);
+        }
 
         parent::tearDown();
     }
