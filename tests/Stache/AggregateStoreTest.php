@@ -352,7 +352,7 @@ class AggregateStoreTest extends TestCase
             '1' => 'converted using toCacheableArray',
             '2' => ['item' => 'two'],
         ]);
-        Cache::shouldReceive('forever')->once()->with('stache::meta/test::one', [
+        Cache::shouldReceive('forever')->once()->with('stache::meta/child/test::one', [
             'paths' => [
                 'en' => [
                     '1' => '/path/to/one.txt',
@@ -376,7 +376,7 @@ class AggregateStoreTest extends TestCase
         Cache::shouldReceive('forever')->once()->with('stache::items/test::two', [
             '3' => ['item' => 'three']
         ]);
-        Cache::shouldReceive('forever')->once()->with('stache::meta/test::two', [
+        Cache::shouldReceive('forever')->once()->with('stache::meta/child/test::two', [
             'paths' => [
                 'en' => [
                     '3' => '/path/to/three.txt',
@@ -404,8 +404,8 @@ class AggregateStoreTest extends TestCase
         $this->store->store('one');
         $this->store->store('two');
         Cache::shouldReceive('get')->with('stache::meta/test-keys')->once()->andReturn(['one', 'two']);
-        Cache::shouldReceive('get')->with('stache::meta/test::one', Mockery::any())->once()->andReturn('first child stores cache');
-        Cache::shouldReceive('get')->with('stache::meta/test::two', Mockery::any())->once()->andReturn('second child stores cache');
+        Cache::shouldReceive('get')->with('stache::meta/child/test::one', Mockery::any())->once()->andReturn('first child stores cache');
+        Cache::shouldReceive('get')->with('stache::meta/child/test::two', Mockery::any())->once()->andReturn('second child stores cache');
 
         $this->assertEquals([
             'test::one' => 'first child stores cache',
