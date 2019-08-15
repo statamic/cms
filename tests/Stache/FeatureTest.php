@@ -90,10 +90,10 @@ class FeatureTest extends TestCase
     function it_gets_globals()
     {
         $global = GlobalSet::find('globals-global');
-        $this->assertEquals('Bar', $global->get('foo'));
+        $this->assertEquals('Bar', $global->in('en')->get('foo'));
         $this->assertSame($global, Data::find('global::globals-global'));
         $this->assertSame($global, Data::find('globals-global'));
-        $this->assertEquals('555-1234', GlobalSet::find('globals-contact')->get('phone'));
+        $this->assertEquals('555-1234', GlobalSet::find('globals-contact')->in('en')->get('phone'));
     }
 
     /** @test */
@@ -141,7 +141,7 @@ class FeatureTest extends TestCase
     {
         $entry = Entry::findByUri('/about/board/directors');
         $this->assertEquals('pages-directors', $entry->id());
-        $this->assertEquals('Directors', $entry->get('title'));
+        $this->assertEquals('Directors', $entry->title());
     }
 
     /** @test */
@@ -173,19 +173,18 @@ class FeatureTest extends TestCase
     /** @test */
     function saving_a_collection_writes_it_to_file()
     {
-        $this->markTestIncomplete(); // TODO: implementation was changed, tests werent.
-
-        $collection = Collection::create('new');
-        $collection->data([
-            'title' => 'New Collection',
-            'order' => 'date',
-            'foo' => 'bar'
-        ]);
-        $collection->save();
+        Collection::make('new')
+            ->title('New Collection')
+            ->defaultStatus('published')
+            ->orderable(true)
+            ->dated(true)
+            ->revisionsEnabled(true)
+            ->data(['foo' => 'bar'])
+            ->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
-            "title: 'New Collection'\norder: date\nfoo: bar\n"
+            "title: 'New Collection'\ndefault_status: published\ndata:\n  foo: bar\norderable: true\nrevisions: true\ndate: true\n"
         );
         @unlink($path);
     }
@@ -206,16 +205,11 @@ class FeatureTest extends TestCase
     /** @test */
     function saving_a_taxonomy_writes_it_to_file()
     {
-        $taxonomy = Taxonomy::create('new');
-        $taxonomy->data([
-            'title' => 'New Taxonomy',
-            'foo' => 'bar'
-        ]);
-        $taxonomy->save();
+        Taxonomy::make('new')->title('New Taxonomy')->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/taxonomies/new.yaml',
-            "title: 'New Taxonomy'\nfoo: bar\n"
+            "title: 'New Taxonomy'\n"
         );
         @unlink($path);
     }
@@ -226,11 +220,13 @@ class FeatureTest extends TestCase
         $global = GlobalSet::make()
             ->id('123')
             ->handle('new')
-            ->title('New Global Set')
-            ->in('en', function ($loc) {
-                $loc->data(['foo' => 'bar']);
-            })
-            ->save();
+            ->title('New Global Set');
+
+        $global->addLocalization(
+            $global->makeLocalization('en')->data(['foo' => 'bar'])
+        );
+
+        $global->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/globals/new.yaml',
@@ -243,19 +239,17 @@ class FeatureTest extends TestCase
     function saving_an_entry_writes_it_to_file()
     {
         Entry::make()
+            ->locale('en')
             ->id('123')
             ->collection(Collection::findByHandle('blog'))
-            ->in('en', function ($loc) {
-                $loc
-                    ->slug('test-entry')
-                    ->date('2017-07-04')
-                    ->data(['title' => 'Test Entry', 'foo' => 'bar']);
-            })
+            ->slug('test-entry')
+            ->date('2017-07-04')
+            ->data(['title' => 'Test Entry', 'foo' => 'bar'])
             ->save();
 
         $this->assertFileEqualsString(
             $path = __DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md',
-            "title: 'Test Entry'\nfoo: bar\nid: '123'\n"
+            "---\ntitle: 'Test Entry'\nfoo: bar\nid: '123'\n---\n"
         );
         @unlink($path);
     }

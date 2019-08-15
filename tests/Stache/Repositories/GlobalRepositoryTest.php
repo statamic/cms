@@ -86,19 +86,17 @@ class GlobalRepositoryTest extends TestCase
         $global = GlobalSetAPI::make()
             ->id('id-new')
             ->handle('new');
-        $global->in(function ($loc) {
-            $loc->data(['foo' => 'bar', 'baz' => 'qux']);
-        });
-        $global->in('fr', function ($loc) {
-            $loc->set('foo', 'le bar');
-        });
+
+        $global->addLocalization(
+            $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux'])
+        );
+
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($global);
 
         $this->assertNotNull($item = $this->repo->find('id-new'));
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data());
-        $this->assertEquals(['foo' => 'le bar'], $item->in('fr')->data());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
     }

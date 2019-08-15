@@ -17,6 +17,7 @@ class TaxonomyRepositoryTest extends TestCase
         parent::setUp();
 
         $stache = (new Stache)->sites(['en', 'fr']);
+        $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/taxonomies';
         $stache->registerStore((new TaxonomiesStore($stache, app('files')))->directory($this->directory));
 
@@ -32,8 +33,8 @@ class TaxonomyRepositoryTest extends TestCase
         $this->assertCount(2, $taxonomies);
         $this->assertEveryItemIsInstanceOf(Taxonomy::class, $taxonomies);
 
-        $ordered = $taxonomies->sortBy->path()->values();
-        $this->assertEquals(['categories', 'tags'], $ordered->map->path()->all()); // TODO: Support ->handle() or ->id()
+        $ordered = $taxonomies->sortBy->handle()->values();
+        $this->assertEquals(['categories', 'tags'], $ordered->map->handle()->all());
         $this->assertEquals(['Categories', 'Tags'], $ordered->map->title()->all());
     }
 
@@ -42,13 +43,13 @@ class TaxonomyRepositoryTest extends TestCase
     {
         tap($this->repo->findByHandle('categories'), function ($taxonomy) {
             $this->assertInstanceOf(Taxonomy::class, $taxonomy);
-            $this->assertEquals('categories', $taxonomy->path());
+            $this->assertEquals('categories', $taxonomy->handle());
             $this->assertEquals('Categories', $taxonomy->title());
         });
 
         tap($this->repo->findByHandle('tags'), function ($taxonomy) {
             $this->assertInstanceOf(Taxonomy::class, $taxonomy);
-            $this->assertEquals('tags', $taxonomy->path());
+            $this->assertEquals('tags', $taxonomy->handle());
             $this->assertEquals('Tags', $taxonomy->title());
         });
 
@@ -58,14 +59,12 @@ class TaxonomyRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_taxonomy_to_the_stache_and_to_a_file()
     {
-        $taxonomy = TaxonomyAPI::create('new');
-        $taxonomy->data(['foo' => 'bar']);
+        $taxonomy = TaxonomyAPI::make('new');
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($taxonomy);
 
-        $this->assertNotNull($item = $this->repo->findByHandle('new'));
-        $this->assertEquals(['foo' => 'bar'], $item->data());
+        $this->assertNotNull($this->repo->findByHandle('new'));
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }

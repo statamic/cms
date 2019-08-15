@@ -220,6 +220,10 @@ class TermsStore extends AggregateStore
             return $term;
         }
 
+        if (! Str::contains($id, '::')) {
+            return null;
+        }
+
         [$taxonomy, $slug] = explode('::', $id);
 
         if (Arr::has($this->associations[$taxonomy] ?? [], $slug)) {

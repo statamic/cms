@@ -64,21 +64,14 @@ class StuctureRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_structure_to_the_stache_and_to_a_file()
     {
-        $structure = (new \Statamic\Data\Structures\Structure)->handle('new')->data([
-            'root' => 'pages-home',
-            'route' => '',
-            'tree' => []
-        ]);
+        $structure = (new \Statamic\Data\Structures\Structure)->handle('new');
+        $structure->addTree($structure->makeTree('en'));
+
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($structure);
 
-        $this->assertNotNull($item = $this->repo->findByHandle('new'));
-        $this->assertEquals([
-            'root' => 'pages-home',
-            'route' => '',
-            'tree' => []
-        ], $item->data());
+        $this->assertNotNull($this->repo->findByHandle('new'));
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
     }
@@ -87,7 +80,7 @@ class StuctureRepositoryTest extends TestCase
     function it_gets_an_entry_by_uri()
     {
         $entry = $this->repo->findEntryByUri('/about/board/directors');
-        $this->assertEquals('Directors', $entry->get('title'));
+        $this->assertEquals('Directors', $entry->title());
         $this->assertEquals('/about/board/directors', $entry->uri());
         $this->assertNull($this->repo->findEntryByUri('/unknown'));
     }

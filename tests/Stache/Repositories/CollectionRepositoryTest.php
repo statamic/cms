@@ -5,6 +5,8 @@ namespace Tests\Stache\Repositories;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Data\Entries\Collection;
+use Statamic\Stache\Stores\EntriesStore;
+use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\API\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
@@ -19,7 +21,11 @@ class CollectionRepositoryTest extends TestCase
         $stache = (new Stache)->sites(['en', 'fr']);
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/collections';
-        $stache->registerStore((new CollectionsStore($stache, app('files')))->directory($this->directory));
+        $stache->registerStores([
+            (new CollectionsStore($stache, app('files')))->directory($this->directory),
+            (new EntriesStore($stache, app('files')))->directory($this->directory),
+            (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+        ]);
 
         $this->repo = new CollectionRepository($stache);
     }

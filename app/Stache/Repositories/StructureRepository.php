@@ -11,10 +11,12 @@ use Statamic\Contracts\Data\Repositories\StructureRepository as RepositoryContra
 
 class StructureRepository implements RepositoryContract
 {
+    protected $stache;
     protected $store;
 
     public function __construct(Stache $stache)
     {
+        $this->stache = $stache;
         $this->store = $stache->store('structures');
     }
 
@@ -33,9 +35,11 @@ class StructureRepository implements RepositoryContract
         return $this->store->getItem($handle);
     }
 
-    public function findEntryByUri(string $uri, string $site): ?Entry
+    public function findEntryByUri(string $uri, string $site = null): ?Entry
     {
         $uri = str_start($uri, '/');
+
+        $site = $site ?? $this->stache->sites()->first();
 
         if (! $key = $this->store->getKeyFromUri($uri, $site)) {
             return null;

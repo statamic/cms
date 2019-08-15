@@ -65,6 +65,8 @@ class EntryRepository implements RepositoryContract
 
     public function save($entry)
     {
+        $entry = clone $entry;
+
         if (! $entry->id()) {
             $entry->id($this->stache->generateId());
         }
@@ -72,8 +74,6 @@ class EntryRepository implements RepositoryContract
         if ($entry->collection()->orderable()) {
             $this->ensureEntryPosition($entry);
         }
-
-        // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
 
         $this->store
             ->store($entry->collectionHandle())

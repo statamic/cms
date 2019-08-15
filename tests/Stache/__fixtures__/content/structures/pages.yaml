@@ -1,5 +1,5 @@
 title: Pages
-route: '{parent_uri}/{slug}'
+expects_root: false
 root: pages-home
 tree:
   -

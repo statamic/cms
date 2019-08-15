@@ -9,7 +9,7 @@ interface UserRepository
 {
     public function make(): User;
     public function all(): UserCollection;
-    // public function find($id): ?User;
+    public function find($id): ?User;
 
     public function findByEmail(string $email): ?User;
     public function findByOAuthId(string $provider, string $id): ?User;

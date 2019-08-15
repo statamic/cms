@@ -160,156 +160,62 @@ class EntryRepositoryTest extends TestCase
 
         $this->assertInstanceOf(Entry::class, $entry);
         $this->assertEquals('pages-directors', $entry->id());
-        $this->assertEquals('Directors', $entry->get('title'));
+        $this->assertEquals('Directors', $entry->title());
     }
 
     /** @test */
     function it_saves_an_entry_to_the_stache_and_to_a_file()
     {
         $entry = EntryAPI::make()
+            ->locale('en')
             ->id('test-blog-entry')
-            ->collection(Collection::findByHandle('blog'));
+            ->collection(Collection::findByHandle('blog'))
+            ->slug('test')
+            ->published(false)
+            ->date('2017-07-04')
+            ->data(['foo' => 'bar']);
 
-        $localized = $entry->in('en', function ($loc) {
-            $loc
-                ->slug('test')
-                ->published(false)
-                ->date('2017-07-04')
-                ->data(['foo' => 'bar']);
-        });
-
-        $localizedFr = $entry->in('fr', function ($loc) {
-            $loc
-                ->slug('le-test')
-                ->published(false)
-                ->date('2017-07-04')
-                ->data(['foo' => 'bar']);
-        });
-
-        $this->unlinkAfter(
-            $path = $this->directory.'/blog/2017-07-04.test.md',
-            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
-        );
+        $this->unlinkAfter($path = $this->directory.'/blog/2017-07-04.test.md');
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
 
-        $this->repo->save($localized);
-        $this->repo->save($localizedFr);
+        $this->repo->save($entry);
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
         $this->assertNotSame($entry, $item);
-        $this->assertNotSame($localized, $item->in('en'));
-        $this->assertNotSame($localizedFr, $item->in('fr'));
         $this->assertArraySubset(['foo' => 'bar'], $item->data());
         $this->assertFileExists($path);
-        $this->assertFileExists($frPath);
     }
 
     /** @test */
-    public function it_can_delete_localizable()
+    public function it_can_delete()
     {
         $entry = EntryAPI::make()
+            ->locale('en')
             ->id('test-blog-entry')
-            ->collection(Collection::findByHandle('blog'));
+            ->collection(Collection::findByHandle('blog'))
+            ->slug('test')
+            ->published(false)
+            ->date('2017-07-04')
+            ->data(['foo' => 'bar']);
 
-        $localized = $entry->in('en', function ($loc) {
-            $loc
-                ->slug('test')
-                ->published(false)
-                ->date('2017-07-04')
-                ->data(['foo' => 'bar']);
-        });
-
-        $localizedFr = $entry->in('fr', function ($loc) {
-            $loc
-                ->slug('le-test')
-                ->published(false)
-                ->date('2017-07-04')
-                ->data(['foo' => 'bar']);
-        });
-
-        $this->unlinkAfter(
-            $path = $this->directory.'/blog/2017-07-04.test.md',
-            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
-        );
+        $this->unlinkAfter($path = $this->directory.'/blog/2017-07-04.test.md');
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($this->repo->find('test-blog-entry'));
 
-        $this->repo->save($localized);
-        $this->repo->save($localizedFr);
+        $this->repo->save($entry);
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
         $this->assertFileExists($path);
-        $this->assertFileExists($frPath);
 
-        $this->repo->deleteLocalizable($item);
+        $this->repo->delete($item);
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
         $this->assertFileNotExists($path);
-        $this->assertFileNotExists($frPath);
-    }
-
-    /** @test */
-    public function it_can_delete_localization()
-    {
-        $this->withoutEvents();
-
-        $entry = EntryAPI::make()
-            ->id('test-blog-entry')
-            ->collection(Collection::findByHandle('blog'));
-
-        $localized = $entry->in('en', function ($loc) {
-            $loc
-                ->slug('test')
-                ->published(false)
-                ->date('2017-07-04')
-                ->data(['foo' => 'bar']);
-        });
-
-        $localizedFr = $entry->in('fr', function ($loc) {
-            $loc
-                ->slug('le-test')
-                ->published(false)
-                ->date('2017-07-04')
-                ->data(['foo' => 'bar']);
-        });
-
-        $this->unlinkAfter(
-            $path = $this->directory.'/blog/2017-07-04.test.md',
-            $frPath = $this->directory.'/blog/2017-07-04.le-test.md'
-        );
-
-        $this->assertCount(14, $this->repo->all());
-        $this->assertNull($this->repo->find('test-blog-entry'));
-
-        $this->repo->save($localized);
-        $this->repo->save($localizedFr);
-
-        $this->assertCount(15, $this->repo->all());
-        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
-        $this->assertFileExists($path);
-        $this->assertFileExists($frPath);
-
-        $this->repo->deleteLocalization($item->in('fr'));
-
-        $this->assertCount(15, $this->repo->all());
-        $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
-        $this->assertFileExists($path);
-        $this->assertFileNotExists($frPath);
-
-        try {
-            $item->in('fr');
-            $this->fail('No exception');
-        } catch (InvalidLocalizationException $exception) {
-            //
-        }
-
-        $this->assertEmpty($this->stache->store('entries::blog')->getSitePaths('fr'));
-        $this->assertEmpty($this->stache->store('entries::blog')->getSiteUris('fr'));
     }
 }
