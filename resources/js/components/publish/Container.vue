@@ -208,6 +208,7 @@ export default {
         meta: {
             deep: true,
             handler(after, before) {
+                if (before === after) return;
                 this.$store.commit(`publish/${this.name}/setMeta`, after);
             }
         },
