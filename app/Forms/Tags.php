@@ -24,6 +24,16 @@ class Tags extends BaseTags
     private $errorBag;
 
     /**
+     * {{ form:* }} ... {{ /form:* }}
+     */
+    public function __call($method, $args)
+    {
+        $this->parameters['form'] = $this->method;
+
+        return $this->create();
+    }
+
+    /**
      * Maps to {{ form:set }}
      *
      * Allows you to inject the formset into the context so child tags can use it.
