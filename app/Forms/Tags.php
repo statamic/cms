@@ -5,12 +5,15 @@ namespace Statamic\Forms;
 use Statamic\API\URL;
 use Statamic\API\Form;
 use DebugBar\DebugBarException;
+use Statamic\Tags\OutputsItems;
 use Statamic\Tags\Tags as BaseTags;
 use Illuminate\Support\Facades\Crypt;
 use DebugBar\DataCollector\ConfigCollector;
 
 class Tags extends BaseTags
 {
+    use OutputsItems;
+
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
 
     protected static $handle = 'form';
@@ -162,11 +165,7 @@ class Tags extends BaseTags
     {
         $submissions = Form::find($this->getForm())->submissions();
 
-        $this->collection = collect_content($submissions);
-
-        $this->filter();
-
-        return $this->output();
+        return $this->output($submissions);
     }
 
     /**
