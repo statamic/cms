@@ -302,7 +302,7 @@ export default {
                 }
 
                 this.popoutResponded = false;
-            }, 200);
+            }, 500);
         },
 
         componentUpdated(handle, value) {
