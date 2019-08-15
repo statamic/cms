@@ -11,6 +11,8 @@ use DebugBar\DataCollector\ConfigCollector;
 
 class Tags extends BaseTags
 {
+    const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
+
     protected static $handle = 'form';
 
     /**
@@ -42,7 +44,7 @@ class Tags extends BaseTags
      */
     public function set()
     {
-        $this->context['form'] = $this->getParam(['in', 'is', 'form', 'formset']);
+        $this->context['form'] = $this->getParam(static::HANDLE_PARAM);
 
         return $this->parse($this->context);
     }
@@ -184,7 +186,7 @@ class Tags extends BaseTags
      */
     private function getForm()
     {
-        if (! $form = $this->get(['form', 'in'], array_get($this->context, 'form'))) {
+        if (! $form = $this->get(static::HANDLE_PARAM, array_get($this->context, 'form'))) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 
