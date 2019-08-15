@@ -65,8 +65,6 @@ class EntryRepository implements RepositoryContract
 
     public function save($entry)
     {
-        $entry = clone $entry;
-
         if (! $entry->id()) {
             $entry->id($this->stache->generateId());
         }
