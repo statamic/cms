@@ -26,9 +26,5 @@ class ServiceProvider extends LaravelServiceProvider
         $stache->registerStores(collect(config('statamic.stache.stores'))->map(function ($config) {
             return app($config['class'])->directory($config['directory']);
         })->all());
-
-        $this->app['events']->listen(RequestHandled::class, function () use ($stache) {
-            $stache->persist();
-        });
     }
 }

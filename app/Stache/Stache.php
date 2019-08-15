@@ -15,41 +15,15 @@ class Stache
     const TEMP_COLD = 'cold';
     const TEMP_WARM = 'warm';
 
-    protected $bootstrapper;
-    protected $shouldBoot = true;
-    protected $booted = false;
-    protected $temperature;
     protected $sites;
     protected $keys;
     protected $config;
     protected $stores;
     protected $startTime;
-    protected $timestamps = [];
 
     public function __construct()
     {
-        $this->temperature = SELF::TEMP_COLD;
         $this->stores = collect();
-    }
-
-    public function isCold()
-    {
-        return $this->temperature === self::TEMP_COLD;
-    }
-
-    public function isWarm()
-    {
-        return $this->temperature === self::TEMP_WARM;
-    }
-
-    public function heat()
-    {
-        $this->temperature = self::TEMP_WARM;
-    }
-
-    public function cool()
-    {
-        $this->temperature = self::TEMP_COLD;
     }
 
     public function sites($sites = null)
@@ -108,8 +82,6 @@ class Stache
 
     public function stores()
     {
-        $this->boot();
-
         return $this->stores;
     }
 
@@ -121,65 +93,6 @@ class Stache
         }
 
         return $this->stores()->get($key);
-    }
-
-    public function load()
-    {
-        (new Loader($this))->load();
-
-        return $this;
-    }
-
-    public function update()
-    {
-        (new StacheUpdater($this))->update();
-
-        return $this;
-    }
-
-    public function boot()
-    {
-        if ($this->shouldBoot && !$this->booted) {
-            $this->booted = true;
-            tap($this->bootstrapper ?? new Bootstrapper)->boot($this);
-        }
-
-        return $this;
-    }
-
-    public function setBootstrapper($bootstrapper)
-    {
-        $this->bootstrapper = $bootstrapper;
-
-        return $this;
-    }
-
-    public function hasBooted()
-    {
-        return $this->booted;
-    }
-
-    public function withoutBooting($callback)
-    {
-        $this->disableBooting();
-        $callback($this);
-        $this->enableBooting();
-
-        return $this;
-    }
-
-    public function disableBooting()
-    {
-        $this->shouldBoot = false;
-
-        return $this;
-    }
-
-    public function enableBooting()
-    {
-        $this->shouldBoot = true;
-
-        return $this;
     }
 
     public function generateId()
@@ -197,11 +110,6 @@ class Stache
     public function getStoreById($id)
     {
         return $this->store($this->idMap()->get($id));
-    }
-
-    public function persist()
-    {
-        app(Persister::class)->persist();
     }
 
     public function clear()
@@ -314,15 +222,5 @@ class Stache
         }
 
         return $paths;
-    }
-
-    public function queuedTimestampCaches()
-    {
-        return collect($this->timestamps);
-    }
-
-    public function queueTimestampCache($key, $timestamps)
-    {
-        $this->timestamps[$key] = $timestamps;
     }
 }

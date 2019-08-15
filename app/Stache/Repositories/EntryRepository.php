@@ -22,45 +22,39 @@ class EntryRepository implements RepositoryContract
 
     public function all(): EntryCollection
     {
-        return collect_entries($this->store->getItems()->mapWithKeys(function ($item) {
-            return $item;
-        }));
+        return $this->query()->get();
     }
 
     public function whereCollection(string $handle): EntryCollection
     {
-        return collect_entries($this->store->store($handle)->getItems());
+        return $this->query()->where('collection', $handle)->get();
     }
 
     public function whereInCollection(array $handles): EntryCollection
     {
-        return collect_entries($handles)->flatMap(function ($collection) {
-            return $this->whereCollection($collection);
-        });
+        return $this->query()->whereIn('collection', $handles)->get();
     }
 
     public function find($id): ?Entry
     {
-        if (! $store = $this->store->getStoreById($id)) {
-            return null;
-        }
-
-        return $store->getItem($id);
+        return $this->query()->where('id', $id)->first();
     }
 
     public function findBySlug(string $slug, string $collection): ?Entry
     {
-        $store = $this->store->store($collection);
-
-        return $store->getItems()->first(function ($entry) use ($slug) {
-            return $entry->slug() === $slug;
-        });
+        return $this->query()
+            ->where('slug', $slug)
+            ->where('collection', $collection)
+            ->first();
     }
 
     public function findByUri(string $uri, string $site = null): ?Entry
     {
         return app(StructureRepository::class)->findEntryByUri($uri, $site)
-            ?? $this->find($this->store->getIdFromUri($uri, $site));
+            ?? $this->query()
+                ->where('uri', $uri)
+                ->where('site', $site)
+                ->first();
     }
 
     public function save($entry)
@@ -69,13 +63,9 @@ class EntryRepository implements RepositoryContract
             $entry->id($this->stache->generateId());
         }
 
-        if ($entry->collection()->orderable()) {
-            $this->ensureEntryPosition($entry);
-        }
-
-        $this->store
-            ->store($entry->collectionHandle())
-            ->insert($entry);
+        // if ($entry->collection()->orderable()) {
+        //     $this->ensureEntryPosition($entry);
+        // }
 
         $this->store->save($entry);
     }
