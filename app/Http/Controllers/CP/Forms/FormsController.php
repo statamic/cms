@@ -112,7 +112,7 @@ class FormsController extends CpController
         $data = $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'blueprint' => 'array',
+            'blueprint' => 'nullable|array',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
