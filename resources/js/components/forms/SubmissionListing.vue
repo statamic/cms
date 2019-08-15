@@ -15,22 +15,31 @@
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div class="card p-0" slot-scope="{ }">
-                <data-list-table v-if="submissions.length" @sorted="sorted">
-                    <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
-                        <a :href="submission.url" class="text-blue">{{ value }}</a>
-                    </template>
-                    <template slot="actions" slot-scope="{ row: submission, index }">
-                        <dropdown-list>
-                            <dropdown-item :text="__('View')" :redirect="submission.url" />
-                            <dropdown-item
-                                v-if="submission.deleteable"
-                                :text="__('Delete')"
-                                class="warning"
-                                @click="destroy(submission.id, index)" />
-                        </dropdown-list>
-                    </template>
-                </data-list-table>
+            <div slot-scope="{ }">
+                <div class="card p-0">
+                    <data-list-table v-if="submissions.length" @sorted="sorted">
+                        <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
+                            <a :href="submission.url" class="text-blue">{{ value }}</a>
+                        </template>
+                        <template slot="actions" slot-scope="{ row: submission, index }">
+                            <dropdown-list>
+                                <dropdown-item :text="__('View')" :redirect="submission.url" />
+                                <dropdown-item
+                                    v-if="submission.deleteable"
+                                    :text="__('Delete')"
+                                    class="warning"
+                                    @click="destroy(submission.id, index)" />
+                            </dropdown-list>
+                        </template>
+                    </data-list-table>
+                </div>
+
+                <data-list-pagination
+                    class="mt-3"
+                    :resource-meta="meta"
+                    :per-page="perPage"
+                    @page-selected="page = $event"
+                />
             </div>
         </data-list>
 
@@ -38,7 +47,12 @@
 </template>
 
 <script>
+import HasPagination from '../data-list/HasPagination';
 export default {
+
+    mixins: [
+        HasPagination,
+    ],
 
     props: {
         form: String
@@ -50,7 +64,7 @@ export default {
             submissions: [],
             columns: [],
             sortColumn: null,
-            sortDirection: 'asc'
+            sortDirection: 'asc',
         }
     },
 
@@ -60,7 +74,8 @@ export default {
             return {
                 sort: this.sortColumn,
                 order: this.sortDirection,
-                // page: this.selectedPage
+                page: this.page,
+                perPage: this.perPage,
             }
         }
 
@@ -88,6 +103,7 @@ export default {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.submissions = response.data.data;
+                this.meta = response.data.meta;
                 this.loading = false;
             });
         },
