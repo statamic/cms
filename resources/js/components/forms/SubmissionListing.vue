@@ -48,10 +48,13 @@
 
 <script>
 import HasPagination from '../data-list/HasPagination';
+import HasPreferences from '../data-list/HasPreferences';
+
 export default {
 
     mixins: [
         HasPagination,
+        HasPreferences,
     ],
 
     props: {
@@ -65,6 +68,7 @@ export default {
             columns: [],
             sortColumn: null,
             sortDirection: 'asc',
+            preferencesPrefix: `forms.${this.form}.submissions`,
         }
     },
 
