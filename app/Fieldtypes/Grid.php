@@ -12,6 +12,7 @@ use Statamic\Fields\ConfigFields;
 class Grid extends Fieldtype
 {
     protected $defaultable = false;
+    protected $defaultValue = [];
 
     protected $configFields = [
         'mode' => [
