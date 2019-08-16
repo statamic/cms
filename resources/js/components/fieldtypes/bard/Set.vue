@@ -59,7 +59,6 @@ export default {
         'editable', // global editor prop whether the content can be edited
         'options', // array of extension options
         `selected`, // whether its selected,
-        'collapsed'
     ],
 
     components: { SetField },
@@ -82,6 +81,10 @@ export default {
 
         meta() {
             return this.options.bard.meta.existing[this.node.attrs.id];
+        },
+
+        collapsed() {
+            return this.options.bard.meta.collapsed.includes(this.node.attrs.id);
         },
 
         config() {

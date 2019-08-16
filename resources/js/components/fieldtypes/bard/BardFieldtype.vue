@@ -20,7 +20,10 @@
                     <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')">
+                    <button @click="collapseAll" v-tooltip="__('Collapse Sets')">
+                        <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
+                    </button>
+                    <button @click="expandAll" v-tooltip="__('Expand Sets')">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
                     <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
@@ -154,6 +157,7 @@ export default {
             showSource: false,
             fullScreenMode: false,
             buttons: [],
+            collapsed: this.meta.collapsed,
         }
     },
 
@@ -186,10 +190,6 @@ export default {
 
         id() {
             return `${this.storeName}.${this.name}`;
-        },
-
-        collapsed() {
-            return this.meta.collapsed;
         }
 
     },
@@ -281,7 +281,7 @@ export default {
         },
 
         collapseAll() {
-            this.collapsed = _.pluck(this.values, '_id');
+            this.collapsed = Object.keys(this.meta.existing);
         },
 
         expandAll() {
