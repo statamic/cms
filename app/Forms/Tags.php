@@ -199,18 +199,32 @@ class Tags extends BaseTags
      */
     protected function getFields()
     {
-        $errors = $this->hasErrors() ? $this->getErrors() : [];
-
         return Form::find($this->getForm())->fields()
-            ->map(function ($field) use ($errors) {
-                return array_merge($field->toArray(), [
-                    'name' => $field->handle(),
-                    'error' => $errors[$field->handle()] ?? null,
-                    'old' => old($field->handle()),
-                ]);
+            ->map(function ($field) {
+                return $this->getField($field);
             })
             ->values()
             ->all();
+    }
+
+    /**
+     * Get field with extra data for rendering.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @return array
+     */
+    protected function getField($field)
+    {
+        $errors = $this->hasErrors() ? $this->getErrors() : [];
+
+        $data = array_merge($field->toArray(), [
+            'error' => $errors[$field->handle()] ?? null,
+            'old' => old($field->handle()),
+        ]);
+
+        $data['field'] = view($field->fieldtype()->view(), $data);
+
+        return $data;
     }
 
     /**
