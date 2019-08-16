@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Echo from './Echo';
+import Bard from './Bard';
 const echo = new Echo;
+const bard = new Bard;
 
 export default new Vue({
     data() {
@@ -19,6 +21,10 @@ export default new Vue({
 
         $echo() {
             return echo;
+        },
+
+        $bard() {
+            return bard;
         },
 
         user() {

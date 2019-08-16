@@ -190,35 +190,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
-            extensions: [
-                new Blockquote(),
-                new BulletList(),
-                new CodeBlock(),
-                new HardBreak(),
-                new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
-                new ListItem(),
-                new OrderedList(),
-                new Bold(),
-                new Code(),
-                new Italic(),
-                new Strike(),
-                new Underline(),
-                new Table({
-                    resizable: true,
-                }),
-                new TableHeader(),
-                new TableCell(),
-                new TableRow(),
-                new History(),
-                new Set({ bard: this }),
-                new ConfirmSetDelete(),
-                new Link({ vm: this }),
-                new RemoveFormat(),
-                new Image({ bard: this }),
-                new CodeBlockHighlight({
-                    languages: { javascript, css }
-                })
-            ],
+            extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
             onFocus: () => this.$emit('focus'),
@@ -316,7 +288,17 @@ export default {
             });
 
             // Let addons add, remove, or control the position of buttons.
-            Statamic.$config.get('bard').buttons.forEach(callback => callback.call(null, buttons));
+            this.$bard.buttonCallbacks.forEach(callback => {
+                let returned = callback(buttons);
+
+                // No return value means they intend to manipulate the
+                // buttons object manually. Just continue on.
+                if (! returned) return;
+
+                buttons = buttons.concat(
+                    Array.isArray(returned) ? returned : [returned]
+                );
+            });
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
             buttons = buttons.filter(button => typeof button != 'string');
@@ -369,6 +351,43 @@ export default {
             return value.length
                 ? { type: 'doc', content: value }
                 : null;
+        },
+
+        getExtensions() {
+            let extensions = [
+                new Blockquote(),
+                new BulletList(),
+                new CodeBlock(),
+                new HardBreak(),
+                new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
+                new ListItem(),
+                new OrderedList(),
+                new Bold(),
+                new Code(),
+                new Italic(),
+                new Strike(),
+                new Underline(),
+                new Table({ resizable: true }),
+                new TableHeader(),
+                new TableCell(),
+                new TableRow(),
+                new History(),
+                new Set({ bard: this }),
+                new ConfirmSetDelete(),
+                new Link({ vm: this }),
+                new RemoveFormat(),
+                new Image({ bard: this }),
+                new CodeBlockHighlight({ languages: { javascript, css }})
+            ];
+
+            this.$bard.extensionCallbacks.forEach(callback => {
+                let returned = callback(this);
+                extensions = extensions.concat(
+                    Array.isArray(returned) ? returned : [returned]
+                );
+            });
+
+            return extensions;
         }
     }
 }
