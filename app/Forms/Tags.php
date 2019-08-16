@@ -183,7 +183,7 @@ class Tags extends BaseTags
      *
      * @return string
      */
-    private function getForm()
+    protected function getForm()
     {
         if (! $form = $this->get(static::HANDLE_PARAM, array_get($this->context, 'form'))) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
@@ -201,7 +201,7 @@ class Tags extends BaseTags
      *
      * @return bool
      */
-    private function hasErrors()
+    protected function hasErrors()
     {
         if (! $formset = $this->getForm()) {
             return false;
@@ -217,7 +217,7 @@ class Tags extends BaseTags
      *
      * @return object
      */
-    private function getErrorBag()
+    protected function getErrorBag()
     {
         if ($this->hasErrors()) {
             return session('errors')->getBag('form.'.$this->formHandle);
@@ -229,7 +229,7 @@ class Tags extends BaseTags
      *
      * @return array
      */
-    private function getErrors()
+    protected function getErrors()
     {
         return array_combine($this->errorBag->keys(), $this->getErrorMessages());
     }
@@ -239,7 +239,7 @@ class Tags extends BaseTags
      *
      * @return array
      */
-    private function getErrorMessages()
+    protected function getErrorMessages()
     {
         return $this->errorBag->all();
     }
@@ -253,7 +253,7 @@ class Tags extends BaseTags
      *
      * @param array $data
      */
-    private function addToDebugBar($data)
+    protected function addToDebugBar($data)
     {
         if (! function_exists('debug_bar')) {
             return;
