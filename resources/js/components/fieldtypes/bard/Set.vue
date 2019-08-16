@@ -4,7 +4,7 @@
         @mousedown="parentMousedown"
         @dragstart="parentDragStart"
     >
-        <div class="replicator-set-header" @dblclick="toggleCollapsedState">
+        <div class="replicator-set-header" :class="{'collapsed': collapsed}" @dblclick="toggleCollapsedState">
             <div class="item-move sortable-handle" ref="dragHandle"></div>
             <div class="flex-1 ml-1 flex items-center" @click="expand">
                 <label v-text="config.display" class="text-xs"/>
@@ -20,8 +20,8 @@
                     v-model="enabled"
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list>
-                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
+                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
