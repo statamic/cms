@@ -27,6 +27,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected $icon;
+    protected $view = 'statamic::forms.fields.default';
 
     protected $queryOperators = [
         '=' => 'Equal to',
@@ -170,6 +171,11 @@ abstract class Fieldtype implements Arrayable
     public function preProcessIndex($data)
     {
         return $data;
+    }
+
+    public function view()
+    {
+        return $this->view;
     }
 
     public function config(string $key = null, $fallback = null)
