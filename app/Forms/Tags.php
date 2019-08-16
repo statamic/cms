@@ -77,11 +77,7 @@ class Tags extends BaseTags
             $data['success'] = true;
         }
 
-        $data['fields'] = Form::find($this->formHandle)->fields()->map(function ($field) use ($data) {
-            return array_merge($field->toArray(), [
-                'error' => array_get($data, "error.{$field->handle()}")
-            ]);
-        })->all();
+        $data['fields'] = $this->getFields();
 
         $this->addToDebugBar($data);
 
@@ -194,6 +190,27 @@ class Tags extends BaseTags
         }
 
         return $form;
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @return array
+     */
+    protected function getFields()
+    {
+        $errors = $this->hasErrors() ? $this->getErrors() : [];
+
+        return Form::find($this->getForm())->fields()
+            ->map(function ($field) use ($errors) {
+                return array_merge($field->toArray(), [
+                    'name' => $field->handle(),
+                    'error' => $errors[$field->handle()] ?? null,
+                    'old' => old($field->handle()),
+                ]);
+            })
+            ->values()
+            ->all();
     }
 
     /**
