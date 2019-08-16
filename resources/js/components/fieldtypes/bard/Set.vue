@@ -58,7 +58,8 @@ export default {
         'updateAttrs', // function to update attributes defined in `schema`
         'editable', // global editor prop whether the content can be edited
         'options', // array of extension options
-        `selected`, // whether its selected
+        `selected`, // whether its selected,
+        'collapsed'
     ],
 
     components: { SetField },
@@ -70,7 +71,6 @@ export default {
     data() {
         return {
             lastClicked: null,
-            collapsed: false
         }
     },
 
@@ -156,15 +156,23 @@ export default {
             }, 1);
         },
 
-        toggleCollapsedState() {
-            this.collapsed = ! this.collapsed;
+         toggleCollapsedState() {
+            if (this.collapsed) {
+                this.expand();
+            } else {
+                this.collapse();
+            }
+        },
+
+        collapse() {
+            // this.$events.$emit('collapsed', this.node.attrs.id);
+            this.options.bard.collapseSet(this.node.attrs.id);
         },
 
         expand() {
-            if (this.collapsed) {
-                this.collapsed = false
-            }
-        }
+            // this.$events.$emit('expanded', this.node.attrs.id);
+            this.options.bard.expandSet(this.node.attrs.id);
+        },
 
     }
 }

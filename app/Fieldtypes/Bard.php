@@ -257,6 +257,8 @@ class Bard extends Replicator
             return (new Fields($set['fields']))->addValues($defaults[$handle])->meta();
         })->toArray();
 
-        return compact('existing', 'new', 'defaults');
+        $collapsed = [];
+
+        return compact('existing', 'new', 'defaults', 'collapsed');
     }
 }

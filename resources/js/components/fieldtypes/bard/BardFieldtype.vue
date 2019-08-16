@@ -16,11 +16,15 @@
                         :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
+                <div class="h-10 -my-sm border-l pr-1 w-px"></div>
                     <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
+                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')">
+                        <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
+                    </button>
                     <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="shrink" class="w-4 h-4" v-if="fullScreenMode" />
+                        <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
                         <svg-icon name="expand" class="w-4 h-4" v-else />
                     </button>
                 </div>
@@ -136,7 +140,7 @@ export default {
 
     provide() {
         return {
-            setConfigs: this.config.sets
+            setConfigs: this.config.sets,
         }
     },
 
@@ -182,6 +186,10 @@ export default {
 
         id() {
             return `${this.storeName}.${this.name}`;
+        },
+
+        collapsed() {
+            return this.meta.collapsed;
         }
 
     },
@@ -235,6 +243,12 @@ export default {
 
         readOnly(readOnly) {
             this.editor.setOptions({ editable: !this.readOnly });
+        },
+
+        collapsed(value) {
+            const meta = this.meta;
+            meta.collapsed = value;
+            this.updateMeta(meta);
         }
 
     },
@@ -251,6 +265,31 @@ export default {
                 this.editor.commands.set({ id, values });
                 this.$refs.setSelectorDropdown.close();
             });
+        },
+
+        collapseSet(id) {
+            if (!this.collapsed.includes(id)) {
+                this.collapsed.push(id)
+            }
+        },
+
+        expandSet(id) {
+            if (this.collapsed.includes(id)) {
+                var index = this.collapsed.indexOf(id);
+                this.collapsed.splice(index, 1);
+            }
+        },
+
+        collapseAll() {
+            this.collapsed = _.pluck(this.values, '_id');
+        },
+
+        expandAll() {
+            this.collapsed = [];
+        },
+
+        toggleCollapseSets() {
+
         },
 
         toggleFullscreen() {
