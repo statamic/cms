@@ -12,4 +12,6 @@ class Textarea extends Fieldtype
             'instructions' => 'Set the maximum number of enterable characters.'
         ],
     ];
+
+    protected $view = 'statamic::forms.fields.textarea';
 }
