@@ -12,9 +12,6 @@ abstract class Store
     protected $customIndexes = [];
     protected $defaultIndexes = [
         'id' => Indexes\Id::class,
-        'path' => Indexes\Path::class,
-        'slug' => Indexes\Slug::class,
-        'uri' => Indexes\Uri::class,
         'site' => Indexes\Site::class,
     ];
     protected static $indexes = [];
