@@ -2,7 +2,7 @@
 
     <div :class="sortableItemClass" class="replicator-set">
 
-        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly }">
+        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
             <div class="flex-1 ml-1 flex items-center" @dblclick="toggleCollapsedState">
                 <label v-text="config.display" class="text-xs"/>
