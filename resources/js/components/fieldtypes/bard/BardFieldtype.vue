@@ -20,10 +20,7 @@
                     <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button @click="collapseAll" v-tooltip="__('Collapse Sets')">
-                        <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
-                    </button>
-                    <button @click="expandAll" v-tooltip="__('Expand Sets')">
+                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
                     <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
@@ -289,7 +286,7 @@ export default {
         },
 
         toggleCollapseSets() {
-
+            (this.collapsed.length === 0) ? this.collapseAll() : this.expandAll();
         },
 
         toggleFullscreen() {
