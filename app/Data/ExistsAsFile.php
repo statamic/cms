@@ -59,4 +59,13 @@ trait ExistsAsFile
     {
         return 'yaml';
     }
+
+    public function writeFile()
+    {
+        File::put($path = $this->path(), $this->fileContents());
+
+        if (($initial = $this->initialPath()) && $path !== $initial) {
+            File::delete($this->initialPath());
+        }
+    }
 }

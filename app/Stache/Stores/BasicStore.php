@@ -40,4 +40,13 @@ abstract class BasicStore extends Store
     {
         return $this->index('path')->get($key);
     }
+
+    public function save($item)
+    {
+        $item->writeFile();
+
+        $this->forgetItem($this->getItemKey($item));
+
+        $this->updateItemIndexes($item);
+    }
 }

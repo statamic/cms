@@ -2,7 +2,6 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\File;
 use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\YAML;
@@ -97,18 +96,5 @@ class CollectionEntriesStore extends ChildStore
         // $this->updatedEntries[] = $entry;
 
         return $entry;
-    }
-
-    public function save($entry)
-    {
-        File::put($path = $entry->path(), $entry->fileContents());
-
-        if (($initial = $entry->initialPath()) && $path !== $initial) {
-            File::delete($entry->initialPath());
-        }
-
-        $this->forgetItem($entry->id());
-
-        $this->updateItemIndexes($entry);
     }
 }
