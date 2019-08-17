@@ -10,6 +10,10 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
+    protected $storeIndexes = [
+        'email'
+    ];
+
     protected $groups = [];
 
     public function key()
