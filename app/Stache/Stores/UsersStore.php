@@ -6,6 +6,7 @@ use Statamic\API\File;
 use Statamic\API\User;
 use Statamic\API\YAML;
 use Statamic\API\UserGroup;
+use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
@@ -16,25 +17,7 @@ class UsersStore extends BasicStore
         return 'users';
     }
 
-    public function getItemsFromCache($cache)
-    {
-        // TODO: TDD
-        return $cache->map(function ($item, $id) {
-            $user = User::make()
-                ->id($id)
-                ->email($item['email'])
-                ->initialPath($item['path'])
-                ->preferences($item['preferences'])
-                ->data($item['data'])
-                ->passwordHash($item['password']);
-
-            $this->queueGroups($user);
-
-            return $user;
-        });
-    }
-
-    public function createItemFromFile($path, $contents)
+    public function makeItemFromFile($path, $contents)
     {
         $data = YAML::parse($contents);
 
@@ -49,40 +32,35 @@ class UsersStore extends BasicStore
             $user->save();
         }
 
-        $this->queueGroups($user);
+        // $this->queueGroups($user);
 
         return $user;
     }
 
-    public function getItemKey($item, $path)
-    {
-        return $item->id();
-    }
-
-    public function filter($file)
+    public function filter(SplFileInfo $file)
     {
         return $file->getExtension() === 'yaml';
     }
 
-    protected function queueGroups($user)
-    {
-        if (! $groups = $user->get('groups')) {
-            return;
-        }
+    // protected function queueGroups($user)
+    // {
+    //     if (! $groups = $user->get('groups')) {
+    //         return;
+    //     }
 
-        foreach ($groups as $group) {
-            $this->groups[$group][] = $user;
-        }
-    }
+    //     foreach ($groups as $group) {
+    //         $this->groups[$group][] = $user;
+    //     }
+    // }
 
-    public function loadingComplete()
-    {
-        foreach ($this->groups as $group => $users) {
-            if ($group = UserGroup::find($group)) {
-                $group->users($users)->resetOriginalUsers();
-            }
-        }
-    }
+    // public function loadingComplete()
+    // {
+    //     foreach ($this->groups as $group => $users) {
+    //         if ($group = UserGroup::find($group)) {
+    //             $group->users($users)->resetOriginalUsers();
+    //         }
+    //     }
+    // }
 
     public function save($user)
     {
@@ -91,23 +69,15 @@ class UsersStore extends BasicStore
         if (($initial = $user->initialPath()) && $path !== $initial) {
             File::delete($user->initialPath()); // TODO: Test
         }
+
+        // Remove item from cache
+        $this->forgetItem($user->id());
+
+        // todo: update appropriate indexes
     }
 
-    public function delete($user)
-    {
-        File::delete($user->path());
-    }
-
-    /**
-     * TODO: Replace this with Arr::removeNullValues from v2.
-     * I copied this temporarily to get it working without porting all of the Arr class.
-     */
-    protected function removeNullValues($data)
-    {
-        return array_filter($data, function ($item) {
-            return is_array($item)
-                ? !empty($item)
-                : !in_array($item, [null, ''], true);
-        });
-    }
+    // public function delete($user)
+    // {
+    //     File::delete($user->path());
+    // }
 }

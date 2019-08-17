@@ -8,9 +8,9 @@ use Statamic\Auth\UserFactory;
 use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Auth\User;
 use Statamic\Auth\File\RoleRepository;
-use Statamic\Auth\File\UserQueryBuilder;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\File\UserGroupRepository;
+use Statamic\Stache\Query\UserQueryBuilder;
 use Statamic\Auth\UserRepository as BaseRepository;
 
 class UserRepository extends BaseRepository
@@ -35,7 +35,7 @@ class UserRepository extends BaseRepository
 
     public function all(): UserCollection
     {
-        return collect_users($this->store->getItems());
+        return $this->query()->get();
     }
 
     public function find($id): ?User
@@ -45,15 +45,12 @@ class UserRepository extends BaseRepository
 
     public function findByEmail(string $email): ?User
     {
-        // TODO: TDD
-        return $this->store->getItems()->first(function ($user) use ($email) {
-            return $user->email() === $email;
-        });
+        return $this->query()->where('email', $email)->first();
     }
 
     public function query()
     {
-        return new UserQueryBuilder;
+        return new UserQueryBuilder($this->store);
     }
 
     public function save(User $user)
@@ -61,8 +58,6 @@ class UserRepository extends BaseRepository
         if (! $user->id()) {
             $user->id($this->stache->generateId());
         }
-
-        $this->store->insert($user);
 
         $this->store->save($user);
     }

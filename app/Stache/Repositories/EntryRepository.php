@@ -3,9 +3,9 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
-use Statamic\Data\Entries\QueryBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
+use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Contracts\Data\Repositories\StructureRepository;
 use Statamic\Contracts\Data\Repositories\EntryRepository as RepositoryContract;
 
@@ -83,7 +83,7 @@ class EntryRepository implements RepositoryContract
 
     public function query()
     {
-        return new QueryBuilder;
+        return new EntryQueryBuilder($this->store);
     }
 
     public function make(): Entry

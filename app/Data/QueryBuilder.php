@@ -8,47 +8,57 @@ use Statamic\Query\Builder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder
 {
+    protected $store;
+
+    public function __construct($store)
+    {
+        $this->store = $store;
+    }
+
     public function count()
     {
-        return $this->getFilteredAndLimitedItems()->count();
+        return $this->getFilteredAndLimitedKeys()->count();
     }
 
     public function get()
     {
-        $items = $this->getFilteredItems();
+        $keys = $this->getFilteredKeys();
 
-        if ($orderBys = $this->orderBys) {
-            $sort = collect($orderBys)->map->toString()->implode('|');
-            $items = $items->multisort($sort)->values();
-        }
+        $keys = $this->orderKeys($keys);
 
-        return $this->limitItems($items);
+        $keys = $this->limitKeys($keys);
+
+        $items = $this->getItems($keys);
+
+        return $this->collect($items);
     }
 
-    protected function getFilteredItems()
+    abstract protected function getFilteredKeys();
+
+    protected function getFilteredAndLimitedKeys()
     {
-        $items = $this->getBaseItems();
-
-        $items = $this->filterWheres($items);
-
-        return $items;
+        return $this->limitKeys($this->getFilteredKeys());
     }
 
-    protected function getFilteredAndLimitedItems()
+    protected function limitKeys($keys)
     {
-        return $this->limitItems($this->getFilteredItems());
+        return $keys->slice($this->offset, $this->limit);
     }
 
-    protected function limitItems($items)
+    protected function orderKeys($keys)
     {
-        return $items->slice($this->offset, $this->limit);
+        // todo
+        return $keys;
     }
-
-    abstract protected function getBaseItems();
 
     protected function getCountForPagination()
     {
-        return $this->getFilteredItems()->count();
+        return $this->getFilteredKeys()->count();
+    }
+
+    protected function getItems($keys)
+    {
+        return $this->store->getItems($keys);
     }
 
     protected function filterWheres($entries)
@@ -61,18 +71,16 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return $entries;
     }
 
-    protected function filterWhereIn($entries, $where)
+    protected function filterWhereIn($values, $where)
     {
-        return $entries->filter(function ($entry) use ($where) {
-            $value = $this->getFilterItemValue($entry, $where['column']);
+        return $values->filter(function ($value) use ($where) {
             return in_array($value, $where['values']);
         });
     }
 
-    protected function filterWhereBasic($entries, $where)
+    protected function filterWhereBasic($values, $where)
     {
-        return $entries->filter(function ($entry) use ($where) {
-            $value = $this->getFilterItemValue($entry, $where['column']);
+        return $values->filter(function ($value) use ($where) {
             $method = 'filterTest' . $this->operators[$where['operator']];
             return $this->{$method}($value, $where['value']);
         });
