@@ -62,20 +62,6 @@ class UsersStore extends BasicStore
     //     }
     // }
 
-    public function save($user)
-    {
-        File::put($path = $user->path(), $user->fileContents());
-
-        if (($initial = $user->initialPath()) && $path !== $initial) {
-            File::delete($user->initialPath()); // TODO: Test
-        }
-
-        // Remove item from cache
-        $this->forgetItem($user->id());
-
-        // todo: update appropriate indexes
-    }
-
     // public function delete($user)
     // {
     //     File::delete($user->path());
