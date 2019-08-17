@@ -10,9 +10,4 @@ class EntriesStore extends AggregateStore
     {
         return 'entries';
     }
-
-    public function save($entry)
-    {
-        $this->store($entry->collectionHandle())->save($entry);
-    }
 }

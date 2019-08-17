@@ -64,5 +64,4 @@ abstract class AggregateStore extends Store
         return $this->store($store)->getItem($id);
     }
 
-    abstract public function save($item);
 }
