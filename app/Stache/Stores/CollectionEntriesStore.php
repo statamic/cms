@@ -8,10 +8,16 @@ use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Entry;
 use Statamic\API\Collection;
+use Statamic\Stache\Indexes;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionEntriesStore extends ChildStore
 {
+    protected $storeIndexes = [
+        'slug',
+        'site' => Indexes\Site::class,
+    ];
+
     public function filter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory, '/');
@@ -101,9 +107,8 @@ class CollectionEntriesStore extends ChildStore
             File::delete($entry->initialPath());
         }
 
-        // Remove item from cache
         $this->forgetItem($entry->id());
 
-        // todo: update appropriate indexes
+        $this->updateItemIndexes($entry);
     }
 }

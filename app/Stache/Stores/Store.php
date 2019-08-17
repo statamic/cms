@@ -11,9 +11,10 @@ abstract class Store
     protected $directory;
     protected $customIndexes = [];
     protected $defaultIndexes = [
-        'id' => Indexes\Id::class,
-        'site' => Indexes\Site::class,
+        'id',
+        'path',
     ];
+    protected $storeIndexes = [];
     protected static $indexes = [];
 
     public function directory($directory = null)
@@ -68,4 +69,25 @@ abstract class Store
     }
 
     abstract public function getItem($key);
+
+    public function updateItemIndexes($item)
+    {
+        $this->getStoreIndexes()->each->updateItem($item);
+    }
+
+    public function getStoreIndexes()
+    {
+        $indices = array_merge(
+            $this->defaultIndexes,
+            $this->storeIndexes,
+            config('statamic.stache.indexes', []),
+            config("statamic.stache.stores.{$this->key()}.indexes", [])
+        );
+
+        return collect($indices)->map(function ($index, $key) {
+            return (is_int($key))
+                ? new Indexes\Value($this, $index)
+                : new $index($this, $key);
+        });
+    }
 }

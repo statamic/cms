@@ -58,16 +58,35 @@ abstract class Index
     {
         debugbar()->addMessage("Updating index: {$this->store->key()}/{$this->name}", 'stache');
 
-        $items = $this->getItems();
+        $this->items = $this->getItems();
 
-        Cache::forever($this->cacheKey(), $items);
-
-        $this->items = $items;
+        $this->cache();
 
         return $this;
     }
 
-    abstract public function getItems();
+    protected function cache()
+    {
+        Cache::forever($this->cacheKey(), $this->items);
+    }
+
+    public function updateItem($item)
+    {
+        $this->load();
+
+        $this->items[$this->store->getItemKey($item)] = $this->getItemValue($item);
+
+        $this->cache();
+    }
+
+    public function getItems()
+    {
+        return $this->store->getItemsFromFiles()->map(function ($item) {
+            return $this->getItemValue($item);
+        })->all();
+    }
+
+    abstract public function getItemValue($item);
 
     public function cacheKey()
     {

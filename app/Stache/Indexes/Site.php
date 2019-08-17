@@ -4,8 +4,8 @@ namespace Statamic\Stache\Indexes;
 
 class Site extends Index
 {
-    public function getItems()
+    public function getItemValue($item)
     {
-        return $this->store->getItemsFromFiles()->map->locale()->all();
+        return $item->locale();
     }
 }
