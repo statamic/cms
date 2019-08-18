@@ -13,7 +13,9 @@ abstract class BasicStore extends Store
 
     public function getItem($key)
     {
-        $path = $this->getPath($key);
+        if (! $path = $this->getPath($key)) {
+            return null;
+        }
 
         $cacheKey = $this->getItemCacheKey($key);
 
