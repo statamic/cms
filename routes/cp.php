@@ -165,6 +165,7 @@ Route::group([
     Route::get('search', 'SearchController')->name('search');
 
     Route::group(['namespace' => 'Utilities'], function () {
+        Route::get('utilities', 'UtilitiesController@index')->name('utilities.index');
         Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
         Route::get('utilities/cache', 'CacheController@index')->name('utilities.cache.index');
         Route::post('utilities/cache/{cache}', 'CacheController@clear')->name('utilities.cache.clear');
