@@ -20,7 +20,7 @@
                     <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')">
+                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
                     <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
