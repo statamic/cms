@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\API\File;
 use Statamic\Stache\Indexes;
+use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Stache\Traverser;
 
 abstract class Store
@@ -77,14 +78,35 @@ abstract class Store
         $this->getStoreIndexes()->each->updateItem($item);
     }
 
+    public function cacheIndexUsage($index)
+    {
+        $key = $this->indexUsageCacheKey();
+        $index = $index->name();
+        $indexes = collect(Cache::get($key, []));
+
+        if ($indexes->contains($index)) {
+            return;
+        }
+
+        $indexes->push($index);
+
+        Cache::put($key, $indexes->all());
+    }
+
+    protected function indexUsageCacheKey()
+    {
+        return "stache::indexes::{$this->key()}::_indexes";
+    }
+
     public function getStoreIndexes()
     {
-        $indices = array_merge(
+        $indices = array_unique(array_merge(
             $this->defaultIndexes,
             $this->storeIndexes,
             config('statamic.stache.indexes', []),
-            config("statamic.stache.stores.{$this->key()}.indexes", [])
-        );
+            config("statamic.stache.stores.{$this->key()}.indexes", []),
+            Cache::get($this->indexUsageCacheKey())
+        ));
 
         return collect($indices)->map(function ($index, $key) {
             return (is_int($key))

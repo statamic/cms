@@ -16,6 +16,11 @@ abstract class Index
         $this->name = $name;
     }
 
+    public function name()
+    {
+        return $this->name;
+    }
+
     public function items()
     {
         return collect($this->items);
@@ -50,6 +55,8 @@ abstract class Index
         if (! $this->items) {
             $this->update();
         }
+
+        $this->store->cacheIndexUsage($this);
 
         return $this;
     }
