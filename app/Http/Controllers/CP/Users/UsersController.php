@@ -141,6 +141,10 @@ class UsersController extends CpController
             ->roles($request->roles ?? [])
             ->groups($request->groups ?? []);
 
+        if ($request->super) {
+            $user->makeSuper();
+        }
+
         $user->save();
 
         ActivateAccount::subject($request->subject);

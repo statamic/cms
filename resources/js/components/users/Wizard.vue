@@ -52,7 +52,7 @@
             <!-- Super Admin -->
              <div class="pb-5">
                 <div class="flex items-center">
-                    <toggle-input v-model="user.super_admin" />
+                    <toggle-input v-model="user.super" />
                     <label class="font-bold ml-1">Super Admin</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
@@ -62,7 +62,7 @@
             </div>
 
             <!-- Roles -->
-            <div class="pb-5" v-if="! user.super_admin">
+            <div class="pb-5" v-if="! user.super">
                 <label class="font-bold text-base mb-sm" for="role">Roles</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
@@ -158,7 +158,7 @@ export default {
             steps: ['User Information', 'Roles & Groups', 'Customize Invitation'],
             user: {
                 email: null,
-                super_admin: true,
+                super: true,
                 roles: []
             },
             send_invite: true,
