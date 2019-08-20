@@ -70,7 +70,7 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
-    function files_get_filtered_by_stores_closure()
+    function files_can_be_filtered()
     {
         touch($this->tempDir.'/one.txt', 1234567890);
         touch($this->tempDir.'/two.yaml', 2345678901);
@@ -80,14 +80,16 @@ class TraverserTest extends TestCase
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
         $store = new class($stache, app('files')) extends BasicStore {
             public function key() { }
-            public function filter($file) {
-                PHPUnit::assertInstanceOf(SplFileInfo::class, $file);
-                return $file->getExtension() === 'txt';
-            }
+            public function makeItemFromFile($path, $contents) { }
         };
         $store->directory($this->tempDir);
 
-        $files = $this->traverser->traverse($store);
+        $filter = function($file) {
+            PHPUnit::assertInstanceOf(SplFileInfo::class, $file);
+            return $file->getExtension() === 'txt';
+        };
+
+        $files = $this->traverser->filter($filter)->traverse($store);
 
         $this->assertCount(2, $files);
         $this->assertEquals([
