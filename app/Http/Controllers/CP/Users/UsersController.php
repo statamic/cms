@@ -147,10 +147,11 @@ class UsersController extends CpController
 
         $user->save();
 
-        ActivateAccount::subject($request->subject);
-        ActivateAccount::body($request->message);
-
-        $user->generateTokenAndSendPasswordResetNotification();
+        if ($request->invitation['send']) {
+            ActivateAccount::subject($request->invitation['subject']);
+            ActivateAccount::body($request->invitation['message']);
+            $user->generateTokenAndSendPasswordResetNotification();
+        }
 
         return array_merge($user->toArray(), [
             'redirect' => $user->editUrl(),
