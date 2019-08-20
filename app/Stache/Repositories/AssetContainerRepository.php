@@ -19,7 +19,9 @@ class AssetContainerRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        return $this->store->getItems();
+        $keys = $this->store->index('path')->keys();
+
+        return $this->store->getItems($keys);
     }
 
     public function findByHandle(string $handle): ?AssetContainer

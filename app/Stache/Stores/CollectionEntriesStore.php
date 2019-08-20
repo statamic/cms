@@ -14,11 +14,12 @@ class CollectionEntriesStore extends ChildStore
 {
     protected $storeIndexes = [
         'slug',
+        'collection',
         'site' => Indexes\Site::class,
+        'origin' => Indexes\Origin::class,
     ];
 
-    public function filter(SplFileInfo $file)
-    {
+    public function getFileFilter(SplFileInfo $file) {
         $dir = str_finish($this->directory, '/');
         $relative = $file->getPathname();
 
@@ -64,12 +65,9 @@ class CollectionEntriesStore extends ChildStore
 
         $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
-        // if ($origin = Arr::pull($data, 'origin')) {
-        //     $this->localizationQueue[] = [
-        //         'origin' => $origin,
-        //         'localization' => $entry,
-        //     ];
-        // }
+        if ($origin = array_pull($data, 'origin')) {
+            $entry->origin($origin);
+        }
 
         $entry
             ->blueprint($data['blueprint'] ?? null)
@@ -84,16 +82,13 @@ class CollectionEntriesStore extends ChildStore
         //     $collection->appendEntryPosition($id)->save();
         // }
 
-        // if ($collection->dated()) { // TODO
-        if (true) {
+        if ($collection->dated()) {
             $entry->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
         }
 
         if (isset($idGenerated) || isset($positionGenerated)) {
             $entry->save();
         }
-
-        // $this->updatedEntries[] = $entry;
 
         return $entry;
     }

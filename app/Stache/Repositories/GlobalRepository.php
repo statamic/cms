@@ -26,7 +26,9 @@ class GlobalRepository implements RepositoryContract
 
     public function all(): GlobalCollection
     {
-        return collect_globals($this->store->getItems());
+        $keys = $this->store->index('path')->keys();
+
+        return collect_globals($this->store->getItems($keys));
     }
 
     public function find($id): ?GlobalSet
@@ -36,7 +38,9 @@ class GlobalRepository implements RepositoryContract
 
     public function findByHandle($handle): ?GlobalSet
     {
-        return $this->find($this->store->getIdByHandle($handle));
+        $key = $this->store->index('handle')->items()->flip()->get($handle);
+
+        return $this->find($key);
     }
 
     public function save($global)

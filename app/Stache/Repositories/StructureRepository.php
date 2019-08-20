@@ -22,7 +22,9 @@ class StructureRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        return $this->store->getItems();
+        $keys = $this->store->index('path')->keys();
+
+        return $this->store->getItems($keys);
     }
 
     public function find($id): ?Structure
@@ -41,11 +43,11 @@ class StructureRepository implements RepositoryContract
 
         $site = $site ?? $this->stache->sites()->first();
 
-        if (! $key = $this->store->getKeyFromUri($uri, $site)) {
+        if (! $key = $this->store->index('uri')->get($site.'::'.$uri)) {
             return null;
         }
 
-        list($handle, $id) = explode('::', $key);
+        [$handle, $id] = explode('::', $key);
 
         return $this->find($handle)->in($site)->page($id);
     }

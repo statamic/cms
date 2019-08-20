@@ -38,7 +38,7 @@ class EntryQueryBuilder extends Builder
     protected function getFilteredKeys()
     {
         $collections = empty($this->collections)
-            ? ['diary', 'pages']//API\Collection::handles()
+            ? API\Collection::handles()
             : $this->collections;
 
         return empty($this->wheres)

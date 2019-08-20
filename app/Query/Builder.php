@@ -138,10 +138,7 @@ abstract class Builder
         ]);
     }
 
-    protected function getCountForPagination()
-    {
-        throw new Exception('Method getCountForPagination not implemented.');
-    }
+    abstract protected function getCountForPagination();
 
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
@@ -157,4 +154,72 @@ abstract class Builder
 
     abstract public function count();
     abstract public function get();
+
+    protected function filterTestEquals($item, $value)
+    {
+        return strtolower($item) === strtolower($value);
+    }
+
+    protected function filterTestNotEquals($item, $value)
+    {
+        return strtolower($item) !== strtolower($value);
+    }
+
+    protected function filterTestLessThan($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->lt($value);
+        }
+
+        return $item < $value;
+    }
+
+    protected function filterTestGreaterThan($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->gt($value);
+        }
+
+        return $item > $value;
+    }
+
+    protected function filterTestLessThanOrEqualTo($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->lte($value);
+        }
+
+        return $item <= $value;
+    }
+
+    protected function filterTestGreaterThanOrEqualTo($item, $value)
+    {
+        if ($item instanceof Carbon) {
+            return $item->gte($value);
+        }
+
+        return $item >= $value;
+    }
+
+    protected function filterTestLike($item, $like)
+    {
+        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/i';
+
+        return preg_match($pattern, $item);
+    }
+
+    protected function filterTestNotLike($item, $like)
+    {
+        return ! $this->filterTestLike($item, $like);
+    }
+
+    protected function filterTestLikeRegex($item, $pattern)
+    {
+        return preg_match("/{$pattern}/i", $item);
+    }
+
+    protected function filterTestNotLikeRegex($item, $pattern)
+    {
+        return ! $this->filterTestLikeRegex($item, $pattern);
+    }
 }

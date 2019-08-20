@@ -79,14 +79,7 @@ abstract class Index
         $this->cache();
     }
 
-    public function getItems()
-    {
-        return $this->store->getItemsFromFiles()->map(function ($item) {
-            return $this->getItemValue($item);
-        })->all();
-    }
-
-    abstract public function getItemValue($item);
+    abstract public function getItems();
 
     public function cacheKey()
     {

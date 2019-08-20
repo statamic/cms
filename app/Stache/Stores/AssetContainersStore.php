@@ -16,25 +16,12 @@ class AssetContainersStore extends BasicStore
         return 'asset-containers';
     }
 
-    public function getItemsFromCache($cache)
-    {
-        return $cache->map(function ($item, $handle) {
-            return $this->containerFromArray($handle, $item);
-        });
-    }
-
-    public function createItemFromFile($path, $contents)
+    public function makeItemFromFile($path, $contents)
     {
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
-        $driver = array_get($data, 'driver', 'local');
 
-        return $this->containerFromArray($handle, $data);
-    }
-
-    protected function containerFromArray($handle, $data)
-    {
-        $container = AssetContainer::make($handle)
+        return AssetContainer::make($handle)
             ->disk(array_get($data, 'disk'))
             ->title(array_get($data, 'title'))
             ->blueprint(array_get($data, 'blueprint'))
@@ -44,22 +31,5 @@ class AssetContainersStore extends BasicStore
             ->allowUploads(array_get($data, 'allow_uploads'))
             ->createFolders(array_get($data, 'create_folders'))
             ->searchIndex(array_get($data, 'search_index'));
-
-        return $container;
-    }
-
-    public function getItemKey($item, $path)
-    {
-        return pathinfo($path, PATHINFO_FILENAME);
-    }
-
-    public function filter($file)
-    {
-        return $file->getExtension() === 'yaml';
-    }
-
-    public function save($container)
-    {
-        File::put($container->path(), $container->fileContents());
     }
 }

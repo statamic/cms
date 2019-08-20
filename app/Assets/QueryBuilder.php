@@ -5,7 +5,7 @@ namespace Statamic\Assets;
 use Exception;
 use Statamic\API;
 use Statamic\Contracts\Assets\AssetContainer;
-use Statamic\Data\QueryBuilder as BaseQueryBuilder;
+use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
 
 class QueryBuilder extends BaseQueryBuilder implements Contract

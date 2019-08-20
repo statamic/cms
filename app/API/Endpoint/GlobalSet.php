@@ -20,7 +20,7 @@ class GlobalSet
      */
     public function findByHandle($handle)
     {
-        return $this->repo()->handle($handle);
+        return $this->repo()->findByHandle($handle);
     }
 
     /**

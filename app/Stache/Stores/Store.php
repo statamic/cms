@@ -34,7 +34,7 @@ abstract class Store
             return static::$indexes[$this->key()][$name];
         }
 
-        $classes = array_merge($this->customIndexes, $this->defaultIndexes);
+        $classes = array_merge($this->customIndexes, $this->defaultIndexes, $this->storeIndexes);
 
         $class = $classes[$name] ?? Indexes\Value::class;
 
@@ -49,7 +49,9 @@ abstract class Store
 
     public function getItemsFromFiles()
     {
-        return Traverser::traverse($this)->map(function ($timestamp, $path) {
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+
+        return $files->map(function ($timestamp, $path) {
             return $this->makeItemFromFile($path, File::get($path));
         })->keyBy(function ($item) {
             return $this->getItemKey($item);

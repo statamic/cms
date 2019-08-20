@@ -390,6 +390,13 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function descendants()
     {
+        if (! $this->localizations) {
+            $this->localizations = API\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->where('origin', $this->id())->get()
+                ->keyBy->locale();
+        }
+
         $localizations = collect($this->localizations);
 
         foreach ($localizations as $loc) {
@@ -490,5 +497,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     public static function __callStatic($method, $parameters)
     {
         return API\Entry::{$method}(...$parameters);
+    }
+
+    protected function getOriginByString($origin)
+    {
+        return API\Entry::find($origin);
     }
 }

@@ -21,8 +21,17 @@ trait HasOrigin
 
     public function origin($origin = null)
     {
-        return $this->fluentlyGetOrSet('origin')->args(func_get_args());
+        return $this->fluentlyGetOrSet('origin')
+            ->getter(function ($origin) {
+                if (is_string($origin)) {
+                    $this->origin = $origin = $this->getOriginByString($origin);
+                }
+                return $origin;
+            })
+            ->args(func_get_args());
     }
+
+    abstract function getOriginByString($origin);
 
     public function hasOrigin()
     {
