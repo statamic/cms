@@ -285,6 +285,7 @@ class TermsStore extends AggregateStore
             : Taxonomy::findByHandle($taxonomy);
 
         return Term::make($slug)
+            ->locale($this->stache->sites()->first())
             ->taxonomy($taxonomy)
             ->set('title', $this->titles["{$taxonomy->handle()}::{$slug}"]);
     }

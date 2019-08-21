@@ -123,8 +123,8 @@ class TermsController extends CpController
             'localizedFields' => array_keys($term->data()),
             'isRoot' => $term->isRoot(),
             'hasOrigin' => $hasOrigin,
-            'originValues' => $originValues ?? [],
-            'originMeta' => $originMeta ?? [],
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
             'permalink' => $term->absoluteUrl(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
