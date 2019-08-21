@@ -9,6 +9,7 @@ abstract class Index
     protected $store;
     protected $name;
     protected $items = [];
+    protected $loaded = false;
 
     public function __construct($store, $name)
     {
@@ -48,6 +49,12 @@ abstract class Index
 
     public function load()
     {
+        if ($this->loaded) {
+            return $this;
+        }
+
+        $this->loaded = true;
+
         debugbar()->addMessage("Loading index: {$this->store->key()}/{$this->name}", 'stache');
 
         $this->items = Cache::get($this->cacheKey());
