@@ -20,7 +20,7 @@
                 <input type="text" v-model="collection.title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Usually a noun, like "Blog", "Product", or "Breakfast Foods".
+                    Usually a plural noun, like "Articles", "Products", or "Breakfast Foods".
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
