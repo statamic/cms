@@ -226,7 +226,7 @@ abstract class Store
         }
 
         if ($paths = Cache::get($key)) {
-            return collect($paths);
+            return $this->paths = collect($paths);
         }
 
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
