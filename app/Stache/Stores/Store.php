@@ -16,6 +16,7 @@ abstract class Store
         'path',
     ];
     protected $storeIndexes = [];
+    protected $usedIndexes;
     protected static $indexes = [];
     protected $fileChangesHandled = false;
     protected $paths;
@@ -83,19 +84,27 @@ abstract class Store
         $this->resolveIndexes()->each->updateItem($item);
     }
 
-    public function cacheIndexUsage($index)
+    public function indexUsage()
     {
         $key = $this->indexUsageCacheKey();
-        $index = $index->name();
-        $indexes = collect(Cache::get($key, []));
 
-        if ($indexes->contains($index)) {
+        return $this->usedIndexes = $this->usedIndexes ?? collect(Cache::get($key, []));
+    }
+
+    public function cacheIndexUsage($index)
+    {
+        $indexes = $this->indexUsage();
+
+        if ($indexes->contains($index = $index->name())) {
+            $this->usedIndexes = $indexes;
             return;
         }
 
         $indexes->push($index);
 
-        Cache::put($key, $indexes->all());
+        $this->usedIndexes = $indexes;
+
+        Cache::put($this->indexUsageCacheKey(), $indexes->all());
     }
 
     protected function indexUsageCacheKey()
@@ -110,7 +119,7 @@ abstract class Store
             $this->storeIndexes,
             config('statamic.stache.indexes', []),
             config("statamic.stache.stores.{$this->key()}.indexes", []),
-            Cache::get($this->indexUsageCacheKey(), [])
+            $this->indexUsage()->all()
         ))->unique(function ($value, $key) {
             return is_int($key) ? $value : $key;
         })->mapWithKeys(function ($index, $key) {
