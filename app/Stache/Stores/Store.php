@@ -110,7 +110,9 @@ abstract class Store
             config('statamic.stache.indexes', []),
             config("statamic.stache.stores.{$this->key()}.indexes", []),
             Cache::get($this->indexUsageCacheKey(), [])
-        ))->mapWithKeys(function ($index, $key) {
+        ))->unique(function ($value, $key) {
+            return is_int($key) ? $value : $key;
+        })->mapWithKeys(function ($index, $key) {
             return is_int($key)
                 ? [$index => Indexes\Value::class]
                 : [$key => $index];
