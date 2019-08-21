@@ -86,6 +86,15 @@ abstract class Index
         $this->cache();
     }
 
+    public function forgetItem($key)
+    {
+        $this->load();
+
+        unset($this->items[$key]);
+
+        $this->cache();
+    }
+
     abstract public function getItems();
 
     public function cacheKey()
