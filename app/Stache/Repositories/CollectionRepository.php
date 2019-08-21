@@ -18,7 +18,7 @@ class CollectionRepository implements RepositoryContract
 
     public function all(): IlluminateCollection
     {
-        $keys = $this->store->index('path')->keys();
+        $keys = $this->store->paths()->keys();
 
         return $this->store->getItems($keys);
     }

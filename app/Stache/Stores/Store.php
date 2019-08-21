@@ -18,6 +18,7 @@ abstract class Store
     protected $storeIndexes = [];
     protected static $indexes = [];
     protected $fileChangesHandled = false;
+    protected $paths;
 
     public function directory($directory = null)
     {
@@ -57,7 +58,7 @@ abstract class Store
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         return $files->map(function ($timestamp, $path) {
-            return $this->makeItemFromFile($path, File::get($path));
+            return $this->getItemByPath($path);
         })->keyBy(function ($item) {
             return $this->getItemKey($item);
         });
@@ -180,7 +181,7 @@ abstract class Store
         }
 
         // Get a path to key mapping, so we can easily get the keys of existing files.
-        $pathMap = $this->index('path')->items()->flip();
+        $pathMap = $this->paths()->items()->flip();
 
         // Flush cached instances of deleted items.
         $deleted->each(function ($path) use ($pathMap) {
@@ -214,5 +215,32 @@ abstract class Store
                 $index->updateItem($item);
             });
         });
+    }
+
+    public function paths()
+    {
+        $key = "stache::indexes::{$this->key()}::_paths";
+
+        if ($this->paths) {
+            return $this->paths;
+        }
+
+        if ($paths = Cache::get($key)) {
+            return collect($paths);
+        }
+
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+
+        $paths = $files->mapWithKeys(function ($timestamp, $path) {
+            $item = $this->makeItemFromFile($path, File::get($path));
+            $this->cacheItem($item);
+            return [$this->getItemKey($item) => $path];
+        });
+
+        Cache::forever($key, $paths->all());
+
+        $this->paths = $paths;
+
+        return $paths;
     }
 }

@@ -8,6 +8,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
 {
+    protected $items = [];
+
     public function getFileFilter(SplFileInfo $file)
     {
         return $file->getExtension() === 'yaml';
@@ -26,15 +28,42 @@ abstract class BasicStore extends Store
             return null;
         }
 
-        $cacheKey = $this->getItemCacheKey($key);
-
-        if ($item = Cache::get($cacheKey)) {
+        if ($item = $this->getCachedItem($key)) {
             return $item;
         }
 
-        return Cache::rememberForever($cacheKey, function () use ($path) {
-            return $this->makeItemFromFile($path, File::get($path));
-        });
+        $item = $this->makeItemFromFile($path, File::get($path));
+
+        $this->cacheItem($item);
+
+        return $item;
+    }
+
+    public function getItemByPath($path)
+    {
+        return $this->getItem($this->getKeyFromPath($path));
+    }
+
+    protected function getCachedItem($key)
+    {
+        $cacheKey = $this->getItemCacheKey($key);
+
+        if ($cached = $this->items[$key] ?? null) {
+            return $cached;
+        }
+
+        return $this->items[$key] = Cache::get($cacheKey);
+    }
+
+    protected function cacheItem($item)
+    {
+        $key = $this->getItemKey($item);
+
+        $cacheKey = $this->getItemCacheKey($key);
+
+        $this->items[$key] = $item;
+
+        Cache::forever($cacheKey, $item);
     }
 
     public function forgetItem($key)
@@ -49,7 +78,12 @@ abstract class BasicStore extends Store
 
     protected function getPath($key)
     {
-        return $this->index('path')->get($key);
+        return $this->paths()->get($key);
+    }
+
+    protected function getKeyFromPath($path)
+    {
+        return $this->paths()->flip()->get($path);
     }
 
     public function save($item)

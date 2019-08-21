@@ -26,7 +26,7 @@ class GlobalRepository implements RepositoryContract
 
     public function all(): GlobalCollection
     {
-        $keys = $this->store->index('path')->keys();
+        $keys = $this->store->paths()->keys();
 
         return collect_globals($this->store->getItems($keys));
     }

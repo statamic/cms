@@ -51,7 +51,7 @@ class EntryQueryBuilder extends Builder
         return collect($collections)->flatMap(function ($collection) {
             $keys = app('stache')
                 ->store("entries::$collection")
-                ->index('path')->keys();
+                ->paths()->keys();
 
             return collect($keys)->map(function ($key) use ($collection) {
                 return "{$collection}::{$key}";

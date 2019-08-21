@@ -13,7 +13,7 @@ class UserQueryBuilder extends Builder
             return $this->getKeysWithWheres();
         }
 
-        return collect($this->store->index('path')->keys());
+        return collect($this->store->paths()->keys());
     }
 
     protected function getKeysWithWheres()

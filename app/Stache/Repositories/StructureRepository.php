@@ -22,7 +22,7 @@ class StructureRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        $keys = $this->store->index('path')->keys();
+        $keys = $this->store->paths()->keys();
 
         return $this->store->getItems($keys);
     }
