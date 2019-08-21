@@ -52,7 +52,7 @@
             <!-- Super Admin -->
              <div class="pb-5">
                 <div class="flex items-center">
-                    <toggle-input v-model="user.super_admin" />
+                    <toggle-input v-model="user.super" />
                     <label class="font-bold ml-1">Super Admin</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
@@ -62,7 +62,7 @@
             </div>
 
             <!-- Roles -->
-            <div class="pb-5" v-if="! user.super_admin">
+            <div class="pb-5" v-if="! user.super">
                 <label class="font-bold text-base mb-sm" for="role">Roles</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
@@ -89,15 +89,15 @@
 
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-2 mb-3 flex items-center">
-                <toggle-input v-model="send_invite" />
-                <label class="font-bold ml-1">Send email invite</label>
+                <toggle-input v-model="invitation.send" />
+                <label class="font-bold ml-1">Send Email Invitation</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-7 border rounded-lg " v-if="send_invite">
+            <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-7 border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-2 pb-5">
                     <label class="font-bold text-base mb-sm" for="email">Email Subject</label>
-                    <input type="text" v-model="email_subject" class="input-text bg-white">
+                    <input type="text" v-model="invitation.subject" class="input-text bg-white">
                 </div>
 
                 <!-- Email Content -->
@@ -105,14 +105,14 @@
                     <label class="font-bold text-base mb-sm" for="email">Email Content</label>
                     <textarea
                         class="input-text min-h-48 p-2 bg-white"
-                        v-model="message"
+                        v-model="invitation.message"
                         v-elastic
                     />
                 </div>
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-7" v-if="!send_invite">
+            <div class="max-w-md mx-auto px-2 pb-7" v-else>
                 <p class="mb-1">Copy these credentials and share them with <code>{{ user.email }}</code> via your preferred method.</p>
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
 Activation URL: url
@@ -158,29 +158,21 @@ export default {
             steps: ['User Information', 'Roles & Groups', 'Customize Invitation'],
             user: {
                 email: null,
-                super_admin: true,
+                super: true,
                 roles: []
             },
-            send_invite: true,
-            email_subject: __('Activate your new Statamic account on ') + window.location.hostname,
-            customizedMessage: null,
+            invitation: {
+                send: true,
+                subject: __('Activate your new Statamic account on ') + window.location.hostname,
+                message: `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.\n\nFor your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`,
+            },
             userExists: false
         }
     },
 
     computed: {
-        message: {
-            get() {
-                return this.customizedMessage || `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.
-
-For your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`
-            },
-            set(message) {
-                this.customizedMessage = message;
-            }
-        },
         finishButtonText() {
-            return this.send_invite ? 'Create and Send Email' : 'Create User';
+            return this.invitation.send ? 'Create and Send Email' : 'Create User';
         },
         isValidEmail() {
             return this.user.email && isEmail(this.user.email)
@@ -205,7 +197,7 @@ For your security, the link below expires after 48 hours. After that, please con
             });
         },
         submit() {
-            let payload = {subject: this.email_subject, message: this.message, ...this.user};
+            let payload = {...this.user, invitation: this.invitation};
 
             this.$axios.post(this.route, payload).then(response => {
                 window.location = response.data.redirect;

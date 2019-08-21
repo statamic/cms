@@ -130,4 +130,11 @@ class Grid extends Fieldtype
     {
         return $this->fields()->all()->map->defaultValue();
     }
+
+    public function augment($value)
+    {
+        return collect($value)->map(function ($row) {
+            return $this->fields()->addValues($row)->augment()->values();
+        });
+    }
 }
