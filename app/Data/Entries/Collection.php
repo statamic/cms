@@ -41,6 +41,11 @@ class Collection implements Contract
     protected $structure;
     protected $taxonomies = [];
 
+    public function id()
+    {
+        return $this->handle();
+    }
+
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
