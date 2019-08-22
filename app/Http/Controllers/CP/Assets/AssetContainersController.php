@@ -15,7 +15,7 @@ class AssetContainersController extends CpController
     {
         $containers = AssetContainer::all()->filter(function ($container) {
             return true; // TODO: auth.
-            // return request()->user()->can('view', $container);
+            // return \Statamic\API\User::current()->can('view', $container);
         })->map(function ($container) {
             return [
                 'id' => $container->handle(),

@@ -2,6 +2,7 @@
 
 namespace Statamic\Widgets;
 
+use Statamic\API\User;
 use Facades\Statamic\Updater\UpdatesOverview;
 
 class Updater extends Widget
@@ -13,7 +14,7 @@ class Updater extends Widget
      */
     public function html()
     {
-        if (! auth()->user()->can('view updates')) {
+        if (! User::current()->can('view updates')) {
             return;
         }
 

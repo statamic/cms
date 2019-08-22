@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Statamic\API\Str;
 use Statamic\API\Form;
+use Statamic\API\User;
 use Statamic\CP\Column;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
@@ -17,7 +18,7 @@ class FormsController extends CpController
 
         $forms = Form::all()
             ->filter(function ($form) {
-                return request()->user()->can('view', $form);
+                return User::current()->can('view', $form);
             })
             ->map(function ($form) {
                 return [

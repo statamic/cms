@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Statamic\API\Site;
+use Statamic\API\User;
 use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
@@ -20,7 +21,7 @@ class CollectionsController extends CpController
         $this->authorize('index', CollectionContract::class, 'You are not authorized to view any collections.');
 
         $collections = Collection::all()->filter(function ($collection) {
-            return request()->user()->can('view', $collection);
+            return User::current()->can('view', $collection);
         })->map(function ($collection) {
             return [
                 'id' => $collection->handle(),

@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\API;
+use Statamic\API\User;
 use Statamic\API\Collection;
 use Statamic\Contracts\Data\Entries\Entry;
 
@@ -21,7 +22,7 @@ class Unpublish extends Action
     public function run($entries)
     {
         $entries->each(function ($entry) {
-            $entry->unpublish(['user' => request()->user()]);
+            $entry->unpublish(['user' => User::current()]);
         });
     }
 }

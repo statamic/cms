@@ -13,8 +13,7 @@ interface UserRepository
 
     public function findByEmail(string $email): ?User;
     public function findByOAuthId(string $provider, string $id): ?User;
-
-    // current/logged in
+    public function current(): ?User;
 
     public function save(User $user);
     public function delete(User $user);

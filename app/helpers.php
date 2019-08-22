@@ -588,7 +588,7 @@ if (! function_exists('__s')) {
 if (! function_exists('user')) {
     function user()
     {
-        return auth()->user();
+        return \Statamic\API\User::current();
     }
 }
 

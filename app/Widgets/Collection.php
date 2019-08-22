@@ -2,6 +2,7 @@
 
 namespace Statamic\Widgets;
 
+use Statamic\API\User;
 use Statamic\API\Collection as CollectionAPI;
 
 class Collection extends Widget
@@ -21,7 +22,7 @@ class Collection extends Widget
 
         $collection = CollectionAPI::findByHandle($collection);
 
-        if (! auth()->user()->can('view', $collection)) {
+        if (! User::current()->can('view', $collection)) {
             return;
         }
 

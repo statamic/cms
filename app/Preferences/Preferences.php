@@ -2,6 +2,7 @@
 
 namespace Statamic\Preferences;
 
+use Statamic\API\User;
 use Illuminate\Support\Arr;
 
 class Preferences
@@ -15,7 +16,7 @@ class Preferences
      */
     public function __construct()
     {
-        $this->user = auth()->user();
+        $this->user = User::current();
     }
 
     /**

@@ -38,7 +38,7 @@ class DashboardController extends CpController
             ->filter(function ($config) {
                 return collect($config['can'] ?? $config['permissions'] ?? ['access cp'])
                     ->filter(function ($ability) {
-                        return auth()->user()->can($ability);
+                        return User::current()->can($ability);
                     })
                     ->isNotEmpty();
             })

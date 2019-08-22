@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Statamic\API\Site;
+use Statamic\API\User;
 use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
@@ -21,7 +22,7 @@ class TaxonomiesController extends CpController
         $this->authorize('index', TaxonomyContract::class, 'You are not authorized to view any taxonomies.');
 
         $taxonomies = Taxonomy::all()->filter(function ($taxonomy) {
-            return request()->user()->can('view', $taxonomy);
+            return User::current()->can('view', $taxonomy);
         })->map(function ($taxonomy) {
             return [
                 'id' => $taxonomy->handle(),

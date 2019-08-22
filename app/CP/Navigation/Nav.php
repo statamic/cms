@@ -5,6 +5,7 @@ namespace Statamic\CP\Navigation;
 use Closure;
 use Exception;
 use Statamic\API\Str;
+use Statamic\API\User;
 use Statamic\CP\Navigation\CoreNav;
 use Statamic\CP\Navigation\NavItem;
 
@@ -264,7 +265,7 @@ class Nav
         return collect($items)
             ->filter(function ($item) {
                 return $item->authorization()
-                    ? auth()->user()->can($item->can()->ability, $item->can()->arguments)
+                    ? User::current()->can($item->can()->ability, $item->can()->arguments)
                     : true;
             })
             ->values();
