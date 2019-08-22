@@ -187,7 +187,7 @@ abstract class Store
         }
 
         // Get a path to key mapping, so we can easily get the keys of existing files.
-        $pathMap = $this->paths()->items()->flip();
+        $pathMap = $this->paths()->flip();
 
         // Flush cached instances of deleted items.
         $deleted->each(function ($path) use ($pathMap) {

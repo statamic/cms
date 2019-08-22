@@ -68,8 +68,6 @@ abstract class BasicStore extends Store
 
     public function forgetItem($key)
     {
-        $this->forgetPath($key);
-
         unset($this->items[$key]);
 
         Cache::forget($this->getItemCacheKey($key));
