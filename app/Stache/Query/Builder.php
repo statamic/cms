@@ -43,11 +43,7 @@ abstract class Builder extends BaseBuilder
         return $keys->slice($this->offset, $this->limit);
     }
 
-    protected function orderKeys($keys)
-    {
-        // todo
-        return $keys;
-    }
+    abstract protected function orderKeys($keys);
 
     protected function getCountForPagination()
     {
