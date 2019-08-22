@@ -64,8 +64,6 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->autoConfigure();
-
         Auth::provider('statamic', function () {
             return new UserProvider;
         });
@@ -87,14 +85,5 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->extend('auth.password', function ($broker, $app) {
             return new PasswordBrokerManager($app);
         });
-    }
-
-    protected function autoConfigure()
-    {
-        config(['auth.providers' => [
-            'users' => [
-                'driver' => 'statamic',
-            ]
-        ]]);
     }
 }
