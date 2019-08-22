@@ -24,6 +24,8 @@ abstract class BasicStore extends Store
 
     public function getItem($key)
     {
+        $this->handleFileChanges();
+
         if (! $path = $this->getPath($key)) {
             return null;
         }

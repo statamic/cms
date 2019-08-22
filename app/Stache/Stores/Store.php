@@ -69,6 +69,8 @@ abstract class Store
 
     public function getItems($keys)
     {
+        $this->handleFileChanges();
+
         return collect($keys)->map(function ($key) {
             return $this->getItem($key);
         });

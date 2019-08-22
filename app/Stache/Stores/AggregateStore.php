@@ -57,6 +57,13 @@ abstract class AggregateStore extends Store
         return $this->directory . $child->childKey();
     }
 
+    public function getItems($keys)
+    {
+        return collect($keys)->map(function ($key) {
+            return $this->getItem($key);
+        });
+    }
+
     public function getItem($key)
     {
         [$store, $id] = explode('::', $key, 2);
