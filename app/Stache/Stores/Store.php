@@ -11,10 +11,7 @@ abstract class Store
 {
     protected $directory;
     protected $customIndexes = [];
-    protected $defaultIndexes = [
-        'id',
-        'path',
-    ];
+    protected $defaultIndexes = ['id'];
     protected $storeIndexes = [];
     protected $usedIndexes;
     protected static $indexes = [];
