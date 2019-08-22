@@ -64,7 +64,7 @@ class UserTags extends Tags
 
         // No user found? Get the current one.
         if (! $user) {
-            if (! me()) {
+            if (! $user = me()) {
                 return $this->parseNoResults();
             }
         }
@@ -383,8 +383,6 @@ class UserTags extends Tags
 
     private function parseUser(UserContract $user)
     {
-        $user->supplementTaxonomies();
-
         return $this->parse($user->toArray());
     }
 }
