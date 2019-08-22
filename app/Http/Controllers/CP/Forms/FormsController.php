@@ -48,11 +48,12 @@ class FormsController extends CpController
         $array = $form->toArray();
 
         $array['honeypot'] = $form->honeypot();
-        $array['columns'] = $form->columns()->map->field();
-        $array['metrics'] = $this->preProcessMetrics($form);
+        $array['columns'] = []; // = $form->columns()->map->field();
+        $array['metrics'] = []; // = $this->preProcessMetrics($form);
         $array['email'] = $form->email();
 
         foreach ($form->fields() as $name => $field) {
+            $field = $field->toArray();
             $field['name'] = $name;
 
             // Vue relies on a boolean being available on the field itself.
