@@ -89,6 +89,8 @@ class EntryQueryBuilder extends Builder
             return $keys;
         }
 
+        $filteredKeys = $keys;
+
         $collections = empty($this->collections)
             ? API\Collection::handles()
             : $this->collections;
@@ -123,6 +125,9 @@ class EntryQueryBuilder extends Builder
                 $items[$key] = array_merge($items[$key] ?? [], [$sort => $value]);
             }
         }
+
+        // Make sure that any keys that were already filtered out remain filtered out.
+        $items = array_intersect_key($items, $filteredKeys->flip()->all());
 
         // Perform the sort.
         $items = DataCollection::make($items)->multisort(
