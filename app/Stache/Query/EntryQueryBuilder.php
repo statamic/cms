@@ -85,6 +85,10 @@ class EntryQueryBuilder extends Builder
 
     protected function orderKeys($keys)
     {
+        if (empty($this->orderBys)) {
+            return $keys;
+        }
+
         $collections = empty($this->collections)
             ? API\Collection::handles()
             : $this->collections;
