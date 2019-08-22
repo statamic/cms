@@ -16,7 +16,7 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 });
 
 Route::group([
-    'middleware' => [Authenticate::class, 'can:access cp']
+    'middleware' => [Authenticate::class]
 ], function () {
     Statamic::additionalCpRoutes();
 
