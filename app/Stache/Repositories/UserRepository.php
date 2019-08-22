@@ -51,11 +51,6 @@ class UserRepository extends BaseRepository
         });
     }
 
-    public function current(): ?User
-    {
-        return request()->user();
-    }
-
     public function query()
     {
         return new UserQueryBuilder;

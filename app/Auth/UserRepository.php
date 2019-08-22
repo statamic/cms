@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 
 abstract class UserRepository implements RepositoryContract
@@ -11,6 +12,19 @@ abstract class UserRepository implements RepositoryContract
         // TODO: Factory?
         throw new \Exception('Factory not supported. Use User::make() to get an instance.');
         return app(UserFactory::class);
+    }
+
+    public function current(): ?User
+    {
+        if (! $user = request()->user()) {
+            return null;
+        }
+
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        return $user->toStatamicUser();
     }
 
     public function roleRepository()
