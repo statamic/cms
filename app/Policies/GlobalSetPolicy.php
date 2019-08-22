@@ -8,6 +8,8 @@ class GlobalSetPolicy
 {
     public function index($user)
     {
+        $user = $user->statamicUser();
+
         if ($this->create($user)) {
             return true;
         }
@@ -19,11 +21,15 @@ class GlobalSetPolicy
 
     public function view($user, $set)
     {
+        $user = $user->statamicUser();
+
         return $this->edit($user, $set);
     }
 
     public function edit($user, $set)
     {
+        $user = $user->statamicUser();
+
         return $user->hasPermission("edit {$set->handle()} globals");
     }
 

@@ -6,6 +6,8 @@ class AssetFolderPolicy
 {
     public function create($user, $assetContainer)
     {
+        $user = $user->statamicUser();
+
         if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
             return false;
         }
@@ -15,6 +17,8 @@ class AssetFolderPolicy
 
     public function delete($user, $assetFolder)
     {
+        $user = $user->statamicUser();
+
         if (! $user->hasPermission("delete {$assetFolder->container()->handle()} assets")) {
             return false;
         }
