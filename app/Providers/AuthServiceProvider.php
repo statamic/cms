@@ -83,7 +83,9 @@ class AuthServiceProvider extends ServiceProvider
         }
 
         $this->app->extend('auth.password', function ($broker, $app) {
-            return new PasswordBrokerManager($app);
+            return ($app['auth']->getProvider() instanceof UserProvider)
+                ? new PasswordBrokerManager($app)
+                : $broker;
         });
     }
 }
