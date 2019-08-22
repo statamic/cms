@@ -42,7 +42,7 @@ abstract class Store
             return static::$indexes[$this->key()][$name];
         }
 
-        $class = $this->indexes()->get($name);
+        $class = $this->indexes()->get($name, Indexes\Value::class);
 
         $index = new $class($this, $name);
 
