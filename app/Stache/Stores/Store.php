@@ -225,13 +225,11 @@ abstract class Store
 
     public function paths()
     {
-        $key = "stache::indexes::{$this->key()}::_paths";
-
         if ($this->paths) {
             return $this->paths;
         }
 
-        if ($paths = Cache::get($key)) {
+        if ($paths = Cache::get($this->pathsCacheKey())) {
             return $this->paths = collect($paths);
         }
 
@@ -243,10 +241,38 @@ abstract class Store
             return [$this->getItemKey($item) => $path];
         });
 
-        Cache::forever($key, $paths->all());
-
-        $this->paths = $paths;
+        $this->cachePaths($paths);
 
         return $paths;
+    }
+
+    protected function forgetPath($key)
+    {
+        $paths = $this->paths();
+
+        unset($paths[$key]);
+
+        $this->cachePaths($paths);
+    }
+
+    protected function setPath($key, $path)
+    {
+        $paths = $this->paths();
+
+        $paths[$key] = $path;
+
+        $this->cachePaths($paths);
+    }
+
+    protected function cachePaths($paths)
+    {
+        Cache::forever($this->pathsCacheKey(), $paths->all());
+
+        $this->paths = $paths;
+    }
+
+    protected function pathsCacheKey()
+    {
+        return "stache::indexes::{$this->key()}::_paths";
     }
 }
