@@ -3,6 +3,7 @@
 namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\User;
+use Statamic\Contracts\Auth\AuthenticatesWithStatamic;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 
 abstract class UserRepository implements RepositoryContract
@@ -24,7 +25,11 @@ abstract class UserRepository implements RepositoryContract
             return $user;
         }
 
-        return $user->toStatamicUser();
+        if ($user instanceof AuthenticatesWithStatamic) {
+            return $user->statamicUser();
+        }
+
+        return null;
     }
 
     public function roleRepository()
