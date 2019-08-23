@@ -20,7 +20,9 @@ class TaxonomyRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        return $this->store->getItems();
+        $keys = $this->store->paths()->keys();
+
+        return $this->store->getItems($keys);
     }
 
     public function findByHandle($handle): ?Taxonomy
@@ -30,8 +32,6 @@ class TaxonomyRepository implements RepositoryContract
 
     public function save(Taxonomy $taxonomy)
     {
-        $this->store->setItem($taxonomy->handle(), $taxonomy);
-
         $this->store->save($taxonomy);
     }
 
@@ -52,10 +52,10 @@ class TaxonomyRepository implements RepositoryContract
             $uri = Str::after($uri, $collection->url());
         }
 
-        if (! $id = $this->store->getIdFromUri($uri, $site)) {
+        if (! $key = $this->store->index('uri')->items()->flip()->get($uri)) {
             return null;
         }
 
-        return $this->findByHandle($id)->collection($collection);
+        return $this->findByHandle($key)->collection($collection);
     }
 }

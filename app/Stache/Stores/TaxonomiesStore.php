@@ -5,7 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Taxonomy;
-use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
+use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomiesStore extends BasicStore
 {
@@ -14,7 +14,19 @@ class TaxonomiesStore extends BasicStore
         return 'taxonomies';
     }
 
-    public function createItemFromFile($path, $contents)
+    public function getItemKey($item)
+    {
+        return $item->handle();
+    }
+
+    public function getFileFilter(SplFileInfo $file)
+    {
+        $filename = str_after($file->getPathName(), $this->directory);
+
+        return $file->getExtension() === 'yaml' && substr_count($filename, '/') === 0;
+    }
+
+    public function makeItemFromFile($path, $contents)
     {
         $handle = pathinfo($path, PATHINFO_FILENAME);
         $data = YAML::parse($contents);
@@ -23,31 +35,8 @@ class TaxonomiesStore extends BasicStore
 
         return Taxonomy::make($handle)
             ->title(array_get($data, 'title'))
-            ->termBlueprint(array_get($data, 'blueprint'))
+            ->termBlueprint(array_get($data, 'term_blueprint'))
             ->revisionsEnabled(array_get($data, 'revisions'))
             ->sites($sites);
-    }
-
-    public function getItemKey($item, $path)
-    {
-        return pathinfo($path)['filename'];
-    }
-
-    public function filter($file)
-    {
-        $relative = $file->getPathname();
-
-        $dir = str_finish($this->directory, '/');
-
-        if (substr($relative, 0, strlen($dir)) == $dir) {
-            $relative = substr($relative, strlen($dir));
-        }
-
-        return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
-    }
-
-    public function save(TaxonomyContract $taxonomy)
-    {
-        $this->files->put($taxonomy->path(), $taxonomy->fileContents());
     }
 }
