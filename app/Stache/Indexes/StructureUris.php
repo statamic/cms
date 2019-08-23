@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Indexes;
 
+use Statamic\API\Str;
 use Statamic\API\Structure;
 
 class StructureUris extends Index
@@ -31,5 +32,20 @@ class StructureUris extends Index
             $value = $tree->handle() . '::' . $page->reference();
             return [$key => $value];
         });
+    }
+
+    public function updateItem($item)
+    {
+        $this->load();
+
+        // Remove this structure's values, then add back fresh versions.
+        $this->items = collect($this->items)
+            ->reject(function ($key) use ($item) {
+                return Str::startsWith($key, $item->handle() . '::');
+            })
+            ->merge($this->structureUris($item))
+            ->all();
+
+        $this->cache();
     }
 }
