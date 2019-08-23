@@ -14,6 +14,7 @@ interface UserRepository
     public function findByEmail(string $email): ?User;
     public function findByOAuthId(string $provider, string $id): ?User;
     public function current(): ?User;
+    public function fromUser($user): ?User;
 
     public function save(User $user);
     public function delete(User $user);

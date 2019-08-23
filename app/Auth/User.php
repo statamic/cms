@@ -202,9 +202,4 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     {
         return API\User::{$method}(...$parameters);
     }
-
-    public function statamicUser(): UserContract
-    {
-        return $this;
-    }
 }

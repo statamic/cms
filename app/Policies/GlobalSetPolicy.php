@@ -8,7 +8,7 @@ class GlobalSetPolicy
 {
     public function index($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($this->create($user)) {
             return true;
@@ -21,14 +21,14 @@ class GlobalSetPolicy
 
     public function view($user, $set)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $this->edit($user, $set);
     }
 
     public function edit($user, $set)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("edit {$set->handle()} globals");
     }

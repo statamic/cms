@@ -2,7 +2,7 @@
 
 namespace Statamic\Contracts\Auth;
 
-interface User extends AuthenticatesWithStatamic
+interface User
 {
     /**
      * Get or set a user's email address

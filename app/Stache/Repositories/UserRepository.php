@@ -80,4 +80,9 @@ class UserRepository extends BaseRepository
             (new Provider($provider))->getUserId($id)
         );
     }
+
+    public function fromUser($user): User
+    {
+        return $user;
+    }
 }

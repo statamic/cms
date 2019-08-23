@@ -10,11 +10,11 @@ return [
     | Statamic assumes you will be storing users in the filesystem inside the
     | "Stache" datastore. You are free to customize the storage method here.
     |
-    | Supported: "stache", "eloquent", "redis"
+    | Supported: "file", "eloquent", "redis"
     |
     */
 
-    'repository' => env('STATAMIC_USERS', 'file'),
+    'repository' => env('STATAMIC_USERS', 'eloquent'),
 
     'repositories' => [
 

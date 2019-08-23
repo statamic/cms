@@ -8,7 +8,7 @@ class StructurePolicy
 {
     public function before($user, $ability)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($user->hasPermission('configure structures')) {
             return true;
@@ -17,7 +17,7 @@ class StructurePolicy
 
     public function index($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($this->create($user)) {
             return true;
@@ -30,42 +30,42 @@ class StructurePolicy
 
     public function create($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("configure structures");
     }
 
     public function store($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $this->create($user);
     }
 
     public function view($user, $structure)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("view {$structure->handle()} structure");
     }
 
     public function edit($user, $structure)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("edit {$structure->handle()} structure");
     }
 
     public function update($user, $structure)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $this->edit($user, $structure);
     }
 
     public function delete($user, $structure)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("configure structures");
     }

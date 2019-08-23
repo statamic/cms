@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\User;
 use Statamic\Policies;
 use Statamic\Auth\UserProvider;
 use Statamic\Contracts\Auth\Role;
@@ -21,7 +22,6 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Statamic\Contracts\Auth\UserGroupRepository;
 use Illuminate\Notifications\Messages\MailMessage;
 use Statamic\Auth\Passwords\PasswordBrokerManager;
-use Statamic\Contracts\Auth\AuthenticatesWithStatamic;
 use Statamic\Auth\Eloquent\UserRepository as EloquentUsers;
 use Statamic\Stache\Repositories\UserRepository as StacheUsers;
 
@@ -70,19 +70,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::before(function ($user, $ability) {
-            if (! $user instanceof AuthenticatesWithStatamic) {
-                return null;
-            }
-
-            return $user->statamicUser()->isSuper() ? true : null;
+            return User::fromUser($user)->isSuper() ? true : null;
         });
 
         Gate::after(function ($user, $ability) {
-            if (! $user instanceof AuthenticatesWithStatamic) {
-                return null;
-            }
-
-            return $user->statamicUser()->hasPermission($ability) === true ? true : null;
+            return User::fromUser($user)->hasPermission($ability) === true ? true : null;
         });
 
         CorePermissions::boot();

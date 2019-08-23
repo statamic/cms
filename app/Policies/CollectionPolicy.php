@@ -8,7 +8,7 @@ class CollectionPolicy
 {
     public function before($user, $ability)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($user->hasPermission('configure collections')) {
             return true;
@@ -17,7 +17,7 @@ class CollectionPolicy
 
     public function index($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($this->create($user)) {
             return true;
@@ -30,7 +30,7 @@ class CollectionPolicy
 
     public function create($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission('configure collections');
     }
@@ -42,14 +42,14 @@ class CollectionPolicy
 
     public function view($user, $collection)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("view {$collection->handle()} entries");
     }
 
     public function edit($user, $collection)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission('configure collections');
     }
@@ -61,14 +61,14 @@ class CollectionPolicy
 
     public function delete($user, $collection)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission('configure collections');
     }
 
     public function reorder($user, $collection)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $collection->orderable() && $user->hasPermission("reorder {$collection->handle()} entries");
     }

@@ -8,7 +8,7 @@ class FormPolicy
 {
     public function before($user, $ability)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($user->hasPermission('configure forms')) {
             return true;
@@ -17,7 +17,7 @@ class FormPolicy
 
     public function index($user)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if ($this->create($user)) {
             return true;
@@ -30,7 +30,7 @@ class FormPolicy
 
     public function view($user, $form)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("view {$form->handle()} form submissions");
     }

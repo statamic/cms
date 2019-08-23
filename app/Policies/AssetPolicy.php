@@ -6,7 +6,7 @@ class AssetPolicy
 {
     public function store($user, $assetContainer)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if (! $user->hasPermission("upload {$assetContainer->handle()} assets")) {
             return false;
@@ -17,7 +17,7 @@ class AssetPolicy
 
     public function move($user, $asset)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if (! $user->hasPermission("move {$asset->container()->handle()} assets")) {
             return false;
@@ -28,7 +28,7 @@ class AssetPolicy
 
     public function rename($user, $asset)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         if (! $user->hasPermission("rename {$asset->container()->handle()} assets")) {
             return false;
@@ -39,7 +39,7 @@ class AssetPolicy
 
     public function delete($user, $asset)
     {
-        $user = $user->statamicUser();
+        $user = User::fromUser($user);
 
         return $user->hasPermission("delete {$asset->container()->handle()} assets");
     }

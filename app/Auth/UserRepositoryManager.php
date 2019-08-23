@@ -3,7 +3,7 @@
 namespace Statamic\Auth;
 
 use Statamic\Manager;
-use Statamic\Eloquent\Auth\UserRepository as EloquentRepository;
+use Statamic\Auth\Eloquent\UserRepository as EloquentRepository;
 use Statamic\Stache\Repositories\UserRepository as StacheRepository;
 
 class UserRepositoryManager extends Manager
@@ -30,6 +30,8 @@ class UserRepositoryManager extends Manager
 
     public function createEloquentDriver(array $config)
     {
+        $config['model'] = $this->app['config']['auth.providers.users.model'];
+
         return new EloquentRepository($config);
     }
 }
