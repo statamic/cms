@@ -23,6 +23,8 @@ class Form implements FormContract
     protected $title;
     protected $blueprint;
     protected $honeypot;
+    protected $store;
+    protected $email;
 
     /**
      * Get or set the handle.
@@ -80,6 +82,28 @@ class Form implements FormContract
                 return $honeypot === 'honeypot' ? null : $honeypot;
             })
             ->args(func_get_args());
+    }
+
+    /**
+     * Get or set the store field.
+     *
+     * @param mixed $store
+     * @return mixed
+     */
+    public function store($store = null)
+    {
+        return $this->fluentlyGetOrSet('store')->args(func_get_args());
+    }
+
+    /**
+     * Get or set the email field.
+     *
+     * @param mixed $email
+     * @return mixed
+     */
+    public function email($email = null)
+    {
+        return $this->fluentlyGetOrSet('email')->args(func_get_args());
     }
 
     /**
@@ -141,6 +165,8 @@ class Form implements FormContract
                     'title',
                     'blueprint',
                     'honeypot',
+                    'store',
+                    'email',
                 ]);
             })
             ->each(function ($value, $property) {
@@ -179,16 +205,6 @@ class Form implements FormContract
         // }
 
         // return $metrics;
-    }
-
-    // TODO: Reimplement email()
-    public function email($email = null)
-    {
-        // if (is_null($email)) {
-        //     return $this->formset()->get('email', []);
-        // }
-
-        // $this->formset()->set('email', $email);
     }
 
     /**
@@ -308,12 +324,13 @@ class Form implements FormContract
      */
     public function toArray()
     {
-        // TODO: When is this used?
-
         return [
-            'handle' => $this->handle(),
-            'title' => $this->title(),
-            'edit_url' => $this->editUrl()
+            'handle' => $this->handle,
+            'title' => $this->title,
+            'blueprint' => $this->blueprint,
+            'honeypot' => $this->honeypot(),
+            'store' => $this->store,
+            'email' => $this->email,
         ];
     }
 }
