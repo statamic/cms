@@ -65,6 +65,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
             ]
         ]);
 
+        $app['config']->set('auth.providers.users.driver', 'statamic');
+        $app['config']->set('statamic.users.repository', 'file');
+
         $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__.'/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.terms.directory', __DIR__.'/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/__fixtures__/content/collections');
