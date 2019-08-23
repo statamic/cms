@@ -43,10 +43,10 @@ return [
             'directory' => base_path('content/assets'),
         ],
 
-        'users' => [
-            'class' => Stores\UsersStore::class,
-            'directory' => base_path('users'),
-        ],
+        // 'users' => [
+        //     'class' => Stores\UsersStore::class,
+        //     'directory' => base_path('users'),
+        // ],
 
     ]
 

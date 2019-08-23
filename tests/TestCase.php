@@ -67,6 +67,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.users.repository', 'file');
+        $app['config']->set('statamic.stache.users', [
+            'class' => \Statamic\Stache\Stores\UsersStore::class,
+            'directory' => __DIR__.'/__fixtures__/users'
+        ]);
 
         $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__.'/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.terms.directory', __DIR__.'/__fixtures__/content/taxonomies');
@@ -75,7 +79,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.structures.directory', __DIR__.'/__fixtures__/content/structures');
         $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
-        $app['config']->set('statamic.stache.stores.users.directory', __DIR__.'/__fixtures__/users');
     }
 
     protected function assertEveryItem($items, $callback)
