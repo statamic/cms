@@ -2,6 +2,7 @@
 
 namespace Statamic\Policies;
 
+use Statamic\API\User;
 use Statamic\API\Structure;
 
 class StructurePolicy

@@ -3,6 +3,7 @@
 namespace Statamic\Policies;
 
 use Statamic\API\Form;
+use Statamic\API\User;
 
 class FormPolicy
 {

@@ -2,6 +2,8 @@
 
 namespace Statamic\Policies;
 
+use Statamic\API\User;
+
 class AssetPolicy
 {
     public function store($user, $assetContainer)

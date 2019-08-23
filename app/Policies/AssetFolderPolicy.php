@@ -2,6 +2,8 @@
 
 namespace Statamic\Policies;
 
+use Statamic\API\User;
+
 class AssetFolderPolicy
 {
     public function create($user, $assetContainer)
