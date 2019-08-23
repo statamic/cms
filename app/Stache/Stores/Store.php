@@ -192,8 +192,10 @@ abstract class Store
         $pathMap = $this->paths()->flip();
 
         // Flush cached instances of deleted items.
-        $deleted->each(function ($path) use ($pathMap) {
-            $this->forgetItem($pathMap[$path]);
+        $deleted->each(function ($path) {
+            if ($key = $this->getKeyFromPath($path)) {
+                $this->forgetItem($key);
+            }
         });
 
         // Flush the cached instances of modified items.
@@ -209,7 +211,9 @@ abstract class Store
         // Remove deleted items from every index.
         $indexes->each(function ($index) use ($deleted, $pathMap) {
             $deleted->each(function ($path) use ($index, $pathMap) {
-                $index->forgetItem($pathMap->get($path));
+                if ($key = $pathMap->get($path)) {
+                    $index->forgetItem($key);
+                }
             });
         });
 

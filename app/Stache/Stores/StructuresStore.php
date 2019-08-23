@@ -114,6 +114,15 @@ class StructuresStore extends BasicStore
         return $item->handle();
     }
 
+    protected function getKeyFromPath($path)
+    {
+        if ($key = parent::getKeyFromPath($path)) {
+            return $key;
+        }
+
+        return pathinfo($path, PATHINFO_FILENAME);
+    }
+
     public function filter($file)
     {
         return $file->getExtension() === 'yaml';
