@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Statamic\Data\DataCollection;
 use Statamic\Stache\Stores\Store;
 use Statamic\Query\Builder as BaseBuilder;
 
@@ -43,7 +44,40 @@ abstract class Builder extends BaseBuilder
         return $keys->slice($this->offset, $this->limit);
     }
 
-    abstract protected function orderKeys($keys);
+    protected function orderKeys($keys)
+    {
+        if (empty($this->orderBys)) {
+            return $keys;
+        }
+
+        // Get key/value pairs for each orderBy's corresponding index, grouped by index.
+        // eg. [
+        //       'title' => ['one' => 'One', 'two' => 'Two'],
+        //       'foo' => ['one' => 'bar', 'two' => 'baz'],
+        //     ]
+        $indexes = $this->getOrderKeyValuesByIndex();
+
+        // Combine into one multidimensional array, where each item contains the values from each index.
+        $items = [];
+        foreach ($indexes as $sort => $values) {
+            foreach ($values as $key => $value) {
+                $items[$key] = array_merge($items[$key] ?? [], [$sort => $value]);
+            }
+        }
+
+        // Make sure that any keys that were already filtered out remain filtered out.
+        $items = array_intersect_key($items, $keys->flip()->all());
+
+        // Perform the sort.
+        $items = DataCollection::make($items)->multisort(
+            collect($this->orderBys)->map->toString()->implode('|')
+        );
+
+        // Finally, we're left with the keys in the correct order.
+        return $items->keys();
+    }
+
+    abstract protected function getOrderKeyValuesByIndex();
 
     protected function getCountForPagination()
     {

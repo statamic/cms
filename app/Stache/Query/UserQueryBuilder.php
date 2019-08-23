@@ -37,4 +37,12 @@ class UserQueryBuilder extends Builder
     {
         return new UserCollection($items);
     }
+
+    protected function getOrderKeyValuesByIndex()
+    {
+        return collect($this->orderBys)->mapWithKeys(function ($orderBy) {
+            $items = $this->store->index($orderBy->sort)->items()->all();
+            return [$orderBy->sort => $items];
+        });
+    }
 }

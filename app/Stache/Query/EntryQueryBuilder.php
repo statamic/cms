@@ -5,7 +5,6 @@ namespace Statamic\Stache\Query;
 use Statamic\API;
 use Statamic\API\Entry;
 use Statamic\API\Stache;
-use Statamic\Data\DataCollection;
 
 class EntryQueryBuilder extends Builder
 {
@@ -83,14 +82,8 @@ class EntryQueryBuilder extends Builder
         });
     }
 
-    protected function orderKeys($keys)
+    protected function getOrderKeyValuesByIndex()
     {
-        if (empty($this->orderBys)) {
-            return $keys;
-        }
-
-        $filteredKeys = $keys;
-
         $collections = empty($this->collections)
             ? API\Collection::handles()
             : $this->collections;
@@ -111,30 +104,11 @@ class EntryQueryBuilder extends Builder
         });
 
         // Then, we'll merge all the corresponding index values together from each collection.
-        $keys = $keys->reduce(function ($carry, $collection) {
+        return $keys->reduce(function ($carry, $collection) {
             foreach ($collection as $sort => $values) {
                 $carry[$sort] = array_merge($carry[$sort] ?? [], $values);
             }
             return $carry;
         }, collect());
-
-        // Then combine into one multidimensional array, where each item contains the values from each index.
-        $items = [];
-        foreach ($keys as $sort => $values) {
-            foreach ($values as $key => $value) {
-                $items[$key] = array_merge($items[$key] ?? [], [$sort => $value]);
-            }
-        }
-
-        // Make sure that any keys that were already filtered out remain filtered out.
-        $items = array_intersect_key($items, $filteredKeys->flip()->all());
-
-        // Perform the sort.
-        $items = DataCollection::make($items)->multisort(
-            collect($this->orderBys)->map->toString()->implode('|')
-        );
-
-        // Finally, we're left with the keys in the correct order.
-        return $items->keys();
     }
 }
