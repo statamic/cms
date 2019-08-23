@@ -16,7 +16,7 @@ abstract class UserRepository implements RepositoryContract
 
     public function current(): ?User
     {
-        if (! $user = request()->user()) {
+        if (! $user = auth()->user()) {
             return null;
         }
 
