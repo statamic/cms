@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\Form;
 use Statamic\API\Site;
 use Statamic\API\Term;
 use Statamic\API\Entry;
@@ -20,6 +21,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindTaxonomies();
         $this->bindSites();
         $this->bindRevisions();
+        $this->bindForms();
     }
 
     protected function bindEntries()
@@ -85,6 +87,14 @@ class RouteServiceProvider extends ServiceProvider
             abort_if(! $revision = $content->revision($revision), 404);
 
             return $revision;
+        });
+    }
+
+    protected function bindForms()
+    {
+        Route::bind('form', function ($form) {
+            abort_unless($form = Form::find($form), 404);
+            return $form;
         });
     }
 }
