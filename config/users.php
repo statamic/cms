@@ -7,10 +7,11 @@ return [
     | User Repository
     |--------------------------------------------------------------------------
     |
-    | Statamic assumes you will be storing users in the filesystem inside the
-    | "Stache" datastore. You are free to customize the storage method here.
+    | Statamic uses a repository to get users, roles, groups, and their
+    | relationships from specified storage locations. The file driver
+    | gets it from disk, while the eloquent driver gets from a DB.
     |
-    | Supported: "file", "eloquent", "redis"
+    | Supported: "file", "eloquent"
     |
     */
 
@@ -33,22 +34,6 @@ return [
 
     ],
 
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Login type
-    |--------------------------------------------------------------------------
-    |
-    | By default, Statamic uses the username field for authentication, and
-    | doesn't require email addresses. You may swap this behavior.
-    |
-    | Supported: "username" or "email"
-    |
-    */
-
-    'login_type' => 'username',
-
     /*
     |--------------------------------------------------------------------------
     | Avatars
@@ -62,46 +47,5 @@ return [
     */
 
     'avatars' => 'initials',
-
-    /*
-    |--------------------------------------------------------------------------
-    | User Roles
-    |--------------------------------------------------------------------------
-    |
-    | One or more roles may be assigned to a user granting them permission to
-    | interact with various parts of the system. Roles are stored in a YAML
-    | file for ease of editing and for the Control Panel to write into.
-    |
-    */
-
-    'roles' => [
-
-        'path' => config_path('statamic/user_roles.yaml'),
-
-        'role' => \Statamic\Auth\Role::class,
-        'repository' => \Statamic\Auth\RoleRepository::class,
-
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | User Groups
-    |--------------------------------------------------------------------------
-    |
-    | A user group can be assigned one or more roles, then users may be added
-    | to the group. A user will then inherit the roles and permissions from
-    | the corresponding groups. Groups are stored in a YAML file for ease
-    | of editing and for the Control Panel to write into.
-    |
-    */
-
-    'groups' => [
-
-        'path' => config_path('statamic/user_groups.yaml'),
-
-        'group' => \Statamic\Auth\UserGroup::class,
-        'repository' => \Statamic\Auth\UserGroupRepository::class,
-
-    ],
 
 ];
