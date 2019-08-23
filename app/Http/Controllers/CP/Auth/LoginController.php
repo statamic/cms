@@ -3,18 +3,15 @@
 namespace Statamic\Http\Controllers\CP\Auth;
 
 use Statamic\API\Str;
-use Statamic\API\User;
 use Statamic\API\OAuth;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Statamic\Http\Middleware\CP\RedirectIfAuthenticated;
+use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
 class LoginController extends CpController
 {
-    use AuthenticatesUsers {
-        attemptLogin as laravelAttemptLogin;
-    }
+    use AuthenticatesUsers;
 
     /**
      * Create a new controller instance.
@@ -23,7 +20,7 @@ class LoginController extends CpController
      */
     public function __construct()
     {
-        $this->middleware(RedirectIfAuthenticated::class)->except('logout');
+        $this->middleware(RedirectIfAuthorized::class)->except('logout');
     }
 
     /**
@@ -73,21 +70,8 @@ class LoginController extends CpController
         return $credentials;
     }
 
-    protected function attemptLogin(Request $request)
+    protected function loggedOut(Request $request)
     {
-        if ($this->userHasNoPermissions($this->credentials($request)['email'])) {
-            return back()->withErrors('You have no control panel permissions.');
-        }
-
-        $this->laravelAttemptLogin($request);
-    }
-
-    protected function userHasNoPermissions($email)
-    {
-        if (! $user = User::findByEmail($email)) {
-            return false;
-        }
-
-        return ! $user->isSuper() && $user->permissions()->isEmpty();
+        return redirect($request->redirect ?? '/');
     }
 }

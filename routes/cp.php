@@ -1,6 +1,6 @@
 <?php
 
-use Statamic\Http\Middleware\CP\Authenticate;
+use Statamic\Http\Middleware\CP\Authorize;
 use Statamic\Http\Middleware\CP\Configurable;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
@@ -13,10 +13,12 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 
     Route::get('token', 'CsrfTokenController')->name('token');
     Route::get('extend', 'ExtendSessionController')->name('extend');
+
+    Route::get('unauthorized', 'UnauthorizedController')->name('unauthorized');
 });
 
 Route::group([
-    'middleware' => [Authenticate::class]
+    'middleware' => [Authorize::class]
 ], function () {
     Statamic::additionalCpRoutes();
 

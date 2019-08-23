@@ -4,9 +4,8 @@ namespace Statamic\Http\Middleware\CP;
 
 use Closure;
 use Statamic\API\User;
-use Illuminate\Support\Facades\Auth;
 
-class RedirectIfAuthenticated
+class RedirectIfAuthorized
 {
     /**
      * Handle an incoming request.
