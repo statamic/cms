@@ -82,7 +82,14 @@ export default {
             }
         },
 
-    }
+    },
+
+    created() {
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            this.submit();
+        });
+    },
 
 }
 </script>
