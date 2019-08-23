@@ -29,7 +29,6 @@ return [
 
         'eloquent' => [
             'driver' => 'eloquent',
-            'model' => \Statamic\Eloquent\Auth\Model::class,
         ],
 
     ],
