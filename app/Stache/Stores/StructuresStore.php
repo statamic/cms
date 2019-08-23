@@ -31,9 +31,20 @@ class StructuresStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $data = YAML::parse($contents);
         $relative = str_after($path, $this->directory);
         $handle = str_before($relative, '.yaml');
+
+        // If it's a tree file that was requested, instead assume that the
+        // base file was requested. The tree will get made as part of it.
+        if (Site::hasMultiple() && str_contains($relative, '/')) {
+            [$site, $relative] = explode('/', $relative, 2);
+            $handle = str_before($relative, '.yaml');
+            $path = $this->directory . $handle . '.yaml';
+            $data = YAML::parse(File::get($path));
+            return $this->makeMultiSiteStructureFromFile($handle, $path, $data);
+        }
+
+        $data = YAML::parse($contents);
 
         return Site::hasMultiple()
             ? $this->makeMultiSiteStructureFromFile($handle, $path, $data)

@@ -213,13 +213,29 @@ abstract class Store
             });
         });
 
+        // Get items from every file that was modified.
+        $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
+            if ($key = $pathMap->get($path)) {
+                return $this->getItem($key);
+            }
+
+            $item = $this->makeItemFromFile($path, File::get($path));
+
+            $this->cacheItem($item);
+
+            return $item;
+        });
+
+        // There may be duplicate items when we're dealing with items that are split across files.
+        // For example, a global set can have the base file, plus a file for each localization.
+        // They'd all resolve to the same item though, so just reduce them down to the same.
+        $modified = $modified->unique(function ($item) {
+            return $this->getItemKey($item);
+        });
+
         // Update modified items in every index.
         $indexes->each(function ($index) use ($modified, $pathMap) {
-            $modified->each(function ($timestamp, $path) use ($index, $pathMap) {
-                $key = $pathMap[$path] ?? null;
-                $item = $key
-                    ? $this->getItem($pathMap[$path])
-                    : $this->makeItemFromFile($path, File::get($path));
+            $modified->each(function ($item) use ($index) {
                 $index->updateItem($item);
             });
         });
