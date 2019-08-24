@@ -5,7 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Statamic\API\Str;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
-use Statamic\Data\Taxonomies\QueryBuilder;
+use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Data\Taxonomies\TermCollection;
 use Statamic\Contracts\Data\Taxonomies\Term;
 use Statamic\Contracts\Data\Repositories\TermRepository as RepositoryContract;
@@ -23,24 +23,22 @@ class TermRepository implements RepositoryContract
 
     public function all(): TermCollection
     {
-        return new TermCollection($this->store->getAllTerms());
+        return $this->query()->get();
     }
 
     public function whereTaxonomy(string $handle): TermCollection
     {
-        return new TermCollection($this->store->getTaxonomyTerms($handle));
+        return $this->query()->where('taxonomy', $handle)->get();
     }
 
     public function whereInTaxonomy(array $handles): TermCollection
     {
-        return (new TermCollection($handles))->flatMap(function ($taxonomy) {
-            return $this->whereTaxonomy($taxonomy);
-        });
+        return $this->query()->whereIn('taxonomy', $handles)->get();
     }
 
     public function find($id): ?Term
     {
-        return $this->store->getTerm($id);
+        return $this->query()->where('id', $id)->first();
     }
 
     public function findByUri(string $uri, string $site = null): ?Term
@@ -55,39 +53,40 @@ class TermRepository implements RepositoryContract
             $uri = Str::after($uri, $collection->url());
         }
 
-        if (! $id = $this->store->getIdFromUri($uri, $site)) {
+        $uri = Str::removeLeft($uri, '/');
+
+        if (! $term = $this->find(str_replace('/', '::', $uri))) {
             return null;
         }
 
-        return $this->find($id)->collection($collection);
+        return $term->collection($collection);
     }
 
     public function findBySlug(string $slug, string $taxonomy): ?Term
     {
-        return $this->whereTaxonomy($taxonomy)->first(function ($term) use ($slug) {
-            return $term->slug() === $slug;
-        });
+        return $this->query()
+            ->where('slug', $slug)
+            ->where('taxonomy', $taxonomy)
+            ->first();
     }
 
     public function save($term)
     {
         $this->store
             ->store($term->taxonomyHandle())
-            ->insert($term);
-
-        $this->store->save($term);
+            ->save($term);
     }
 
-    public function delete($entry)
+    public function delete($term)
     {
-        $this->store->remove($entry->id());
-
-        $this->store->delete($entry);
+        $this->store
+            ->store($term->taxonomyHandle())
+            ->delete($term);
     }
 
     public function query()
     {
-        return new QueryBuilder;
+        return new TermQueryBuilder($this->store);
     }
 
     public function make($slug = null): Term

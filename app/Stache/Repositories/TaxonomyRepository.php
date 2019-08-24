@@ -20,9 +20,12 @@ class TaxonomyRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        $keys = $this->store->paths()->keys();
+        return $this->store->getItems($this->handles());
+    }
 
-        return $this->store->getItems($keys);
+    public function handles()
+    {
+        return $this->store->paths()->keys();
     }
 
     public function findByHandle($handle): ?Taxonomy
