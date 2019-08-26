@@ -22,6 +22,10 @@ class Traverser
 
         $dir = rtrim($dir, '/');
 
+        if (! $this->filesystem->exists($dir)) {
+            return collect();
+        }
+
         $files = collect($this->filesystem->allFiles($dir));
 
         if ($this->filter) {

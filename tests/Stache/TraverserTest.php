@@ -44,6 +44,19 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
+    function it_gets_no_files_if_directory_doesnt_exist()
+    {
+        $store = Mockery::mock();
+        $store->shouldReceive('directory')->andReturn($this->tempDir.'/non-existent');
+        $store->shouldReceive('filter')->andReturnTrue();
+
+        $files = $this->traverser->traverse($store);
+
+        $this->assertInstanceOf(Collection::class, $files);
+        $this->assertCount(0, $files);
+    }
+
+    /** @test */
     function gets_files_in_a_stores_directory()
     {
         mkdir($this->tempDir.'/nested');
