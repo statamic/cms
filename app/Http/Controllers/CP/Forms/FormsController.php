@@ -181,7 +181,9 @@ class FormsController extends CpController
         return $form
             ->title($data['title'])
             ->handle($data['handle'])
-            ->blueprint(collect($data['blueprint'])->first());
+            ->blueprint(collect($data['blueprint'])->first())
+            ->store($data['store'])
+            ->email($data['email']);
     }
 
     /**
