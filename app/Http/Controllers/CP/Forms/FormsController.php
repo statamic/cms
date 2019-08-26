@@ -149,9 +149,21 @@ class FormsController extends CpController
         ]);
     }
 
-    public function update($form)
+    public function update($form, Request $request)
     {
         $this->authorize('edit', $form);
+
+        $data = $request->validate([
+            'title' => 'required',
+            'handle' => 'nullable|alpha_dash',
+            'blueprint' => 'nullable|array',
+            'honeypot' => 'nullable|string',
+            'store' => 'nullable|boolean',
+            'email' => 'nullable|array',
+            'email.*.to' => 'required|email',
+            'email.*.from' => 'nullable|email',
+            'email.*.reply_to' => 'nullable|email',
+        ]);
 
         $this->hydrateForm($form, $data);
         $form->save();
