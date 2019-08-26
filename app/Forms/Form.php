@@ -92,7 +92,14 @@ class Form implements FormContract
      */
     public function store($store = null)
     {
-        return $this->fluentlyGetOrSet('store')->args(func_get_args());
+        return $this->fluentlyGetOrSet('store')
+            ->getter(function ($store) {
+                return (bool) $store ?? true;
+            })
+            ->setter(function ($store) {
+                return $store === false ? false : null;
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -138,6 +145,10 @@ class Form implements FormContract
             // 'metrics' => $this->get('metrics'),
             // 'email' => $this->get('email')
         ])->filter()->all();
+
+        if ($this->store === false) {
+            $data['store'] = false;
+        }
 
         File::put($this->path(), YAML::dump($data));
     }
