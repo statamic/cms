@@ -274,7 +274,6 @@ class FormsController extends CpController
             ],
             'honeypot' => [
                 'type' => 'text',
-                'validate' => 'required',
                 'width' => 50,
                 'instructions' => __('The field name to be used for the honeypot.'),
             ],
