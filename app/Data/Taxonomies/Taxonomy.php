@@ -6,6 +6,7 @@ use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
+use Statamic\API\Collection;
 use Statamic\Data\ExistsAsFile;
 use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Responsable;
@@ -162,6 +163,16 @@ class Taxonomy implements Contract, Responsable
     public function collection($collection = null)
     {
         return $this->fluentlyGetOrSet('collection')->args(func_get_args());
+    }
+
+    public function collections()
+    {
+        return Collection::all()->filter(function ($collection) {
+            return $collection
+                ->taxonomies()
+                ->keyBy->handle()
+                ->has($this->handle);
+        })->values();
     }
 
     public function toResponse($request)

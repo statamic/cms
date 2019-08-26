@@ -60,9 +60,9 @@ class TermQueryBuilder extends Builder
     protected function getKeysFromTaxonomies($taxonomies)
     {
         return collect($taxonomies)->flatMap(function ($taxonomy) {
-            $keys = $this->store->store($taxonomy)->paths()->keys();
+            $store = $this->store->store($taxonomy);
 
-            return collect($keys)->map(function ($key) use ($taxonomy) {
+            return collect($store->index('title')->keys())->map(function ($key) use ($taxonomy) {
                 return "{$taxonomy}::{$key}";
             });
         });

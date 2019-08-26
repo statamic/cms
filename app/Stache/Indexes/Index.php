@@ -47,6 +47,16 @@ abstract class Index
         return array_key_exists($key, $this->items);
     }
 
+    public function put($key, $value)
+    {
+        $this->items[$key] = $value;
+    }
+
+    public function push($value)
+    {
+        $this->items[] = $value;
+    }
+
     public function load()
     {
         if ($this->loaded) {
@@ -79,7 +89,7 @@ abstract class Index
         return $this;
     }
 
-    protected function cache()
+    public function cache()
     {
         Cache::forever($this->cacheKey(), $this->items);
     }
@@ -88,7 +98,7 @@ abstract class Index
     {
         $this->load();
 
-        $this->items[$this->store->getItemKey($item)] = $this->getItemValue($item);
+        $this->put($this->store->getItemKey($item), $this->getItemValue($item));
 
         $this->cache();
     }

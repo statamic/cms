@@ -237,12 +237,21 @@ abstract class Store
             return $this->getItemKey($item);
         });
 
+        $modified->each(function ($item) {
+            $this->handleModifiedItem($item);
+        });
+
         // Update modified items in every index.
         $indexes->each(function ($index) use ($modified, $pathMap) {
             $modified->each(function ($item) use ($index) {
                 $index->updateItem($item);
             });
         });
+    }
+
+    protected function handleModifiedItem($item)
+    {
+        //
     }
 
     public function paths()

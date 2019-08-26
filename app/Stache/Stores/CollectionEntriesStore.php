@@ -92,4 +92,9 @@ class CollectionEntriesStore extends ChildStore
 
         return $entry;
     }
+
+    protected function handleModifiedItem($item)
+    {
+        $item->taxonomize();
+    }
 }

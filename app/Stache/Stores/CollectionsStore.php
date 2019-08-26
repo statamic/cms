@@ -40,8 +40,8 @@ class CollectionsStore extends BasicStore
             ->revisionsEnabled(array_get($data, 'revisions'))
             ->defaultStatus(array_get($data, 'default_status'))
             ->structure(array_get($data, 'structure'))
-            ->orderable(array_get($data, 'orderable', false));
-            // ->taxonomies(array_get($data, 'taxonomies'));
+            ->orderable(array_get($data, 'orderable', false))
+            ->taxonomies(array_get($data, 'taxonomies'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection

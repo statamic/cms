@@ -99,7 +99,7 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function blueprint()
     {
-        return $this->taxonomy->termBlueprint();
+        return $this->taxonomy()->termBlueprint();
     }
 
     public function toArray()
