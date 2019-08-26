@@ -25,6 +25,7 @@ class Form implements FormContract
     protected $honeypot;
     protected $store;
     protected $email;
+    protected $metrics;
 
     /**
      * Get or set the handle.
@@ -105,12 +106,21 @@ class Form implements FormContract
     /**
      * Get or set the email field.
      *
-     * @param mixed $email
+     * @param mixed $emails
      * @return mixed
      */
-    public function email($email = null)
+    public function email($emails = null)
     {
-        return $this->fluentlyGetOrSet('email')->args(func_get_args());
+        return $this->fluentlyGetOrSet('email')
+            ->setter(function ($emails) {
+                return collect($emails)
+                    ->map(function ($email) {
+                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'template'])->filter()->all();
+                    })
+                    ->filter()
+                    ->all();
+            })
+            ->args(func_get_args());
     }
 
     /**
@@ -142,8 +152,8 @@ class Form implements FormContract
             'title' => $this->title,
             'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot,
-            // 'metrics' => $this->get('metrics'),
-            // 'email' => $this->get('email')
+            'email' => $this->email,
+            'metrics' => $this->metrics,
         ])->filter()->all();
 
         if ($this->store === false) {
