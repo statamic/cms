@@ -295,6 +295,9 @@ class FormsController extends CpController
                             'type' => 'text',
                             'display' => __('Recipient (To)'),
                             'width' => 50,
+                            'validate' => [
+                                'required',
+                            ],
                             'instructions' => __('Email address of the recipient.'),
                         ]
                     ],
