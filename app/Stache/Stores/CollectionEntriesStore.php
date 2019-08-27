@@ -15,6 +15,7 @@ class CollectionEntriesStore extends ChildStore
     protected $storeIndexes = [
         'slug',
         'collection',
+        'published',
         'site' => Indexes\Site::class,
         'origin' => Indexes\Origin::class,
     ];
