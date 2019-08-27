@@ -9,7 +9,9 @@ class StructureUris extends Index
 {
     public function getItems()
     {
-        return Structure::all()->flatMap(function ($structure) {
+        return Structure::all()->filter(function ($structure) {
+            return $structure->collection();
+        })->flatMap(function ($structure) {
             return $this->structureUris($structure);
         })->all();
     }
