@@ -14,8 +14,6 @@ class FormExportController extends CpController
     {
         $this->authorize('forms');
 
-        $form = Form::find($form);
-
         $exporter = 'Statamic\Forms\Exporters\\' . Str::studly($type) . 'Exporter';
 
         if (! class_exists($exporter)) {
