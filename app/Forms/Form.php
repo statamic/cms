@@ -95,7 +95,7 @@ class Form implements FormContract
     {
         return $this->fluentlyGetOrSet('store')
             ->getter(function ($store) {
-                return (bool) $store ?? true;
+                return $store !== false;
             })
             ->setter(function ($store) {
                 return $store === false ? false : null;
@@ -350,7 +350,7 @@ class Form implements FormContract
             'title' => $this->title,
             'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot(),
-            'store' => $this->store,
+            'store' => $this->store(),
             'email' => $this->email,
         ];
     }
