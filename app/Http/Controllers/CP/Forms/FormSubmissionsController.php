@@ -15,8 +15,6 @@ class FormSubmissionsController extends CpController
 {
     public function index($form)
     {
-        $form = Form::find($form);
-
         $this->authorize('view', $form);
 
         $columns = $form->blueprint()->columns()
@@ -95,7 +93,7 @@ class FormSubmissionsController extends CpController
 
     public function destroy($form, $id)
     {
-        $submission = Form::find($form)->submission($id);
+        $submission = $form->submission($id);
 
         $this->authorize('delete', $submission);
 
@@ -106,8 +104,6 @@ class FormSubmissionsController extends CpController
 
     public function show($form, $submission)
     {
-        $form = Form::find($form);
-
         if (! $submission = $form->submission($submission)) {
             return $this->pageNotFound();
         }
