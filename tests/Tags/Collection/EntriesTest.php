@@ -41,9 +41,9 @@ class EntriesTest extends TestCase
         ]);
 }
 
-    protected function makeEntry()
+    protected function makeEntry($slug)
     {
-        return EntryFactory::collection($this->collection)->make();
+        return EntryFactory::slug($slug)->collection($this->collection)->make();
     }
 
     protected function getEntries($params = [])
@@ -60,7 +60,7 @@ class EntriesTest extends TestCase
     {
         $this->assertCount(0, $this->getEntries());
 
-        $this->makeEntry()->save();
+        $this->makeEntry('test')->save();
 
         $this->assertCount(1, $this->getEntries());
     }
@@ -68,11 +68,11 @@ class EntriesTest extends TestCase
     /** @test */
     function it_gets_paginated_entries_in_a_collection()
     {
-        $this->makeEntry()->save();
-        $this->makeEntry()->save();
-        $this->makeEntry()->save();
-        $this->makeEntry()->save();
-        $this->makeEntry()->save();
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
 
         $this->assertCount(5, $this->getEntries());
         $this->assertCount(3, $this->getEntries(['paginate' => 3]));
@@ -88,11 +88,11 @@ class EntriesTest extends TestCase
 
         $this->collection->sites(['en', 'fr'])->save();
 
-        $this->makeEntry()->set('title', 'One')->save();
-        $this->makeEntry()->set('title', 'Two')->save();
-        $this->makeEntry()->set('title', 'Three')->save();
-        $this->makeEntry()->set('title', 'Quatre')->locale('fr')->save();
-        $this->makeEntry()->set('title', 'Cinq')->locale('fr')->save();
+        $this->makeEntry('one')->set('title', 'One')->save();
+        $this->makeEntry('two')->set('title', 'Two')->save();
+        $this->makeEntry('three')->set('title', 'Three')->save();
+        $this->makeEntry('four')->set('title', 'Quatre')->locale('fr')->save();
+        $this->makeEntry('five')->set('title', 'Cinq')->locale('fr')->save();
 
         $this->assertCount(3, $this->getEntries(['site' => 'en']));
         $this->assertCount(2, $this->getEntries(['site' => 'fr']));
@@ -107,11 +107,11 @@ class EntriesTest extends TestCase
     /** @test */
     function it_limits_entries_with_offset()
     {
-        $this->makeEntry()->set('title', 'A')->save();
-        $this->makeEntry()->set('title', 'B')->save();
-        $this->makeEntry()->set('title', 'C')->save();
-        $this->makeEntry()->set('title', 'D')->save();
-        $this->makeEntry()->set('title', 'E')->save();
+        $this->makeEntry('a')->set('title', 'A')->save();
+        $this->makeEntry('b')->set('title', 'B')->save();
+        $this->makeEntry('c')->set('title', 'C')->save();
+        $this->makeEntry('d')->set('title', 'D')->save();
+        $this->makeEntry('e')->set('title', 'E')->save();
 
         $this->assertCount(5, $this->getEntries());
 
@@ -129,9 +129,9 @@ class EntriesTest extends TestCase
     /** @test */
     function it_filters_by_publish_status()
     {
-        $this->makeEntry()->published(true)->save();
-        $this->makeEntry()->published(true)->save();
-        $this->makeEntry()->published(false)->save();
+        $this->makeEntry('o')->published(true)->save();
+        $this->makeEntry('b')->published(true)->save();
+        $this->makeEntry('c')->published(false)->save();
 
         $this->assertCount(2, $this->getEntries());
         $this->assertCount(2, $this->getEntries(['show_unpublished' => false]));
@@ -146,12 +146,12 @@ class EntriesTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->date('2019-03-09')->save(); // definitely in past
-        $this->makeEntry()->date('2019-03-10')->save(); // today
-        $this->makeEntry()->date('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry()->date('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry()->date('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry()->date('2019-03-11')->save(); // definitely in future
+        $this->makeEntry('a')->date('2019-03-09')->save(); // definitely in past
+        $this->makeEntry('b')->date('2019-03-10')->save(); // today
+        $this->makeEntry('c')->date('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry('d')->date('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry('e')->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry('f')->date('2019-03-11')->save(); // definitely in future
 
         // Default date behaviors.
         $this->collection->dated(true)->save();
@@ -203,14 +203,14 @@ class EntriesTest extends TestCase
         $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->date('2019-03-06')->save(); // further in past
-        $this->makeEntry()->date('2019-03-09')->save(); // yesterday
-        $this->makeEntry()->date('2019-03-10')->save(); // today
-        $this->makeEntry()->date('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry()->date('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry()->date('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry()->date('2019-03-11')->save(); // tomorrow
-        $this->makeEntry()->date('2019-03-13')->save(); // further in future
+        $this->makeEntry('a')->date('2019-03-06')->save(); // further in past
+        $this->makeEntry('b')->date('2019-03-09')->save(); // yesterday
+        $this->makeEntry('c')->date('2019-03-10')->save(); // today
+        $this->makeEntry('d')->date('2019-03-10-1259')->save(); // today, but before "now"
+        $this->makeEntry('e')->date('2019-03-10-1300')->save(); // today, and also "now"
+        $this->makeEntry('f')->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry('g')->date('2019-03-11')->save(); // tomorrow
+        $this->makeEntry('h')->date('2019-03-13')->save(); // further in future
 
         $this->assertCount(8, $this->getEntries(['show_future' => true]));
         $this->assertCount(6, $this->getEntries(['show_future' => true, 'since' => 'yesterday']));
@@ -222,10 +222,10 @@ class EntriesTest extends TestCase
     /** @test */
     function it_filters_by_custom_query_scopes()
     {
-        $this->makeEntry()->set('title', 'Cat Stories')->save();
-        $this->makeEntry()->set('title', 'Tiger Stories')->save();
-        $this->makeEntry()->set('title', 'Tiger Fables')->save();
-        $this->makeEntry()->set('title', 'Tiger Tales')->save();
+        $this->makeEntry('a')->set('title', 'Cat Stories')->save();
+        $this->makeEntry('b')->set('title', 'Tiger Stories')->save();
+        $this->makeEntry('c')->set('title', 'Tiger Fables')->save();
+        $this->makeEntry('d')->set('title', 'Tiger Tales')->save();
 
         $this->assertCount(4, $this->getEntries());
         $this->assertCount(2, $this->getEntries(['query' => 'post_type', 'post_type' => 'stories']));
@@ -246,9 +246,9 @@ class EntriesTest extends TestCase
         $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->date('2019-02-06')->set('title', 'Pear')->save();
-        $this->makeEntry()->date('2019-02-07')->set('title', 'Apple')->save();
-        $this->makeEntry()->date('2019-03-03')->set('title', 'Banana')->save();
+        $this->makeEntry('a')->date('2019-02-06')->set('title', 'Pear')->save();
+        $this->makeEntry('b')->date('2019-02-07')->set('title', 'Apple')->save();
+        $this->makeEntry('c')->date('2019-03-03')->set('title', 'Banana')->save();
 
         $this->assertEquals(
             ['2019-03-03', '2019-02-07', '2019-02-06'],
@@ -272,10 +272,10 @@ class EntriesTest extends TestCase
         $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
-        $this->makeEntry()->date('2019-02-06')->set('title', 'Pear')->save();
-        $this->makeEntry()->date('2019-02-06')->set('title', 'Apple')->save();
-        $this->makeEntry()->date('2019-03-03')->set('title', 'Apricot')->save();
-        $this->makeEntry()->date('2019-03-03')->set('title', 'Banana')->save();
+        $this->makeEntry('a')->date('2019-02-06')->set('title', 'Pear')->save();
+        $this->makeEntry('b')->date('2019-02-06')->set('title', 'Apple')->save();
+        $this->makeEntry('c')->date('2019-03-03')->set('title', 'Apricot')->save();
+        $this->makeEntry('d')->date('2019-03-03')->set('title', 'Banana')->save();
 
         $this->assertEquals(
             ['Apricot', 'Banana', 'Apple', 'Pear'],
