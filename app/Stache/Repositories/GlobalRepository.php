@@ -49,10 +49,6 @@ class GlobalRepository implements RepositoryContract
             $global->id($this->stache->generateId());
         }
 
-        // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
-
-        $this->store->insert($global);
-
         $this->store->save($global);
     }
 }

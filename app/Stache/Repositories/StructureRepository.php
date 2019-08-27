@@ -54,8 +54,6 @@ class StructureRepository implements RepositoryContract
 
     public function save(Structure $structure)
     {
-        $this->store->setItem($structure->handle(), $structure);
-
         $this->store->save($structure);
     }
 
