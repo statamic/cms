@@ -85,7 +85,7 @@ class DataCollection extends IlluminateCollection
     protected function getSortableValue($sort, $item)
     {
         if (is_array($item)) {
-            return $item[$sort] ?? null;
+            return $this->normalizeSortableValue($item[$sort] ?? null);
         }
 
         $method = Str::camel($sort);
