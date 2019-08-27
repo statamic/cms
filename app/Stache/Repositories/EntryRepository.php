@@ -63,9 +63,9 @@ class EntryRepository implements RepositoryContract
             $entry->id($this->stache->generateId());
         }
 
-        // if ($entry->collection()->orderable()) {
-        //     $this->ensureEntryPosition($entry);
-        // }
+        if ($entry->collection()->orderable()) {
+            $this->ensureEntryPosition($entry);
+        }
 
         $this->store->store($entry->collectionHandle())->save($entry);
     }
