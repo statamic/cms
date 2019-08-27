@@ -12,12 +12,7 @@ use Illuminate\Support\Facades\Cache;
 
 class Stache
 {
-    const TEMP_COLD = 'cold';
-    const TEMP_WARM = 'warm';
-
     protected $sites;
-    protected $keys;
-    protected $config;
     protected $stores;
     protected $startTime;
 
@@ -40,28 +35,6 @@ class Stache
     public function defaultSite()
     {
         return $this->sites->first();
-    }
-
-    public function keys($keys = null)
-    {
-        if ($keys === null) {
-            return $this->keys;
-        }
-
-        $this->keys = collect($keys);
-
-        return $this;
-    }
-
-    public function config($config = null)
-    {
-        if (! $config) {
-            return $this->config;
-        }
-
-        $this->config = $config;
-
-        return $this;
     }
 
     public function registerStore(Store $store)
@@ -98,18 +71,6 @@ class Stache
     public function generateId()
     {
         return (string) Str::uuid();
-    }
-
-    public function idMap()
-    {
-        return collect($this->stores())->mapWithKeys(function ($store) {
-            return $store->getIdMap();
-        });
-    }
-
-    public function getStoreById($id)
-    {
-        return $this->store($this->idMap()->get($id));
     }
 
     public function clear()
@@ -182,45 +143,5 @@ class Stache
         };
 
         return Carbon::createFromTimestamp($cache['date']);
-    }
-
-    public function paths()
-    {
-        $paths = $this->sites()->mapWithKeys(function ($site) {
-            return [$site => collect()];
-        });
-
-        foreach ($this->stores() as $store) {
-            $storePaths = $store instanceof Stores\AggregateStore
-                ? $this->getAggregateStorePaths($store)
-                : $store->getPaths();
-
-            $storeKey = $store->key();
-
-            foreach ($storePaths as $site => $sitePaths) {
-                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($storeKey) {
-                    return ["{$storeKey}::{$key}" => $path];
-                }));
-            }
-        }
-
-        return $paths;
-    }
-
-    private function getAggregateStorePaths($store)
-    {
-        $paths = $this->sites()->mapWithKeys(function ($site) {
-            return [$site => collect()];
-        });
-
-        foreach ($store->stores() as $store) {
-            foreach ($store->getPaths() as $site => $sitePaths) {
-                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($store) {
-                    return ["{$store->childKey()}::{$key}" => $path];
-                }));
-            }
-        }
-
-        return $paths;
     }
 }
