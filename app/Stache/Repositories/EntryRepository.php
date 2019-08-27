@@ -76,9 +76,7 @@ class EntryRepository implements RepositoryContract
             $this->removeEntryPosition($entry);
         }
 
-        $this->store->remove($entry->id());
-
-        $this->store->delete($entry);
+        $this->store->store($entry->collectionHandle())->delete($entry);
     }
 
     public function query()
