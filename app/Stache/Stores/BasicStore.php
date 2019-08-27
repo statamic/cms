@@ -101,5 +101,7 @@ abstract class BasicStore extends Store
         $this->setPath($key, $item->path());
 
         $this->updateItemIndexes($item);
+
+        $this->cacheItem($item);
     }
 }
