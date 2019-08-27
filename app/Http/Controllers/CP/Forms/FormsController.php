@@ -171,10 +171,7 @@ class FormsController extends CpController
 
         $this->success(__('Saved'));
 
-        return [
-            'success' => true,
-            'redirect' => $form->editUrl()
-        ];
+        return $form->toArray();
     }
 
     protected function hydrateForm($form, $data)
