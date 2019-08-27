@@ -87,10 +87,10 @@
             <!-- Email-->
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Email Notifications</label>
-                <input type="text" v-model="form.email" class="input-text" autofocus tabindex="1">
+                <input type="email" v-model="form.email" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Be notified of submissions by email. TODO: Customize email headers?
+                    Be notified of submissions at this email address. You can further customize notification settings later.
                 </div>
             </div>
         </div>
@@ -103,7 +103,7 @@
                 <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
-                <button tabindex="4" class="btn-primary mx-3" @click="submit" v-if="onLastStep">
+                <button tabindex="4" class="btn-primary mx-3" :disabled="! canSubmit" @click="submit" v-if="onLastStep">
                     {{ __('Create Form') }}
                 </button>
             </div>
@@ -144,10 +144,15 @@ export default {
     computed: {
         blueprintFieldConfig() {
             return { handle: 'blueprints', type: 'blueprints', max_items: 1 };
+        },
+
+        canSubmit() {
+            if (this.form.email) {
+                return isEmail(this.form.email);
+            }
+
+            return true;
         }
-        // isValidEmail() {
-        //     return this.user.email && isEmail(this.user.email)
-        // }
     },
 
     methods: {
