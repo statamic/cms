@@ -60,7 +60,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
         return $this
             ->fluentlyGetOrSet('collection')
             ->setter(function ($collection) {
-                return $collection instanceof \Statamic\Data\Entries\Collection ? $collection->handle() : $collection;
+                return $collection instanceof \Statamic\Contracts\Data\Entries\Collection ? $collection->handle() : $collection;
             })
             ->getter(function ($collection) {
                 return $collection ? Collection::findByHandle($collection) : null;
