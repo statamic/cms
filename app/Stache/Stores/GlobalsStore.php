@@ -124,9 +124,4 @@ class GlobalsStore extends BasicStore
             return $this->paths()->flip()->get($path);
         }
     }
-
-    public function save($global)
-    {
-        // todo
-    }
 }

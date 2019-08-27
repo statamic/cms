@@ -128,11 +128,6 @@ class StructuresStore extends BasicStore
         return $file->getExtension() === 'yaml';
     }
 
-    public function save($structure)
-    {
-        // todo
-    }
-
     public function delete($structure)
     {
         // todo
