@@ -171,7 +171,7 @@ class Entries
     {
         $site = Arr::getFirst($this->parameters, ['site', 'locale'], Site::current()->handle());
 
-        if ($site === '*') {
+        if ($site === '*' || ! Site::hasMultiple()) {
             return;
         }
 
