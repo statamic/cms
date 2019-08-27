@@ -175,7 +175,7 @@ class AssetContainerTest extends TestCase
     {
         $container = (new AssetContainer)->handle('test');
 
-        $this->assertEquals($this->fakeStacheDirectory.'/test.yaml', $container->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/assets/test.yaml', $container->path());
     }
 
     /** @test */

@@ -19,11 +19,10 @@ class PagesTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('stache')->withoutBooting(function ($stache) {
-            $dir = __DIR__.'/../../Stache/__fixtures__';
-            $stache->store('collections')->directory($dir . '/content/collections');
-            $stache->store('entries')->directory($dir . '/content/collections');
-        });
+        $stache = $this->app->make('stache');
+        $dir = __DIR__.'/../../Stache/__fixtures__';
+        $stache->store('collections')->directory($dir . '/content/collections');
+        $stache->store('entries')->directory($dir . '/content/collections');
     }
 
     /** @test */

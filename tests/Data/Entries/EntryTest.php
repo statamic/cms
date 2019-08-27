@@ -131,11 +131,12 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/'],
         ]]);
 
-        $collection = (new Collection)->ampable(true)->route([
+        $collection = (new Collection)->handle('blog')->ampable(true)->route([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
         ]);
+        $collection->save();
         $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
         $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
         $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
@@ -177,7 +178,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)
             ->locale('en')
             ->slug('test')
-            ->collection(new Collection)
+            ->collection(Collection::make('blog')->save())
             ->data([
                 'foo' => 'bar',
                 'bar' => 'baz',
@@ -219,8 +220,8 @@ class EntryTest extends TestCase
         $collection = (new Collection)->handle('blog');
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
@@ -234,8 +235,8 @@ class EntryTest extends TestCase
         $collection = (new Collection)->handle('blog');
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/post.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
@@ -265,7 +266,7 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_order()
     {
-        $collection = new Collection;
+        $collection = tap(Collection::make('ordered'))->save();
         $one = (new Entry)->id('one')->collection($collection);
         $this->assertNull($one->order());
 
@@ -288,7 +289,7 @@ class EntryTest extends TestCase
     /** @test */
     function it_sets_the_order_on_the_collection_when_dealing_with_numeric_collections()
     {
-        $collection = (new Collection)->orderable(true);
+        $collection = tap(Collection::make('ordered')->orderable(true))->save();
         $one = (new Entry)->id('one')->collection($collection);
         $two = (new Entry)->id('two')->collection($collection);
 
@@ -306,11 +307,11 @@ class EntryTest extends TestCase
     function it_gets_and_sets_the_date_for_date_collections()
     {
         $dateEntry = with('', function() {
-            $collection = (new Collection)->dated(true);
+            $collection = tap(Collection::make('dated')->dated(true))->save();
             return (new Entry)->collection($collection);
         });
         $numberEntry = with('', function() {
-            $collection = (new Collection)->orderable(true);
+            $collection = tap(Collection::make('ordered')->orderable(true))->save();
             return (new Entry)->collection($collection);
         });
         $this->assertNull($dateEntry->order());
@@ -332,7 +333,7 @@ class EntryTest extends TestCase
     function future_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');
-        $collection = (new Collection)->dated(true)->futureDateBehavior('private');
+        $collection = tap(Collection::make('dated')->dated(true)->futureDateBehavior('private'))->save();
         $entry = (new Entry)->collection($collection);
 
         $entry->date('2018-01-01');
@@ -346,7 +347,7 @@ class EntryTest extends TestCase
     function past_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');
-        $collection = (new Collection)->dated(true)->pastDateBehavior('private');
+        $collection = tap(Collection::make('dated')->dated(true)->pastDateBehavior('private'))->save();
         $entry = (new Entry)->collection($collection);
 
         $entry->date('2019-01-02');
@@ -374,11 +375,11 @@ class EntryTest extends TestCase
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint = new Blueprint);
         $entry = (new Entry)
-            ->collection(new Collection)
+            ->collection('blog')
             ->blueprint('test');
 
-        $this->assertEquals($blueprint, $entry->blueprint());
-        $this->assertNotEquals($default, $entry->blueprint());
+        $this->assertSame($blueprint, $entry->blueprint());
+        $this->assertNotSame($default, $entry->blueprint());
     }
 
     /** @test */
@@ -387,7 +388,7 @@ class EntryTest extends TestCase
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('another')->andReturn(new Blueprint);
 
-        $collection = (new Collection)->entryBlueprints(['test', 'another']);
+        $collection = tap(Collection::make('test')->entryBlueprints(['test', 'another']))->save();
         $entry = (new Entry)->collection($collection);
 
         $this->assertEquals($blueprint, $entry->blueprint());
@@ -465,7 +466,7 @@ EOT;
     {
         config(['statamic.theming.views.entry' => 'post']);
 
-        $collection = new Collection;
+        $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
         // defaults to the configured
@@ -486,7 +487,7 @@ EOT;
     {
         config(['statamic.theming.views.layout' => 'default']);
 
-        $collection = new Collection;
+        $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
         // defaults to the configured
@@ -505,10 +506,11 @@ EOT;
     /** @test */
     function it_gets_the_last_modified_time()
     {
-        $collection = new Collection;
+        $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection)->slug('bar');
         $path = $entry->path();
         $date = Carbon::parse('2017-01-02');
+        mkdir(dirname($path));
         touch($path, $date->timestamp);
 
         $this->assertTrue($date->eq($entry->lastModified()));
@@ -525,7 +527,7 @@ EOT;
     function it_gets_and_sets_the_collection()
     {
         $entry = new Entry;
-        $collection = (new Collection)->handle('foo');
+        $collection = tap(Collection::make('foo'))->save();
         $this->assertNull($entry->collection());
 
         $return = $entry->collection($collection);
