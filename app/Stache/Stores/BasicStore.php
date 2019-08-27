@@ -104,4 +104,9 @@ abstract class BasicStore extends Store
 
         $this->cacheItem($item);
     }
+
+    public function delete($item)
+    {
+        // todo
+    }
 }
