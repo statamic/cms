@@ -50,6 +50,8 @@ class EntryRepository implements RepositoryContract
 
     public function findByUri(string $uri, string $site = null): ?Entry
     {
+        $site = $site ?? $this->stache->sites()->first();
+
         return app(StructureRepository::class)->findEntryByUri($uri, $site)
             ?? $this->query()
                 ->where('uri', $uri)
