@@ -77,12 +77,23 @@ class Stache
     {
         $this->stores()->each->clear();
 
+        Cache::forget('stache::timing');
+
         return $this;
     }
 
     public function refresh()
     {
-        $this->clear()->startTimer()->update()->persist();
+        return $this->clear()->warm();
+    }
+
+    public function warm()
+    {
+        $this->startTimer();
+
+        $this->stores()->each->warm();
+
+        $this->stopTimer();
     }
 
     public function instance()
@@ -92,7 +103,9 @@ class Stache
 
     public function fileCount()
     {
-        return $this->paths()->flatten()->count();
+        return $this->stores()->reduce(function ($carry, $store) {
+            return $store->paths()->count() + $carry;
+        }, 0);
     }
 
     public function fileSize()

@@ -6,19 +6,19 @@ use Statamic\API\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 
-class StacheRefresh extends Command
+class StacheWarm extends Command
 {
     use RunsInPlease;
 
-    protected $signature = 'statamic:stache:refresh';
-    protected $description = 'Clear and rebuild the "Stache" cache';
+    protected $signature = 'statamic:stache:warm';
+    protected $description = 'Build the "Stache" cache';
 
     public function handle()
     {
         $this->line('Please wait. This may take a while if you have a lot of content.');
 
-        Stache::refresh();
+        Stache::warm();
 
-        $this->info('You have trimmed and polished the Stache. It is handsome, warm, and ready.');
+        $this->info('You have poured oil over the Stache and polished it until it shines. It is warm and ready.');
     }
 }

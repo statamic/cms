@@ -324,4 +324,9 @@ abstract class Store
         $this->paths = null;
         Cache::forget($this->pathsCacheKey());
     }
+
+    public function warm()
+    {
+        $this->resolveIndexes()->each->update();
+    }
 }

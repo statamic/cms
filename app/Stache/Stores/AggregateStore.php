@@ -70,5 +70,17 @@ abstract class AggregateStore extends Store
         $this->discoverStores()->each->clear();
     }
 
+    public function warm()
+    {
+        $this->discoverStores()->each->warm();
+    }
+
+    public function paths()
+    {
+        return $this->discoverStores()->flatMap(function ($store) {
+            return $store->paths();
+        });
+    }
+
     abstract public function discoverStores();
 }

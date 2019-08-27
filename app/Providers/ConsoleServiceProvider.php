@@ -25,6 +25,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\MigrateFieldset::class,
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
+        Commands\StacheWarm::class,
         Commands\StaticClear::class,
         // Commands\MakeUserMigration::class,
     ];
