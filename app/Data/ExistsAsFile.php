@@ -67,5 +67,7 @@ trait ExistsAsFile
         if (($initial = $this->initialPath()) && $path !== $initial) {
             File::delete($this->initialPath());
         }
+
+        $this->initialPath($path);
     }
 }
