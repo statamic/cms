@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\API\Site;
 use Statamic\API\YAML;
+use Statamic\API\Stache;
 use Statamic\API\Collection;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -77,5 +78,13 @@ class CollectionsStore extends BasicStore
         return collect($positions)->mapWithKeys(function ($id, $index) {
             return [$index + 1 => $id];
         })->all();
+    }
+
+    public function updateEntryUris($collection)
+    {
+        Stache::store('entries')
+            ->store($collection->handle())
+            ->index('uri')
+            ->update();
     }
 }
