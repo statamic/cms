@@ -182,6 +182,7 @@ class FormsController extends CpController
             ->title($data['title'])
             ->handle($data['handle'])
             ->blueprint(collect($data['blueprint'])->first())
+            ->honeypot($data['honeypot'])
             ->store($data['store'])
             ->email($data['email']);
     }
