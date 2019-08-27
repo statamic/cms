@@ -49,9 +49,7 @@ class EntryQueryBuilder extends Builder
     protected function getKeysFromCollections($collections)
     {
         return collect($collections)->flatMap(function ($collection) {
-            $keys = app('stache')
-                ->store("entries::$collection")
-                ->paths()->keys();
+            $keys = $this->store->store($collection)->paths()->keys();
 
             return collect($keys)->map(function ($key) use ($collection) {
                 return "{$collection}::{$key}";
@@ -64,8 +62,7 @@ class EntryQueryBuilder extends Builder
         return collect($wheres)->reduce(function ($ids, $where) use ($collections) {
             // Get a single array comprised of the items from the same index across all collections.
             $items = collect($collections)->flatMap(function ($collection) use ($where) {
-                return app('stache')
-                    ->store("entries::$collection")
+                return $this->store->store($collection)
                     ->index($where['column'])->items()
                     ->mapWithKeys(function ($item, $key) use ($collection) {
                         return ["{$collection}::{$key}" => $item];
