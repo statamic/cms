@@ -23,6 +23,11 @@ class Taxonomy implements Contract, Responsable
     protected $collection;
     protected $defaultStatus = 'published';
 
+    public function id()
+    {
+        return $this->handle();
+    }
+
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
