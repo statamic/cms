@@ -162,7 +162,11 @@ abstract class Builder
 
     protected function filterTestNotEquals($item, $value)
     {
-        return strtolower($item) !== strtolower($value);
+        if (is_string($item)) {
+            return strtolower($item) !== strtolower($value);
+        }
+
+        return $item !== $value;
     }
 
     protected function filterTestLessThan($item, $value)
