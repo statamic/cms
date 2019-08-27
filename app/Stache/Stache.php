@@ -75,9 +75,7 @@ class Stache
 
     public function clear()
     {
-        // TODO: This is temporary. It wont work for other cache drivers like Redis.
-        // We need to track all the cache keys, then loop through and forget them all.
-        app('files')->deleteDirectory(base_path('storage/framework/cache/data/stache'));
+        $this->stores()->each->clear();
 
         return $this;
     }

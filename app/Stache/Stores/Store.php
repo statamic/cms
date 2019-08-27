@@ -307,4 +307,21 @@ abstract class Store
     {
         return "stache::indexes::{$this->key()}::_paths";
     }
+
+    public function clear()
+    {
+        $this->paths()->keys()->each(function ($key) {
+            $this->forgetItem($key);
+        });
+
+        $this->resolveIndexes()->each(function ($index) {
+            $index->clear();
+            app('stache.indexes')->forget("{$this->key()}.{$index->name()}");
+        });
+
+        Cache::forget($this->indexUsageCacheKey());
+
+        $this->paths = null;
+        Cache::forget($this->pathsCacheKey());
+    }
 }

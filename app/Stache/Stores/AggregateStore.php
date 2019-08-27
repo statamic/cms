@@ -65,4 +65,10 @@ abstract class AggregateStore extends Store
         return $this->store($store)->getItem($id);
     }
 
+    public function clear()
+    {
+        $this->discoverStores()->each->clear();
+    }
+
+    abstract public function discoverStores();
 }

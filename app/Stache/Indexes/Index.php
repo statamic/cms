@@ -121,4 +121,11 @@ abstract class Index
             str_replace('.', '::', $this->name)
         ]);
     }
+
+    public function clear()
+    {
+        $this->items = null;
+
+        Cache::forget($this->cacheKey());
+    }
 }
