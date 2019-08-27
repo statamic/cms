@@ -37,5 +37,8 @@ class StoreTest extends TestCase
 
 class TestStore extends Store
 {
-    //
+    public function getItem($key)
+    {
+
+    }
 }

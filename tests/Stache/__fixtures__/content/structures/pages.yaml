@@ -3,12 +3,12 @@ expects_root: false
 root: pages-home
 tree:
   -
-    entry: pages-about # (/about)
+    entry: pages-about
     children:
       -
-        entry: pages-board # (/about/board)
+        entry: pages-board
         children:
           -
-            entry: pages-directors # (/about/board/directors)
+            entry: pages-directors
   -
-    entry: pages-blog # (/blog)
+    entry: pages-blog

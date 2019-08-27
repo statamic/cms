@@ -5,13 +5,14 @@ namespace Tests\Stache\Stores;
 use Mockery;
 use Statamic\API;
 use Tests\TestCase;
-use Statamic\Stache\Stache;
+use Statamic\API\Stache;
 use Statamic\API\Collection;
 use Illuminate\Support\Carbon;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
 use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Stache\Stores\CollectionEntriesStore;
 
 class EntriesStoreTest extends TestCase
 {
@@ -21,101 +22,69 @@ class EntriesStoreTest extends TestCase
     {
         parent::setUp();
 
-        $stache = (new Stache)->sites(['en']);
-        $this->store = (new EntriesStore($stache, app('files')))
-            ->directory($this->directory = __DIR__.'/../__fixtures__/content/collections');
+        $this->parent = (new EntriesStore)->directory(
+            $this->directory = __DIR__.'/../__fixtures__/content/collections'
+        );
+
+        Stache::registerStore($this->parent);
+
+        Stache::store('collections')->directory($this->directory);
     }
 
     /** @test */
     function it_gets_nested_files()
     {
-        Collection::make('alphabetical')->save();
-        Collection::make('blog')->save();
-        Collection::make('numeric')->save();
-        Collection::make('pages')->save();
+        tap($this->parent->store('alphabetical'), function ($store) {
+            $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
-        $files = Traverser::traverse($this->store);
-
-        $this->assertEquals(collect([
-            $this->directory.'/alphabetical/alpha.md',
-            $this->directory.'/alphabetical/bravo.md',
-            $this->directory.'/alphabetical/zulu.md',
-            $this->directory.'/blog/2017-25-12.christmas.md',
-            $this->directory.'/blog/2018-07-04.fourth-of-july.md',
-            $this->directory.'/numeric/1.one.md',
-            $this->directory.'/numeric/2.two.md',
-            $this->directory.'/numeric/3.three.md',
-            $this->directory.'/pages/about.md',
-            $this->directory.'/pages/about/board.md',
-            $this->directory.'/pages/about/directors.md',
-            $this->directory.'/pages/blog.md',
-            $this->directory.'/pages/contact.md',
-            $this->directory.'/pages/home.md',
-        ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
-
-        // Sanity check. These files should exist but not be included.
-        $this->assertTrue(file_exists($this->directory.'/blog.yaml'));
-        $this->assertTrue(file_exists($this->directory.'/entry-cant-go-here.md'));
-    }
-
-    /** @test */
-    function it_makes_entry_instances_from_cache()
-    {
-        API\Collection::shouldReceive('whereHandle')->with('blog')->andReturn(new \Statamic\Data\Entries\Collection);
-
-        $cache = collect([
-            '123' => [
-                'collection' => 'blog',
-                'localizations' => [
-                    'en' => [
-                        'slug' => 'test',
-                        'published' => true,
-                        'path' => '/path/to/en.md',
-                        'data' => [
-                            'title' => 'Test Entry',
-                        ]
-                    ],
-                    'fr' => [
-                        'published' => false,
-                        'slug' => 'le-test',
-                        'path' => '/path/to/fr.md',
-                        'data' => [
-                            'title' => 'Le Test Entry',
-                        ]
-                    ]
-                ]
-            ]
-        ]);
-
-        $items = $this->store->getItemsFromCache($cache);
-
-        $this->assertCount(1, $items);
-        $entry = $items->first();
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertCount(2, $entry->localizations());
-        $this->assertEquals('123', $entry->id());
-        tap($entry->in('en'), function ($entry) {
-            $this->assertEquals('test', $entry->slug());
-            $this->assertEquals('/path/to/en.md', $entry->initialPath());
-            $this->assertTrue($entry->published());
-            $this->assertEquals('Test Entry', $entry->get('title'));
+            $this->assertEquals(collect([
+                $this->directory.'/alphabetical/alpha.md',
+                $this->directory.'/alphabetical/bravo.md',
+                $this->directory.'/alphabetical/zulu.md',
+            ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
-        tap($entry->in('fr'), function ($entry) {
-            $this->assertEquals('le-test', $entry->slug());
-            $this->assertEquals('/path/to/fr.md', $entry->initialPath());
-            $this->assertFalse($entry->published());
-            $this->assertEquals('Le Test Entry', $entry->get('title'));
+
+        tap($this->parent->store('blog'), function ($store) {
+            $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
+
+            $this->assertEquals(collect([
+                $this->directory.'/blog/2017-25-12.christmas.md',
+                $this->directory.'/blog/2018-07-04.fourth-of-july.md',
+            ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
+        });
+
+        tap($this->parent->store('numeric'), function ($store) {
+            $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
+
+            $this->assertEquals(collect([
+                $this->directory.'/numeric/1.one.md',
+                $this->directory.'/numeric/2.two.md',
+                $this->directory.'/numeric/3.three.md',
+            ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
+        });
+
+        tap($this->parent->store('pages'), function ($store) {
+            $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
+
+            $this->assertEquals(collect([
+                $this->directory.'/pages/about.md',
+                $this->directory.'/pages/about/board.md',
+                $this->directory.'/pages/about/directors.md',
+                $this->directory.'/pages/blog.md',
+                $this->directory.'/pages/contact.md',
+                $this->directory.'/pages/home.md',
+            ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
     }
 
     /** @test */
     function it_makes_entry_instances_from_files()
     {
-        API\Collection::shouldReceive('whereHandle')->with('blog')->andReturn(
+        API\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
             (new \Statamic\Data\Entries\Collection)->dated(true)
         );
 
-        $item = $this->store->createItemFromFile(
+        $item = $this->parent->store('blog')->makeItemFromFile(
             $this->directory.'/blog/2017-01-02.my-post.md',
             "id: 123\ntitle: Example\nfoo: bar"
         );
@@ -130,43 +99,30 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_uses_the_id_of_the_entry_object_combined_with_collection_handle_as_the_item_key()
+    function it_uses_the_id_of_the_entry_as_the_item_key()
     {
         $entry = Mockery::mock();
         $entry->shouldReceive('id')->andReturn('test');
         $entry->shouldReceive('collectionHandle')->andReturn('example');
 
         $this->assertEquals(
-            'example::test',
-            $this->store->getItemKey($entry, '/path/to/doesnt/matter.yaml')
+            'test',
+            $this->parent->store('test')->getItemKey($entry)
         );
     }
 
     /** @test */
     function it_saves_to_disk()
     {
-        API\Stache::shouldReceive('store')->with('entries')->andReturn($this->store);
+        $entry = API\Entry::make()
+            ->id('123')
+            ->slug('test')
+            ->date('2017-07-04')
+            ->collection('blog');
 
-        $entry = (new \Statamic\Data\Entries\Entry)
-            ->id('test-blog-entry')
-            ->collection((new \Statamic\Data\Entries\Collection)->handle('blog')->dated(true))
-            ->in('en', function ($loc) {
-                $loc
-                    ->slug('test')
-                    ->date('2017-07-04')
-                    ->data(['foo' => 'bar', 'content' => 'test content']);
-            });
+        $this->parent->store('blog')->save($entry);
 
-        $this->store->save($entry);
-
-        $contents = <<<EOT
----
-foo: bar
-id: test-blog-entry
----
-test content
-EOT;
-        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.test.md', $contents);
+        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
         @unlink($path);
         $this->assertFileNotExists($path);
     }

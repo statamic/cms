@@ -19,7 +19,8 @@ class TaxonomiesStoreTest extends TestCase
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new TaxonomiesStore($stache, app('files')))->directory($this->tempDir);
+        $this->app->instance(Stache::class, $stache);
+        $stache->registerStore($this->store = (new TaxonomiesStore($stache, app('files')))->directory($this->tempDir));
     }
 
     function tearDown(): void
@@ -39,7 +40,7 @@ class TaxonomiesStoreTest extends TestCase
         touch($this->tempDir.'/subdirectory/nested-two.yaml', 1234567890);
         touch($this->tempDir.'/top-level-non-yaml-file.md', 1234567890);
 
-        $files = Traverser::traverse($this->store);
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
         $this->assertEquals([
             $this->tempDir.'/one.yaml' => 1234567890,
@@ -51,25 +52,13 @@ class TaxonomiesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_taxonomy_instances_from_cache()
-    {
-        $taxonomy = TaxonomyAPI::create('example');
-
-        $items = $this->store->getItemsFromCache([$taxonomy]);
-
-        $this->assertCount(1, $items);
-        $this->assertInstanceOf(Taxonomy::class, reset($items));
-    }
-
-    /** @test */
     function it_makes_taxonomy_instances_from_files()
     {
-        $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
 
         $this->assertInstanceOf(Taxonomy::class, $item);
-        $this->assertEquals('example', $item->path());
+        $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
     }
 
     /** @test */
@@ -77,22 +66,17 @@ class TaxonomiesStoreTest extends TestCase
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey('irrelevant', '/path/to/test.yaml')
+            $this->store->getItemKey(TaxonomyAPI::make('test'))
         );
     }
 
     /** @test */
     function it_saves_to_disk()
     {
-        $taxonomy = TaxonomyAPI::create('new');
-        $taxonomy->data([
-            'title' => 'New Taxonomy',
-            'order' => 'date',
-            'foo' => 'bar'
-        ]);
+        $taxonomy = TaxonomyAPI::make('new');
 
         $this->store->save($taxonomy);
 
-        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', "title: 'New Taxonomy'\norder: date\nfoo: bar\n");
+        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $taxonomy->fileContents());
     }
 }

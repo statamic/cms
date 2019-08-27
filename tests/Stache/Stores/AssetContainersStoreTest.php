@@ -40,7 +40,7 @@ class AssetContainersStoreTest extends TestCase
         touch($this->tempDir.'/subdirectory/nested-one.yaml', 1234567890);
         touch($this->tempDir.'/subdirectory/nested-two.yaml', 1234567890);
 
-        $files = Traverser::traverse($this->store);
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
         $this->assertEquals([
             $this->tempDir.'/one.yaml' => 1234567890,
@@ -51,36 +51,6 @@ class AssetContainersStoreTest extends TestCase
 
         // Sanity check. Make sure the file is there but wasn't included.
         $this->assertTrue(file_exists($this->tempDir.'/three.txt'));
-    }
-
-    /** @test */
-    function it_makes_asset_container_instances_from_cache()
-    {
-        $container = API\AssetContainer::create();
-
-        $items = $this->store->getItemsFromCache(collect([
-            'one' => [
-                'title' => 'One',
-                'disk' => 'local',
-                'blueprint' => 'one',
-                'assets' => [
-                    'foo.txt' => ['foo' => 'foo'],
-                    'bar.txt' => ['foo' => 'bar'],
-                ]
-            ],
-            'two' => [
-                'title' => 'Two',
-                'disk' => 'local',
-                'blueprint' => 'two',
-                'assets' => [
-                    'baz.txt' => ['foo' => 'baz'],
-                    'qux.txt' => ['foo' => 'qux'],
-                ]
-            ]
-        ]));
-
-        $this->assertCount(2, $items);
-        $this->assertEveryItemIsInstanceOf(AssetContainer::class, $items);
     }
 
     /** @test */
@@ -97,7 +67,7 @@ disk: test
 title: Example
 blueprint: test
 EOL;
-        $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', $contents);
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', $contents);
 
         $this->assertInstanceOf(AssetContainer::class, $item);
         $this->assertEquals(File::disk('test'), $item->disk());
@@ -118,11 +88,11 @@ EOL;
     }
 
     /** @test */
-    function it_uses_the_filename_as_the_item_key()
+    function it_uses_the_handle_as_the_item_key()
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey('irrelevant', '/path/to/test.yaml')
+            $this->store->getItemKey(API\AssetContainer::make('test'))
         );
     }
 
