@@ -3,20 +3,14 @@
 namespace Statamic\Stache\Stores;
 
 use Closure;
-use Statamic\Stache\Stache;
-use Illuminate\Filesystem\Filesystem;
 
 abstract class AggregateStore extends Store
 {
-    protected $stache;
     protected $stores;
-    protected $files;
     protected $childStoreCreator;
 
-    public function __construct(Stache $stache, Filesystem $files)
+    public function __construct()
     {
-        $this->stache = $stache;
-        $this->files = $files;
         $this->stores = collect();
     }
 
