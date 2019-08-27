@@ -115,6 +115,7 @@ class FormsController extends CpController
             'handle' => 'nullable|alpha_dash',
             'blueprint' => 'nullable|array',
             'store' => 'nullable|boolean',
+            'email' => 'nullable|string',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -178,13 +179,17 @@ class FormsController extends CpController
 
     protected function hydrateForm($form, $data)
     {
+        if (is_string($data['email'])) {
+            $data['email'] = [['to' => $data['email']]];
+        }
+
         return $form
             ->title($data['title'])
             ->handle($data['handle'])
             ->blueprint(collect($data['blueprint'])->first())
-            ->honeypot($data['honeypot'])
-            ->store($data['store'])
-            ->email($data['email']);
+            ->honeypot($data['honeypot'] ?? null)
+            ->store($data['store'] ?? null)
+            ->email($data['email'] ?? null);
     }
 
     /**
