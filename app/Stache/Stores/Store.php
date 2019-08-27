@@ -14,7 +14,6 @@ abstract class Store
     protected $defaultIndexes = ['id'];
     protected $storeIndexes = [];
     protected $usedIndexes;
-    protected static $indexes = [];
     protected $fileChangesHandled = false;
     protected $paths;
 
@@ -38,15 +37,17 @@ abstract class Store
 
     protected function resolveIndex($name)
     {
-        if (isset(static::$indexes[$this->key()][$name])) {
-            return static::$indexes[$this->key()][$name];
+        $cached = app('stache.indexes');
+
+        if ($cached->has($key = "{$this->key()}.{$name}")) {
+            return $cached->get($key);
         }
 
         $class = $this->indexes()->get($name, Indexes\Value::class);
 
         $index = new $class($this, $name);
 
-        static::$indexes[$this->key()][$name] = $index;
+        $cached->put($key, $index);
 
         return $index;
     }

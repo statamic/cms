@@ -15,6 +15,10 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $this->app->alias(Stache::class, 'stache');
+
+        $this->app->singleton('stache.indexes', function () {
+            return collect();
+        });
     }
 
     public function boot()
