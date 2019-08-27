@@ -5,6 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Collection;
+use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
 {
@@ -16,6 +17,13 @@ class CollectionsStore extends BasicStore
     public function getItemKey($item)
     {
         return $item->handle();
+    }
+
+    public function getFileFilter(SplFileInfo $file)
+    {
+        $dir = str_finish($this->directory, '/');
+        $relative = str_after($file->getPathname(), $dir);
+        return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
     }
 
     public function makeItemFromFile($path, $contents)

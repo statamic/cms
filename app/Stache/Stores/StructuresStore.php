@@ -26,7 +26,7 @@ class StructuresStore extends BasicStore
         // The structures themselves should only exist in the root
         // (ie. no slashes in the filename)
         $filename = str_after($file->getPathName(), $this->directory);
-        return substr_count($filename, '/') === 0;
+        return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
     public function makeItemFromFile($path, $contents)
