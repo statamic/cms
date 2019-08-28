@@ -63,6 +63,10 @@ test('it waits for hook defined promises to resolve', () => {
 
 test('it fails if a hook defined promise is rejected', () => {
     Statamic.$hooks.on('entries.publish.before', data => {
+        expect(data.count).toBe(1);
+    });
+
+    Statamic.$hooks.on('entries.publish.before', data => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 reject();
