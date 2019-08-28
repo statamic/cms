@@ -4,6 +4,8 @@ namespace Statamic\Query;
 
 abstract class IteratorBuilder extends Builder
 {
+    protected $randomize = false;
+
     public function count()
     {
         return $this->getFilteredAndLimitedItems()->count();
@@ -18,7 +20,9 @@ abstract class IteratorBuilder extends Builder
     {
         $items = $this->getFilteredItems();
 
-        if ($orderBys = $this->orderBys) {
+        if ($this->randomize) {
+            $items = $items->shuffle();
+        } elseif ($orderBys = $this->orderBys) {
             $sort = collect($orderBys)->map->toString()->implode('|');
             $items = $items->multisort($sort)->values();
         }
@@ -72,4 +76,11 @@ abstract class IteratorBuilder extends Builder
     }
 
     abstract protected function getBaseItems();
+
+    public function inRandomOrder()
+    {
+        $this->randomize = true;
+
+        return $this;
+    }
 }
