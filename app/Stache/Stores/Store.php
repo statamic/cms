@@ -109,11 +109,13 @@ abstract class Store
 
     public function indexes($withUsages = true)
     {
+        $storeIndexConfigKey = $this instanceof ChildStore ? $this->parent->key() : $this->key();
+
         $indexes = collect(array_merge(
             $this->defaultIndexes,
             $this->storeIndexes(),
             config('statamic.stache.indexes', []),
-            config("statamic.stache.stores.{$this->key()}.indexes", []),
+            config("statamic.stache.stores.{$storeIndexConfigKey}.indexes", [])
         ));
 
         if ($withUsages) {
