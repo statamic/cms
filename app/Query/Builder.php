@@ -60,6 +60,8 @@ abstract class Builder
         return $this;
     }
 
+    abstract public function inRandomOrder();
+
     public function where($column, $operator = null, $value = null)
     {
         // Here we will make some assumptions about the operator. If only 2 values are

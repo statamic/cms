@@ -9,6 +9,7 @@ use Statamic\Query\Builder as BaseBuilder;
 abstract class Builder extends BaseBuilder
 {
     protected $store;
+    protected $randomize = false;
 
     public function __construct(Store $store)
     {
@@ -44,8 +45,19 @@ abstract class Builder extends BaseBuilder
         return $keys->slice($this->offset, $this->limit);
     }
 
+    public function inRandomOrder()
+    {
+        $this->randomize = true;
+
+        return $this;
+    }
+
     protected function orderKeys($keys)
     {
+        if ($this->randomize) {
+            return $keys->shuffle();
+        }
+
         if (empty($this->orderBys)) {
             return $keys;
         }

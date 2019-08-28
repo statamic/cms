@@ -11,7 +11,13 @@ trait HasOrderBys
 
     public function queryOrderBys($query)
     {
-        $this->parseOrderBys()->each(function ($orderBy) use ($query) {
+        $orderBys = $this->parseOrderBys();
+
+        if ($orderBys->map->sort->contains('random')) {
+            return $query->inRandomOrder();
+        }
+
+        $orderBys->each(function ($orderBy) use ($query) {
             $query->orderBy($orderBy->sort, $orderBy->direction);
         });
     }
