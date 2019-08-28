@@ -41,6 +41,11 @@ class TestAggregateStore extends AggregateStore
     {
         return 'test';
     }
+
+    public function discoverStores()
+    {
+        //
+    }
 }
 
 class TestChildStore extends ChildStore
