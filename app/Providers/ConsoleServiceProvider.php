@@ -26,6 +26,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
         Commands\StacheWarm::class,
+        Commands\StacheDoctor::class,
         Commands\StaticClear::class,
         // Commands\MakeUserMigration::class,
     ];
