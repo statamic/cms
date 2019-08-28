@@ -107,15 +107,20 @@ abstract class Store
         return "stache::indexes::{$this->key()}::_indexes";
     }
 
-    public function indexes()
+    public function indexes($withUsages = true)
     {
-        return collect(array_merge(
+        $indexes = collect(array_merge(
             $this->defaultIndexes,
             $this->storeIndexes,
             config('statamic.stache.indexes', []),
             config("statamic.stache.stores.{$this->key()}.indexes", []),
-            $this->indexUsage()->all()
-        ))->unique(function ($value, $key) {
+        ));
+
+        if ($withUsages) {
+            $indexes = $indexes->merge($this->indexUsage()->all());
+        }
+
+        return $indexes->unique(function ($value, $key) {
             return is_int($key) ? $value : $key;
         })->mapWithKeys(function ($index, $key) {
             return is_int($key)
@@ -124,9 +129,9 @@ abstract class Store
         });
     }
 
-    public function resolveIndexes()
+    public function resolveIndexes($withUsages = true)
     {
-        return $this->indexes()->map(function ($index, $name) {
+        return $this->indexes($withUsages)->map(function ($index, $name) {
             return $this->resolveIndex($name);
         });
     }
