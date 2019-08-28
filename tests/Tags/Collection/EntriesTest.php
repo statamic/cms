@@ -287,6 +287,22 @@ class EntriesTest extends TestCase
             $this->getEntries(['sort' => 'date:desc|title:desc'])->map->get('title')->all()
         );
     }
+
+    /** @test */
+    function it_sorts_entries_randomly()
+    {
+        $this->makeEntry('a')->set('number', '1')->save();
+        $this->makeEntry('b')->set('number', '2')->save();
+        $this->makeEntry('c')->set('number', '3')->save();
+
+        $orders = collect();
+
+        for ($i=0; $i < 10; $i++) {
+            $orders[] = $this->getEntries(['sort' => 'random'])->map->get('number')->implode('');
+        }
+
+        $this->assertTrue($orders->unique()->count() > 1);
+    }
 }
 
 class PostType extends Scope
