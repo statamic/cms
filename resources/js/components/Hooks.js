@@ -3,17 +3,17 @@ class Hooks {
         this.hooks = {};
     }
 
-    on(key, callback) {
+    on(key, callback, priority=10) {
         if (this.hooks[key] === undefined) {
             this.hooks[key] = [];
         }
 
-        this.hooks[key].push(callback);
+        this.hooks[key].push({callback, priority});
     }
 
     run(key, payload) {
-        let promises = this.hooks[key].map(callback => {
-            let result = callback(payload);
+        let promises = this.hooks[key].map(hook => {
+            let result = hook.callback(payload);
 
             if (result && typeof result.then === 'function') {
                 return result;
