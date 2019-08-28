@@ -155,7 +155,7 @@ abstract class Store
         // This whole process can be disabled to save overhead, at the expense of needing to update
         // the cache manually. If the Control Panel is being used, or the cache is cleared when
         // deployed, for example, this will happen naturally and disabling is a good idea.
-        if (! config('statamic.stache.update_every_request')) {
+        if (! config('statamic.stache.watcher')) {
             return;
         }
 
