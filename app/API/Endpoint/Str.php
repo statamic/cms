@@ -141,7 +141,7 @@ class Str extends \Illuminate\Support\Str
             return $ms . 'ms';
         }
 
-        return $ms * 60 . 'sec';
+        return round($ms / 1000, 2) . 's';
     }
 
     /**
