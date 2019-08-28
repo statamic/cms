@@ -80,3 +80,27 @@ test('it fails if a hook defined promise is rejected', () => {
     return expect(promise).rejects.toMatch('');
 });
 
+test('it runs hooks in order by priority', () => {
+    let runHooks = [];
+
+    // This hook defaults to priority of 10.
+    Statamic.$hooks.on('example.hook', data => {
+        runHooks.push('this should run second');
+    });
+
+    Statamic.$hooks.on('example.hook', data => {
+        runHooks.push('this should run third');
+    }, 200);
+
+    Statamic.$hooks.on('example.hook', data => {
+        runHooks.push('this should run first');
+    }, 2);
+
+    let promise = Statamic.$hooks.run('example.hook');
+
+    return promise.then(() => {
+        expect(runHooks[0]).toBe('this should run first');
+        expect(runHooks[1]).toBe('this should run second');
+        expect(runHooks[2]).toBe('this should run third');
+    });
+});

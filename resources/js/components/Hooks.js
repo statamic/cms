@@ -12,17 +12,11 @@ class Hooks {
     }
 
     run(key, payload) {
-        let promises = this.hooks[key].map(hook => {
-            let result = hook.callback(payload);
-
-            if (result && typeof result.then === 'function') {
-                return result;
-            } else if (result === false) {
-                return Promise.reject();
-            }
-
-            return Promise.resolve();
-        });
+        let promises = this.hooks[key]
+            .sort((a, b) => a.priority - b.priority)
+            .map(hook => {
+                return this.ensureFulfilledPromise(hook.callback(payload));
+            });
 
         return new Promise((resolve, reject) => {
             Promise.all(promises).then(values => {
@@ -31,6 +25,16 @@ class Hooks {
                 reject('');
             });
         });
+    }
+
+    ensureFulfilledPromise(result) {
+        if (result && typeof result.then === 'function') {
+            return result;
+        } else if (result === false) {
+            return Promise.reject();
+        }
+
+        return Promise.resolve();
     }
 }
 
