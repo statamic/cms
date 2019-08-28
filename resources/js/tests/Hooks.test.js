@@ -14,6 +14,15 @@ afterEach(() => {
     Statamic.$hooks.hooks = {}
 });
 
+test('it runs without hooks', () => {
+    let payload = {count: 1};
+    let promise = Statamic.$hooks.run('example.hook', payload);
+
+    return promise.then(() => {
+        expect(payload.count).toBe(1);
+    });
+});
+
 test('it sets and runs a hook', () => {
     Statamic.$hooks.on('example.hook', data => {
         expect(data.count).toBe(1);

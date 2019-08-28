@@ -11,8 +11,12 @@ class Hooks {
         this.hooks[key].push({callback, priority});
     }
 
+    get(key) {
+        return this.hooks[key] || [];
+    }
+
     run(key, payload) {
-        let promises = this.hooks[key]
+        let promises = this.get(key)
             .sort((a, b) => a.priority - b.priority)
             .map(hook => {
                 return this.ensureFulfilledPromise(hook.callback(payload));
