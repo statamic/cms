@@ -100,13 +100,21 @@ abstract class BasicStore extends Store
 
         $this->setPath($key, $item->path());
 
-        $this->updateItemIndexes($item);
+        $this->resolveIndexes()->each->updateItem($item);
 
         $this->cacheItem($item);
     }
 
     public function delete($item)
     {
-        // todo
+        $item->deleteFile();
+
+        $key = $this->getItemKey($item);
+
+        $this->forgetItem($key);
+
+        $this->forgetPath($key);
+
+        $this->resolveIndexes()->each->forgetItem($key);
     }
 }

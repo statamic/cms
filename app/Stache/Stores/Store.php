@@ -79,11 +79,6 @@ abstract class Store
 
     abstract public function getItem($key);
 
-    public function updateItemIndexes($item)
-    {
-        $this->resolveIndexes()->each->updateItem($item);
-    }
-
     public function indexUsage()
     {
         $key = $this->indexUsageCacheKey();

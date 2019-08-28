@@ -70,4 +70,9 @@ trait ExistsAsFile
 
         $this->initialPath($path);
     }
+
+    public function deleteFile()
+    {
+        File::delete($this->path());
+    }
 }
