@@ -9,6 +9,7 @@ use Statamic\API\Stache;
 class EntryQueryBuilder extends Builder
 {
     protected $collections;
+    protected $taxonomyTerms = [];
 
     public function where($column, $operator = null, $value = null)
     {
@@ -30,6 +31,13 @@ class EntryQueryBuilder extends Builder
         return parent::whereIn($column, $values);
     }
 
+    public function whereTaxonomy($term)
+    {
+        $this->taxonomyTerms[] = $term;
+
+        return $this;
+    }
+
     protected function collect($items = [])
     {
         return collect_entries($items);
@@ -40,6 +48,8 @@ class EntryQueryBuilder extends Builder
         $collections = empty($this->collections)
             ? API\Collection::handles()
             : $this->collections;
+
+        $this->addTaxonomyWheres();
 
         return empty($this->wheres)
             ? $this->getKeysFromCollections($collections)
@@ -70,7 +80,8 @@ class EntryQueryBuilder extends Builder
             });
 
             // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $keys = $this->filterWhereBasic($items, $where)->keys();
+            $method = 'filterWhere'.$where['type'];
+            $keys = $this->{$method}($items, $where)->keys();
 
             // Continue intersecting the keys across the where clauses.
             // If a key exists in the reduced array but not in the current iteration, it should be removed.
@@ -107,5 +118,25 @@ class EntryQueryBuilder extends Builder
             }
             return $carry;
         }, collect());
+    }
+
+    protected function addTaxonomyWheres()
+    {
+        if (empty($this->taxonomyTerms)) {
+            return;
+        }
+
+        $entryIds = collect($this->taxonomyTerms)->reduce(function ($ids, $term) {
+            [$taxonomy, $slug] = explode('::', $term);
+
+            $keys = Stache::store('terms')->store($taxonomy)
+                ->index('associations')
+                ->items()->where('slug', $slug)
+                ->pluck('entry');
+
+            return $ids ? $ids->intersect($keys)->values() : $keys;
+        });
+
+        $this->whereIn('id', $entryIds->all());
     }
 }
