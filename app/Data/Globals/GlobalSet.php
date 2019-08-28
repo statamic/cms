@@ -93,6 +93,13 @@ class GlobalSet implements Contract
         return $this;
     }
 
+    public function delete()
+    {
+        API\GlobalSet::delete($this);
+
+        return true;
+    }
+
     public function fileData()
     {
         $data = [

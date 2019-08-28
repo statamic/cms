@@ -51,4 +51,9 @@ class GlobalRepository implements RepositoryContract
 
         $this->store->save($global);
     }
+
+    public function delete($global)
+    {
+        $this->store->delete($global);
+    }
 }

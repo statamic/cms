@@ -91,6 +91,7 @@ Route::group([
     Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
     Route::post('globals', 'GlobalsController@store')->name('globals.store');
     Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
+    Route::delete('globals/{id}', 'GlobalsController@destroy')->name('globals.destroy');
     Route::get('globals/{id}/{handle}', 'GlobalsController@edit')->name('globals.edit');
     Route::patch('globals/{id}/{handle}', 'GlobalsController@update')->name('globals.update');
     Route::post('globals/{id}/{handle}/localize', 'Globals\LocalizeGlobalsController')->name('globals.localize');

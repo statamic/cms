@@ -51,6 +51,11 @@ class GlobalSet
         $this->repo()->save($global);
     }
 
+    public function delete($global)
+    {
+        $this->repo()->delete($global);
+    }
+
     protected function repo()
     {
         return app(GlobalRepository::class);
