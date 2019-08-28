@@ -111,7 +111,7 @@ abstract class Store
     {
         $indexes = collect(array_merge(
             $this->defaultIndexes,
-            $this->storeIndexes,
+            $this->storeIndexes(),
             config('statamic.stache.indexes', []),
             config("statamic.stache.stores.{$this->key()}.indexes", []),
         ));
@@ -134,6 +134,11 @@ abstract class Store
         return $this->indexes($withUsages)->map(function ($index, $name) {
             return $this->resolveIndex($name);
         });
+    }
+
+    protected function storeIndexes()
+    {
+        return $this->storeIndexes;
     }
 
     public function handleFileChanges()

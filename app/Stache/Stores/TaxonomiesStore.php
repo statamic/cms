@@ -9,6 +9,10 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomiesStore extends BasicStore
 {
+    protected $storeIndexes = [
+        'uri',
+    ];
+
     public function key()
     {
         return 'taxonomies';

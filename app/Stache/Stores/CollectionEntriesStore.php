@@ -12,14 +12,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionEntriesStore extends ChildStore
 {
-    protected $storeIndexes = [
-        'slug',
-        'collection',
-        'published',
-        'site' => Indexes\Site::class,
-        'origin' => Indexes\Origin::class,
-    ];
-
     public function getFileFilter(SplFileInfo $file) {
         $dir = str_finish($this->directory, '/');
         $relative = $file->getPathname();
@@ -97,5 +89,34 @@ class CollectionEntriesStore extends ChildStore
     protected function handleModifiedItem($item)
     {
         $item->taxonomize();
+    }
+
+    protected function storeIndexes()
+    {
+        $indexes = collect([
+            'slug',
+            'uri',
+            'collection',
+            'published',
+            'title',
+            'site' => Indexes\Site::class,
+            'origin' => Indexes\Origin::class,
+        ]);
+
+        if (! $collection = Collection::findByHandle($this->childKey())) {
+            return $indexes->all();
+        }
+
+        if ($collection->orderable()) {
+            $indexes[] = 'order';
+        }
+
+        if ($collection->dated()) {
+            $indexes[] = 'date';
+        }
+
+        return $indexes->merge(
+            $collection->taxonomies()->map->handle()
+        )->all();
     }
 }
