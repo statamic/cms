@@ -54,7 +54,7 @@ test('it sets and runs a failed hook', () => {
     return expect(promise).rejects.toMatch('');
 });
 
-test('it waits for hook defined promises to resolve', () => {
+test('it waits for hook promise to resolve', () => {
     Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
         setTimeout(() => {
             data.count = 2;
@@ -68,24 +68,6 @@ test('it waits for hook defined promises to resolve', () => {
     return promise.then(() => {
         expect(payload.count).toBe(2);
     });
-});
-
-test('it fails if a hook defined promise is rejected', () => {
-    Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
-        expect(data.count).toBe(1);
-        resolve();
-    });
-
-    Statamic.$hooks.on('example.hook', (resolve, reject) => {
-        setTimeout(() => {
-            reject();
-        }, 10);
-    });
-
-    let payload = {count: 1};
-    let promise = Statamic.$hooks.run('example.hook', payload);
-
-    return expect(promise).rejects.toMatch('');
 });
 
 test('it runs hooks in order by priority', () => {
