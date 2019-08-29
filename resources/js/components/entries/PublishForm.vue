@@ -373,15 +373,6 @@ export default {
 
             let saveResponse = null;
 
-            Statamic.$hooks.on('entries.publish.after', data => {
-                console.log('after');
-            });
-
-            Statamic.$hooks.on('entries.publish.before', data => {
-                data.title = data.title + ' huh?';
-                console.log('before');
-            });
-
             let saveOperation = new Promise((resolve, reject) => {
                 this.$axios[this.method](this.actions.save, payload)
                     .then(response => {
@@ -392,7 +383,6 @@ export default {
                         if (!this.isCreating) this.$notify.success('Saved');
                         this.$refs.container.saved();
                         saveResponse = response;
-                        console.log('save');
                         resolve();
                     })
                     .catch(error => {
