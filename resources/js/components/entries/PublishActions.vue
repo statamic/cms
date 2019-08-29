@@ -132,11 +132,15 @@ export default {
         submitPublish() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.post(this.actions.publish, payload).then(response => {
-                this.$notify.success(__('Published'));
-                this.revisionMessage = null;
-                this.$emit('saved', { published: true, isWorkingCopy: false, response });
-            }).catch(e => this.handleAxiosError(e));
+            let publishOperation = this.$axios.post(this.actions.publish, payload);
+
+            Statamic.$hooks.runBeforeAndAfter(publishOperation, 'entries.publish', payload)
+                .then(response => {
+                    this.$notify.success(__('Published'));
+                    this.revisionMessage = null;
+                    this.$emit('saved', { published: true, isWorkingCopy: false, response });
+                })
+                .catch(e => this.handleAxiosError(e));
         },
 
         submitSchedule() {

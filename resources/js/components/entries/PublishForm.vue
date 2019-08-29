@@ -373,8 +373,11 @@ export default {
 
             let saveOperation = this.$axios[this.method](this.actions.save, payload);
 
-            Statamic.$hooks
-                .runBeforeAndAfter(saveOperation, 'entries.publish', payload)
+            if (! this.revisionsEnabled) {
+                saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', payload);
+            }
+
+            saveOperation
                 .then(response => {
                     this.saving = false;
                     this.title = this.values.title;
