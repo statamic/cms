@@ -30,6 +30,10 @@ class CollectionRepository implements RepositoryContract
 
     public function findByMount($mount): ?Collection
     {
+        if (! $mount->reference()) {
+            return null;
+        }
+
         return $this->all()->first(function ($collection) use ($mount) {
             return optional($collection->mount())->id() === $mount->id();
         });
