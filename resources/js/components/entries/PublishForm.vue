@@ -213,7 +213,7 @@
             v-if="confirmingPublish"
             :actions="actions"
             :published="published"
-            :values="values"
+            :hook-payload="hookPayload"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
@@ -337,7 +337,14 @@ export default {
             if (!this.published && this.initialPublished) return __('Save & Unpublish');
 
             return __('Save');
-        }
+        },
+
+        hookPayload() {
+            return {
+                collection: this.collection,
+                values: this.values,
+            };
+        },
 
     },
 
@@ -375,7 +382,7 @@ export default {
             let saveOperation = this.$axios[this.method](this.actions.save, payload);
 
             if (! this.revisionsEnabled) {
-                saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', this.values);
+                saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', this.hookPayload);
             }
 
             saveOperation

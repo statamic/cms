@@ -75,7 +75,7 @@ export default {
     props: {
         actions: Object,
         published: Boolean,
-        values: Object,
+        hookPayload: Object,
     },
 
     data() {
@@ -135,7 +135,7 @@ export default {
 
             let publishOperation = this.$axios.post(this.actions.publish, payload);
 
-            Statamic.$hooks.runBeforeAndAfter(publishOperation, 'entries.publish', this.values)
+            Statamic.$hooks.runBeforeAndAfter(publishOperation, 'entries.publish', this.hookPayload)
                 .then(response => {
                     this.$notify.success(__('Published'));
                     this.revisionMessage = null;
