@@ -16,6 +16,8 @@ abstract class Store
     protected $usedIndexes;
     protected $fileChangesHandled = false;
     protected $paths;
+    protected $fileItems;
+    protected $shouldCacheFileItems = false;
 
     public function directory($directory = null)
     {
@@ -54,13 +56,19 @@ abstract class Store
 
     public function getItemsFromFiles()
     {
+        if ($this->shouldCacheFileItems && $this->fileItems) {
+            return $this->fileItems;
+        }
+
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
-        return $files->map(function ($timestamp, $path) {
+        $items = $files->map(function ($timestamp, $path) {
             return $this->getItemByPath($path);
         })->keyBy(function ($item) {
             return $this->getItemKey($item);
         });
+
+        return $this->fileItems = $items;
     }
 
     public function getItemKey($item)
@@ -334,6 +342,11 @@ abstract class Store
 
     public function warm()
     {
+        $this->shouldCacheFileItems = true;
+
         $this->resolveIndexes()->each->update();
+
+        $this->shouldCacheFileItems = false;
+        $this->fileItems = null;
     }
 }
