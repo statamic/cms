@@ -371,30 +371,22 @@ export default {
                 _localized: this.localizedFields,
             }};
 
-            let saveResponse = null;
-
-            let saveOperation = new Promise((resolve, reject) => {
-                this.$axios[this.method](this.actions.save, payload)
-                    .then(response => {
-                        this.saving = false;
-                        this.title = this.values.title;
-                        this.isWorkingCopy = true;
-                        if (!this.revisionsEnabled) this.permalink = response.data.permalink;
-                        if (!this.isCreating) this.$notify.success('Saved');
-                        this.$refs.container.saved();
-                        saveResponse = response;
-                        resolve();
-                    })
-                    .catch(error => {
-                        this.handleAxiosError(error);
-                        reject();
-                    });
-            });
+            let saveOperation = this.$axios[this.method](this.actions.save, payload);
 
             Statamic.$hooks
                 .runBeforeAndAfter(saveOperation, 'entries.publish', payload)
-                .then(() => this.$nextTick(() => this.$emit('saved', saveResponse)))
-                .catch(() => this.$notify.error('Something went wrong'));
+                .then(response => {
+                    this.saving = false;
+                    this.title = this.values.title;
+                    this.isWorkingCopy = true;
+                    if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                    if (!this.isCreating) this.$notify.success('Saved');
+                    this.$refs.container.saved();
+                    this.$nextTick(() => {
+                        this.$emit('saved', response);
+                    });
+                })
+                .catch(error => this.handleAxiosError(error));
         },
 
         confirmPublish() {
