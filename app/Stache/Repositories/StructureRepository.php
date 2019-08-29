@@ -59,8 +59,6 @@ class StructureRepository implements RepositoryContract
 
     public function delete(Structure $structure)
     {
-        $this->store->removeItem($structure->handle());
-
         $this->store->delete($structure);
     }
 
