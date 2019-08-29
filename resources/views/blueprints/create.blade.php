@@ -15,7 +15,7 @@
                 <form-group
                     handle="title"
                     :display="__('Title')"
-                    :instructions="__('Usually a singular noun, like "Article" or "Product"')"
+                    :instructions="__('Usually a singular noun, like Article or Product')"
                     autofocus />
             </div>
         </div>
