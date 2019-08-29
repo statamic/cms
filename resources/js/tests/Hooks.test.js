@@ -113,3 +113,29 @@ test('it runs hooks in order by priority', () => {
         expect(runHooks[2]).toBe('this should run third');
     });
 });
+
+test('it can run before and after hooks in one shot', () => {
+    let runHooks = [];
+
+    Statamic.$hooks.on('example.save.after', data => {
+        runHooks.push('this should run after');
+    });
+
+    Statamic.$hooks.on('example.save.before', data => {
+        runHooks.push('this should run before');
+    });
+
+    let saveOperation = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            runHooks.push('this should run in the middle');
+            resolve();
+        }, 10);
+    });
+
+    return Statamic.$hooks.runBeforeAndAfter(saveOperation, 'example.save').then(() => {
+        expect(runHooks[0]).toBe('this should run before');
+        expect(runHooks[1]).toBe('this should run in the middle');
+        expect(runHooks[2]).toBe('this should run after');
+    });
+});
+

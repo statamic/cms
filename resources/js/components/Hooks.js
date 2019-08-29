@@ -31,6 +31,23 @@ class Hooks {
         });
     }
 
+    runBeforeAndAfter(operation, key, payload) {
+        if (typeof operation.then !== 'function') {
+            return console.error('First parameter must be a valid promise.');
+        }
+
+        let beforeHooks = `${key}.before`;
+        let afterHooks = `${key}.after`;
+
+        return new Promise((resolve, reject) => {
+            this.run(beforeHooks, payload).then(() => {
+                operation.then(() => {
+                    this.run(afterHooks, payload).then(() => resolve()).catch(() => reject());
+                }).catch(() => reject());
+            }).catch(() => reject());
+        });
+    }
+
     ensureFulfilledPromise(result) {
         if (result && typeof result.then === 'function') {
             return result;
