@@ -141,3 +141,27 @@ test('it can run before and after hooks in one shot', () => {
         expect(runHooks[2]).toBe('this should run after');
     });
 });
+
+test('it can run before and after hooks and gets success from passed promise', () => {
+    let saveOperation = resolve => {
+        setTimeout(() => {
+            resolve('twas a success, mate');
+        }, 10);
+    };
+
+    return Statamic.$hooks.runBeforeAndAfter(saveOperation, 'example.save').then(success => {
+        expect(success).toBe('twas a success, mate');
+    });
+});
+
+test('it can run before and after hooks and gets error from passed promise', () => {
+    let saveOperation = (resolve, reject) => {
+        setTimeout(() => {
+            reject('houston, we have a problem');
+        }, 10);
+    };
+
+    return Statamic.$hooks.runBeforeAndAfter(saveOperation, 'example.save').catch(error => {
+        expect(error).toBe('houston, we have a problem');
+    });
+});
