@@ -27,7 +27,7 @@ class FeatureTest extends TestCase
     {
         parent::setUp();
 
-        $this->stache = $this->app->make('stache')->withoutBooting(function ($stache) {
+        $this->stache = tap($this->app->make('stache'), function ($stache) {
             $dir = __DIR__.'/__fixtures__';
             $stache->store('taxonomies')->directory($dir . '/content/taxonomies');
             $stache->store('collections')->directory($dir . '/content/collections');

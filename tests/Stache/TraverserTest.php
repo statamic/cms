@@ -44,6 +44,19 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
+    function it_gets_no_files_if_directory_doesnt_exist()
+    {
+        $store = Mockery::mock();
+        $store->shouldReceive('directory')->andReturn($this->tempDir.'/non-existent');
+        $store->shouldReceive('filter')->andReturnTrue();
+
+        $files = $this->traverser->traverse($store);
+
+        $this->assertInstanceOf(Collection::class, $files);
+        $this->assertCount(0, $files);
+    }
+
+    /** @test */
     function gets_files_in_a_stores_directory()
     {
         mkdir($this->tempDir.'/nested');
@@ -70,7 +83,7 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
-    function files_get_filtered_by_stores_closure()
+    function files_can_be_filtered()
     {
         touch($this->tempDir.'/one.txt', 1234567890);
         touch($this->tempDir.'/two.yaml', 2345678901);
@@ -80,14 +93,16 @@ class TraverserTest extends TestCase
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
         $store = new class($stache, app('files')) extends BasicStore {
             public function key() { }
-            public function filter($file) {
-                PHPUnit::assertInstanceOf(SplFileInfo::class, $file);
-                return $file->getExtension() === 'txt';
-            }
+            public function makeItemFromFile($path, $contents) { }
         };
         $store->directory($this->tempDir);
 
-        $files = $this->traverser->traverse($store);
+        $filter = function($file) {
+            PHPUnit::assertInstanceOf(SplFileInfo::class, $file);
+            return $file->getExtension() === 'txt';
+        };
+
+        $files = $this->traverser->filter($filter)->traverse($store);
 
         $this->assertCount(2, $files);
         $this->assertEquals([

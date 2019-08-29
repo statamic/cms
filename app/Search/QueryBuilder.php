@@ -4,7 +4,7 @@ namespace Statamic\Search;
 
 use Statamic\API\Data;
 use Statamic\Data\DataCollection;
-use Statamic\Data\QueryBuilder as BaseQueryBuilder;
+use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder
 {

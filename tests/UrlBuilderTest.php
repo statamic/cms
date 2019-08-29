@@ -28,7 +28,7 @@ class UrlBuilderTest extends TestCase
             ->id('post')
             ->locale('en')
             ->collection(
-                \Statamic\API\Collection::create('example')->dated(true)
+                tap(\Statamic\API\Collection::create('example')->dated(true))->save()
             )
             ->slug('post')
             ->date('2015-01-02')

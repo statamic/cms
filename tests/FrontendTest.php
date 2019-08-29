@@ -53,7 +53,7 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
 
-        $page = $this->createPage('/about', [
+        $page = $this->createPage('about', [
             'with' => [
                 'title' => 'The About Page',
                 'content' => 'This is the about page.',
@@ -73,7 +73,7 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
 
-        $page = $this->createPage('/about', [
+        $page = $this->createPage('about', [
             'with' => [
                 'title' => 'The About Page',
                 'content' => 'This is the about page.',
@@ -90,7 +90,7 @@ class FrontendTest extends TestCase
     function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
-        $this->createPage('/about')->published(false)->save();
+        $this->createPage('about')->published(false)->save();
 
         $this->get('/about')->assertStatus(404);
     }
@@ -101,7 +101,7 @@ class FrontendTest extends TestCase
         $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
         $user = User::make()->assignRole('draft_viewer');
 
-        $this->createPage('/about')->published(false)->set('content', 'Testing 123')->save();
+        $this->createPage('about')->published(false)->set('content', 'Testing 123')->save();
 
         $response = $this
             ->actingAs($user)
@@ -126,15 +126,15 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRendered('default', 'The template contents');
 
-        $page = tap($this->createPage('/about')->date('2019-01-02'))->save();
-        $collection = $page->collection()->dated(true);
+        $collection = tap($this->makeCollection()->dated(true))->save();
+        tap($this->makePage('about')->date('2019-01-02'))->save();
 
         $this
             ->get('/about')
             ->assertStatus(200)
             ->assertSee('The template contents');
 
-        $collection->futureDateBehavior('private');
+        tap($collection->futureDateBehavior('private'))->save();
 
         $this
             ->get('/about')
@@ -149,15 +149,15 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRendered('default', 'The template contents');
 
-        $page = tap($this->createPage('/about')->date('2018-01-01'))->save();
-        $collection = $page->collection()->dated(true);
+        $collection = tap($this->makeCollection()->dated(true))->save();
+        tap($this->makePage('about')->date('2018-01-01'))->save();
 
         $this
             ->get('/about')
             ->assertStatus(200)
             ->assertSee('The template contents');
 
-        $collection->pastDateBehavior('private');
+        tap($collection->pastDateBehavior('private'))->save();
 
         $this
             ->get('/about')
@@ -365,15 +365,25 @@ class FrontendTest extends TestCase
 
     private function createPage($slug, $attributes = [])
     {
-        $collection = Collection::create('pages')
+        $this->makeCollection()->save();
+
+        return tap($this->makePage($slug, $attributes))->save();
+    }
+
+    private function makePage($slug, $attributes = [])
+    {
+        return EntryFactory::slug($slug)
+            ->id($slug)
+            ->collection('pages')
+            ->data($attributes['with'] ?? [])
+            ->make();
+    }
+
+    private function makeCollection()
+    {
+        return Collection::create('pages')
             ->route('{slug}')
             ->template('default')
             ->entryBlueprints(['empty']);
-
-        return EntryFactory::slug($slug)
-            ->id($slug)
-            ->collection($collection)
-            ->data($attributes['with'] ?? [])
-            ->create();
     }
 }

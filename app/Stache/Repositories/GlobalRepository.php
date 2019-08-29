@@ -26,7 +26,9 @@ class GlobalRepository implements RepositoryContract
 
     public function all(): GlobalCollection
     {
-        return collect_globals($this->store->getItems());
+        $keys = $this->store->paths()->keys();
+
+        return collect_globals($this->store->getItems($keys));
     }
 
     public function find($id): ?GlobalSet
@@ -36,7 +38,9 @@ class GlobalRepository implements RepositoryContract
 
     public function findByHandle($handle): ?GlobalSet
     {
-        return $this->find($this->store->getIdByHandle($handle));
+        $key = $this->store->index('handle')->items()->flip()->get($handle);
+
+        return $this->find($key);
     }
 
     public function save($global)
@@ -45,10 +49,11 @@ class GlobalRepository implements RepositoryContract
             $global->id($this->stache->generateId());
         }
 
-        // TODO: Ensure changes to entry after saving aren't persisted at the end of the request.
-
-        $this->store->insert($global);
-
         $this->store->save($global);
+    }
+
+    public function delete($global)
+    {
+        $this->store->delete($global);
     }
 }

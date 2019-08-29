@@ -19,7 +19,9 @@ class AssetContainerRepository implements RepositoryContract
 
     public function all(): Collection
     {
-        return $this->store->getItems();
+        $keys = $this->store->paths()->keys();
+
+        return $this->store->getItems($keys);
     }
 
     public function findByHandle(string $handle): ?AssetContainer
@@ -34,8 +36,6 @@ class AssetContainerRepository implements RepositoryContract
 
     public function save(AssetContainer $container)
     {
-        $this->store->setItem($container->handle(), $container);
-
         $this->store->save($container);
     }
 }

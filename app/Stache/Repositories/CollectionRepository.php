@@ -18,7 +18,9 @@ class CollectionRepository implements RepositoryContract
 
     public function all(): IlluminateCollection
     {
-        return $this->store->getItems();
+        $keys = $this->store->paths()->keys();
+
+        return $this->store->getItems($keys);
     }
 
     public function findByHandle($handle): ?Collection
@@ -35,8 +37,6 @@ class CollectionRepository implements RepositoryContract
 
     public function save(Collection $collection)
     {
-        $this->store->setItem($collection->handle(), $collection);
-
         $this->store->save($collection);
     }
 

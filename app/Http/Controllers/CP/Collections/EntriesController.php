@@ -29,7 +29,7 @@ class EntriesController extends CpController
         $this->filter($query, $request->filters);
 
         $sortField = request('sort');
-        $sortDirection = request('order');
+        $sortDirection = request('order', 'asc');
 
         if (!$sortField && !request('search')) {
             $sortField = $collection->sortField();

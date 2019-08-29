@@ -28,7 +28,7 @@ class Collection
      */
     public function handles()
     {
-        return self::all()->keys()->all();
+        return self::all()->map->handle();
     }
 
     /**

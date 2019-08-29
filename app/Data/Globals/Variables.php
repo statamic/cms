@@ -146,4 +146,9 @@ class Variables implements Contract, Localization, AugmentableContract
     {
         return "globals::{$this->id()}";
     }
+
+    protected function getOriginByString($origin)
+    {
+        return $this->globalSet()->in($origin);
+    }
 }

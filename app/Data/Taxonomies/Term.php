@@ -53,12 +53,20 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function taxonomy($taxonomy = null)
     {
-        return $this->fluentlyGetOrSet('taxonomy')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('taxonomy')
+            ->setter(function ($taxonomy) {
+                return $taxonomy instanceof \Statamic\Contracts\Data\Taxonomies\Taxonomy ? $taxonomy->handle() : $taxonomy;
+            })
+            ->getter(function ($taxonomy) {
+                return $taxonomy ? Taxonomy::findByHandle($taxonomy) : null;
+            })
+            ->args(func_get_args());
     }
 
     public function taxonomyHandle()
     {
-        return $this->taxonomy->handle();
+        return $this->taxonomy()->handle();
     }
 
     public function path()
@@ -91,7 +99,7 @@ class Term implements TermContract, Responsable, AugmentableContract
 
     public function blueprint()
     {
-        return $this->taxonomy->termBlueprint();
+        return $this->taxonomy()->termBlueprint();
     }
 
     public function toArray()
@@ -296,4 +304,8 @@ class Term implements TermContract, Responsable, AugmentableContract
             ->slug($attrs['slug']);
     }
 
+    protected function getOriginByString($origin)
+    {
+        //
+    }
 }

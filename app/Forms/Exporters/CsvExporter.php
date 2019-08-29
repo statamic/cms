@@ -39,7 +39,7 @@ class CsvExporter extends AbstractExporter
      */
     private function insertHeaders()
     {
-        $headers = array_keys($this->form()->fields());
+        $headers = $this->form()->fields()->keys()->all();
 
         $headers[] = 'date';
 

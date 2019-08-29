@@ -57,7 +57,15 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function collection($collection = null)
     {
-        return $this->fluentlyGetOrSet('collection')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('collection')
+            ->setter(function ($collection) {
+                return $collection instanceof \Statamic\Contracts\Data\Entries\Collection ? $collection->handle() : $collection;
+            })
+            ->getter(function ($collection) {
+                return $collection ? Collection::findByHandle($collection) : null;
+            })
+            ->args(func_get_args());
     }
 
     public function blueprint()
@@ -66,15 +74,12 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
             ->getter(function ($blueprint) {
                 return $blueprint ? Blueprint::find($blueprint) : $this->defaultBlueprint();
             })
-            ->setter(function ($blueprint) {
-                return $blueprint !== $this->defaultBlueprint()->handle() ? $blueprint : null;
-            })
             ->args(func_get_args());
     }
 
     public function collectionHandle()
     {
-        return $this->collection->handle();
+        return $this->collection;
     }
 
     public function toArray()
@@ -390,6 +395,13 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
 
     public function descendants()
     {
+        if (! $this->localizations) {
+            $this->localizations = API\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->where('origin', $this->id())->get()
+                ->keyBy->locale();
+        }
+
         $localizations = collect($this->localizations);
 
         foreach ($localizations as $loc) {
@@ -490,5 +502,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     public static function __callStatic($method, $parameters)
     {
         return API\Entry::{$method}(...$parameters);
+    }
+
+    protected function getOriginByString($origin)
+    {
+        return API\Entry::find($origin);
     }
 }

@@ -39,7 +39,7 @@ class UsersStoreTest extends TestCase
         touch($this->tempDir.'/subdirectory/nested-two.yaml', 1234567890);
         touch($this->tempDir.'/top-level-non-yaml-file.md', 1234567890);
 
-        $files = Traverser::traverse($this->store);
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
         $this->assertEquals([
             $this->tempDir.'/one.yaml' => 1234567890,
@@ -53,20 +53,9 @@ class UsersStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_user_instances_from_cache()
-    {
-        $this->markTestIncomplete();
-
-        $items = $this->store->getItemsFromCache([$user]);
-
-        $this->assertCount(1, $items);
-        $this->assertInstanceOf(User::class, reset($items));
-    }
-
-    /** @test */
     function it_makes_user_instances_from_files()
     {
-        $item = $this->store->createItemFromFile($this->tempDir.'/john@example.com.yaml', "id: 123\nname: John Doe\nemail: john@example.com");
+        $item = $this->store->makeItemFromFile($this->tempDir.'/john@example.com.yaml', "id: 123\nname: John Doe\nemail: john@example.com");
 
         $this->assertInstanceOf(User::class, $item);
         $this->assertEquals('123', $item->id());
@@ -83,7 +72,7 @@ class UsersStoreTest extends TestCase
 
         $this->assertEquals(
             '123',
-            $this->store->getItemKey($user, '/path/to/irrelevant.yaml')
+            $this->store->getItemKey($user)
         );
     }
 }

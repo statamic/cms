@@ -19,6 +19,7 @@ class Tree implements Localization
     protected $tree = [];
     protected $withParent = true;
     protected $structure;
+    protected $cachedFlattenedPages;
 
     public function locale($locale = null)
     {
@@ -110,7 +111,11 @@ class Tree implements Localization
 
     public function flattenedPages()
     {
-        return $this->pages()->flattenedPages();
+        if ($this->cachedFlattenedPages) {
+            return $this->cachedFlattenedPages;
+        }
+
+        return $this->cachedFlattenedPages = $this->pages()->flattenedPages();
     }
 
     public function uris()

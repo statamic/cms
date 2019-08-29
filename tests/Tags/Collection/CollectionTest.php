@@ -31,24 +31,24 @@ class CollectionTest extends TestCase
             ->setContext([]);
     }
 
-    protected function makeEntry($collection)
+    protected function makeEntry($collection, $slug)
     {
-        return EntryFactory::collection($collection)->make();
+        return EntryFactory::collection($collection)->slug($slug)->make();
     }
 
     protected function makePosts()
     {
-        $this->makeEntry($this->music)->set('title', 'I Love Guitars')->save();
-        $this->makeEntry($this->music)->set('title', 'I Love Drums')->save();
-        $this->makeEntry($this->music)->set('title', 'I Hate Flutes')->save();
+        $this->makeEntry($this->music, 'a')->set('title', 'I Love Guitars')->save();
+        $this->makeEntry($this->music, 'b')->set('title', 'I Love Drums')->save();
+        $this->makeEntry($this->music, 'c')->set('title', 'I Hate Flutes')->save();
 
-        $this->makeEntry($this->art)->set('title', 'I Love Drawing')->save();
-        $this->makeEntry($this->art)->set('title', 'I Love Painting')->save();
-        $this->makeEntry($this->art)->set('title', 'I Hate Sculpting')->save();
+        $this->makeEntry($this->art, 'd')->set('title', 'I Love Drawing')->save();
+        $this->makeEntry($this->art, 'e')->set('title', 'I Love Painting')->save();
+        $this->makeEntry($this->art, 'f')->set('title', 'I Hate Sculpting')->save();
 
-        $this->makeEntry($this->books)->set('title', 'I Love Tolkien')->save();
-        $this->makeEntry($this->books)->set('title', 'I Love Lewis')->save();
-        $this->makeEntry($this->books)->set('title', 'I Hate Martin')->save();
+        $this->makeEntry($this->books, 'g')->set('title', 'I Love Tolkien')->save();
+        $this->makeEntry($this->books, 'h')->set('title', 'I Love Lewis')->save();
+        $this->makeEntry($this->books, 'i')->set('title', 'I Hate Martin')->save();
     }
 
     /** @test */
@@ -238,15 +238,15 @@ class CollectionTest extends TestCase
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
 
-        $this->makeEntry($this->foods)->date('2019-02-01')->set('title', 'Apple')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Fig')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Grape')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Hummus')->save();
-        $this->makeEntry($this->foods)->date('2019-03-11')->set('title', 'Ice Cream')->save();
+        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->date('2019-03-04')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods, 'g')->date('2019-03-10')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
         $currentId = API\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
@@ -271,15 +271,15 @@ class CollectionTest extends TestCase
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
 
-        $this->makeEntry($this->foods)->date('2019-02-01')->set('title', 'Apple')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Fig')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Grape')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Hummus')->save();
-        $this->makeEntry($this->foods)->date('2019-03-11')->set('title', 'Ice Cream')->save();
+        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->date('2019-03-04')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods, 'g')->date('2019-03-10')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
         $currentId = API\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
@@ -316,15 +316,15 @@ class CollectionTest extends TestCase
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
 
-        $this->makeEntry($this->foods)->date('2019-02-01')->set('title', 'Apple')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Fig')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Grape')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Hummus')->save();
-        $this->makeEntry($this->foods)->date('2019-03-11')->set('title', 'Ice Cream')->save();
+        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->date('2019-03-04')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods, 'g')->date('2019-03-10')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
         $currentId = API\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
@@ -349,15 +349,15 @@ class CollectionTest extends TestCase
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
 
-        $this->makeEntry($this->foods)->date('2019-02-01')->set('title', 'Apple')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods)->date('2019-02-06')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods)->date('2019-03-02')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods)->date('2019-03-03')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods)->date('2019-03-04')->set('title', 'Fig')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Grape')->save();
-        $this->makeEntry($this->foods)->date('2019-03-10')->set('title', 'Hummus')->save();
-        $this->makeEntry($this->foods)->date('2019-03-11')->set('title', 'Ice Cream')->save();
+        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->date('2019-03-04')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods, 'g')->date('2019-03-10')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
         $currentId = API\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';

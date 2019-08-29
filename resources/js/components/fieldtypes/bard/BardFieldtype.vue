@@ -16,7 +16,7 @@
                         :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
-                <div class="h-10 -my-sm border-l pr-1 w-px"></div>
+                <div class="h-10 -my-sm border-l pr-1 w-px" v-if="hasExtraButtons"></div>
                     <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
@@ -170,6 +170,10 @@ export default {
 
         toolbarIsFloating() {
             return this.config.toolbar_mode === 'floating';
+        },
+
+        hasExtraButtons() {
+            return this.allowSource || this.config.sets.length > 0 || this.config.fullscreen;
         },
 
         readingTime() {

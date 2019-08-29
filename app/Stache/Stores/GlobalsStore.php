@@ -3,72 +3,52 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\API\Arr;
-use Statamic\API\Str;
 use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\GlobalSet;
-use Statamic\API\Collection;
-use Statamic\Data\Globals\Variables;
-use Statamic\Contracts\Data\Globals\GlobalSet as GlobalsContract;
+use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalsStore extends BasicStore
 {
-    protected $localizationQueue = [];
-
     public function key()
     {
         return 'globals';
     }
 
-    public function setItem($key, $item)
+    public function getItemFilter(SplFileInfo $file)
     {
-        if ($item instanceof LocalizedGlobalSet) {
-            $item = $item->globalSet();
-        }
-
-        return parent::setItem($key, $item);
+        // The global sets themselves should only exist in the root
+        // (ie. no slashes in the filename)
+        $filename = str_after($file->getPathName(), $this->directory);
+        return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
-    public function getItemsFromCache($cache)
+    public function makeItemFromFile($path, $contents)
     {
-        return $cache->map(function ($item, $id) {
-            $set = GlobalSet::make()
-                ->id($id)
-                ->handle($item['handle'])
-                ->title($item['title'])
-                ->blueprint($item['blueprint'])
-                ->sites($item['sites'])
-                ->initialPath($item['path']);
-
-            foreach ($item['localizations'] as $site => $localization) {
-                $set->addLocalization(
-                    $set
-                        ->makeLocalization($site)
-                        ->initialPath($localization['path'])
-                        ->data($localization['data'])
-                );
-            }
-
-            return $set;
-        });
-    }
-
-    public function createItemFromFile($path, $contents)
-    {
-        $data = YAML::parse($contents);
         $relative = str_after($path, $this->directory);
         $handle = str_before($relative, '.yaml');
 
+        // If it's a variables file that was requested, instead assume that the
+        // base file was requested. The variables will get made as part of it.
+        if (Site::hasMultiple() && str_contains($relative, '/')) {
+            $handle = pathinfo($relative, PATHINFO_FILENAME);
+            $path = $this->directory . $handle . '.yaml';
+            $data = YAML::parse(File::get($path));
+            return $this->makeMultiSiteGlobalFromFile($handle, $path, $data);
+        }
+
+        $data = YAML::parse($contents);
+
         return Site::hasMultiple()
-            ? $this->createMultiSiteGlobalFromFile($handle, $path, $data)
-            : $this->createSingleSiteGlobalFromFile($handle, $path, $data);
+            ? $this->makeMultiSiteGlobalFromFile($handle, $path, $data)
+            : $this->makeSingleSiteGlobalFromFile($handle, $path, $data);
     }
 
-    protected function createSingleSiteGlobalFromFile($handle, $path, $data)
+    protected function makeSingleSiteGlobalFromFile($handle, $path, $data)
     {
         $set = $this
-            ->createBaseGlobalFromFile($handle, $path, $data)
+            ->makeBaseGlobalFromFile($handle, $path, $data)
             ->sites([$site = Site::default()->handle()]);
 
         return $set->addLocalization(
@@ -79,159 +59,69 @@ class GlobalsStore extends BasicStore
         );
     }
 
-    protected function createMultiSiteGlobalFromFile($handle, $path, $data)
+    protected function makeMultiSiteGlobalFromFile($handle, $path, $data)
     {
-        return substr_count($handle, '/') === 0
-            ? $this->createBaseGlobalFromFile($handle, $path, $data)
-            : $this->createLocalizedGlobalFromFile($handle, $path, $data);
+        $set = $this->makeBaseGlobalFromFile($handle, $path, $data);
+
+        $set->sites()->map(function ($site) use ($set) {
+            return $this->makeVariables($set, $site);
+        })->filter()->each(function ($variables) use ($set) {
+            $set->addLocalization($variables);
+        });
+
+        return $set;
     }
 
-    protected function createBaseGlobalFromFile($handle, $path, $data)
+    protected function makeBaseGlobalFromFile($handle, $path, $data)
     {
-        $set = GlobalSet::make()
+        return GlobalSet::make()
             ->id($data['id'])
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->blueprint($data['blueprint'] ?? null)
             ->sites($data['sites'] ?? null)
             ->initialPath($path);
-
-        // If the base set file was modified, its localizations will already exist in the Stache.
-        // We should get those existing localizations and add it to this newly created set.
-        // Otherwise, the localizations would just disappear since they'd no longer be linked.
-        $existing = $this->items->first(function ($global) use ($handle) {
-            return $global->handle() === $handle;
-        });
-
-        if ($existing) {
-            $existing->localizations()->each(function ($localization) use ($set) {
-                $set->addLocalization($localization);
-            });
-        }
-
-        return $set;
     }
 
-    protected function createLocalizedGlobalFromFile($handle, $path, $data)
+    protected function makeVariables($set, $site)
     {
-        list($site, $handle) = explode('/', $handle);
+        $variables = $set->makeLocalization($site);
 
-        $set = $this->items->first(function ($global) use ($handle) {
-            return $global->handle() === $handle;
-        });
+        // todo: cache the reading and parsing of the file
+        if (! File::exists($path = $variables->path())) {
+            return;
+        }
+        $contents = File::get($path);
+        $data = YAML::parse($contents);
 
-        $variables = $set->makeLocalization($site)
+        $variables
             ->initialPath($path)
             ->data(Arr::except($data, 'origin'));
 
         if ($origin = Arr::get($data, 'origin')) {
-            $this->localizationQueue[] = [
-                'set' => $set,
-                'origin' => $origin,
-                'localization' => $variables,
-            ];
+            $variables->origin($origin);
         }
 
-        return $set->addLocalization($variables);
+        return $variables;
     }
 
-    public function getItemKey($item, $path)
+    protected function getKeyFromPath($path)
     {
-        return $item->id();
-    }
-
-    public function filter($file)
-    {
-        return $file->getExtension() === 'yaml';
-    }
-
-    public function getIdByHandle($handle)
-    {
-        return $this->paths->flatMap(function ($paths, $site) {
-            return $paths->mapWithKeys(function ($path, $id) {
-                $handle = pathinfo($path, PATHINFO_FILENAME);
-                return [$handle => $id];
-            });
-        })->get($handle);
-    }
-
-    public function save($global)
-    {
-        if ($global instanceof LocalizedGlobalSet) {
-            $global = $global->globalSet();
+        if ($key = parent::getKeyFromPath($path)) {
+            return $key;
         }
 
-        $this->write($global);
-
-        // When using multiple sites, the global's localized data exists
-        // in separate files, so we'll write each one of those, too.
-        if (Site::hasMultiple()) {
-            $global->localizations()->each(function ($localization) {
-                $this->write($localization);
-            });
-        }
-    }
-
-    protected function write($global)
-    {
-        File::put($path = $global->path(), $global->fileContents());
-
-        if (($initial = $global->initialPath()) && $path !== $initial) {
-            File::delete($global->initialPath());
-        }
-    }
-
-
-    public function loadingComplete()
-    {
-        foreach ($this->localizationQueue as $item) {
-            $set = $item['set'];
-            $origin = $set->in($item['origin']);
-            $set->addLocalization(
-                $item['localization']->origin($origin)
-            );
-            $this->setItem($this->getItemKey($set, ''), $set);
-        }
-    }
-
-    public function insert($item, $key = null)
-    {
-        parent::insert($item, $key);
-
-        if (Site::hasMultiple()) {
-            $item->localizations()->each(function ($localization) use ($key) {
-                $this->setSitePath($localization->locale(), $key.'::'.$localization->locale(), $localization->path());
-            });
+        // If we're not using multiple sites and no key has been
+        // found at this point, then we aren't going to find one.
+        if (! Site::hasMultiple()) {
+            return null;
         }
 
-        return $this;
-    }
-
-    public function removeByPath($path)
-    {
-        $id = $this->getIdFromPath($path);
-
-        if (Str::contains($id, '::')) {
-            $this->removeLocalization($id);
-        } else {
-            $this->removeGlobal($id);
+        // Given a path to a variables file, get the key based on its base global set path.
+        if (str_contains($relative = str_after($path, $this->directory), '/')) {
+            $handle = pathinfo($relative, PATHINFO_FILENAME);
+            $path = $this->directory . $handle . '.yaml';
+            return $this->paths()->flip()->get($path);
         }
-    }
-
-    protected function removeGlobal($key)
-    {
-        $this->removeItem($key);
-        $this->removeSitePath($this->stache->sites()->first(), $key);
-    }
-
-    protected function removeLocalization($key)
-    {
-        [$handle, $site] = explode('::', $key);
-
-        $this->removeSitePath($site, $key);
-
-        $set = $this->getItem($handle);
-        $set->removeLocalization($set->in($site));
-        $this->setItem($handle, $set);
     }
 }

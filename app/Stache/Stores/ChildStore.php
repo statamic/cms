@@ -2,6 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
+use Symfony\Component\Finder\SplFileInfo;
+
 class ChildStore extends BasicStore
 {
     protected $parent;
@@ -36,32 +38,20 @@ class ChildStore extends BasicStore
         return $this->parent->key() . '::' . $this->childKey;
     }
 
-    public function getItemsFromCache($cache)
+    public function directory($directory = null)
     {
-        return $this->parent->getItemsFromCache($cache);
+        throw_if($directory, new \LogicException('Cannot set directory on a child store.'));
+
+        return $this->parent->childDirectory($this);
     }
 
-    protected function getMetaCacheKey()
+    public function filter(SplFileInfo $file)
     {
-        return 'stache::meta/child/' . $this->key();
+        return $this->parent->filter($file);
     }
 
-    public function cache()
+    public function makeItemFromFile($path, $contents)
     {
-        parent::cache();
-
-        $this->parent->cacheMetaKeys();
-    }
-
-    public function uncache()
-    {
-        parent::uncache();
-
-        $this->parent->cacheMetaKeys();
-    }
-
-    public function shouldStoreUri($item)
-    {
-        return $this->parent->shouldStoreUri($item);
+        return $this->parent->makeItemFromFile($path, $contents);
     }
 }

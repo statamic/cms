@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Statamic\API\Form;
 use Statamic\API\Site;
 use Statamic\API\Term;
 use Statamic\API\Entry;
@@ -20,6 +21,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindTaxonomies();
         $this->bindSites();
         $this->bindRevisions();
+        $this->bindForms();
     }
 
     protected function bindEntries()
@@ -37,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindCollections()
     {
         Route::bind('collection', function ($collection) {
-            abort_if(! $collection = Collection::findByHandle($collection), 404);
+            abort_unless($collection = Collection::findByHandle($collection), 404);
             return $collection;
         });
     }
@@ -45,7 +47,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindTaxonomies()
     {
         Route::bind('taxonomy', function ($taxonomy) {
-            abort_if(! $taxonomy = Taxonomy::findByHandle($taxonomy), 404);
+            abort_unless($taxonomy = Taxonomy::findByHandle($taxonomy), 404);
             return $taxonomy;
         });
     }
@@ -66,7 +68,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindSites()
     {
         Route::bind('site', function ($site) {
-            abort_if(! $site = Site::get($site), 404);
+            abort_unless($site = Site::get($site), 404);
             return $site;
         });
     }
@@ -82,9 +84,17 @@ class RouteServiceProvider extends ServiceProvider
                 abort(404);
             }
 
-            abort_if(! $revision = $content->revision($revision), 404);
+            abort_unless($revision = $content->revision($revision), 404);
 
             return $revision;
+        });
+    }
+
+    protected function bindForms()
+    {
+        Route::bind('form', function ($form) {
+            abort_unless($form = Form::find($form), 404);
+            return $form;
         });
     }
 }

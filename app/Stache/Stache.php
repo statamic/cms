@@ -9,47 +9,17 @@ use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
+use Wilderborn\Partyline\Facade as Partyline;
 
 class Stache
 {
-    const TEMP_COLD = 'cold';
-    const TEMP_WARM = 'warm';
-
-    protected $bootstrapper;
-    protected $shouldBoot = true;
-    protected $booted = false;
-    protected $temperature;
     protected $sites;
-    protected $keys;
-    protected $config;
     protected $stores;
     protected $startTime;
-    protected $timestamps = [];
 
     public function __construct()
     {
-        $this->temperature = SELF::TEMP_COLD;
         $this->stores = collect();
-    }
-
-    public function isCold()
-    {
-        return $this->temperature === self::TEMP_COLD;
-    }
-
-    public function isWarm()
-    {
-        return $this->temperature === self::TEMP_WARM;
-    }
-
-    public function heat()
-    {
-        $this->temperature = self::TEMP_WARM;
-    }
-
-    public function cool()
-    {
-        $this->temperature = self::TEMP_COLD;
     }
 
     public function sites($sites = null)
@@ -66,28 +36,6 @@ class Stache
     public function defaultSite()
     {
         return $this->sites->first();
-    }
-
-    public function keys($keys = null)
-    {
-        if ($keys === null) {
-            return $this->keys;
-        }
-
-        $this->keys = collect($keys);
-
-        return $this;
-    }
-
-    public function config($config = null)
-    {
-        if (! $config) {
-            return $this->config;
-        }
-
-        $this->config = $config;
-
-        return $this;
     }
 
     public function registerStore(Store $store)
@@ -108,8 +56,6 @@ class Stache
 
     public function stores()
     {
-        $this->boot();
-
         return $this->stores;
     }
 
@@ -123,99 +69,36 @@ class Stache
         return $this->stores()->get($key);
     }
 
-    public function load()
-    {
-        (new Loader($this))->load();
-
-        return $this;
-    }
-
-    public function update()
-    {
-        (new StacheUpdater($this))->update();
-
-        return $this;
-    }
-
-    public function boot()
-    {
-        if ($this->shouldBoot && !$this->booted) {
-            $this->booted = true;
-            tap($this->bootstrapper ?? new Bootstrapper)->boot($this);
-        }
-
-        return $this;
-    }
-
-    public function setBootstrapper($bootstrapper)
-    {
-        $this->bootstrapper = $bootstrapper;
-
-        return $this;
-    }
-
-    public function hasBooted()
-    {
-        return $this->booted;
-    }
-
-    public function withoutBooting($callback)
-    {
-        $this->disableBooting();
-        $callback($this);
-        $this->enableBooting();
-
-        return $this;
-    }
-
-    public function disableBooting()
-    {
-        $this->shouldBoot = false;
-
-        return $this;
-    }
-
-    public function enableBooting()
-    {
-        $this->shouldBoot = true;
-
-        return $this;
-    }
-
     public function generateId()
     {
         return (string) Str::uuid();
     }
 
-    public function idMap()
-    {
-        return collect($this->stores())->mapWithKeys(function ($store) {
-            return $store->getIdMap();
-        });
-    }
-
-    public function getStoreById($id)
-    {
-        return $this->store($this->idMap()->get($id));
-    }
-
-    public function persist()
-    {
-        app(Persister::class)->persist();
-    }
-
     public function clear()
     {
-        // TODO: This is temporary. It wont work for other cache drivers like Redis.
-        // We need to track all the cache keys, then loop through and forget them all.
-        app('files')->deleteDirectory(base_path('storage/framework/cache/data/stache'));
+        Partyline::comment('Clearing Stache...');
+
+        $this->stores()->each->clear();
+
+        Cache::forget('stache::timing');
 
         return $this;
     }
 
     public function refresh()
     {
-        $this->clear()->startTimer()->update()->persist();
+        return $this->clear()->warm();
+    }
+
+    public function warm()
+    {
+        Partyline::comment('Warming Stache...');
+
+        $this->startTimer();
+
+        $this->stores()->each->warm();
+
+        $this->stopTimer();
     }
 
     public function instance()
@@ -225,7 +108,9 @@ class Stache
 
     public function fileCount()
     {
-        return $this->paths()->flatten()->count();
+        return $this->stores()->reduce(function ($carry, $store) {
+            return $store->paths()->count() + $carry;
+        }, 0);
     }
 
     public function fileSize()
@@ -274,55 +159,5 @@ class Stache
         };
 
         return Carbon::createFromTimestamp($cache['date']);
-    }
-
-    public function paths()
-    {
-        $paths = $this->sites()->mapWithKeys(function ($site) {
-            return [$site => collect()];
-        });
-
-        foreach ($this->stores() as $store) {
-            $storePaths = $store instanceof Stores\AggregateStore
-                ? $this->getAggregateStorePaths($store)
-                : $store->getPaths();
-
-            $storeKey = $store->key();
-
-            foreach ($storePaths as $site => $sitePaths) {
-                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($storeKey) {
-                    return ["{$storeKey}::{$key}" => $path];
-                }));
-            }
-        }
-
-        return $paths;
-    }
-
-    private function getAggregateStorePaths($store)
-    {
-        $paths = $this->sites()->mapWithKeys(function ($site) {
-            return [$site => collect()];
-        });
-
-        foreach ($store->stores() as $store) {
-            foreach ($store->getPaths() as $site => $sitePaths) {
-                $paths[$site] = $paths[$site]->merge($sitePaths->mapWithKeys(function ($path, $key) use ($store) {
-                    return ["{$store->childKey()}::{$key}" => $path];
-                }));
-            }
-        }
-
-        return $paths;
-    }
-
-    public function queuedTimestampCaches()
-    {
-        return collect($this->timestamps);
-    }
-
-    public function queueTimestampCache($key, $timestamps)
-    {
-        $this->timestamps[$key] = $timestamps;
     }
 }

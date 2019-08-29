@@ -31,7 +31,8 @@ class PageProtectionTestCase extends TestCase
     {
         $collection = Collection::create('pages')
             ->route('{slug}')
-            ->template('default');
+            ->template('default')
+            ->save();
 
         EntryFactory::slug($slug)
             ->id($slug)

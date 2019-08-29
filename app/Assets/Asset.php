@@ -638,7 +638,7 @@ class Asset implements AssetContract, Arrayable
      */
     public function editUrl()
     {
-        return cp_route('assets.edit', base64_encode($this->id()));
+        return cp_route('assets.browse.edit', $this->container()->handle() . '/' . $this->path());
     }
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 class Traverser
 {
     protected $filesystem;
+    protected $filter;
 
     public function __construct(Filesystem $filesystem)
     {
@@ -21,15 +22,29 @@ class Traverser
 
         $dir = rtrim($dir, '/');
 
-        return collect($this->filesystem->allFiles($dir))
-            ->filter(function ($item) use ($store) {
-                return $store->filter($item);
-            })
+        if (! $this->filesystem->exists($dir)) {
+            return collect();
+        }
+
+        $files = collect($this->filesystem->allFiles($dir));
+
+        if ($this->filter) {
+            $files = $files->filter($this->filter);
+        }
+
+        return $files
             ->mapWithKeys(function ($file) {
                 return [$file->getPathname() => $file->getMTime()];
             })
             ->sortBy(function ($timestamp, $path) {
                 return [substr_count($path, '/'), $path];
             });
+    }
+
+    public function filter($filter)
+    {
+        $this->filter = $filter;
+
+        return $this;
     }
 }

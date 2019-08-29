@@ -3,9 +3,9 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
-use Statamic\Data\Entries\QueryBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Data\Entries\EntryCollection;
+use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Contracts\Data\Repositories\StructureRepository;
 use Statamic\Contracts\Data\Repositories\EntryRepository as RepositoryContract;
 
@@ -22,45 +22,41 @@ class EntryRepository implements RepositoryContract
 
     public function all(): EntryCollection
     {
-        return collect_entries($this->store->getItems()->mapWithKeys(function ($item) {
-            return $item;
-        }));
+        return $this->query()->get();
     }
 
     public function whereCollection(string $handle): EntryCollection
     {
-        return collect_entries($this->store->store($handle)->getItems());
+        return $this->query()->where('collection', $handle)->get();
     }
 
     public function whereInCollection(array $handles): EntryCollection
     {
-        return collect_entries($handles)->flatMap(function ($collection) {
-            return $this->whereCollection($collection);
-        });
+        return $this->query()->whereIn('collection', $handles)->get();
     }
 
     public function find($id): ?Entry
     {
-        if (! $store = $this->store->getStoreById($id)) {
-            return null;
-        }
-
-        return $store->getItem($id);
+        return $this->query()->where('id', $id)->first();
     }
 
     public function findBySlug(string $slug, string $collection): ?Entry
     {
-        $store = $this->store->store($collection);
-
-        return $store->getItems()->first(function ($entry) use ($slug) {
-            return $entry->slug() === $slug;
-        });
+        return $this->query()
+            ->where('slug', $slug)
+            ->where('collection', $collection)
+            ->first();
     }
 
     public function findByUri(string $uri, string $site = null): ?Entry
     {
+        $site = $site ?? $this->stache->sites()->first();
+
         return app(StructureRepository::class)->findEntryByUri($uri, $site)
-            ?? $this->find($this->store->getIdFromUri($uri, $site));
+            ?? $this->query()
+                ->where('uri', $uri)
+                ->where('site', $site)
+                ->first();
     }
 
     public function save($entry)
@@ -73,11 +69,7 @@ class EntryRepository implements RepositoryContract
             $this->ensureEntryPosition($entry);
         }
 
-        $this->store
-            ->store($entry->collectionHandle())
-            ->insert($entry);
-
-        $this->store->save($entry);
+        $this->store->store($entry->collectionHandle())->save($entry);
     }
 
     public function delete($entry)
@@ -86,14 +78,12 @@ class EntryRepository implements RepositoryContract
             $this->removeEntryPosition($entry);
         }
 
-        $this->store->remove($entry->id());
-
-        $this->store->delete($entry);
+        $this->store->store($entry->collectionHandle())->delete($entry);
     }
 
     public function query()
     {
-        return new QueryBuilder;
+        return new EntryQueryBuilder($this->store);
     }
 
     public function make(): Entry
@@ -110,11 +100,9 @@ class EntryRepository implements RepositoryContract
     public function taxonomize($entry)
     {
         $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {
-            $this->stache->store('terms')->sync(
-                $entry,
-                $taxonomy->handle(),
-                $entry->value($taxonomy->handle())
-            );
+            $this->stache->store('terms')
+                ->store($taxonomy = $taxonomy->handle())
+                ->sync($entry->id(), $entry->value($taxonomy));
         });
     }
 

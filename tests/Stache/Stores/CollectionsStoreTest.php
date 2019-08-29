@@ -40,7 +40,7 @@ class CollectionsStoreTest extends TestCase
         touch($this->tempDir.'/subdirectory/nested-two.yaml', 1234567890);
         touch($this->tempDir.'/top-level-non-yaml-file.md', 1234567890);
 
-        $files = Traverser::traverse($this->store);
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
         $this->assertEquals([
             $this->tempDir.'/one.yaml' => 1234567890,
@@ -52,20 +52,9 @@ class CollectionsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_collection_instances_from_cache()
-    {
-        $collection = CollectionAPI::create('example');
-
-        $items = $this->store->getItemsFromCache([$collection]);
-
-        $this->assertCount(1, $items);
-        $this->assertInstanceOf(Collection::class, reset($items));
-    }
-
-    /** @test */
     function it_makes_collection_instances_from_files()
     {
-        $item = $this->store->createItemFromFile($this->tempDir.'/example.yaml', "title: Example");
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example");
 
         $this->assertInstanceOf(Collection::class, $item);
         $this->assertEquals('example', $item->handle());
@@ -77,25 +66,17 @@ class CollectionsStoreTest extends TestCase
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey('irrelevant', '/path/to/test.yaml')
+            $this->store->getItemKey(CollectionAPI::create('test'))
         );
     }
 
     /** @test */
     function it_saves_to_disk()
     {
-        $this->markTestIncomplete(); // TODO: implementation was changed, tests werent.
-
-        $collection = CollectionAPI::create('new');
-        $collection->data([
-            'title' => 'New Collection',
-            'order' => 'date',
-            'foo' => 'bar',
-        ]);
-        $collection->setEntryPositions(['3' => '123', '10' => '456']);
+        $collection = CollectionAPI::make('new');
 
         $this->store->save($collection);
 
-        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', "title: 'New Collection'\norder: date\nfoo: bar\nentry_order:\n  - '123'\n  - '456'\n");
+        $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $collection->fileContents());
     }
 }

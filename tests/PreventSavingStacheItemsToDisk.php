@@ -2,57 +2,26 @@
 
 namespace Tests;
 
+use Statamic\API\Stache;
+
 trait PreventSavingStacheItemsToDisk
 {
     protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
 
     protected function preventSavingStacheItemsToDisk()
     {
-        $stores = collect([
-            NonSavingCollectionsStore::class,
-            NonSavingEntriesStore::class,
-            NonSavingGlobalsStore::class,
-            NonSavingAssetContainersStore::class,
-            NonSavingUsersStore::class,
-        ])->map(function ($class) {
-            return app($class)->directory($this->fakeStacheDirectory);
+        Stache::stores()->each(function ($store) {
+            $dir = __DIR__.'/__fixtures__';
+            $relative = str_after(str_after($store->directory(), $dir), '/');
+            $store->directory($this->fakeStacheDirectory . '/' . $relative);
         });
-
-        $this->app['stache']->registerStores($stores->all());
     }
-}
 
-class NonSavingCollectionsStore extends \Statamic\Stache\Stores\CollectionsStore
-{
-    public function save(\Statamic\Contracts\Data\Entries\Collection $collection) { }
-}
+    protected function deleteFakeStacheDirectory()
+    {
+        app('files')->deleteDirectory($this->fakeStacheDirectory);
 
-class NonSavingEntriesStore extends \Statamic\Stache\Stores\EntriesStore
-{
-    public function save($entry) { }
-}
-
-class NonSavingGlobalsStore extends \Statamic\Stache\Stores\GlobalsStore
-{
-    public function save($globals) { }
-}
-
-class NonSavingAssetContainersStore extends \Statamic\Stache\Stores\AssetContainersStore
-{
-    public function save($container) { }
-}
-
-class NonSavingUsersStore extends \Statamic\Stache\Stores\UsersStore
-{
-    public function save($user) { }
-}
-
-class NonSavingTaxonomiesStore extends \Statamic\Stache\Stores\TaxonomiesStore
-{
-    public function save($taxonomy) { }
-}
-
-class NonSavingTermsStore extends \Statamic\Stache\Stores\TermsStore
-{
-    public function save($term) { }
+        mkdir($this->fakeStacheDirectory);
+        touch($this->fakeStacheDirectory.'/.gitkeep');
+    }
 }

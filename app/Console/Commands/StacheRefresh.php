@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Statamic\API\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Wilderborn\Partyline\Facade as Partyline;
 
 class StacheRefresh extends Command
 {
@@ -15,8 +16,12 @@ class StacheRefresh extends Command
 
     public function handle()
     {
+        Partyline::bind($this);
+
+        $this->line('Please wait. This may take a while if you have a lot of content.');
+
         Stache::refresh();
 
-        $this->info('The Stache has been trimmed, regrown, and groomed.');
+        $this->info('You have trimmed and polished the Stache. It is handsome, warm, and ready.');
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Data\Structures;
 
 use Tests\TestCase;
+use Tests\UnlinksPaths;
 use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Statamic\Data\Structures\Page;
@@ -15,25 +16,27 @@ use Statamic\API\Structure as StructureAPI;
 class TreeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use UnlinksPaths;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->app->make('stache')->withoutBooting(function ($stache) {
-            $dir = __DIR__.'/../../Stache/__fixtures__';
-            $stache->store('collections')->directory($dir . '/content/collections');
-            $stache->store('entries')->directory($dir . '/content/collections');
-        });
+        $stache = $this->app->make('stache');
+        $dir = __DIR__.'/../../Stache/__fixtures__';
+        $stache->store('collections')->directory($dir . '/content/collections');
+        $stache->store('entries')->directory($dir . '/content/collections');
     }
 
     /** @test */
     function it_gets_the_route_from_the_collection()
     {
-        Collection::make('test-collection')
+        $collection = tap(Collection::make('test-collection')
             ->structure('test-structure')
             ->route('the-uri/{slug}')
-            ->save();
+        )->save();
+
+        $this->unlinkAfter($collection->path());
 
         $structure = (new Structure)->handle('test-structure');
         $tree = (new Tree)->structure($structure);
