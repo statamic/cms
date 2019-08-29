@@ -371,15 +371,47 @@ export default {
                 _localized: this.localizedFields,
             }};
 
-            this.$axios[this.method](this.actions.save, payload).then(response => {
-                this.saving = false;
-                this.title = this.values.title;
-                this.isWorkingCopy = true;
-                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
-                if (!this.isCreating) this.$notify.success('Saved');
-                this.$refs.container.saved();
-                this.$nextTick(() => this.$emit('saved', response));
-            }).catch(e => this.handleAxiosError(e));
+            let saveResponse = null;
+
+            Statamic.$hooks.on('entries.publish.after', data => {
+                console.log('after');
+            });
+
+            Statamic.$hooks.on('entries.publish.before', data => {
+                data.title = data.title + ' huh?';
+                console.log('before');
+            });
+
+            let saveOperation = new Promise((resolve, reject) => {
+                this.$axios[this.method](this.actions.save, payload)
+                    .then(response => {
+                        this.saving = false;
+                        this.title = this.values.title;
+                        this.isWorkingCopy = true;
+                        if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                        if (!this.isCreating) this.$notify.success('Saved');
+                        this.$refs.container.saved();
+                        saveResponse = response;
+                        console.log('save');
+                        resolve();
+                    })
+                    .catch(error => {
+                        this.handleAxiosError(error);
+                        reject();
+                    });
+            });
+
+            Statamic.$hooks.run('entries.publish.before', payload).then(() => {
+                saveOperation.then(() => {
+                    Statamic.$hooks.run('entries.publish.after', payload)
+                        .then(() => {
+                            this.$nextTick(() => {
+                                this.$emit('saved', saveResponse);
+                            });
+                        })
+                        .catch(() => this.$notify.error('Something went wrong'));
+                }).catch(() => this.$notify.error('Something went wrong'));
+            }).catch(() => this.$notify.error('Something went wrong'));
         },
 
         confirmPublish() {
