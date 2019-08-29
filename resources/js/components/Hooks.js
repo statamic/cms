@@ -11,10 +11,6 @@ class Hooks {
         this.hooks[key].push({callback, priority});
     }
 
-    get(key) {
-        return this.hooks[key] || [];
-    }
-
     run(key, payload) {
         let promises = this.get(key)
             .sort((a, b) => a.priority - b.priority)
@@ -42,10 +38,14 @@ class Hooks {
         return new Promise((resolve, reject) => {
             this.run(beforeHooks, payload).then(() => {
                 operation.then(() => {
-                    this.run(afterHooks, payload).then(() => resolve()).catch(() => reject());
-                }).catch(() => reject());
-            }).catch(() => reject());
+                    this.run(afterHooks, payload).then(resolve).catch(reject);
+                }).catch(reject);
+            }).catch(reject);
         });
+    }
+
+    get(key) {
+        return this.hooks[key] || [];
     }
 
     ensureFulfilledPromise(result) {
