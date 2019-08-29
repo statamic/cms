@@ -62,6 +62,7 @@ require('mousetrap/plugins/global-bind/mousetrap-global-bind');
 
 Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
+Vue.prototype.$bard = Statamic.$bard;
 
 window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 

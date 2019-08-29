@@ -60,6 +60,12 @@ class AppServiceProvider extends ServiceProvider
             "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic')
         ], 'statamic-translations');
 
+        $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
+
+        $this->publishes([
+            "{$this->root}/resources/views/extend" => resource_path('views/vendor/statamic')
+        ], 'statamic-views');
+
         Blade::directive('svg', function ($expression) {
             return "<?php echo Statamic::svg({$expression}) ?>";
         });

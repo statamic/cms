@@ -36,7 +36,7 @@ export default {
     methods: {
 
         filtersChanged(filters) {
-            this.activeFilters = filters;
+            this.activeFilters = filters || {};
             this.unselectAllItems();
         },
 

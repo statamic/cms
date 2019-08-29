@@ -12,6 +12,7 @@ use Statamic\Fields\ConfigFields;
 class Grid extends Fieldtype
 {
     protected $defaultable = false;
+    protected $defaultValue = [];
 
     protected $configFields = [
         'mode' => [
@@ -128,5 +129,12 @@ class Grid extends Fieldtype
     protected function defaultRowData()
     {
         return $this->fields()->all()->map->defaultValue();
+    }
+
+    public function augment($value)
+    {
+        return collect($value)->map(function ($row) {
+            return $this->fields()->addValues($row)->augment()->values();
+        });
     }
 }

@@ -18,8 +18,8 @@ const availableButtons = () => [
     { name: 'anchor', text: __('Link'), command: 'link', icon: 'link', component: 'LinkToolbarButton' },
     { name: 'table', text: __('Table'), command: 'createTable', args: { rowsCount: 3, colsCount: 3, withHeaderRow: false }, svg: 'add-table' },
     { name: 'image', text: __('Image'), command: 'image', args: { src: '' }, icon: 'picture-o', condition: (config) => config.container },
-    { name: 'code', text: __('Inline Code'), command: 'code', icon: 'code' },
-    { name: 'codeblock', text: __('Code Block'), command: 'code_block', icon: 'code' },
+    { name: 'code', text: __('Inline Code'), command: 'code', svg: 'angle-brackets-bold' },
+    { name: 'codeblock', text: __('Code Block'), command: 'code_block', svg: 'code-block' },
 ];
 
 const addButtonHtml = (buttons) => {

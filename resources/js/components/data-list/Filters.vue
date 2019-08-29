@@ -93,7 +93,7 @@ export default {
 
         filterChanged(handle, value) {
             let filters = this.activeFilters;
-            if (value) {
+            if (value && ! _.isEmpty(value)) {
                 Vue.set(filters, handle, value);
             } else {
                 Vue.delete(filters, handle);

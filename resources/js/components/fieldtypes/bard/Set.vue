@@ -4,7 +4,7 @@
         @mousedown="parentMousedown"
         @dragstart="parentDragStart"
     >
-        <div class="replicator-set-header" @dblclick="toggleCollapsedState">
+        <div class="replicator-set-header" :class="{'collapsed': collapsed}" @dblclick="toggleCollapsedState">
             <div class="item-move sortable-handle" ref="dragHandle"></div>
             <div class="flex-1 ml-1 flex items-center" @click="expand">
                 <label v-text="config.display" class="text-xs"/>
@@ -20,8 +20,8 @@
                     v-model="enabled"
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list>
-                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
+                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
@@ -58,7 +58,7 @@ export default {
         'updateAttrs', // function to update attributes defined in `schema`
         'editable', // global editor prop whether the content can be edited
         'options', // array of extension options
-        `selected`, // whether its selected
+        `selected`, // whether its selected,
     ],
 
     components: { SetField },
@@ -70,7 +70,6 @@ export default {
     data() {
         return {
             lastClicked: null,
-            collapsed: false
         }
     },
 
@@ -82,6 +81,10 @@ export default {
 
         meta() {
             return this.options.bard.meta.existing[this.node.attrs.id];
+        },
+
+        collapsed() {
+            return this.options.bard.meta.collapsed.includes(this.node.attrs.id);
         },
 
         config() {
@@ -156,15 +159,23 @@ export default {
             }, 1);
         },
 
-        toggleCollapsedState() {
-            this.collapsed = ! this.collapsed;
+         toggleCollapsedState() {
+            if (this.collapsed) {
+                this.expand();
+            } else {
+                this.collapse();
+            }
+        },
+
+        collapse() {
+            // this.$events.$emit('collapsed', this.node.attrs.id);
+            this.options.bard.collapseSet(this.node.attrs.id);
         },
 
         expand() {
-            if (this.collapsed) {
-                this.collapsed = false
-            }
-        }
+            // this.$events.$emit('expanded', this.node.attrs.id);
+            this.options.bard.expandSet(this.node.attrs.id);
+        },
 
     }
 }

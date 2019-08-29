@@ -16,11 +16,15 @@
                         :editor="editor" />
                 </div>
                 <div class="flex items-center no-select">
+                <div class="h-10 -my-sm border-l pr-1 w-px" v-if="hasExtraButtons"></div>
                     <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
+                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                        <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
+                    </button>
                     <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="shrink" class="w-4 h-4" v-if="fullScreenMode" />
+                        <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
                         <svg-icon name="expand" class="w-4 h-4" v-else />
                     </button>
                 </div>
@@ -136,7 +140,7 @@ export default {
 
     provide() {
         return {
-            setConfigs: this.config.sets
+            setConfigs: this.config.sets,
         }
     },
 
@@ -150,6 +154,7 @@ export default {
             showSource: false,
             fullScreenMode: false,
             buttons: [],
+            collapsed: this.meta.collapsed,
         }
     },
 
@@ -165,6 +170,10 @@ export default {
 
         toolbarIsFloating() {
             return this.config.toolbar_mode === 'floating';
+        },
+
+        hasExtraButtons() {
+            return this.allowSource || this.config.sets.length > 0 || this.config.fullscreen;
         },
 
         readingTime() {
@@ -190,35 +199,7 @@ export default {
         this.initToolbarButtons();
 
         this.editor = new Editor({
-            extensions: [
-                new Blockquote(),
-                new BulletList(),
-                new CodeBlock(),
-                new HardBreak(),
-                new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
-                new ListItem(),
-                new OrderedList(),
-                new Bold(),
-                new Code(),
-                new Italic(),
-                new Strike(),
-                new Underline(),
-                new Table({
-                    resizable: true,
-                }),
-                new TableHeader(),
-                new TableCell(),
-                new TableRow(),
-                new History(),
-                new Set({ bard: this }),
-                new ConfirmSetDelete(),
-                new Link({ vm: this }),
-                new RemoveFormat(),
-                new Image({ bard: this }),
-                new CodeBlockHighlight({
-                    languages: { javascript, css }
-                })
-            ],
+            extensions: this.getExtensions(),
             content: this.valueToContent(clone(this.value)),
             editable: !this.readOnly,
             onFocus: () => this.$emit('focus'),
@@ -263,6 +244,12 @@ export default {
 
         readOnly(readOnly) {
             this.editor.setOptions({ editable: !this.readOnly });
+        },
+
+        collapsed(value) {
+            const meta = this.meta;
+            meta.collapsed = value;
+            this.updateMeta(meta);
         }
 
     },
@@ -279,6 +266,31 @@ export default {
                 this.editor.commands.set({ id, values });
                 this.$refs.setSelectorDropdown.close();
             });
+        },
+
+        collapseSet(id) {
+            if (!this.collapsed.includes(id)) {
+                this.collapsed.push(id)
+            }
+        },
+
+        expandSet(id) {
+            if (this.collapsed.includes(id)) {
+                var index = this.collapsed.indexOf(id);
+                this.collapsed.splice(index, 1);
+            }
+        },
+
+        collapseAll() {
+            this.collapsed = Object.keys(this.meta.existing);
+        },
+
+        expandAll() {
+            this.collapsed = [];
+        },
+
+        toggleCollapseSets() {
+            (this.collapsed.length === 0) ? this.collapseAll() : this.expandAll();
         },
 
         toggleFullscreen() {
@@ -316,7 +328,17 @@ export default {
             });
 
             // Let addons add, remove, or control the position of buttons.
-            Statamic.$config.get('bard').buttons.forEach(callback => callback.call(null, buttons));
+            this.$bard.buttonCallbacks.forEach(callback => {
+                let returned = callback(buttons);
+
+                // No return value means they intend to manipulate the
+                // buttons object manually. Just continue on.
+                if (! returned) return;
+
+                buttons = buttons.concat(
+                    Array.isArray(returned) ? returned : [returned]
+                );
+            });
 
             // Remove any non-objects. This would happen if you configure a button name that doesn't exist.
             buttons = buttons.filter(button => typeof button != 'string');
@@ -363,12 +385,52 @@ export default {
         },
 
         valueToContent(value) {
-            // A json string is passed from PHP since that's what's submitted.
+            if (! value) {
+                return null;
+            }
+
             value = JSON.parse(value);
 
             return value.length
                 ? { type: 'doc', content: value }
                 : null;
+        },
+
+        getExtensions() {
+            let extensions = [
+                new Blockquote(),
+                new BulletList(),
+                new CodeBlock(),
+                new HardBreak(),
+                new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
+                new ListItem(),
+                new OrderedList(),
+                new Bold(),
+                new Code(),
+                new Italic(),
+                new Strike(),
+                new Underline(),
+                new Table({ resizable: true }),
+                new TableHeader(),
+                new TableCell(),
+                new TableRow(),
+                new History(),
+                new Set({ bard: this }),
+                new ConfirmSetDelete(),
+                new Link({ vm: this }),
+                new RemoveFormat(),
+                new Image({ bard: this }),
+                new CodeBlockHighlight({ languages: { javascript, css }})
+            ];
+
+            this.$bard.extensionCallbacks.forEach(callback => {
+                let returned = callback(this);
+                extensions = extensions.concat(
+                    Array.isArray(returned) ? returned : [returned]
+                );
+            });
+
+            return extensions;
         }
     }
 }

@@ -5,12 +5,17 @@ namespace Statamic\Forms;
 use Statamic\API\URL;
 use Statamic\API\Form;
 use DebugBar\DebugBarException;
+use Statamic\Tags\OutputsItems;
 use Statamic\Tags\Tags as BaseTags;
 use Illuminate\Support\Facades\Crypt;
 use DebugBar\DataCollector\ConfigCollector;
 
 class Tags extends BaseTags
 {
+    use OutputsItems;
+
+    const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
+
     protected static $handle = 'form';
 
     /**
@@ -24,6 +29,16 @@ class Tags extends BaseTags
     private $errorBag;
 
     /**
+     * {{ form:* }} ... {{ /form:* }}
+     */
+    public function __call($method, $args)
+    {
+        $this->parameters['form'] = $this->method;
+
+        return $this->create();
+    }
+
+    /**
      * Maps to {{ form:set }}
      *
      * Allows you to inject the formset into the context so child tags can use it.
@@ -32,7 +47,7 @@ class Tags extends BaseTags
      */
     public function set()
     {
-        $this->context['form'] = $this->getParam(['in', 'is', 'form', 'formset']);
+        $this->context['form'] = $this->getParam(static::HANDLE_PARAM);
 
         return $this->parse($this->context);
     }
@@ -62,11 +77,7 @@ class Tags extends BaseTags
             $data['success'] = true;
         }
 
-        $data['fields'] = Form::find($this->formHandle)->fields()->map(function ($field) use ($data) {
-            return array_merge($field->toArray(), [
-                'error' => array_get($data, "error.{$field->handle()}")
-            ]);
-        })->all();
+        $data['fields'] = $this->getFields();
 
         $this->addToDebugBar($data);
 
@@ -150,11 +161,7 @@ class Tags extends BaseTags
     {
         $submissions = Form::find($this->getForm())->submissions();
 
-        $this->collection = collect_content($submissions);
-
-        $this->filter();
-
-        return $this->output();
+        return $this->output($submissions);
     }
 
     /**
@@ -172,9 +179,9 @@ class Tags extends BaseTags
      *
      * @return string
      */
-    private function getForm()
+    protected function getForm()
     {
-        if (! $form = $this->get(['form', 'in'], array_get($this->context, 'form'))) {
+        if (! $form = $this->get(static::HANDLE_PARAM, array_get($this->context, 'form'))) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 
@@ -186,11 +193,46 @@ class Tags extends BaseTags
     }
 
     /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @return array
+     */
+    protected function getFields()
+    {
+        return Form::find($this->getForm())->fields()
+            ->map(function ($field) {
+                return $this->getField($field);
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get field with extra data for rendering.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @return array
+     */
+    protected function getField($field)
+    {
+        $errors = $this->hasErrors() ? $this->getErrors() : [];
+
+        $data = array_merge($field->toArray(), [
+            'error' => $errors[$field->handle()] ?? null,
+            'old' => old($field->handle()),
+        ]);
+
+        $data['field'] = view($field->fieldtype()->view(), $data);
+
+        return $data;
+    }
+
+    /**
      * Does this form have errors?
      *
      * @return bool
      */
-    private function hasErrors()
+    protected function hasErrors()
     {
         if (! $formset = $this->getForm()) {
             return false;
@@ -206,7 +248,7 @@ class Tags extends BaseTags
      *
      * @return object
      */
-    private function getErrorBag()
+    protected function getErrorBag()
     {
         if ($this->hasErrors()) {
             return session('errors')->getBag('form.'.$this->formHandle);
@@ -218,7 +260,7 @@ class Tags extends BaseTags
      *
      * @return array
      */
-    private function getErrors()
+    protected function getErrors()
     {
         return array_combine($this->errorBag->keys(), $this->getErrorMessages());
     }
@@ -228,7 +270,7 @@ class Tags extends BaseTags
      *
      * @return array
      */
-    private function getErrorMessages()
+    protected function getErrorMessages()
     {
         return $this->errorBag->all();
     }
@@ -242,7 +284,7 @@ class Tags extends BaseTags
      *
      * @param array $data
      */
-    private function addToDebugBar($data)
+    protected function addToDebugBar($data)
     {
         if (! function_exists('debug_bar')) {
             return;

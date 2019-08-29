@@ -6,6 +6,7 @@ use Statamic\API\Form;
 use Statamic\CP\Column;
 use Statamic\API\Config;
 use Statamic\API\Helper;
+use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Forms\Presenters\UploadedFilePresenter;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -14,8 +15,6 @@ class FormSubmissionsController extends CpController
 {
     public function index($form)
     {
-        $form = Form::find($form);
-
         $this->authorize('view', $form);
 
         $columns = $form->blueprint()->columns()
@@ -52,28 +51,16 @@ class FormSubmissionsController extends CpController
 
         // Set up the paginator, since we don't want to display all the entries.
         $totalSubmissionCount = $submissions->count();
-        $perPage = Config::get('statamic.cp.pagination_size');
+        $perPage = request('perPage') ?? Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
         $offset = ($currentPage - 1) * $perPage;
         $submissions = $submissions->slice($offset, $perPage);
         $paginator = new LengthAwarePaginator($submissions, $totalSubmissionCount, $perPage, $currentPage);
 
-        return [
-            'data' => $submissions->values(),
-            'meta' => [
-                'columns' => $columns,
-                'sortColumn' => $sort,
-            ]
-            // 'pagination' => [
-            //     'totalItems' => $totalSubmissionCount,
-            //     'itemsPerPage' => $perPage,
-            //     'totalPages'    => $paginator->lastPage(),
-            //     'currentPage'   => $paginator->currentPage(),
-            //     'prevPage'      => $paginator->previousPageUrl(),
-            //     'nextPage'      => $paginator->nextPageUrl(),
-            //     'segments'      => array_get($paginator->renderArray(), 'segments')
-            // ]
-        ];
+        return Resource::collection($paginator)->additional(['meta' => [
+            'columns' => $columns,
+            'sortColumn' => $sort,
+        ]]);
     }
 
     private function sanitizeSubmission($submission)
@@ -106,7 +93,7 @@ class FormSubmissionsController extends CpController
 
     public function destroy($form, $id)
     {
-        $submission = Form::find($form)->submission($id);
+        $submission = $form->submission($id);
 
         $this->authorize('delete', $submission);
 
@@ -117,8 +104,6 @@ class FormSubmissionsController extends CpController
 
     public function show($form, $submission)
     {
-        $form = Form::find($form);
-
         if (! $submission = $form->submission($submission)) {
             return $this->pageNotFound();
         }

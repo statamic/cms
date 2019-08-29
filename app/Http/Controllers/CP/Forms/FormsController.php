@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Statamic\API\Str;
 use Statamic\API\Form;
 use Statamic\CP\Column;
+use Statamic\API\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -36,8 +37,6 @@ class FormsController extends CpController
 
     public function show($form)
     {
-        abort_unless($form = Form::find($form), 404);
-
         $this->authorize('view', $form);
 
         return view('statamic::forms.show', compact('form'));
@@ -48,11 +47,12 @@ class FormsController extends CpController
         $array = $form->toArray();
 
         $array['honeypot'] = $form->honeypot();
-        $array['columns'] = $form->columns()->map->field();
-        $array['metrics'] = $this->preProcessMetrics($form);
+        $array['columns'] = []; // = $form->columns()->map->field();
+        $array['metrics'] = []; // = $this->preProcessMetrics($form);
         $array['email'] = $form->email();
 
         foreach ($form->fields() as $name => $field) {
+            $field = $field->toArray();
             $field['name'] = $name;
 
             // Vue relies on a boolean being available on the field itself.
@@ -100,6 +100,7 @@ class FormsController extends CpController
     {
         $this->authorize('create', FormContract::class);
 
+        // Wat is this italic?
         return view('statamic::forms.create', [
             'title' => t('creating_formset')
         ]);
@@ -112,7 +113,9 @@ class FormsController extends CpController
         $data = $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'blueprint' => 'array',
+            'blueprint' => 'nullable|array',
+            'store' => 'nullable|boolean',
+            'email' => 'nullable|string',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
@@ -130,38 +133,60 @@ class FormsController extends CpController
 
     public function edit($form)
     {
-        $form = Form::find($form);
-
         $this->authorize('edit', $form);
 
-        $formset = $this->getFormsetJson($form);
+        $values = $form->toArray();
 
-        return view('statamic::forms.edit', compact('form', 'formset'));
+        $fields = ($blueprint = $this->editFormBlueprint())
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        return view('statamic::forms.edit', [
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+            'form' => $form,
+        ]);
     }
 
-    public function update($form)
+    public function update($form, Request $request)
     {
-        $form = Form::find($form);
-
         $this->authorize('edit', $form);
+
+        $data = $request->validate([
+            'title' => 'required',
+            'handle' => 'nullable|alpha_dash',
+            'blueprint' => 'nullable|array',
+            'honeypot' => 'nullable|string',
+            'store' => 'nullable|boolean',
+            'email' => 'nullable|array',
+            'email.*.to' => 'required|email',
+            'email.*.from' => 'nullable|email',
+            'email.*.reply_to' => 'nullable|email',
+        ]);
 
         $this->hydrateForm($form, $data);
         $form->save();
 
         $this->success(__('Saved'));
 
-        return [
-            'success' => true,
-            'redirect' => $form->editUrl()
-        ];
+        return $form->toArray();
     }
 
     protected function hydrateForm($form, $data)
     {
+        if (is_string($data['email'])) {
+            $data['email'] = [['to' => $data['email']]];
+        }
+
         return $form
             ->title($data['title'])
             ->handle($data['handle'])
-            ->blueprint(collect($data['blueprint'])->first());
+            ->blueprint(collect($data['blueprint'])->first())
+            ->honeypot($data['honeypot'] ?? null)
+            ->store($data['store'] ?? null)
+            ->email($data['email'] ?? null);
     }
 
     /**
@@ -236,10 +261,104 @@ class FormsController extends CpController
 
     public function destroy($form)
     {
-        $form = Form::find($form);
-
         $this->authorize('delete', $form, 'You are not authorized to delete this form.');
 
         $form->delete();
+    }
+
+    protected function editFormBlueprint()
+    {
+        return Blueprint::makeFromFields([
+            'title' => [
+                'type' => 'text',
+                'validate' => 'required',
+                'width' => 50,
+                'instructions' => __('Usually a call to action, like "Contact Us" or "Vote for Your Favorite Porg".'),
+            ],
+            'handle' => [
+                'type' => 'text',
+                'validate' => 'required|alpha_dash',
+                'width' => 50,
+                'instructions' => 'How you\'ll reference to this form in your templates. Cannot easily be changed.'
+            ],
+            'fields' => ['type' => 'section'],
+            'blueprint' => [
+                'type' => 'blueprints',
+                'instructions' => __('You can pick an existing Blueprint or create a new one.'),
+                'validate' => 'min:1',
+                'max_items' => 1,
+                'width' => 50,
+            ],
+            'honeypot' => [
+                'type' => 'text',
+                'width' => 50,
+                'instructions' => __('The field name to be used for the honeypot.'),
+            ],
+            'submissions' => ['type' => 'section'],
+            'store' => [
+                'display' => __('Store Submissions'),
+                'type' => 'toggle',
+                'width' => 100,
+                'instructions' => __('Whether form submissions should be stored. Turn off if you only wish to get email notifications.'),
+            ],
+            'email' => [
+                'type' => 'grid',
+                'mode' => 'stacked',
+                'instructions' => __('Add any emails you want to be sent upon submission.'),
+                'fields' => [
+                    [
+                        'handle' => 'to',
+                        'field' => [
+                            'type' => 'text',
+                            'display' => __('Recipient (To)'),
+                            'width' => 50,
+                            'validate' => [
+                                'required',
+                            ],
+                            'instructions' => __('Email address of the recipient.'),
+                        ]
+                    ],
+                    [
+                        'handle' => 'from',
+                        'field' => [
+                            'type' => 'text',
+                            'display' => __('Sender (From)'),
+                            'width' => 50,
+                            'instructions' => __('Leave blank to fall back to the site default.'),
+                        ]
+                    ],
+                    [
+                        'handle' => 'reply_to',
+                        'field' => [
+                            'type' => 'text',
+                            'display' => __('Reply To'),
+                            'width' => 50,
+                            'instructions' => __('Leave blank to fall back to sender.'),
+                        ]
+                    ],
+                    [
+                        'handle' => 'subject',
+                        'field' => [
+                            'type' => 'text',
+                            'width' => 100,
+                            'instructions' => __('Email subject line.'),
+                        ]
+                    ],
+                    [
+                        'handle' => 'template',
+                        'field' => [
+                            'type' => 'text',
+                            'width' => 100,
+                            'instructions' => __('Leave blank to use an automagic email template.'),
+                        ]
+                    ],
+                ]
+            ],
+
+
+
+
+            // metrics
+        ]);
     }
 }

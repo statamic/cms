@@ -76,8 +76,16 @@ class Replicator extends Fieldtype
 
     public function augment($array)
     {
-        return collect($array)->reject(function ($value, $key) {
-            return array_get($value, 'enabled', true) === false;
+        return collect($array)->reject(function ($set, $key) {
+            return array_get($set, 'enabled', true) === false;
+        })->map(function ($set) {
+            if (! $config = $this->config("sets.{$set['type']}.fields")) {
+                return $set;
+            }
+
+            $values = (new Fields($config))->addValues($set)->augment()->values();
+
+            return array_merge($values, ['type' => $set['type']]);
         });
     }
 

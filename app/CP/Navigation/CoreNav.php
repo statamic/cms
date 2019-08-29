@@ -153,7 +153,7 @@ class CoreNav
             ->can('view updates');
 
         Nav::tools('Utilities')
-            ->route('utilities.phpinfo')
+            ->route('utilities.index')
             ->active('utilities*')
             ->icon('settings-slider')
             // ->can() // TODO: Permission to use utilities?

@@ -336,7 +336,7 @@
     }
 
     .tableWrapper table {
-        @apply w-full overflow-hidden m-0 mb-2;
+        @apply w-full overflow-hidden m-0 mb-2 bg-white;
         border-collapse: collapse;
         table-layout: fixed;
 
@@ -345,7 +345,7 @@
         }
 
         td, th {
-            @apply border align-top relative py-sm px-1 bg-white;
+            @apply border align-top relative py-sm px-1;
             min-width: 1em;
         }
     }

@@ -71,7 +71,7 @@ Route::group([
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
 
-            Route::group(['prefix' => '{term}/{site}'], function () {
+            Route::group(['prefix' => '{term}/{site?}'], function () {
                 Route::get('/', 'TermsController@edit')->name('taxonomies.terms.edit');
                 Route::post('/', 'PublishedTermsController@store')->name('taxonomies.terms.published.store');
                 Route::delete('/', 'PublishedTermsController@destroy')->name('taxonomies.terms.published.destroy');
@@ -166,6 +166,7 @@ Route::group([
     Route::get('search', 'SearchController')->name('search');
 
     Route::group(['namespace' => 'Utilities'], function () {
+        Route::get('utilities', 'UtilitiesController@index')->name('utilities.index');
         Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
         Route::get('utilities/cache', 'CacheController@index')->name('utilities.cache.index');
         Route::post('utilities/cache/{cache}', 'CacheController@clear')->name('utilities.cache.clear');

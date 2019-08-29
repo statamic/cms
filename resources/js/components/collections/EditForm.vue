@@ -11,7 +11,7 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue }">
+        <div slot-scope="{ setFieldValue, setFieldMeta }">
 
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">
@@ -24,7 +24,10 @@
                 <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections @updated="setFieldValue" :enable-sidebar="false"/>
+            <publish-sections
+                @updated="setFieldValue"
+                @meta-updated="setFieldMeta"
+                :enable-sidebar="false"/>
         </div>
     </publish-container>
 
@@ -82,7 +85,14 @@ export default {
             }
         },
 
-    }
+    },
+
+    created() {
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            this.submit();
+        });
+    },
 
 }
 </script>

@@ -2,7 +2,7 @@
 
     <div :class="sortableItemClass" class="replicator-set">
 
-        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly }">
+        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
             <div class="flex-1 ml-1 flex items-center" @dblclick="toggleCollapsedState">
                 <label v-text="config.display" class="text-xs"/>
@@ -14,8 +14,8 @@
             <div class="replicator-set-controls" v-if="!isReadOnly">
                 <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @input="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
-                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
+                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>

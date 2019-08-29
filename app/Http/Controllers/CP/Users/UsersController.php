@@ -6,6 +6,7 @@ use Statamic\API\URL;
 use Statamic\API\User;
 use Statamic\API\Email;
 use Statamic\API\Scope;
+use Statamic\CP\Column;
 use Statamic\API\Action;
 use Statamic\API\Config;
 use Statamic\API\Helper;
@@ -71,10 +72,10 @@ class UsersController extends CpController
             'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
-                ['label' => __('Email'), 'field' => 'email'],
-                ['label' => __('Name'), 'field' => 'name'],
-                ['label' => __('Roles'), 'field' => 'roles'],
-                ['label' => __('Last Login'), 'field' => 'last_login'],
+                Column::make('email'),
+                Column::make('name'),
+                Column::make('roles'),
+                Column::make('last_login'),
             ],
         ]]);
     }
@@ -140,12 +141,17 @@ class UsersController extends CpController
             ->roles($request->roles ?? [])
             ->groups($request->groups ?? []);
 
+        if ($request->super) {
+            $user->makeSuper();
+        }
+
         $user->save();
 
-        ActivateAccount::subject($request->subject);
-        ActivateAccount::body($request->message);
-
-        $user->generateTokenAndSendPasswordResetNotification();
+        if ($request->invitation['send']) {
+            ActivateAccount::subject($request->invitation['subject']);
+            ActivateAccount::body($request->invitation['message']);
+            $user->generateTokenAndSendPasswordResetNotification();
+        }
 
         return array_merge($user->toArray(), [
             'redirect' => $user->editUrl(),

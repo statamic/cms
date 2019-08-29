@@ -23,6 +23,9 @@ class Form implements FormContract
     protected $title;
     protected $blueprint;
     protected $honeypot;
+    protected $store;
+    protected $email;
+    protected $metrics;
 
     /**
      * Get or set the handle.
@@ -83,6 +86,44 @@ class Form implements FormContract
     }
 
     /**
+     * Get or set the store field.
+     *
+     * @param mixed $store
+     * @return mixed
+     */
+    public function store($store = null)
+    {
+        return $this->fluentlyGetOrSet('store')
+            ->getter(function ($store) {
+                return $store !== false;
+            })
+            ->setter(function ($store) {
+                return $store === false ? false : null;
+            })
+            ->args(func_get_args());
+    }
+
+    /**
+     * Get or set the email field.
+     *
+     * @param mixed $emails
+     * @return mixed
+     */
+    public function email($emails = null)
+    {
+        return $this->fluentlyGetOrSet('email')
+            ->setter(function ($emails) {
+                return collect($emails)
+                    ->map(function ($email) {
+                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'template'])->filter()->all();
+                    })
+                    ->filter()
+                    ->all();
+            })
+            ->args(func_get_args());
+    }
+
+    /**
      * Get the form fields off the blueprint.
      *
      * @return \Illuminate\Support\Collection
@@ -111,9 +152,13 @@ class Form implements FormContract
             'title' => $this->title,
             'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot,
-            // 'metrics' => $this->get('metrics'),
-            // 'email' => $this->get('email')
+            'email' => $this->email,
+            'metrics' => $this->metrics,
         ])->filter()->all();
+
+        if ($this->store === false) {
+            $data['store'] = false;
+        }
 
         File::put($this->path(), YAML::dump($data));
     }
@@ -141,6 +186,8 @@ class Form implements FormContract
                     'title',
                     'blueprint',
                     'honeypot',
+                    'store',
+                    'email',
                 ]);
             })
             ->each(function ($value, $property) {
@@ -179,16 +226,6 @@ class Form implements FormContract
         // }
 
         // return $metrics;
-    }
-
-    // TODO: Reimplement email()
-    public function email($email = null)
-    {
-        // if (is_null($email)) {
-        //     return $this->formset()->get('email', []);
-        // }
-
-        // $this->formset()->set('email', $email);
     }
 
     /**
@@ -308,12 +345,13 @@ class Form implements FormContract
      */
     public function toArray()
     {
-        // TODO: When is this used?
-
         return [
-            'handle' => $this->handle(),
-            'title' => $this->title(),
-            'edit_url' => $this->editUrl()
+            'handle' => $this->handle,
+            'title' => $this->title,
+            'blueprint' => $this->blueprint,
+            'honeypot' => $this->honeypot(),
+            'store' => $this->store(),
+            'email' => $this->email,
         ];
     }
 }
