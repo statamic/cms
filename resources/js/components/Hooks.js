@@ -33,10 +33,10 @@ class Hooks {
 
         return new Promise((resolve, reject) => {
             this.run(beforeHooks, payload).then(() => {
-                this.convertToPromise(callback).then(() => {
-                    this.run(afterHooks, payload).then(resolve).catch(reject);
-                }).catch(reject);
-            }).catch(reject);
+                this.convertToPromise(callback).then(success => {
+                    this.run(afterHooks, payload).then(resolve(success)).catch(error => reject(error));
+                }).catch(error => reject(error));
+            }).catch(error => reject(error));
         });
     }
 
