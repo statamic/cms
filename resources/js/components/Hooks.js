@@ -12,7 +12,7 @@ class Hooks {
     }
 
     run(key, payload) {
-        let promises = this.get(key)
+        let promises = this.getCallbacks(key)
             .sort((a, b) => a.priority - b.priority)
             .map(hook => {
                 return this.convertToPromise(hook.callback, payload);
@@ -40,7 +40,7 @@ class Hooks {
         });
     }
 
-    get(key) {
+    getCallbacks(key) {
         return this.hooks[key] || [];
     }
 
