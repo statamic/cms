@@ -4,6 +4,7 @@ namespace Statamic\Data\Entries;
 
 use Statamic\API;
 use Statamic\API\Arr;
+use Statamic\API\File;
 use Statamic\API\Site;
 use Statamic\API\Entry;
 use Statamic\API\Search;
@@ -456,6 +457,12 @@ class Collection implements Contract
                 });
             })
             ->args(func_get_args());
+    }
+
+    public function deleteFile()
+    {
+        File::delete($this->path());
+        File::delete(dirname($this->path()) . '/' . $this->handle);
     }
 
     public static function __callStatic($method, $parameters)
