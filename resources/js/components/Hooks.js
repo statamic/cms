@@ -11,15 +11,11 @@ class Hooks {
         this.hooks[key].push({callback, priority});
     }
 
-    get(key) {
-        return this.hooks[key] || [];
-    }
-
     run(key, payload) {
-        let promises = this.get(key)
+        let promises = this.getCallbacks(key)
             .sort((a, b) => a.priority - b.priority)
             .map(hook => {
-                return this.ensureFulfilledPromise(hook.callback(payload));
+                return this.convertToPromise(hook.callback, payload);
             });
 
         return new Promise((resolve, reject) => {
@@ -31,31 +27,31 @@ class Hooks {
         });
     }
 
-    runBeforeAndAfter(operation, key, payload) {
-        if (typeof operation.then !== 'function') {
-            return console.error('First parameter must be a valid promise.');
-        }
-
+    runBeforeAndAfter(callback, key, payload) {
         let beforeHooks = `${key}.before`;
         let afterHooks = `${key}.after`;
 
         return new Promise((resolve, reject) => {
             this.run(beforeHooks, payload).then(() => {
-                operation.then(() => {
-                    this.run(afterHooks, payload).then(() => resolve()).catch(() => reject());
-                }).catch(() => reject());
-            }).catch(() => reject());
+                this.convertToPromise(callback).then(success => {
+                    this.run(afterHooks, payload).then(resolve(success)).catch(error => reject(error));
+                }).catch(error => reject(error));
+            }).catch(error => reject(error));
         });
     }
 
-    ensureFulfilledPromise(result) {
-        if (result && typeof result.then === 'function') {
-            return result;
-        } else if (result === false) {
-            return Promise.reject();
+    getCallbacks(key) {
+        return this.hooks[key] || [];
+    }
+
+    convertToPromise(callback, payload) {
+        if (typeof callback.then === 'function') {
+            return callback;
         }
 
-        return Promise.resolve();
+        return new Promise((resolve, reject) => {
+            return callback(resolve, reject, payload);
+        });
     }
 }
 
