@@ -191,8 +191,12 @@ class Tree implements Localization
 
     protected function validateRoot($root)
     {
-        if ($this->structure->isCollectionBased()) {
-            $this->validateUniqueEntries($root, $this->tree);
+        if (! $this->structure->isCollectionBased()) {
+            return $root;
+        }
+
+        if ($entryId = $this->getEntryIdsFromTree($this->tree)->duplicates()->first()) {
+            $this->throwDuplicateEntryException($entryId);
         }
 
         return $root;
@@ -200,18 +204,26 @@ class Tree implements Localization
 
     protected function validateTree($tree)
     {
-        if ($this->structure->isCollectionBased()) {
-            $this->validateUniqueEntries($this->root, $tree);
+        if (! $this->structure->isCollectionBased()) {
+            return $tree;
+        }
+
+        $entryIds = $this->getEntryIdsFromTree($tree);
+
+        if ($this->root) {
+            $entryIds->push($this->root);
+        }
+
+        if ($entryId = $entryIds->duplicates()->first()) {
+            $this->throwDuplicateEntryException($entryId);
         }
 
         return $tree;
     }
 
-    protected function validateUniqueEntries($root, $tree)
+    private function throwDuplicateEntryException($id)
     {
-        if ($entryId = $this->getEntryIdsFromTree($tree)->push($root)->filter()->duplicates()->first()) {
-            throw new \Exception("Duplicate entry [{$entryId}] in [{$this->structure->handle()}] structure.");
-        }
+        throw new \Exception("Duplicate entry [{$id}] in [{$this->structure->handle()}] structure.");
     }
 
     protected function getEntryIdsFromTree($tree)
