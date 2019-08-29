@@ -229,6 +229,13 @@ class Term implements TermContract, Responsable, AugmentableContract
         return true;
     }
 
+    public function delete()
+    {
+        API\Term::delete($this);
+
+        return true;
+    }
+
     public function reference()
     {
         return "term::{$this->id()}";

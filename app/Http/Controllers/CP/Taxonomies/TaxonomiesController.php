@@ -137,6 +137,13 @@ class TaxonomiesController extends CpController
         return $taxonomy->toArray();
     }
 
+    public function destroy($taxonomy)
+    {
+        $this->authorize('delete', $taxonomy, 'You are not authorized to delete this taxonomy.');
+
+        $taxonomy->delete();
+    }
+
     protected function updateTaxonomy($taxonomy, $data)
     {
         return $taxonomy

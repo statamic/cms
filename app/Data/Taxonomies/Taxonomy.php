@@ -115,6 +115,15 @@ class Taxonomy implements Contract, Responsable
         return true;
     }
 
+    public function delete()
+    {
+        $this->queryTerms()->get()->each->delete();
+
+        API\Taxonomy::delete($this);
+
+        return true;
+    }
+
     public function fileData()
     {
         return Arr::except($this->toArray(), [

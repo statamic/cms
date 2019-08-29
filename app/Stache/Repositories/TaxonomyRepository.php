@@ -38,6 +38,11 @@ class TaxonomyRepository implements RepositoryContract
         $this->store->save($taxonomy);
     }
 
+    public function delete(Taxonomy $taxonomy)
+    {
+        $this->store->delete($taxonomy);
+    }
+
     public function make($handle = null)
     {
         return app(Taxonomy::class)->handle($handle);
