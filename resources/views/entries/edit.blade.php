@@ -7,6 +7,7 @@
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
         method="patch"
+        collection-handle="{{ $collection['handle'] }}"
         collection-title="{{ $collection['title'] }}"
         collection-url="{{ $collection['url'] }}"
         initial-title="{{ $title }}"

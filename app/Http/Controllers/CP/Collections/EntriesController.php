@@ -339,6 +339,7 @@ class EntriesController extends CpController
     protected function collectionToArray($collection)
     {
         return [
+            'handle' => $collection->handle(),
             'title' => $collection->title(),
             'url' => cp_route('collections.show', $collection->handle())
         ];

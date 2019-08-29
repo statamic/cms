@@ -248,6 +248,7 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         initialIsWorkingCopy: Boolean,
+        collectionHandle: String,
         collectionTitle: String,
         collectionUrl: String,
         initialActions: Object,
@@ -341,7 +342,7 @@ export default {
 
         hookPayload() {
             return {
-                collection: this.collection,
+                collection: this.collectionHandle,
                 values: this.values,
             };
         },
