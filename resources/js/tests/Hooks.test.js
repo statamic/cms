@@ -24,9 +24,10 @@ test('it runs without hooks', () => {
 });
 
 test('it sets and runs a hook', () => {
-    Statamic.$hooks.on('example.hook', data => {
+    Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
         expect(data.count).toBe(1);
         data.count = 2;
+        resolve();
     });
 
     let payload = {count: 1};
@@ -38,12 +39,13 @@ test('it sets and runs a hook', () => {
 });
 
 test('it sets and runs a failed hook', () => {
-    Statamic.$hooks.on('example.hook', data => {
+    Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
         expect(data.count).toBe(1);
+        resolve();
     });
 
-    Statamic.$hooks.on('example.hook', data => {
-        return false;
+    Statamic.$hooks.on('example.hook', (resolve, reject) => {
+        reject();
     });
 
     let payload = {count: 1};
@@ -53,13 +55,11 @@ test('it sets and runs a failed hook', () => {
 });
 
 test('it waits for hook defined promises to resolve', () => {
-    Statamic.$hooks.on('example.hook', data => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                data.count = 2;
-                resolve();
-            }, 10);
-        });
+    Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
+        setTimeout(() => {
+            data.count = 2;
+            resolve();
+        }, 10);
     });
 
     let payload = {count: 1};
@@ -71,16 +71,15 @@ test('it waits for hook defined promises to resolve', () => {
 });
 
 test('it fails if a hook defined promise is rejected', () => {
-    Statamic.$hooks.on('example.hook', data => {
+    Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
         expect(data.count).toBe(1);
+        resolve();
     });
 
-    Statamic.$hooks.on('example.hook', data => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                reject();
-            }, 10);
-        });
+    Statamic.$hooks.on('example.hook', (resolve, reject) => {
+        setTimeout(() => {
+            reject();
+        }, 10);
     });
 
     let payload = {count: 1};
@@ -93,16 +92,19 @@ test('it runs hooks in order by priority', () => {
     let runHooks = [];
 
     // This hook defaults to priority of 10.
-    Statamic.$hooks.on('example.hook', data => {
+    Statamic.$hooks.on('example.hook', resolve => {
         runHooks.push('this should run second');
+        resolve();
     });
 
-    Statamic.$hooks.on('example.hook', data => {
+    Statamic.$hooks.on('example.hook', resolve => {
         runHooks.push('this should run third');
+        resolve();
     }, 200);
 
-    Statamic.$hooks.on('example.hook', data => {
+    Statamic.$hooks.on('example.hook', resolve => {
         runHooks.push('this should run first');
+        resolve();
     }, 2);
 
     let promise = Statamic.$hooks.run('example.hook');
@@ -117,20 +119,22 @@ test('it runs hooks in order by priority', () => {
 test('it can run before and after hooks in one shot', () => {
     let runHooks = [];
 
-    Statamic.$hooks.on('example.save.after', data => {
+    Statamic.$hooks.on('example.save.after', (resolve, reject) => {
         runHooks.push('this should run after');
+        resolve();
     });
 
-    Statamic.$hooks.on('example.save.before', data => {
+    Statamic.$hooks.on('example.save.before', (resolve, reject) => {
         runHooks.push('this should run before');
+        resolve();
     });
 
-    let saveOperation = new Promise((resolve, reject) => {
+    let saveOperation = (resolve, reject) => {
         setTimeout(() => {
             runHooks.push('this should run in the middle');
             resolve();
         }, 10);
-    });
+    };
 
     return Statamic.$hooks.runBeforeAndAfter(saveOperation, 'example.save').then(() => {
         expect(runHooks[0]).toBe('this should run before');
