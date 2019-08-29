@@ -9,6 +9,7 @@ use Statamic\API\Helper;
 use Statamic\Stache\Stores\Store;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
+use Wilderborn\Partyline\Facade as Partyline;
 
 class Stache
 {
@@ -75,6 +76,8 @@ class Stache
 
     public function clear()
     {
+        Partyline::comment('Clearing Stache...');
+
         $this->stores()->each->clear();
 
         Cache::forget('stache::timing');
@@ -89,6 +92,8 @@ class Stache
 
     public function warm()
     {
+        Partyline::comment('Warming Stache...');
+
         $this->startTimer();
 
         $this->stores()->each->warm();

@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Statamic\API\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Wilderborn\Partyline\Facade as Partyline;
 
 class StacheWarm extends Command
 {
@@ -15,6 +16,8 @@ class StacheWarm extends Command
 
     public function handle()
     {
+        Partyline::bind($this);
+
         $this->line('Please wait. This may take a while if you have a lot of content.');
 
         Stache::warm();
