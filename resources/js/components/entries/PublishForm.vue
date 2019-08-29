@@ -401,17 +401,10 @@ export default {
                     });
             });
 
-            Statamic.$hooks.run('entries.publish.before', payload).then(() => {
-                saveOperation.then(() => {
-                    Statamic.$hooks.run('entries.publish.after', payload)
-                        .then(() => {
-                            this.$nextTick(() => {
-                                this.$emit('saved', saveResponse);
-                            });
-                        })
-                        .catch(() => this.$notify.error('Something went wrong'));
-                }).catch(() => this.$notify.error('Something went wrong'));
-            }).catch(() => this.$notify.error('Something went wrong'));
+            Statamic.$hooks
+                .runBeforeAndAfter(saveOperation, 'entries.publish', payload)
+                .then(() => this.$nextTick(() => this.$emit('saved', saveResponse)))
+                .catch(() => this.$notify.error('Something went wrong'));
         },
 
         confirmPublish() {
