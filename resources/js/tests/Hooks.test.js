@@ -70,6 +70,23 @@ test('it waits for hook promise to resolve', () => {
     });
 });
 
+test('it sets and runs a hook that passes a promise instead of a callback', () => {
+    let runHooks = [];
+
+    Statamic.$hooks.on('example.hook', new Promise((resolve, reject) => {
+        setTimeout(() => {
+            runHooks.push('we passed our own promise');
+            resolve();
+        }, 10);
+    }));
+
+    let promise = Statamic.$hooks.run('example.hook');
+
+    return promise.then(() => {
+        expect(runHooks[0]).toBe('we passed our own promise');
+    });
+});
+
 test('it runs hooks in order by priority', () => {
     let runHooks = [];
 
@@ -124,4 +141,3 @@ test('it can run before and after hooks in one shot', () => {
         expect(runHooks[2]).toBe('this should run after');
     });
 });
-

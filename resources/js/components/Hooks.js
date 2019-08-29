@@ -45,6 +45,10 @@ class Hooks {
     }
 
     convertToPromise(callback, payload) {
+        if (typeof callback.then === 'function') {
+            return callback;
+        }
+
         return new Promise((resolve, reject) => {
             return callback(resolve, reject, payload);
         });
