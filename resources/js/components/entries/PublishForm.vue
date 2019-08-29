@@ -213,6 +213,7 @@
             v-if="confirmingPublish"
             :actions="actions"
             :published="published"
+            :values="values"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
@@ -374,7 +375,7 @@ export default {
             let saveOperation = this.$axios[this.method](this.actions.save, payload);
 
             if (! this.revisionsEnabled) {
-                saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', payload);
+                saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', this.values);
             }
 
             saveOperation
