@@ -73,7 +73,7 @@ test('it waits for hook promise to resolve', () => {
 test('it sets and runs a hook that passes a promise instead of a callback', () => {
     let runHooks = [];
 
-    Statamic.$hooks.on('example.hook', new Promise((resolve, reject) => {
+    Statamic.$hooks.on('example.hook', new Promise(resolve => {
         setTimeout(() => {
             runHooks.push('we passed our own promise');
             resolve();
@@ -118,17 +118,17 @@ test('it runs hooks in order by priority', () => {
 test('it can run before and after hooks in one shot', () => {
     let runHooks = [];
 
-    Statamic.$hooks.on('example.save.after', (resolve, reject) => {
+    Statamic.$hooks.on('example.save.after', resolve => {
         runHooks.push('this should run after');
         resolve();
     });
 
-    Statamic.$hooks.on('example.save.before', (resolve, reject) => {
+    Statamic.$hooks.on('example.save.before', resolve => {
         runHooks.push('this should run before');
         resolve();
     });
 
-    let saveOperation = (resolve, reject) => {
+    let saveOperation = resolve => {
         setTimeout(() => {
             runHooks.push('this should run in the middle');
             resolve();
