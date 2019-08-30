@@ -10,6 +10,7 @@ use Statamic\Fields\Value;
 use Statamic\Query\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Facade\Ignition\Facades\Flare;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions\ModifierException;
@@ -120,7 +121,7 @@ class Parser
         try {
             $parsed = $this->parse($text, $data);
         } catch (\Exception | \Error $e) {
-            Whoops::addDataTable('Parser', [
+            Flare::group('Parser', [
                 'view' => $this->view,
                 'text' => $text,
                 'data' => $data,

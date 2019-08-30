@@ -97,7 +97,7 @@ class Terms
             ->diff($excludedTaxonomies)
             ->map(function ($handle) {
                 $taxonomy = Taxonomy::findByHandle($handle);
-                throw_unless($taxonomy, new \Exception("Taxonomy [{$handle}] does not exist."));
+                throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException("Taxonomy [{$handle}] does not exist."));
                 return $taxonomy;
             })
             ->values();
@@ -114,7 +114,7 @@ class Terms
         return collect(explode('|', $collections))
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
-                throw_unless($collection, new \Exception("Collection [{$handle}] does not exist."));
+                throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException("Collection [{$handle}] does not exist."));
                 return $collection;
             })
             ->values();

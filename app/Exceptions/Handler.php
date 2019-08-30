@@ -22,7 +22,11 @@ class Handler extends ExceptionHandler
 
     protected function whoopsHandler()
     {
-        return (new WhoopsHandler)->forDebug();
+        try {
+            return app(\Whoops\Handler\HandlerInterface::class);
+        } catch (\Illuminate\Contracts\Container\BindingResolutionException $e) {
+            return (new \Illuminate\Foundation\Exceptions\WhoopsHandler)->forDebug();
+        }
     }
 
     /**
