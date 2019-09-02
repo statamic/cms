@@ -80,4 +80,9 @@ class Value implements IteratorAggregate
 
         return $value;
     }
+
+    public function fieldtype()
+    {
+        return $this->fieldtype;
+    }
 }

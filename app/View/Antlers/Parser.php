@@ -10,11 +10,13 @@ use Statamic\Fields\Value;
 use Statamic\Query\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Facade\Ignition\Facades\Flare;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
+use Facade\Ignition\Exceptions\ViewException;
+use Facade\IgnitionContracts\ProvidesSolution;
+use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 
 class Parser
 {
@@ -120,13 +122,7 @@ class Parser
         try {
             $parsed = $this->parse($text, $data);
         } catch (\Exception | \Error $e) {
-            Flare::group('Parser', [
-                'view' => $this->view,
-                'text' => $text,
-                'data' => $data,
-            ]);
-
-            throw $e;
+            throw $this->viewException($e, $data);
         }
 
         $this->view = $existingView;
@@ -1383,5 +1379,29 @@ class Parser
         $value = $value->value();
 
         return is_array($value) || $value instanceof Collection;
+    }
+
+    protected function viewException($e, $data)
+    {
+        if (! class_exists(ViewException::class)) {
+            return $e;
+        }
+
+        $exceptionClass = ViewException::class;
+
+        if (in_array(ProvidesSolution::class, class_implements($e))) {
+            $exceptionClass = ViewExceptionWithSolution::class;
+        }
+
+        $exception = new $exceptionClass($e->getMessage(), 0, 1, $this->view, null, $e);
+
+        if ($exceptionClass === ViewExceptionWithSolution::class) {
+            $exception->setSolution($e->getSolution());
+        }
+
+        $exception->setView($this->view);
+        $exception->setViewData($data);
+
+        return $exception;
     }
 }
