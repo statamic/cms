@@ -5,17 +5,39 @@ namespace Statamic\Exceptions;
 use Exception;
 use Facade\IgnitionContracts\Solution;
 use Facade\IgnitionContracts\BaseSolution;
+use Facade\Ignition\Support\StringComparator;
 use Facade\IgnitionContracts\ProvidesSolution;
+use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldtypeNotFoundException extends Exception implements ProvidesSolution
 {
-    /** @return  \Facade\IgnitionContracts\Solution[] */
+    protected $fieldtype;
+
+    public function __construct($fieldtype)
+    {
+        parent::__construct("Fieldtype [{$fieldtype}] not found");
+
+        $this->fieldtype = $fieldtype;
+    }
+
     public function getSolution(): Solution
     {
-        return BaseSolution::create('Fieldtype not found')
-            ->setSolutionDescription("It could be a typo, or perhaps you haven't created it yet?")
+        $description = ($suggestedFieldtype = $this->getSuggestedFieldtype())
+            ? "Did you mean `$suggestedFieldtype`?"
+            : 'Are you sure the fieldtype exists?';
+
+        return BaseSolution::create("The {$this->fieldtype} fieldtype was not found.")
+            ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Fieldtypes' => 'https://docs.statamic.com/fieldtypes',
+                'Read the fieldtypes guide' => 'https://docs.statamic.com/fieldtypes',
             ]);
+    }
+
+    protected function getSuggestedFieldtype()
+    {
+        return StringComparator::findClosestMatch(
+            FieldtypeRepository::handles()->all(),
+            $this->fieldtype
+        );
     }
 }
