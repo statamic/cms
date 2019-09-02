@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Exceptions\WhoopsHandler as Whoops;
 
 class Parser
 {
