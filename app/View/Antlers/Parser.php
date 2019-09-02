@@ -16,6 +16,7 @@ use Statamic\Exceptions\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
 use Facade\Ignition\Exceptions\ViewException;
 use Facade\IgnitionContracts\ProvidesSolution;
+use Statamic\Ignition\Value as IgnitionViewValue;
 use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 
 class Parser
@@ -1400,8 +1401,27 @@ class Parser
         }
 
         $exception->setView($this->view);
-        $exception->setViewData($data);
+        $exception->setViewData($this->getViewDataForException($data));
 
         return $exception;
+    }
+
+    protected function getViewDataForException($data)
+    {
+        return collect($data)
+            ->except(['__env', 'app', 'config'])
+            ->map(function ($value) {
+                if ($value instanceof Value) {
+                    return new IgnitionViewValue($value);
+                }
+
+                if (is_array($value)) {
+                    return $this->getViewDataForException($value);
+                }
+
+                return $value;
+            })
+            ->sortKeys()
+            ->all();
     }
 }
