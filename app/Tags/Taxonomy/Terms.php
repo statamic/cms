@@ -97,7 +97,7 @@ class Terms
             ->diff($excludedTaxonomies)
             ->map(function ($handle) {
                 $taxonomy = Taxonomy::findByHandle($handle);
-                throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException("Taxonomy [{$handle}] does not exist."));
+                throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException($handle));
                 return $taxonomy;
             })
             ->values();

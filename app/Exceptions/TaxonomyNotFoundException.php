@@ -3,19 +3,41 @@
 namespace Statamic\Exceptions;
 
 use Exception;
+use Statamic\API\Taxonomy;
 use Facade\IgnitionContracts\Solution;
 use Facade\IgnitionContracts\BaseSolution;
+use Facade\Ignition\Support\StringComparator;
 use Facade\IgnitionContracts\ProvidesSolution;
 
 class TaxonomyNotFoundException extends Exception implements ProvidesSolution
 {
-    /** @return  \Facade\IgnitionContracts\Solution[] */
+    protected $taxonomy;
+
+    public function __construct($taxonomy)
+    {
+        parent::__construct("Taxonomy [{$taxonomy}] not found");
+
+        $this->taxonomy = $taxonomy;
+    }
+
     public function getSolution(): Solution
     {
-        return BaseSolution::create('Taxonomy not found')
-            ->setSolutionDescription("It could be a typo, or perhaps you haven't created it yet?")
+        $description = ($suggestedTaxonomy = $this->getSuggestedTaxonomy())
+            ? "Did you mean `$suggestedTaxonomy`?"
+            : 'Are you sure the taxonomy exists?';
+
+        return BaseSolution::create("The {$this->taxonomy} taxonomy was not found.")
+            ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Collections' => 'https://docs.statamic.com/taxonomies',
+                'Read the taxonomies guide' => 'https://docs.statamic.com/taxonomies',
             ]);
+    }
+
+    protected function getSuggestedTaxonomy()
+    {
+        return StringComparator::findClosestMatch(
+            Taxonomy::handles()->all(),
+            $this->taxonomy
+        );
     }
 }
