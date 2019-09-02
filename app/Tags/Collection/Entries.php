@@ -147,7 +147,7 @@ class Entries
             ->diff($excludedCollections)
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
-                throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException("Collection [{$handle}] does not exist."));
+                throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException($handle));
                 return $collection;
             })
             ->values();
