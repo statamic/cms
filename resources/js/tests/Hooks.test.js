@@ -142,6 +142,31 @@ test('it can run before and after hooks in one shot', () => {
     });
 });
 
+test('it can run before and after hooks in one shot, but rejecting any befores stops the action and afters', () => {
+    let runHooks = [];
+
+    Statamic.$hooks.on('example.save.after', resolve => {
+        runHooks.push('this should not run');
+        resolve();
+    });
+
+    Statamic.$hooks.on('example.save.before', (resolve, reject) => {
+        runHooks.push('this should run before');
+        reject();
+    });
+
+    let saveOperation = resolve => {
+        setTimeout(() => {
+            runHooks.push('this should not run');
+            resolve();
+        }, 10);
+    };
+
+    return Statamic.$hooks.runBeforeAndAfter(saveOperation, 'example.save').catch(() => {
+        expect(runHooks.length).toBe(1);
+        expect(runHooks[0]).toBe('this should run before');
+    });
+});
 test('it can run before and after hooks and gets success from passed promise', () => {
     let saveOperation = resolve => {
         setTimeout(() => {
