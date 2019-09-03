@@ -22,7 +22,7 @@ class Hooks {
             Promise.all(promises).then(values => {
                 resolve(values);
             }).catch(error => {
-                reject('');
+                reject(error);
             });
         });
     }

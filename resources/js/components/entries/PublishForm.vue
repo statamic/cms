@@ -417,7 +417,7 @@ export default {
                 this.errors = errors;
                 this.$notify.error(message);
             } else {
-                this.$notify.error('Something went wrong');
+                this.$notify.error(e || 'Something went wrong');
             }
         },
 

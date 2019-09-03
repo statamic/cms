@@ -170,7 +170,7 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
-            this.$notify.error('Something went wrong');
+            this.$notify.error(e || 'Something went wrong');
         }
 
     }
