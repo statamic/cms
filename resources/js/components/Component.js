@@ -15,6 +15,10 @@ class Component {
         Vue.set(this.events, event, handler);
     }
 
+    destroy() {
+        Statamic.$components.destroy(this.id);
+    }
+
 }
 
 export default Component;

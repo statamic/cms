@@ -28,6 +28,15 @@ class Components {
         return _.findWhere(components, { id });
     }
 
+    destroy(id) {
+        let appended = this.getAppended(id);
+
+        if (appended) {
+            const index = _.indexOf(this.$root.appendedComponents, appended);
+            this.$root.appendedComponents.splice(index, 1);
+        }
+    }
+
 }
 
 export default Components;
