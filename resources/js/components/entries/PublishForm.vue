@@ -380,10 +380,12 @@ export default {
                 _localized: this.localizedFields,
             }};
 
-            let saveOperation = this.$axios[this.method](this.actions.save, payload);
+            let saveOperation = () => this.$axios[this.method](this.actions.save, payload);
 
             if (! this.revisionsEnabled) {
                 saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', this.hookPayload);
+            } else {
+                saveOperation = saveOperation();
             }
 
             saveOperation

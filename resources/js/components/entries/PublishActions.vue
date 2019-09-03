@@ -133,7 +133,7 @@ export default {
         submitPublish() {
             const payload = { message: this.revisionMessage };
 
-            let publishOperation = this.$axios.post(this.actions.publish, payload);
+            let publishOperation = () => this.$axios.post(this.actions.publish, payload);
 
             Statamic.$hooks.runBeforeAndAfter(publishOperation, 'entries.publish', this.hookPayload)
                 .then(response => {

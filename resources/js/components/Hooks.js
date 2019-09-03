@@ -50,7 +50,13 @@ class Hooks {
         }
 
         return new Promise((resolve, reject) => {
-            return callback(resolve, reject, payload);
+            let returned = callback(resolve, reject, payload);
+
+            if (returned && typeof returned.then === 'function') {
+                returned
+                    .then(success => resolve(success))
+                    .catch(error => reject(error));
+            }
         });
     }
 }

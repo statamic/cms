@@ -87,6 +87,27 @@ test('it sets and runs a hook that passes a promise instead of a callback', () =
     });
 });
 
+test('it sets and runs a hook that passes a callback returning a promise', () => {
+    let runHooks = [];
+
+    Statamic.$hooks.on('example.hook', () => {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                runHooks.push('we passed our own promise');
+                resolve('great!');
+            }, 10);
+        });
+    });
+
+    let promise = Statamic.$hooks.run('example.hook');
+
+    return promise.then(success => {
+        expect(success.length).toBe(1);
+        expect(success[0]).toBe('great!');
+        expect(runHooks[0]).toBe('we passed our own promise');
+    });
+});
+
 test('it runs hooks in order by priority', () => {
     let runHooks = [];
 
@@ -167,6 +188,37 @@ test('it can run before and after hooks in one shot, but rejecting any befores s
         expect(runHooks[0]).toBe('this should run before');
     });
 });
+
+test('it can run before and after hooks in one shot, but rejecting any befores stops the action and afters, but with callbacks returning promises', () => {
+    let runHooks = [];
+
+    Statamic.$hooks.on('example.save.after', () => {
+        return new Promise((resolve, reject) => {
+            runHooks.push('this should not run');
+            resolve();
+        });
+    });
+
+    Statamic.$hooks.on('example.save.before', () => {
+        return new Promise((resolve, reject) => {
+            runHooks.push('this should run before');
+            reject();
+        });
+    });
+
+    let saveOperation = resolve => {
+        setTimeout(() => {
+            runHooks.push('this should not run');
+            resolve();
+        }, 10);
+    };
+
+    return Statamic.$hooks.runBeforeAndAfter(saveOperation, 'example.save').catch(() => {
+        expect(runHooks.length).toBe(1);
+        expect(runHooks[0]).toBe('this should run before');
+    });
+});
+
 test('it can run before and after hooks and gets success from passed promise', () => {
     let saveOperation = resolve => {
         setTimeout(() => {
