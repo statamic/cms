@@ -25,6 +25,14 @@
                   </div>
             </div>
 
+            <component
+                  v-for="component in appendedComponents"
+                  :key="component.id"
+                  :is="component.name"
+                  v-bind="component.props"
+                  v-on="component.events"
+            ></component>
+
             <portal to="modals" v-if="showLoginModal">
                 <login-modal
                       email="{{ me()->email() }}"

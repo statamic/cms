@@ -149,6 +149,7 @@ Statamic.app({
         modals: [],
         stacks: [],
         panes: [],
+        appendedComponents: []
     },
 
     computed: {

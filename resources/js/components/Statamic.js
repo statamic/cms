@@ -2,9 +2,11 @@ import Vue from 'vue';
 import Echo from './Echo';
 import Bard from './Bard';
 import Hooks from './Hooks';
+import Components from './Components';
 const echo = new Echo;
 const bard = new Bard;
 const hooks = new Hooks;
+const components = new Components;
 
 export default new Vue({
     data() {
@@ -15,6 +17,10 @@ export default new Vue({
     },
 
     computed: {
+
+        $components() {
+            return components;
+        },
 
         $request() {
             // TODO: Custom $request error handling, etc?  For now, we'll just alias directly to $axios.
@@ -61,6 +67,8 @@ export default new Vue({
             this.bootingCallbacks = [];
 
             this.$app = new Vue(this.$app);
+
+            this.$components.$root = this.$app;
 
             this.bootedCallbacks.forEach(callback => callback(this));
             this.bootedCallbacks = [];
