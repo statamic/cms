@@ -25,7 +25,7 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
 
-class Entry implements Contract, AugmentableContract, Responsable, Localization
+class Entry implements Contract, AugmentableContract, Responsable, Localization, ArrayAccess
 {
     use Routable {
         uri as routableUri;
@@ -507,5 +507,25 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization
     protected function getOriginByString($origin)
     {
         return API\Entry::find($origin);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->has($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->value($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    public function offsetUnset($key)
+    {
+        $this->remove($key);
     }
 }

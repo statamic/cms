@@ -60,7 +60,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_sets_and_gets_data_values()
+    function it_sets_gets_and_removes_data_values()
     {
         $entry = new Entry;
         $this->assertNull($entry->get('foo'));
@@ -71,6 +71,11 @@ class EntryTest extends TestCase
         $this->assertTrue($entry->has('foo'));
         $this->assertEquals('bar', $entry->get('foo'));
         $this->assertEquals('fallback', $entry->get('unknown', 'fallback'));
+
+        $return = $entry->remove('foo');
+
+        $this->assertEquals($entry, $return);
+        $this->assertFalse($entry->has('foo'));
     }
 
     /** @test */
@@ -83,6 +88,26 @@ class EntryTest extends TestCase
 
         $this->assertTrue($entry->has('foo'));
         $this->assertEquals('bar', $entry->foo);
+    }
+
+    /** @test */
+    function it_gets_sets_and_removes_data_values_using_array_access()
+    {
+        $entry = new Entry;
+        $this->assertNull($entry['foo']);
+        $this->assertFalse(isset($entry['foo']));
+
+        $entry['foo'] = 'bar';
+
+        $this->assertTrue($entry->has('foo'));
+        $this->assertTrue(isset($entry['foo']));
+        $this->assertEquals('bar', $entry['foo']);
+
+        unset($entry['foo']);
+
+        $this->assertFalse($entry->has('foo'));
+        $this->assertFalse(isset($entry['foo']));
+        $this->assertNull($entry['foo']);
     }
 
     /** @test */
