@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Entries;
 
+use ArrayAccess;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Site;
