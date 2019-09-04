@@ -214,6 +214,12 @@ abstract class Store
             }
         });
 
+        // Clear cached paths so we're free to deal with the latest ones. We do this after
+        // forgetting deleted files, otherwise they wouldn't be available in the array.
+        // TODO: It may be more performant to keep the paths instead of clearing them
+        // all, then manually create any added files, and delete any deleted files.
+        $this->clearCachedPaths();
+
         // Flush the cached instances of modified items.
         $modified->each(function ($timestamp, $path) use ($pathMap) {
             if ($key = $pathMap->get($path)) {
@@ -318,6 +324,12 @@ abstract class Store
         $this->paths = $paths;
     }
 
+    protected function clearCachedPaths()
+    {
+        $this->paths = null;
+        Cache::forget($this->pathsCacheKey());
+    }
+
     protected function pathsCacheKey()
     {
         return "stache::indexes::{$this->key()}::_paths";
@@ -336,8 +348,7 @@ abstract class Store
 
         Cache::forget($this->indexUsageCacheKey());
 
-        $this->paths = null;
-        Cache::forget($this->pathsCacheKey());
+        $this->clearCachedPaths();
     }
 
     public function warm()
