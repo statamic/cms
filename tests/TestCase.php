@@ -78,7 +78,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.users.repository', 'file');
-        $app['config']->set('statamic.stache.users', [
+        $app['config']->set('statamic.stache.stores.users', [
             'class' => \Statamic\Stache\Stores\UsersStore::class,
             'directory' => __DIR__.'/__fixtures__/users'
         ]);
