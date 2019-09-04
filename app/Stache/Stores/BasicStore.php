@@ -92,7 +92,7 @@ abstract class BasicStore extends Store
 
     public function save($item)
     {
-        $item->writeFile();
+        $this->writeItemToDisk($item);
 
         $key = $this->getItemKey($item);
 
@@ -116,5 +116,10 @@ abstract class BasicStore extends Store
         $this->forgetPath($key);
 
         $this->resolveIndexes()->each->forgetItem($key);
+    }
+
+    protected function writeItemToDisk($item)
+    {
+        $item->writeFile();
     }
 }
