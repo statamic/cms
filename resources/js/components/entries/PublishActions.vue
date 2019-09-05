@@ -75,7 +75,7 @@ export default {
     props: {
         actions: Object,
         published: Boolean,
-        hookPayload: Object,
+        collection: String,
     },
 
     data() {
@@ -131,17 +131,41 @@ export default {
         },
 
         submitPublish() {
+            this.runBeforePublishHook();
+        },
+
+        runBeforePublishHook() {
+            Statamic.$hooks
+                .run('entry.publishing', { collection: this.collection, message: this.revisionMessage })
+                .then(this.performPublishRequest)
+                .catch(error => {
+                    this.saving = false;
+                    this.$notify.error(error || 'Something went wrong');
+                });
+        },
+
+        performPublishRequest() {
             const payload = { message: this.revisionMessage };
-
-            let publishOperation = () => this.$axios.post(this.actions.publish, payload);
-
-            Statamic.$hooks.runBeforeAndAfter(publishOperation, 'entries.publish', this.hookPayload)
+            this.$axios.post(this.actions.publish, payload)
                 .then(response => {
+                    this.saving = false;
                     this.$notify.success(__('Published'));
+                    this.runAfterPublishHook(response);
+                }).catch(error => this.handleAxiosError(error));
+        },
+
+        runAfterPublishHook(response) {
+            // Once the publish request has completed, we want to run the "after" hook.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
+            const afterHookPayload = { collection: this.collection, message: this.revisionMessage, response };
+            Statamic.$hooks
+                .run('entry.published', afterHookPayload)
+                .then(() => {
+                    // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
+                    // if this form is being shown in a stack, we only want to close it once everything's done.
                     this.revisionMessage = null;
                     this.$emit('saved', { published: true, isWorkingCopy: false, response });
-                })
-                .catch(e => this.handleAxiosError(e));
+                }).catch(e => {});
         },
 
         submitSchedule() {
