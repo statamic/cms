@@ -33,6 +33,16 @@ class OAuthController
 
     protected function successRedirectUrl()
     {
-        //
+        $default = '/';
+
+        $previous = session('_previous.url');
+
+        if (! $query = array_get(parse_url($previous), 'query')) {
+            return $default;
+        }
+
+        parse_str($query, $query);
+
+        return array_get($query, 'redirect', $default);
     }
 }
