@@ -3,6 +3,7 @@
 namespace Statamic\View\Antlers;
 
 use Statamic\API\Arr;
+use ReflectionProperty;
 use Statamic\API\Config;
 use Statamic\API\Helper;
 use Statamic\View\Modify;
@@ -1399,6 +1400,10 @@ class Parser
         if ($exceptionClass === ViewExceptionWithSolution::class) {
             $exception->setSolution($e->getSolution());
         }
+
+        $traceProperty = new ReflectionProperty('Exception', 'trace');
+        $traceProperty->setAccessible(true);
+        $traceProperty->setValue($exception, $exception->getPrevious()->getTrace());
 
         $exception->setView($this->view);
         $exception->setViewData($this->getViewDataForException($data));
