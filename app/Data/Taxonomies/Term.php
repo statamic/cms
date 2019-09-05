@@ -2,6 +2,7 @@
 
 namespace Statamic\Data\Taxonomies;
 
+use ArrayAccess;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Str;
@@ -31,7 +32,7 @@ use Statamic\Contracts\Data\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
 
-class Term implements TermContract, Responsable, AugmentableContract
+class Term implements TermContract, Responsable, AugmentableContract, ArrayAccess
 {
     use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable, Revisable, HasOrigin;
 
@@ -314,5 +315,25 @@ class Term implements TermContract, Responsable, AugmentableContract
     protected function getOriginByString($origin)
     {
         //
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->has($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->value($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    public function offsetUnset($key)
+    {
+        $this->remove($key);
     }
 }
