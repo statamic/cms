@@ -213,7 +213,6 @@
             v-if="confirmingPublish"
             :actions="actions"
             :published="published"
-            :hook-payload="hookPayload"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
@@ -338,14 +337,7 @@ export default {
             if (!this.published && this.initialPublished) return __('Save & Unpublish');
 
             return __('Save');
-        },
-
-        hookPayload() {
-            return {
-                collection: this.collectionHandle,
-                values: this.values,
-            };
-        },
+        }
 
     },
 
@@ -374,33 +366,53 @@ export default {
             this.saving = true;
             this.clearErrors();
 
+            this.runBeforeSaveHook();
+        },
+
+        runBeforeSaveHook() {
+            Statamic.$hooks.run('entry.saving', {
+                collection: this.collectionHandle,
+                values: this.values,
+                container: this.$refs.container
+            })
+            .then(this.performSaveRequest)
+            .catch(error => {
+                this.saving = false;
+                this.$notify.error(error || 'Something went wrong');
+            });
+        },
+
+        performSaveRequest() {
+            // Once the hook has completed, we need to make the actual request.
+            // We build the payload here because the before hook may have modified values.
             const payload = { ...this.values, ...{
                 blueprint: this.fieldset.handle,
                 published: this.published,
                 _localized: this.localizedFields,
             }};
 
-            let saveOperation = () => this.$axios[this.method](this.actions.save, payload);
+            this.$axios[this.method](this.actions.save, payload).then(response => {
+                this.saving = false;
+                this.title = this.values.title;
+                this.isWorkingCopy = true;
+                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                if (!this.isCreating) this.$notify.success('Saved');
+                this.$refs.container.saved();
+                this.runAfterSaveHook(response);
+            }).catch(error => this.handleAxiosError(error));
+        },
 
-            if (! this.revisionsEnabled) {
-                saveOperation = Statamic.$hooks.runBeforeAndAfter(saveOperation, 'entries.publish', this.hookPayload);
-            } else {
-                saveOperation = saveOperation();
-            }
-
-            saveOperation
-                .then(response => {
-                    this.saving = false;
-                    this.title = this.values.title;
-                    this.isWorkingCopy = true;
-                    if (!this.revisionsEnabled) this.permalink = response.data.permalink;
-                    if (!this.isCreating) this.$notify.success('Saved');
-                    this.$refs.container.saved();
-                    this.$nextTick(() => {
-                        this.$emit('saved', response);
-                    });
-                })
-                .catch(error => this.handleAxiosError(error));
+        runAfterSaveHook(response) {
+            // Once the save request has completed, we want to run the "after" hook.
+            // Devs can do what they need and we'll wait for them, but they can't cancel anything.
+            const afterHookPayload = { collection: this.collectionHandle, response };
+            Statamic.$hooks
+                .run('entry.saved', afterHookPayload)
+                .then(() => {
+                    // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
+                    // if this form is being shown in a stack, we only want to close it once everything's done.
+                    this.$nextTick(() => this.$emit('saved', response));
+                }).catch(e => {});
         },
 
         confirmPublish() {
