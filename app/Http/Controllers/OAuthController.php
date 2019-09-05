@@ -33,6 +33,6 @@ class OAuthController
 
     protected function successRedirectUrl()
     {
-        //
+        return route('statamic.cp.dashboard');
     }
 }
