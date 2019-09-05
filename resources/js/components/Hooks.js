@@ -12,31 +12,15 @@ class Hooks {
     }
 
     run(key, payload) {
-        let promises = this.getCallbacks(key)
-            .sort((a, b) => a.priority - b.priority)
-            .map(hook => {
-                return this.convertToPromise(hook.callback, payload);
-            });
-
         return new Promise((resolve, reject) => {
-            Promise.all(promises).then(values => {
-                resolve(values);
-            }).catch(error => {
-                reject(error);
-            });
-        });
-    }
-
-    runBeforeAndAfter(callback, key, payload) {
-        let beforeHooks = `${key}.before`;
-        let afterHooks = `${key}.after`;
-
-        return new Promise((resolve, reject) => {
-            this.run(beforeHooks, payload).then(() => {
-                this.convertToPromise(callback).then(success => {
-                    this.run(afterHooks, payload).then(resolve(success)).catch(error => reject(error));
-                }).catch(error => reject(error));
-            }).catch(error => reject(error));
+            this.getCallbacks(key)
+                .sort((a, b) => a.priority - b.priority)
+                .map(hook => this.convertToPromiseCallback(hook.callback, payload))
+                .reduce((promise, callback) => {
+                    return promise.then(result => callback().then(Array.prototype.concat.bind(result)));
+                }, Promise.resolve([]))
+                .then(results => resolve(results))
+                .catch(error => reject(error));
         });
     }
 
@@ -44,20 +28,12 @@ class Hooks {
         return this.hooks[key] || [];
     }
 
-    convertToPromise(callback, payload) {
-        if (typeof callback.then === 'function') {
-            return callback;
-        }
-
-        return new Promise((resolve, reject) => {
-            let returned = callback(resolve, reject, payload);
-
-            if (returned && typeof returned.then === 'function') {
-                returned
-                    .then(success => resolve(success))
-                    .catch(error => reject(error));
-            }
-        });
+    convertToPromiseCallback(callback, payload) {
+        return () => {
+            return new Promise((resolve, reject) => {
+                callback(resolve, reject, payload);
+            });
+        };
     }
 }
 
