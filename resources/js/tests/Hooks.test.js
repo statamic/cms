@@ -41,17 +41,17 @@ test('it sets and runs a hook', () => {
 test('it sets and runs a failed hook', () => {
     Statamic.$hooks.on('example.hook', (resolve, reject, data) => {
         expect(data.count).toBe(1);
-        resolve();
+        resolve('resolved!');
     });
 
     Statamic.$hooks.on('example.hook', (resolve, reject) => {
-        reject();
+        reject('rejected!');
     });
 
     let payload = {count: 1};
     let promise = Statamic.$hooks.run('example.hook', payload);
 
-    return expect(promise).rejects.toMatch('');
+    return expect(promise).rejects.toMatch('rejected!');
 });
 
 test('it waits for hook promise to resolve', () => {
