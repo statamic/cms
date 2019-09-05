@@ -111,14 +111,20 @@ test('it runs hooks in order by priority', () => {
     });
 
     Statamic.$hooks.on('example.hook', resolve => {
+        resolve('fourth');
+    }, 2);
+
+    Statamic.$hooks.on('example.hook', resolve => {
         resolve('third');
-    }, 200);
+    }, 5);
 
     Statamic.$hooks.on('example.hook', resolve => {
         resolve('first');
-    }, 2);
+    }, 200);
 
     let promise = Statamic.$hooks.run('example.hook');
 
-    return expect(promise).resolves.toMatchObject(['first', 'second', 'third']);
+    return expect(promise).resolves.toMatchObject([
+        'first', 'second', 'third', 'fourth'
+    ]);
 });

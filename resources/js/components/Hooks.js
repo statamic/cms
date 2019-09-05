@@ -14,7 +14,7 @@ class Hooks {
     run(key, payload) {
         return new Promise((resolve, reject) => {
             this.getCallbacks(key)
-                .sort((a, b) => a.priority - b.priority)
+                .sort((a, b) => b.priority - a.priority)
                 .map(hook => this.convertToPromiseCallback(hook.callback, payload))
                 .reduce((promise, callback) => {
                     return promise.then(result => callback().then(Array.prototype.concat.bind(result)));
