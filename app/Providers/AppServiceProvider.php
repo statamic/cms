@@ -13,7 +13,9 @@ use Illuminate\Support\Carbon;
 use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Ignition\SolutionProviders;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Facade\IgnitionContracts\SolutionProviderRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->registerIgnitionSolutionProviders();
+
         $this->swapSessionMiddleware();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
@@ -143,5 +147,12 @@ class AppServiceProvider extends ServiceProvider
             : \Statamic\Http\Middleware\CP\StartSession::class;
 
         $this->app->singleton(\Illuminate\Session\Middleware\StartSession::class, $middleware);
+    }
+
+    protected function registerIgnitionSolutionProviders()
+    {
+        $this->app->make(SolutionProviderRepository::class)->registerSolutionProvider(
+            SolutionProviders\OAuthDisabled::class
+        );
     }
 }
