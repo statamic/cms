@@ -13,7 +13,7 @@ class CollectionEntriesController extends CpController
 
     public function index($collection, Request $request)
     {
-        $entries = static::paginate(Entry::whereCollection($collection));
+        $entries = static::paginate(Entry::whereCollection($collection->handle()));
 
         return EntryResource::collection($entries);
     }
