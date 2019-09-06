@@ -10,6 +10,15 @@ use Statamic\YAML\ParseException as StatamicParseException;
 
 class Yaml
 {
+    protected $file;
+
+    public function file($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
     /**
      * Parse a string of raw YAML into an array
      *
@@ -76,7 +85,7 @@ class Yaml
 
     protected function viewException($e, $str)
     {
-        $path = $this->createTemporaryExceptionFile($str);
+        $path = $this->file ?? $this->createTemporaryExceptionFile($str);
 
         $args = [
             $e->getMessage(), 0, 1, $path, $e->getParsedLine(), $e

@@ -99,7 +99,7 @@ EOT;
     }
 
     /** @test */
-    function it_creates_parse_exception()
+    function it_creates_parse_exception_pointing_to_temporary_file_when_no_file_is_provided()
     {
         $yaml = <<<EOT
 ---
@@ -116,6 +116,29 @@ EOT;
             $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
             $path = storage_path('statamic/tmp/yaml-'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
             $this->assertEquals($path, $e->getFile());
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    function it_creates_parse_exception_pointing_to_actual_file_when_file_is_provided()
+    {
+        $yaml = <<<EOT
+---
+foo: 'bar
+baz: 'qux'
+---
+some content
+EOT;
+
+        try {
+            YAML::file('path/to/file.yaml')->parse($yaml);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
+            $this->assertEquals('path/to/file.yaml', $e->getFile());
             return;
         }
 
