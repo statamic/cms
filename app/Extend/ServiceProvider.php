@@ -234,7 +234,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
             return;
         }
 
-        $name = $this->getAddon()->handle();
+        $name = $this->getAddon()->id();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
@@ -250,7 +250,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
             return;
         }
 
-        $name = $this->getAddon()->handle();
+        $name = $this->getAddon()->id();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
