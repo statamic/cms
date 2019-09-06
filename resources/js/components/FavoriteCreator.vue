@@ -83,7 +83,7 @@ export default {
 
         remove() {
             this.$preferences.remove('favorites', this.persistedFavorite).then(response => {
-                this.$notify.success(__('Favorite removed'), { timeout: 3000 });
+                this.$notify.success(__('Favorite removed'));
             });
         }
     },
