@@ -1,4 +1,7 @@
 <script>
+import uniqid from 'uniqid';
+import Component from '../Component';
+
 export default {
 
     props: {
@@ -171,8 +174,10 @@ export default {
             this.$dirty.remove(this.name);
         },
 
-        pushComponent(component) {
+        pushComponent(name, { props }) {
+            const component = new Component(uniqid(), name, props);
             this.components.push(component);
+            return component;
         },
 
         setFieldValue(handle, value) {

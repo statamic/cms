@@ -70,10 +70,11 @@
                 <div>
                     <component
                         v-for="component in components"
-                        :key="component.name"
+                        :key="component.id"
                         :is="component.name"
                         :container="container"
                         v-bind="component.props"
+                        v-on="component.events"
                     />
 
                     <transition name="live-preview-sections-drop">
