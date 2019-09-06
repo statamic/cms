@@ -21,7 +21,6 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\MakeTag::class,
         Commands\MakeWidget::class,
         Commands\MakeUser::class,
-        Commands\MigrateFieldset::class,
         Commands\Rtfm::class,
         Commands\StacheClear::class,
         Commands\StacheRefresh::class,
