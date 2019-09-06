@@ -21,6 +21,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     protected $commands = [];
     protected $stylesheets = [];
     protected $scripts = [];
+    protected $publishables = [];
     protected $routes = [];
 
     public function boot()
@@ -38,6 +39,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
             ->bootSchedule()
             ->bootStylesheets()
             ->bootScripts()
+            ->bootPublishables()
             ->bootRoutes();
     }
 
@@ -117,6 +119,20 @@ abstract class ServiceProvider extends LaravelServiceProvider
         foreach ($this->scripts as $path) {
             $this->registerScript($path);
         }
+
+        return $this;
+    }
+
+    protected function bootPublishables()
+    {
+        $package = $this->getAddon()->id();
+
+        $publishables = collect($this->publishables)
+            ->mapWithKeys(function ($destination, $origin) use ($package) {
+                return [$origin => public_path("vendor/{$package}/{$destination}")];
+            });
+
+        $this->publishes($publishables->all());
 
         return $this;
     }
