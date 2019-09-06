@@ -317,7 +317,8 @@ export default {
                     'addrowbefore',
                     'addrowafter',
                     'deleterow',
-                    'togglecellmerge'
+                    'togglecellmerge',
+                    'toggleheadercell'
                 );
             }
 
@@ -362,6 +363,7 @@ export default {
                     { name: 'addrowafter', text: __('Add Row After'), command: 'addRowAfter', svg: 'add-row-after', visibleWhenActive: 'table' },
                     { name: 'deleterow', text: __('Delete Row'), command: 'deleteRow', svg: 'delete-row', visibleWhenActive: 'table' },
                     { name: 'togglecellmerge', text: __('Merge Cells'), command: 'toggleCellMerge', svg: 'combine-cells', visibleWhenActive: 'table' },
+                    { name: 'toggleheadercell', text: __('Header Cells'), command: 'toggleHeaderCell', svg: 'title', visibleWhenActive: 'table' },
                 )
             }
 
