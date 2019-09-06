@@ -9,6 +9,10 @@ class NotificationBus {
         this.instance.$events.$emit('notify.success', message, opts);
     }
 
+    info(message, opts) {
+        this.instance.$events.$emit('notify.info', message, opts);
+    }
+
     error(message, opts) {
         this.instance.$events.$emit('notify.error', message, opts);
     }
