@@ -34,11 +34,11 @@ class GlobalsStore extends BasicStore
         if (Site::hasMultiple() && str_contains($relative, '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
             $path = $this->directory . $handle . '.yaml';
-            $data = YAML::parse(File::get($path));
+            $data = YAML::file($path)->parse();
             return $this->makeMultiSiteGlobalFromFile($handle, $path, $data);
         }
 
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse($contents);
 
         return Site::hasMultiple()
             ? $this->makeMultiSiteGlobalFromFile($handle, $path, $data)
@@ -91,8 +91,7 @@ class GlobalsStore extends BasicStore
         if (! File::exists($path = $variables->path())) {
             return;
         }
-        $contents = File::get($path);
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse();
 
         $variables
             ->initialPath($path)

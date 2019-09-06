@@ -42,7 +42,7 @@ class CollectionEntriesStore extends ChildStore
             $collection = str_before($collection, '/');
         }
 
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse($contents);
 
         if (! $id = array_pull($data, 'id')) {
             $idGenerated = true;

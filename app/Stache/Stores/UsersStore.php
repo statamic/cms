@@ -23,7 +23,7 @@ class UsersStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse($contents);
 
         $user = User::make()
             ->id(array_pull($data, 'id'))

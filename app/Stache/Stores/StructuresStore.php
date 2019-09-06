@@ -40,11 +40,11 @@ class StructuresStore extends BasicStore
             [$site, $relative] = explode('/', $relative, 2);
             $handle = str_before($relative, '.yaml');
             $path = $this->directory . $handle . '.yaml';
-            $data = YAML::parse(File::get($path));
+            $data = YAML::file($path)->parse();
             return $this->makeMultiSiteStructureFromFile($handle, $path, $data);
         }
 
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse($contents);
 
         return Site::hasMultiple()
             ? $this->makeMultiSiteStructureFromFile($handle, $path, $data)
@@ -100,8 +100,7 @@ class StructuresStore extends BasicStore
         if (! File::exists($path = $tree->path())) {
             return;
         }
-        $contents = File::get($path);
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse();
 
         return $tree
             ->initialPath($path)

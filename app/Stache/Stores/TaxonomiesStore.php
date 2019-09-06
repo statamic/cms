@@ -33,7 +33,7 @@ class TaxonomiesStore extends BasicStore
     public function makeItemFromFile($path, $contents)
     {
         $handle = pathinfo($path, PATHINFO_FILENAME);
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse($contents);
 
         $sites = array_get($data, 'sites', Site::hasMultiple() ? [] : [Site::default()->handle()]);
 

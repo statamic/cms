@@ -50,7 +50,7 @@ class TaxonomyTermsStore extends ChildStore
             ->slug(pathinfo(Path::clean($path), PATHINFO_FILENAME))
             ->initialPath($path)
             ->locale($site)
-            ->data(YAML::parse($contents));
+            ->data(YAML::file($path)->parse($contents));
     }
 
     public function getItemKey($item)

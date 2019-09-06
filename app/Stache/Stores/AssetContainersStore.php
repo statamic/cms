@@ -19,7 +19,7 @@ class AssetContainersStore extends BasicStore
     public function makeItemFromFile($path, $contents)
     {
         $handle = pathinfo($path, PATHINFO_FILENAME);
-        $data = YAML::parse($contents);
+        $data = YAML::file($path)->parse($contents);
 
         return AssetContainer::make($handle)
             ->disk(array_get($data, 'disk'))
