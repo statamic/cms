@@ -85,13 +85,6 @@ final class Addon
     protected $description;
 
     /**
-     * The Composer package name. eg. "statamic/bloodhound"
-     *
-     * @var string
-     */
-    protected $package;
-
-    /**
      * The addon's version.
      *
      * @var string
