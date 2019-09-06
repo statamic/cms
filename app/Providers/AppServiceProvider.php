@@ -16,6 +16,7 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Ignition\SolutionProviders;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Facade\IgnitionContracts\SolutionProviderRepository;
+use Illuminate\Contracts\Container\BindingResolutionException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -151,8 +152,12 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerIgnitionSolutionProviders()
     {
-        $this->app->make(SolutionProviderRepository::class)->registerSolutionProvider(
-            SolutionProviders\OAuthDisabled::class
-        );
+        try {
+            $this->app->make(SolutionProviderRepository::class)->registerSolutionProviders([
+                SolutionProviders\OAuthDisabled::class
+            ]);
+        } catch (BindingResolutionException $e) {
+            //
+        }
     }
 }
