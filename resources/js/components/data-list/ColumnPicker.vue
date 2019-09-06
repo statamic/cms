@@ -6,7 +6,7 @@
         </button>
 
         <pane name="columns" v-if="customizing" @closed="dismiss">
-            <div>
+            <div class="flex flex-col h-full">
 
                 <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
                     {{ __('Columns') }}
@@ -17,7 +17,7 @@
                         v-html="'&times'" />
                 </div>
 
-                <div class="p-2">
+                <div class="pt-2 overflow-y-auto">
 
                     <sortable-list
                         v-model="columns"
@@ -26,7 +26,7 @@
                         handle-class="column-picker-item"
                     >
                         <div>
-                            <div class="column-picker-item column" v-for="column in sharedState.columns" :key="column.field">
+                            <div class="column-picker-item column px-3" v-for="column in sharedState.columns" :key="column.field">
                                 <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                     <div v-if="preferencesKey">
                         <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
                         <template v-else>
-                            <div class="flex justify-center mt-3">
+                            <div class="flex justify-center p-3">
                                 <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
                                 <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
                             </div>
