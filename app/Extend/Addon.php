@@ -172,6 +172,16 @@ final class Addon
     }
 
     /**
+     * The composer package string
+     *
+     * @return string
+     */
+    public function package()
+    {
+        return $this->id();
+    }
+
+    /**
      * The marketplace variant ID of the addon.
      *
      * @param int $id
