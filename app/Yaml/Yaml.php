@@ -2,9 +2,11 @@
 
 namespace Statamic\Yaml;
 
+use Statamic\API\File;
+use ReflectionProperty;
 use Statamic\API\Pattern;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
-use Statamic\Exceptions\WhoopsHandler as Whoops;
+use Statamic\YAML\ParseException as StatamicParseException;
 
 class Yaml
 {
@@ -29,8 +31,7 @@ class Yaml
         try {
             $yaml = SymfonyYaml::parse($str);
         } catch (\Exception $e) {
-            Whoops::addDataTable('YAML', ['string' => $str]);
-            throw $e;
+            throw $this->viewException($e, $str);
         };
 
         return isset($content)
@@ -71,5 +72,42 @@ class Yaml
         $yaml = "---".PHP_EOL . $yaml . "---".PHP_EOL . $content;
 
         return $yaml ?: '';
+    }
+
+    protected function viewException($e, $str)
+    {
+        $path = $this->createTemporaryExceptionFile($str);
+
+        $args = [
+            $e->getMessage(), 0, 1, $path, $e->getParsedLine(), $e
+        ];
+
+        $exception = new StatamicParseException(...$args);
+
+        $trace = $exception->getTrace();
+        array_unshift($trace, [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'class' => StatamicParseException::class,
+            'args' => $args,
+        ]);
+        $traceProperty = new ReflectionProperty('Exception', 'trace');
+        $traceProperty->setAccessible(true);
+        $traceProperty->setValue($exception, $trace);
+
+        return $exception;
+    }
+
+    protected function createTemporaryExceptionFile($string)
+    {
+        $path = storage_path('statamic/tmp/yaml-'.md5($string));
+
+        File::put($path, $string);
+
+        app()->terminating(function () use ($path) {
+            File::delete($path);
+        });
+
+        return $path;
     }
 }
