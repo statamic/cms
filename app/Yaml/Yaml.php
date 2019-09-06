@@ -2,6 +2,7 @@
 
 namespace Statamic\Yaml;
 
+use Exception;
 use Statamic\API\File;
 use ReflectionProperty;
 use Statamic\API\Pattern;
@@ -22,11 +23,16 @@ class Yaml
     /**
      * Parse a string of raw YAML into an array
      *
-     * @param string $str  The YAML string
+     * @param null|string $str  The YAML string
      * @return array
      */
-    public function parse($str)
+    public function parse($str = null)
     {
+        if (func_num_args() === 0) {
+            throw_if(!$this->file, new Exception('Cannot parse YAML without a file or string.'));
+            $str = File::get($this->file);
+        }
+
         if (empty($str)) {
             return [];
         }

@@ -99,6 +99,35 @@ EOT;
     }
 
     /** @test */
+    function it_parses_a_file_when_no_argument_is_given()
+    {
+        $yaml = <<<EOT
+---
+foo: bar
+---
+some content
+EOT;
+
+        $fp = tmpfile();
+        fwrite($fp, $yaml);
+        $path = stream_get_meta_data($fp)['uri'];
+
+        $this->assertEquals(
+            ['foo' => 'bar', 'content' => 'some content'],
+            YAML::file($path)->parse()
+        );
+    }
+
+    /** @test */
+    function it_throws_exception_when_parsing_without_an_argument_or_file()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Cannot parse YAML without a file or string.');
+
+        YAML::parse();
+    }
+
+    /** @test */
     function it_creates_parse_exception_pointing_to_temporary_file_when_no_file_is_provided()
     {
         $yaml = <<<EOT
