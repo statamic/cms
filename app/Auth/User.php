@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use ArrayAccess;
 use Statamic\API;
 use Statamic\API\Arr;
 use Statamic\API\Blueprint;
@@ -16,7 +17,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable, ArrayAccess
 {
     use Authorizable, Notifiable, CanResetPassword, Augmentable;
 
@@ -24,6 +25,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     abstract public function value($key);
     abstract public function has($key);
     abstract public function set($key, $value);
+    abstract public function remove($key);
 
     public function reference()
     {
@@ -202,5 +204,25 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public static function __callStatic($method, $parameters)
     {
         return API\User::{$method}(...$parameters);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->has($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->value($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    public function offsetUnset($key)
+    {
+        $this->remove($key);
     }
 }

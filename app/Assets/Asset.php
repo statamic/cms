@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use ArrayAccess;
 use Statamic\API;
 use Stringy\Stringy;
 use Statamic\API\Str;
@@ -28,7 +29,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class Asset implements AssetContract, Arrayable
+class Asset implements AssetContract, Arrayable, ArrayAccess
 {
     use FluentlyGetsAndSets, ContainsData {
         set as traitSet;
@@ -680,5 +681,25 @@ class Asset implements AssetContract, Arrayable
     public static function __callStatic($method, $parameters)
     {
         return API\Asset::{$method}(...$parameters);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->has($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    public function offsetUnset($key)
+    {
+        $this->remove($key);
     }
 }
