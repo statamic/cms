@@ -11,9 +11,9 @@ return [
     |
     */
 
-    'enabled' => env('API_ENABLED', false),
+    'enabled' => env('STATAMIC_API_ENABLED', false),
 
-    'route' => env('API_ROUTE', 'api'),
+    'route' => env('STATAMIC_API_ROUTE', 'api'),
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'middleware' => env('API_MIDDLEWARE', 'api'),
+    'middleware' => env('STATAMIC_API_MIDDLEWARE', 'api'),
 
     /*
     |--------------------------------------------------------------------------
