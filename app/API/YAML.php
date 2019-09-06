@@ -8,6 +8,6 @@ class YAML extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Endpoint\YAML::class;
+        return \Statamic\Yaml\Yaml::class;
     }
 }

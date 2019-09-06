@@ -1,15 +1,12 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Yaml;
 
 use Statamic\API\Pattern;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Statamic\Exceptions\WhoopsHandler as Whoops;
 
-/**
- * Parsing and dumping YAML
- */
-class YAML
+class Yaml
 {
     /**
      * Parse a string of raw YAML into an array
