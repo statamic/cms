@@ -6,6 +6,7 @@ use Statamic\API\Arr;
 use Statamic\API\Str;
 use Statamic\API\Data;
 use Statamic\API\File;
+use Statamic\API\Html;
 use Statamic\API\Path;
 use Statamic\API\Site;
 use Statamic\API\YAML;
@@ -316,7 +317,7 @@ class BaseModifiers extends Modifier
      */
     public function decode($value)
     {
-        return app('html')->decode($value);
+        return Html::decode($value);
     }
 
     /**
@@ -351,7 +352,7 @@ class BaseModifiers extends Modifier
      */
     public function dl($value, $params)
     {
-        return app('html')->dl($value, $this->buildAttributesFromParameters($params));
+        return Html::dl($value, $this->buildAttributesFromParameters($params));
     }
 
     /**
@@ -410,7 +411,7 @@ class BaseModifiers extends Modifier
      */
     public function entities($value)
     {
-        return app('html')->entities($value);
+        return Html::entities($value);
     }
 
     /**
@@ -463,7 +464,7 @@ class BaseModifiers extends Modifier
      */
     public function favicon($value, $params)
     {
-        return app('html')->favicon($value, $this->buildAttributesFromParameters($params));
+        return Html::favicon($value, $this->buildAttributesFromParameters($params));
     }
 
     /**
@@ -679,7 +680,7 @@ class BaseModifiers extends Modifier
      */
     public function image($value, $params)
     {
-        return '<img src="'.$value.app('html')->attributes($this->buildAttributesFromParameters($params)).'">';
+        return '<img src="'.$value.'"'.Html::attributes($this->buildAttributesFromParameters($params)).'>';
     }
 
     /**
@@ -1008,7 +1009,7 @@ class BaseModifiers extends Modifier
         $attributes = $this->buildAttributesFromParameters($params);
         $title = array_pull($attributes, 'title', null);
 
-        return app('html')->link($value, $title, $attributes);
+        return Html::link($value, $title, $attributes);
     }
 
     /**
@@ -1064,7 +1065,7 @@ class BaseModifiers extends Modifier
      */
     public function mailto($value, $params)
     {
-        return app('html')->mailto($value, null, $this->buildAttributesFromParameters($params));
+        return Html::mailto($value, null, $this->buildAttributesFromParameters($params));
     }
 
     /**
@@ -1200,7 +1201,7 @@ class BaseModifiers extends Modifier
      */
     public function obfuscate($value)
     {
-        return app('html')->obfuscate($value);
+        return Html::obfuscate($value);
     }
 
     /**
@@ -1212,7 +1213,7 @@ class BaseModifiers extends Modifier
      */
     public function obfuscateEmail($value, $params)
     {
-        return app('html')->email($value, null, $this->buildAttributesFromParameters($params));
+        return Html::email($value, null, $this->buildAttributesFromParameters($params));
     }
 
     /**
@@ -1224,7 +1225,7 @@ class BaseModifiers extends Modifier
      */
     public function ol($value, $params)
     {
-        return app('html')->ol($value, $this->buildAttributesFromParameters($params));
+        return Html::ol($value, $this->buildAttributesFromParameters($params));
     }
 
     /**
@@ -1903,7 +1904,7 @@ class BaseModifiers extends Modifier
      */
     public function ul($value, $params)
     {
-        return app('html')->ul($value, $this->buildAttributesFromParameters($params));
+        return Html::ul($value, $this->buildAttributesFromParameters($params));
     }
 
     /**
