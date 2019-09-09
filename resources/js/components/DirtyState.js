@@ -66,6 +66,9 @@ class DirtyState {
     has(name) {
         return vm.names.includes(name);
     }
+    disableWarning() {
+        vm.disableWarning();
+    }
 }
 
 Object.defineProperties(Vue.prototype, {
