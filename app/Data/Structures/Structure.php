@@ -9,8 +9,8 @@ use Statamic\API\Entry;
 use Statamic\API\Stache;
 use Statamic\API\Collection;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Structure as StructureAPI;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
 class Structure implements StructureContract

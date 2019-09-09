@@ -3,7 +3,7 @@
 namespace Statamic\CP;
 
 use Statamic\API\Str;
-use Statamic\FluentlyGetsAndSets;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Column
 {

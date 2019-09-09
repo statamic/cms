@@ -12,11 +12,11 @@ use Statamic\API\Search;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\API\Asset as AssetAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 

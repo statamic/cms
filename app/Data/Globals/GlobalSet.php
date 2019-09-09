@@ -7,7 +7,7 @@ use Statamic\API\Site;
 use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Globals\GlobalSet as Contract;
 
 class GlobalSet implements Contract

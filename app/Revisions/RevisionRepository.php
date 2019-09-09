@@ -7,6 +7,7 @@ use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Folder;
 use Illuminate\Support\Carbon;
+use Statamic\Support\FileCollection;
 use Statamic\Contracts\Revisions\Revision as RevisionContract;
 use Statamic\Contracts\Revisions\RevisionRepository as Contract;
 
@@ -28,7 +29,7 @@ class RevisionRepository implements Contract
 
         $files = Folder::getFiles($directory);
 
-        return collect_files($files)->filterByExtension('yaml')->reject(function ($path) {
+        return FileCollection::make($files)->filterByExtension('yaml')->reject(function ($path) {
             return Str::endsWith($path, 'working.yaml');
         })->map(function ($path) use ($key) {
             return $this->makeRevisionFromFile($key, $path);

@@ -6,12 +6,12 @@ use Statamic\API\Arr;
 use Statamic\Tags\Tags;
 use Statamic\API\Folder;
 use Statamic\API\Helper;
-use Statamic\FileCollection;
+use Statamic\Support\FileCollection;
 
 class GetFiles extends Tags
 {
     /**
-     * @var \Statamic\FileCollection
+     * @var \Statamic\Support\FileCollection
      */
     private $files;
 

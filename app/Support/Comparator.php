@@ -1,20 +1,31 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Support;
 
-class Compare
+use Collator;
+use Statamic\API\Str;
+use Statamic\API\Site;
+
+class Comparator
 {
+    protected $locale;
+
+    public function __construct()
+    {
+        $this->locale = Site::current()->locale();
+    }
+
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+    }
 
     /**
      * Compares two values
      *
      * Returns 1 if first is greater, -1 if second is, 0 if same
-     *
-     * @param mixed $one Value 1 to compare
-     * @param mixed $two Value 2 to compare
-     * @return int
      */
-    public function values($one, $two)
+    public function values($one, $two): int
     {
         // something is null
         if (is_null($one) || is_null($two)) {
@@ -62,10 +73,36 @@ class Compare
 
         // string based
         if (!is_numeric($one) || !is_numeric($two)) {
-            return Str::compare($one, $two, null, false);
+            return $this->strings($one, $two);
         }
 
-        // number-based
+        return $this->numbers($one, $two);
+    }
+
+    /**
+     * Compares two strings
+     *
+     * Returns 1 if first is greater, -1 if second is, 0 if same
+     */
+    public function strings(string $one, string $two): int
+    {
+        $one = Str::lower($one);
+        $two = Str::lower($two);
+
+        if (! class_exists(Collator::class)) {
+            return strcmp($one, $two);
+        }
+
+        return (new Collator($this->locale))->compare($one, $two);
+    }
+
+    /**
+     * Compares two numbers
+     *
+     * Returns 1 if first is greater, -1 if second is, 0 if same
+     */
+    public function numbers($one, $two): int
+    {
         if ($one > $two) {
             return 1;
         } elseif ($one < $two) {

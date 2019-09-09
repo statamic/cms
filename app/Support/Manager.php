@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic;
+namespace Statamic\Support;
 
 use Closure;
 use InvalidArgumentException;
@@ -15,7 +15,7 @@ abstract class Manager
     {
         $this->app = $app;
     }
-    
+
     public function driver($name = null)
     {
         $name = $name ?: $this->getDefaultDriver();
@@ -27,7 +27,7 @@ abstract class Manager
     {
         return $this->drivers[$name] ?? $this->resolve($name);
     }
-    
+
     protected function resolve($name)
     {
         if ($name === 'null') {

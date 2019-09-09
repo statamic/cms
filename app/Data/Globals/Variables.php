@@ -9,8 +9,8 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Globals\LocalizedGlobalSet as Contract;
 

@@ -4,12 +4,12 @@ namespace Statamic\Revisions;
 
 use Statamic\API;
 use Illuminate\Support\Carbon;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\Data\ExistsAsFile;
 use Statamic\API\Revision as Revisions;
 use Statamic\Contracts\Auth\User;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\API\Arr;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Revisions\Revision as Contract;
 
 class Revision implements Contract, Arrayable

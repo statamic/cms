@@ -101,15 +101,6 @@ function site_locale($locale = null)
 
 /**
  * @param array $value
- * @return \Statamic\FileCollection;
- */
-function collect_files($value = [])
-{
-    return new \Statamic\FileCollection($value);
-}
-
-/**
- * @param array $value
  * @return \Statamic\Data\Content\ContentCollection
  */
 function collect_content($value = [])
@@ -195,14 +186,6 @@ function markdown($content)
 function smartypants($content)
 {
     return SmartyPants::defaultTransform($content);
-}
-
-/**
- * @return \Statamic\DataStore
- */
-function datastore()
-{
-    return app('Statamic\DataStore');
 }
 
 /**

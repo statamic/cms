@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\Manager;
+use Statamic\Support\Manager;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Statamic\Auth\Protect\Protectors\IpAddress;
 use Statamic\Auth\Protect\Protectors\Authenticated;

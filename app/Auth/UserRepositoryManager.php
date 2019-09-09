@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Manager;
+use Statamic\Support\Manager;
 use Statamic\Auth\Eloquent\UserRepository as EloquentRepository;
 use Statamic\Stache\Repositories\UserRepository as StacheRepository;
 
