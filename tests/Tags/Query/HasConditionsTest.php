@@ -340,7 +340,7 @@ class HasConditionsTest extends TestCase
         $this->assertCount(5, $this->getEntries(['website:is_url' => false]));
 
         $this->getEntries(['website:is_url' => true])->map->get('website')->each(function ($url) {
-            $this->assertContains('domain.tld', $url);
+            $this->assertStringContainsString('domain.tld', $url);
         });
     }
 
@@ -367,8 +367,8 @@ class HasConditionsTest extends TestCase
         $this->assertCount(6, $this->getEntries(['video:is_embeddable' => false]));
 
         $this->getEntries(['video:is_embeddable' => true])->map->get('video')->each(function ($url) {
-            $this->assertContains('http', $url);
-            $this->assertContains('/id', $url);
+            $this->assertStringContainsString('http', $url);
+            $this->assertStringContainsString('/id', $url);
         });
     }
 
@@ -386,7 +386,7 @@ class HasConditionsTest extends TestCase
         $this->assertCount(3, $this->getEntries(['email:is_email' => false]));
 
         $this->getEntries(['email:is_email' => true])->map->get('email')->each(function ($email) {
-            $this->assertContains('.com', $email);
+            $this->assertStringContainsString('.com', $email);
         });
     }
 

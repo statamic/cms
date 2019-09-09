@@ -104,11 +104,9 @@ class PathBuilderTest extends TestCase
 
     //-----
 
-    /**
-     * @expectedException \Exception
-     */
     public function testCantBuildEntryPathWithoutCollection()
     {
+        $this->expectException(\Exception::class);
         $this->builder->entry()->get();
     }
 

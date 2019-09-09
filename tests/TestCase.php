@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\Assert;
+
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
@@ -138,5 +140,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
         preg_match("/<[^<]+>/", $string, $matches);
 
         $this->assertNotEmpty($matches, 'Failed asserting that string contains HTML.');
+    }
+
+    public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
+    {
+        Assert::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
     }
 }

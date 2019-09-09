@@ -53,7 +53,7 @@ class ComposerTest extends TestCase
      */
     function it_can_get_installed_path_of_a_package()
     {
-        $this->assertContains('/vendor/laravel/framework', Composer::installedPath('laravel/framework'));
+        $this->assertStringContainsString('/vendor/laravel/framework', Composer::installedPath('laravel/framework'));
     }
 
     /**
@@ -77,7 +77,7 @@ class ComposerTest extends TestCase
         Composer::require('test/package');
 
         $installed = Composer::installed();
-        $this->assertContains('test/package', $installed->keys());
+        $this->assertStringContainsString('test/package', $installed->keys());
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Installing test/package'));
@@ -88,7 +88,7 @@ class ComposerTest extends TestCase
         Composer::update('test/package');
 
         $installed = Composer::installed();
-        $this->assertContains('test/package', $installed->keys());
+        $this->assertStringContainsString('test/package', $installed->keys());
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.1', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Updating test/package'));
@@ -99,7 +99,7 @@ class ComposerTest extends TestCase
         Composer::require('test/package', '1.0.0');
 
         $installed = Composer::installed();
-        $this->assertContains('test/package', $installed->keys());
+        $this->assertStringContainsString('test/package', $installed->keys());
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Downgrading test/package'));
@@ -108,7 +108,7 @@ class ComposerTest extends TestCase
 
         Composer::remove('test/package');
 
-        $this->assertNotContains('test/package', Composer::installed()->keys());
+        $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
         $this->assertFileNotExists($this->basePath('vendor/test/package'));
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Removing test/package'));
     }
