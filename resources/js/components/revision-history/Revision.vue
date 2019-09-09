@@ -32,7 +32,11 @@
                     @closed="showDetails = false"
                 >
                     <template slot="action-buttons-right">
-                        <restore-revision :revision="revision" :url="restoreUrl" class="ml-2" />
+                        <restore-revision
+                            :revision="revision"
+                            :url="restoreUrl"
+                            :reference="reference"
+                            class="ml-2" />
                     </template>
                 </revision-preview>
             </div>
@@ -54,7 +58,8 @@ export default {
 
     props: {
         revision: Object,
-        restoreUrl: String
+        restoreUrl: String,
+        reference: String,
     },
 
     data() {

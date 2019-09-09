@@ -32,6 +32,7 @@
                         :key="revision.date"
                         :revision="revision"
                         :restore-url="restoreUrl"
+                        :reference="reference"
                         @working-copy-selected="close"
                     />
                 </div>
@@ -55,6 +56,7 @@ export default {
     props: {
         indexUrl: String,
         restoreUrl: String,
+        reference: String,
     },
 
     data() {

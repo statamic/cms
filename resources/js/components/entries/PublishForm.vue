@@ -206,6 +206,7 @@
                 slot-scope="{ close }"
                 :index-url="actions.revisions"
                 :restore-url="actions.restore"
+                :reference="initialReference"
                 @closed="close"
             />
         </stack>

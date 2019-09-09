@@ -24,7 +24,8 @@ export default {
 
     props: {
         revision: Object,
-        url: String
+        url: String,
+        reference: String,
     },
 
     data() {
@@ -41,7 +42,12 @@ export default {
             };
 
             this.$axios.post(this.url, payload).then(response => {
-                window.location.reload();
+                Statamic.$hooks
+                    .run('revision.restored', { reference: this.reference })
+                    .then(() => {
+                        this.$dirty.disableWarning();
+                        window.location.reload();
+                    });
             })
         }
 
