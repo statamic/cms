@@ -345,6 +345,8 @@ class Collection implements Contract
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'orderable' => $array['orderable'] ?: null,
+            'sort_by' => $this->sortField,
+            'sort_dir' => $this->sortDirection,
             'default_status' => $this->defaultStatus,
             'date_behavior' => [
                 'past' => $this->pastDateBehavior,
