@@ -351,7 +351,7 @@
     }
 
     p > code {
-        @apply font-mono bg-grey-40 rounded text-xs relative;
+        @apply font-mono bg-grey-40 rounded-sm text-xs relative;
         padding: 2px 4px;
         top: -1px;
     }
