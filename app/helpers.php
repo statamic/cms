@@ -198,14 +198,6 @@ function smartypants($content)
 }
 
 /**
- * @return \Statamic\DataStore
- */
-function datastore()
-{
-    return app('Statamic\DataStore');
-}
-
-/**
  * Sanitizes a string
  *
  * @param bool $antlers  Whether Antlers (curly braces) should be escaped.

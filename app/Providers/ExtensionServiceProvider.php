@@ -4,7 +4,6 @@ namespace Statamic\Providers;
 
 use Statamic\Tags;
 use Statamic\Actions;
-use Statamic\DataStore;
 use Statamic\Fieldtypes;
 use Statamic\Query\Scopes;
 use Statamic\Extend\Modifier;

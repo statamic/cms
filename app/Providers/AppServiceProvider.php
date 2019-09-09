@@ -4,7 +4,6 @@ namespace Statamic\Providers;
 
 use Statamic\API\File;
 use Statamic\Statamic;
-use Statamic\DataStore;
 use Statamic\Sites\Sites;
 use Stringy\StaticStringy;
 use Statamic\API\Preference;
@@ -91,10 +90,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(ExceptionHandler::class, Handler::class);
-
-        $this->app->singleton('Statamic\DataStore', function() {
-            return new DataStore;
-        });
 
         $this->app->bind(Router::class, function () {
             return new Router(config('statamic.routes.routes', []));
