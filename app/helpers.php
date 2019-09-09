@@ -101,11 +101,11 @@ function site_locale($locale = null)
 
 /**
  * @param array $value
- * @return \Statamic\FileCollection;
+ * @return \Statamic\Support\FileCollection;
  */
 function collect_files($value = [])
 {
-    return new \Statamic\FileCollection($value);
+    return new \Statamic\Support\FileCollection($value);
 }
 
 /**

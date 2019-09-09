@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic;
+namespace Statamic\Support;
 
 use Carbon\Carbon;
 use Statamic\API\Str;
