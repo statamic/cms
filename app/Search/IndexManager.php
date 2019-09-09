@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\Manager;
+use Statamic\Support\Manager;
 use Algolia\AlgoliaSearch\SearchClient;
 use Statamic\Search\Comb\Index as CombIndex;
 use Statamic\Search\Algolia\Index as AlgoliaIndex;

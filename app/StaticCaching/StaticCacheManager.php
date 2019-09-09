@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
-use Statamic\Manager;
+use Statamic\Support\Manager;
 use Illuminate\Cache\Repository;
 use Statamic\StaticCaching\Cachers\Writer;
 use Statamic\StaticCaching\Cachers\FileCacher;
