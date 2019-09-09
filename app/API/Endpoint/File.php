@@ -5,6 +5,7 @@ namespace Statamic\API\Endpoint;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Filesystem\FlysystemAdapter;
 use Statamic\Filesystem\FilesystemAdapter;
+use Illuminate\Contracts\Container\BindingResolutionException;
 
 /**
  * Manipulating files on the local filesystem
@@ -40,7 +41,7 @@ class File
 
         try {
             $root = app("filesystems.paths.$name");
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException | BindingResolutionException $e) {
             return new FlysystemAdapter(Storage::disk($name));
         }
 
