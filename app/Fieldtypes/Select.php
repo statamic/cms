@@ -45,4 +45,9 @@ class Select extends Fieldtype
             'instructions' => 'Add newly created tags to the options list.'
         ],
     ];
+
+    public function preProcessIndex($value)
+    {
+        return array_get($this->field->get('options'), $value, $value);
+    }
 }
