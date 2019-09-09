@@ -76,6 +76,7 @@ export default {
         actions: Object,
         published: Boolean,
         collection: String,
+        reference: String,
     },
 
     data() {
@@ -157,9 +158,13 @@ export default {
         runAfterPublishHook(response) {
             // Once the publish request has completed, we want to run the "after" hook.
             // Devs can do what they need and we'll wait for them, but they can't cancel anything.
-            const afterHookPayload = { collection: this.collection, message: this.revisionMessage, response };
             Statamic.$hooks
-                .run('entry.published', afterHookPayload)
+                .run('entry.published', {
+                    collection: this.collection,
+                    reference: this.reference,
+                    message: this.revisionMessage,
+                    response
+                })
                 .then(() => {
                     // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
                     // if this form is being shown in a stack, we only want to close it once everything's done.

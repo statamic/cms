@@ -215,6 +215,7 @@
             :actions="actions"
             :published="published"
             :collection="collectionHandle"
+            :reference="initialReference"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
@@ -407,9 +408,12 @@ export default {
         runAfterSaveHook(response) {
             // Once the save request has completed, we want to run the "after" hook.
             // Devs can do what they need and we'll wait for them, but they can't cancel anything.
-            const afterHookPayload = { collection: this.collectionHandle, response };
             Statamic.$hooks
-                .run('entry.saved', afterHookPayload)
+                .run('entry.saved', {
+                    collection: this.collectionHandle,
+                    reference: this.initialReference,
+                    response
+                })
                 .then(() => {
                     // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
                     // if this form is being shown in a stack, we only want to close it once everything's done.
