@@ -6,8 +6,8 @@ use Statamic\API;
 use Statamic\API\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Tree implements Localization
 {

@@ -8,9 +8,9 @@ use Statamic\API\YAML;
 use Statamic\API\Action;
 use Statamic\Data\DataFolder;
 use Statamic\API\AssetContainer;
-use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 
 class AssetFolder implements Contract, Arrayable

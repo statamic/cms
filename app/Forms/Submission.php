@@ -6,8 +6,8 @@ use Carbon\Carbon;
 use Statamic\API\File;
 use Statamic\API\YAML;
 use Statamic\API\Helper;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\Exceptions\PublishException;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 

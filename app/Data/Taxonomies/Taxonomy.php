@@ -8,8 +8,8 @@ use Statamic\API\Stache;
 use Statamic\API\Blueprint;
 use Statamic\API\Collection;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
 use Illuminate\Contracts\Support\Responsable;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as Contract;
 
 class Taxonomy implements Contract, Responsable

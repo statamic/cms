@@ -14,7 +14,7 @@ use Statamic\API\Blueprint;
 use Statamic\API\Structure;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Entries\Collection as Contract;
 
 class Collection implements Contract

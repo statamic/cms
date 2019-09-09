@@ -10,9 +10,9 @@ use Statamic\CP\Column;
 use Statamic\API\Config;
 use Statamic\API\Folder;
 use Statamic\Fields\Blueprint;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\Exceptions\FatalException;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Forms\Form as FormContract;
 
 class Form implements FormContract

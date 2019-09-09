@@ -5,7 +5,7 @@ namespace Tests;
 use Tests\TestCase;
 use Statamic\API\Str;
 use Statamic\Data\ContainsData;
-use Statamic\FluentlyGetsAndSets;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class FluentlyGetsAndSetsTest extends TestCase
 {

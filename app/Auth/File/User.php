@@ -10,13 +10,13 @@ use Statamic\Data\Data;
 use Statamic\API\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\FluentlyGetsAndSets;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Statamic\Preferences\HasPreferences;
 use Statamic\Notifications\PasswordReset;
 use Statamic\Notifications\ActivateAccount;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 

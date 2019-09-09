@@ -1,6 +1,8 @@
 <?php
 
-namespace Statamic;
+namespace Statamic\Support\Traits;
+
+use Statamic\Support\FluentGetterSetter;
 
 trait FluentlyGetsAndSets
 {
