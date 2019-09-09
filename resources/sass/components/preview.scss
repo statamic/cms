@@ -4,7 +4,7 @@
 }
 
 .live-preview-header {
-    @apply relative bg-grey-20 border-b px-3 py-2 shadow flex items-center justify-between;
+    @apply relative bg-grey-20 border-b px-2 py-1 shadow-sm flex items-center justify-between;
     z-index: 2;
 }
 
@@ -27,7 +27,14 @@
     @apply bg-grey-30 ml-0 pl-0;
     a {
         border-radius: 0;
+        height: 100%;
+        min-width: 100px;
+        border: none;
     }
+}
+
+.live-preview .publish-section-actions-footer {
+    display: none;
 }
 
 .live-preview-contents iframe {
