@@ -101,15 +101,6 @@ function site_locale($locale = null)
 
 /**
  * @param array $value
- * @return \Statamic\Support\FileCollection;
- */
-function collect_files($value = [])
-{
-    return new \Statamic\Support\FileCollection($value);
-}
-
-/**
- * @param array $value
  * @return \Statamic\Data\Content\ContentCollection
  */
 function collect_content($value = [])
