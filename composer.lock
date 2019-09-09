@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ceeae01f3b10dadbab4986ded8d3e0aa",
+    "content-hash": "0acda3fa4a4fa77be9de55b749fe19ca",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -6859,48 +6859,6 @@
             "time": "2019-06-13T22:48:21+00:00"
         },
         {
-            "name": "tightenco/mailthief",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tightenco/mailthief.git",
-                "reference": "e94b7cd4753e8636885559092dfd04368ea2f004"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tightenco/mailthief/zipball/e94b7cd4753e8636885559092dfd04368ea2f004",
-                "reference": "e94b7cd4753e8636885559092dfd04368ea2f004",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/mail": "5.*",
-                "illuminate/view": "5.*"
-            },
-            "require-dev": {
-                "laravel/framework": ">=5.0 <5.5",
-                "mockery/mockery": "^0.9.5",
-                "phpunit/phpunit": "^5.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MailThief\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Adam Wathan",
-                    "email": "adam.wathan@gmail.com"
-                }
-            ],
-            "description": "A fake Mailer for Laravel applications that takes the pain out of testing mail.",
-            "time": "2018-02-12T21:32:26+00:00"
-        },
-        {
             "name": "webmozart/assert",
             "version": "1.4.0",
             "source": {
@@ -6958,8 +6916,7 @@
         "netcarver/textile": 20,
         "scrumpy/html-to-prosemirror": 20,
         "scrumpy/prosemirror-to-html": 20,
-        "symfony/yaml": 20,
-        "tightenco/mailthief": 20
+        "symfony/yaml": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
