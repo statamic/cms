@@ -2,12 +2,13 @@
 
 namespace Statamic\API;
 
+use Statamic\Support\Comparator;
 use Illuminate\Support\Facades\Facade;
 
 class Compare extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Endpoint\Compare::class;
+        return Comparator::class;
     }
 }
