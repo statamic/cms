@@ -362,8 +362,8 @@ export default {
                     { name: 'addrowbefore', text: __('Add Row Before'), command: 'addRowBefore', svg: 'add-row-before', visibleWhenActive: 'table' },
                     { name: 'addrowafter', text: __('Add Row After'), command: 'addRowAfter', svg: 'add-row-after', visibleWhenActive: 'table' },
                     { name: 'deleterow', text: __('Delete Row'), command: 'deleteRow', svg: 'delete-row', visibleWhenActive: 'table' },
+                    { name: 'toggleheadercell', text: __('Toggle Header Cell'), command: 'toggleHeaderCell', svg: 'flip-vertical', visibleWhenActive: 'table' },
                     { name: 'togglecellmerge', text: __('Merge Cells'), command: 'toggleCellMerge', svg: 'combine-cells', visibleWhenActive: 'table' },
-                    { name: 'toggleheadercell', text: __('Header Cells'), command: 'toggleHeaderCell', svg: 'title', visibleWhenActive: 'table' },
                 )
             }
 
