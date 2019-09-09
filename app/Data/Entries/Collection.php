@@ -33,6 +33,8 @@ class Collection implements Contract
     protected $searchIndex;
     protected $dated = false;
     protected $orderable = false;
+    protected $sortField;
+    protected $sortDirection;
     protected $ampable = false;
     protected $revisions = false;
     protected $positions = [];
@@ -67,26 +69,48 @@ class Collection implements Contract
         return $this->fluentlyGetOrSet('orderable')->args(func_get_args());
     }
 
-    public function sortField()
+    public function sortField($field = null)
     {
-        if ($this->orderable()) {
-            return 'order';
-        } elseif ($this->dated()) {
-            return 'date';
-        }
-
-        return 'title';
+        return $this
+            ->fluentlyGetOrSet('sortField')
+            ->getter(function ($sortField) {
+                if ($sortField) {
+                    return $sortField;
+                } elseif ($this->orderable()) {
+                    return 'order';
+                } elseif ($this->dated()) {
+                    return 'date';
+                }
+                return 'title';
+            })
+            ->args(func_get_args());
     }
 
-    public function sortDirection()
+    public function sortDirection($dir = null)
     {
-        if ($this->orderable()) {
-            return 'asc';
-        } elseif ($this->dated()) {
-            return 'desc';
-        }
+        return $this
+            ->fluentlyGetOrSet('sortDirection')
+            ->getter(function ($sortDirection) {
+                if ($sortDirection) {
+                    return $sortDirection;
+                }
 
-        return 'asc';
+                // If a custom sort field has been defined but no direction, we'll default
+                // to ascending. Otherwise, if it was a dated collection, it might end
+                // up with a field in descending order which would be confusing.
+                if ($this->sortField) {
+                    return 'asc';
+                }
+
+                if ($this->orderable()) {
+                    return 'asc';
+                } elseif ($this->dated()) {
+                    return 'desc';
+                }
+
+                return 'asc';
+            })
+            ->args(func_get_args());
     }
 
     public function title($title = null)

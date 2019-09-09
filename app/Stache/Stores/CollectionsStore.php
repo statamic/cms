@@ -50,6 +50,8 @@ class CollectionsStore extends BasicStore
             ->defaultStatus(array_get($data, 'default_status'))
             ->structure(array_get($data, 'structure'))
             ->orderable(array_get($data, 'orderable', false))
+            ->sortField(array_get($data, 'sort_by'))
+            ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
