@@ -10,7 +10,7 @@
         </div>
 
         <!-- Step 1 -->
-        <div v-if="currentStep === 0">
+        <div v-show="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Create a new Collection</h1>
                 <p class="text-grey">A Collection is a group of entries that holds similar content and shares behavior and attributes, like URL patterns, ordering, and visibility.</p>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div v-if="currentStep === 1">
+        <div v-show="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Dates</h1>
                 <p class="text-grey">You can select different date behaviors.</p>
@@ -57,7 +57,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div v-if="currentStep === 2">
+        <div v-show="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Order</h1>
                 <p class="text-grey">Choose how you want your Collection to be ordered.</p>
@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <div v-if="currentStep === 3">
+        <div v-show="currentStep === 3">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Content Model</h1>
                 <p class="text-grey">Your content model determines what field and data are stored in this collection.</p>
@@ -217,7 +217,7 @@
             </div>
         </div>
 
-        <div v-if="currentStep === 4">
+        <div v-show="currentStep === 4">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Routing</h1>
                 <p class="text-grey">Route rules determine the URL pattern of your collection's entries.</p>
