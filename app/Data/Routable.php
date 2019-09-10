@@ -2,6 +2,7 @@
 
 namespace Statamic\Data;
 
+use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\Contracts\Data\Content\UrlBuilder;
 
@@ -14,7 +15,9 @@ trait Routable
 
     public function slug($slug = null)
     {
-        return $this->fluentlyGetOrSet('slug')->args(func_get_args());
+        return $this->fluentlyGetOrSet('slug')->setter(function ($slug) {
+            return Str::slug($slug);
+        })->args(func_get_args());
     }
 
     public function uri()
