@@ -11,16 +11,17 @@ use Statamic\API\Term;
 use Statamic\API\YAML;
 use Statamic\API\Stache;
 use Statamic\API\Taxonomy;
+use Statamic\Stache\Indexes\Terms\Value;
 use Statamic\Stache\Indexes\Terms\Titles;
 use Symfony\Component\Finder\SplFileInfo;
 use Statamic\Stache\Indexes\Terms\Associations;
 
 class TaxonomyTermsStore extends ChildStore
 {
+    protected $valueIndex = Value::class;
     protected $storeIndexes = [
         'slug',
         'taxonomy',
-        'title' => Titles::class,
         'associations' => Associations::class,
     ];
 
@@ -71,6 +72,7 @@ class TaxonomyTermsStore extends ChildStore
         } else {
             $item = Term::make($key)
                 ->taxonomy($this->childKey())
+                ->locale(Site::default()->handle())
                 ->set('title', $this->index('title')->get($key));
         }
 

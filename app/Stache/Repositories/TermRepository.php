@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Statamic\API\Str;
 use Statamic\Stache\Stache;
 use Statamic\API\Collection;
+use Statamic\API\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Data\Taxonomies\TermCollection;
 use Statamic\Contracts\Data\Taxonomies\Term;
@@ -86,11 +87,20 @@ class TermRepository implements RepositoryContract
 
     public function query()
     {
+        $this->ensureAssociations();
+
         return new TermQueryBuilder($this->store);
     }
 
     public function make($slug = null): Term
     {
         return (new \Statamic\Data\Taxonomies\Term)->slug($slug);
+    }
+
+    protected function ensureAssociations()
+    {
+        Taxonomy::all()->each(function ($taxonomy) {
+            $this->store->store($taxonomy->handle())->index('associations');
+        });
     }
 }

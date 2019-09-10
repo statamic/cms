@@ -10,6 +10,7 @@ use Facades\Statamic\Stache\Traverser;
 abstract class Store
 {
     protected $directory;
+    protected $valueIndex = Indexes\Value::class;
     protected $customIndexes = [];
     protected $defaultIndexes = ['id'];
     protected $storeIndexes = [];
@@ -45,7 +46,7 @@ abstract class Store
             return $cached->get($key);
         }
 
-        $class = $this->indexes()->get($name, Indexes\Value::class);
+        $class = $this->indexes()->get($name, $this->valueIndex);
 
         $index = new $class($this, $name);
 
@@ -134,7 +135,7 @@ abstract class Store
             return is_int($key) ? $value : $key;
         })->mapWithKeys(function ($index, $key) {
             return is_int($key)
-                ? [$index => Indexes\Value::class]
+                ? [$index => $this->valueIndex]
                 : [$key => $index];
         });
     }
