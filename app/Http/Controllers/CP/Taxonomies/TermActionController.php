@@ -13,6 +13,6 @@ class TermActionController extends ActionController
     {
         return $items->map(function ($item) {
             return Term::find($item);
-        });
+        })->filter();
     }
 }
