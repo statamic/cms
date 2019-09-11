@@ -177,15 +177,25 @@ class Structure implements StructureContract
 
     public function collection()
     {
-        if ($this->collection !== null) {
-            return $this->collection;
+        if ($this->collection === false) {
+            return null;
+        }
+
+        if (is_string($this->collection)) {
+            return Collection::findByHandle($this->collection);
         }
 
         $collection = Collection::all()->first(function ($collection) {
             return $collection->structureHandle() === $this->handle();
         });
 
-        return $this->collection = $collection ?: false;
+        $this->collection = optional($collection)->handle() ?: false;
+
+        if ($collection) {
+            return Collection::findByHandle($this->collection);
+        }
+
+        return null;
     }
 
     public function isCollectionBased()
