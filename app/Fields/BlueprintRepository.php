@@ -8,7 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class BlueprintRepository
 {
-    protected static $blueprints = [];
+    protected $blueprints = [];
     protected $files;
     protected $directory;
     protected $fallbackDirectory;
@@ -38,7 +38,7 @@ class BlueprintRepository
             return null;
         }
 
-        if ($cached = array_get(static::$blueprints, $handle)) {
+        if ($cached = array_get($this->blueprints, $handle)) {
             return $cached;
         }
 
@@ -52,7 +52,7 @@ class BlueprintRepository
             ->setHandle($handle)
             ->setContents(YAML::parse($this->files->get($path)));
 
-        static::$blueprints[$handle] = $blueprint;
+        $this->blueprints[$handle] = $blueprint;
 
         return $blueprint;
     }
