@@ -26,7 +26,6 @@ class Page implements Entry, AugmentableContract, Responsable
     protected $url;
     protected $title;
     protected $depth;
-    protected static $uris = [];
 
     public function setUrl($url)
     {
@@ -144,15 +143,21 @@ class Page implements Entry, AugmentableContract, Responsable
             return;
         }
 
-        if ($cached = static::$uris[$this->reference] ?? null) {
+        $uris = app(UriCache::class);
+
+        if ($cached = $uris[$this->reference] ?? null) {
+            return $cached;
+        }
+
+        if ($cached = $uris[$this->reference] ?? null) {
             return $cached;
         }
 
         if (! $this->structure()->collection()) {
-            return static::$uris[$this->reference] = $this->entry()->uri();
+            return $uris[$this->reference] = $this->entry()->uri();
         }
 
-        return static::$uris[$this->reference] = app(UrlBuilder::class)
+        return $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
                 'parent_uri' => $this->parent && !$this->parent->isRoot() ? $this->parent->uri() : '',

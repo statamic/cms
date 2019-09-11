@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\API\Config;
+use Statamic\Data\Structures\UriCache;
 use Illuminate\Support\ServiceProvider;
 
 class DataServiceProvider extends ServiceProvider
@@ -63,5 +64,9 @@ class DataServiceProvider extends ServiceProvider
             \Statamic\Contracts\Forms\Submission::class,
             \Statamic\Forms\Submission::class
         );
+
+        $this->app->singleton(UriCache::class, function () {
+            return new UriCache;
+        });
     }
 }
