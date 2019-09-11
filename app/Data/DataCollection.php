@@ -135,19 +135,6 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Filter the Collection by condition(s)
-     *
-     * @param string $conditions
-     * @return \Statamic\Data\DataCollection
-     */
-    public function conditions($conditions)
-    {
-        $filterer = app('Statamic\Data\Filters\ConditionFilterer');
-
-        return $filterer->filter($this, $conditions);
-    }
-
-    /**
      * Add a new key to each item of the collection
      *
      * @param string|callable $key       New key to add, or a function to return an array of new values
