@@ -23,7 +23,12 @@ class TaxonomyRepository implements RepositoryContract
         return $this->store->getItems($this->handles());
     }
 
-    public function handles()
+    public function find($id): ?Taxonomy
+    {
+        return $this->findByHandle($id);
+    }
+
+    public function handles(): Collection
     {
         return $this->store->paths()->keys();
     }
@@ -43,7 +48,7 @@ class TaxonomyRepository implements RepositoryContract
         $this->store->delete($taxonomy);
     }
 
-    public function make($handle = null)
+    public function make($handle = null): Taxonomy
     {
         return app(Taxonomy::class)->handle($handle);
     }
