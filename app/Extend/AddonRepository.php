@@ -1,24 +1,23 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Extend;
 
 use Statamic\Extend\Management\Manifest;
-use Statamic\Extend\Addon as AddonInstance;
 
-class Addon
+class AddonRepository
 {
     /**
      * Create an addon instance.
      *
      * @param string|array $addon  The name of the addon. This will be converted to StudlyCase.
      *                             Or, an array containing package data.
-     * @return AddonInstance
+     * @return Addon
      */
     public function create($addon)
     {
         $method = is_array($addon) ? 'createFromPackage' : 'create';
 
-        return AddonInstance::$method($addon);
+        return Addon::$method($addon);
     }
 
     /**
@@ -36,7 +35,7 @@ class Addon
     /**
      * Get an addon instance.
      *
-     * @return AddonInstance
+     * @return Addon
      */
     public function get($id)
     {
