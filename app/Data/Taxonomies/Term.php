@@ -24,7 +24,6 @@ use Statamic\Revisions\Revisable;
 use Statamic\Data\Content\Content;
 use Statamic\Data\Services\TermsService;
 use Statamic\API\Taxonomy as TaxonomyAPI;
-use Statamic\Data\Content\ContentCollection;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Taxonomies\Term as TermContract;
