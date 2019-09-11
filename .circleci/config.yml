@@ -10,7 +10,7 @@ jobs:
       - run: sudo apt update
       - run: sudo docker-php-ext-install zip
       - run: sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
-      - run: sudo docker-php-ext-install -j$(nproc) gd
+      - run: sudo -E docker-php-ext-install -j$(nproc) gd
 
       - restore_cache:
           keys:
