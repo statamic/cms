@@ -2,12 +2,7 @@
 
 namespace Statamic\API;
 
-use Illuminate\Support\Facades\Facade;
-
-class Folder extends Facade
+class Folder extends File
 {
-    protected static function getFacadeAccessor()
-    {
-        return Endpoint\Folder::class;
-    }
+    //
 }

@@ -1,30 +1,13 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Filesystem;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Filesystem\FlysystemAdapter;
 use Statamic\Filesystem\FilesystemAdapter;
 use Illuminate\Contracts\Container\BindingResolutionException;
 
-/**
- * Manipulating files on the local filesystem
- *
- * @method static \Illuminate\Contracts\Filesystem\Filesystem filesystem()
- * @method static string get(string $file, string $fallback = null)
- * @method static bool exists(string $file)
- * @method static bool put(string $file, string $contents)
- * @method static bool copy(string $src, string $dest, bool $overwrite = false)
- * @method static bool delete(string $file)
- * @method static bool rename(string $old, string $new)
- * @method static string extension(string $path)
- * @method static string mimeType(string $path)
- * @method static int lastModified(string $file)
- * @method static int size(string $file)
- * @method static string sizeHuman(string $file)
- * @method static bool isImage(string $file)
- */
-class File
+class Manager
 {
     /**
      * Get a filesystem disk.
