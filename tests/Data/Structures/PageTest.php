@@ -11,9 +11,12 @@ use Statamic\Data\Structures\Tree;
 use Statamic\API\Entry as EntryAPI;
 use Statamic\Data\Structures\Pages;
 use Statamic\Data\Structures\Structure;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class PageTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     function it_gets_and_sets_the_entry()
     {
@@ -80,10 +83,13 @@ class PageTest extends TestCase
                 return 'entry-slug';
             }
         };
+        \Statamic\API\Collection::make('test')->save();
+        $entry->collection('test');
 
         $parent = Mockery::mock(Page::class);
         $parent->shouldReceive('id')->andReturn('not-the-entry');
         $parent->shouldReceive('uri')->andReturn('/the/parent/uri');
+        $parent->shouldReceive('isRoot')->andReturnFalse();
 
         $tree = (new Tree)->structure(
             $this->mock(Structure::class)->shouldReceive('collection')->andReturnTrue()->getMock()
@@ -124,7 +130,10 @@ class PageTest extends TestCase
     /** @test */
     function it_gets_child_pages()
     {
+        $tree = (new Tree)->structure($this->mock(Structure::class));
+
         $page = (new Page)
+            ->setTree($tree)
             ->setEntry(new Entry)
             ->setRoute('')
             ->setChildren([
@@ -172,9 +181,13 @@ class PageTest extends TestCase
         $entry->shouldReceive('id')->andReturn('root');
         $entry->shouldReceive('slug')->andReturn('');
 
+        $tree = (new Tree)->structure(
+            $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
+        );
+
         $page = (new Page)
+            ->setTree($tree)
             ->setEntry($entry)
-            ->setRoute('{parent_uri}/{slug}')
             ->setChildren([
                 ['entry' => 'one'],
                 ['entry' => 'two', 'children' => [
@@ -188,13 +201,6 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Collection::class, $flattened);
         $this->assertCount(4, $flattened);
         $this->assertEveryItemIsInstanceOf(Page::class, $flattened);
-        $this->assertEquals([
-            'one' => '/one',
-            'two' => '/two',
-            'three' => '/two/three',
-            'four' => '/two/three/four',
-        ], $flattened->mapWithKeys(function ($page) {
-            return [$page->reference() => $page->uri()];
-        })->all());
+        $this->assertEquals(['one', 'two', 'three', 'four'], $flattened->map->reference()->all());
     }
 }
