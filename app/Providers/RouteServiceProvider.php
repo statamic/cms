@@ -13,6 +13,14 @@ use Illuminate\Support\ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
 {
+    public function register()
+    {
+        $this->app->bind(
+            \Statamic\Contracts\Routing\UrlBuilder::class,
+            \Statamic\Routing\UrlBuilder::class
+        );
+    }
+
     public function boot()
     {
         $this->bindEntries();

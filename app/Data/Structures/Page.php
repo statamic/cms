@@ -7,8 +7,8 @@ use Statamic\API\Site;
 use Statamic\API\Collection;
 use Statamic\Data\Augmentable;
 use Statamic\API\Entry as EntryAPI;
-use Statamic\Data\Content\UrlBuilder;
 use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 

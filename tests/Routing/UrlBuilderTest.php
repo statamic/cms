@@ -1,17 +1,19 @@
 <?php
 
-namespace Tests;
+namespace Tests\Routing;
 
+use Tests\TestCase;
 use Statamic\API\Entry;
 use Statamic\Stache\Stache;
-use Statamic\Contracts\Data\Content\UrlBuilder;
+use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Contracts\Routing\UrlBuilder;
 
 class UrlBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     /**
-     * @var \Statamic\Contracts\Data\Content\UrlBuilder
+     * @var \Statamic\Contracts\Routing\UrlBuilder
      */
     protected $builder;
 

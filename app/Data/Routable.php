@@ -4,7 +4,7 @@ namespace Statamic\Data;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
-use Statamic\Contracts\Data\Content\UrlBuilder;
+use Statamic\Contracts\Routing\UrlBuilder;
 
 trait Routable
 {

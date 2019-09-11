@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Data\Content;
+namespace Statamic\Routing;
 
 use Statamic\API\Str;
 use Statamic\API\URL;
 use Statamic\API\Antlers;
-use Statamic\Contracts\Data\Content\UrlBuilder as UrlBuilderContract;
+use Statamic\Contracts\Routing\UrlBuilder as UrlBuilderContract;
 
 class UrlBuilder implements UrlBuilderContract
 {
