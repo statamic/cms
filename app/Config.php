@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic;
 
 use Statamic\API\Str;
 use Statamic\API\Site;
