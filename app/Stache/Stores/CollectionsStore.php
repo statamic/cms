@@ -5,6 +5,7 @@ namespace Statamic\Stache\Stores;
 use Statamic\API\Site;
 use Statamic\API\YAML;
 use Statamic\API\Stache;
+use Statamic\API\Structure;
 use Statamic\API\Collection;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -88,5 +89,17 @@ class CollectionsStore extends BasicStore
             ->store($collection->handle())
             ->index('uri')
             ->update();
+    }
+
+    public function handleFileChanges()
+    {
+        if ($this->fileChangesHandled) {
+            return;
+        }
+
+        parent::handleFileChanges();
+
+        // TODO: only update structures for collections that were modified.
+        Structure::all()->each->updateEntryUris();
     }
 }
