@@ -134,7 +134,7 @@
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'blueprints', type: 'blueprints' }"
+                            :config="{ handle: 'blueprints', type: 'blueprints', mode: 'select' }"
                             :value="value"
                             :meta="meta"
                             name="blueprints"
@@ -154,7 +154,7 @@
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'taxonomies', type: 'taxonomies' }"
+                            :config="{ handle: 'taxonomies', type: 'taxonomies', mode: 'select' }"
                             :value="value"
                             :meta="meta"
                             name="taxonomies"
