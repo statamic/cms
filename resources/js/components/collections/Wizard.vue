@@ -127,7 +127,7 @@
                 <p class="text-grey">Your content model determines what field and data are stored in this collection.</p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
+                <label class="font-bold text-base mb-sm" for="name">Blueprints</label>
                 <publish-field-meta
                     :config="{ handle: 'blueprints', type: 'blueprints' }"
                     :initial-value="collection.blueprints">
@@ -143,7 +143,7 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    You can pick an existing Blueprint or create a new one.
+                    If you choose multiple Blueprints, users will be able to select from one when creating entries. The first will be the default.
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
