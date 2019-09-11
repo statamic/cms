@@ -66,7 +66,7 @@ class CollectionsStoreTest extends TestCase
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey(CollectionAPI::create('test'))
+            $this->store->getItemKey(CollectionAPI::make('test'))
         );
     }
 

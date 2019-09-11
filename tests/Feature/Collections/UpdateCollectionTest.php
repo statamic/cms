@@ -24,7 +24,7 @@ class UpdateCollectionTest extends TestCase
     /** @test */
     function it_denies_access_if_you_dont_have_permission()
     {
-        $collection = Collection::create('test')->save();
+        $collection = Collection::make('test')->save();
 
         $this
             ->from('/original')
@@ -81,7 +81,7 @@ class UpdateCollectionTest extends TestCase
 
     private function createCollection()
     {
-        return tap(Collection::create('test'))->data([
+        return tap(Collection::make('test'))->data([
             'title' => 'Existing',
             'template' => 'existing-template',
             'fieldset' => 'existing-fieldset',

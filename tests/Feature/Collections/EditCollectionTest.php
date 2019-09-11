@@ -19,7 +19,7 @@ class EditCollectionTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
         $user = User::make()->assignRole('test')->save();
 
-        $collection = Collection::create('test')->save();
+        $collection = Collection::make('test')->save();
 
         $this
             ->actingAs($user)
@@ -34,7 +34,7 @@ class EditCollectionTest extends TestCase
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
 
-        $collection = Collection::create('test')->save();
+        $collection = Collection::make('test')->save();
 
         $this
             ->from('/original')

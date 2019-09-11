@@ -19,7 +19,7 @@ class DeleteCollectionTest extends TestCase
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
 
-        $collection = Collection::create('test')->save();
+        $collection = Collection::make('test')->save();
         $this->assertCount(1, Collection::all());
 
         $this
@@ -40,7 +40,7 @@ class DeleteCollectionTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
         $user = User::make()->assignRole('test');
 
-        $collection = Collection::create('test')->save();
+        $collection = Collection::make('test')->save();
         $this->assertCount(1, Collection::all());
 
         $this

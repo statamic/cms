@@ -125,7 +125,7 @@ class CollectionsController extends CpController
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $collection = $this->updateCollection(Collection::create($handle), $data);
+        $collection = $this->updateCollection(Collection::make($handle), $data);
 
         switch ($data['dateBehavior']) {
             case 'articles':

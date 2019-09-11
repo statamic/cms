@@ -381,7 +381,7 @@ class FrontendTest extends TestCase
 
     private function makeCollection()
     {
-        return Collection::create('pages')
+        return Collection::make('pages')
             ->route('{slug}')
             ->template('default')
             ->entryBlueprints(['empty']);

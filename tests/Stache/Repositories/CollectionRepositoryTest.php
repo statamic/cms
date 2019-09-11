@@ -77,7 +77,7 @@ class CollectionRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_collection_to_the_stache_and_to_a_file()
     {
-        $collection = CollectionAPI::create('new');
+        $collection = CollectionAPI::make('new');
         $collection->data(['foo' => 'bar']);
         $this->assertNull($this->repo->findByHandle('new'));
 

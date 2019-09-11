@@ -4,6 +4,8 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
 use Statamic\Data\Entries\Collection;
+use Statamic\Events\Data\CollectionSaved;
+use Statamic\Events\Data\CollectionDeleted;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Data\Repositories\CollectionRepository as RepositoryContract;
 
@@ -23,6 +25,11 @@ class CollectionRepository implements RepositoryContract
         return $this->store->getItems($keys);
     }
 
+    public function find($id): ?Collection
+    {
+        return $this->findByHandle($id);
+    }
+
     public function findByHandle($handle): ?Collection
     {
         return $this->store->getItem($handle);
@@ -39,14 +46,28 @@ class CollectionRepository implements RepositoryContract
         });
     }
 
+    public function make(string $handle = null): Collection
+    {
+        return app(Collection::class)->handle($handle);
+    }
+
+    public function handles(): IlluminateCollection
+    {
+        return $this->all()->map->handle();
+    }
+
     public function save(Collection $collection)
     {
         $this->store->save($collection);
+
+        CollectionSaved::dispatch($collection);
     }
 
     public function delete(Collection $collection)
     {
         $this->store->delete($collection);
+
+        CollectionDeleted::dispatch($collection);
     }
 
     public function updateEntryUris(Collection $collection)
