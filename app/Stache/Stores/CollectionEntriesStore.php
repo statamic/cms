@@ -9,6 +9,7 @@ use Statamic\API\Entry;
 use Statamic\API\Collection;
 use Statamic\Stache\Indexes;
 use Symfony\Component\Finder\SplFileInfo;
+use Statamic\Data\Entries\GetDateFromPath;
 
 class CollectionEntriesStore extends ChildStore
 {
@@ -76,7 +77,7 @@ class CollectionEntriesStore extends ChildStore
         // }
 
         if ($collection->dated()) {
-            $entry->date(app('Statamic\Contracts\Data\Content\OrderParser')->getEntryOrder($path));
+            $entry->date((new GetDateFromPath)($path));
         }
 
         if (isset($idGenerated) || isset($positionGenerated)) {

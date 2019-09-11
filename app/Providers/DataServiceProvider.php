@@ -20,11 +20,6 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Content\OrderParser::class,
-            \Statamic\Data\Content\OrderParser::class
-        );
-
-        $this->app->bind(
             \Statamic\Contracts\Data\Content\PathBuilder::class,
             \Statamic\Data\Content\PathBuilder::class
         );
