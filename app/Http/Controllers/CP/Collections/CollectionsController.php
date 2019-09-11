@@ -146,7 +146,9 @@ class CollectionsController extends CpController
         session()->flash('success', __('Collection created'));
 
         return [
-            'redirect' => $collection->showUrl()
+            'redirect' => $collection->hasStructure()
+                ? $collection->structure()->showUrl()
+                : $collection->showUrl()
         ];
     }
 
