@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\Auth;
 use Statamic\API\User;
 use Statamic\Auth\PasswordReset;
 use Statamic\Auth\UserRegistrar;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Auth;
 use Statamic\Contracts\Auth\User as UserContract;
 
 class UserController extends Controller
@@ -27,9 +27,8 @@ class UserController extends Controller
             return back()->withInput()->withErrors($validator);
         }
 
-        $logged_in = Auth::login(
-            request()->input('username'),
-            request()->input('password'),
+        $logged_in = Auth::attempt(
+            request()->only('username', 'password'),
             request()->has('remember')
         );
 
@@ -44,7 +43,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        \Auth::logout();
+        Auth::logout();
 
         return redirect(request()->get('redirect', '/'));
     }

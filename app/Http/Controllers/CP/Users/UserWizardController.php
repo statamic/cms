@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\API\Auth;
 use Statamic\API\User;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
