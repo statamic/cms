@@ -24,14 +24,19 @@ class AssetContainerRepository implements RepositoryContract
         return $this->store->getItems($keys);
     }
 
+    public function find($id): AssetContainer
+    {
+        return $this->findByHandle($id);
+    }
+
     public function findByHandle(string $handle): ?AssetContainer
     {
         return $this->store->getItem($handle);
     }
 
-    public function create()
+    public function make($handle = null): AssetContainer
     {
-        return app(AssetContainer::class);
+        return app(AssetContainer::class)->handle($handle);
     }
 
     public function save(AssetContainer $container)

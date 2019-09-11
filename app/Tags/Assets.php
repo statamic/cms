@@ -54,8 +54,11 @@ class Assets extends Tags
             return;
         }
 
-        // Get the assets (container) by either ID or path.
-        $container = ($id) ? AssetContainer::find($id) : AssetContainer::wherePath($path);
+        if (! $id) {
+            throw new \Exception('TODO: Support assets by path.');
+        }
+
+        $container = AssetContainer::find($id);
 
         if (! $container) {
             return $this->parseNoResults();
