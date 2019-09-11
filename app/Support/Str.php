@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Support;
 
 use Statamic\API\Compare;
 use Stringy\StaticStringy;

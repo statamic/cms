@@ -8,6 +8,6 @@ class Str extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Endpoint\Str::class;
+        return \Statamic\Support\Str::class;
     }
 }
