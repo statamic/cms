@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
 
-class Image
+class Manager
 {
     /**
      * Get a URL manipulator instance to continue chaining, or a URL right away if provided with params.
