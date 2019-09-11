@@ -69,6 +69,6 @@ class StructureRepository implements RepositoryContract
 
     public function updateEntryUris(Structure $structure)
     {
-        $this->store->updateEntryUris($structure);
+        $this->store->index('uri')->updateItem($structure);
     }
 }
