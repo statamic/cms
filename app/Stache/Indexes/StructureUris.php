@@ -38,6 +38,10 @@ class StructureUris extends Index
 
     public function updateItem($item)
     {
+        if (! $item->isCollectionBased()) {
+            return;
+        }
+
         $this->load();
 
         // Remove this structure's values, then add back fresh versions.
