@@ -230,9 +230,9 @@
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'structure', type: 'structures', max_items: 1 }"
+                            :config="{ handle: 'structure', type: 'structures', max_items: 1, mode: 'select' }"
                             :value="value"
-                            :meta="meta"
+                            :meta="Object.assign({}, meta, { taggable: true })"
                             name="structure"
                             @input="collection.structure = $event[0]" />
                     </div>

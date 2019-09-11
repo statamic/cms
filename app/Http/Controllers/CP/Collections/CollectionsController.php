@@ -2,12 +2,14 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Statamic\API\Str;
 use Statamic\API\Site;
 use Statamic\API\User;
 use Statamic\API\Scope;
 use Statamic\CP\Column;
 use Statamic\API\Action;
 use Statamic\API\Blueprint;
+use Statamic\API\Structure;
 use Illuminate\Http\Request;
 use Statamic\API\Collection;
 use Statamic\Fields\Validation;
@@ -119,6 +121,8 @@ class CollectionsController extends CpController
             'taxonomies' => 'array',
         ]);
 
+        $data['structure'] = $this->ensureStructureExists($data['structure'] ?? null);
+
         $handle = $request->handle ?? snake_case($request->title);
 
         $collection = $this->updateCollection(Collection::create($handle), $data);
@@ -192,6 +196,26 @@ class CollectionsController extends CpController
             ->entryBlueprints($data['blueprints'])
             ->mount($data['mount'] ?? null)
             ->taxonomies($data['taxonomies'] ?? []);
+    }
+
+    protected function ensureStructureExists($structure)
+    {
+        if (! $structure) {
+            return;
+        }
+
+        if (Structure::findByHandle($structure)) {
+            return;
+        }
+
+        Structure::make()
+            ->handle($handle = Str::snake($structure))
+            ->title($structure)
+            ->tap(function ($structure) {
+                $structure->addTree($structure->makeTree(Site::default()->handle()));
+            })->save();
+
+        return $handle;
     }
 
     protected function editFormBlueprint()
