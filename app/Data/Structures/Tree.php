@@ -14,7 +14,6 @@ class Tree implements Localization
     use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $locale;
-    protected $route;
     protected $root;
     protected $tree = [];
     protected $withParent = true;
@@ -149,7 +148,6 @@ class Tree implements Localization
     public function fileData()
     {
         return [
-            'route' => $this->route,
             'root' => $this->root,
             'tree' => $this->removeEmptyChildren($this->tree),
         ];
