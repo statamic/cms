@@ -27,7 +27,6 @@ use Statamic\API\Taxonomy as TaxonomyAPI;
 use Statamic\Data\Content\ContentCollection;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Data\Content\HasLocalizedSlugsInData;
 use Statamic\Contracts\Data\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
