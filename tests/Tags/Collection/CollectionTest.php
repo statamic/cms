@@ -12,6 +12,7 @@ use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Collection\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Exceptions\CollectionNotFoundException;
 
 class CollectionTest extends TestCase
 {
@@ -58,8 +59,8 @@ class CollectionTest extends TestCase
 
         $this->setTagParameters(['from' => 'music|unknown']);
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Collection [unknown] does not exist.');
+        $this->expectException(CollectionNotFoundException::class);
+        $this->expectExceptionMessage('Collection [unknown] not found');
 
         $this->collectionTag->index();
     }
