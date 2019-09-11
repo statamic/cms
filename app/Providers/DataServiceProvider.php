@@ -25,11 +25,6 @@ class DataServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Content\StatusParser::class,
-            \Statamic\Data\Content\StatusParser::class
-        );
-
-        $this->app->bind(
             \Statamic\Contracts\Data\Content\PathBuilder::class,
             \Statamic\Data\Content\PathBuilder::class
         );
