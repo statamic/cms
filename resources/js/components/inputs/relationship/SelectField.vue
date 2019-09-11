@@ -62,6 +62,10 @@ export default {
         },
 
         input(items) {
+            if (! this.multiple) {
+                items = items === null ? [] : [items];
+            }
+
             // On-the-fly items created (when using taggable) won't have an ID.
             // But v-select gives them a title, so we'll use that as the ID.
             items = items.map(item => {
