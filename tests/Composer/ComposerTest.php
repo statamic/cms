@@ -77,7 +77,7 @@ class ComposerTest extends TestCase
         Composer::require('test/package');
 
         $installed = Composer::installed();
-        $this->assertStringContainsString('test/package', $installed->keys());
+        $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Installing test/package'));
@@ -88,7 +88,7 @@ class ComposerTest extends TestCase
         Composer::update('test/package');
 
         $installed = Composer::installed();
-        $this->assertStringContainsString('test/package', $installed->keys());
+        $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.1', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Updating test/package'));
@@ -99,7 +99,7 @@ class ComposerTest extends TestCase
         Composer::require('test/package', '1.0.0');
 
         $installed = Composer::installed();
-        $this->assertStringContainsString('test/package', $installed->keys());
+        $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Downgrading test/package'));
