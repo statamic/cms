@@ -7,7 +7,7 @@ use Statamic\API\File;
 use ReflectionProperty;
 use Statamic\API\Pattern;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
-use Statamic\YAML\ParseException as StatamicParseException;
+use Statamic\Yaml\ParseException as StatamicParseException;
 
 class Yaml
 {
