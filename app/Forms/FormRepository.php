@@ -1,15 +1,12 @@
 <?php
 
-namespace Statamic\API\Endpoint;
+namespace Statamic\Forms;
 
-use Request as Req;
 use Statamic\API\File;
-use Statamic\API\YAML;
 use Statamic\API\Folder;
-use Statamic\API\Metrics;
 use Statamic\Contracts\Forms\Form as FormContract;
 
-class Form
+class FormRepository
 {
     /**
      * Find a form.
