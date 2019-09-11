@@ -184,7 +184,7 @@ class EntryRepositoryTest extends TestCase
 
         $this->assertCount(15, $this->repo->all());
         $this->assertNotNull($item = $this->repo->find('test-blog-entry'));
-        $this->assertNotSame($entry, $item);
+        $this->assertSame($entry, $item);
         $this->assertArraySubset(['foo' => 'bar'], $item->data());
         $this->assertFileExists($path);
     }
