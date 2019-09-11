@@ -93,7 +93,7 @@ class CollectionsStore extends BasicStore
 
     public function handleFileChanges()
     {
-        if ($this->fileChangesHandled) {
+        if ($this->fileChangesHandled || ! config('statamic.stache.watcher')) {
             return;
         }
 

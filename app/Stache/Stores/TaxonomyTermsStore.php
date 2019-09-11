@@ -115,7 +115,7 @@ class TaxonomyTermsStore extends ChildStore
 
     public function handleFileChanges()
     {
-        if ($this->fileChangesHandled) {
+        if ($this->fileChangesHandled || ! config('statamic.stache.watcher')) {
             return;
         }
 
