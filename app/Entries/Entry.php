@@ -9,7 +9,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
-use Statamic\Data\Routable;
+use Statamic\Routing\Routable;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
 use Statamic\Data\Augmentable;

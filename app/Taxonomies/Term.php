@@ -15,7 +15,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Config;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Fieldset;
-use Statamic\Data\Routable;
+use Statamic\Routing\Routable;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;

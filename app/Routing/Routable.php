@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Data;
+namespace Statamic\Routing;
 
 use Statamic\Facades\Str;
 use Statamic\Facades\URL;
