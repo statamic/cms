@@ -120,7 +120,7 @@ class Statamic
             'version' => static::version(),
             'laravelVersion' => app()->version(),
             'csrfToken' => csrf_token(),
-            'cpRoot' => cp_root(),
+            'cpRoot' => str_start(config('statamic.cp.route'), '/'),
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => Statamic::assetUrl(),
             'locales' => \Statamic\Facades\Config::get('statamic.system.locales'),

@@ -18,12 +18,6 @@ function cp_route($route, $params = [])
     return $route;
 }
 
-function cp_root()
-{
-    return str_start(config('statamic.cp.route'), '/');
-}
-
-
 function statamic_path($path = null)
 {
     return Path::tidy(__DIR__ . '/../' . $path);
