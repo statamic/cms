@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Statamic\Support\Arr;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
 use Statamic\Fields\Value;
@@ -162,10 +163,10 @@ class Cascade
             // Request
             'current_url' => $this->request->url(),
             'current_uri' => URL::format($this->request->path()),
-            'get_post' => sanitize_array($this->request->all()),
-            'get' => sanitize_array($this->request->query->all()),
-            'post' => $this->request->isMethod('post') ? sanitize_array($this->request->request->all()) : [],
-            'old' => sanitize_array(old(null, [])),
+            'get_post' => Arr::sanitize($this->request->all()),
+            'get' => Arr::sanitize($this->request->query->all()),
+            'post' => $this->request->isMethod('post') ? Arr::sanitize($this->request->request->all()) : [],
+            'old' => Arr::sanitize(old(null, [])),
 
             // Site
             'site' => $siteHandle = $this->site->handle(),

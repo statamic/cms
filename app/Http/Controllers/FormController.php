@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Carbon\Carbon;
+use Statamic\Support\Arr;
 use Statamic\Facades\Form;
 use Statamic\Facades\Email;
 use Statamic\Facades\Parse;
@@ -40,7 +41,7 @@ class FormController extends Controller
         $submission = $form->createSubmission();
 
         if ($form->sanitize()) {
-            $fields = sanitize_array($fields);
+            $fields = Arr::sanitize($fields);
         }
 
         try {

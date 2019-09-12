@@ -319,4 +319,26 @@ class Html
     {
         return SmartyPants::defaultTransform($string, $behavior ?? SmartyPants::ATTR_DEFAULT);
     }
+
+    /**
+     * Sanitizes a string
+     *
+     * @param string|array $value  The value to sanitize
+     * @param bool $antlers  Whether Antlers (curly braces) should be escaped.
+     * @return string
+     */
+    public static function sanitize($value, $antlers = true)
+    {
+        if (is_array($value)) {
+            return Arr::sanitize($value, $antlers);
+        }
+
+        $value = self::entities($value);
+
+        if ($antlers) {
+            $value = str_replace(['{', '}'], ['&lbrace;', '&rbrace;'], $value);
+        }
+
+        return $value;
+    }
 }

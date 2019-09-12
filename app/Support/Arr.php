@@ -77,6 +77,20 @@ class Arr extends IlluminateArr
     }
 
     /**
+     * Recusive friendly method of sanitizing an array.
+     *
+     * @param array $array   The array to sanitize
+     * @param bool $antlers  Whether Antlers (curly braces) should be escaped.
+     * @return array
+     */
+    public static function sanitize($array, $antlers = true)
+    {
+        return collect($array)->mapWithKeys(function ($value, $key) use ($antlers) {
+            return [Html::sanitize($key) => Html::sanitize($value, $antlers)];
+        })->all();
+    }
+
+    /**
      * Explodes options into an array
      *
      * @param string  $string  String to explode

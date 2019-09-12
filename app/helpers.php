@@ -50,46 +50,6 @@ function cp_route($route, $params = [])
     return $route;
 }
 
-/**
- * Sanitizes a string
- *
- * @param bool $antlers  Whether Antlers (curly braces) should be escaped.
- * @return string
- */
-
-function sanitize($value, $antlers = true)
-{
-    if (is_array($value)) {
-        return sanitize_array($value, $antlers);
-    }
-
-    $value = htmlentities($value);
-
-    if ($antlers) {
-        $value = str_replace(['{', '}'], ['&lbrace;', '&rbrace;'], $value);
-    }
-
-    return $value;
-}
-
-/**
- * Recusive friendly method of sanitizing an array.
- *
- * @param bool $antlers  Whether Antlers (curly braces) should be escaped.
- * @return array
- */
-function sanitize_array($array, $antlers = true)
-{
-    $result = array();
-
-    foreach ($array as $key => $value) {
-        $key = htmlentities($key);
-        $result[$key] = sanitize($value, $antlers);
-    }
-
-    return $result;
-}
-
 function translate($id, array $parameters = [])
 {
     return trans($id, $parameters);
