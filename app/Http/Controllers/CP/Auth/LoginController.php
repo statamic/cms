@@ -40,7 +40,7 @@ class LoginController extends CpController
         $view = view('statamic::auth.login', $data);
 
         if ($request->expired) {
-            return $view->withErrors(t('session_expired'));
+            return $view->withErrors(__('Session Expired'));
         }
 
         return $view;

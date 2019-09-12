@@ -45,18 +45,6 @@ function statamic_path($path = null)
 }
 
 /**
- * Shorthand for translate()
- *
- * @param string $var
- * @param array  $params
- * @return string
- */
-function t($var, $params = [])
-{
-    return trans('cp.'.$var, $params);
-}
-
-/**
  * Check whether the nav link is active
  *
  * @param string $url

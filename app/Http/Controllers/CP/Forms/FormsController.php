@@ -101,10 +101,7 @@ class FormsController extends CpController
     {
         $this->authorize('create', FormContract::class);
 
-        // Wat is this italic?
-        return view('statamic::forms.create', [
-            'title' => t('creating_formset')
-        ]);
+        return view('statamic::forms.create');
     }
 
     public function store(Request $request)
