@@ -1740,7 +1740,7 @@ class BaseModifiers extends Modifier
     public function table($value, $params)
     {
         $rows = $value;
-        $parse_markdown = bool(Arr::get($params, 0));
+        $parse_markdown = in_array(Arr::get($params, 0), ['true', 'markdown']);
 
         $html = '<table>';
 
