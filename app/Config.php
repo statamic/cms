@@ -71,7 +71,7 @@ class Config
 
     public function getSite($locale = null)
     {
-        return Site::get($locale ?? site_locale());
+        return Site::get($locale ?? Site::current()->handle());
     }
 
     /**
@@ -136,7 +136,7 @@ class Config
     public function getOtherLocales($locale = null)
     {
         if (! $locale) {
-            $locale = site_locale();
+            $locale = Site::current()->handle();
         }
 
         return array_values(array_diff($this->getLocales(), [$locale]));

@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Statamic\Facades\Site;
 use Statamic\Support\Manager;
 use Illuminate\Cache\Repository;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -44,7 +45,7 @@ class StaticCacheManager extends Manager
 
         return array_merge($config, [
             'base_url' => $this->app['request']->root(),
-            'locale' => site_locale(),
+            'locale' => Site::current()->handle(),
         ]);
     }
 }

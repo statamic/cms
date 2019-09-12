@@ -9,26 +9,6 @@ use Statamic\Extend\Addon;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
-function site_handle($handle = null)
-{
-    return site_locale($handle);
-}
-
-/**
- * Gets or sets the site locale
- *
- * @param string|null $locale
- * @return string
- */
-function site_locale($locale = null)
-{
-    if ($locale) {
-        return Site::setCurrent($locale);
-    }
-
-    return Site::current()->handle();
-}
-
 function cp_route($route, $params = [])
 {
     if (! config('statamic.cp.enabled')) {

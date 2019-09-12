@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Statamic\Facades\Site;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Config;
 use Illuminate\Bus\Queueable;
@@ -77,8 +78,8 @@ class Email extends Mailable
             'date'       => now(),
             'now'        => now(),
             'today'      => now(),
-            'site'     => site_handle(),
-            'locale'     => site_locale()
+            'site'       => $site = Site::current()->handle(),
+            'locale'     => $site
         ]);
 
         return $this->with($data);

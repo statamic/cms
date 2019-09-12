@@ -87,8 +87,8 @@ class Locales extends Tags
         return $locales->map(function ($locale, $key) {
             $localized = $this->getLocalizedData($key);
             $localized['locale'] = $locale;
-            $localized['current'] = site_locale();
-            $localized['is_current'] = $key === site_locale();
+            $localized['current'] = Site::current()->handle();
+            $localized['is_current'] = $key === Site::current()->handle();
             return $localized;
         });
     }
@@ -166,7 +166,7 @@ class Locales extends Tags
      */
     private function moveCurrentLocaleToFront($locales)
     {
-        $key = site_locale();
+        $key = Site::current()->handle();
         $current = $locales->pull($key);
         return collect([$key => $current])->merge($locales);
     }
