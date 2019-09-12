@@ -3,7 +3,7 @@
 namespace Statamic\Assets;
 
 use Exception;
-use Statamic\API;
+use Statamic\Facades;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
@@ -18,7 +18,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     {
         $container = $this->container instanceof AssetContainer
             ? $this->container
-            : API\AssetContainer::find($this->container);
+            : Facades\AssetContainer::find($this->container);
 
         $recursive = $this->folder ? $this->recursive : true;
 

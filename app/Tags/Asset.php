@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Helper;
-use Statamic\API\Asset as AssetAPI;
+use Statamic\Facades\Helper;
+use Statamic\Facades\Asset as AssetAPI;
 
 class Asset extends Assets
 {

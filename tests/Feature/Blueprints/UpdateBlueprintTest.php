@@ -3,7 +3,7 @@
 namespace Tests\Feature\Blueprints;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Blueprint;
@@ -26,7 +26,7 @@ class UpdateBlueprintTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -36,14 +36,14 @@ class UpdateBlueprintTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
-        $blueprint = API\Blueprint::find('test');
+        $blueprint = Facades\Blueprint::find('test');
         $this->assertEquals('Test', $blueprint->title());
     }
 
     /** @test */
     function blueprint_gets_saved()
     {
-        $user = API\User::make()->makeSuper();
+        $user = Facades\User::make()->makeSuper();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -104,14 +104,14 @@ class UpdateBlueprintTest extends TestCase
                     ]
                 ]
             ]
-        ], API\Blueprint::find('test')->contents());
+        ], Facades\Blueprint::find('test')->contents());
     }
 
     /** @test */
     function title_is_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Blueprint::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -121,14 +121,14 @@ class UpdateBlueprintTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
 
-        $this->assertEquals('Test', API\Blueprint::find('test')->title());
+        $this->assertEquals('Test', Facades\Blueprint::find('test')->title());
     }
 
     /** @test */
     function sections_are_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Blueprint::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
             'sections' => ['foo' => 'bar']
@@ -141,14 +141,14 @@ class UpdateBlueprintTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHasErrors('sections');
 
-        $this->assertEquals($originalContents, API\Blueprint::find('test')->contents());
+        $this->assertEquals($originalContents, Facades\Blueprint::find('test')->contents());
     }
 
     /** @test */
     function sections_must_be_an_array()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Blueprint::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
             'sections' => ['foo' => 'bar']
@@ -161,7 +161,7 @@ class UpdateBlueprintTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHasErrors('sections');
 
-        $this->assertEquals($originalContents, API\Blueprint::find('test')->contents());
+        $this->assertEquals($originalContents, Facades\Blueprint::find('test')->contents());
     }
 
     /** @test */

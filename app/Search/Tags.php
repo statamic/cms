@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\Search;
+use Statamic\Facades\Search;
 use Statamic\Tags\OutputsItems;
 use Statamic\Tags\Tags as BaseTags;
 

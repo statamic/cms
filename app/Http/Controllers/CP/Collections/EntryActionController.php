@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\API\Entry;
-use Statamic\API\Action;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Action;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\ActionController;
 

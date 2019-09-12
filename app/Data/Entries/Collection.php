@@ -2,16 +2,16 @@
 
 namespace Statamic\Data\Entries;
 
-use Statamic\API;
-use Statamic\API\Arr;
-use Statamic\API\File;
-use Statamic\API\Site;
-use Statamic\API\Entry;
-use Statamic\API\Search;
-use Statamic\API\Stache;
-use Statamic\API\Taxonomy;
-use Statamic\API\Blueprint;
-use Statamic\API\Structure;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Search;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Structure;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -157,7 +157,7 @@ class Collection implements Contract
 
     public function queryEntries()
     {
-        return API\Entry::query()->where('collection', $this->handle());
+        return Facades\Entry::query()->where('collection', $this->handle());
     }
 
     public function entryBlueprints($blueprints = null)
@@ -242,7 +242,7 @@ class Collection implements Contract
 
     public function save()
     {
-        API\Collection::save($this);
+        Facades\Collection::save($this);
 
         optional($this->structure())->updateEntryUris();
 
@@ -251,7 +251,7 @@ class Collection implements Contract
 
     public function updateEntryUris()
     {
-        API\Collection::updateEntryUris($this);
+        Facades\Collection::updateEntryUris($this);
 
         return $this;
     }
@@ -458,7 +458,7 @@ class Collection implements Contract
     {
         $this->queryEntries()->get()->each->delete();
 
-        API\Collection::delete($this);
+        Facades\Collection::delete($this);
 
         return true;
     }
@@ -493,6 +493,6 @@ class Collection implements Contract
 
     public static function __callStatic($method, $parameters)
     {
-        return API\Collection::{$method}(...$parameters);
+        return Facades\Collection::{$method}(...$parameters);
     }
 }

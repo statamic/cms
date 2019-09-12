@@ -2,9 +2,9 @@
 
 namespace Statamic\Auth;
 
-use Statamic\API;
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
@@ -23,7 +23,7 @@ abstract class RoleRepository implements RepositoryContract
     public function all(): Collection
     {
         return $this->raw()->map(function ($role, $handle) {
-            return API\Role::make()
+            return Facades\Role::make()
                 ->handle($handle)
                 ->title(array_get($role, 'title'))
                 ->addPermission(array_get($role, 'permissions', []))

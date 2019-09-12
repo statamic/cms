@@ -4,7 +4,7 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
-use Statamic\API\Entry as EntryAPI;
+use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Contracts\Data\Structures\Structure;
 use Statamic\Contracts\Data\Repositories\StructureRepository as RepositoryContract;

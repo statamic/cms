@@ -4,7 +4,7 @@ namespace Tests\Auth\Protect;
 
 use Tests\TestCase;
 use Tests\FakesViews;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 

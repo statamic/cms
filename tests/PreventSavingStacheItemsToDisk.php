@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Statamic\API\Stache;
+use Statamic\Facades\Stache;
 
 trait PreventSavingStacheItemsToDisk
 {

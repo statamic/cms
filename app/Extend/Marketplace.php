@@ -3,7 +3,7 @@
 namespace Statamic\Extend;
 
 use Facades\GuzzleHttp\Client;
-use Statamic\API\Addon as AddonAPI;
+use Statamic\Facades\Addon as AddonAPI;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Resources\Json\Resource;

@@ -3,7 +3,7 @@
 namespace Statamic\Revisions;
 
 use Illuminate\Support\Carbon;
-use Statamic\API\Revision as Revisions;
+use Statamic\Facades\Revision as Revisions;
 
 trait Revisable
 {

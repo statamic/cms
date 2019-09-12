@@ -2,8 +2,8 @@
 
 namespace Statamic\Data;
 
-use Statamic\API\Str;
-use Statamic\API\URL;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
 use Statamic\Contracts\Routing\UrlBuilder;
 
 trait Routable

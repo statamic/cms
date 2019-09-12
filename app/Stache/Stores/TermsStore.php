@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\Taxonomy;
+use Statamic\Facades\Taxonomy;
 
 class TermsStore extends AggregateStore
 {

@@ -2,9 +2,9 @@
 
 namespace Statamic\Addons\In;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Extend\API;
-use Statamic\API\UserGroup;
+use Statamic\Facades\UserGroup;
 
 class InAPI extends API
 {

@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\API\URL;
-use Statamic\API\Entry;
+use Statamic\Facades\URL;
+use Statamic\Facades\Entry;
 use Statamic\Tags\Tags;
 use Statamic\Tags\OutputsItems;
 use Statamic\Data\Entries\EntryCollection;

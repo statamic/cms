@@ -2,8 +2,8 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\API\Image;
-use Statamic\API\Config;
+use Statamic\Facades\Image;
+use Statamic\Facades\Config;
 use League\Glide\ServerFactory;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 

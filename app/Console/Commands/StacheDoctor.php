@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\API\Stache;
+use Statamic\Facades\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Stache\Stores\AggregateStore;

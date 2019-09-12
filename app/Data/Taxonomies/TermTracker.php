@@ -2,10 +2,10 @@
 
 namespace Statamic\Data\Taxonomies;
 
-use Statamic\API\Config;
-use Statamic\API\Helper;
-use Statamic\API\Taxonomy;
-use Statamic\API\Term;
+use Statamic\Facades\Config;
+use Statamic\Facades\Helper;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Data\Content\Content;
 use Statamic\Events\Stache\RepositoryItemInserted;
 use Statamic\Events\Stache\RepositoryItemRemoved;

@@ -3,7 +3,7 @@
 namespace Statamic\Updater;
 
 use Statamic\Statamic;
-use Statamic\API\Addon;
+use Statamic\Facades\Addon;
 use Statamic\Updater\Changelog;
 use Facades\Statamic\Console\Processes\Composer;
 use Statamic\Updater\Core\Updater as CoreUpdater;

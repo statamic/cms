@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Auth\PasswordReset;
 use Statamic\Auth\UserRegistrar;
 use Illuminate\Support\MessageBag;

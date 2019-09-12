@@ -2,7 +2,7 @@
 
 namespace Tests\Assets;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Statamic\Fields\Blueprint;
@@ -160,14 +160,14 @@ class AssetContainerTest extends TestCase
     /** @test */
     function it_saves_the_container_through_the_api()
     {
-        API\AssetContainer::spy();
+        Facades\AssetContainer::spy();
 
         $container = new AssetContainer;
 
         $return = $container->save();
 
         $this->assertEquals($container, $return);
-        API\AssetContainer::shouldHaveReceived('save')->with($container)->once();
+        Facades\AssetContainer::shouldHaveReceived('save')->with($container)->once();
     }
 
     /** @test */

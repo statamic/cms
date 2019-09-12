@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 
 class Parameters extends ArrayAccessor
 {

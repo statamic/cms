@@ -3,12 +3,12 @@
 namespace Tests\Data\Structures;
 
 use Tests\TestCase;
-use Statamic\API\Entry;
+use Statamic\Facades\Entry;
 use Illuminate\Support\Collection;
 use Statamic\Data\Structures\Page;
 use Statamic\Data\Structures\Pages;
 use Statamic\Data\Structures\Structure;
-use Statamic\API\Structure as StructureAPI;
+use Statamic\Facades\Structure as StructureAPI;
 
 class StructureTest extends TestCase
 {

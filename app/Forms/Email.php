@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms;
 
-use Statamic\API\Parse;
-use Statamic\API\Config;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Config;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;

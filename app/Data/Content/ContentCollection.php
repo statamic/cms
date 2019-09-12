@@ -3,10 +3,10 @@
 namespace Statamic\Data\Content;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Term;
-use Statamic\API\Helper;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Term;
+use Statamic\Facades\Helper;
 use Statamic\Data\DataCollection;
 use Statamic\Contracts\Data\Localizable;
 use Statamic\Contracts\Data\Entries\Entry;

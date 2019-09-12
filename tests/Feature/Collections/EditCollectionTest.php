@@ -4,8 +4,8 @@ namespace Tests\Feature\Collections;
 
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\API\User;
-use Statamic\API\Collection;
+use Statamic\Facades\User;
+use Statamic\Facades\Collection;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class EditCollectionTest extends TestCase

@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\CP\Column;
 
 class Users extends Relationship

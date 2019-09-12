@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Policies;
 use Statamic\Auth\UserProvider;
 use Statamic\Contracts\Auth\Role;

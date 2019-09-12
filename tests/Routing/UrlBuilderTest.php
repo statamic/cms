@@ -3,7 +3,7 @@
 namespace Tests\Routing;
 
 use Tests\TestCase;
-use Statamic\API\Entry;
+use Statamic\Facades\Entry;
 use Statamic\Stache\Stache;
 use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Contracts\Routing\UrlBuilder;
@@ -26,11 +26,11 @@ class UrlBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $entry = \Statamic\API\Entry::make()
+        $entry = \Statamic\Facades\Entry::make()
             ->id('post')
             ->locale('en')
             ->collection(
-                tap(\Statamic\API\Collection::make('example')->dated(true))->save()
+                tap(\Statamic\Facades\Collection::make('example')->dated(true))->save()
             )
             ->slug('post')
             ->date('2015-01-02')

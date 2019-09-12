@@ -3,10 +3,10 @@
 namespace Statamic\Auth;
 
 use ArrayAccess;
-use Statamic\API;
-use Statamic\API\Arr;
-use Statamic\API\Blueprint;
-use Statamic\API\Preference;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Preference;
 use Statamic\Data\Augmentable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -175,7 +175,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function save()
     {
-        API\User::save($this);
+        Facades\User::save($this);
 
         // TODO: dispatch event
 
@@ -184,7 +184,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function delete()
     {
-        API\User::delete($this);
+        Facades\User::delete($this);
 
         // TODO: dispatch event
 
@@ -203,7 +203,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public static function __callStatic($method, $parameters)
     {
-        return API\User::{$method}(...$parameters);
+        return Facades\User::{$method}(...$parameters);
     }
 
     public function offsetExists($key)

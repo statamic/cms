@@ -4,7 +4,7 @@ namespace Tests\Yaml;
 
 use Exception;
 use Tests\TestCase;
-use Statamic\API\YAML;
+use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
 
 class YamlTest extends TestCase

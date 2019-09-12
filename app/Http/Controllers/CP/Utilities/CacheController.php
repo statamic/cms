@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use League\Glide\Server;
-use Statamic\API\Stache;
+use Statamic\Facades\Stache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;

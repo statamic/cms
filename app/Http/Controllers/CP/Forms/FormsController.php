@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\API\Str;
-use Statamic\API\Form;
-use Statamic\API\User;
+use Statamic\Facades\Str;
+use Statamic\Facades\Form;
+use Statamic\Facades\User;
 use Statamic\CP\Column;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Forms\Form as FormContract;

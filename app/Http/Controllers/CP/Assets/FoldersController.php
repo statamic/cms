@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\API\Path;
+use Statamic\Facades\Path;
 use Illuminate\Http\Request;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Validation\ValidationException;
 

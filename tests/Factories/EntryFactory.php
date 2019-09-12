@@ -2,8 +2,8 @@
 
 namespace Tests\Factories;
 
-use Statamic\API\Entry;
-use Statamic\API\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Collection;
 use Statamic\Contracts\Data\Entries\Collection as StatamicCollection;
 
 class EntryFactory

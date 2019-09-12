@@ -3,8 +3,8 @@
 namespace Statamic\Preferences;
 
 use Closure;
-use Statamic\API\Arr;
-use Statamic\API\Str;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
 
 trait HasPreferences
 {

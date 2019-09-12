@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\Search;
+use Statamic\Facades\Search;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Search\UpdateItemIndexes;

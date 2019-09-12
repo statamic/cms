@@ -2,7 +2,7 @@
 
 namespace Statamic\Actions;
 
-use Statamic\API;
+use Statamic\Facades;
 
 class Delete extends Action
 {

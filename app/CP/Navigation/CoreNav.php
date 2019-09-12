@@ -2,22 +2,22 @@
 
 namespace Statamic\CP\Navigation;
 
-use Statamic\API\Nav;
-use Statamic\API\Site;
-use Statamic\API\Form as FormAPI;
-use Statamic\API\Role as RoleAPI;
+use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
+use Statamic\Facades\Form as FormAPI;
+use Statamic\Facades\Role as RoleAPI;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Forms\Form;
-use Statamic\API\Taxonomy as TaxonomyAPI;
-use Statamic\API\GlobalSet as GlobalSetAPI;
-use Statamic\API\Structure as StructureAPI;
-use Statamic\API\UserGroup as UserGroupAPI;
-use Statamic\API\Collection as CollectionAPI;
+use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\GlobalSet as GlobalSetAPI;
+use Statamic\Facades\Structure as StructureAPI;
+use Statamic\Facades\UserGroup as UserGroupAPI;
+use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 use Statamic\Contracts\Data\Entries\Collection;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy;
 use Statamic\Contracts\Data\Structures\Structure;
-use Statamic\API\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\AssetContainer as AssetContainerAPI;
 
 class CoreNav
 {

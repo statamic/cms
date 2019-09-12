@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\API\Form;
+use Statamic\Facades\Form;
 use Illuminate\Http\Request;
 use Statamic\Http\Resources\FormResource;
 use Statamic\Http\Controllers\CP\CpController;

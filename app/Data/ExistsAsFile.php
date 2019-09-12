@@ -2,9 +2,9 @@
 
 namespace Statamic\Data;
 
-use Statamic\API\Arr;
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades\Arr;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Illuminate\Support\Carbon;
 
 trait ExistsAsFile

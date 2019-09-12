@@ -2,7 +2,7 @@
 
 namespace Statamic\Search\Comb;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;

@@ -3,18 +3,18 @@
 namespace Statamic\Data\Taxonomies;
 
 use ArrayAccess;
-use Statamic\API;
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Data;
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\Entry;
-use Statamic\API\Config;
-use Statamic\API\Stache;
-use Statamic\API\Fieldset;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Data;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Config;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Fieldset;
 use Statamic\Data\Routable;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
@@ -23,7 +23,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Revisions\Revisable;
 use Statamic\Data\Content\Content;
 use Statamic\Data\Services\TermsService;
-use Statamic\API\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Taxonomies\Term as TermContract;
@@ -223,14 +223,14 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function save()
     {
-        API\Term::save($this);
+        Facades\Term::save($this);
 
         return true;
     }
 
     public function delete()
     {
-        API\Term::delete($this);
+        Facades\Term::delete($this);
 
         return true;
     }

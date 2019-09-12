@@ -2,9 +2,9 @@
 
 namespace Statamic\Stache\Query;
 
-use Statamic\API;
-use Statamic\API\Term;
-use Statamic\API\Taxonomy;
+use Statamic\Facades;
+use Statamic\Facades\Term;
+use Statamic\Facades\Taxonomy;
 
 class TermQueryBuilder extends Builder
 {
@@ -49,7 +49,7 @@ class TermQueryBuilder extends Builder
     protected function getFilteredKeys()
     {
         $taxonomies = empty($this->taxonomies)
-            ? API\Taxonomy::handles()
+            ? Facades\Taxonomy::handles()
             : $this->taxonomies;
 
         return empty($this->wheres)
@@ -93,7 +93,7 @@ class TermQueryBuilder extends Builder
     protected function getOrderKeyValuesByIndex()
     {
         $taxonomies = empty($this->taxonomies)
-            ? API\Taxonomy::handles()
+            ? Facades\Taxonomy::handles()
             : $this->taxonomies;
 
         // First, we'll get the values from each index grouped by taxonomy

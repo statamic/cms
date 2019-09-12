@@ -3,10 +3,10 @@
 namespace Statamic\Support;
 
 use Carbon\Carbon;
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\File;
-use Statamic\API\Compare;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\File;
+use Statamic\Facades\Compare;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;

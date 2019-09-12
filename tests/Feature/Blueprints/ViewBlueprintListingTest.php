@@ -3,7 +3,7 @@
 namespace Tests\Feature\Blueprints;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
@@ -20,14 +20,14 @@ class ViewBlueprintListingTest extends TestCase
     function it_shows_a_list_of_fieldsets()
     {
         // When the CP header loads the avatar it reaches for the user blueprint.
-        API\Blueprint::shouldReceive('find')->with('user')->andReturn(new Blueprint);
+        Facades\Blueprint::shouldReceive('find')->with('user')->andReturn(new Blueprint);
 
-        API\Blueprint::shouldReceive('all')->andReturn(collect([
+        Facades\Blueprint::shouldReceive('all')->andReturn(collect([
             'foo' => $blueprintA = $this->createBlueprint('foo'),
             'bar' => $blueprintB = $this->createBlueprint('bar')
         ]));
 
-        $user = API\User::make()->makeSuper()->save();
+        $user = Facades\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)
@@ -58,7 +58,7 @@ class ViewBlueprintListingTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
 
         $response = $this
             ->from('/cp/original')

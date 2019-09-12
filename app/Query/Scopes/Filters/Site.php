@@ -2,14 +2,14 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\API;
+use Statamic\Facades;
 use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
     public function fieldItems()
     {
-        $options = API\Site::all()->mapWithKeys(function ($site) {
+        $options = Facades\Site::all()->mapWithKeys(function ($site) {
             return [$site->handle() => $site->name()];
         })->all();
 
@@ -34,7 +34,7 @@ class Site extends Filter
 
     public function visibleTo($key)
     {
-        if (! API\Site::hasMultiple()) {
+        if (! Facades\Site::hasMultiple()) {
             return false;
         }
 

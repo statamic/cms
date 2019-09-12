@@ -2,16 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\API\Str;
-use Statamic\API\Site;
-use Statamic\API\User;
-use Statamic\API\Scope;
+use Statamic\Facades\Str;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Facades\Scope;
 use Statamic\CP\Column;
-use Statamic\API\Action;
-use Statamic\API\Blueprint;
-use Statamic\API\Structure;
+use Statamic\Facades\Action;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
@@ -28,7 +28,7 @@ class CollectionsController extends CpController
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),
-                'entries' => \Statamic\API\Entry::query()->where('collection', $collection->handle())->count(),
+                'entries' => \Statamic\Facades\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
                 'blueprints' => $collection->entryBlueprints()->map(function ($blueprint) {
                     return [

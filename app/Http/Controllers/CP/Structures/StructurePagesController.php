@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
-use Statamic\API\Arr;
-use Statamic\API\Site;
-use Statamic\API\Structure;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Site;
+use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Data\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;

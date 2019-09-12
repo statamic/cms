@@ -2,7 +2,7 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\API\Revision as Revisions;
+use Statamic\Facades\Revision as Revisions;
 
 class WorkingCopy extends Revision
 {

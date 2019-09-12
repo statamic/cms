@@ -2,12 +2,12 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\Form;
-use Statamic\API\Site;
-use Statamic\API\Term;
-use Statamic\API\Entry;
-use Statamic\API\Taxonomy;
-use Statamic\API\Collection;
+use Statamic\Facades\Form;
+use Statamic\Facades\Site;
+use Statamic\Facades\Term;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 

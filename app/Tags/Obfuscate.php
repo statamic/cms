@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Html;
+use Statamic\Facades\Html;
 use Statamic\Tags\Tags;
 
 class Obfuscate extends Tags

@@ -2,11 +2,11 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Str;
-use Statamic\API\Site;
-use Statamic\API\Entry;
+use Statamic\Facades\Str;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
 use Statamic\Tags\Tags;
-use Statamic\API\Config;
+use Statamic\Facades\Config;
 use Illuminate\Support\Collection;
 
 class Locales extends Tags

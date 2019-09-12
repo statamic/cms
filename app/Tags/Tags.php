@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Parse;
-use Statamic\API\Antlers;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
 use Statamic\Data\DataCollection;

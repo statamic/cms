@@ -4,13 +4,13 @@ namespace Tests\Stache\Stores;
 
 use Mockery;
 use Tests\TestCase;
-use Statamic\API\Site;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Site;
+use Statamic\Facades\Blueprint;
 use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\GlobalsStore;
-use Statamic\API\GlobalSet as GlobalsAPI;
+use Statamic\Facades\GlobalSet as GlobalsAPI;
 use Statamic\Contracts\Data\Globals\GlobalSet;
 
 class GlobalsStoreTest extends TestCase

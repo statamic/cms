@@ -2,22 +2,22 @@
 
 namespace Statamic\View;
 
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Data;
-use Statamic\API\File;
-use Statamic\API\Html;
-use Statamic\API\Path;
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\Asset;
-use Statamic\API\Entry;
-use Statamic\API\Parse;
-use Statamic\API\Theme;
-use Statamic\API\Config;
-use Statamic\API\Helper;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Data;
+use Statamic\Facades\File;
+use Statamic\Facades\Html;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Theme;
+use Statamic\Facades\Config;
+use Statamic\Facades\Helper;
 use Statamic\Extend\Modifier;
-use Statamic\API\Localization;
+use Statamic\Facades\Localization;
 use Stringy\StaticStringy as Stringy;
 
 class BaseModifiers extends Modifier

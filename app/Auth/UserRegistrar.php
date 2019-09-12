@@ -3,10 +3,10 @@
 namespace Statamic\Auth;
 
 use Validator;
-use Statamic\API\User;
-use Statamic\API\Config;
-use Statamic\API\Helper;
-use Statamic\API\Fieldset;
+use Statamic\Facades\User;
+use Statamic\Facades\Config;
+use Statamic\Facades\Helper;
+use Statamic\Facades\Fieldset;
 use Illuminate\Http\Request;
 use Statamic\CP\Publish\ValidationBuilder;
 

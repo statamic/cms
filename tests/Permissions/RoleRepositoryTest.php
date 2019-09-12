@@ -3,7 +3,7 @@
 namespace Tests\Permissions;
 
 use Tests\TestCase;
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Auth\File\RoleRepository;

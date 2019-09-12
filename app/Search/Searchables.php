@@ -2,9 +2,9 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\User;
-use Statamic\API\Asset;
-use Statamic\API\Entry;
+use Statamic\Facades\User;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Entry;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 

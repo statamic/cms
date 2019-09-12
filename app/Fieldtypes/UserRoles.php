@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API\Role;
+use Statamic\Facades\Role;
 
 class UserRoles extends Relationship
 {

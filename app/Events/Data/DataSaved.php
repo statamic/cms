@@ -2,7 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Statamic\Data\Data;
 use Statamic\Events\Event;
 use Statamic\Contracts\Data\DataSavedEvent;

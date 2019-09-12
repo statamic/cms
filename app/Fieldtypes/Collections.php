@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 
 class Collections extends Relationship
 {

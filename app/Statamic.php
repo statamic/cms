@@ -3,9 +3,9 @@
 namespace Statamic;
 
 use Closure;
-use Statamic\API\URL;
-use Statamic\API\File;
-use Statamic\API\Site;
+use Statamic\Facades\URL;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
 
@@ -123,8 +123,8 @@ class Statamic
             'cpRoot' => cp_root(),
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => Statamic::assetUrl(),
-            'locales' => \Statamic\API\Config::get('statamic.system.locales'),
-            'markdownHardWrap' => \Statamic\API\Config::get('statamic.theming.markdown_hard_wrap'),
+            'locales' => \Statamic\Facades\Config::get('statamic.system.locales'),
+            'markdownHardWrap' => \Statamic\Facades\Config::get('statamic.theming.markdown_hard_wrap'),
             'conditions' => [],
             'MediumEditorExtensions' => [],
             'flash' => static::flash(),

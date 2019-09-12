@@ -2,9 +2,9 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\Asset;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\Asset;
 
 class StaticUrlBuilder extends ImageUrlBuilder
 {

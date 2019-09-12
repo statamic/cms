@@ -2,12 +2,12 @@
 
 namespace Statamic\Auth\File;
 
-use Statamic\API;
+use Statamic\Facades;
 use Carbon\Carbon;
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Statamic\Data\Data;
-use Statamic\API\Stache;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Auth\User as BaseUser;
@@ -161,7 +161,7 @@ class User extends BaseUser
     {
         return collect($this->get('roles', []))
             ->map(function ($role) {
-                return API\Role::find($role);
+                return Facades\Role::find($role);
             })->filter()->keyBy->handle();
     }
 
@@ -236,7 +236,7 @@ class User extends BaseUser
     protected function getGroups()
     {
         return collect($this->get('groups', []))->map(function ($group) {
-            return API\UserGroup::find($group);
+            return Facades\UserGroup::find($group);
         })->filter()->keyBy->handle();
     }
 

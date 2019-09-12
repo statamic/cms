@@ -2,11 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API\Arr;
-use Statamic\API\Asset;
-use Statamic\API\Helper;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Statamic\Assets\AssetCollection;
 
 class Assets extends Fieldtype

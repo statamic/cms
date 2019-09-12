@@ -3,10 +3,10 @@
 namespace Tests\Feature\Entries;
 
 use Tests\TestCase;
-use Statamic\API\Term;
-use Statamic\API\Entry;
-use Statamic\API\Taxonomy;
-use Statamic\API\Collection;
+use Statamic\Facades\Term;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 

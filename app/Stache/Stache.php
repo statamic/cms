@@ -3,9 +3,9 @@
 namespace Statamic\Stache;
 
 use Carbon\Carbon;
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\Helper;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\Helper;
 use Statamic\Stache\Stores\Store;
 use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;

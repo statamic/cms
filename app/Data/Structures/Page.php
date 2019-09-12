@@ -2,11 +2,11 @@
 
 namespace Statamic\Data\Structures;
 
-use Statamic\API\URL;
-use Statamic\API\Site;
-use Statamic\API\Collection;
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
+use Statamic\Facades\Collection;
 use Statamic\Data\Augmentable;
-use Statamic\API\Entry as EntryAPI;
+use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Contracts\Data\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;

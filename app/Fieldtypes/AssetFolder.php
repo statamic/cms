@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 
 class AssetFolder extends Relationship
 {

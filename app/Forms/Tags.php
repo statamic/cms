@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms;
 
-use Statamic\API\URL;
-use Statamic\API\Form;
+use Statamic\Facades\URL;
+use Statamic\Facades\Form;
 use DebugBar\DebugBarException;
 use Statamic\Tags\OutputsItems;
 use Statamic\Tags\Tags as BaseTags;

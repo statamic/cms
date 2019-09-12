@@ -2,7 +2,7 @@
 
 namespace Tests\Auth;
 
-use Statamic\API;
+use Statamic\Facades;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Illuminate\Support\Facades\Hash;
@@ -168,7 +168,7 @@ trait UserContractTests
             public function __construct($handle) { $this->handle = $handle; }
         };
 
-        API\Role::shouldReceive('find')
+        Facades\Role::shouldReceive('find')
             ->with($handle)
             ->andReturn($class);
 
@@ -181,7 +181,7 @@ trait UserContractTests
             public function __construct($handle) { $this->handle = $handle; }
         };
 
-        API\UserGroup::shouldReceive('find')
+        Facades\UserGroup::shouldReceive('find')
             ->with($handle)
             ->andReturn($class);
 

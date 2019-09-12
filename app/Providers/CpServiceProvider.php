@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\Site;
+use Statamic\Facades\Site;
 use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\Translation\Loader;

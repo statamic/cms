@@ -3,8 +3,8 @@
 namespace Statamic\Support;
 
 use Collator;
-use Statamic\API\Str;
-use Statamic\API\Site;
+use Statamic\Facades\Str;
+use Statamic\Facades\Site;
 
 class Comparator
 {

@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
-use Statamic\API\Structure;
+use Statamic\Facades\Structure;
 
 class Structures extends Relationship
 {

@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Updater;
 
 use Statamic\Statamic;
-use Statamic\API\Addon;
+use Statamic\Facades\Addon;
 use Illuminate\Http\Request;
 use Statamic\Updater\Changelog;
 use Facades\Statamic\Updater\UpdatesOverview;

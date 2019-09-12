@@ -3,8 +3,8 @@
 namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
-use Statamic\API\Field as FieldAPI;
-use Statamic\API\Str;
+use Statamic\Facades\Field as FieldAPI;
+use Statamic\Facades\Str;
 
 class Section
 {

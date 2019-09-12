@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Requests;
 
-use Statamic\API\Site;
+use Statamic\Facades\Site;
 
 class FilteredSiteRequest extends FilteredRequest
 {

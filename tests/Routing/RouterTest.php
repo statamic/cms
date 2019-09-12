@@ -1,7 +1,7 @@
 <?php namespace Tests\Routing;
 
 use Tests\TestCase;
-use Statamic\API\Site;
+use Statamic\Facades\Site;
 use Statamic\Routing\Route;
 use Statamic\Routing\Router;
 

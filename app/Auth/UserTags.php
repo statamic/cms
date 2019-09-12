@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth;
 
-use Statamic\API\URL;
-use Statamic\API\User;
+use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\Exceptions\RedirectException;
 use Statamic\Contracts\Auth\User as UserContract;

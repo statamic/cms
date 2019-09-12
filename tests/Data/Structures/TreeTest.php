@@ -4,14 +4,14 @@ namespace Tests\Data\Structures;
 
 use Tests\TestCase;
 use Tests\UnlinksPaths;
-use Statamic\API\Entry;
-use Statamic\API\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Collection;
 use Statamic\Data\Structures\Page;
 use Statamic\Data\Structures\Tree;
 use Statamic\Data\Structures\Pages;
 use Statamic\Data\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\API\Structure as StructureAPI;
+use Statamic\Facades\Structure as StructureAPI;
 
 class TreeTest extends TestCase
 {

@@ -4,8 +4,8 @@ namespace Statamic\View;
 
 use Exception;
 use ArrayIterator;
-use Statamic\API\Str;
-use Statamic\API\Helper;
+use Statamic\Facades\Str;
+use Statamic\Facades\Helper;
 use Statamic\Exceptions\ModifierException;
 use Statamic\Extend\Management\ModifierLoader;
 

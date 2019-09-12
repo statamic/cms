@@ -2,7 +2,7 @@
 
 namespace Statamic\Actions;
 
-use Statamic\API;
+use Statamic\Facades;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 
 class SendActivationEmail extends Action

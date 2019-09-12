@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Indexes;
 
-use Statamic\API\Str;
-use Statamic\API\Structure;
+use Statamic\Facades\Str;
+use Statamic\Facades\Structure;
 
 class StructureUris extends Index
 {

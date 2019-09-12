@@ -2,7 +2,7 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 

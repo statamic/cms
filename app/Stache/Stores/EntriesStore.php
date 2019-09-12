@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 
 class EntriesStore extends AggregateStore
 {

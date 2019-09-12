@@ -3,9 +3,9 @@
 namespace Statamic\Testing\Extend;
 
 use Tests\TestCase;
-use Statamic\API\URL;
-use Statamic\API\Path;
-use Statamic\API\File;
+use Statamic\Facades\URL;
+use Statamic\Facades\Path;
+use Statamic\Facades\File;
 use Statamic\Extend\Addon;
 
 class AddonTest extends TestCase

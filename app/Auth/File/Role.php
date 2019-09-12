@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth\File;
 
-use Statamic\API;
-use Statamic\API\Arr;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Auth\Role as BaseRole;
 use Statamic\Preferences\HasPreferences;
@@ -102,13 +102,13 @@ class Role extends BaseRole
 
     public function save()
     {
-        API\Role::save($this);
+        Facades\Role::save($this);
 
         return $this;
     }
 
     public function delete()
     {
-        API\Role::delete($this);
+        Facades\Role::delete($this);
     }
 }

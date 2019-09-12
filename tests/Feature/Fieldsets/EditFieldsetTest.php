@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Fieldset;
@@ -26,7 +26,7 @@ class EditFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -41,7 +41,7 @@ class EditFieldsetTest extends TestCase
     function it_provides_the_fieldset()
     {
         $this->withoutExceptionHandling();
-        $user = API\User::make()->makeSuper()->save();
+        $user = Facades\User::make()->makeSuper()->save();
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this

@@ -4,7 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Tests\TestCase;
 use Statamic\Stache\Stache;
-use Statamic\API\User as UserAPI;
+use Statamic\Facades\User as UserAPI;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\UsersStore;

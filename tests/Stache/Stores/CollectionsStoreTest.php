@@ -7,7 +7,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\CollectionsStore;
-use Statamic\API\Collection as CollectionAPI;
+use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Data\Entries\Collection;
 
 class CollectionsStoreTest extends TestCase

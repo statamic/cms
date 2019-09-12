@@ -3,7 +3,7 @@
 namespace Tests\Extend;
 
 use Tests\TestCase;
-use Statamic\API\Antlers;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;

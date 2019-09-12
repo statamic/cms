@@ -2,9 +2,9 @@
 
 namespace Statamic\Auth;
 
-use Statamic\API;
-use Statamic\API\YAML;
-use Statamic\API\File;
+use Statamic\Facades;
+use Statamic\Facades\YAML;
+use Statamic\Facades\File;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\UserGroup;
@@ -29,12 +29,12 @@ class UserGroupRepository implements RepositoryContract
         }
 
         return $this->groups = $this->raw()->map(function ($data, $handle) {
-            $group = API\UserGroup::make()
+            $group = Facades\UserGroup::make()
                 ->handle($handle)
                 ->title(array_get($data, 'title'));
 
             foreach ($data['roles'] as $role) {
-                if ($role = API\Role::find($role)) {
+                if ($role = Facades\Role::find($role)) {
                     $group->assignRole($role);
                 }
             }

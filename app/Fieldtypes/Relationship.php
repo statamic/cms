@@ -2,12 +2,12 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API\Site;
-use Statamic\API\Entry;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
 use Statamic\CP\Column;
-use Statamic\API\Content;
+use Statamic\Facades\Content;
 use Illuminate\Support\Arr;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Fieldtype;
 
 class Relationship extends Fieldtype

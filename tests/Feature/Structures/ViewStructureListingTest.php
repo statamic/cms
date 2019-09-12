@@ -3,7 +3,7 @@
 namespace Tests\Feature\Structures;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Auth\User;
 use Statamic\Data\Structures\Tree;
@@ -17,12 +17,12 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_shows_a_list_of_structures()
     {
-        API\Structure::shouldReceive('all')->andReturn(collect([
+        Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $structureA = $this->createStructure('foo'),
             'bar' => $structureB = $this->createStructure('bar')
         ]));
 
-        $user = API\User::make()->makeSuper()->save();
+        $user = Facades\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)
@@ -37,7 +37,7 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_shows_no_results_when_there_are_no_structures()
     {
-        $user = API\User::make()->makeSuper()->save();
+        $user = Facades\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)
@@ -51,12 +51,12 @@ class ViewStructureListingTest extends TestCase
     function it_filters_out_structures_the_user_cannot_access()
     {
         $this->withoutExceptionHandling();
-        API\Structure::shouldReceive('all')->andReturn(collect([
+        Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $structureA = $this->createStructure('foo'),
             'bar' => $structureB = $this->createStructure('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'view bar structure']]);
-        $user = API\User::make()->assignRole('test')->save();
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -71,12 +71,12 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
     {
-        API\Structure::shouldReceive('all')->andReturn(collect([
+        Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $structureA = $this->createStructure('foo'),
             'bar' => $structureB = $this->createStructure('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'configure structures', 'view bar structure']]);
-        $user = API\User::make()->assignRole('test')->save();
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -91,13 +91,13 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_denies_access_when_there_are_no_permitted_structures()
     {
-        API\Structure::shouldReceive('all')->andReturn(collect([
+        Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $structureA = $this->createStructure('foo'),
             'bar' => $structureB = $this->createStructure('bar')
         ]));
 
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test')->save();
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->from('/cp/original')
@@ -110,7 +110,7 @@ class ViewStructureListingTest extends TestCase
     function create_structure_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
-        $user = API\User::make()->assignRole('test')->save();
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -122,7 +122,7 @@ class ViewStructureListingTest extends TestCase
     function create_structure_button_is_not_visible_without_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -133,12 +133,12 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function delete_button_is_visible_with_permission_to_configure()
     {
-        API\Structure::shouldReceive('all')->andReturn(collect([
+        Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $this->createStructure('foo'),
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
-        $user = API\User::make()->assignRole('test')->save();
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -151,12 +151,12 @@ class ViewStructureListingTest extends TestCase
     {
         $this->markTestIncomplete();
 
-        API\Structure::shouldReceive('all')->andReturn(collect([
+        Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $this->createStructure('foo'),
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'view foo structure']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
@@ -185,7 +185,7 @@ class ViewStructureListingTest extends TestCase
     private function setTestRoles($roles)
     {
         $roles = collect($roles)->map(function ($permissions, $handle) {
-            return API\Role::make()
+            return Facades\Role::make()
                 ->handle($handle)
                 ->addPermission($permissions);
         });
@@ -201,6 +201,6 @@ class ViewStructureListingTest extends TestCase
         };
 
         app()->instance(\Statamic\Contracts\Auth\RoleRepository::class, $fake);
-        API\Role::swap($fake);
+        Facades\Role::swap($fake);
     }
 }

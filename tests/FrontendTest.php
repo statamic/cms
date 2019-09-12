@@ -2,11 +2,11 @@
 
 namespace Tests;
 
-use Statamic\API\Site;
-use Statamic\API\User;
-use Statamic\API\Entry;
-use Statamic\API\Blueprint;
-use Statamic\API\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Statamic\Events\ResponseCreated;

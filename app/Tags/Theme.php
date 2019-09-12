@@ -2,14 +2,14 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Parse;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\Parse;
 use Statamic\Tags\Tags;
-use Statamic\API\Config;
-use Statamic\API\Antlers;
+use Statamic\Facades\Config;
+use Statamic\Facades\Antlers;
 
 class Theme extends Tags
 {

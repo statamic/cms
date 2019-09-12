@@ -3,7 +3,7 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Closure;
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Exceptions\AuthenticationException;
 use Statamic\Exceptions\AuthorizationException;
 

@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
-use Statamic\API\Addon;
+use Statamic\Facades\Addon;
 use Facades\Statamic\Extend\AddonInstaller;
 
 class AddonsController extends CpController

@@ -3,7 +3,7 @@
 namespace Tests\Console;
 
 use Tests\TestCase;
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Illuminate\Filesystem\Filesystem;
 
 class UserGeneratorTest extends TestCase

@@ -1,6 +1,6 @@
 <?php
 
-use Statamic\API\OAuth;
+use Statamic\Facades\OAuth;
 
 Route::name('statamic.')->group(function () {
     /**

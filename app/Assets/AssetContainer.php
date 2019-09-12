@@ -2,17 +2,17 @@
 
 namespace Statamic\Assets;
 
-use Statamic\API;
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\YAML;
-use Statamic\API\Parse;
-use Statamic\API\Folder;
-use Statamic\API\Search;
-use Statamic\API\Stache;
-use Statamic\API\Blueprint;
+use Statamic\Facades;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Folder;
+use Statamic\Facades\Search;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Blueprint;
 use Statamic\Data\ExistsAsFile;
-use Statamic\API\Asset as AssetAPI;
+use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Events\Data\AssetContainerDeleted;
@@ -160,7 +160,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function save()
     {
-        API\AssetContainer::save($this);
+        Facades\AssetContainer::save($this);
 
         // event(new AssetContainerSaved($this));
 
@@ -302,7 +302,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function asset($path)
     {
-        $asset = API\Asset::make()->container($this)->path($path);
+        $asset = Facades\Asset::make()->container($this)->path($path);
 
         if (! $asset->disk()->exists($asset->path())) {
             return null;
@@ -453,7 +453,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public function queryAssets()
     {
-        return API\Asset::query()->where('container', $this);
+        return Facades\Asset::query()->where('container', $this);
     }
 
     public function hasSearchIndex()
@@ -473,6 +473,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
 
     public static function __callStatic($method, $parameters)
     {
-        return API\AssetContainer::{$method}(...$parameters);
+        return Facades\AssetContainer::{$method}(...$parameters);
     }
 }

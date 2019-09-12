@@ -2,7 +2,7 @@
 
 namespace Statamic\Filesystem;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 

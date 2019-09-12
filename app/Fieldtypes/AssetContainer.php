@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API;
+use Statamic\Facades;
 
 class AssetContainer extends Relationship
 {
@@ -13,7 +13,7 @@ class AssetContainer extends Relationship
 
     protected function toItemArray($id, $site = null)
     {
-        if ($container = API\AssetContainer::find($id)) {
+        if ($container = Facades\AssetContainer::find($id)) {
             return [
                 'title' => $container->title(),
                 'id' => $container->handle(),
@@ -25,7 +25,7 @@ class AssetContainer extends Relationship
 
     public function getIndexItems($request)
     {
-        return API\AssetContainer::all()->map(function ($container) {
+        return Facades\AssetContainer::all()->map(function ($container) {
             return [
                 'id' => $container->handle(),
                 'title' => $container->title(),
@@ -35,6 +35,6 @@ class AssetContainer extends Relationship
 
     public function augmentValue($value)
     {
-        return API\AssetContainer::find($value);
+        return Facades\AssetContainer::find($value);
     }
 }

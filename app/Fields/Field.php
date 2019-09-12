@@ -2,7 +2,7 @@
 
 namespace Statamic\Fields;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\CP\FieldtypeFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Facades\Statamic\Fields\FieldtypeRepository;

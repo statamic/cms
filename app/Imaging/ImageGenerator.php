@@ -3,10 +3,10 @@
 namespace Statamic\Imaging;
 
 use GuzzleHttp\Client;
-use Statamic\API\File;
-use Statamic\API\Config;
+use Statamic\Facades\File;
+use Statamic\Facades\Config;
 use League\Glide\Server;
-use Statamic\API\Helper;
+use Statamic\Facades\Helper;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Twistor\Flysystem\GuzzleAdapter;

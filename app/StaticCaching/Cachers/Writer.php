@@ -2,8 +2,8 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Statamic\API\File;
-use Statamic\API\Folder;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
 
 class Writer
 {

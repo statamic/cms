@@ -3,8 +3,8 @@
 namespace Statamic\Imaging;
 
 use Exception;
-use Statamic\API\Str;
-use Statamic\API\Asset as AssetAPI;
+use Statamic\Facades\Str;
+use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Contracts\Imaging\ImageManipulator;

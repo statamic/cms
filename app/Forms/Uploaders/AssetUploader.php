@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms\Uploaders;
 
-use Statamic\API\Asset;
-use Statamic\API\Path;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Path;
 
 class AssetUploader extends Uploader
 {

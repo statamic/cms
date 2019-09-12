@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
-use Statamic\API\Site;
-use Statamic\API\Blueprint;
-use Statamic\API\Structure;
+use Statamic\Facades\Site;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Validation;
 use Statamic\Data\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;

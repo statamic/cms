@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\ActionController;
 
 class UserActionController extends ActionController

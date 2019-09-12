@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Finder\SplFileInfo;
 

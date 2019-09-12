@@ -2,8 +2,8 @@
 
 namespace Statamic\Data\Structures;
 
-use Statamic\API;
-use Statamic\API\Stache;
+use Statamic\Facades;
+use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Contracts\Data\Localization;

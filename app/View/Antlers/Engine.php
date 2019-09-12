@@ -2,10 +2,10 @@
 
 namespace Statamic\View\Antlers;
 
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Path;
-use Statamic\API\Parse;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Path;
+use Statamic\Facades\Parse;
 use Statamic\Exceptions;
 use Illuminate\Support\Collection;
 use Facades\Statamic\View\Cascade;

@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms;
 
-use Statamic\API\Form;
+use Statamic\Facades\Form;
 use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget

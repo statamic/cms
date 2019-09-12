@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache;
 
-use Statamic\API\Site;
+use Statamic\Facades\Site;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 

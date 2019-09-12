@@ -2,12 +2,12 @@
 
 namespace Statamic\Assets;
 
-use Statamic\API\Arr;
-use Statamic\API\Path;
-use Statamic\API\YAML;
-use Statamic\API\Action;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Path;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Action;
 use Statamic\Data\DataFolder;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
 use Statamic\Support\Traits\FluentlyGetsAndSets;

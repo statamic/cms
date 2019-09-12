@@ -4,8 +4,8 @@ namespace Statamic\CP\Navigation;
 
 use Closure;
 use Exception;
-use Statamic\API\Str;
-use Statamic\API\User;
+use Statamic\Facades\Str;
+use Statamic\Facades\User;
 use Statamic\CP\Navigation\CoreNav;
 use Statamic\CP\Navigation\NavItem;
 

@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Blueprint;
 
 class Blueprints extends Relationship
 {

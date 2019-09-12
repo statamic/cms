@@ -3,9 +3,9 @@
 namespace Statamic\OAuth;
 
 use Closure;
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\User;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\User;
 use Statamic\Contracts\Auth\User as StatamicUser;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 

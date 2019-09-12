@@ -2,8 +2,8 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Statamic\API\Str;
-use Statamic\API\Config;
+use Statamic\Facades\Str;
+use Statamic\Facades\Config;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\StaticCaching\Cacher;

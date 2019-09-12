@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use Illuminate\Support\Collection;
 
 class ArrayAccessor extends Collection

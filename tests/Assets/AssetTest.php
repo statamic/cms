@@ -2,10 +2,10 @@
 
 namespace Tests\Assets;
 
-use Statamic\API;
+use Statamic\Facades;
 use Carbon\Carbon;
 use Tests\TestCase;
-use Statamic\API\YAML;
+use Statamic\Facades\YAML;
 use Statamic\Assets\Asset;
 use Statamic\Fields\Blueprint;
 use Illuminate\Http\UploadedFile;
@@ -91,7 +91,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_gets_the_container_if_provided_with_a_string()
     {
-        API\AssetContainer::shouldReceive('find')
+        Facades\AssetContainer::shouldReceive('find')
             ->with('test')
             ->andReturn($container = new AssetContainer);
 
@@ -287,7 +287,7 @@ class AssetTest extends TestCase
             'size' => 123,
         ]));
 
-        $container = API\AssetContainer::make('test')->disk('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
 
         $this->assertEquals($meta, $asset->meta());
@@ -304,7 +304,7 @@ class AssetTest extends TestCase
         $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix() . 'foo/image.jpg';
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
 
-        $container = API\AssetContainer::make('test')->disk('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/image.jpg')->set('foo', 'bar');
 
         $this->assertEquals([
@@ -324,7 +324,7 @@ class AssetTest extends TestCase
         $disk->put('foo/test.txt', '');
         $disk->put('foo/.meta/test.txt.yaml', YAML::dump(['data' => ['hello' => 'world']]));
 
-        $container = API\AssetContainer::make('test')->disk('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
 
         $this->assertEquals(['hello' => 'world'], $asset->data());
@@ -334,9 +334,9 @@ class AssetTest extends TestCase
     function it_saves()
     {
         Storage::fake('test');
-        $container = API\AssetContainer::make('test')->disk('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
-        API\Asset::shouldReceive('save')->with($asset);
+        Facades\Asset::shouldReceive('save')->with($asset);
 
         $return = $asset->save();
 
@@ -353,8 +353,8 @@ class AssetTest extends TestCase
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('path/to/asset.txt', '');
-        $container = API\AssetContainer::make('test')->disk('local');
-        API\AssetContainer::shouldReceive('save')->with($container);
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('path/to/asset.txt');
         $disk->assertExists('path/to/asset.txt');
 
@@ -372,8 +372,8 @@ class AssetTest extends TestCase
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('old/asset.txt', 'The asset contents');
-        $container = API\AssetContainer::make('test')->disk('local');
-        API\AssetContainer::shouldReceive('save')->with($container);
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $disk->assertExists('old/asset.txt');
@@ -400,8 +400,8 @@ class AssetTest extends TestCase
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('old/asset.txt', 'The asset contents');
-        $container = API\AssetContainer::make('test')->disk('local');
-        API\AssetContainer::shouldReceive('save')->with($container);
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $disk->assertExists('old/asset.txt');
@@ -427,8 +427,8 @@ class AssetTest extends TestCase
     {
         $disk = Storage::fake('local');
         $disk->put('old/asset.txt', 'The asset contents');
-        $container = API\AssetContainer::make('test')->disk('local');
-        API\AssetContainer::shouldReceive('save')->with($container);
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
         $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $disk->assertExists('old/asset.txt');
@@ -478,7 +478,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_converts_to_array()
     {
-        API\Blueprint::shouldReceive('find')->once()
+        Facades\Blueprint::shouldReceive('find')->once()
             ->with('test_blueprint')
             ->andReturn((new Blueprint)->setHandle('test_blueprint'));
 

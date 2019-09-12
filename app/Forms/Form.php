@@ -2,13 +2,13 @@
 
 namespace Statamic\Forms;
 
-use Statamic\API;
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Statamic\CP\Column;
-use Statamic\API\Config;
-use Statamic\API\Folder;
+use Statamic\Facades\Config;
+use Statamic\Facades\Folder;
 use Statamic\Fields\Blueprint;
 use Statamic\Exceptions\FatalException;
 use Statamic\Contracts\Forms\Submission;
@@ -59,7 +59,7 @@ class Form implements FormContract
     {
         return $this->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) {
-                return API\Blueprint::find($blueprint);
+                return Facades\Blueprint::find($blueprint);
             })
             ->setter(function ($blueprint) {
                 return $blueprint instanceof Blueprint ? $blueprint->handle() : $blueprint;

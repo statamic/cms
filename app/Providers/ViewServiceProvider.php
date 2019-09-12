@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\Site;
+use Statamic\Facades\Site;
 use Statamic\Statamic;
 use Statamic\View\Store;
 use Illuminate\View\View;

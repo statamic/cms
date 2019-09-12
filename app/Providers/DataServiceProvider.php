@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\Config;
+use Statamic\Facades\Config;
 use Statamic\Data\Structures\UriCache;
 use Illuminate\Support\ServiceProvider;
 

@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Statamic\API\Str;
-use Statamic\API\OAuth;
+use Statamic\Facades\Str;
+use Statamic\Facades\OAuth;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;

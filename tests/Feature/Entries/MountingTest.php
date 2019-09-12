@@ -3,8 +3,8 @@
 namespace Tests\Feature\Entries;
 
 use Tests\TestCase;
-use Statamic\API\Entry;
-use Statamic\API\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 

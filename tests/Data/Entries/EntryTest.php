@@ -2,9 +2,9 @@
 
 namespace Tests\Data\Entries;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Sites\Site;
 use Illuminate\Support\Carbon;
 use Statamic\Fields\Blueprint;
@@ -150,7 +150,7 @@ class EntryTest extends TestCase
     {
         config(['statamic.amp.enabled' => true]);
 
-        API\Site::setConfig(['default' => 'en', 'sites' => [
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => 'http://domain.com/'],
             'fr' => ['url' => 'http://domain.com/fr/'],
             'de' => ['url' => 'http://domain.de/'],
@@ -238,7 +238,7 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
-        API\Site::setConfig(['default' => 'en', 'sites' => [
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => '/'],
         ]]);
 
@@ -252,7 +252,7 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
-        API\Site::setConfig(['default' => 'en', 'sites' => [
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => '/'],
             'fr' => ['url' => '/'],
         ]]);
@@ -424,8 +424,8 @@ class EntryTest extends TestCase
     {
         Event::fake();
         $entry = (new Entry)->collection(new Collection);
-        API\Entry::shouldReceive('save')->with($entry);
-        API\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
 
         $return = $entry->save();
 
@@ -441,7 +441,7 @@ class EntryTest extends TestCase
     /** @test */
     function if_saving_event_returns_false_the_entry_doesnt_save()
     {
-        API\Entry::spy();
+        Facades\Entry::spy();
         Event::fake([EntrySaved::class]);
 
         Event::listen(EntrySaving::class, function () {
@@ -453,7 +453,7 @@ class EntryTest extends TestCase
         $return = $entry->save();
 
         $this->assertFalse($return);
-        API\Entry::shouldNotHaveReceived('save');
+        Facades\Entry::shouldNotHaveReceived('save');
         Event::assertNotDispatched(EntrySaved::class);
     }
 
@@ -580,7 +580,7 @@ EOT;
     {
         Event::fake();
         $entry = new Entry;
-        API\Entry::shouldReceive('delete')->with($entry);
+        Facades\Entry::shouldReceive('delete')->with($entry);
 
         $return = $entry->delete();
 

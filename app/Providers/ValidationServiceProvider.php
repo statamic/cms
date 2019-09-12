@@ -3,12 +3,12 @@
 namespace Statamic\Providers;
 
 use Validator;
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\Page;
-use Statamic\API\Path;
-use Statamic\API\Entry;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\Page;
+use Statamic\Facades\Path;
+use Statamic\Facades\Entry;
+use Statamic\Facades\AssetContainer;
 use Illuminate\Support\ServiceProvider;
 
 class ValidationServiceProvider extends ServiceProvider
@@ -35,7 +35,7 @@ class ValidationServiceProvider extends ServiceProvider
      */
     private function assetContainerExists($value)
     {
-        return (bool) \Statamic\API\AssetContainer::find($value);
+        return (bool) \Statamic\Facades\AssetContainer::find($value);
     }
 
     private function entrySlugExists()

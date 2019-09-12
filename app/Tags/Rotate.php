@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use Statamic\Tags\Tags;
-use Statamic\API\Helper;
+use Statamic\Facades\Helper;
 
 class Rotate extends Tags
 {

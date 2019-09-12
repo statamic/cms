@@ -2,7 +2,7 @@
 
 namespace Tests\Stache\Repositories;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Contracts\Assets\AssetContainer;
@@ -62,7 +62,7 @@ class AssetContainerRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_container_to_the_stache_and_to_a_file()
     {
-        $container = API\AssetContainer::make('new');
+        $container = Facades\AssetContainer::make('new');
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($container);

@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Illuminate\Support\Carbon;
 use Statamic\Assets\Dimensions;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Illuminate\Http\UploadedFile;
 use Statamic\Imaging\ImageGenerator;
 use Illuminate\Support\Facades\Cache;

@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
-use Statamic\API\Search;
+use Statamic\Facades\Search;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 

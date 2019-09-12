@@ -2,8 +2,8 @@
 
 namespace Statamic\Policies;
 
-use Statamic\API\User;
-use Statamic\API\Structure;
+use Statamic\Facades\User;
+use Statamic\Facades\Structure;
 
 class StructurePolicy
 {

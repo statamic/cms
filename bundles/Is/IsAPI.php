@@ -2,8 +2,8 @@
 
 namespace Statamic\Addons\Is;
 
-use Statamic\API\Role;
-use Statamic\API\User;
+use Statamic\Facades\Role;
+use Statamic\Facades\User;
 use Statamic\Extend\API;
 
 class IsAPI extends API

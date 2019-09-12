@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Tags\Tags;
 
 class Widont extends Tags

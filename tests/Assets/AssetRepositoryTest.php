@@ -3,9 +3,9 @@
 namespace Tests\Assets;
 
 use Tests\TestCase;
-use Statamic\API\Asset;
+use Statamic\Facades\Asset;
 use Illuminate\Support\Carbon;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Illuminate\Http\UploadedFile;
 use Statamic\Assets\AssetRepository;
 use Illuminate\Support\Facades\Storage;

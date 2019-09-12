@@ -3,8 +3,8 @@
 namespace Statamic\Imaging;
 
 use Exception;
-use Statamic\API\Str;
-use Statamic\API\URL;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
 use League\Glide\Urls\UrlBuilderFactory;
 
 class GlideUrlBuilder extends ImageUrlBuilder

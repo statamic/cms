@@ -6,9 +6,9 @@ use Facades\Statamic\Extend\Marketplace;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest;
 use ReflectionClass;
-use Statamic\API\Arr;
-use Statamic\API\File;
-use Statamic\API\Str;
+use Statamic\Facades\Arr;
+use Statamic\Facades\File;
+use Statamic\Facades\Str;
 
 class Manifest extends PackageManifest
 {

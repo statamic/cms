@@ -2,11 +2,11 @@
 
 namespace Statamic\Assets;
 
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\AssetContainer;
 use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\QueryBuilder;

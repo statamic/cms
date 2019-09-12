@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\URL;
-use Statamic\API\Entry;
-use Statamic\API\Action;
+use Statamic\Facades\URL;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Action;
 use Illuminate\Http\Request;
-use Statamic\Api\Preference;
+use Statamic\Facades\Preference;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FavoritesController extends CpController

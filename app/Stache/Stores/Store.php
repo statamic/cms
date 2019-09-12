@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Statamic\Stache\Indexes;
 use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Stache\Traverser;

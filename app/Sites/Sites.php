@@ -2,7 +2,7 @@
 
 namespace Statamic\Sites;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Statamic;
 
 class Sites

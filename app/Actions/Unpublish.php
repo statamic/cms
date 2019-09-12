@@ -2,9 +2,9 @@
 
 namespace Statamic\Actions;
 
-use Statamic\API;
-use Statamic\API\User;
-use Statamic\API\Collection;
+use Statamic\Facades;
+use Statamic\Facades\User;
+use Statamic\Facades\Collection;
 use Statamic\Contracts\Data\Entries\Entry;
 
 class Unpublish extends Action

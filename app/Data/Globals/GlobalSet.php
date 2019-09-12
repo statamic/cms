@@ -2,10 +2,10 @@
 
 namespace Statamic\Data\Globals;
 
-use Statamic\API;
-use Statamic\API\Site;
-use Statamic\API\Stache;
-use Statamic\API\Blueprint;
+use Statamic\Facades;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Blueprint;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Globals\GlobalSet as Contract;
@@ -88,14 +88,14 @@ class GlobalSet implements Contract
 
     public function save()
     {
-        API\GlobalSet::save($this);
+        Facades\GlobalSet::save($this);
 
         return $this;
     }
 
     public function delete()
     {
-        API\GlobalSet::delete($this);
+        Facades\GlobalSet::delete($this);
 
         return true;
     }
@@ -175,6 +175,6 @@ class GlobalSet implements Contract
 
     public static function __callStatic($method, $parameters)
     {
-        return API\GlobalSet::{$method}(...$parameters);
+        return Facades\GlobalSet::{$method}(...$parameters);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Statamic\View\Antlers;
 
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use ReflectionProperty;
-use Statamic\API\Config;
-use Statamic\API\Helper;
+use Statamic\Facades\Config;
+use Statamic\Facades\Helper;
 use Statamic\View\Modify;
 use Statamic\Fields\Value;
 use Statamic\Query\Builder;

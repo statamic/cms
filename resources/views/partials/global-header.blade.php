@@ -13,7 +13,7 @@
 
     <div class="head-link h-full md:pl-3 flex items-center">
 
-        @if (Statamic\API\Site::hasMultiple())
+        @if (Statamic\Facades\Site::hasMultiple())
             <site-selector>
                 <template slot="icon">@svg('sites')</template>
             </site-selector>

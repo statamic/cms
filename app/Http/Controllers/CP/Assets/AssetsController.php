@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\API\Asset;
-use Statamic\API\Action;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Action;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Statamic\CP\Publish\ProcessesFields;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Assets\Asset as AssetContract;

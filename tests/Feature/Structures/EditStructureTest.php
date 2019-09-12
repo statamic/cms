@@ -3,7 +3,7 @@
 namespace Tests\Feature\Structures;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
@@ -19,11 +19,11 @@ class EditStructureTest extends TestCase
     function it_shows_the_edit_form_if_user_has_edit_permission()
     {
         $structure = $this->createStructure('foo');
-        API\Structure::shouldReceive('all')->andReturn(collect([$structure]));
-        API\Structure::shouldReceive('find')->andReturn($structure);
+        Facades\Structure::shouldReceive('all')->andReturn(collect([$structure]));
+        Facades\Structure::shouldReceive('find')->andReturn($structure);
 
         $this->setTestRoles(['test' => ['access cp', 'edit foo structure']]);
-        $user = API\User::make()->assignRole('test')->save();
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
@@ -36,11 +36,11 @@ class EditStructureTest extends TestCase
     function it_denies_access_if_user_doesnt_have_edit_permission()
     {
         $structure = $this->createStructure('foo');
-        API\Structure::shouldReceive('all')->andReturn(collect([$structure]));
-        API\Structure::shouldReceive('find')->andReturn($structure);
+        Facades\Structure::shouldReceive('all')->andReturn(collect([$structure]));
+        Facades\Structure::shouldReceive('find')->andReturn($structure);
 
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
 
         $response = $this
             ->from('/cp/original')

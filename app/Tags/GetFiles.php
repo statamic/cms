@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use Statamic\Tags\Tags;
-use Statamic\API\Folder;
-use Statamic\API\Helper;
+use Statamic\Facades\Folder;
+use Statamic\Facades\Helper;
 use Statamic\Support\FileCollection;
 
 class GetFiles extends Tags

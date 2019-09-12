@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\API;
-use Statamic\API\Arr;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
@@ -16,7 +16,7 @@ class BlueprintController extends CpController
     {
         $this->authorize('index', Blueprint::class, 'You are not authorized to access blueprints.');
 
-        $blueprints = API\Blueprint::all()->map(function ($blueprint) {
+        $blueprints = Facades\Blueprint::all()->map(function ($blueprint) {
             return [
                 'id' => $blueprint->handle(),
                 'handle' => $blueprint->handle(),
@@ -62,7 +62,7 @@ class BlueprintController extends CpController
 
     public function edit($blueprint)
     {
-        $blueprint = API\Blueprint::find($blueprint);
+        $blueprint = Facades\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
 
@@ -80,7 +80,7 @@ class BlueprintController extends CpController
     public function update(Request $request, $blueprint)
     {
 
-        $blueprint = API\Blueprint::find($blueprint);
+        $blueprint = Facades\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
 
@@ -220,7 +220,7 @@ class BlueprintController extends CpController
 
     private function fieldsets()
     {
-        return \Statamic\API\Fieldset::all()->mapWithKeys(function ($fieldset) {
+        return \Statamic\Facades\Fieldset::all()->mapWithKeys(function ($fieldset) {
             return [$fieldset->handle() => [
                 'handle' => $fieldset->handle(),
                 'title' => $fieldset->title(),
@@ -230,7 +230,7 @@ class BlueprintController extends CpController
 
     private function fieldsetFields()
     {
-        return $this->fieldsetFields = $this->fieldsetFields ?? collect(\Statamic\API\Fieldset::all())->flatMap(function ($fieldset) {
+        return $this->fieldsetFields = $this->fieldsetFields ?? collect(\Statamic\Facades\Fieldset::all())->flatMap(function ($fieldset) {
             return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
                 return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
                     'fieldset' => [

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Fieldsets;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
@@ -19,12 +19,12 @@ class ViewFieldsetListingTest extends TestCase
     /** @test */
     function it_shows_a_list_of_fieldsets()
     {
-        API\Fieldset::shouldReceive('all')->andReturn(collect([
+        Facades\Fieldset::shouldReceive('all')->andReturn(collect([
             'foo' => $fieldsetA = $this->createfieldset('foo'),
             'bar' => $fieldsetB = $this->createFieldset('bar')
         ]));
 
-        $user = API\User::make()->makeSuper()->save();
+        $user = Facades\User::make()->makeSuper()->save();
 
         $response = $this
             ->actingAs($user)
@@ -53,7 +53,7 @@ class ViewFieldsetListingTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
 
         $response = $this
             ->from('/cp/original')

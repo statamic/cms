@@ -2,8 +2,8 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Statamic\API\File;
-use Statamic\API\Path;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Cache\Repository;
 
@@ -47,7 +47,7 @@ class FileCacher extends AbstractCacher
         if (! $this->writer->write($path, $content, $this->config('lock_hold_length'))) {
             return;
         }
-        
+
         $this->cacheUrl($this->makeHash($url), $url);
     }
 

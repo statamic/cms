@@ -2,7 +2,7 @@
 
 namespace Statamic\Support;
 
-use Statamic\API\Compare;
+use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
 
 /**

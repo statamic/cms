@@ -2,11 +2,11 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\Stache;
-use Statamic\API\Structure;
-use Statamic\API\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Structure;
+use Statamic\Facades\Collection;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore

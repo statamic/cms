@@ -3,9 +3,9 @@
 namespace Statamic\Extend;
 
 use Closure;
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Statamic;
-use Statamic\API\Addon;
+use Statamic\Facades\Addon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Console\Scheduling\Schedule;

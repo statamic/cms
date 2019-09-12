@@ -10,7 +10,7 @@ class Yaml extends Fieldtype
     public function preProcess($data)
     {
         if (is_array($data)) {
-            return count($data) > 0 ? \Statamic\Api\Yaml::dump($data) : '';
+            return count($data) > 0 ? \Statamic\Facades\Yaml::dump($data) : '';
         }
 
         return $data;
@@ -19,7 +19,7 @@ class Yaml extends Fieldtype
     public function process($data)
     {
         if (substr_count($data, "\n") > 0 || substr_count($data, ': ') > 0) {
-            $data = \Statamic\Api\Yaml::parse($data);
+            $data = \Statamic\Facades\Yaml::parse($data);
         }
 
         if (empty($data)) {

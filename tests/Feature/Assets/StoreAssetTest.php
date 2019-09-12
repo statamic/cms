@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Illuminate\Http\UploadedFile;
@@ -108,13 +108,13 @@ class StoreAssetTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp', 'upload test_container assets']]);
 
-        return API\User::make()->assignRole('test');
+        return Facades\User::make()->assignRole('test');
     }
 
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return API\User::make()->assignRole('test');
+        return Facades\User::make()->assignRole('test');
     }
 }

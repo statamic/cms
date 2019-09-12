@@ -2,8 +2,8 @@
 
 namespace Statamic;
 
-use Statamic\API\Str;
-use Statamic\API\Site;
+use Statamic\Facades\Str;
+use Statamic\Facades\Site;
 
 /**
  * Interacting with the configuration

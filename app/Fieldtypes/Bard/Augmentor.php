@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
 

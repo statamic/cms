@@ -2,8 +2,8 @@
 
 namespace Statamic\Policies;
 
-use Statamic\API\User;
-use Statamic\API\GlobalSet;
+use Statamic\Facades\User;
+use Statamic\Facades\GlobalSet;
 
 class GlobalSetPolicy
 {

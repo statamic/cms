@@ -3,7 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
-use Statamic\API\Path;
+use Statamic\Facades\Path;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
 use Tests\TestCase;

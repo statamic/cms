@@ -2,13 +2,13 @@
 
 namespace Statamic\Auth;
 
-use Statamic\API\Form;
-use Statamic\API\Taxonomy;
-use Statamic\API\GlobalSet;
-use Statamic\API\Structure;
-use Statamic\API\Collection;
-use Statamic\API\Permission;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\Form;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Structure;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Permission;
+use Statamic\Facades\AssetContainer;
 
 class CorePermissions
 {

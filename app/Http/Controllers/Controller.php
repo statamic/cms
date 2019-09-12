@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;

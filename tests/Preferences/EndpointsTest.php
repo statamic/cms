@@ -3,8 +3,8 @@
 namespace Tests\Preferences;
 
 use Tests\TestCase;
-use Statamic\API\User;
-use Statamic\API\Preference;
+use Statamic\Facades\User;
+use Statamic\Facades\Preference;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class EndpointsTest extends TestCase

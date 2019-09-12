@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\API;
+use Statamic\Facades;
 use Illuminate\Http\Request;
 use Statamic\Fields\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
@@ -13,7 +13,7 @@ class FieldsetController extends CpController
     {
         $this->authorize('index', Fieldset::class, 'You are not authorized to access fieldsets.');
 
-        $fieldsets = API\Fieldset::all()->map(function ($fieldset) {
+        $fieldsets = Facades\Fieldset::all()->map(function ($fieldset) {
             return [
                 'id' => $fieldset->handle(),
                 'handle' => $fieldset->handle(),
@@ -32,7 +32,7 @@ class FieldsetController extends CpController
 
     public function edit($fieldset)
     {
-        $fieldset = API\Fieldset::find($fieldset);
+        $fieldset = Facades\Fieldset::find($fieldset);
 
         $this->authorize('edit', $fieldset);
 
@@ -41,7 +41,7 @@ class FieldsetController extends CpController
 
     public function update(Request $request, $fieldset)
     {
-        $fieldset = API\Fieldset::find($fieldset);
+        $fieldset = Facades\Fieldset::find($fieldset);
 
         $this->authorize('edit', $fieldset);
 
@@ -90,7 +90,7 @@ class FieldsetController extends CpController
     {
         $title = $request->title;
 
-        if (API\Fieldset::exists($handle = snake_case($title))) {
+        if (Facades\Fieldset::exists($handle = snake_case($title))) {
             return ['success' => true];
         }
 

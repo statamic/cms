@@ -3,9 +3,9 @@
 namespace Statamic\Yaml;
 
 use Exception;
-use Statamic\API\File;
+use Statamic\Facades\File;
 use ReflectionProperty;
-use Statamic\API\Pattern;
+use Statamic\Facades\Pattern;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Statamic\Yaml\ParseException as StatamicParseException;
 

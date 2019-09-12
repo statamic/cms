@@ -2,10 +2,10 @@
 
 namespace Statamic\Routing;
 
-use Statamic\API\URL;
-use Statamic\API\Site;
-use Statamic\API\Entry;
-use Statamic\API\Config;
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Config;
 use Statamic\Http\Responses\DataResponse;
 use Illuminate\Contracts\Support\Responsable;
 

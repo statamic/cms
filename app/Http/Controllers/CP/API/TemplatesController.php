@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\API;
 
-use Statamic\API\File;
-use Statamic\API\Folder;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 

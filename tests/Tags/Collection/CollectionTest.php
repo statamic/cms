@@ -2,9 +2,9 @@
 
 namespace Tests\Tags\Collection;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
-use Statamic\API\Antlers;
+use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
@@ -22,10 +22,10 @@ class CollectionTest extends TestCase
     {
         parent::setUp();
 
-        $this->music = API\Collection::make('music')->save();
-        $this->art = API\Collection::make('art')->save();
-        $this->books = API\Collection::make('books')->save();
-        $this->foods = API\Collection::make('foods')->save();
+        $this->music = Facades\Collection::make('music')->save();
+        $this->art = Facades\Collection::make('art')->save();
+        $this->books = Facades\Collection::make('books')->save();
+        $this->foods = Facades\Collection::make('foods')->save();
 
         $this->collectionTag = (new Collection)
             ->setParser(Antlers::parser())
@@ -249,7 +249,7 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
-        $currentId = API\Entry::all()->first(function ($entry) {
+        $currentId = Facades\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
         })->id();
 
@@ -282,7 +282,7 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
-        $currentId = API\Entry::all()->first(function ($entry) {
+        $currentId = Facades\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
         })->id();
 
@@ -327,7 +327,7 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
-        $currentId = API\Entry::all()->first(function ($entry) {
+        $currentId = Facades\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
         })->id();
 
@@ -360,7 +360,7 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
-        $currentId = API\Entry::all()->first(function ($entry) {
+        $currentId = Facades\Entry::all()->first(function ($entry) {
             return $entry->get('title') === 'Egg';
         })->id();
 

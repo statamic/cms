@@ -2,9 +2,9 @@
 
 namespace Tests\Tags\Query;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
-use Statamic\API\Antlers;
+use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
@@ -19,12 +19,12 @@ class HasConditionsTest extends TestCase
     {
         parent::setUp();
 
-        $this->collection = API\Collection::make('test')->save();
+        $this->collection = Facades\Collection::make('test')->save();
     }
 
     protected function makeEntry($slug)
     {
-        return API\Entry::make()
+        return Facades\Entry::make()
             ->locale('en')
             ->slug($slug)
             ->collection($this->collection);

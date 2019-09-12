@@ -3,7 +3,7 @@
 namespace Tests\Forms;
 
 use Tests\TestCase;
-use Statamic\API\Form;
+use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
 
 class FormTest extends TestCase

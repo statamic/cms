@@ -2,7 +2,7 @@
 
 namespace Tests\Fields;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;

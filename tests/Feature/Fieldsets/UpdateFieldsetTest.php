@@ -3,7 +3,7 @@
 namespace Tests\Feature\Fieldsets;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Fieldset;
@@ -26,7 +26,7 @@ class UpdateFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -36,7 +36,7 @@ class UpdateFieldsetTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
-        $fieldset = API\Fieldset::find('test');
+        $fieldset = Facades\Fieldset::find('test');
         $this->assertEquals('Test', $fieldset->title());
     }
 
@@ -44,7 +44,7 @@ class UpdateFieldsetTest extends TestCase
     function fieldset_gets_saved()
     {
         $this->withoutExceptionHandling();
-        $user = API\User::make()->makeSuper();
+        $user = Facades\User::make()->makeSuper();
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -88,14 +88,14 @@ class UpdateFieldsetTest extends TestCase
                     'baz' => 'qux'
                 ]
             ]
-        ], API\Fieldset::find('test')->contents());
+        ], Facades\Fieldset::find('test')->contents());
     }
 
     /** @test */
     function title_is_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -105,14 +105,14 @@ class UpdateFieldsetTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
 
-        $this->assertEquals('Test', API\Fieldset::find('test')->title());
+        $this->assertEquals('Test', Facades\Fieldset::find('test')->title());
     }
 
     /** @test */
     function fields_are_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
             'fields' => ['foo' => 'bar']
@@ -125,14 +125,14 @@ class UpdateFieldsetTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHasErrors('fields');
 
-        $this->assertEquals($originalContents, API\Fieldset::find('test')->contents());
+        $this->assertEquals($originalContents, Facades\Fieldset::find('test')->contents());
     }
 
     /** @test */
     function fields_must_be_an_array()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
             'fields' => ['foo' => 'bar']
@@ -145,7 +145,7 @@ class UpdateFieldsetTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHasErrors('fields');
 
-        $this->assertEquals($originalContents, API\Fieldset::find('test')->contents());
+        $this->assertEquals($originalContents, Facades\Fieldset::find('test')->contents());
     }
 
     private function submit($fieldset, $params = [])

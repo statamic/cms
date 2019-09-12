@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Site;
-use Statamic\API\Helper;
-use Statamic\API\GlobalSet;
+use Statamic\Facades\Site;
+use Statamic\Facades\Helper;
+use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Events\Data\PublishBlueprintFound;

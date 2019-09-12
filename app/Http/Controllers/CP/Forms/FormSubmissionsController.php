@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\API\Form;
+use Statamic\Facades\Form;
 use Statamic\CP\Column;
-use Statamic\API\Config;
-use Statamic\API\Helper;
+use Statamic\Facades\Config;
+use Statamic\Facades\Helper;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Forms\Presenters\UploadedFilePresenter;

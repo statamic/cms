@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\API;
-use Statamic\API\Str;
+use Statamic\Facades;
+use Statamic\Facades\Str;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy;
@@ -55,7 +55,7 @@ class TaxonomyRepository implements RepositoryContract
 
     public function findByUri(string $uri, string $site = null): ?Taxonomy
     {
-        $collection = API\Collection::all()
+        $collection = Facades\Collection::all()
             ->filter->url()
             ->first(function ($collection) use ($uri) {
                 return Str::startsWith($uri, $collection->url());

@@ -2,8 +2,8 @@
 
 namespace Statamic\Data\Structures;
 
-use Statamic\API\Arr;
-use Statamic\API\Structure;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Structure;
 
 class TreeBuilder
 {

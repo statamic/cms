@@ -4,8 +4,8 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
-use Statamic\API\Asset;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 
 class AssetsMeta extends Command
 {

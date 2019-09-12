@@ -4,9 +4,9 @@ namespace Tests\Preferences;
 
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\API\Role;
-use Statamic\API\User;
-use Statamic\API\Preference;
+use Statamic\Facades\Role;
+use Statamic\Facades\User;
+use Statamic\Facades\Preference;
 
 class PrecedenceTest extends TestCase
 {

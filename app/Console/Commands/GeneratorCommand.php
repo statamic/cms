@@ -3,7 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Exception;
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Facades\Statamic\Console\Processes\Composer;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;

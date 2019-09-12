@@ -4,7 +4,7 @@ namespace Statamic\Updater;
 
 use Carbon\Carbon;
 use Statamic\Statamic;
-use Statamic\API\Addon;
+use Statamic\Facades\Addon;
 use Facades\Statamic\Extend\Marketplace;
 use Statamic\Updater\Core\Changelog as CoreChangelog;
 use Statamic\Updater\Presenters\GithubReleasePresenter;

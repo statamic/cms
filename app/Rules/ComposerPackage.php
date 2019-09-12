@@ -2,7 +2,7 @@
 
 namespace Statamic\Rules;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Illuminate\Contracts\Validation\Rule;
 
 class ComposerPackage implements Rule

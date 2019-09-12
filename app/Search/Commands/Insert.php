@@ -2,8 +2,8 @@
 
 namespace Statamic\Search\Commands;
 
-use Statamic\API\Data;
-use Statamic\API\Search;
+use Statamic\Facades\Data;
+use Statamic\Facades\Search;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 

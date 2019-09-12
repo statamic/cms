@@ -2,7 +2,7 @@
 
 namespace Statamic\CP;
 
-use Statamic\API\Preference;
+use Statamic\Facades\Preference;
 use Illuminate\Support\Collection;
 
 class Columns extends Collection

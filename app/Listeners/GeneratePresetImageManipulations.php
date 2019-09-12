@@ -2,8 +2,8 @@
 
 namespace Statamic\Listeners;
 
-use Statamic\API\Path;
-use Statamic\API\Folder;
+use Statamic\Facades\Path;
+use Statamic\Facades\Folder;
 use Statamic\Imaging\PresetGenerator;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\Events\Data\AssetReplaced;

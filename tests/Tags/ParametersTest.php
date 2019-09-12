@@ -3,7 +3,7 @@
 namespace Tests\Tags;
 
 use Tests\TestCase;
-use Statamic\API\Antlers;
+use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 

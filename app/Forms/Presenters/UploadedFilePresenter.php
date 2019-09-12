@@ -3,8 +3,8 @@
 namespace Statamic\Forms\Presenters;
 
 use Illuminate\Support\Collection;
-use Statamic\API\Asset;
-use Statamic\API\Helper;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Helper;
 use Statamic\Contracts\Forms\Submission;
 
 class UploadedFilePresenter

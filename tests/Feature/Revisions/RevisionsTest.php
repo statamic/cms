@@ -3,9 +3,9 @@
 namespace Tests\Feature\Revisions;
 
 use Tests\TestCase;
-use Statamic\API\User;
-use Statamic\API\Entry;
-use Statamic\API\Collection;
+use Statamic\Facades\User;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
 use Statamic\Revisions\Revision;
 use Facades\Tests\Factories\EntryFactory;

@@ -2,8 +2,8 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\API\Str;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Str;
+use Statamic\Facades\Blueprint;
 use Statamic\Query\Scopes\Filter;
 
 class Fields extends Filter

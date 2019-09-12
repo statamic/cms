@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\URL;
-use Statamic\API\Data;
-use Statamic\API\Site;
+use Statamic\Facades\URL;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Statamic;
-use Statamic\API\Content;
+use Statamic\Facades\Content;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
 

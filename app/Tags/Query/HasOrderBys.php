@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags\Query;
 
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use Statamic\Query\OrderBy;
 
 trait HasOrderBys

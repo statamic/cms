@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 use Statamic\Tags\Tags;
 
 class Cache extends Tags

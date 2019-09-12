@@ -2,9 +2,9 @@
 
 namespace Statamic\Auth;
 
-use Statamic\API;
-use Statamic\API\User;
-use Statamic\API\Role as RoleAPI;
+use Statamic\Facades;
+use Statamic\Facades\User;
+use Statamic\Facades\Role as RoleAPI;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\Permissible;
@@ -180,14 +180,14 @@ class UserGroup implements UserGroupContract
 
     public function save()
     {
-        API\UserGroup::save($this);
+        Facades\UserGroup::save($this);
 
         return $this;
     }
 
     public function delete()
     {
-        API\UserGroup::delete($this);
+        Facades\UserGroup::delete($this);
 
         return $this;
     }
@@ -199,6 +199,6 @@ class UserGroup implements UserGroupContract
 
     public static function __callStatic($method, $parameters)
     {
-        return API\UserGroup::{$method}(...$parameters);
+        return Facades\UserGroup::{$method}(...$parameters);
     }
 }

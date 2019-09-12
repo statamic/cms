@@ -4,7 +4,7 @@ namespace Statamic\View;
 
 use Statamic\Sites\Site;
 use Statamic\Fields\Value;
-use Statamic\API\GlobalSet;
+use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
 

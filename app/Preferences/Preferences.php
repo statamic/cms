@@ -2,7 +2,7 @@
 
 namespace Statamic\Preferences;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Illuminate\Support\Arr;
 
 class Preferences

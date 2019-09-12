@@ -8,7 +8,7 @@ use Statamic\Data\Entries\Entry;
 use Illuminate\Support\Collection;
 use Statamic\Data\Structures\Page;
 use Statamic\Data\Structures\Tree;
-use Statamic\API\Entry as EntryAPI;
+use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Data\Structures\Pages;
 use Statamic\Data\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -83,7 +83,7 @@ class PageTest extends TestCase
                 return 'entry-slug';
             }
         };
-        \Statamic\API\Collection::make('test')->save();
+        \Statamic\Facades\Collection::make('test')->save();
         $entry->collection('test');
 
         $parent = Mockery::mock(Page::class);

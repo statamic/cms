@@ -3,10 +3,10 @@
 namespace Statamic\Http\Controllers;
 
 use Carbon\Carbon;
-use Statamic\API\Form;
-use Statamic\API\Email;
-use Statamic\API\Parse;
-use Statamic\API\Config;
+use Statamic\Facades\Form;
+use Statamic\Facades\Email;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Config;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\RedirectResponse;

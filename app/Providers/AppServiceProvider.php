@@ -2,11 +2,11 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\Sites\Sites;
 use Stringy\StaticStringy;
-use Statamic\API\Preference;
+use Statamic\Facades\Preference;
 use Statamic\Routing\Router;
 use Illuminate\Support\Carbon;
 use Statamic\Exceptions\Handler;

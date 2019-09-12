@@ -2,9 +2,9 @@
 
 namespace Statamic\Stache\Query;
 
-use Statamic\API;
-use Statamic\API\Entry;
-use Statamic\API\Stache;
+use Statamic\Facades;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Stache;
 
 class EntryQueryBuilder extends Builder
 {
@@ -46,7 +46,7 @@ class EntryQueryBuilder extends Builder
     protected function getFilteredKeys()
     {
         $collections = empty($this->collections)
-            ? API\Collection::handles()
+            ? Facades\Collection::handles()
             : $this->collections;
 
         $this->addTaxonomyWheres();
@@ -93,7 +93,7 @@ class EntryQueryBuilder extends Builder
     protected function getOrderKeyValuesByIndex()
     {
         $collections = empty($this->collections)
-            ? API\Collection::handles()
+            ? Facades\Collection::handles()
             : $this->collections;
 
         // First, we'll get the values from each index grouped by collection

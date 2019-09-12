@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\Data;
+use Statamic\Facades\Data;
 use Statamic\Data\DataCollection;
 use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 

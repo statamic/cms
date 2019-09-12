@@ -2,7 +2,7 @@
 
 namespace Statamic\Fields;
 
-use Statamic\API\YAML;
+use Statamic\Facades\YAML;
 
 class FieldRepository
 {

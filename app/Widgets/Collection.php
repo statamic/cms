@@ -2,8 +2,8 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\API\User;
-use Statamic\API\Collection as CollectionAPI;
+use Statamic\Facades\User;
+use Statamic\Facades\Collection as CollectionAPI;
 
 class Collection extends Widget
 {

@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Tests\TestCase;
-use Statamic\API\Compare;
+use Statamic\Facades\Compare;
 use Statamic\Support\Comparator;
 
 class ComparatorTest extends TestCase

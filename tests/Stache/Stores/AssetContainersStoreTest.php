@@ -2,9 +2,9 @@
 
 namespace Tests\Stache\Stores;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Statamic\Assets\Asset;
 use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
@@ -58,7 +58,7 @@ class AssetContainersStoreTest extends TestCase
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
 
-        API\Blueprint::shouldReceive('find')
+        Facades\Blueprint::shouldReceive('find')
             ->with('test')->once()
             ->andReturn($blueprint = new \Statamic\Fields\Blueprint);
 
@@ -92,18 +92,18 @@ EOL;
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey(API\AssetContainer::make('test'))
+            $this->store->getItemKey(Facades\AssetContainer::make('test'))
         );
     }
 
     /** @test */
     function it_saves_to_disk()
     {
-        API\Stache::shouldReceive('store')
+        Facades\Stache::shouldReceive('store')
             ->with('asset-containers')
             ->andReturn($this->store);
 
-        $container = API\AssetContainer::make('new')
+        $container = Facades\AssetContainer::make('new')
             ->title('New Container')
             ->blueprint('foo');
 

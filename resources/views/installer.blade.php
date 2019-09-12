@@ -39,7 +39,7 @@
 
                         <license-key v-if="currentStep === 'licenseKey'"></license-key>
 
-                        <settings v-if="currentStep === 'settings'" :timezone='["{{ \Statamic\API\Config::get('system.timezone') }}"]'></settings>
+                        <settings v-if="currentStep === 'settings'" :timezone='["{{ \Statamic\Facades\Config::get('system.timezone') }}"]'></settings>
 
                         <user v-if="currentStep === 'user'"></user>
 

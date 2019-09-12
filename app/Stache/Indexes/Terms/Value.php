@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Indexes\Terms;
 
-use Statamic\API\Term;
+use Statamic\Facades\Term;
 use Statamic\Stache\Indexes\Value as Index;
 
 class Value extends Index

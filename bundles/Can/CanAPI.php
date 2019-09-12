@@ -2,7 +2,7 @@
 
 namespace Statamic\Addons\Can;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Statamic\Extend\API;
 
 class CanAPI extends API

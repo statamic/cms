@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\Form;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\Form;
 use Statamic\Exceptions\FatalException;
 use Statamic\Http\Controllers\CP\CpController;
 

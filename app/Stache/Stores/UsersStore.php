@@ -2,10 +2,10 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\File;
-use Statamic\API\User;
-use Statamic\API\YAML;
-use Statamic\API\UserGroup;
+use Statamic\Facades\File;
+use Statamic\Facades\User;
+use Statamic\Facades\YAML;
+use Statamic\Facades\UserGroup;
 use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore

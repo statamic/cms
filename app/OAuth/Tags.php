@@ -2,7 +2,7 @@
 
 namespace Statamic\OAuth;
 
-use Statamic\API\OAuth;
+use Statamic\Facades\OAuth;
 use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags

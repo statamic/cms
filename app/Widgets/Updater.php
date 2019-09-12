@@ -2,7 +2,7 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 use Facades\Statamic\Updater\UpdatesOverview;
 
 class Updater extends Widget

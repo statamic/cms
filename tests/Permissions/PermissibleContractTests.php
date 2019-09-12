@@ -3,10 +3,10 @@
 namespace Tests\Permissions;
 
 use Statamic\Auth\File\Role;
-use Statamic\API\Role as RoleAPI;
+use Statamic\Facades\Role as RoleAPI;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\UserGroup;
-use Statamic\API\UserGroup as UserGroupAPI;
+use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 

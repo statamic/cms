@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
-use Statamic\API\Parse;
-use Statamic\API\Entry;
+use Statamic\Facades\URL;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Entry;
 use Statamic\Tags\Tags;
 use Stringy\StaticStringy as Stringy;
 

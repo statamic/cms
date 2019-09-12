@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 use Statamic\Tags\Tags;
-use Statamic\API\Config;
-use Statamic\API\Path as PathAPI;
+use Statamic\Facades\Config;
+use Statamic\Facades\Path as PathAPI;
 
 class Path extends Tags
 {

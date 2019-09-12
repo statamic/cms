@@ -2,7 +2,7 @@
 
 namespace Statamic\Routing;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 
 class Router
 {

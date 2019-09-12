@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
-use Statamic\API\Site;
+use Statamic\Facades\URL;
+use Statamic\Facades\Site;
 use Statamic\Data\Structures\TreeBuilder;
 
 class Structure extends Tags

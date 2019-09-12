@@ -3,7 +3,7 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Facade\IgnitionContracts\Solution;
 use Facade\IgnitionContracts\BaseSolution;
 use Facade\Ignition\Support\StringComparator;

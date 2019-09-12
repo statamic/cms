@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\User;
-use Statamic\API\Preference;
+use Statamic\Facades\User;
+use Statamic\Facades\Preference;
 use Statamic\Extend\Management\WidgetLoader;
 
 class DashboardController extends CpController

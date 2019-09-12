@@ -2,9 +2,9 @@
 
 namespace Statamic\Providers;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 use League\Glide\Server;
-use Statamic\API\Config;
+use Statamic\Facades\Config;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\PresetGenerator;

@@ -2,9 +2,9 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\Taxonomy;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Taxonomy;
 use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomiesStore extends BasicStore

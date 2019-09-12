@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\API\GlobalSet;
+use Statamic\Facades\GlobalSet;
 
 class LocalizeGlobalsController extends CpController
 {

@@ -4,8 +4,8 @@ namespace Statamic;
 
 use Log;
 use GuzzleHttp\Client;
-use Statamic\API\Addon;
-use Statamic\API\Config;
+use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;

@@ -2,10 +2,10 @@
 
 namespace Tests\Tags\Collection;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
-use Statamic\API\Site;
-use Statamic\API\Antlers;
+use Statamic\Facades\Site;
+use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
@@ -22,7 +22,7 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        $this->collection = API\Collection::make('test')->save();
+        $this->collection = Facades\Collection::make('test')->save();
 
         app('statamic.scopes')[PostType::handle()] = PostType::class;
         app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;

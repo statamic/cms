@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\API;
+use Statamic\Facades;
 use Illuminate\Http\Request;
 use Statamic\Fields\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
@@ -13,7 +13,7 @@ class FieldsetFieldController extends CpController
     {
         $this->authorize('create', Fieldset::class);
 
-        $fieldset = API\Fieldset::find($fieldset);
+        $fieldset = Facades\Fieldset::find($fieldset);
         $field = $request->all();
         $handle = array_pull($field, 'handle');
 

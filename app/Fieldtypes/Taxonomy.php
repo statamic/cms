@@ -2,10 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API;
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Term;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Term;
 use Statamic\CP\Column;
 use Statamic\Data\Taxonomies\TermCollection;
 
@@ -21,7 +21,7 @@ class Taxonomy extends Relationship
 
         if ($this->usingSingleTaxonomy()) {
             $handle = $this->taxonomies()[0];
-            $taxonomy = API\Taxonomy::findByHandle($handle);
+            $taxonomy = Facades\Taxonomy::findByHandle($handle);
         }
 
         return (new TermCollection(Arr::wrap($value)))
@@ -35,7 +35,7 @@ class Taxonomy extends Relationship
                     }
                     $id = $value;
                     [$handle, $slug] = explode('::', $id, 2);
-                    $taxonomy = API\Taxonomy::findByHandle($handle);
+                    $taxonomy = Facades\Taxonomy::findByHandle($handle);
                 }
 
                 $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
@@ -148,9 +148,9 @@ class Taxonomy extends Relationship
             return "{$taxonomy}::{$slug}";
         }
 
-        $term = API\Term::make()
+        $term = Facades\Term::make()
             ->slug($slug)
-            ->taxonomy(API\Taxonomy::findByHandle($taxonomy))
+            ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 
         $term->save();

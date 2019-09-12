@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms;
 
-use Statamic\API;
+use Statamic\Facades;
 use Statamic\CP\Column;
 use Statamic\Fieldtypes\Relationship;
 
@@ -36,7 +36,7 @@ class Fieldtype extends Relationship
 
     protected function toItemArray($id, $site = null)
     {
-        if ($form = API\Form::find($id)) {
+        if ($form = Facades\Form::find($id)) {
             return [
                 'title' => $form->title(),
                 'id' => $form->handle(),
@@ -48,7 +48,7 @@ class Fieldtype extends Relationship
 
     public function getIndexItems($request)
     {
-        return API\Form::all()->map(function ($form) {
+        return Facades\Form::all()->map(function ($form) {
             return [
                 'id' => $form->handle(),
                 'title' => $form->title(),
@@ -59,6 +59,6 @@ class Fieldtype extends Relationship
 
     public function augmentValue($value)
     {
-        return API\Form::find($value);
+        return Facades\Form::find($value);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms\Metrics;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Metric;
 

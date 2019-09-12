@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth;
 
-use Statamic\API;
+use Statamic\Facades;
 use Statamic\Contracts\Auth\Role as RoleContract;
 
 abstract class Role implements RoleContract
@@ -14,6 +14,6 @@ abstract class Role implements RoleContract
 
     public static function __callStatic($method, $parameters)
     {
-        return API\Role::{$method}(...$parameters);
+        return Facades\Role::{$method}(...$parameters);
     }
 }

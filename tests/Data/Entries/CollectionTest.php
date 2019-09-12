@@ -2,7 +2,7 @@
 
 namespace Tests\Data\Entries;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Fields\Blueprint;
 use Statamic\Data\Entries\Entry;
@@ -164,7 +164,7 @@ class CollectionTest extends TestCase
     {
         $collection = new Collection;
 
-        API\Collection::shouldReceive('save')->with($collection)->once();
+        Facades\Collection::shouldReceive('save')->with($collection)->once();
 
         $return = $collection->save();
 

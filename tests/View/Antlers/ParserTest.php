@@ -4,7 +4,7 @@ namespace Tests\View\Antlers;
 
 use Tests\TestCase;
 use Statamic\Tags\Tags;
-use Statamic\API\Antlers;
+use Statamic\Facades\Antlers;
 use Statamic\Fields\Value;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Blueprint;

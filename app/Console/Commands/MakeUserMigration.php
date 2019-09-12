@@ -2,7 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 

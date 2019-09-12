@@ -2,11 +2,11 @@
 
 namespace Statamic\Data\Taxonomies;
 
-use Statamic\API;
-use Statamic\API\Arr;
-use Statamic\API\Stache;
-use Statamic\API\Blueprint;
-use Statamic\API\Collection;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Data\ExistsAsFile;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -99,7 +99,7 @@ class Taxonomy implements Contract, Responsable
 
     public function queryTerms()
     {
-        $query = API\Term::query()->where('taxonomy', $this->handle());
+        $query = Facades\Term::query()->where('taxonomy', $this->handle());
 
         if ($this->collection) {
             $query->where('collection', $this->collection->handle());
@@ -110,7 +110,7 @@ class Taxonomy implements Contract, Responsable
 
     public function save()
     {
-        API\Taxonomy::save($this);
+        Facades\Taxonomy::save($this);
 
         return true;
     }
@@ -119,7 +119,7 @@ class Taxonomy implements Contract, Responsable
     {
         $this->queryTerms()->get()->each->delete();
 
-        API\Taxonomy::delete($this);
+        Facades\Taxonomy::delete($this);
 
         return true;
     }
@@ -217,6 +217,6 @@ class Taxonomy implements Contract, Responsable
 
     public static function __callStatic($method, $parameters)
     {
-        return API\Taxonomy::{$method}(...$parameters);
+        return Facades\Taxonomy::{$method}(...$parameters);
     }
 }

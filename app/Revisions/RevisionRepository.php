@@ -2,10 +2,10 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\YAML;
-use Statamic\API\Folder;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Folder;
 use Illuminate\Support\Carbon;
 use Statamic\Support\FileCollection;
 use Statamic\Contracts\Revisions\Revision as RevisionContract;

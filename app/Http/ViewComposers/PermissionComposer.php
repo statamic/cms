@@ -3,8 +3,8 @@
 namespace Statamic\Http\ViewComposers;
 
 use Illuminate\Contracts\View\View;
-use Statamic\API\Folder;
-use Statamic\API\User;
+use Statamic\Facades\Folder;
+use Statamic\Facades\User;
 
 class PermissionComposer
 {

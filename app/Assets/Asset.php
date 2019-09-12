@@ -3,18 +3,18 @@
 namespace Statamic\Assets;
 
 use ArrayAccess;
-use Statamic\API;
+use Statamic\Facades;
 use Stringy\Stringy;
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\Arr;
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\Image;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\Arr;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Image;
 use Statamic\Data\Data;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Blueprint;
 use Illuminate\Support\Carbon;
 use Statamic\Data\ContainsData;
 use League\Flysystem\Filesystem;
@@ -24,7 +24,7 @@ use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\API\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -337,7 +337,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
      */
     public function save()
     {
-        API\Asset::save($this);
+        Facades\Asset::save($this);
 
         event('asset.saved', $this);
 
@@ -680,7 +680,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
     public static function __callStatic($method, $parameters)
     {
-        return API\Asset::{$method}(...$parameters);
+        return Facades\Asset::{$method}(...$parameters);
     }
 
     public function offsetExists($key)

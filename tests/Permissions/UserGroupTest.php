@@ -5,8 +5,8 @@ namespace Tests\Permissions;
 use Tests\TestCase;
 use Statamic\Auth\File\User;
 use Statamic\Auth\File\Role;
-use Statamic\API\Role as RoleAPI;
-use Statamic\API\User as UserAPI;
+use Statamic\Facades\Role as RoleAPI;
+use Statamic\Facades\User as UserAPI;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\UserGroup;
 

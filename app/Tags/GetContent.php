@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\Site;
-use Statamic\API\Entry;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
 use Statamic\Tags\Collection\Collection;
 
 class GetContent extends Collection

@@ -3,14 +3,14 @@
 namespace Statamic\Data\Entries;
 
 use ArrayAccess;
-use Statamic\API;
-use Statamic\API\Arr;
-use Statamic\API\Site;
-use Statamic\API\User;
-use Statamic\API\Stache;
-use Statamic\API\Blueprint;
+use Statamic\Facades;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Blueprint;
 use Statamic\Data\Routable;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
@@ -31,7 +31,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     use Routable {
         uri as routableUri;
     }
-    
+
     use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, HasOrigin;
 
     protected $id;
@@ -119,7 +119,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function delete()
     {
-        API\Entry::delete($this);
+        Facades\Entry::delete($this);
 
         return true;
     }
@@ -181,7 +181,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             return false;
         }
 
-        API\Entry::save($this);
+        Facades\Entry::save($this);
 
         $this->taxonomize();
 
@@ -194,7 +194,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function taxonomize()
     {
-        API\Entry::taxonomize($this);
+        Facades\Entry::taxonomize($this);
     }
 
     public function path()
@@ -397,7 +397,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     public function descendants()
     {
         if (! $this->localizations) {
-            $this->localizations = API\Entry::query()
+            $this->localizations = Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
                 ->keyBy->locale();
@@ -428,7 +428,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function makeLocalization($site)
     {
-        return API\Entry::make()
+        return Facades\Entry::make()
             ->collection($this->collection)
             ->origin($this)
             ->locale($site)
@@ -497,17 +497,17 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function fresh()
     {
-        return API\Entry::find($this->id);
+        return Facades\Entry::find($this->id);
     }
 
     public static function __callStatic($method, $parameters)
     {
-        return API\Entry::{$method}(...$parameters);
+        return Facades\Entry::{$method}(...$parameters);
     }
 
     protected function getOriginByString($origin)
     {
-        return API\Entry::find($origin);
+        return Facades\Entry::find($origin);
     }
 
     public function offsetExists($key)

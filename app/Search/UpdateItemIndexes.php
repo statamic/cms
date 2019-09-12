@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\API\Search;
+use Statamic\Facades\Search;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntryDeleted;
 

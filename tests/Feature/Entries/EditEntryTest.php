@@ -4,10 +4,10 @@ namespace Tests\Feature\Entries;
 
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\API\User;
-use Statamic\API\Entry;
-use Statamic\API\Folder;
-use Statamic\API\Collection;
+use Statamic\Facades\User;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Folder;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Tests\Factories\EntryFactory;

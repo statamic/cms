@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\Str;
-use Statamic\API\Asset;
+use Statamic\Facades\Str;
+use Statamic\Facades\Asset;
 use League\Glide\Server;
-use Statamic\API\AssetContainer;
-use Statamic\API\Config;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Config;
 use Illuminate\Http\Request;
 use Statamic\Imaging\ImageGenerator;
 use League\Flysystem\FileNotFoundException;

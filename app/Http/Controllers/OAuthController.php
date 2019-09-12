@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\User;
-use Statamic\API\OAuth;
+use Statamic\Facades\User;
+use Statamic\Facades\OAuth;
 use Statamic\OAuth\Provider;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;

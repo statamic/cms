@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\API\Asset;
+use Statamic\Facades\Asset;
 use Illuminate\Http\Request;
 use Statamic\Http\Resources\AssetResource;
 use Statamic\Http\Controllers\CP\CpController;

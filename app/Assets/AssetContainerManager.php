@@ -3,10 +3,10 @@
 namespace Statamic\Assets;
 
 use Illuminate\Filesystem\FilesystemManager;
-use Statamic\API\Config;
-use Statamic\API\Parse;
-use Statamic\API\Path;
-use Statamic\API\URL;
+use Statamic\Facades\Config;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Path;
+use Statamic\Facades\URL;
 
 class AssetContainerManager
 {

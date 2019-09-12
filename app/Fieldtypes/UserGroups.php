@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\API\UserGroup;
+use Statamic\Facades\UserGroup;
 
 class UserGroups extends Relationship
 {

@@ -3,7 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
@@ -22,7 +22,7 @@ class StructuresStoreTest extends TestCase
         $stache = (new Stache)->sites(['en']);
         $this->store = (new StructuresStore($stache, app('files')))->directory($this->tempDir);
 
-        API\Stache::registerStore($this->store);
+        Facades\Stache::registerStore($this->store);
     }
 
     function tearDown(): void
@@ -87,14 +87,14 @@ EOT;
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey(API\Structure::make()->handle('test'))
+            $this->store->getItemKey(Facades\Structure::make()->handle('test'))
         );
     }
 
     /** @test */
     function it_saves_to_disk()
     {
-        $structure = API\Structure::make()->handle('pages');
+        $structure = Facades\Structure::make()->handle('pages');
         $structure->addTree($structure->makeTree('en'));
 
         $this->store->save($structure);

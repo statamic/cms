@@ -4,11 +4,11 @@ namespace Tests\View;
 
 use Mockery;
 use Tests\TestCase;
-use Statamic\API\Site;
-use Statamic\API\User;
-use Statamic\API\File;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Facades\File;
 use Statamic\View\Cascade;
-use Statamic\API\GlobalSet;
+use Statamic\Facades\GlobalSet;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Carbon;
 use Facades\Tests\Factories\EntryFactory;

@@ -2,7 +2,7 @@
 
 namespace Statamic\Fields;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;

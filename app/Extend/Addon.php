@@ -2,12 +2,12 @@
 
 namespace Statamic\Extend;
 
-use Statamic\API\Arr;
-use Statamic\API\URL;
-use Statamic\API\Str;
-use Statamic\API\Path;
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades\Arr;
+use Statamic\Facades\URL;
+use Statamic\Facades\Str;
+use Statamic\Facades\Path;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Statamic\Updater\Changelog;
 
 final class Addon

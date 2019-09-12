@@ -2,7 +2,7 @@
 
 namespace Tests\Assets;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Illuminate\Support\Carbon;
@@ -18,7 +18,7 @@ class AssetFolderTest extends TestCase
     {
         $folder = new Folder;
 
-        $return = $folder->container($container = API\AssetContainer::make('test'));
+        $return = $folder->container($container = Facades\AssetContainer::make('test'));
 
         $this->assertEquals($folder, $return);
         $this->assertEquals($container, $folder->container());
@@ -217,8 +217,8 @@ EOT;
     function deleting_a_folder_deletes_the_assets_and_the_meta_file()
     {
         Storage::fake('local');
-        $container = API\AssetContainer::make('test')->disk('local');
-        API\AssetContainer::shouldReceive('save')->with($container);
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
 
         $disk = Storage::disk('local');
         $disk->put('path/to/folder/one.txt', '');

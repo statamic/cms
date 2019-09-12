@@ -2,8 +2,8 @@
 
 namespace Statamic\Actions;
 
-use Statamic\API;
-use Statamic\API\AssetContainer;
+use Statamic\Facades;
+use Statamic\Facades\AssetContainer;
 use Statamic\Contracts\Assets\Asset;
 
 class RenameAsset extends Action

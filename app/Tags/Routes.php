@@ -2,9 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 use Statamic\Tags\Tags;
-use Statamic\API\Config;
+use Statamic\Facades\Config;
 
 class Routes extends Tags
 {

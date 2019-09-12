@@ -4,7 +4,7 @@ namespace Tests\Tags;
 
 use Tests\TestCase;
 use Statamic\Tags\Tags;
-use Statamic\API\Antlers;
+use Statamic\Facades\Antlers;
 use Tests\TestDependency;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;

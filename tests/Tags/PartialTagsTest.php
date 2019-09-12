@@ -2,9 +2,9 @@
 
 namespace Tests\Tags;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 use Tests\TestCase;
-use Statamic\API\Parse;
+use Statamic\Facades\Parse;
 use Tests\FakesViews;
 
 class PartialTagsTest extends TestCase

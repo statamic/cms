@@ -8,7 +8,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Section;
 use Statamic\Fields\Blueprint;
 use Illuminate\Support\Collection;
-use Statamic\API\Field as FieldAPI;
+use Statamic\Facades\Field as FieldAPI;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
 

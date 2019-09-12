@@ -2,13 +2,13 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\API;
+use Statamic\Facades;
 use Illuminate\Support\Carbon;
 use Statamic\Data\ExistsAsFile;
-use Statamic\API\Revision as Revisions;
+use Statamic\Facades\Revision as Revisions;
 use Statamic\Contracts\Auth\User;
 use Illuminate\Contracts\Support\Arrayable;
-use Statamic\API\Arr;
+use Statamic\Facades\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Revisions\Revision as Contract;
 
@@ -37,7 +37,7 @@ class Revision implements Contract, Arrayable
                 return $this->user;
             }
 
-            return $this->user = API\User::find($this->userId ?: null);
+            return $this->user = Facades\User::find($this->userId ?: null);
         }
 
         if ($user instanceof User) {

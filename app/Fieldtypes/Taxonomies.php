@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
-use Statamic\API\Taxonomy;
+use Statamic\Facades\Taxonomy;
 
 class Taxonomies extends Relationship
 {

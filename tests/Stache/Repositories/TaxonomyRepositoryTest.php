@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Data\Taxonomies\Taxonomy;
 use Statamic\Stache\Stores\TaxonomiesStore;
-use Statamic\API\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Repositories\TaxonomyRepository;
 use Illuminate\Support\Collection as IlluminateCollection;
 

@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Scrumpy\ProseMirrorToHtml\Nodes\Node;
-use Statamic\API\Asset;
+use Statamic\Facades\Asset;
 
 class ImageNode extends Node
 {

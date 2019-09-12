@@ -2,11 +2,11 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Statamic\Assets\Asset;
-use Statamic\API\Collection;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\Collection;
+use Statamic\Facades\AssetContainer;
 use Statamic\Contracts\Assets\AssetContainer as ContainerContract;
 
 class AssetContainersStore extends BasicStore

@@ -2,7 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\API;
+use Statamic\Facades;
 use Statamic\Query\Scopes\Filter;
 
 class UserGroup extends Filter
@@ -34,7 +34,7 @@ class UserGroup extends Filter
 
     protected function options()
     {
-        return API\UserGroup::all()->mapWithKeys(function ($group) {
+        return Facades\UserGroup::all()->mapWithKeys(function ($group) {
             return [$group->handle() => $group->title()];
         })->all();
     }

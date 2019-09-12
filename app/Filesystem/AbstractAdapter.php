@@ -2,8 +2,8 @@
 
 namespace Statamic\Filesystem;
 
-use Statamic\API\Str;
-use Statamic\API\Helper;
+use Statamic\Facades\Str;
+use Statamic\Facades\Helper;
 use Statamic\Filesystem\Filesystem;
 
 abstract class AbstractAdapter implements Filesystem

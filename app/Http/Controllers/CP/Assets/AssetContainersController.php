@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\API\Blueprint;
+use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
@@ -15,7 +15,7 @@ class AssetContainersController extends CpController
     {
         $containers = AssetContainer::all()->filter(function ($container) {
             return true; // TODO: auth.
-            // return \Statamic\API\User::current()->can('view', $container);
+            // return \Statamic\Facades\User::current()->can('view', $container);
         })->map(function ($container) {
             return [
                 'id' => $container->handle(),

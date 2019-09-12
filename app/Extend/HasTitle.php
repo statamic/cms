@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 
 trait HasTitle
 {

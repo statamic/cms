@@ -2,8 +2,8 @@
 
 namespace Statamic\Actions;
 
-use Statamic\API;
-use Statamic\API\Site;
+use Statamic\Facades;
+use Statamic\Facades\Site;
 
 class DeleteEntry extends Action
 {

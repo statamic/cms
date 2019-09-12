@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Blueprint;
 
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Blueprint;
@@ -19,7 +19,7 @@ class EditBlueprintTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -34,7 +34,7 @@ class EditBlueprintTest extends TestCase
     function it_provides_the_blueprint()
     {
         $this->withoutExceptionHandling();
-        $user = API\User::make()->makeSuper()->save();
+        $user = Facades\User::make()->makeSuper()->save();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this

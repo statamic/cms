@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\API\Asset;
+use Statamic\Facades\Asset;
 use Statamic\Http\Controllers\CP\ActionController as Controller;
 
 class ActionController extends Controller

@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Tests\TestCase;
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Data\ContainsData;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 

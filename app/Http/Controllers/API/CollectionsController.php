@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CollectionResource;
 

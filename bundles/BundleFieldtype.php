@@ -2,8 +2,8 @@
 
 namespace Statamic\Addons;
 
-use Statamic\API\File;
-use Statamic\API\YAML;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
 
 abstract class BundleFieldtype extends Fieldtype

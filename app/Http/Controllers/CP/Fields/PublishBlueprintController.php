@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\API\Blueprint;
+use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 class PublishBlueprintController extends CpController

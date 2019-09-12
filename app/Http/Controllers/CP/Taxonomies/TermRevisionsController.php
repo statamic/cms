@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\API\Site;
+use Statamic\Facades\Site;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 

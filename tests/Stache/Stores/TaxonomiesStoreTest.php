@@ -7,7 +7,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\TaxonomiesStore;
-use Statamic\API\Taxonomy as TaxonomyAPI;
+use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy;
 
 class TaxonomiesStoreTest extends TestCase

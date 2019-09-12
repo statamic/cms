@@ -2,11 +2,11 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API;
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\Site;
-use Statamic\API\YAML;
+use Statamic\Facades;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -82,7 +82,7 @@ class StructuresStore extends BasicStore
 
     protected function makeBaseStructureFromFile($handle, $path, $data)
     {
-        return API\Structure::make()
+        return Facades\Structure::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->sites($data['sites'] ?? null)

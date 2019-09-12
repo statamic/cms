@@ -2,10 +2,10 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\API\Str;
+use Statamic\Facades\Str;
 use Statamic\Stache\Stache;
-use Statamic\API\Collection;
-use Statamic\API\Taxonomy;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Data\Taxonomies\TermCollection;
 use Statamic\Contracts\Data\Taxonomies\Term;

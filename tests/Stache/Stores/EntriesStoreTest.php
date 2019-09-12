@@ -3,10 +3,10 @@
 namespace Tests\Stache\Stores;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
-use Statamic\API\Stache;
-use Statamic\API\Collection;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
@@ -80,7 +80,7 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_makes_entry_instances_from_files()
     {
-        API\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
+        Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
             (new \Statamic\Data\Entries\Collection)->dated(true)
         );
 
@@ -114,7 +114,7 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_saves_to_disk()
     {
-        $entry = API\Entry::make()
+        $entry = Facades\Entry::make()
             ->id('123')
             ->slug('test')
             ->date('2017-07-04')

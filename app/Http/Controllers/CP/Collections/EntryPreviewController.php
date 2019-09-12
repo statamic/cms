@@ -4,11 +4,11 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Exception;
 use Throwable;
-use Statamic\API\Site;
-use Statamic\API\Entry;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Contracts\Debug\ExceptionHandler;

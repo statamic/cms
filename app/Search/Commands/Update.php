@@ -2,7 +2,7 @@
 
 namespace Statamic\Search\Commands;
 
-use Statamic\API\Search;
+use Statamic\Facades\Search;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 

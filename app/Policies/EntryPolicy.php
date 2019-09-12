@@ -2,7 +2,7 @@
 
 namespace Statamic\Policies;
 
-use Statamic\API\User;
+use Statamic\Facades\User;
 
 class EntryPolicy
 {

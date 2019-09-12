@@ -2,8 +2,8 @@
 
 namespace Statamic\Policies;
 
-use Statamic\API\Form;
-use Statamic\API\User;
+use Statamic\Facades\Form;
+use Statamic\Facades\User;
 
 class FormPolicy
 {

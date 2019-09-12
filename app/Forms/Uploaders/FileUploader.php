@@ -2,7 +2,7 @@
 
 namespace Statamic\Forms\Uploaders;
 
-use Statamic\API\File;
+use Statamic\Facades\File;
 
 class FileUploader extends Uploader
 {

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Fieldsets;
 
 use Mockery;
-use Statamic\API;
+use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Fieldset;
@@ -26,7 +26,7 @@ class StoreFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = API\User::make()->assignRole('test');
+        $user = Facades\User::make()->assignRole('test');
 
         $this
             ->from('/original')
@@ -39,14 +39,14 @@ class StoreFieldsetTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
-        $this->assertNull(API\Fieldset::find('test'));
+        $this->assertNull(Facades\Fieldset::find('test'));
     }
 
     /** @test */
     function fieldset_gets_created()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
 
         $this
             ->actingAs($user)
@@ -78,7 +78,7 @@ class StoreFieldsetTest extends TestCase
             ])
             ->assertSessionHas('message', __('Saved'));
 
-        $this->assertCount(1, API\Fieldset::all());
+        $this->assertCount(1, Facades\Fieldset::all());
         $this->assertEquals([
             'title' => 'Test',
             'fields' => [
@@ -95,14 +95,14 @@ class StoreFieldsetTest extends TestCase
                     'baz' => 'qux'
                 ]
             ]
-        ], API\Fieldset::find('test')->contents());
+        ], Facades\Fieldset::find('test')->contents());
     }
 
     /** @test */
     function handle_is_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
 
         $this
             ->from('/original')
@@ -115,8 +115,8 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
 
         $this
             ->from('/original')
@@ -129,8 +129,8 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function fields_are_required()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
 
         $this
             ->from('/original')
@@ -143,8 +143,8 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function fields_must_be_an_array()
     {
-        $user = API\User::make()->makeSuper();
-        $this->assertCount(0, API\Fieldset::all());
+        $user = Facades\User::make()->makeSuper();
+        $this->assertCount(0, Facades\Fieldset::all());
 
         $this
             ->from('/original')

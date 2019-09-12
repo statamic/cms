@@ -2,13 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Str;
-use Statamic\API\URL;
-use Statamic\API\Asset;
-use Statamic\API\Image;
+use Statamic\Facades\Str;
+use Statamic\Facades\URL;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Image;
 use Statamic\Tags\Tags;
 use League\Glide\Server;
-use Statamic\API\Config;
+use Statamic\Facades\Config;
 use Statamic\Imaging\ImageGenerator;
 
 class Glide extends Tags

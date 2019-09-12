@@ -2,11 +2,11 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\Path;
-use Statamic\API\Site;
-use Statamic\API\YAML;
-use Statamic\API\Entry;
-use Statamic\API\Collection;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Collection;
 use Statamic\Stache\Indexes;
 use Symfony\Component\Finder\SplFileInfo;
 use Statamic\Data\Entries\GetDateFromPath;

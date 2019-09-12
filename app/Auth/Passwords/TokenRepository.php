@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth\Passwords;
 
-use Statamic\API\YAML;
+use Statamic\Facades\YAML;
 use Illuminate\Support\Carbon;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;

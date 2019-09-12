@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\API\Search;
-use Statamic\API\Content;
+use Statamic\Facades\Search;
+use Statamic\Facades\Content;
 use Illuminate\Http\Request;
 use Statamic\Search\IndexNotFoundException;
 

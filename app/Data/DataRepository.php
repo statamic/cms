@@ -2,8 +2,8 @@
 
 namespace Statamic\Data;
 
-use Statamic\API\Arr;
-use Statamic\API\Str;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
 use Statamic\Routing\RouteRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Contracts\Assets\AssetRepository;

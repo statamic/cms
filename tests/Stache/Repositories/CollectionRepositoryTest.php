@@ -8,7 +8,7 @@ use Statamic\Data\Entries\Collection;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Stache\Stores\CollectionsStore;
-use Statamic\API\Collection as CollectionAPI;
+use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
 use Illuminate\Support\Collection as IlluminateCollection;
 

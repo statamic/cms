@@ -2,17 +2,17 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\API\URL;
-use Statamic\API\User;
-use Statamic\API\Email;
-use Statamic\API\Scope;
+use Statamic\Facades\URL;
+use Statamic\Facades\User;
+use Statamic\Facades\Email;
+use Statamic\Facades\Scope;
 use Statamic\CP\Column;
-use Statamic\API\Action;
-use Statamic\API\Config;
-use Statamic\API\Helper;
-use Statamic\API\Fieldset;
-use Statamic\API\Blueprint;
-use Statamic\API\UserGroup;
+use Statamic\Facades\Action;
+use Statamic\Facades\Config;
+use Statamic\Facades\Helper;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Auth\PasswordReset;

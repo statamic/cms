@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth\Eloquent;
 
-use Statamic\API\Role;
-use Statamic\API\UserGroup;
+use Statamic\Facades\Role;
+use Statamic\Facades\UserGroup;
 use Illuminate\Support\Carbon;
 use Statamic\Data\SupplementsData;
 use Statamic\Auth\User as BaseUser;

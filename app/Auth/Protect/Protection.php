@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 use InvalidArgumentException;
 use Statamic\Auth\Protect\Protectors\NullProtector;
 use Statamic\Auth\Protect\Protectors\FallbackProtector;

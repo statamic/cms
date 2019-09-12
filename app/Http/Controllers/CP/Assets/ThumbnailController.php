@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Statamic\Statamic;
-use Statamic\API\Asset;
-use Statamic\API\Config;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Config;
 use League\Glide\Server;
 use Statamic\Imaging\ImageGenerator;
 use Illuminate\Support\Facades\Cache;

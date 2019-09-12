@@ -2,9 +2,9 @@
 
 namespace Statamic\Data\Globals;
 
-use Statamic\API\Site;
-use Statamic\API\Stache;
-use Statamic\API\GlobalSet;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\GlobalSet;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;

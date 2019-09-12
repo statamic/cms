@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\Asset;
+use Statamic\Facades\Asset;
 use Statamic\Tags\Tags;
-use Statamic\API\Helper;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\Helper;
+use Statamic\Facades\AssetContainer;
 use Statamic\Assets\AssetCollection;
 
 class Assets extends Tags

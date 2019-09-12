@@ -2,15 +2,15 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\API\Arr;
-use Statamic\API\Str;
-use Statamic\API\File;
-use Statamic\API\Path;
-use Statamic\API\Site;
-use Statamic\API\Term;
-use Statamic\API\YAML;
-use Statamic\API\Stache;
-use Statamic\API\Taxonomy;
+use Statamic\Facades\Arr;
+use Statamic\Facades\Str;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\Term;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Indexes\Terms\Value;
 use Statamic\Stache\Indexes\Terms\Titles;
 use Symfony\Component\Finder\SplFileInfo;

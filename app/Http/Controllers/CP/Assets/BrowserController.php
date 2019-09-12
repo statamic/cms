@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\API\Asset;
-use Statamic\API\Str;
-use Statamic\API\Action;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Str;
+use Statamic\Facades\Action;
 use Illuminate\Http\Request;
-use Statamic\API\AssetContainer;
+use Statamic\Facades\AssetContainer;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Pagination\LengthAwarePaginator;

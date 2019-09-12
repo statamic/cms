@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\API\User;
-use Statamic\API\UserGroup;
+use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Tags\Query;
 
 class Users extends Tags

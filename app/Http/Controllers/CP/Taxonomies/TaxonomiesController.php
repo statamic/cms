@@ -2,15 +2,15 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\API\Site;
-use Statamic\API\User;
-use Statamic\API\Scope;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Facades\Scope;
 use Statamic\CP\Column;
-use Statamic\API\Action;
-use Statamic\API\Taxonomy;
-use Statamic\API\Blueprint;
+use Statamic\Facades\Action;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
-use Statamic\API\Collection;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;

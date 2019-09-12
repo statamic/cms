@@ -1,10 +1,10 @@
 <?php
 
-use Statamic\API\URL;
-use Statamic\API\Str;
-use Statamic\API\Path;
-use Statamic\API\Site;
-use Statamic\API\Config;
+use Statamic\Facades\URL;
+use Statamic\Facades\Str;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\Config;
 use Michelf\SmartyPants;
 use Statamic\Extend\Addon;
 use Illuminate\Support\Arr;
@@ -571,7 +571,7 @@ if (! function_exists('__s')) {
 if (! function_exists('user')) {
     function user()
     {
-        return \Statamic\API\User::current();
+        return \Statamic\Facades\User::current();
     }
 }
 

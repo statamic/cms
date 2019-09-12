@@ -2,15 +2,15 @@
 
 namespace Statamic\Data\Structures;
 
-use Statamic\API;
-use Statamic\API\Str;
-use Statamic\API\Site;
-use Statamic\API\Entry;
-use Statamic\API\Stache;
-use Statamic\API\Collection;
+use Statamic\Facades;
+use Statamic\Facades\Str;
+use Statamic\Facades\Site;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Collection;
 use Statamic\Data\ExistsAsFile;
 use Illuminate\Support\Traits\Tappable;
-use Statamic\API\Structure as StructureAPI;
+use Statamic\Facades\Structure as StructureAPI;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Structures\Structure as StructureContract;
 
@@ -239,6 +239,6 @@ class Structure implements StructureContract
 
     public static function __callStatic($method, $parameters)
     {
-        return API\Structure::{$method}(...$parameters);
+        return Facades\Structure::{$method}(...$parameters);
     }
 }

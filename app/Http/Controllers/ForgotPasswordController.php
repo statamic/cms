@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\API\URL;
+use Statamic\Facades\URL;
 use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
