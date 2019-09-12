@@ -50,17 +50,6 @@ function cp_route($route, $params = [])
     return $route;
 }
 
-function translate($id, array $parameters = [])
-{
-    return trans($id, $parameters);
-}
-
-function translate_choice($id, $number, array $parameters = [])
-{
-    return trans_choice($id, $number, $parameters);
-}
-
-
 if (! function_exists('array_filter_use_both')) {
     /**
      * Polyfill for the array_filter constant ARRAY_FILTER_USE_BOTH.
@@ -185,7 +174,7 @@ function statamic_path($path = null)
  */
 function t($var, $params = [])
 {
-    return translate('cp.'.$var, $params);
+    return trans('cp.'.$var, $params);
 }
 
 /**
