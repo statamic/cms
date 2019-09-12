@@ -56,20 +56,6 @@ function current_class($pattern)
     return is_current($pattern) ? 'current' : '';
 }
 
-if (! function_exists('start_measure')) {
-    function start_measure()
-    {
-        // Prevent errors if debug bar is not installed.
-    }
-}
-
-if (! function_exists('stop_measure')) {
-    function stop_measure()
-    {
-        // Prevent errors if debug bar is not installed.
-    }
-}
-
 if (! function_exists('user')) {
     function user()
     {

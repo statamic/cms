@@ -140,7 +140,7 @@ class Engine implements EngineInterface
     public static function renderTag(Parser $parser, $name, $parameters = [], $content = '', $context = [])
     {
         $tag_measure = 'tag_' . $name . microtime();
-        start_measure($tag_measure, 'Tag: ' . $name);
+        debugbar()->startMeasure($tag_measure, 'Tag: ' . $name);
 
         // determine format
         if ($pos = strpos($name, ':')) {
@@ -185,6 +185,6 @@ class Engine implements EngineInterface
             throw $e;
         }
 
-        stop_measure($tag_measure);
+        debugbar()->stopMeasure($tag_measure);
     }
 }
