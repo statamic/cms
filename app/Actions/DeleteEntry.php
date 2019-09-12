@@ -2,8 +2,8 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class DeleteEntry extends Action
 {
@@ -18,7 +18,7 @@ class DeleteEntry extends Action
 
     public function authorize($entry)
     {
-        return user()->can('delete', $entry);
+        return User::current()->can('delete', $entry);
     }
 
     public function run($entries)

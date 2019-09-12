@@ -6,6 +6,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Helper;
 use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 use Statamic\Fields\Validation;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
@@ -15,7 +16,7 @@ class GlobalsController extends CpController
     public function index()
     {
         $globals = GlobalSet::all()->filter(function ($set) {
-            return user()->can('view', $set);
+            return User::current()->can('view', $set);
         })->tap(function ($globals) {
             $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
         })->map(function ($set) {
@@ -25,7 +26,7 @@ class GlobalsController extends CpController
                 'id' => $set->id(),
                 'handle' => $set->handle(),
                 'title' => $set->title(),
-                'deleteable' => user()->can('delete', $set),
+                'deleteable' => User::current()->can('delete', $set),
                 'edit_url' => $localized->editUrl(),
             ];
         })->values();

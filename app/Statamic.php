@@ -6,6 +6,7 @@ use Closure;
 use Statamic\Facades\URL;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Stringy\StaticStringy;
 use Illuminate\Http\Request;
 
@@ -130,7 +131,7 @@ class Statamic
             'flash' => static::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'user' => ($user = user()) ? $user->toJavascriptArray() : [],
+            'user' => ($user = User::current()) ? $user->toJavascriptArray() : [],
             'paginationSize' => config('statamic.cp.pagination_size'),
         ];
 

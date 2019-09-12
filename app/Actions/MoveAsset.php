@@ -2,7 +2,7 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades;
+use Statamic\Facades\User;
 use Statamic\Facades\AssetContainer;
 use Statamic\Contracts\Assets\Asset;
 
@@ -17,7 +17,7 @@ class MoveAsset extends Action
 
     public function authorize($asset)
     {
-        return user()->can('move', $asset);
+        return User::current()->can('move', $asset);
     }
 
     public function run($assets, $values)

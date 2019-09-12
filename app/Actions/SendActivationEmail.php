@@ -2,8 +2,7 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades;
-use Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Statamic\Facades\User;
 
 class SendActivationEmail extends Action
 {
@@ -14,7 +13,7 @@ class SendActivationEmail extends Action
 
     public function authorize($user)
     {
-        return user()->can('sendActivationEmail', $user);
+        return User::current()->can('sendActivationEmail', $user);
     }
 
     public function run($users)
