@@ -2,8 +2,8 @@
 
 namespace Statamic\Taxonomies;
 
-use Statamic\Data\Content\ContentCollection;
+use Statamic\Data\DataCollection;
 
-class TermCollection extends ContentCollection
+class TermCollection extends DataCollection
 {
 }

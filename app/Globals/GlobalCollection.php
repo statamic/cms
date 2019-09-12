@@ -2,8 +2,8 @@
 
 namespace Statamic\Globals;
 
-use Statamic\Data\Content\ContentCollection;
+use Statamic\Data\DataCollection;
 
-class GlobalCollection extends ContentCollection
+class GlobalCollection extends DataCollection
 {
 }
