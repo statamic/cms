@@ -364,15 +364,6 @@ function textile($content)
         ->parse($content);
 }
 
-/**
- * @param array $value
- * @return \Statamic\Data\Pages\PageCollection
- */
-function collect_pages($value = [])
-{
-    return new \Statamic\Data\Pages\PageCollection($value);
-}
-
 function bool_str($bool)
 {
     return ((bool) $bool) ? 'true' : 'false';
