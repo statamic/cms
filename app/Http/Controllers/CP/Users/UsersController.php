@@ -60,8 +60,8 @@ class UsersController extends CpController
             ->supplement(function ($user) use ($request) {
                 return [
                     'edit_url' => $user->editUrl(),
-                    'editable' => me()->can('edit', $user),
-                    'deleteable' => me()->can('delete', $user),
+                    'editable' => User::current()->can('edit', $user),
+                    'deleteable' => User::current()->can('delete', $user),
                     'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
                     'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never"),
                     'actions' => Action::for('users', [], $user),
@@ -241,7 +241,7 @@ class UsersController extends CpController
         $user = User::whereUsername($username);
 
         // Users can reset their own password
-        if ($user !== me()) {
+        if ($user !== User::current()) {
             $this->authorize('super');
         }
 

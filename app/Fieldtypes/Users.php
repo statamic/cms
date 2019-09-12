@@ -23,7 +23,7 @@ class Users extends Relationship
     public function preProcess($data)
     {
         if ($data === 'current') {
-            $data = my()->id();
+            $data = user()->id();
         }
 
         return parent::preProcess($data);

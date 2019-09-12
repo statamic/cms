@@ -11,6 +11,7 @@ use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
+use Statamic\Facades\User;
 use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
@@ -44,8 +45,8 @@ class EntriesController extends CpController
             ->paginate(request('perPage'))
             ->supplement(function ($entry) {
                 return [
-                    'viewable' => me()->can('view', $entry),
-                    'editable' => me()->can('edit', $entry),
+                    'viewable' => User::current()->can('view', $entry),
+                    'editable' => User::current()->can('edit', $entry),
                     'actions' => Action::for('entries', [], $entry),
                 ];
             })

@@ -1,4 +1,4 @@
-<?php $authed = me(); ?>
+<?php $authed = \Statamic\Facades\User::current(); ?>
 
 @extends($authed ? 'statamic::layout' : 'statamic::outside')
 

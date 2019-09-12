@@ -38,7 +38,7 @@ class CollectionsController extends CpController
                     ];
                 }),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
-                'deleteable' => me()->can('delete', $collection)
+                'deleteable' => User::current()->can('delete', $collection)
             ];
         })->values();
 

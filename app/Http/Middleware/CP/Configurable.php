@@ -16,7 +16,7 @@ class Configurable
      */
     public function handle($request, Closure $next)
     {
-        if (! me()->isSuper()) {
+        if (! User::current()->isSuper()) {
             abort(403);
         }
 

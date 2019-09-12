@@ -10,7 +10,7 @@ class CanAPI extends API
     public function can($permissions)
     {
         // Not logged in? This is the end of the road.
-        if (! $user = me()) {
+        if (! $user = User::current()) {
             return false;
         }
 

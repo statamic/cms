@@ -7,6 +7,7 @@ use Statamic\CP\Column;
 use Statamic\Facades\Config;
 use Statamic\Facades\Helper;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Forms\Presenters\UploadedFilePresenter;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
@@ -30,7 +31,7 @@ class FormSubmissionsController extends CpController
                 'datestring' => $submission->date()->format($form->dateFormat()),
                 'datestamp' => $submission->date()->timestamp,
                 'url' => cp_route('forms.submissions.show', [$form->handle(), $submission->id()]),
-                'deleteable' => me()->can('delete', $submission),
+                'deleteable' => User::current()->can('delete', $submission),
             ]);
         });
 

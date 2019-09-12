@@ -11,7 +11,7 @@ class IsAPI extends API
     public function is($roles)
     {
         // Not logged in? This is the end of the road.
-        if (! $user = me()) {
+        if (! $user = User::current()) {
             return;
         }
 

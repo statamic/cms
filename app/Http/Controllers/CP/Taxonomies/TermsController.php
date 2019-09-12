@@ -12,6 +12,7 @@ use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
+use Statamic\Facades\User;
 use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
@@ -43,8 +44,8 @@ class TermsController extends CpController
 
         $paginator->supplement(function ($term) {
             return [
-                'viewable' => me()->can('view', $term),
-                'editable' => me()->can('edit', $term),
+                'viewable' => User::current()->can('view', $term),
+                'editable' => User::current()->can('edit', $term),
                 'actions' => Action::for('terms', [], $term),
             ];
         })->preProcessForIndex();

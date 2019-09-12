@@ -28,7 +28,7 @@ class FormsController extends CpController
                     'submissions' => $form->submissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
-                    'deleteable' => me()->can('delete', $form)
+                    'deleteable' => User::current()->can('delete', $form)
                 ];
             })
             ->values();

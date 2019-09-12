@@ -124,20 +124,6 @@ if (! function_exists('user')) {
     }
 }
 
-if (! function_exists('me')) {
-    function me()
-    {
-        return user();
-    }
-}
-
-if (! function_exists('my')) {
-    function my()
-    {
-        return user();
-    }
-}
-
 if (! function_exists('debugbar')) {
     function debugbar()
     {

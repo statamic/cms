@@ -7,6 +7,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 use Statamic\Fields\Validation;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
@@ -19,7 +20,7 @@ class StructuresController extends CpController
         $this->authorize('index', StructureContract::class, 'You are not authorized to view any structures.');
 
         $structures = Structure::all()->filter(function ($structure) {
-            return me()->can('view', $structure);
+            return User::current()->can('view', $structure);
         })->map(function ($structure) {
             $tree = $structure->in(Site::selected()->handle());
 
@@ -29,7 +30,7 @@ class StructuresController extends CpController
                 'purpose' => $structure->collection() ? 'collection' : 'navigation',
                 'show_url' => $tree->editUrl(),
                 'edit_url' => $structure->editUrl(),
-                'deleteable' => me()->can('delete', $structure)
+                'deleteable' => User::current()->can('delete', $structure)
             ];
         })->values();
 

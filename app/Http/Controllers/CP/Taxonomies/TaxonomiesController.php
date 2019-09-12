@@ -30,7 +30,7 @@ class TaxonomiesController extends CpController
                 'terms' => $taxonomy->queryTerms()->count(),
                 'edit_url' => $taxonomy->editUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
-                'deleteable' => me()->can('delete', $taxonomy)
+                'deleteable' => User::current()->can('delete', $taxonomy)
             ];
         })->values();
 
