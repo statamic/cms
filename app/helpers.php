@@ -103,20 +103,6 @@ if (! function_exists('stop_measure')) {
     }
 }
 
-if (! function_exists('__n')) {
-    function __n($key, $number, $replace = [], $locale = null)
-    {
-        return trans_choice(__($key, $replace, $locale), $number);
-    }
-}
-
-if (! function_exists('__s')) {
-    function __s($key, $replace = [], $locale = null)
-    {
-        return trans('statamic::messages.'.$key, $replace, $locale);
-    }
-}
-
 if (! function_exists('user')) {
     function user()
     {
