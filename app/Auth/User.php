@@ -4,6 +4,7 @@ namespace Statamic\Auth;
 
 use ArrayAccess;
 use Statamic\Facades;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
@@ -63,7 +64,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         }
 
         return config('statamic.users.avatars') === 'gravatar'
-            ? gravatar($this->email(), $size)
+            ? URL::gravatar($this->email(), $size)
             : null;
     }
 

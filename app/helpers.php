@@ -199,24 +199,6 @@ function t($var, $params = [])
 }
 
 /**
- * Return a gravatar image
- *
- * @param  string  $email
- * @param  integer $size
- * @return string
- */
-function gravatar($email, $size = null)
-{
-    $url = "https://www.gravatar.com/avatar/" . e(md5(strtolower($email)));
-
-    if ($size) {
-        $url .= '?s=' . $size;
-    }
-
-    return $url;
-}
-
-/**
  * Check whether the nav link is active
  *
  * @param string $url

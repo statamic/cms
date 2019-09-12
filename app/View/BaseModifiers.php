@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Data;
@@ -621,7 +622,7 @@ class BaseModifiers extends Modifier
      */
     public function gravatar($value, $params)
     {
-        return gravatar($value, Arr::get($params, 0));
+        return URL::gravatar($value, Arr::get($params, 0));
     }
 
     /**

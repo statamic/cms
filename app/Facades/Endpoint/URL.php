@@ -318,4 +318,22 @@ class URL
         return $uri; // TODO
         return app(ContentService::class)->defaultUri($locale, $uri);
     }
+
+    /**
+     * Return a gravatar image
+     *
+     * @param  string  $email
+     * @param  integer $size
+     * @return string
+     */
+    public function gravatar($email, $size = null)
+    {
+        $url = "https://www.gravatar.com/avatar/" . e(md5(strtolower($email)));
+
+        if ($size) {
+            $url .= '?s=' . $size;
+        }
+
+        return $url;
+    }
 }
