@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9856a73fe327b75b4dfccdce23e10f89",
+    "content-hash": "7644b636e408863b231519ec341fb11f",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -4917,16 +4917,16 @@
         },
         {
             "name": "codedungeon/phpunit-result-printer",
-            "version": "0.26.0",
+            "version": "0.26.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mikeerickson/phpunit-pretty-result-printer.git",
-                "reference": "55ddb3894b28f70df90b6053cb121da91cac1dc1"
+                "reference": "89f1664579d8732e987bf5db1f689dab39d19d36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikeerickson/phpunit-pretty-result-printer/zipball/55ddb3894b28f70df90b6053cb121da91cac1dc1",
-                "reference": "55ddb3894b28f70df90b6053cb121da91cac1dc1",
+                "url": "https://api.github.com/repos/mikeerickson/phpunit-pretty-result-printer/zipball/89f1664579d8732e987bf5db1f689dab39d19d36",
+                "reference": "89f1664579d8732e987bf5db1f689dab39d19d36",
                 "shasum": ""
             },
             "require": {
@@ -4934,10 +4934,10 @@
                 "codedungeon/php-cli-colors": "^1.10.2",
                 "hassankhan/config": "^0.11.2",
                 "php": "^7.1",
+                "phpunit/phpunit": "^8.0",
                 "symfony/yaml": "^2.7|^3.0|^4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "8.0.*",
                 "spatie/phpunit-watcher": "^1.6"
             },
             "type": "library",
@@ -4966,7 +4966,7 @@
                 "result-printer",
                 "testing"
             ],
-            "time": "2019-02-05T19:45:42+00:00"
+            "time": "2019-04-02T17:06:04+00:00"
         },
         {
             "name": "doctrine/instantiator",
