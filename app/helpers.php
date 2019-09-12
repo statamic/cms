@@ -460,15 +460,6 @@ function current_class($pattern)
     return is_current($pattern) ? 'current' : '';
 }
 
-/**
- * @param array $value
- * @return \Statamic\Assets\AssetCollection
- */
-function collect_assets($value = [])
-{
-    return new \Statamic\Assets\AssetCollection($value);
-}
-
 if (! function_exists('start_measure')) {
     function start_measure()
     {

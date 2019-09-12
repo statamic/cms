@@ -55,6 +55,6 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
 
     protected function collect($items = [])
     {
-        return collect_assets($items);
+        return AssetCollection::make($items);
     }
 }

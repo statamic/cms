@@ -83,7 +83,7 @@ class Assets extends Tags
 
         $urls = (array) $urls;
 
-        $this->assets = collect_assets();
+        $this->assets = new AssetCollection;
 
         foreach ($urls as $url) {
             if ($asset = Asset::find($url)) {

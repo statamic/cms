@@ -16,7 +16,7 @@ class AssetRepository implements Contract
 {
     public function all()
     {
-        return collect_assets(AssetContainer::all()->flatMap(function ($container) {
+        return AssetCollection::make(AssetContainer::all()->flatMap(function ($container) {
             return $container->assets();
         }));
     }
