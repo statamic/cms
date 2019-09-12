@@ -1,7 +1,6 @@
 <?php
 
 use Statamic\Facades\Path;
-use Stringy\StaticStringy as Stringy;
 
 function cp_route($route, $params = [])
 {
@@ -24,20 +23,6 @@ function cp_root()
     return str_start(config('statamic.cp.route'), '/');
 }
 
-/**
- * Inline SVG helper
- *
- * Outputs the contents of an svg file
- *
- * @param string $src Name of svg
- * @return string
- */
-function inline_svg($src)
-{
-    return Stringy::collapseWhitespace(
-        File::get(statamic_path("resources/dist/svg/{$src}.svg"))
-    );
-}
 
 function statamic_path($path = null)
 {
