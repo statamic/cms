@@ -28,7 +28,7 @@ class GlobalRepository implements RepositoryContract
     {
         $keys = $this->store->paths()->keys();
 
-        return collect_globals($this->store->getItems($keys));
+        return GlobalCollection::make($this->store->getItems($keys));
     }
 
     public function find($id): ?GlobalSet

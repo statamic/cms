@@ -228,15 +228,6 @@ function sanitize_array($array, $antlers = true)
     return $result;
 }
 
-/**
- * @param array $value
- * @return \Statamic\Globals\GlobalCollection
- */
-function collect_globals($value = [])
-{
-    return new \Statamic\Globals\GlobalCollection($value);
-}
-
 function translate($id, array $parameters = [])
 {
     return trans($id, $parameters);
