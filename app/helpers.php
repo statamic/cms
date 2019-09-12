@@ -151,16 +151,6 @@ function array_reindex($array)
     return $array;
 }
 
-function root_path()
-{
-    return base_path();
-}
-
-function bundles_path($path = null)
-{
-    return path(statamic_path('bundles'), $path);
-}
-
 function cp_root()
 {
     return str_start(config('statamic.cp.route'), '/');

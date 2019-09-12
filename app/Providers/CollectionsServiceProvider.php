@@ -111,7 +111,7 @@ class CollectionsServiceProvider extends ServiceProvider
                     return $prefix . pathinfo($item, PATHINFO_FILENAME);
                 })
                 ->map(function ($item) {
-                    return require root_path($item);
+                    return require base_path($item);
                 });
         });
     }

@@ -40,7 +40,7 @@ class Path
      */
     public function makeFull($path)
     {
-        return self::assemble(root_path(), $path);
+        return self::assemble(base_path(), $path);
     }
 
     /**
