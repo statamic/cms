@@ -10,6 +10,7 @@ use Statamic\Facades\Entry;
 use Statamic\Tags\Query;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
+use Statamic\Entries\EntryCollection;
 
 class Entries
 {
@@ -37,7 +38,7 @@ class Entries
         try {
             $query = $this->query();
         } catch (NoResultsExpected $exception) {
-            return collect_entries();
+            return new EntryCollection;
         }
 
         return $this->results($query);

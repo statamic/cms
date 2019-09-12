@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Facades;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
+use Statamic\Entries\EntryCollection;
 
 class EntryQueryBuilder extends Builder
 {
@@ -40,7 +41,7 @@ class EntryQueryBuilder extends Builder
 
     protected function collect($items = [])
     {
-        return collect_entries($items);
+        return EntryCollection::make($items);
     }
 
     protected function getFilteredKeys()

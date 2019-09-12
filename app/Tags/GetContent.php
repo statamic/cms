@@ -6,6 +6,7 @@ use Statamic\Facades\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Site;
 use Statamic\Facades\Entry;
+use Statamic\Entries\EntryCollection;
 use Statamic\Tags\Collection\Collection;
 
 class GetContent extends Collection
@@ -36,7 +37,7 @@ class GetContent extends Collection
         if (Str::startsWith($from[0], '/')) {
             $site = $this->get(['site', 'locale'], Site::current()->handle());
 
-            $entries = collect_entries($from)->map(function ($item) use ($site) {
+            $entries = EntryCollection::make($from)->map(function ($item) use ($site) {
                 return Entry::findByUri($item, $site);
             });
 

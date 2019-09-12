@@ -278,14 +278,6 @@ if (! function_exists('array_filter_use_both')) {
 }
 
 /**
- * @param array $value
- * @return \Statamic\Entries\EntryCollection
- */
-function collect_entries($value = [])
-{
-    return new \Statamic\Entries\EntryCollection($value);
-}
-/**
  * Returns a real boolean from a string based boolean
  *
  * @param string $value
