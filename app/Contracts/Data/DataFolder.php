@@ -2,9 +2,7 @@
 
 namespace Statamic\Contracts\Data;
 
-use Statamic\Contracts\CP\Editable;
-
-interface DataFolder extends Editable
+interface DataFolder
 {
     /**
      * Get data from the folder

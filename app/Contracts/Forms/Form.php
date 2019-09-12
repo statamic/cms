@@ -3,10 +3,9 @@
 namespace Statamic\Contracts\Forms;
 
 use Statamic\Fields\Blueprint;
-use Statamic\Contracts\CP\Editable;
 use Illuminate\Contracts\Support\Arrayable;
 
-interface Form extends Arrayable, Editable
+interface Form extends Arrayable
 {
     /**
      * Get or set the handle
