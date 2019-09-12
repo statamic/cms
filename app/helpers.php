@@ -50,15 +50,6 @@ function cp_route($route, $params = [])
     return $route;
 }
 
-function carbon($value)
-{
-    if (! $value instanceof Carbon) {
-        $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
-    }
-
-    return $value;
-}
-
 function cp_root()
 {
     return str_start(config('statamic.cp.route'), '/');

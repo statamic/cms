@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Carbon\Carbon;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Facades\Str;
@@ -297,7 +298,7 @@ class BaseModifiers extends Modifier
      */
     public function daysAgo($value, $params)
     {
-        return carbon($value)->diffInDays(Arr::get($params, 0));
+        return $this->carbon($value)->diffInDays(Arr::get($params, 0));
     }
 
     /**
@@ -526,7 +527,7 @@ class BaseModifiers extends Modifier
      */
     public function format($value, $params)
     {
-        return carbon($value)->format(Arr::get($params, 0));
+        return $this->carbon($value)->format(Arr::get($params, 0));
     }
 
     /**
@@ -538,7 +539,7 @@ class BaseModifiers extends Modifier
      */
     public function formatLocalized($value, $params)
     {
-        return carbon($value)->formatLocalized(Arr::get($params, 0));
+        return $this->carbon($value)->formatLocalized(Arr::get($params, 0));
     }
 
     /**
@@ -669,7 +670,7 @@ class BaseModifiers extends Modifier
      */
     public function hoursAgo($value, $params)
     {
-        return carbon($value)->diffInHours(Arr::get($params, 0));
+        return $this->carbon($value)->diffInHours(Arr::get($params, 0));
     }
 
     /**
@@ -746,9 +747,9 @@ class BaseModifiers extends Modifier
      */
     public function isAfter($value, $params, $context)
     {
-        $date = carbon(Arr::get($context, $params[0], $params[0]));
+        $date = $this->carbon(Arr::get($context, $params[0], $params[0]));
 
-        return carbon($value)->gt($date);
+        return $this->carbon($value)->gt($date);
     }
 
     /**
@@ -783,9 +784,9 @@ class BaseModifiers extends Modifier
      */
     public function isBefore($value, $params, $context)
     {
-        $date = carbon(Arr::get($context, $params[0], $params[0]));
+        $date = $this->carbon(Arr::get($context, $params[0], $params[0]));
 
-        return carbon($value)->lt($date);
+        return $this->carbon($value)->lt($date);
     }
 
     /**
@@ -798,10 +799,10 @@ class BaseModifiers extends Modifier
      */
     public function isBetween($value, $params, $context)
     {
-        $date1 = carbon(Arr::get($context, $params[0], $params[0]));
-        $date2 = carbon(Arr::get($context, $params[1], $params[1]));
+        $date1 = $this->carbon(Arr::get($context, $params[0], $params[0]));
+        $date2 = $this->carbon(Arr::get($context, $params[1], $params[1]));
 
-        return carbon($value)->between($date1, $date2);
+        return $this->carbon($value)->between($date1, $date2);
     }
 
     /**
@@ -834,7 +835,7 @@ class BaseModifiers extends Modifier
      */
     public function isFuture($value)
     {
-        return carbon($value)->isFuture();
+        return $this->carbon($value)->isFuture();
     }
 
     /**
@@ -856,7 +857,7 @@ class BaseModifiers extends Modifier
      */
     public function isLeapYear($value)
     {
-        return carbon($value)->isLeapYear();
+        return $this->carbon($value)->isLeapYear();
     }
 
     /**
@@ -889,7 +890,7 @@ class BaseModifiers extends Modifier
      */
     public function isPast($value)
     {
-        return carbon($value)->isPast();
+        return $this->carbon($value)->isPast();
     }
 
     /**
@@ -900,7 +901,7 @@ class BaseModifiers extends Modifier
      */
     public function isToday($value)
     {
-        return carbon($value)->isToday();
+        return $this->carbon($value)->isToday();
     }
 
     /**
@@ -923,7 +924,7 @@ class BaseModifiers extends Modifier
     public function isWeekday($value)
     {
 
-        return carbon($value)->isWeekday();
+        return $this->carbon($value)->isWeekday();
     }
 
     /**
@@ -934,7 +935,7 @@ class BaseModifiers extends Modifier
      */
     public function isWeekend($value)
     {
-        return carbon($value)->isWeekend();
+        return $this->carbon($value)->isWeekend();
     }
 
     /**
@@ -945,7 +946,7 @@ class BaseModifiers extends Modifier
      */
     public function isYesterday($value)
     {
-        return carbon($value)->isYesterday();
+        return $this->carbon($value)->isYesterday();
     }
 
     /**
@@ -1105,7 +1106,7 @@ class BaseModifiers extends Modifier
      */
     public function minutesAgo($value, $params)
     {
-        return carbon($value)->diffInMinutes(Arr::get($params, 0));
+        return $this->carbon($value)->diffInMinutes(Arr::get($params, 0));
     }
 
     /**
@@ -1133,7 +1134,7 @@ class BaseModifiers extends Modifier
      */
     public function modifyDate($value, $params)
     {
-        return carbon($value)->modify(Arr::get($params, 0));
+        return $this->carbon($value)->modify(Arr::get($params, 0));
     }
 
     /**
@@ -1146,7 +1147,7 @@ class BaseModifiers extends Modifier
      */
     public function monthsAgo($value, $params)
     {
-        return carbon($value)->diffInMonths(Arr::get($params, 0));
+        return $this->carbon($value)->diffInMonths(Arr::get($params, 0));
     }
 
     /**
@@ -1366,7 +1367,7 @@ class BaseModifiers extends Modifier
     {
         $remove_modifiers = Arr::get($params, 0, false);
 
-        return carbon($value)->diffForHumans(null, $remove_modifiers);
+        return $this->carbon($value)->diffForHumans(null, $remove_modifiers);
     }
 
     /**
@@ -1523,7 +1524,7 @@ class BaseModifiers extends Modifier
      */
     public function secondsAgo($value, $params)
     {
-        return carbon($value)->diffInSeconds(Arr::get($params, 0));
+        return $this->carbon($value)->diffInSeconds(Arr::get($params, 0));
     }
 
     /**
@@ -1882,7 +1883,7 @@ class BaseModifiers extends Modifier
     {
         $timezone = Arr::get($params, 0, Config::get('statamic.system.timezone'));
 
-        return carbon($value)->tz($timezone);
+        return $this->carbon($value)->tz($timezone);
     }
 
     /**
@@ -1991,7 +1992,7 @@ class BaseModifiers extends Modifier
      */
     public function weeksAgo($value, $params)
     {
-        return carbon($value)->diffInWeeks(Arr::get($params, 0));
+        return $this->carbon($value)->diffInWeeks(Arr::get($params, 0));
     }
 
     /**
@@ -2066,7 +2067,7 @@ class BaseModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return carbon($value)->diffInYears(Arr::get($params, 0));
+        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
     }
 
     /**
@@ -2133,5 +2134,14 @@ class BaseModifiers extends Modifier
         return (is_numeric($number))
             ? $number
             : Arr::get($context, $number, $number);
+    }
+
+    private function carbon($value)
+    {
+        if (! $value instanceof Carbon) {
+            $value = (is_numeric($value)) ? Carbon::createFromTimestamp($value) : Carbon::parse($value);
+        }
+
+        return $value;
     }
 }

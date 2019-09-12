@@ -12,7 +12,7 @@
                 {{ $submission->form->title() }}
             </a>
             @svg('chevron-right')
-            {{ carbon($submission->id())->format('M j, Y @ h:m') }}
+            {{ $submission->date()->format('M j, Y @ h:m') }}
         </h1>
     </div>
 

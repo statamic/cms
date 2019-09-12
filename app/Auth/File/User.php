@@ -303,7 +303,7 @@ class User extends BaseUser
     {
         $last_login = $this->getMeta('last_login');
 
-        return $last_login ? carbon($last_login) : $last_login;
+        return $last_login ? Carbon::createFromTimestamp($last_login) : $last_login;
     }
 
     public function setLastLogin($carbon)
