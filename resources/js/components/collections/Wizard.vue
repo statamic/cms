@@ -212,7 +212,7 @@
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
                     <input type="radio" v-model="collection.defaultStatus" value="draft" />
-                    <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash; Entries will default to <span class="text-grey-50">draft</span> status.</p>
+                    <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash; Entries will default to <span class="text-grey-60">draft</span> status.</p>
                 </label>
             </div>
         </div>
@@ -259,8 +259,7 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Mounting to an entry will give you shortcuts to add and edit this collection's entries from within a Structure.
-                    It will also let you use the `mount` variable in your routes, which will be the URL of the entry.
+                    Add Structure shortcuts to this collection.
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
@@ -277,7 +276,7 @@
                 <label><input type="checkbox" v-model="collection.amp" /> Enable AMP</label>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The AMP version of an entry will be routed to <code>{site url}/amp/{entry url}</code>
+                    AMP versions will be routed to <code>{site url}/amp/{entry url}</code>
                 </div>
             </div>
         </div>
