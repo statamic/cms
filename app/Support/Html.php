@@ -2,6 +2,7 @@
 
 namespace Statamic\Support;
 
+use ParsedownExtra;
 use Michelf\SmartyPants;
 use Illuminate\Support\HtmlString;
 
@@ -307,6 +308,11 @@ class Html
     public static function email($email)
     {
         return str_replace('@', '&#64;', static::obfuscate($email));
+    }
+
+    public static function markdown($string)
+    {
+        return (new ParsedownExtra)->text($string);
     }
 
     public static function smartypants($string, $behavior = null)

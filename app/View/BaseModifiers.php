@@ -1076,7 +1076,7 @@ class BaseModifiers extends Modifier
      */
     public function markdown($value)
     {
-        return markdown($value);
+        return Html::markdown($value);
     }
 
     /**
@@ -1747,7 +1747,7 @@ class BaseModifiers extends Modifier
             $html .= '<tr>';
             foreach ($row['cells'] as $cell) {
                 $html .= '<td>';
-                $html .= ($parse_markdown) ? markdown($cell) : $cell;
+                $html .= ($parse_markdown) ? Html::markdown($cell) : $cell;
                 $html .= '</td>';
             }
             $html .= '</tr>';

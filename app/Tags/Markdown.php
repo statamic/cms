@@ -2,13 +2,14 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Support\Html;
 use Statamic\Tags\Tags;
 
 class Markdown extends Tags
 {
     public function index()
     {
-        return markdown($this->parse());
+        return Html::markdown($this->parse());
     }
 
     /**
@@ -38,6 +39,6 @@ class Markdown extends Tags
             return preg_replace('/^\s{0,' . $maxTrim . '}/', '', $line);
         })->implode(PHP_EOL);
 
-        return markdown($md);
+        return Html::markdown($md);
     }
 }

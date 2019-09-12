@@ -51,19 +51,6 @@ function cp_route($route, $params = [])
 }
 
 /**
- * Parse string with basic Markdown
- *
- * @param $content
- * @return mixed
- */
-function markdown($content)
-{
-    $markdown = new \ParsedownExtra();
-
-    return $markdown->text($content);
-}
-
-/**
  * Sanitizes a string
  *
  * @param bool $antlers  Whether Antlers (curly braces) should be escaped.

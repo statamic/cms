@@ -3,6 +3,7 @@
 namespace Statamic\Updater\Presenters;
 
 use Statamic\Facades\Str;
+use Statamic\Support\Html;
 
 class GithubReleasePresenter
 {
@@ -28,7 +29,7 @@ class GithubReleasePresenter
      */
     public function toHtml()
     {
-        $string = markdown($this->githubRelease ?: '- [na] Changelog unavailable.');
+        $string = Html::markdown($this->githubRelease ?: '- [na] Changelog unavailable.');
 
         // TODO: Move to blade or vue? Or leave in presenter?
         // TODO: Create tailwind classes for these labels.
