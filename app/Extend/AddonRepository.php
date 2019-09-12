@@ -7,15 +7,15 @@ use Statamic\Extend\Management\Manifest;
 class AddonRepository
 {
     /**
-     * Create an addon instance.
+     * Make an addon instance.
      *
      * @param string|array $addon  The name of the addon. This will be converted to StudlyCase.
      *                             Or, an array containing package data.
      * @return Addon
      */
-    public function create($addon)
+    public function make($addon)
     {
-        $method = is_array($addon) ? 'createFromPackage' : 'create';
+        $method = is_array($addon) ? 'makeFromPackage' : 'make';
 
         return Addon::$method($addon);
     }

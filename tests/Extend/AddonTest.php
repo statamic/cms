@@ -13,7 +13,7 @@ class AddonTest extends TestCase
     /** @test */
     function it_creates_an_instance_with_a_name()
     {
-        $this->assertInstanceOf(Addon::class, Addon::create('TestAddon'));
+        $this->assertInstanceOf(Addon::class, Addon::make('TestAddon'));
     }
 
     /** @test */
@@ -21,7 +21,7 @@ class AddonTest extends TestCase
     {
         $this->assertEquals(
             'vendor/foo-bar',
-            Addon::create('vendor/foo-bar')->id()
+            Addon::make('vendor/foo-bar')->id()
         );
     }
 
@@ -30,7 +30,7 @@ class AddonTest extends TestCase
     {
         $this->assertEquals(
             'foo_bar',
-            Addon::create('vendor/foo-bar')->handle()
+            Addon::make('vendor/foo-bar')->handle()
         );
     }
 
@@ -39,14 +39,14 @@ class AddonTest extends TestCase
     {
         $this->assertEquals(
             'foo-bar',
-            Addon::create('vendor/foo-bar')->slug()
+            Addon::make('vendor/foo-bar')->slug()
         );
     }
 
     /** @test */
     function it_creates_an_instance_from_a_package()
     {
-        $addon = $this->createFromPackage([]);
+        $addon = $this->makeFromPackage([]);
 
         $this->assertInstanceOf(Addon::class, $addon);
         $this->assertEquals('vendor/test-addon', $addon->id());
@@ -63,7 +63,7 @@ class AddonTest extends TestCase
     /** @test */
     public function it_checks_if_a_file_exists()
     {
-        $addon = Addon::create('Test Addon')->directory('/path/to/addon');
+        $addon = Addon::make('Test Addon')->directory('/path/to/addon');
 
         File::shouldReceive('exists')->with('/path/to/addon/test.txt')->andReturnTrue();
         File::shouldReceive('exists')->with('/path/to/addon/notfound.txt')->andReturnFalse();
@@ -75,7 +75,7 @@ class AddonTest extends TestCase
     /** @test */
     public function it_gets_file_contents()
     {
-        $addon = Addon::create('Test Addon')->directory('/path/to/addon');
+        $addon = Addon::make('Test Addon')->directory('/path/to/addon');
 
         File::shouldReceive('get')->with('/path/to/addon/test.txt')->andReturn('the file contents');
 
@@ -85,7 +85,7 @@ class AddonTest extends TestCase
     /** @test */
     public function it_writes_file_contents()
     {
-        $addon = Addon::create('Test Addon')->directory('/path/to/addon');
+        $addon = Addon::make('Test Addon')->directory('/path/to/addon');
 
         File::shouldReceive('put')->with('/path/to/addon/test.txt', 'the file contents');
 
@@ -96,7 +96,7 @@ class AddonTest extends TestCase
     function it_doesnt_allow_getting_files_if_no_directory_is_set()
     {
         File::spy();
-        $addon = $this->createFromPackage(['directory' => null]);
+        $addon = $this->makeFromPackage(['directory' => null]);
 
         try {
             $addon->getFile('foo.txt', 'foo');
@@ -113,7 +113,7 @@ class AddonTest extends TestCase
     function it_doesnt_allow_checking_for_files_if_no_directory_is_set()
     {
         File::spy();
-        $addon = $this->createFromPackage(['directory' => null]);
+        $addon = $this->makeFromPackage(['directory' => null]);
 
         try {
             $addon->hasFile('foo.txt', 'foo');
@@ -132,7 +132,7 @@ class AddonTest extends TestCase
     function it_doesnt_allow_writing_files_if_no_directory_is_set()
     {
         File::spy();
-        $addon = $this->createFromPackage(['directory' => null]);
+        $addon = $this->makeFromPackage(['directory' => null]);
 
         try {
             $addon->putFile('foo.txt', 'foo');
@@ -148,7 +148,7 @@ class AddonTest extends TestCase
     /** @test */
     public function it_gets_the_name_from_id_if_it_wasnt_specified()
     {
-        $addon = $this->createFromPackage([
+        $addon = $this->makeFromPackage([
             'name' => null,
             'id' => 'BarBaz',
         ]);
@@ -159,9 +159,9 @@ class AddonTest extends TestCase
     /** @test */
     public function it_checks_if_commercial()
     {
-        $this->assertTrue($this->createFromPackage(['isCommercial' => true])->isCommercial());
-        $this->assertFalse($this->createFromPackage(['isCommercial' => false])->isCommercial());
-        $this->assertFalse($this->createFromPackage([])->isCommercial());
+        $this->assertTrue($this->makeFromPackage(['isCommercial' => true])->isCommercial());
+        $this->assertFalse($this->makeFromPackage(['isCommercial' => false])->isCommercial());
+        $this->assertFalse($this->makeFromPackage([])->isCommercial());
     }
 
     /** @test */
@@ -169,19 +169,19 @@ class AddonTest extends TestCase
     {
         config(['test_addon' => ['license_key' => 'TESTLICENSEKEY']]);
 
-        $this->assertEquals('TESTLICENSEKEY', Addon::create('vendor/test-addon')->licenseKey());
+        $this->assertEquals('TESTLICENSEKEY', Addon::make('vendor/test-addon')->licenseKey());
     }
 
     public function it_gets_the_autoloaded_directory()
     {
-        $addon = $this->createFromPackage(['autoload' => 'src']);
+        $addon = $this->makeFromPackage(['autoload' => 'src']);
 
         $this->assertEquals('src', $addon->autoload());
     }
 
-    private function createFromPackage($attributes)
+    private function makeFromPackage($attributes)
     {
-        return Addon::createFromPackage(array_merge([
+        return Addon::makeFromPackage(array_merge([
             'id' => 'vendor/test-addon',
             'name' => 'Test Addon',
             'description' => 'Test description',

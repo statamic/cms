@@ -128,24 +128,24 @@ final class Addon
     }
 
     /**
-     * Create an addon instance.
+     * Make an addon instance.
      *
      * @return self
      */
-    public static function create($name)
+    public static function make($name)
     {
         return new self($name);
     }
 
     /**
-     * Create an addon instance from package details.
+     * Make an addon instance from package details.
      *
      * @param array $package
      * @return self
      */
-    public static function createFromPackage(array $package)
+    public static function makeFromPackage(array $package)
     {
-        $instance = self::create($package['id']);
+        $instance = self::make($package['id']);
 
         $keys = [
             'id', 'slug', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
