@@ -5,7 +5,6 @@ use Statamic\Facades\Str;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\Config;
-use Michelf\SmartyPants;
 use Statamic\Extend\Addon;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
@@ -62,17 +61,6 @@ function markdown($content)
     $markdown = new \ParsedownExtra();
 
     return $markdown->text($content);
-}
-
-/**
- * Run through Smartypants
- *
- * @param $content
- * @return mixed
- */
-function smartypants($content)
-{
-    return SmartyPants::defaultTransform($content);
 }
 
 /**

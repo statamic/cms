@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Support\Html;
 use Statamic\Fields\Fieldtype;
 
 class Markdown extends Fieldtype
@@ -55,7 +56,7 @@ class Markdown extends Fieldtype
                 ->text($value);
 
         if ($this->config('smartypants')) {
-            $html = smartypants($html);
+            $html = Html::smartypants($html);
         }
 
         return $html;

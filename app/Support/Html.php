@@ -2,6 +2,7 @@
 
 namespace Statamic\Support;
 
+use Michelf\SmartyPants;
 use Illuminate\Support\HtmlString;
 
 class Html
@@ -306,5 +307,10 @@ class Html
     public static function email($email)
     {
         return str_replace('@', '&#64;', static::obfuscate($email));
+    }
+
+    public static function smartypants($string, $behavior = null)
+    {
+        return SmartyPants::defaultTransform($string, $behavior ?? SmartyPants::ATTR_DEFAULT);
     }
 }

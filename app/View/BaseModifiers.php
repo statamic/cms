@@ -1605,7 +1605,7 @@ class BaseModifiers extends Modifier
      */
     public function smartypants($value, $params)
     {
-        return smartypants($value, Arr::get($params, 0 , 1));
+        return Html::smartypants($value, Arr::get($params, 0 , 1));
     }
 
     /**
