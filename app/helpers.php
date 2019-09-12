@@ -29,33 +29,6 @@ function statamic_path($path = null)
     return Path::tidy(__DIR__ . '/../' . $path);
 }
 
-/**
- * Check whether the nav link is active
- *
- * @param string $url
- * @return bool
- */
-function nav_is($url)
-{
-    return is_current($url);
-}
-
-/**
- * Returns true if CP URL pattern matches current URL
- *
- * @param string $pattern
- * @return bool
- */
-function is_current($pattern)
-{
-    return request()->is(config('statamic.cp.route') . '/' . $pattern);
-}
-
-function current_class($pattern)
-{
-    return is_current($pattern) ? 'current' : '';
-}
-
 if (! function_exists('user')) {
     function user()
     {

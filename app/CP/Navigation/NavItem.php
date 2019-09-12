@@ -160,6 +160,16 @@ class NavItem
     }
 
     /**
+     * Get whether the nav item is currently active.
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return request()->is(config('statamic.cp.route') . '/' . $this->active);
+    }
+
+    /**
      * Get or set custom view.
      *
      * @param string|null $view

@@ -8,14 +8,14 @@
                 <ul>
                     @foreach ($items as $item)
                         @unless ($item->view())
-                            <li class="{{ current_class($item->active()) }}">
+                            <li class="{{ $item->isActive() ? 'current' : '' }}">
                                 <a href="{{ $item->url() }}">
                                     <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
                                 </a>
-                                @if ($item->children() && is_current($item->active()))
+                                @if ($item->children() && $item->isActive())
                                     <ul>
                                         @foreach ($item->children() as $child)
-                                            <li class="{{ current_class($child->active()) }}">
+                                            <li class="{{ $child->isActive() ? 'current' : '' }}">
                                                 <a href="{{ $child->url() }}">{{ __($child->name()) }}</a>
                                             </li>
                                         @endforeach
