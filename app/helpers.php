@@ -416,15 +416,6 @@ function gravatar($email, $size = null)
 }
 
 /**
- * @param array $value
- * @return \Statamic\Auth\UserCollection
- */
-function collect_users($value = [])
-{
-    return new \Statamic\Auth\UserCollection($value);
-}
-
-/**
  * Check whether the nav link is active
  *
  * @param string $url

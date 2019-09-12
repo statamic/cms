@@ -29,7 +29,7 @@ class UserRepository extends BaseRepository
             return $this->makeUser($model);
         });
 
-        return collect_users($users);
+        return UserCollection::make($users);
     }
 
     public function find($id): ?UserContract
