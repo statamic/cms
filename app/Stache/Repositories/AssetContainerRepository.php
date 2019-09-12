@@ -24,7 +24,7 @@ class AssetContainerRepository implements RepositoryContract
         return $this->store->getItems($keys);
     }
 
-    public function find($id): AssetContainer
+    public function find($id): ?AssetContainer
     {
         return $this->findByHandle($id);
     }
