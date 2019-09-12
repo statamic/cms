@@ -9,11 +9,6 @@ use Statamic\Extend\Addon;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
-function path($from, $extra = null)
-{
-    return Path::tidy($from . '/' . $extra);
-}
-
 function site_handle($handle = null)
 {
     return site_locale($handle);
@@ -72,7 +67,7 @@ function inline_svg($src)
 
 function statamic_path($path = null)
 {
-    return path(__DIR__ . '/../', $path);
+    return Path::tidy(__DIR__ . '/../' . $path);
 }
 
 /**
