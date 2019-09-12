@@ -35,7 +35,7 @@
         @component('statamic::partials.create-first', [
             'resource' => __("{$taxonomy->title()} term"),
             'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
-            'can' => user()->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
+            'can' => $user->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
         ])
             @slot('button')
                 {{-- <create-term-button

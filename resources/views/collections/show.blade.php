@@ -41,7 +41,7 @@
             initial-sort-direction="{{ $collection->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
             action-url="{{ cp_route('collections.entries.actions', $collection->handle()) }}"
-            :reorderable="{{ Statamic\Support\Str::bool($collection->orderable() && user()->can('reorder', $collection)) }}"
+            :reorderable="{{ Statamic\Support\Str::bool($collection->orderable() && $user->can('reorder', $collection)) }}"
             reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
             structure-url="{{ optional($collection->structure())->showUrl() }}"
         ></entry-list>
@@ -51,7 +51,7 @@
         @component('statamic::partials.create-first', [
             'resource' => __("{$collection->title()} entry"),
             'svg' => 'empty/collection', // TODO: Do we want separate entry SVG?
-            'can' => user()->can('create', ['Statamic\Contracts\Entries\Entry', $collection])
+            'can' => $user->can('create', ['Statamic\Contracts\Entries\Entry', $collection])
         ])
             @slot('button')
                 <create-entry-button

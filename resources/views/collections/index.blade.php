@@ -26,7 +26,7 @@
             'description' => 'Collections are groups of entries that hold similar content and share behaviors and attributes.',
             'svg' => 'empty/collection',
             'route' => cp_route('collections.create'),
-            'can' => user()->can('create', 'Statamic\Contracts\Entries\Collection')
+            'can' => $user->can('create', 'Statamic\Contracts\Entries\Collection')
         ])
 
     @endunless

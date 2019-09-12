@@ -26,7 +26,7 @@
             'description' => 'A Taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.',
             'svg' => 'empty/collection',
             'route' => cp_route('taxonomies.create'),
-            'can' => user()->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
+            'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
         ])
 
     @endunless

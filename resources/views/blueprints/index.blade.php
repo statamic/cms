@@ -22,7 +22,7 @@
             'description' => 'Blueprints let you mix and match fields and fieldsets to create the content structures for collections and other data types.',
             'svg' => 'empty/blueprints',
             'route' => cp_route('blueprints.create'),
-            'can' => user()->can('create', 'Statamic\Fields\Blueprint')
+            'can' => $user->can('create', 'Statamic\Fields\Blueprint')
         ])
 
     @endunless

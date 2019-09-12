@@ -4,7 +4,7 @@
         @svg($svg)
 
         <h1 class="my-3">
-            @if ($can ?? user()->can('super'))
+            @if ($can ?? $user->can('super'))
                 {{ __("Create your first {$resource} now") }}
             @else
                 {{ __('No ' . Statamic\Facades\Str::plural($resource) . ' exist yet') }}
@@ -17,7 +17,7 @@
             </p>
         @endif
 
-        @if ($can ?? user()->can('super'))
+        @if ($can ?? $user->can('super'))
             @if($button ?? false)
                 {{ $button }}
             @else

@@ -8,7 +8,7 @@
     <div id="statamic" :style="{ marginRight: panes.length ? `24rem` : null }">
 
       <session-expiry
-          email="{{ user()->email() }}"
+          email="{{ $user->email() }}"
           :warn-at="60"
           :lifetime="{{ config('session.lifetime') * 60 }}"
       ></session-expiry>
@@ -35,7 +35,7 @@
 
             <portal to="modals" v-if="showLoginModal">
                 <login-modal
-                      email="{{ user()->email() }}"
+                      email="{{ $user->email() }}"
                       @closed="showLoginModal = false"
                 ></login-modal>
             </portal>

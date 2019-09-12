@@ -23,13 +23,6 @@ function statamic_path($path = null)
     return Path::tidy(__DIR__ . '/../' . $path);
 }
 
-if (! function_exists('user')) {
-    function user()
-    {
-        return \Statamic\Facades\User::current();
-    }
-}
-
 if (! function_exists('debugbar')) {
     function debugbar()
     {

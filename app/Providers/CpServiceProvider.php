@@ -2,8 +2,10 @@
 
 namespace Statamic\Providers;
 
+use Statamic\Facades\User;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\Translation\Loader;
 use Statamic\Extensions\Translation\Translator;
@@ -16,6 +18,10 @@ class CpServiceProvider extends ServiceProvider
         if ($this->preventRegistration()) {
             return;
         }
+
+        View::composer('statamic::*', function ($view) {
+            $view->with('user', User::current());
+        });
 
         tap($this->app->make('view'), function ($view) {
             $view->composer('statamic::layout', 'Statamic\Http\ViewComposers\PermissionComposer');

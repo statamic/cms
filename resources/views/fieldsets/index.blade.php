@@ -22,7 +22,7 @@
             'description' => 'Fieldsets are an optional companion to blueprints, allowing you to create partials to be used within blueprints.',
             'svg' => 'empty/collection', // TODO: Need empty/fieldset svg
             'route' => cp_route('fieldsets.create'),
-            'can' => user()->can('create', 'Statamic\Fields\Fieldset')
+            'can' => $user->can('create', 'Statamic\Fields\Fieldset')
         ])
 
     @endunless

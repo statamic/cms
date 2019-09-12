@@ -57,17 +57,17 @@
         <dropdown-list>
             <template v-slot:trigger>
                 <a class="dropdown-toggle items-center ml-2 hide md:flex">
-                    @if (user()->avatar())
-                        <div class="icon-header-avatar"><img src="{{ user()->avatar() }}" /></div>
+                    @if ($user->avatar())
+                        <div class="icon-header-avatar"><img src="{{ $user->avatar() }}" /></div>
                     @else
-                        <div class="icon-header-avatar icon-user-initials">{{ user()->initials() }}</div>
+                        <div class="icon-header-avatar icon-user-initials">{{ $user->initials() }}</div>
                     @endif
                 </a>
             </template>
 
             <div class="px-1">
-                <div class="text-base mb-px">{{ user()->email() }}</div>
-                @if (user()->isSuper())
+                <div class="text-base mb-px">{{ $user->email() }}</div>
+                @if ($user->isSuper())
                     <div class="text-2xs mt-px text-grey-60">{{ __('Super Admin') }}</div>
                 @endif
             </div>
