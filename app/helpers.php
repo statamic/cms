@@ -50,17 +50,6 @@ function cp_route($route, $params = [])
     return $route;
 }
 
-/**
- * Return a real integer from a string based integer
- *
- * @param string $value
- * @return int
- */
-function int($value)
-{
-    return intval($value);
-}
-
 function carbon($value)
 {
     if (! $value instanceof Carbon) {
