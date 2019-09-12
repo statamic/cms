@@ -1,4 +1,4 @@
-@inject('str', 'Statamic\Support\Str');
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
 @section('title', __('Edit Term'))
 

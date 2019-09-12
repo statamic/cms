@@ -1,4 +1,4 @@
-@inject('str', 'Statamic\Support\Str');
+@inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
 @section('body_class', 'rad-mode')
 @section('title', __('Login'))
