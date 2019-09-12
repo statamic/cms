@@ -12,7 +12,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
-use Statamic\Contracts\Globals\LocalizedGlobalSet as Contract;
+use Statamic\Contracts\Globals\Variables as Contract;
 
 class Variables implements Contract, Localization, AugmentableContract
 {

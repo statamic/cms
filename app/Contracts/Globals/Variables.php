@@ -2,6 +2,6 @@
 
 namespace Statamic\Contracts\Globals;
 
-interface LocalizedGlobalSet
+interface Variables
 {
 }
