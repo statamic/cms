@@ -1,3 +1,4 @@
+@inject('str', 'Statamic\Support\Str');
 @extends('statamic::outside')
 @section('body_class', 'rad-mode')
 @section('title', __('Login'))
@@ -8,7 +9,7 @@
 </div>
 
 <div class="card auth-card mx-auto">
-    <login inline-template :show-email-login="!{{ bool_str($oauth) }}" :has-error="{{ bool_str(count($errors) > 0) }}">
+    <login inline-template :show-email-login="!{{ $str::bool($oauth) }}" :has-error="{{ $str::bool(count($errors) > 0) }}">
     <div>
         @if ($oauth)
             <div class="login-oauth-providers">

@@ -218,4 +218,9 @@ class Str extends \Illuminate\Support\Str
 
         return "w-$class";
     }
+
+    public static function bool($string)
+    {
+        return ((bool) $string) ? 'true' : 'false';
+    }
 }

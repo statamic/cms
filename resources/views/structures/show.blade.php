@@ -1,3 +1,4 @@
+@inject('str', 'Statamic\Support\Str');
 @extends('statamic::layout')
 @section('title', crumb($structure->title(), 'Structures'))
 
@@ -14,8 +15,8 @@
         :localizations="{{ json_encode($localizations) }}"
         :collections="{{ json_encode($collections) }}"
         :max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
-        :expects-root="{{ bool_str($expectsRoot) }}"
-        :has-collection="{{ bool_str($hasCollection) }}"
+        :expects-root="{{ $str::bool($expectsRoot) }}"
+        :has-collection="{{ $str::bool($hasCollection) }}"
     >
         <template slot="header">
             <h1 class="flex-1">

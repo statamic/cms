@@ -1,3 +1,4 @@
+@inject('str', 'Statamic\Support\Str');
 @extends('statamic::layout')
 @section('content-class', 'publishing')
 
@@ -17,7 +18,7 @@
 
     <publish title="{{ $title }}"
              extra="{{ json_encode($extra) }}"
-             :is-new="{{ bool_str($is_new) }}"
+             :is-new="{{ $str::bool($is_new) }}"
              content-type="{{ $content_type }}"
              uuid="{{ $uuid }}"
              fieldset-name="{{ $fieldset }}"
@@ -25,10 +26,10 @@
              uri="{{ $uri }}"
              url="{{ $url }}"
              submit-url="{{ route("{$content_type}.save") }}"
-             :status="{{ bool_str($status) }}"
+             :status="{{ $str::bool($status) }}"
              locale="{{ $locale }}"
              locales="{{ json_encode($locales) }}"
-             :is-default-locale="{{ bool_str($is_default_locale) }}"
+             :is-default-locale="{{ $str::bool($is_default_locale) }}"
              title-display-name="{{ isset($title_display_name) ? $title_display_name : t('title') }}"
              :remove-title="true"
     ></publish>

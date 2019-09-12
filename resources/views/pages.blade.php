@@ -57,7 +57,7 @@
                         title="{{ array_get($home, 'title') }}"
                         uuid="{{ array_get($home, 'id')}}"
                         :edit-url="homeEditUrl"
-                        :has-entries="{{ bool_str(array_get($home, 'has_entries')) }}"
+                        :has-entries="{{ Statamic\Support\Str::bool(array_get($home, 'has_entries')) }}"
                         entries-url="{{ array_get($home, 'entries_url') }}"
                         create-entry-url="{{ array_get($home, 'create_entry_url') }}">
                 </branch>

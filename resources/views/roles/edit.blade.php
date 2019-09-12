@@ -8,7 +8,7 @@
         method="patch"
         initial-title="{{ $role->title() }}"
         initial-handle="{{ $role->handle() }}"
-        :initial-super="{{ bool_str($super) }}"
+        :initial-super="{{ Statamic\Support\Str::bool($super) }}"
         :initial-permissions="{{ json_encode($permissions) }}"
         v-cloak
     >

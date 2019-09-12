@@ -18,7 +18,7 @@
         :initial-localized-fields="{{ json_encode($localizedFields) }}"
         :initial-meta="{{ json_encode($meta, JSON_FORCE_OBJECT) }}"
         :initial-localizations="{{ json_encode($localizations) }}"
-        :initial-has-origin="{{ bool_str($hasOrigin) }}"
+        :initial-has-origin="{{ Statamic\Support\Str::bool($hasOrigin) }}"
         :initial-origin-values="{{ json_encode($originValues, JSON_FORCE_OBJECT) }}"
         initial-site="{{ $locale }}"
         configure-save-url="{{ cp_route('globals.update-meta', $set->id()) }}"

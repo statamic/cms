@@ -12,7 +12,7 @@
         :initial-fieldset="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :initial-meta="{{ json_encode($meta) }}"
-        :can-edit-password="{{ bool_str($canEditPassword) }}"
+        :can-edit-password="{{ Statamic\Support\Str::bool($canEditPassword) }}"
     ></user-publish-form>
 
 @endsection

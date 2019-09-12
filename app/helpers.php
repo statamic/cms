@@ -161,11 +161,6 @@ function bundles_path($path = null)
     return path(statamic_path('bundles'), $path);
 }
 
-function bool_str($bool)
-{
-    return ((bool) $bool) ? 'true' : 'false';
-}
-
 function cp_root()
 {
     return str_start(config('statamic.cp.route'), '/');
