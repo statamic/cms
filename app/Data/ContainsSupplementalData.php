@@ -2,7 +2,7 @@
 
 namespace Statamic\Data;
 
-trait SupplementsData
+trait ContainsSupplementalData
 {
     protected $supplements = [];
 

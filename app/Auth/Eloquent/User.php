@@ -5,7 +5,7 @@ namespace Statamic\Auth\Eloquent;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
 use Illuminate\Support\Carbon;
-use Statamic\Data\SupplementsData;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 
 class User extends BaseUser
 {
-    use SupplementsData;
+    use ContainsSupplementalData;
 
     protected $model;
     protected $roles;

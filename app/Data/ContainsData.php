@@ -4,7 +4,7 @@ namespace Statamic\Data;
 
 trait ContainsData
 {
-    use SupplementsData;
+    use ContainsSupplementalData;
 
     protected $data = [];
 
