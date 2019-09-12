@@ -51,17 +51,6 @@ function cp_route($route, $params = [])
 }
 
 /**
- * Returns a real boolean from a string based boolean
- *
- * @param string $value
- * @return bool
- */
-function bool($value)
-{
-    return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
-}
-
-/**
  * Return a real integer from a string based integer
  *
  * @param string $value
