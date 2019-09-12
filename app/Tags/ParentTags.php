@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use Statamic\Facades\URL;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Entry;
+use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 use Stringy\StaticStringy as Stringy;
 
@@ -25,7 +26,7 @@ class ParentTags extends Tags
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 
-        $data = array_get_colon($this->getParent(), $var_name);
+        $data = Arr::get($this->getParent(), $var_name);
 
         if ($this->isPair) {
             $this->content = '{{'.$var_name.'}}' . $this->content . '{{/'.$var_name.'}}';

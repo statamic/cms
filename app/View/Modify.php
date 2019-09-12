@@ -4,6 +4,7 @@ namespace Statamic\View;
 
 use Exception;
 use ArrayIterator;
+use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Helper;
 use Statamic\Exceptions\ModifierException;
@@ -113,7 +114,7 @@ class Modify implements \IteratorAggregate
      */
     public function __call($method, $args)
     {
-        $this->value = $this->modify($method, array_get_colon($args, 0));
+        $this->value = $this->modify($method, Arr::get($args, 0));
 
         return $this;
     }

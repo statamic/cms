@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\Asset;
+use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 use Statamic\Facades\Helper;
 use Statamic\Facades\AssetContainer;
@@ -29,7 +30,7 @@ class Assets extends Tags
      */
     public function __call($method, $arguments)
     {
-        $value = array_get_colon($this->context, $this->method);
+        $value = Arr::get($this->context, $this->method);
 
         return $this->assets($value);
     }

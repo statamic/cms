@@ -8,6 +8,39 @@ use Illuminate\Support\Arr as IlluminateArr;
 class Arr extends IlluminateArr
 {
     /**
+     * Get an item from an array using "dot" or "colon" notation.
+     *
+     * @param  array  $array
+     * @param  string $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function get($array, $key, $default = null)
+    {
+        if ($key) {
+            $key = str_replace(':', '.', $key);
+        }
+
+        return parent::get($array, $key, $default);
+    }
+
+    /**
+     * Check if an item from an array exists using "dot" or "colon" notation.
+     *
+     * @param  array  $array
+     * @param  string $key
+     * @return bool
+     */
+    public static function has($array, $key)
+    {
+        if ($key) {
+            $key = str_replace(':', '.', $key);
+        }
+
+        return parent::has($array, $key);
+    }
+
+    /**
      * Checks if an array is associative
      *
      * @param $array

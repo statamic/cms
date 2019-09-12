@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\Facades\Helper;
 use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Support\Arr;
 
 class Asset extends Assets
 {
@@ -25,7 +26,7 @@ class Asset extends Assets
      */
     public function __call($method, $arguments)
     {
-        $value = array_get_colon($this->context, $this->method);
+        $value = Arr::get($this->context, $this->method);
         $value = (array) $value;
         $value = current($value);
 

@@ -7,46 +7,8 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Config;
 use Michelf\SmartyPants;
 use Statamic\Extend\Addon;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
-
-if (! function_exists('array_get_colon')) {
-    /**
-     * Get an item from an array using "dot" or "colon" notation.
-     *
-     * @param  array  $array
-     * @param  string $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    function array_get_colon($array, $key, $default = null)
-    {
-        if ($key) {
-            $key = str_replace(':', '.', $key);
-        }
-
-        return Arr::get($array, $key, $default);
-    }
-}
-
-if (! function_exists('array_has_colon')) {
-    /**
-     * Check if an item from an array exists using "dot" or "colon" notation.
-     *
-     * @param  array  $array
-     * @param  string $key
-     * @return mixed
-     */
-    function array_has_colon($array, $key)
-    {
-        if ($key) {
-            $key = str_replace(':', '.', $key);
-        }
-
-        return Arr::has($array, $key);
-    }
-}
 
 
 /**

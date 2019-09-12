@@ -2,13 +2,15 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Support\Arr;
+
 class Partial extends Tags
 {
     public function __call($method, $arguments)
     {
         // We pass the original non-studly case value in as
         // an argument, but fall back to the studly version just in case.
-        $partial = $this->get('src', array_get_colon($arguments, 0, $this->method));
+        $partial = $this->get('src', Arr::get($arguments, 0, $this->method));
 
         $variables = array_merge($this->context->all(), $this->parameters->all(), [
             '__frontmatter' => $this->parameters->all()

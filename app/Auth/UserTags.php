@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Support\Arr;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
@@ -21,7 +22,7 @@ class UserTags extends Tags
      */
     public function __call($method, $args)
     {
-        $id = array_get_colon($this->context, $method);
+        $id = Arr::get($this->context, $method);
 
         if (! $user = User::find($id)) {
             return;
