@@ -1047,7 +1047,7 @@ class BaseModifiers extends Modifier
     public function macro($value, $params, $context)
     {
         $path = base_path('resources/macros.yaml');
-        $macros = array_reindex(YAML::parse(File::get($path)));
+        $macros = YAML::file($path)->parse();
         $macro = Arr::get($macros, Arr::get($params, 0));
 
         return collect($macro)->map(function ($params, $name) {

@@ -19,7 +19,6 @@ class CollectionsServiceProvider extends ServiceProvider
     {
         $this->getOrPut();
         $this->keyByWithKey();
-        $this->filterWithKey();
         $this->l10n();
         $this->pipe();
         $this->transpose();
@@ -70,26 +69,6 @@ class CollectionsServiceProvider extends ServiceProvider
             }
 
             return new static($results);
-        });
-    }
-
-    /**
-     * The Laravel 5.3 way of doing filter
-     *
-     * 5.1 doesn't give us access to the keys
-     *
-     * @return void
-     */
-    private function filterWithKey()
-    {
-        Collection::macro('filterWithKey', function ($callback) {
-            if ($callback) {
-                return new static(
-                    array_filter_use_both($this->items, $callback)
-                );
-            }
-
-            return new static(array_filter($this->items));
         });
     }
 

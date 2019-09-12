@@ -50,35 +50,6 @@ function cp_route($route, $params = [])
     return $route;
 }
 
-if (! function_exists('array_filter_use_both')) {
-    /**
-     * Polyfill for the array_filter constant ARRAY_FILTER_USE_BOTH.
-     *
-     * This filters the array passing the key as the second parameter
-     * for more complex filtering.
-     *
-     * BC for `array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);`
-     *
-     * @param  array  $array
-     * @param  Closure  $callback
-     * @return array
-     */
-    function array_filter_use_both($array, $callback)
-    {
-        $items = [];
-
-        foreach ($array as $key => $value) {
-            if (! $callback($value, $key)) {
-                continue;
-            }
-
-            $items[$key] = $value;
-        }
-
-        return $items;
-    }
-}
-
 /**
  * Returns a real boolean from a string based boolean
  *
@@ -88,22 +59,6 @@ if (! function_exists('array_filter_use_both')) {
 function bool($value)
 {
     return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
-}
-
-
-/**
- * Filtering a array by its keys using a callback.
- *
- * @param $array array The array to filter
- * @param $callback Callback The filter callback, that will get the key as first argument.
- *
- * @return array The remaining key => value combinations from $array.
- */
-function array_filter_key(array $array, $callback)
-{
-    $matchedKeys = array_filter(array_keys($array), $callback);
-
-    return array_intersect_key($array, array_flip($matchedKeys));
 }
 
 /**
@@ -124,20 +79,6 @@ function carbon($value)
     }
 
     return $value;
-}
-/**
- * Reindex an array so unnamed keys are named
- *
- * @param array $array
- * @return mixed
- */
-function array_reindex($array)
-{
-    if (array_values($array) === $array) {
-        $array = array_flip($array);
-    }
-
-    return $array;
 }
 
 function cp_root()
