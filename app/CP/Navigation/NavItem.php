@@ -4,7 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Exception;
 use Statamic\Facades\Nav;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class NavItem

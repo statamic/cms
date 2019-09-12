@@ -3,7 +3,7 @@
 namespace Statamic\Http\Middleware;
 
 use Closure;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 
 class PermanentRedirects
 {

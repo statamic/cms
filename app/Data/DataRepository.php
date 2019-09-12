@@ -3,7 +3,7 @@
 namespace Statamic\Data;
 
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Routing\RouteRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Contracts\Assets\AssetRepository;

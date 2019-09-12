@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Statamic\Facades\Asset;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Action;
 use Illuminate\Http\Request;
 use Statamic\Facades\AssetContainer;

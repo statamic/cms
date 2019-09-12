@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;

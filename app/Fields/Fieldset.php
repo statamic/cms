@@ -3,7 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\Facades;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Facades\Statamic\Fields\FieldsetRepository;
 
 class Fieldset

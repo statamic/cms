@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Auth\Authenticatable;

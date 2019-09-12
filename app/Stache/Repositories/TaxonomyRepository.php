@@ -3,7 +3,7 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Facades;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;

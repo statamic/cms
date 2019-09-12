@@ -5,7 +5,7 @@ namespace Statamic\Assets;
 use ArrayAccess;
 use Statamic\Facades;
 use Stringy\Stringy;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Facades\File;

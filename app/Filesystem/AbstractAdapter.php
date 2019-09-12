@@ -2,7 +2,7 @@
 
 namespace Statamic\Filesystem;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Helper;
 use Statamic\Filesystem\Filesystem;
 

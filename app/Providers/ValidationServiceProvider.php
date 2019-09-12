@@ -3,7 +3,7 @@
 namespace Statamic\Providers;
 
 use Validator;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Facades\Page;
 use Statamic\Facades\Path;

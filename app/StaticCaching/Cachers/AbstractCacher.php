@@ -2,7 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Config;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

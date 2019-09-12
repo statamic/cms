@@ -7,7 +7,7 @@
             @if ($can ?? $user->can('super'))
                 {{ __("Create your first {$resource} now") }}
             @else
-                {{ __('No ' . Statamic\Facades\Str::plural($resource) . ' exist yet') }}
+                {{ __('No ' . Statamic\Support\Str::plural($resource) . ' exist yet') }}
             @endif
         </h1>
 

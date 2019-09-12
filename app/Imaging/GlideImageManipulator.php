@@ -3,7 +3,7 @@
 namespace Statamic\Imaging;
 
 use Exception;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;

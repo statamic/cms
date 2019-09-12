@@ -2,7 +2,7 @@
 
 namespace Statamic\CP;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Column

@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Asset;
 use League\Glide\Server;
 use Statamic\Facades\AssetContainer;

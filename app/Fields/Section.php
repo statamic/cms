@@ -4,7 +4,7 @@ namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
 use Statamic\Facades\Field as FieldAPI;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 
 class Section
 {

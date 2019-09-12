@@ -4,7 +4,7 @@ namespace Statamic\Preferences;
 
 use Closure;
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 
 trait HasPreferences
 {

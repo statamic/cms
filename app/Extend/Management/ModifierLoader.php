@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend\Management;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Exceptions\ResourceNotFoundException;
 
 class ModifierLoader

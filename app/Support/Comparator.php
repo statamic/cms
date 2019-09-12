@@ -3,7 +3,7 @@
 namespace Statamic\Support;
 
 use Collator;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
 
 class Comparator

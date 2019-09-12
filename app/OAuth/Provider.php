@@ -3,7 +3,7 @@
 namespace Statamic\OAuth;
 
 use Closure;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Contracts\Auth\User as StatamicUser;

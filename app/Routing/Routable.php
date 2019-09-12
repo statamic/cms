@@ -2,7 +2,7 @@
 
 namespace Statamic\Routing;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Contracts\Routing\UrlBuilder;
 

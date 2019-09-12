@@ -2,7 +2,7 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Path;
 use Statamic\Facades\Config;
 use Statamic\Facades\Content;

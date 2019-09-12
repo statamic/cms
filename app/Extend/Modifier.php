@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 
 /**
  * Modify values within templates

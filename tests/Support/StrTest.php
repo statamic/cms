@@ -8,6 +8,13 @@ use Statamic\Support\Str;
 class StrTest extends TestCase
 {
     /** @test */
+    function undefined_methods_get_passed_to_stringy()
+    {
+        $this->assertFalse(method_exists(Str::class, 'last'));
+        $this->assertEquals('bar', Str::last('foobar', 3));
+    }
+
+    /** @test */
     function it_converts_to_boolean_strings()
     {
         $this->assertEquals('true', Str::bool(true));

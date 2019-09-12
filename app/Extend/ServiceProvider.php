@@ -3,7 +3,7 @@
 namespace Statamic\Extend;
 
 use Closure;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Statamic;
 use Statamic\Facades\Addon;
 use Illuminate\Support\Facades\Event;

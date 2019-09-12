@@ -3,7 +3,7 @@
 namespace Statamic\Support;
 
 use Carbon\Carbon;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Facades\File;
 use Statamic\Facades\Compare;

@@ -2,7 +2,7 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Facades\Asset;
 

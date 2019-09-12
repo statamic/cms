@@ -4,7 +4,7 @@ namespace Statamic\Data;
 
 use Closure;
 use Carbon\Carbon;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Compare;
 use Statamic\Exceptions\MethodNotFoundException;
 use Illuminate\Support\Collection as IlluminateCollection;

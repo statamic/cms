@@ -5,7 +5,7 @@ namespace Statamic\Taxonomies;
 use ArrayAccess;
 use Statamic\Facades;
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;

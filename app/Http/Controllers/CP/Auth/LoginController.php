@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\OAuth;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;

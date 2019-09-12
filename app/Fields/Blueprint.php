@@ -3,7 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\Facades;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Illuminate\Support\Collection;

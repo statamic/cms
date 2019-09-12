@@ -3,7 +3,7 @@
 namespace Statamic\Assets;
 
 use Statamic\Facades;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Facades\Parse;

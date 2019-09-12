@@ -8,7 +8,7 @@ use Illuminate\Foundation\PackageManifest;
 use ReflectionClass;
 use Statamic\Support\Arr;
 use Statamic\Facades\File;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 
 class Manifest extends PackageManifest
 {

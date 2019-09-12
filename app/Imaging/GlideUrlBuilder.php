@@ -3,7 +3,7 @@
 namespace Statamic\Imaging;
 
 use Exception;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use League\Glide\Urls\UrlBuilderFactory;
 

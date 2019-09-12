@@ -10,7 +10,7 @@ use Stringy\StaticStringy;
  */
 class Str extends \Illuminate\Support\Str
 {
-    public function __call($method, $parameters)
+    public static function __callStatic($method, $parameters)
     {
         return call_user_func_array([StaticStringy::class, $method], $parameters);
     }

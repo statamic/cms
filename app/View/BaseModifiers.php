@@ -5,7 +5,7 @@ namespace Statamic\View;
 use Carbon\Carbon;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
 use Statamic\Support\Html;

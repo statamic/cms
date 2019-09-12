@@ -3,7 +3,7 @@
 namespace Statamic\View\Antlers;
 
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Path;
 use Statamic\Facades\Parse;
 use Statamic\Exceptions;

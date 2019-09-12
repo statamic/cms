@@ -3,7 +3,7 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Antlers;
 use Statamic\Extend\HasHandle;

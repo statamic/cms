@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Scope;

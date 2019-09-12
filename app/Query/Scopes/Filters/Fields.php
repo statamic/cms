@@ -2,7 +2,7 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Blueprint;
 use Statamic\Query\Scopes\Filter;
 

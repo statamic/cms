@@ -3,7 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Facades;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Site;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;

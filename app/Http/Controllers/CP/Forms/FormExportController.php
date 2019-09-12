@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Exceptions\FatalException;

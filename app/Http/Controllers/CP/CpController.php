@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Facades\Folder;

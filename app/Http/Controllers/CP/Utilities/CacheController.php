@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use League\Glide\Server;
 use Statamic\Facades\Stache;
 use Illuminate\Http\Request;

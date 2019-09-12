@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags\Query;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Carbon\Carbon;
 
 trait HasConditions

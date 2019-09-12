@@ -5,7 +5,7 @@ namespace Statamic\View;
 use Exception;
 use ArrayIterator;
 use Statamic\Support\Arr;
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Facades\Helper;
 use Statamic\Exceptions\ModifierException;
 use Statamic\Extend\Management\ModifierLoader;

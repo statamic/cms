@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Facades\Str;
+use Statamic\Support\Str;
 use Statamic\Stache\Stache;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
