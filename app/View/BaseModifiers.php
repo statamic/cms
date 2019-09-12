@@ -6,7 +6,7 @@ use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
-use Statamic\Facades\Html;
+use Statamic\Support\Html;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;

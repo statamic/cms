@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Facades;
+namespace Tests\Support;
 
 use Tests\TestCase;
-use Statamic\Facades\Html;
+use Statamic\Support\Html;
 
 class HtmlTest extends TestCase
 {
@@ -62,7 +62,7 @@ class HtmlTest extends TestCase
 
     public function testMailto()
     {
-        $html = $this->mock('Statamic\Facades\Html[obfuscate,email]');
+        $html = $this->mock('Statamic\Support\Html[obfuscate,email]');
         $html->shouldReceive('obfuscate', 'email')->andReturnUsing(function () {
             $args = func_get_args();
             return $args[0];

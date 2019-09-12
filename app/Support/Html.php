@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Facades;
+namespace Statamic\Support;
 
 use Illuminate\Support\HtmlString;
 
