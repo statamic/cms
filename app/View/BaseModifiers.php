@@ -1766,7 +1766,7 @@ class BaseModifiers extends Modifier
      */
     public function textile($value)
     {
-        return textile($value);
+        return Html::textile($value);
     }
 
     /**

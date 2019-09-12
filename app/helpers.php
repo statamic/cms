@@ -161,22 +161,6 @@ function bundles_path($path = null)
     return path(statamic_path('bundles'), $path);
 }
 
-
-/**
- * Parse string with basic Textile
- *
- * @param $content
- * @return string
- */
-function textile($content)
-{
-    $parser = new \Netcarver\Textile\Parser();
-
-    return $parser
-        ->setDocumentType('html5')
-        ->parse($content);
-}
-
 function bool_str($bool)
 {
     return ((bool) $bool) ? 'true' : 'false';
