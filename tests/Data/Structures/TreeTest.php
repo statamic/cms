@@ -6,10 +6,10 @@ use Tests\TestCase;
 use Tests\UnlinksPaths;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Collection;
-use Statamic\Data\Structures\Page;
-use Statamic\Data\Structures\Tree;
-use Statamic\Data\Structures\Pages;
-use Statamic\Data\Structures\Structure;
+use Statamic\Structures\Page;
+use Statamic\Structures\Tree;
+use Statamic\Structures\Pages;
+use Statamic\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Facades\Structure as StructureAPI;
 

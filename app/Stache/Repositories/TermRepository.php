@@ -7,9 +7,9 @@ use Statamic\Stache\Stache;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
-use Statamic\Data\Taxonomies\TermCollection;
-use Statamic\Contracts\Data\Taxonomies\Term;
-use Statamic\Contracts\Data\Repositories\TermRepository as RepositoryContract;
+use Statamic\Taxonomies\TermCollection;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 
 class TermRepository implements RepositoryContract
 {
@@ -94,7 +94,7 @@ class TermRepository implements RepositoryContract
 
     public function make($slug = null): Term
     {
-        return (new \Statamic\Data\Taxonomies\Term)->slug($slug);
+        return (new \Statamic\Taxonomies\Term)->slug($slug);
     }
 
     protected function ensureAssociations()

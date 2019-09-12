@@ -7,7 +7,7 @@
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Globals') }}</h1>
-            @can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
+            @can('create', 'Statamic\Contracts\Globals\GlobalSet')
                 <a href="{{ cp_route('globals.create') }}" class="btn btn-primary">{{ __('Create Global Set') }}</a>
             @endcan
         </div>
@@ -21,7 +21,7 @@
             'description' => 'Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.',
             'svg' => 'empty/global',
             'route' => cp_route('globals.create'),
-            'can' => user()->can('create', 'Statamic\Contracts\Data\Globals\GlobalSet')
+            'can' => user()->can('create', 'Statamic\Contracts\Globals\GlobalSet')
         ])
 
     @endunless

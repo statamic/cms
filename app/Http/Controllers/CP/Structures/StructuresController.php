@@ -8,9 +8,9 @@ use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Validation;
-use Statamic\Data\Structures\TreeBuilder;
+use Statamic\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Data\Structures\Structure as StructureContract;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 
 class StructuresController extends CpController
 {

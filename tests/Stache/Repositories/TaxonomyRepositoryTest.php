@@ -4,7 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Tests\TestCase;
 use Statamic\Stache\Stache;
-use Statamic\Data\Taxonomies\Taxonomy;
+use Statamic\Taxonomies\Taxonomy;
 use Statamic\Stache\Stores\TaxonomiesStore;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Repositories\TaxonomyRepository;

@@ -6,8 +6,8 @@ use Statamic\Facades;
 use Statamic\Facades\Str;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Data\Taxonomies\Taxonomy;
-use Statamic\Contracts\Data\Repositories\TaxonomyRepository as RepositoryContract;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Taxonomies\TaxonomyRepository as RepositoryContract;
 
 class TaxonomyRepository implements RepositoryContract
 {

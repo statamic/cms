@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Stache\Stores\CollectionsStore;
-use Statamic\Contracts\Data\Structures\Structure;
+use Statamic\Contracts\Structures\Structure;
 use Statamic\Stache\Repositories\StructureRepository;
 
 class StuctureRepositoryTest extends TestCase
@@ -64,7 +64,7 @@ class StuctureRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_structure_to_the_stache_and_to_a_file()
     {
-        $structure = (new \Statamic\Data\Structures\Structure)->handle('new');
+        $structure = (new \Statamic\Structures\Structure)->handle('new');
         $structure->addTree($structure->makeTree('en'));
 
         $this->assertNull($this->repo->findByHandle('new'));

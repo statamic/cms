@@ -6,8 +6,8 @@ use Mockery;
 use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Auth\User;
-use Statamic\Data\Structures\Tree;
-use Statamic\Data\Structures\Structure;
+use Statamic\Structures\Tree;
+use Statamic\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class ViewStructureListingTest extends TestCase

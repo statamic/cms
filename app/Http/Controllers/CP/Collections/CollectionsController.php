@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Data\Entries\Collection as CollectionContract;
+use Statamic\Contracts\Entries\Collection as CollectionContract;
 
 class CollectionsController extends CpController
 {

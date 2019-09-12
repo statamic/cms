@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Blueprint;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 use Tests\Fakes\FakeBlueprintRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
 

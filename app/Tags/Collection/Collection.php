@@ -6,7 +6,7 @@ use Statamic\Facades\URL;
 use Statamic\Facades\Entry;
 use Statamic\Tags\Tags;
 use Statamic\Tags\OutputsItems;
-use Statamic\Data\Entries\EntryCollection;
+use Statamic\Entries\EntryCollection;
 
 class Collection extends Tags
 {

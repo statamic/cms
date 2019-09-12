@@ -4,7 +4,7 @@ namespace Tests\StaticCaching;
 
 use Tests\TestCase;
 use Statamic\StaticCaching\Cacher;
-use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Data\Content\Content;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 

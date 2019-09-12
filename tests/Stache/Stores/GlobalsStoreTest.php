@@ -11,7 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Facades\GlobalSet as GlobalsAPI;
-use Statamic\Contracts\Data\Globals\GlobalSet;
+use Statamic\Contracts\Globals\GlobalSet;
 
 class GlobalsStoreTest extends TestCase
 {

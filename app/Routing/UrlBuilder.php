@@ -10,14 +10,14 @@ use Statamic\Contracts\Routing\UrlBuilder as UrlBuilderContract;
 class UrlBuilder implements UrlBuilderContract
 {
     /**
-     * @var \Statamic\Contracts\Data\Entry|\Statamic\Data\Taxonomy
+     * @var \Statamic\Contracts\Entries\Entry|\Statamic\Taxonomies\Term
      */
     protected $content;
 
     protected $merged = [];
 
     /**
-     * @param \Statamic\Contracts\Data\Entry|\Statamic\Data\Taxonomies\Term $content
+     * @param \Statamic\Contracts\Entries\Entry|\Statamic\Taxonomies\Term $content
      * @return $this
      * @throws \Exception
      */

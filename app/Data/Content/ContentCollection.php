@@ -9,7 +9,7 @@ use Statamic\Facades\Term;
 use Statamic\Facades\Helper;
 use Statamic\Data\DataCollection;
 use Statamic\Contracts\Data\Localizable;
-use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Contracts\Entries\Entry;
 
 /**
  * A collection of Content data types. (Pages and Entries)

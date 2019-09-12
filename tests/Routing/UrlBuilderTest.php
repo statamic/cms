@@ -18,7 +18,7 @@ class UrlBuilderTest extends TestCase
     protected $builder;
 
     /**
-     * @var \Statamic\Data\Entries\File\Entry
+     * @var \Statamic\Entries\File\Entry
      */
     protected $entry;
 

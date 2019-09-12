@@ -4,7 +4,7 @@ namespace Tests\Data\Globals;
 
 use Tests\TestCase;
 use Statamic\Facades\Site;
-use Statamic\Data\Globals\GlobalSet;
+use Statamic\Globals\GlobalSet;
 
 class GlobalSetTest extends TestCase
 {

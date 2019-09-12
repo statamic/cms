@@ -4,7 +4,7 @@ namespace Tests\Factories;
 
 use Statamic\Facades\Entry;
 use Statamic\Facades\Collection;
-use Statamic\Contracts\Data\Entries\Collection as StatamicCollection;
+use Statamic\Contracts\Entries\Collection as StatamicCollection;
 
 class EntryFactory
 {

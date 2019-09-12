@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
-use Statamic\Data\Structures\Structure;
+use Statamic\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class EditStructureTest extends TestCase

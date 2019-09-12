@@ -6,7 +6,7 @@ use Statamic\Facades\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
-use Statamic\Data\Structures\TreeBuilder;
+use Statamic\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
 
 class StructurePagesController extends CpController

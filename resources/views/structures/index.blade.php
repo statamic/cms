@@ -8,7 +8,7 @@
         <div class="flex mb-3">
             <h1 class="flex-1">{{ __('Structures') }}</h1>
 
-            @can('create', 'Statamic\Contracts\Data\Structures\Structure')
+            @can('create', 'Statamic\Contracts\Structures\Structure')
                 <a href="{{ cp_route('structures.create') }}" class="btn-primary">{{ __('Create Structure') }}</a>
             @endcan
         </div>
@@ -24,7 +24,7 @@
             'description' => 'Structures are heirarchial arrangements of your content, most often used to represent forms of site navigation.',
             'svg' => 'empty/structure',
             'route' => cp_route('structures.create'),
-            'can' => user()->can('create', 'Statamic\Contracts\Data\Structures\Structure')
+            'can' => user()->can('create', 'Statamic\Contracts\Structures\Structure')
         ])
 
     @endunless

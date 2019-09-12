@@ -13,10 +13,10 @@ use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Structure as StructureAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Collection as CollectionAPI;
-use Statamic\Contracts\Data\Globals\GlobalSet;
-use Statamic\Contracts\Data\Entries\Collection;
-use Statamic\Contracts\Data\Taxonomies\Taxonomy;
-use Statamic\Contracts\Data\Structures\Structure;
+use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Contracts\Structures\Structure;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 
 class CoreNav

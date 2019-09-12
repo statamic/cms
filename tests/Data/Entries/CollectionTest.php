@@ -5,8 +5,8 @@ namespace Tests\Data\Entries;
 use Statamic\Facades;
 use Tests\TestCase;
 use Statamic\Fields\Blueprint;
-use Statamic\Data\Entries\Entry;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Entry;
+use Statamic\Entries\Collection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\BlueprintRepository;
 

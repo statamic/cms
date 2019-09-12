@@ -3,7 +3,7 @@
 namespace Statamic\Providers;
 
 use Statamic\Facades\Config;
-use Statamic\Data\Structures\UriCache;
+use Statamic\Structures\UriCache;
 use Illuminate\Support\ServiceProvider;
 
 class DataServiceProvider extends ServiceProvider
@@ -16,18 +16,18 @@ class DataServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(
-            \Statamic\Contracts\Data\Structures\Structure::class,
-            \Statamic\Data\Structures\Structure::class
+            \Statamic\Contracts\Structures\Structure::class,
+            \Statamic\Structures\Structure::class
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Entries\Collection::class,
-            \Statamic\Data\Entries\Collection::class
+            \Statamic\Contracts\Entries\Collection::class,
+            \Statamic\Entries\Collection::class
         );
 
         $this->app->bind(
-            \Statamic\Contracts\Data\Taxonomies\Taxonomy::class,
-            \Statamic\Data\Taxonomies\Taxonomy::class
+            \Statamic\Contracts\Taxonomies\Taxonomy::class,
+            \Statamic\Taxonomies\Taxonomy::class
         );
 
         $this->app->bind(

@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\EntriesStore;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Stache\Stores\CollectionEntriesStore;
 
 class EntriesStoreTest extends TestCase
@@ -81,7 +81,7 @@ class EntriesStoreTest extends TestCase
     function it_makes_entry_instances_from_files()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
-            (new \Statamic\Data\Entries\Collection)->dated(true)
+            (new \Statamic\Entries\Collection)->dated(true)
         );
 
         $item = $this->parent->store('blog')->makeItemFromFile(

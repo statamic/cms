@@ -3,11 +3,11 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
-use Statamic\Contracts\Data\Entries\Entry;
-use Statamic\Data\Entries\EntryCollection;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Entries\EntryCollection;
 use Statamic\Stache\Query\EntryQueryBuilder;
-use Statamic\Contracts\Data\Repositories\StructureRepository;
-use Statamic\Contracts\Data\Repositories\EntryRepository as RepositoryContract;
+use Statamic\Contracts\Structures\StructureRepository;
+use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 
 class EntryRepository implements RepositoryContract
 {
@@ -88,7 +88,7 @@ class EntryRepository implements RepositoryContract
 
     public function make(): Entry
     {
-        return new \Statamic\Data\Entries\Entry;
+        return new \Statamic\Entries\Entry;
     }
 
     // TODO: Remove

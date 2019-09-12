@@ -3,7 +3,7 @@
 namespace Tests\Data\Globals;
 
 use Tests\TestCase;
-use Statamic\Data\Globals\Variables;
+use Statamic\Globals\Variables;
 
 class VariablesTest extends TestCase
 {

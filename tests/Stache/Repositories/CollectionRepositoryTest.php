@@ -4,7 +4,7 @@ namespace Tests\Stache\Repositories;
 
 use Tests\TestCase;
 use Statamic\Stache\Stache;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Stache\Stores\CollectionsStore;

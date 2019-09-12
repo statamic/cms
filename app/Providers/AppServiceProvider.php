@@ -100,26 +100,26 @@ class AppServiceProvider extends ServiceProvider
         });
 
         collect([
-            \Statamic\Contracts\Data\Repositories\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
-            \Statamic\Contracts\Data\Repositories\TermRepository::class => \Statamic\Stache\Repositories\TermRepository::class,
-            \Statamic\Contracts\Data\Repositories\TaxonomyRepository::class => \Statamic\Stache\Repositories\TaxonomyRepository::class,
-            \Statamic\Contracts\Data\Repositories\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
-            \Statamic\Contracts\Data\Repositories\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
-            \Statamic\Contracts\Data\Repositories\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
+            \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
+            \Statamic\Contracts\Taxonomies\TermRepository::class => \Statamic\Stache\Repositories\TermRepository::class,
+            \Statamic\Contracts\Taxonomies\TaxonomyRepository::class => \Statamic\Stache\Repositories\TaxonomyRepository::class,
+            \Statamic\Contracts\Entries\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
+            \Statamic\Contracts\Globals\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
+            \Statamic\Contracts\Assets\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
             \Statamic\Contracts\Data\Repositories\ContentRepository::class => \Statamic\Stache\Repositories\ContentRepository::class,
-            \Statamic\Contracts\Data\Repositories\StructureRepository::class => \Statamic\Stache\Repositories\StructureRepository::class,
+            \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Stache\Repositories\StructureRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->singleton($abstract, $concrete);
         });
 
-        $this->app->singleton(\Statamic\Contracts\Data\Repositories\DataRepository::class, function ($app) {
+        $this->app->singleton(\Statamic\Contracts\Data\DataRepository::class, function ($app) {
             return (new \Statamic\Data\DataRepository)
                 ->setRepository('route', \Statamic\Routing\RouteRepository::class)
-                ->setRepository('entry', \Statamic\Contracts\Data\Repositories\EntryRepository::class)
-                ->setRepository('term', \Statamic\Contracts\Data\Repositories\TermRepository::class)
-                ->setRepository('taxonomy', \Statamic\Contracts\Data\Repositories\TaxonomyRepository::class)
-                ->setRepository('global', \Statamic\Contracts\Data\Repositories\GlobalRepository::class)
+                ->setRepository('entry', \Statamic\Contracts\Entries\EntryRepository::class)
+                ->setRepository('term', \Statamic\Contracts\Taxonomies\TermRepository::class)
+                ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
+                ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });

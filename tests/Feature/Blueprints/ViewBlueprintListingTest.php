@@ -8,7 +8,7 @@ use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class ViewBlueprintListingTest extends TestCase

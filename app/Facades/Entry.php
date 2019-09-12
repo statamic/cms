@@ -3,7 +3,7 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Contracts\Data\Repositories\EntryRepository;
+use Statamic\Contracts\Entries\EntryRepository;
 
 class Entry extends Facade
 {

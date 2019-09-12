@@ -3,10 +3,10 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
-use Statamic\Data\Globals\GlobalCollection;
-use Statamic\Contracts\Data\Globals\GlobalSet;
+use Statamic\Globals\GlobalCollection;
+use Statamic\Contracts\Globals\GlobalSet;
 use Illuminate\Support\Collection as IlluminateCollection;
-use Statamic\Contracts\Data\Repositories\GlobalRepository as RepositoryContract;
+use Statamic\Contracts\Globals\GlobalRepository as RepositoryContract;
 
 class GlobalRepository implements RepositoryContract
 {
@@ -21,7 +21,7 @@ class GlobalRepository implements RepositoryContract
 
     public function make()
     {
-        return new \Statamic\Data\Globals\GlobalSet;
+        return new \Statamic\Globals\GlobalSet;
     }
 
     public function all(): GlobalCollection

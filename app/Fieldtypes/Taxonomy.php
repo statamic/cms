@@ -7,7 +7,7 @@ use Statamic\Facades\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Term;
 use Statamic\CP\Column;
-use Statamic\Data\Taxonomies\TermCollection;
+use Statamic\Taxonomies\TermCollection;
 
 class Taxonomy extends Relationship
 {

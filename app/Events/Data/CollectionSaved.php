@@ -4,7 +4,7 @@ namespace Statamic\Events\Data;
 
 use Statamic\Facades\Path;
 use Statamic\Events\Event;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 use Statamic\Contracts\Data\DataSavedEvent;
 
 class CollectionSaved extends Event implements DataSavedEvent

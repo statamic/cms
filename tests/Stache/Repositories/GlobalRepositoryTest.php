@@ -6,8 +6,8 @@ use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
-use Statamic\Data\Globals\GlobalCollection;
-use Statamic\Contracts\Data\Globals\GlobalSet;
+use Statamic\Globals\GlobalCollection;
+use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Stache\Repositories\GlobalRepository;
 use Illuminate\Support\Collection as IlluminateCollection;
 

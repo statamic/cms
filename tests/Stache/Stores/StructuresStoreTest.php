@@ -9,7 +9,7 @@ use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\StructuresStore;
-use Statamic\Contracts\Data\Structures\Structure;
+use Statamic\Contracts\Structures\Structure;
 
 class StructuresStoreTest extends TestCase
 {

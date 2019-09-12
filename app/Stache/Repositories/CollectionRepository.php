@@ -3,11 +3,11 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 use Statamic\Events\Data\CollectionSaved;
 use Statamic\Events\Data\CollectionDeleted;
 use Illuminate\Support\Collection as IlluminateCollection;
-use Statamic\Contracts\Data\Repositories\CollectionRepository as RepositoryContract;
+use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 
 class CollectionRepository implements RepositoryContract
 {

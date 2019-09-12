@@ -3,7 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Tests\TestCase;
-use Statamic\Data\Entries\GetDateFromPath;
+use Statamic\Entries\GetDateFromPath;
 
 class GetDateFromPathTest extends TestCase
 {

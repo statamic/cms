@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Fields\Fieldset;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 

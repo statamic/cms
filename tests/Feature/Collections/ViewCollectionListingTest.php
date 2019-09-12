@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
 use Statamic\Auth\User;
-use Statamic\Data\Entries\Collection;
+use Statamic\Entries\Collection;
 
 class ViewCollectionListingTest extends TestCase
 {

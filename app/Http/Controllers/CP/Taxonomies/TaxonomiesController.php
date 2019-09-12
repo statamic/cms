@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Data\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 
 class TaxonomiesController extends CpController
 {

@@ -14,7 +14,7 @@
             <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
             <dropdown-item :text="__('Delete Taxonomy')" class="warning"></dropdown-item>
         </dropdown-list>
-        @can('create', ['Statamic\Contracts\Data\Taxonomies\Term', $taxonomy])
+        @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
             <a href="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}" class="btn btn-primary">{{ __('Create Term') }}</a>
         @endcan
     </div>
@@ -35,7 +35,7 @@
         @component('statamic::partials.create-first', [
             'resource' => __("{$taxonomy->title()} term"),
             'svg' => 'empty/taxonomy', // TODO: Do we want separate term SVG?
-            'can' => user()->can('create', ['Statamic\Contracts\Data\Taxonomies\Term', $taxonomy])
+            'can' => user()->can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
         ])
             @slot('button')
                 {{-- <create-term-button

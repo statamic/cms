@@ -5,9 +5,9 @@ namespace Statamic\Stache\Repositories;
 use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Entry as EntryAPI;
-use Statamic\Contracts\Data\Entries\Entry;
-use Statamic\Contracts\Data\Structures\Structure;
-use Statamic\Contracts\Data\Repositories\StructureRepository as RepositoryContract;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Structures\Structure;
+use Statamic\Contracts\Structures\StructureRepository as RepositoryContract;
 
 class StructureRepository implements RepositoryContract
 {
@@ -64,7 +64,7 @@ class StructureRepository implements RepositoryContract
 
     public function make()
     {
-        return new \Statamic\Data\Structures\Structure;
+        return new \Statamic\Structures\Structure;
     }
 
     public function updateEntryUris(Structure $structure)

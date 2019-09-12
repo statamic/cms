@@ -5,9 +5,9 @@ namespace Tests\Data\Structures;
 use Tests\TestCase;
 use Statamic\Facades\Entry;
 use Illuminate\Support\Collection;
-use Statamic\Data\Structures\Page;
-use Statamic\Data\Structures\Pages;
-use Statamic\Data\Structures\Structure;
+use Statamic\Structures\Page;
+use Statamic\Structures\Pages;
+use Statamic\Structures\Structure;
 use Statamic\Facades\Structure as StructureAPI;
 
 class StructureTest extends TestCase

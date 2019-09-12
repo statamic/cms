@@ -25,7 +25,7 @@
                 </dropdown-item>
             @endcan
         </dropdown-list>
-        @can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
+        @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
             <create-entry-button
                 url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
                 :blueprints="{{ $blueprints->toJson() }}">
@@ -51,7 +51,7 @@
         @component('statamic::partials.create-first', [
             'resource' => __("{$collection->title()} entry"),
             'svg' => 'empty/collection', // TODO: Do we want separate entry SVG?
-            'can' => user()->can('create', ['Statamic\Contracts\Data\Entries\Entry', $collection])
+            'can' => user()->can('create', ['Statamic\Contracts\Entries\Entry', $collection])
         ])
             @slot('button')
                 <create-entry-button

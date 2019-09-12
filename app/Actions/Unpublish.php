@@ -5,7 +5,7 @@ namespace Statamic\Actions;
 use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Facades\Collection;
-use Statamic\Contracts\Data\Entries\Entry;
+use Statamic\Contracts\Entries\Entry;
 
 class Unpublish extends Action
 {

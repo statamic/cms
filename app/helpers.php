@@ -230,11 +230,11 @@ function sanitize_array($array, $antlers = true)
 
 /**
  * @param array $value
- * @return \Statamic\Data\Globals\GlobalCollection
+ * @return \Statamic\Globals\GlobalCollection
  */
 function collect_globals($value = [])
 {
-    return new \Statamic\Data\Globals\GlobalCollection($value);
+    return new \Statamic\Globals\GlobalCollection($value);
 }
 
 function translate($id, array $parameters = [])
@@ -279,11 +279,11 @@ if (! function_exists('array_filter_use_both')) {
 
 /**
  * @param array $value
- * @return \Statamic\Data\Entries\EntryCollection
+ * @return \Statamic\Entries\EntryCollection
  */
 function collect_entries($value = [])
 {
-    return new \Statamic\Data\Entries\EntryCollection($value);
+    return new \Statamic\Entries\EntryCollection($value);
 }
 /**
  * Returns a real boolean from a string based boolean
@@ -324,11 +324,11 @@ function int($value)
 }
 /**
  * @param array $value
- * @return \Statamic\Data\Taxonomies\TermCollection
+ * @return \Statamic\Taxonomies\TermCollection
  */
 function collect_terms($value = [])
 {
-    return new \Statamic\Data\Taxonomies\TermCollection($value);
+    return new \Statamic\Taxonomies\TermCollection($value);
 }
 
 

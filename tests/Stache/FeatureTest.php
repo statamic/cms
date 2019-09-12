@@ -19,7 +19,7 @@ use Statamic\Stache\Stores\BasicStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\AggregateStore;
 use Statamic\Stache\Stores\CollectionsStore;
-use Statamic\Contracts\Data\Repositories\StructureRepository;
+use Statamic\Contracts\Structures\StructureRepository;
 
 class FeatureTest extends TestCase
 {

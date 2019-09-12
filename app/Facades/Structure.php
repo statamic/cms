@@ -3,7 +3,7 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Contracts\Data\Repositories\StructureRepository;
+use Statamic\Contracts\Structures\StructureRepository;
 
 class Structure extends Facade
 {

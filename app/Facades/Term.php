@@ -3,7 +3,7 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Contracts\Data\Repositories\TermRepository;
+use Statamic\Contracts\Taxonomies\TermRepository;
 
 class Term extends Facade
 {

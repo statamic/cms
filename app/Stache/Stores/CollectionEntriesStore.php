@@ -9,7 +9,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Stache\Indexes;
 use Symfony\Component\Finder\SplFileInfo;
-use Statamic\Data\Entries\GetDateFromPath;
+use Statamic\Entries\GetDateFromPath;
 
 class CollectionEntriesStore extends ChildStore
 {

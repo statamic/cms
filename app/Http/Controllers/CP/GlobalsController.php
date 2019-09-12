@@ -8,7 +8,7 @@ use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
 use Statamic\Events\Data\PublishBlueprintFound;
-use Statamic\Contracts\Data\Globals\GlobalSet as GlobalSetContract;
+use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
 
 class GlobalsController extends CpController
 {

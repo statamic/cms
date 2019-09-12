@@ -4,7 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;
-use Statamic\Data\Structures\TreeBuilder;
+use Statamic\Structures\TreeBuilder;
 
 class Structure extends Tags
 {

@@ -16,7 +16,7 @@ use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
-use Statamic\Contracts\Data\Entries\Entry as EntryContract;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 
 class EntriesController extends CpController
 {

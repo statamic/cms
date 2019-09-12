@@ -7,10 +7,10 @@ use Statamic\Facades\Str;
 use Statamic\Routing\RouteRepository;
 use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Contracts\Assets\AssetRepository;
-use Statamic\Contracts\Data\Repositories\TermRepository;
-use Statamic\Contracts\Data\Repositories\EntryRepository;
-use Statamic\Contracts\Data\Repositories\GlobalRepository;
-use Statamic\Contracts\Data\Repositories\TaxonomyRepository;
+use Statamic\Contracts\Taxonomies\TermRepository;
+use Statamic\Contracts\Entries\EntryRepository;
+use Statamic\Contracts\Globals\GlobalRepository;
+use Statamic\Contracts\Taxonomies\TaxonomyRepository;
 
 class DataRepository
 {

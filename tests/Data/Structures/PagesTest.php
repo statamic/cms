@@ -4,14 +4,14 @@ namespace Tests\Data\Structures;
 
 use Mockery;
 use Tests\TestCase;
-use Statamic\Data\Entries\Entry;
+use Statamic\Entries\Entry;
 use Illuminate\Support\Collection;
-use Statamic\Data\Structures\Page;
-use Statamic\Data\Structures\Tree;
+use Statamic\Structures\Page;
+use Statamic\Structures\Tree;
 use Statamic\Facades\Entry as EntryAPI;
-use Statamic\Data\Structures\Pages;
-use Statamic\Data\Structures\Structure;
-use Statamic\Contracts\Data\Entries\Entry as EntryContract;
+use Statamic\Structures\Pages;
+use Statamic\Structures\Structure;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 
 class PagesTest extends TestCase
 {
