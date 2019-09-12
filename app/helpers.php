@@ -1,12 +1,6 @@
 <?php
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Str;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\Config;
-use Statamic\Extend\Addon;
-use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
 function cp_route($route, $params = [])
