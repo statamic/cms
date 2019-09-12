@@ -3,7 +3,7 @@
 namespace Statamic\Entries;
 
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\Entry;

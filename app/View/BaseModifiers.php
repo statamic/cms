@@ -2,7 +2,7 @@
 
 namespace Statamic\View;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;

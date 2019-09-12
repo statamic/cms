@@ -2,7 +2,7 @@
 
 namespace Statamic\Data;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Illuminate\Support\Carbon;

@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Fields\Field;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;

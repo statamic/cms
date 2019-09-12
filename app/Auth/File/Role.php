@@ -3,7 +3,7 @@
 namespace Statamic\Auth\File;
 
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Auth\Role as BaseRole;
 use Statamic\Preferences\HasPreferences;

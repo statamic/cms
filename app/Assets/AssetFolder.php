@@ -2,7 +2,7 @@
 
 namespace Statamic\Assets;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Facades\Action;

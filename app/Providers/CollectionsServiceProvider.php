@@ -2,7 +2,7 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Data\Augmentable;

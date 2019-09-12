@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags\Query;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 
 trait HasScopes
 {

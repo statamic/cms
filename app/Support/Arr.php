@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Facades;
+namespace Statamic\Support;
 
 use Statamic\Data\DataCollection;
 use Illuminate\Support\Arr as IlluminateArr;

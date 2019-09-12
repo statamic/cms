@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;

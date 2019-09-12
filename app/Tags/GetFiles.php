@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Helper;

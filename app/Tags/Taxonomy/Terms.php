@@ -4,7 +4,7 @@ namespace Statamic\Tags\Taxonomy;
 
 use Closure;
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Tags\Query;

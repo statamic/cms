@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Site;
 use Statamic\Facades\Entry;

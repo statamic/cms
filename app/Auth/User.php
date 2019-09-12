@@ -4,7 +4,7 @@ namespace Statamic\Auth;
 
 use ArrayAccess;
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
 use Statamic\Data\Augmentable;

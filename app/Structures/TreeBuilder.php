@@ -2,7 +2,7 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Structure;
 
 class TreeBuilder

@@ -3,7 +3,7 @@
 namespace Statamic\Preferences;
 
 use Closure;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 
 trait HasPreferences

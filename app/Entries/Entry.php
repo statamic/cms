@@ -4,7 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Stache;

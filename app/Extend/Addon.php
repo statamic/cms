@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\URL;
 use Statamic\Facades\Str;
 use Statamic\Facades\Path;

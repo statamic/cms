@@ -2,7 +2,7 @@
 
 namespace Statamic\View\Antlers;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use ReflectionProperty;
 use Statamic\Facades\Config;
 use Statamic\Facades\Helper;

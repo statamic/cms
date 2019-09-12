@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Stringy\Stringy;
 use Statamic\Facades\Str;
 use Statamic\Facades\URL;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;

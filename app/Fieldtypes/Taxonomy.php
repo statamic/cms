@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Str;
 use Statamic\Facades\Term;
 use Statamic\CP\Column;

@@ -2,7 +2,7 @@
 
 namespace Statamic\Search;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 
 abstract class Index
 {

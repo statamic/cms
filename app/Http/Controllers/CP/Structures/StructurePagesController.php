@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Structure;
 use Illuminate\Http\Request;

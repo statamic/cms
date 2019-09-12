@@ -8,7 +8,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Contracts\Auth\User;
 use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Revisions\Revision as Contract;
 

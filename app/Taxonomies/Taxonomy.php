@@ -3,7 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use Statamic\Facades;
-use Statamic\Facades\Arr;
+use Statamic\Support\Arr;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
