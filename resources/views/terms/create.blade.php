@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', crumb('Create Term', $taxonomy['title']))
+@section('title', Statamic::crumb('Create Term', $taxonomy['title']))
 
 @section('content')
     <base-term-create-form

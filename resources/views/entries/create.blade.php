@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', crumb('Create Entry', $collection['title']))
+@section('title', Statamic::crumb('Create Entry', $collection['title']))
 
 @section('content')
     <base-entry-create-form

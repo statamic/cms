@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', crumb('Assets', $container['title']))
+@section('title', Statamic::crumb('Assets', $container['title']))
 
 @section('content')
 

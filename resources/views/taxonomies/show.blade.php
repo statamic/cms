@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', crumb($taxonomy->title(), 'Taxonomies'))
+@section('title', Statamic::crumb($taxonomy->title(), 'Taxonomies'))
 
 @section('content')
 

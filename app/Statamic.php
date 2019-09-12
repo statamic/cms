@@ -173,4 +173,9 @@ class Statamic
 
         return $messages ?? [];
     }
+
+    public static function crumb(...$values)
+    {
+        return implode(' ‹ ', array_map("__", $values));
+    }
 }
