@@ -6,7 +6,6 @@ use Statamic\Facades\Arr;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Facades\Action;
-use Statamic\Data\DataFolder;
 use Statamic\Facades\AssetContainer;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Events\Data\AssetFolderDeleted;
