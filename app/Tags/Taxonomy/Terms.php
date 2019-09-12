@@ -11,6 +11,7 @@ use Statamic\Tags\Query;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
+use Statamic\Taxonomies\TermCollection;
 
 class Terms
 {
@@ -34,7 +35,7 @@ class Terms
         try {
             $query = $this->query();
         } catch (NoResultsExpected $exception) {
-            return collect_terms();
+            return new TermCollection;
         }
 
         $terms = $this->results($query);

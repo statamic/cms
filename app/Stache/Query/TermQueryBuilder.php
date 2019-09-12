@@ -5,6 +5,7 @@ namespace Statamic\Stache\Query;
 use Statamic\Facades;
 use Statamic\Facades\Term;
 use Statamic\Facades\Taxonomy;
+use Statamic\Taxonomies\TermCollection;
 
 class TermQueryBuilder extends Builder
 {
@@ -43,7 +44,7 @@ class TermQueryBuilder extends Builder
 
     protected function collect($items = [])
     {
-        return collect_terms($items);
+        return TermCollection::make($items);
     }
 
     protected function getFilteredKeys()

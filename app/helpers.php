@@ -305,15 +305,6 @@ function int($value)
 {
     return intval($value);
 }
-/**
- * @param array $value
- * @return \Statamic\Taxonomies\TermCollection
- */
-function collect_terms($value = [])
-{
-    return new \Statamic\Taxonomies\TermCollection($value);
-}
-
 
 function carbon($value)
 {
