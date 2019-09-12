@@ -10,35 +10,9 @@ use Statamic\Extend\Addon;
 use Illuminate\Support\Carbon;
 use Stringy\StaticStringy as Stringy;
 
-
-/**
- * Gets the site's default locale
- *
- * @return string
- */
-function default_locale()
-{
-    return Config::getDefaultLocale();
-}
-
 function path($from, $extra = null)
 {
     return Path::tidy($from . '/' . $extra);
-}
-
-function cache_path($path = null)
-{
-    return path(storage_path('statamic/cache'), $path);
-}
-
-function addons_path($path = null)
-{
-    return path(base_path('addons'), $path);
-}
-
-function temp_path($path = null)
-{
-    return path(storage_path('statamic/temp'), $path);
 }
 
 function site_handle($handle = null)
@@ -59,46 +33,6 @@ function site_locale($locale = null)
     }
 
     return Site::current()->handle();
-}
-
-/**
- * Gets an addon's API class if it exists, or creates a temporary generic addon class.
- *
- * @param string $addon
- * @return Addon|API
- */
-function addon($addon)
-{
-    try {
-        $addon = app("Statamic\\Addons\\{$addon}\\{$addon}API");
-    } catch (ReflectionException $e) {
-        $addon = new Addon($addon);
-    }
-
-    return $addon;
-}
-
-
-/**
- * Turns a string into a slug
- *
- * @param string $var
- * @return string
- */
-function slugify($value)
-{
-    return Stringy::slugify($value);
-}
-
-/**
- * Make sure a URL /looks/like/this
- *
- * @param string $url Any given URL
- * @return string
- */
-function format_url($url)
-{
-    return '/' . trim($url, '/');
 }
 
 function cp_route($route, $params = [])

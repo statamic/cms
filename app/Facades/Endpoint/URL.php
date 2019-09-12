@@ -212,7 +212,7 @@ class URL
      */
     public function getCurrent()
     {
-        return format_url(app('request')->path());
+        return self::format(app('request')->path());
     }
 
     /**
@@ -223,7 +223,7 @@ class URL
      */
     public function format($url)
     {
-        return self::tidy(format_url($url));
+        return self::tidy('/' . trim($url, '/'));
     }
 
     /**

@@ -147,7 +147,7 @@ class Theme extends Tags
 
         $url = URL::prependSiteUrl(
             $path,
-            $this->get('locale', default_locale()),
+            $this->get('locale', Config::getDefaultLocale()),
             false
         );
 

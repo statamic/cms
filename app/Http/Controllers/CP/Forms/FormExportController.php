@@ -26,7 +26,7 @@ class FormExportController extends CpController
         $content = $exporter->export();
 
         if ($this->request->has('download')) {
-            $path = temp_path('forms/'.$form->handle().'-'.time().'.'.$type);
+            $path = storage_path('statamic/tmp/forms/'.$form->handle().'-'.time().'.'.$type);
             File::put($path, $content);
             $response = response()->download($path)->deleteFileAfterSend(true);
         } else {

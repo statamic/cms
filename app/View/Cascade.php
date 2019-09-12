@@ -2,6 +2,7 @@
 
 namespace Statamic\View;
 
+use Statamic\Facades\URL;
 use Statamic\Sites\Site;
 use Statamic\Fields\Value;
 use Statamic\Facades\GlobalSet;
@@ -160,7 +161,7 @@ class Cascade
 
             // Request
             'current_url' => $this->request->url(),
-            'current_uri' => format_url($this->request->path()),
+            'current_uri' => URL::format($this->request->path()),
             'get_post' => sanitize_array($this->request->all()),
             'get' => sanitize_array($this->request->query->all()),
             'post' => $this->request->isMethod('post') ? sanitize_array($this->request->request->all()) : [],
