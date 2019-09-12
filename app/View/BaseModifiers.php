@@ -1338,7 +1338,7 @@ class BaseModifiers extends Modifier
      */
     public function readTime($value, $params)
     {
-        $words = mb_str_word_count(strip_tags($value));
+        $words = $this->wordCount(strip_tags($value));
 
         return ceil($words / Arr::get($params, 0, 200));
     }
@@ -2054,7 +2054,10 @@ class BaseModifiers extends Modifier
      */
     public function wordCount($value)
     {
-        return mb_str_word_count($value);
+        // adapted mb_str_word_count from https://stackoverflow.com/a/17725577
+        $words = empty($string = trim($value)) ? [] : preg_split('~[^\p{L}\p{N}\']+~u', $value);
+
+        return count($words);
     }
 
     /**
