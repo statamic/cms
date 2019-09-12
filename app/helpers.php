@@ -100,15 +100,6 @@ function site_locale($locale = null)
 }
 
 /**
- * @param array $value
- * @return \Statamic\Data\Content\ContentCollection
- */
-function collect_content($value = [])
-{
-    return new \Statamic\Data\Content\ContentCollection($value);
-}
-
-/**
  * Gets an addon's API class if it exists, or creates a temporary generic addon class.
  *
  * @param string $addon

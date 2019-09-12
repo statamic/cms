@@ -21,7 +21,7 @@ class Widget extends BaseWidget
             'form'        => $form,
             'format'      => $this->config('date_format', $form->dateFormat()),
             'fields'      => $this->config('fields', []),
-            'submissions' => collect_content($form->submissions())->reverse()->limit((int) $this->config('limit', 5))->toArray(),
+            'submissions' => collect($form->submissions())->reverse()->take((int) $this->config('limit', 5))->toArray(),
             'title'       => $this->config('title', $form->title())
         ]);
     }
