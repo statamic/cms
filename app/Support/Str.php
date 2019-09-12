@@ -219,8 +219,25 @@ class Str extends \Illuminate\Support\Str
         return "w-$class";
     }
 
-    public static function bool($string)
+    /**
+     * Output either literal "true" or "false" strings given a boolean.
+     *
+     * @param bool $value
+     * @return string
+     */
+    public static function bool(bool $value): string
     {
-        return ((bool) $string) ? 'true' : 'false';
+        return ((bool) $value) ? 'true' : 'false';
+    }
+
+    /**
+     * Get an actual boolean from a string based boolean.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function toBool($value): bool
+    {
+        return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
     }
 }
