@@ -23,7 +23,7 @@ class Str extends \Illuminate\Support\Str
      * @param bool  $oxford_comma  Include a comma before $glue?
      * @return string
      */
-    public function makeSentenceList(Array $list, $glue = "and", $oxford_comma = true)
+    public static function makeSentenceList(Array $list, $glue = "and", $oxford_comma = true)
     {
         $length = count($list);
 
@@ -46,7 +46,7 @@ class Str extends \Illuminate\Support\Str
         }
     }
 
-    public function stripTags($html, $tags_list = [])
+    public static function stripTags($html, $tags_list = [])
     {
         if (count($tags_list) > 0) {
             $all_tags = [
@@ -134,7 +134,7 @@ class Str extends \Illuminate\Support\Str
         return $bytes;
     }
 
-    public function timeForHumans($ms)
+    public static function timeForHumans($ms)
     {
         if ($ms < 1000) {
             return $ms . 'ms';
@@ -150,7 +150,7 @@ class Str extends \Illuminate\Support\Str
      * @param string $value
      * @return string
      */
-    public function widont($value)
+    public static function widont($value)
     {
         // thanks to Shaun Inman for inspiration here
         // http://www.shauninman.com/archive/2008/08/25/widont_2_1_1
