@@ -24,7 +24,7 @@
                                 :key="handle"
                                 :is="component"
                                 :value="extras[handle]"
-                                @updated="componentUpdated(handle, $event)"
+                                @input="componentUpdated(handle, $event)"
                                 class="ml-2" />
 
                             <button
