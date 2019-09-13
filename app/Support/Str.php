@@ -23,7 +23,7 @@ class Str extends \Illuminate\Support\Str
      * @param bool  $oxford_comma  Include a comma before $glue?
      * @return string
      */
-    public static function makeSentenceList(Array $list, $glue = "and", $oxford_comma = true)
+    public static function makeSentenceList(array $list, $glue = "and", $oxford_comma = true)
     {
         $length = count($list);
 
