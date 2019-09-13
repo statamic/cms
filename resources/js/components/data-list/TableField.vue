@@ -22,7 +22,7 @@ export default {
             const fallback = 'DefaultField';
             const custom = `${this.fieldtype}-fieldtype-index`;
 
-            if (!this.value || !this.fieldtype) return fallback;
+            if (!this.fieldtype) return fallback;
 
             return Vue.options.components[custom] ? custom : fallback;
         }
