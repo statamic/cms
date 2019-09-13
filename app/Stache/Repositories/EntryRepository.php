@@ -91,12 +91,6 @@ class EntryRepository implements RepositoryContract
         return new \Statamic\Entries\Entry;
     }
 
-    // TODO: Remove
-    public function create()
-    {
-        return $this->make();
-    }
-
     public function taxonomize($entry)
     {
         $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {
