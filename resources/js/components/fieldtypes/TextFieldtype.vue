@@ -9,7 +9,7 @@
         :append="config.append"
         :limit="config.character_limit"
         :placeholder="config.placeholder"
-        :name="config.handle"
+        :name="name"
         @input="update"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

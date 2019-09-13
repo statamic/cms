@@ -19,6 +19,7 @@
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 :read-only="grid.isReadOnly"
+                :name-prefix="namePrefix"
                 class="p-2"
                 @input="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -46,6 +47,12 @@ import PublishField from '../../publish/Field.vue';
 
 export default {
     mixins: [Row],
-    components: { PublishField }
+    components: { PublishField },
+
+    computed: {
+        namePrefix() {
+            return `${this.name}[${this.index}]`;
+        }
+    }
 }
 </script>

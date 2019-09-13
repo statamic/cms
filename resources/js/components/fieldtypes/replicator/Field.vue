@@ -22,7 +22,8 @@
             :config="field"
             :meta="meta"
             :value="value"
-            :name="name"
+            :handle="field.handle"
+            :name-prefix="namePrefix"
             :read-only="isReadOnly"
             @input="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"
@@ -67,8 +68,8 @@ export default {
             return `${this.field.component || this.field.type}-fieldtype`;
         },
 
-        name() {
-            return `${this.parentName}[${this.setIndex}][${this.field.handle}]`;
+        namePrefix() {
+            return `${this.parentName}[${this.setIndex}]`;
         },
 
         display() {

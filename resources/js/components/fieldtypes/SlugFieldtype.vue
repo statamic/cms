@@ -8,7 +8,7 @@
         <text-fieldtype
             slot-scope="{ }"
             class="font-mono text-xs"
-            name="slug"
+            handle="slug"
             :config="config"
             :read-only="isReadOnly"
             v-model="slug"

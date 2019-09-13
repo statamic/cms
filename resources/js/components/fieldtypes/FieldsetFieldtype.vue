@@ -24,7 +24,7 @@
             <div class="flex" v-if="!creating">
                 <div class="flex-1">
                     <select-fieldtype
-                        :name="name"
+                        :handle="handle"
                         :value="value"
                         :config="selectConfig"
                         @input="update" />

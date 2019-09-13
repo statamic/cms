@@ -1,6 +1,6 @@
 <template>
     <div>
-        <relate-fieldtype :data.sync="data" :name="name" :config="adjustedConfig" v-ref=relate></relate-fieldtype>
+        <relate-fieldtype :data.sync="data" :handle="name" :config="adjustedConfig" v-ref=relate></relate-fieldtype>
     </div>
 </template>
 

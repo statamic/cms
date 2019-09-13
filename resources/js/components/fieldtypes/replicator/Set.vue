@@ -12,7 +12,7 @@
                     class="help-block replicator-set-instructions" />
             </div>
             <div class="replicator-set-controls" v-if="!isReadOnly">
-                <toggle-fieldtype name="set-enabled" class="toggle-sm mr-2" @input="toggleEnabledState" :value="values.enabled" />
+                <toggle-fieldtype handle="set-enabled" class="toggle-sm mr-2" @input="toggleEnabledState" :value="values.enabled" />
                 <dropdown-list>
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />

@@ -7,7 +7,8 @@
                 :config="field"
                 :value="value"
                 :meta="meta"
-                :name="name"
+                :handle="field.handle"
+                :name-prefix="namePrefix"
                 :read-only="grid.isReadOnly"
                 @input="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -63,8 +64,8 @@ export default {
             return `${this.field.component || this.field.type}-fieldtype`;
         },
 
-        name() {
-            return `${this.gridName}[${this.rowIndex}][${this.field.handle}]`;
+        namePrefix() {
+            return `${this.gridName}[${this.rowIndex}]`;
         },
 
         hasError() {

@@ -15,7 +15,7 @@
                     <td class="col-handle"><input type="text" class="code" v-model="field.name" /></td>
                     <td class="col-display"><input type="text" v-model="field.display" /></td>
                     <td class="col-column">
-                        <toggle-fieldtype :value="field.column" :config="{}" name="column"></toggle-fieldtype>
+                        <toggle-fieldtype :value="field.column" :config="{}" handle="column"></toggle-fieldtype>
                     </td>
                     <td class="row-controls">
                         <span class="icon icon-edit edit" @click="selectField($index)"></span>

@@ -9,7 +9,7 @@ export default {
             type: Object,
             default: () => { return {}; }
         },
-        name: {
+        handle: {
             type: String,
             required: true
         },
@@ -21,6 +21,7 @@ export default {
             type: Boolean,
             default: false
         },
+        namePrefix: String,
     },
 
     methods: {
@@ -34,6 +35,14 @@ export default {
     },
 
     computed: {
+        name() {
+            if (this.namePrefix) {
+                return `${this.namePrefix}[${this.handle}]`;
+            }
+
+            return this.handle;
+        },
+
         isReadOnly() {
             return this.readOnly || this.config.read_only || false;
         }

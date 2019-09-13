@@ -11,7 +11,7 @@
 
         <div class="list-fieldtype">
             <list-fieldtype
-                name="rules"
+                handle="rules"
                 :value="rules"
                 ref="list"
                 @input="updated" />

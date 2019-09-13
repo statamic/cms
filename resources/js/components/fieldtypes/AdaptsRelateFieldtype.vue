@@ -4,7 +4,7 @@
         <relate-fieldtype
             ref="relate"
             :value="value"
-            :name="name"
+            :handle="handle"
             :config="config">
         </relate-fieldtype>
     </div>

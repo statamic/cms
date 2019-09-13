@@ -4,7 +4,7 @@
 
         <relationship-fieldtype
             v-if="container"
-            :name="name"
+            :handle="handle"
             :value="value"
             :meta="relationshipMeta"
             :config="{ type: 'asset_folder' }"
