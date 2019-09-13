@@ -255,7 +255,8 @@ class EntriesController extends CpController
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
                 ];
-            })->all()
+            })->all(),
+            'revisionsEnabled' => $collection->revisionsEnabled(),
         ];
 
         if ($request->wantsJson()) {

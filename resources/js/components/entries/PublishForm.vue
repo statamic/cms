@@ -23,14 +23,14 @@
                     v-if="!readOnly"
                     class="btn"
                     :class="{
-                        'btn-primary': ! revisionsEnabled,
+                        'btn-primary': isCreating || !revisionsEnabled,
                     }"
                     :disabled="!canSave"
                     @click.prevent="save"
                     v-text="saveText" />
 
                 <button
-                    v-if="revisionsEnabled"
+                    v-if="revisionsEnabled && !isCreating"
                     class="ml-2 btn btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
@@ -117,7 +117,7 @@
                                     <toggle-input v-model="published" />
                                 </div>
 
-                                <div class="border-t p-2" v-if="revisionsEnabled">
+                                <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
                                     <div class="mb-sm flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>

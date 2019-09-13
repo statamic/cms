@@ -16,6 +16,7 @@
         :initial-has-origin="false"
         :initial-is-root="true"
         :initial-origin-values="{}"
+        :revisions-enabled="revisions"
         @saved="saved"
     ></entry-publish-form>
 
@@ -33,6 +34,7 @@ export default {
         'meta',
         'published',
         'localizations',
+        'revisions',
     ],
 
     methods: {
