@@ -28,7 +28,7 @@ class AddonRepository
     public function all()
     {
         return app(Manifest::class)->addons()->map(function ($addon) {
-            return $this->create($addon);
+            return $this->make($addon);
         });
     }
 
@@ -39,7 +39,7 @@ class AddonRepository
      */
     public function get($id)
     {
-        return $this->create(
+        return $this->make(
             app(Manifest::class)->addons()->get($id)
         );
     }
