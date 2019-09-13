@@ -1,5 +1,5 @@
 <template>
-    <div><component :is="component" :value="value" :values="values" /></div>
+    <div><component :is="component" :handle="handle" :value="value" :values="values" /></div>
 </template>
 
 <script>
@@ -10,6 +10,7 @@ export default {
     components: { DefaultField },
 
     props: {
+        handle: { type: String, required: true },
         value: { required: true },
         values: { required: true },
         fieldtype: String
