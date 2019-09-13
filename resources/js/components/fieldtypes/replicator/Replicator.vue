@@ -35,23 +35,23 @@
                     @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
-                />
+                >
+                    <template v-slot:picker v-if="!isReadOnly && index !== values.length-1">
+                        <set-picker
+                            class="replicator-set-picker-between"
+                            :sets="setConfigs"
+                            :index="index"
+                            @added="addSet" />
+                    </template>
+                </replicator-set>
             </div>
         </sortable-list>
 
-        <div class="replicator-set-picker inline-block">
-            <dropdown-list ref="setSelectorDropdown" v-if="!isReadOnly" class="align-left">
-                <template v-slot:trigger>
-                    <button type="button" class="btn btn-round">
-                        <span class="icon icon-plus text-grey-80 antialiased"></span>
-                    </button>
-                </template>
-
-                <div v-for="set in setConfigs" :key="set.handle">
-                    <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
-                </div>
-            </dropdown-list>
-        </div>
+        <set-picker v-if="!isReadOnly"
+            :last="true"
+            :sets="setConfigs"
+            :index="values.length"
+            @added="addSet" />
 
     </div>
 
@@ -60,6 +60,7 @@
 <script>
 import uniqid from 'uniqid';
 import ReplicatorSet from './Set.vue';
+import SetPicker from './SetPicker.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
 
@@ -69,7 +70,8 @@ export default {
 
     components: {
         ReplicatorSet,
-        SortableList
+        SortableList,
+        SetPicker,
     },
 
     data() {
@@ -126,7 +128,8 @@ export default {
             });
 
             this.updateSetMeta(set._id, this.meta.new[handle]);
-            this.values.push(set);
+
+            this.values.splice(index, 0, set);
         },
 
         collapseSet(id) {

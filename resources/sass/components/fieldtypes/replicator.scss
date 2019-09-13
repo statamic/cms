@@ -7,7 +7,7 @@
 }
 
 .replicator-set {
-    @apply mb-4 shadow-button rounded bg-white outline-none;
+    @apply mb-4 shadow-button rounded bg-white outline-none relative;
 }
 
 .replicator-set-header {
@@ -41,6 +41,11 @@
 
 .replicator-set-body {
     @apply flex flex-wrap;
+}
+
+.replicator-set-picker-between {
+    @apply absolute pin-b w-full text-center;
+    margin-bottom: -27px;
 }
 
 // Extra contrast when full width

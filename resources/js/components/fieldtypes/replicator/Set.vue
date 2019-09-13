@@ -38,6 +38,8 @@
             />
         </div>
 
+        <slot name="picker" />
+
     </div>
 
 </template>
