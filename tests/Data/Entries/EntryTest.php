@@ -397,6 +397,7 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_the_blueprint_when_defined_on_itself()
     {
+        Collection::make('blog')->save();
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint = new Blueprint);
         $entry = (new Entry)
