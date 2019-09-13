@@ -9,6 +9,7 @@ use Statamic\CP\FieldtypeFactory;
 
 class Replicator extends Fieldtype
 {
+    protected $defaultValue = [];
     protected $configFields = [
         'sets' => ['type' => 'sets'],
     ];
