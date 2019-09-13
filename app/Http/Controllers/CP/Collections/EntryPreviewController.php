@@ -47,16 +47,14 @@ class EntryPreviewController extends CpController
 
         $values = array_except($fields->values(), ['slug']);
 
-        $entry = Entry::create()
+        $entry = Entry::make()
+            ->slug($preview['slug'] ?? 'slug')
             ->collection($collection)
-            ->in($site->handle(), function ($localized) use ($values, $preview) {
-                $localized
-                    ->slug($preview['slug'] ?? 'slug')
-                    ->data($values);
-            });
+            ->locale($site->handle())
+            ->data($values);
 
         if ($collection->dated()) {
-            $entry->order($preview['date'] ?? now()->format('Y-m-d-Hi'));
+            $entry->date($preview['date'] ?? now()->format('Y-m-d-Hi'));
         }
 
         return $this->getEntryResponse($request, $entry)->getContent();
