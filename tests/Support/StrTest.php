@@ -4,6 +4,7 @@ namespace Tests;
 
 use Tests\TestCase;
 use Statamic\Support\Str;
+use Statamic\Facades\Compare;
 
 class StrTest extends TestCase
 {
@@ -12,6 +13,130 @@ class StrTest extends TestCase
     {
         $this->assertFalse(method_exists(Str::class, 'last'));
         $this->assertEquals('bar', Str::last('foobar', 3));
+    }
+
+    /** @test */
+    function it_makes_sentence_lists()
+    {
+        $this->assertEquals('this', Str::makeSentenceList(['this']));
+        $this->assertEquals('this and that', Str::makeSentenceList(['this', 'that']));
+        $this->assertEquals('this, that, and the other', Str::makeSentenceList(['this', 'that', 'the other']));
+
+        $this->assertEquals('this', Str::makeSentenceList(['this'], '&'));
+        $this->assertEquals('this & that', Str::makeSentenceList(['this', 'that'], '&'));
+        $this->assertEquals('this, that, & the other', Str::makeSentenceList(['this', 'that', 'the other'], '&'));
+
+        $this->assertEquals('this', Str::makeSentenceList(['this'], 'and', false));
+        $this->assertEquals('this and that', Str::makeSentenceList(['this', 'that'], 'and', false));
+        $this->assertEquals('this, that and the other', Str::makeSentenceList(['this', 'that', 'the other'], 'and', false));
+    }
+
+    /** @test */
+    function it_strips_tags()
+    {
+        $html = '<h1>heading</h1> <b>bold</b>';
+        $this->assertEquals('heading bold', Str::stripTags($html));
+        $this->assertEquals('heading <b>bold</b>', Str::stripTags($html, ['h1']));
+        $this->assertEquals('<h1>heading</h1> <b>bold</b>', Str::stripTags($html, ['em']));
+        $this->assertEquals('heading <b>bold</b>', Str::stripTags($html, ['h1', 'em']));
+        $this->assertEquals('heading bold', Str::stripTags($html, ['h1', 'b']));
+    }
+
+    /** @test */
+    function it_converts_studly_to_slug()
+    {
+        $this->assertEquals('foo-bar-baz', Str::studlyToSlug('FooBarBaz'));
+    }
+
+    /** @test */
+    function it_converts_studly_to_title()
+    {
+        $this->assertEquals('Foo Bar Baz', Str::studlyToTitle('FooBarBaz'));
+    }
+
+    /** @test */
+    function it_converts_slug_to_title()
+    {
+        $this->assertEquals('Foo Bar Baz', Str::studlyToTitle('foo-bar-baz'));
+    }
+
+    /** @test */
+    function it_checks_for_a_url()
+    {
+        $this->assertTrue(Str::isUrl('http://example.com'));
+        $this->assertTrue(Str::isUrl('https://example.com'));
+        $this->assertTrue(Str::isUrl('/relative'));
+        $this->assertFalse(Str::isUrl('test'));
+    }
+
+    /** @test */
+    function it_deslugifies_a_slug()
+    {
+        $this->assertEquals('foo bar baz', Str::deslugify('foo-bar-baz'));
+    }
+
+    /** @test */
+    function it_gets_file_size_for_humans()
+    {
+        $this->assertEquals('0 B', Str::fileSizeForHumans(0));
+        $this->assertEquals('1.00 KB', Str::fileSizeForHumans(1024));
+        $this->assertEquals('1.75 KB', Str::fileSizeForHumans(1792));
+        $this->assertEquals('1.00 MB', Str::fileSizeForHumans(1048576));
+        $this->assertEquals('1.75 MB', Str::fileSizeForHumans(1835008));
+        $this->assertEquals('1.00 GB', Str::fileSizeForHumans(1073741824));
+        $this->assertEquals('1.75 GB', Str::fileSizeForHumans(1879048192));
+
+        $this->assertEquals('0 B', Str::fileSizeForHumans(0, 0));
+        $this->assertEquals('1 KB', Str::fileSizeForHumans(1024, 0));
+        $this->assertEquals('2 KB', Str::fileSizeForHumans(1792, 0));
+        $this->assertEquals('1 MB', Str::fileSizeForHumans(1048576, 0));
+        $this->assertEquals('2 MB', Str::fileSizeForHumans(1835008, 0));
+        $this->assertEquals('1 GB', Str::fileSizeForHumans(1073741824, 0));
+        $this->assertEquals('2 GB', Str::fileSizeForHumans(1879048192, 0));
+    }
+
+    /** @test */
+    function it_gets_time_for_humans()
+    {
+        $this->assertEquals('1ms', Str::timeForHumans(1));
+        $this->assertEquals('1s', Str::timeForHumans(1000));
+        $this->assertEquals('1.5s', Str::timeForHumans(1500));
+        $this->assertEquals('1.57s', Str::timeForHumans(1570));
+    }
+
+    /** @test */
+    function it_widonts()
+    {
+        $this->assertEquals('one two&nbsp;three', Str::widont('one two three'));
+        $this->assertEquals('<p>one two&nbsp;three</p>', Str::widont('<p>one two three</p>'));
+    }
+
+    /** @test */
+    function it_compares_two_strings()
+    {
+        Compare::shouldReceive('strings')->with('one', 'two')->once();
+        Str::compare('one', 'two');
+    }
+
+    /** @test */
+    function it_modifies_strings_with_multiple_methods_at_once()
+    {
+        $this->assertEquals(
+            'this, that, and the&nbsp;other',
+            Str::modifyMultiple(['this', 'that', 'the other'], ['makeSentenceList', 'widont'])
+        );
+    }
+
+    /** @test */
+    function it_makes_tailwind_width_classes()
+    {
+        $this->assertEquals('w-1/4', Str::tailwindWidthClass(25));
+        $this->assertEquals('w-1/3', Str::tailwindWidthClass(33));
+        $this->assertEquals('w-1/2', Str::tailwindWidthClass(50));
+        $this->assertEquals('w-2/3', Str::tailwindWidthClass(66));
+        $this->assertEquals('w-3/4', Str::tailwindWidthClass(75));
+        $this->assertEquals('w-full', Str::tailwindWidthClass(100));
+        $this->assertEquals('w-full', Str::tailwindWidthClass('foo'));
     }
 
     /** @test */
