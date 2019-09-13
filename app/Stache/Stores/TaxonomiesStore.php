@@ -40,7 +40,7 @@ class TaxonomiesStore extends BasicStore
         return Taxonomy::make($handle)
             ->title(array_get($data, 'title'))
             ->termBlueprint(array_get($data, 'term_blueprint'))
-            ->revisionsEnabled(array_get($data, 'revisions'))
+            ->revisionsEnabled(array_get($data, 'revisions', false))
             ->sites($sites);
     }
 }

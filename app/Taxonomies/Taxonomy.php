@@ -22,6 +22,7 @@ class Taxonomy implements Contract, Responsable
     protected $sites = [];
     protected $collection;
     protected $defaultStatus = 'published';
+    protected $revisions = false;
 
     public function id()
     {
