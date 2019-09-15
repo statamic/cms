@@ -44,7 +44,7 @@ class Site
     public function absoluteUrl()
     {
         if (Str::startsWith($url = $this->url(), '/')) {
-            return Str::ensureLeft($url, $this->removePath(request()->getUri()));
+            return Str::ensureLeft($url, request()->getSchemeAndHttpHost());
         }
 
         return $url;
