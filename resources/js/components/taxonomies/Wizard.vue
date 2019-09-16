@@ -10,7 +10,7 @@
         </div>
 
         <!-- Step 1 -->
-        <div v-if="currentStep === 0">
+        <div v-show="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Create a new Taxonomy</h1>
                 <p class="text-grey">A Taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.</p>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div v-if="currentStep === 1">
+        <div v-show="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">Content Model</h1>
                 <p class="text-grey">Your content model determines what field and data are stored in this taxonomy.</p>
@@ -42,16 +42,16 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
                 <publish-field-meta
-                    :config="{ handle: 'term_blueprint', type: 'blueprints' }"
-                    :initial-value="taxonomy.term_blueprint ? [taxonomy.term_blueprint] : []">
+                    :config="{ handle: 'blueprints', type: 'blueprints' }"
+                    :initial-value="taxonomy.blueprints">
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'term_blueprint', type: 'blueprints', max_items: 1 }"
+                            :config="{ handle: 'blueprints', type: 'blueprints', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            name="term_blueprint"
-                            @input="taxonomy.term_blueprint = $event[0]" />
+                            handle="blueprints"
+                            @input="taxonomy.blueprints = $event" />
                     </div>
                 </publish-field-meta>
                 <div class="text-2xs text-grey-50 mt-1 flex items-center">
@@ -77,7 +77,7 @@
                             :config="{ handle: 'collections', type: 'collections' }"
                             :value="value"
                             :meta="meta"
-                            name="collections"
+                            handle="collections"
                             @input="taxonomy.collections = $event" />
                     </div>
                 </publish-field-meta>
@@ -120,7 +120,7 @@ export default {
             taxonomy: {
                 title: null,
                 handle: null,
-                term_blueprint: null,
+                blueprints: [],
                 template: null,
                 layout: null,
                 route: null,

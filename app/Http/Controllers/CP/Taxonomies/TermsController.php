@@ -210,7 +210,7 @@ class TermsController extends CpController
         $this->authorize('create', [TermContract::class, $taxonomy]);
 
         $blueprint = $request->blueprint
-            ? Blueprint::find($request->blueprint)
+            ? $taxonomy->ensureTermBlueprintFields(Blueprint::find($request->blueprint))
             : $taxonomy->termBlueprint();
 
         if (! $blueprint) {
@@ -259,7 +259,9 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->termBlueprint();
+        $blueprint = $taxonomy->ensureTermBlueprintFields(
+            Blueprint::find($request->blueprint)
+        );
 
         $fields = $blueprint->fields()->addValues($request->all())->process();
 
@@ -274,6 +276,7 @@ class TermsController extends CpController
 
         $term = Term::make()
             ->taxonomy($taxonomy)
+            ->blueprint($request->blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
             ->slug($request->slug)

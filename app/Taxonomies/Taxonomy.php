@@ -18,7 +18,7 @@ class Taxonomy implements Contract, Responsable
 
     protected $handle;
     protected $title;
-    protected $termBlueprint;
+    protected $blueprints = [];
     protected $sites = [];
     protected $collection;
     protected $defaultStatus = 'published';
@@ -62,16 +62,27 @@ class Taxonomy implements Contract, Responsable
         ]);
     }
 
-    public function termBlueprint($blueprint = null)
+    public function termBlueprints($blueprints = null)
     {
         return $this
-            ->fluentlyGetOrSet('termBlueprint')
-            ->getter(function ($blueprint) {
-                return $this->ensureTermBlueprintFields(
-                    $blueprint ? Blueprint::find($blueprint) : $this->fallbackTermBlueprint()
-                );
+            ->fluentlyGetOrSet('blueprints')
+            ->getter(function ($blueprints) {
+                if (is_null($blueprints)) {
+                    return collect([$this->fallbackTermBlueprint()]);
+                }
+
+                return collect($blueprints)->map(function ($blueprint) {
+                    return Blueprint::find($blueprint);
+                });
             })
             ->args(func_get_args());
+    }
+
+    public function termBlueprint()
+    {
+        return $this->ensureTermBlueprintFields(
+            $this->termBlueprints()->first() ?? $this->fallbackTermBlueprint()
+        );
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -142,7 +153,7 @@ class Taxonomy implements Contract, Responsable
         return [
             'title' => $this->title,
             'handle' => $this->handle,
-            'term_blueprint' => $this->termBlueprint,
+            'blueprints' => $this->blueprints,
         ];
     }
 

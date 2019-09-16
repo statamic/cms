@@ -45,7 +45,7 @@ class TaxonomiesController extends CpController
 
     public function show($taxonomy)
     {
-        $blueprints = collect([$taxonomy->termBlueprint()])->map(function ($blueprint) {
+        $blueprints = $taxonomy->termBlueprints()->map(function ($blueprint) {
             return [
                 'handle' => $blueprint->handle(),
                 'title' => $blueprint->title(),
@@ -77,7 +77,7 @@ class TaxonomiesController extends CpController
         $data = $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'term_blueprint' => 'nullable',
+            'blueprints' => 'array',
             'collections' => 'array',
         ]);
 
@@ -148,7 +148,7 @@ class TaxonomiesController extends CpController
     {
         return $taxonomy
             ->title($data['title'])
-            ->termBlueprint($data['term_blueprint']);
+            ->termBlueprints($data['blueprints']);
     }
 
     protected function editFormBlueprint()
@@ -166,10 +166,10 @@ class TaxonomiesController extends CpController
             ],
 
             'content_model' => ['type' => 'section'],
-            'term_blueprint' => [
+            'blueprints' => [
                 'type' => 'blueprints',
-                'instructions' => __('Terms in this taxonomy will use this blueprint.'),
-                'max_items' => 1,
+                'instructions' => __('Terms in this taxonomy may use any of these blueprints.'),
+                'validate' => 'min:1',
             ],
         ]);
     }
