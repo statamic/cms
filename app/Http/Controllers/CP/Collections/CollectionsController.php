@@ -285,7 +285,7 @@ class CollectionsController extends CpController
             'blueprints' => [
                 'type' => 'blueprints',
                 'instructions' => __('Entries in this collection may use any of these blueprints.'),
-                'validate' => 'min:1',
+                'validate' => 'array',
             ],
             'taxonomies' => [
                 'type' => 'taxonomies',

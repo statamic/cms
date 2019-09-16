@@ -169,7 +169,7 @@ class TaxonomiesController extends CpController
             'blueprints' => [
                 'type' => 'blueprints',
                 'instructions' => __('Terms in this taxonomy may use any of these blueprints.'),
-                'validate' => 'min:1',
+                'validate' => 'array',
             ],
         ]);
     }
