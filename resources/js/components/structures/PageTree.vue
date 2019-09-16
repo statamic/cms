@@ -14,11 +14,11 @@
                 <template #trigger>
                     <button class="btn" v-text="`${__('Add Link')}`" />
                 </template>
-                <dropdown-item :text="__('Link to URL')" @click="createPage" />
-                <dropdown-item :text="__('Link to Entry')" @click="createEntries" />
+                <dropdown-item :text="__('Link to URL')" @click="linkPage" />
+                <dropdown-item :text="__('Link to Entry')" @click="linkToEntries" />
             </dropdown-list>
 
-            <a v-if="hasCollection" class="btn ml-2" v-text="`${__('Create Page')}`" :href="createUrl" />
+            <button v-if="hasCollection" class="btn ml-2" v-text="`${__('Create Page')}`" @click="createEntry(null)" />
 
             <button
                 class="btn btn-primary ml-2"
@@ -78,8 +78,9 @@
                     @edit="editPage(page, vm)"
                     @updated="pageUpdated(tree)"
                     @removed="pageRemoved"
-                    @create-page="createChildPage(vm)"
-                    @create-entry="createChildEntries(vm)"
+                    @link-page="linkChildPage(vm)"
+                    @link-entries="linkChildEntries(vm)"
+                    @create-entry="createEntry"
                 />
             </draggable-tree>
 
@@ -328,21 +329,27 @@ export default {
             });
         },
 
-        createChildPage(vm) {
+        createEntry(parent) {
+            let url = this.createUrl;
+            if (parent) url += '?parent=' + parent;
+            window.location = url;
+        },
+
+        linkChildPage(vm) {
             this.parentPageForAdding = vm;
             this.openPageCreator();
         },
 
-        createChildEntries(vm) {
+        linkChildEntries(vm) {
             this.parentPageForAdding = vm;
-            this.createEntries();
+            this.linkToEntries();
         },
 
-        createPage() {
+        linkPage() {
             this.openPageCreator();
         },
 
-        createEntries() {
+        linkToEntries() {
             this.$refs.selector.linkExistingItem();
         },
 

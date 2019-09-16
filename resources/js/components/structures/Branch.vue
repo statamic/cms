@@ -25,8 +25,9 @@
                 <svg-icon v-if="isText" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
 
                 <dropdown-list class="ml-2">
-                    <dropdown-item :text="__('Add child link to URL')" @click="$emit('create-page')" />
-                    <dropdown-item :text="__('Add child link to entry')" @click="$emit('create-entry')" />
+                    <dropdown-item :text="__('Add child link to URL')" @click="$emit('link-page')" />
+                    <dropdown-item :text="__('Add child link to entry')" @click="$emit('link-entries')" />
+                    <dropdown-item :text="__('Create entry')" @click="$emit('create-entry', page.id)" />
                     <dropdown-item :text="__('Remove')" class="warning" @click="remove" />
                 </dropdown-list>
             </div>
