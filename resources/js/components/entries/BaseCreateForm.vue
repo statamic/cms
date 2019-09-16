@@ -5,9 +5,8 @@
         publish-container="base"
         :initial-actions="actions"
         method="post"
-        :initial-title="__('Create')"
-        :collection-title="collectionTitle"
-        :collection-url="collectionUrl"
+        :initial-title="__('Create Entry')"
+        :collection-handle="collectionHandle"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
@@ -17,6 +16,7 @@
         :initial-is-root="true"
         :initial-origin-values="{}"
         :revisions-enabled="revisions"
+        :breadcrumbs="breadcrumbs"
         @saved="saved"
     ></entry-publish-form>
 
@@ -27,14 +27,14 @@ export default {
 
     props: [
         'actions',
-        'collectionTitle',
-        'collectionUrl',
+        'collectionHandle',
         'fieldset',
         'values',
         'meta',
         'published',
         'localizations',
         'revisions',
+        'breadcrumbs',
     ],
 
     methods: {

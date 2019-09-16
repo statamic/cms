@@ -1,9 +1,8 @@
 <template>
 
     <div>
-        <div class="subhead">
-            <a :href="collectionUrl" v-text="collectionTitle" class="font-bold hover:text-blue" />
-        </div>
+        <breadcrumbs :crumbs="breadcrumbs" />
+
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
                 <div class="flex items-center">
@@ -252,8 +251,7 @@ export default {
         initialSite: String,
         initialIsWorkingCopy: Boolean,
         collectionHandle: String,
-        collectionTitle: String,
-        collectionUrl: String,
+        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         amp: Boolean,

@@ -59,6 +59,7 @@ Vue.component('validation-errors', require('../components/ValidationErrors'));
 Vue.component('slugify', require('../components/Slugify.vue'));
 Vue.component('element-container', require('../components/ElementContainer.vue'));
 Vue.component('avatar', require('../components/Avatar.vue'));
+Vue.component('breadcrumbs', require('../components/Breadcrumbs.vue'));
 
 // Recursive
 Vue.component('role-permission-tree', require('../components/roles/PermissionTree.vue'));

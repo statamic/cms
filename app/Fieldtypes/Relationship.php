@@ -27,8 +27,6 @@ class Relationship extends Fieldtype
 
     protected $formComponentProps = [
         'initialActions' => 'actions',
-        'collectionTitle' => 'collection.title',
-        'collectionUrl' => 'collection.url',
         'initialTitle' => 'title',
         'initialReference' => 'reference',
         'initialFieldset' => 'blueprint',
@@ -46,6 +44,7 @@ class Relationship extends Fieldtype
         'initialIsRoot' => 'isRoot',
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
+        'breadcrumbs' => 'breadcrumbs',
     ];
 
     protected $configFields = [

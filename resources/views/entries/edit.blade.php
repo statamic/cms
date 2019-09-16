@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', __('Edit Entry'))
+@section('title', $breadcrumbs->title('Edit Entry'))
 
 @section('content')
 
@@ -8,9 +8,7 @@
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
         method="patch"
-        collection-handle="{{ $collection['handle'] }}"
-        collection-title="{{ $collection['title'] }}"
-        collection-url="{{ $collection['url'] }}"
+        collection-handle="{{ $collection }}"
         initial-title="{{ $title }}"
         initial-reference="{{ $reference }}"
         :initial-fieldset="{{ json_encode($blueprint) }}"
@@ -30,6 +28,7 @@
         :amp="{{ $str::bool($entry->ampable()) }}"
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
+        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
     ></entry-publish-form>
 
 @endsection

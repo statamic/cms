@@ -6,6 +6,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\CP\Column;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
@@ -124,7 +125,7 @@ class EntriesController extends CpController
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
-            'collection' => $this->collectionToArray($collection),
+            'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => $request->user()->cant('edit', $entry),
             'published' => $entry->published(),
@@ -152,10 +153,11 @@ class EntriesController extends CpController
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
+            'breadcrumbs' => $this->breadcrumbs($collection),
         ];
 
         if ($request->wantsJson()) {
-            return $viewData;
+            return collect($viewData);
         }
 
         if ($request->has('created')) {
@@ -257,7 +259,7 @@ class EntriesController extends CpController
             ],
             'values' => $values,
             'meta' => $fields->meta(),
-            'collection' => $this->collectionToArray($collection),
+            'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultStatus() === 'published',
             'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
@@ -271,10 +273,11 @@ class EntriesController extends CpController
                 ];
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
+            'breadcrumbs' => $this->breadcrumbs($collection),
         ];
 
         if ($request->wantsJson()) {
-            return $viewData;
+            return collect($viewData);
         }
 
         return view('statamic::entries.create', $viewData);
@@ -356,16 +359,6 @@ class EntriesController extends CpController
         return response('', 204);
     }
 
-    // TODO: Change to $collection->toArray()
-    protected function collectionToArray($collection)
-    {
-        return [
-            'handle' => $collection->handle(),
-            'title' => $collection->title(),
-            'url' => cp_route('collections.show', $collection->handle())
-        ];
-    }
-
     protected function extractFromFields($entry, $blueprint)
     {
         $values = $entry->values();
@@ -421,5 +414,19 @@ class EntriesController extends CpController
         }
 
         return $date;
+    }
+
+    protected function breadcrumbs($collection)
+    {
+        return new Breadcrumbs([
+            [
+                'text' => $collection->hasStructure() ? __('Structures') : __('Collections'),
+                'url' => $collection->hasStructure() ? cp_route('structures.index') : cp_route('collections.index'),
+            ],
+            [
+                'text' => $collection->title(),
+                'url' => $collection->hasStructure() ? $collection->structure()->showUrl() : $collection->showUrl(),
+            ]
+        ]);
     }
 }
