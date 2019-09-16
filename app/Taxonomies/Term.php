@@ -20,6 +20,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Facades\Blueprint;
 use Statamic\Revisions\Revisable;
 use Statamic\Data\Content\Content;
 use Statamic\Data\Services\TermsService;
@@ -35,6 +36,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
     use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable, Revisable, HasOrigin;
 
     protected $taxonomy;
+    protected $blueprint;
     protected $template;
     protected $layout;
     protected $locale;
@@ -98,7 +100,13 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function blueprint()
     {
-        return $this->taxonomy()->termBlueprint();
+        return $this->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return $blueprint
+                    ? $this->taxonomy()->ensureTermBlueprintFields(Blueprint::find($blueprint))
+                    : $this->taxonomy()->termBlueprint();
+            })
+            ->args(func_get_args());
     }
 
     public function toArray()
