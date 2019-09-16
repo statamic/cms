@@ -137,7 +137,7 @@
                             :config="{ handle: 'blueprints', type: 'blueprints', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            name="blueprints"
+                            handle="blueprints"
                             @input="collection.blueprints = $event" />
                     </div>
                 </publish-field-meta>
@@ -157,7 +157,7 @@
                             :config="{ handle: 'taxonomies', type: 'taxonomies', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            name="taxonomies"
+                            handle="taxonomies"
                             @input="collection.taxonomies = $event" />
                     </div>
                 </publish-field-meta>
@@ -176,7 +176,7 @@
                             :config="{ handle: 'template', type: 'template' }"
                             :value="value"
                             :meta="meta"
-                            name="template"
+                            handle="template"
                             @input="collection.template = $event" />
                     </div>
                 </publish-field-meta>
@@ -195,7 +195,7 @@
                             :config="{ handle: 'layout', type: 'template' }"
                             :value="value"
                             :meta="meta"
-                            name="layout"
+                            handle="layout"
                             @input="collection.layout = $event" />
                     </div>
                 </publish-field-meta>
@@ -233,7 +233,7 @@
                             :config="{ handle: 'structure', type: 'structures', max_items: 1, mode: 'select' }"
                             :value="value"
                             :meta="Object.assign({}, meta, { taggable: true })"
-                            name="structure"
+                            handle="structure"
                             @input="collection.structure = $event[0]" />
                     </div>
                 </publish-field-meta>
@@ -253,7 +253,7 @@
                             :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
                             :value="value"
                             :meta="meta"
-                            name="mount"
+                            handle="mount"
                             @input="collection.mount = $event[0]" />
                     </div>
                 </publish-field-meta>
