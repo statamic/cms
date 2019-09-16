@@ -195,6 +195,11 @@ export default {
 
     created() {
         this.updateTreeData();
+
+        this.$mousetrap.bindGlobal(['command+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
     },
 
     methods: {
