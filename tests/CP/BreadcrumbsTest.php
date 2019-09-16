@@ -22,6 +22,19 @@ class BreadcrumbsTest extends TestCase
     }
 
     /** @test */
+    function it_is_arrayable()
+    {
+        $bc = new Breadcrumbs($array = [
+            ['text' => 'First', 'url' => '/first'],
+            ['text' => 'Second', 'url' => '/second'],
+        ]);
+
+        $collection = collect(['breadcrumbs' => $bc]);
+
+        $this->assertSame(['breadcrumbs' => $array], $collection->toArray());
+    }
+
+    /** @test */
     function it_pushes_a_crumb_into_the_title()
     {
         app()->instance('translator', $this->mock(Translator::class)

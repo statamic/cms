@@ -2,7 +2,9 @@
 
 namespace Statamic\CP;
 
-class Breadcrumbs
+use Illuminate\Contracts\Support\Arrayable;
+
+class Breadcrumbs implements Arrayable
 {
     protected $crumbs;
 
