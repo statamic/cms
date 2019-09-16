@@ -128,7 +128,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function editUrl()
     {
-        return $this->cpUrl('collections.entries.edit');
+        return $this->hasStructure()
+            ? $this->cpUrl('structures.entries.edit')
+            : $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
