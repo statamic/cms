@@ -7,7 +7,9 @@
 
             <div class="flex items-center flex-1">
                 <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
-                <a @click="edit" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
+
+                <a v-if="!page.id" @click="edit" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
+                <a v-else :href="page.edit_url" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
 
                 <div v-if="page.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
@@ -109,11 +111,6 @@ export default {
         },
 
         edit() {
-            if (this.page.id) {
-                window.location = this.page.edit_url;
-                return;
-            }
-
             this.editing = true;
         },
 
