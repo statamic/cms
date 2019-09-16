@@ -212,6 +212,13 @@ class EntriesController extends CpController
                 ->save();
         }
 
+        if ($request->parent && ($structure = $collection->structure())) {
+            $structure
+                ->in($entry->locale())
+                ->move($entry->id(), $values['parent'])
+                ->save();
+        }
+
         return $entry->fresh()->toArray();
     }
 
@@ -313,10 +320,15 @@ class EntriesController extends CpController
         }
 
         if ($structure = $collection->structure()) {
-            $tree = $structure
-                ->in($site->handle())
-                ->append($entry)
-                ->save();
+            $tree = $structure->in($site->handle());
+
+            if ($request->parent) {
+                $tree->appendTo($values['parent'], $entry);
+            } else {
+                $tree->append($entry);
+            }
+
+            $tree->save();
         }
 
         return array_merge($entry->toArray(), [
@@ -349,9 +361,15 @@ class EntriesController extends CpController
 
     protected function extractFromFields($entry, $blueprint)
     {
+        $values = $entry->values();
+
+        if ($entry->hasStructure()) {
+            $values['parent'] = array_filter([optional($entry->parent())->id()]);
+        }
+
         $fields = $blueprint
             ->fields()
-            ->addValues($entry->values())
+            ->addValues($values)
             ->preProcess();
 
         $values = array_merge($fields->values(), [

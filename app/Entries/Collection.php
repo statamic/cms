@@ -198,6 +198,14 @@ class Collection implements Contract
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
         }
 
+        if ($this->hasStructure()) {
+            $blueprint->ensureField('parent', [
+                'type' => 'relationship',
+                'collections' => [$this->handle()],
+                'max_items' => 1
+            ], 'sidebar');
+        }
+
         foreach ($this->taxonomies() as $taxonomy) {
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'taxonomy',
