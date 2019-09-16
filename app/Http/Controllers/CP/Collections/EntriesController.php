@@ -234,8 +234,15 @@ class EntriesController extends CpController
             throw new \Exception('A valid blueprint is required.');
         }
 
+        $values = [];
+
+        if ($collection->hasStructure() && $request->parent) {
+            $values['parent'] = $request->parent;
+        }
+
         $fields = $blueprint
             ->fields()
+            ->addValues($values)
             ->preProcess();
 
         $values = array_merge($fields->values(), [
