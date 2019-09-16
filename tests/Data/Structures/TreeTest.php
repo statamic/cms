@@ -90,6 +90,97 @@ class TreeTest extends TestCase
         $this->assertEquals('Directors', $page->title());
     }
 
+    /** @test */
+    function it_appends_an_entry()
+    {
+        $tree = $this->tree();
+
+        $tree->append(Entry::make()->id('appended-page'));
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                        'children' => [
+                            [
+                                'entry' => 'pages-directors'
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            [
+                'entry' => 'pages-blog'
+            ],
+            [
+                'entry' => 'appended-page'
+            ],
+        ], $tree->tree());
+    }
+
+    /** @test */
+    function it_appends_an_entry_to_another_page()
+    {
+        $tree = $this->tree();
+
+        $tree->appendTo('pages-board', Entry::make()->id('appended-page'));
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                        'children' => [
+                            [
+                                'entry' => 'pages-directors'
+                            ],
+                            [
+                                'entry' => 'appended-page'
+                            ],
+                        ]
+                    ]
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ]
+        ], $tree->tree());
+    }
+
+    /** @test */
+    function it_moves_an_entry_to_another_page()
+    {
+        $tree = $this->tree();
+
+        // Add [foo=>bar] to the directors page, just so we can test the whole array gets moved.
+        $treeContent = $tree->tree();
+        $treeContent[0]['children'][0]['children'][0]['foo'] = 'bar';
+        $tree->tree($treeContent);
+
+        $tree->move('pages-directors', 'pages-about');
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                        'foo' => 'bar',
+                    ]
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ]
+        ], $tree->tree());
+    }
+
     protected function tree()
     {
         return (new Tree)

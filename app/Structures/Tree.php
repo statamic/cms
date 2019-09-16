@@ -187,6 +187,80 @@ class Tree implements Localization
         return $this;
     }
 
+    public function appendTo($parent, $page)
+    {
+        if (! $this->page($parent)) {
+            throw new \Exception("Page [{$parent}] does not exist in this structure");
+        }
+
+        if (is_string($page)) {
+            $page = ['entry' => $page];
+        } elseif (is_object($page)) {
+            $page = ['entry' => $page->id()];
+        }
+
+        $this->tree = $this->appendToInBranches($parent, $page, $this->tree);
+
+        return $this;
+    }
+
+    private function appendToInBranches($parent, $page, $branches)
+    {
+        foreach ($branches as &$branch) {
+            $children = $branch['children'] ?? [];
+
+            if ($branch['entry'] === $parent) {
+                $children[] = $page;
+                $branch['children'] = $children;
+                break;
+            }
+
+            $children = $this->appendToInBranches($parent, $page, $children);
+
+            if (! empty($children)) {
+                $branch['children'] = $children;
+            }
+        }
+
+        return $branches;
+    }
+
+    public function move($entry, $target)
+    {
+        [$match, $branches] = $this->removeFromInBranches($entry, $this->tree);
+
+        $this->tree = $branches;
+
+        return $this->appendTo($target, $match);
+    }
+
+    private function removeFromInBranches($entry, $branches)
+    {
+        $match = null;
+
+        foreach ($branches as $key => &$branch) {
+            if ($branch['entry'] === $entry) {
+                $match = $branch;
+                unset($branches[$key]);
+                break;
+            }
+
+            [$m, $children] = $this->removeFromInBranches($entry, $branch['children'] ?? []);
+
+            if ($m) {
+                $match = $m;
+            }
+
+            if (empty($children)) {
+                unset($branch['children']);
+            } else {
+                $branch['children'] = $children;
+            }
+        }
+
+        return [$match, $branches];
+    }
+
     protected function validateRoot($root)
     {
         if (! $this->structure->isCollectionBased()) {
