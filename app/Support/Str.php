@@ -83,9 +83,19 @@ class Str extends \Illuminate\Support\Str
         return strip_tags($html);
     }
 
+    public static function slug($string, $separator = '-', $language = 'en')
+    {
+        // Statamic is a-OK with underscores in slugs.
+        $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
+
+        $slug = parent::slug($string, $separator, $language);
+
+        return str_replace($placeholder, '_', $slug);
+    }
+
     public static function studlyToSlug($string)
     {
-        return Str::slug(Str::snake($string));
+        return parent::slug(Str::snake($string));
     }
 
     public static function studlyToTitle($string)

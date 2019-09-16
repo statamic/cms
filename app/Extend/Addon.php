@@ -244,7 +244,7 @@ final class Addon
     {
         return $slug
             ? $this->slug = $slug
-            : ($this->slug ?? Str::slug($this->handle()));
+            : ($this->slug ?? Str::slug(explode('/', $this->id)[1]));
     }
 
     /**

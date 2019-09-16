@@ -43,6 +43,15 @@ class StrTest extends TestCase
     }
 
     /** @test */
+    function it_makes_slugs()
+    {
+        $this->assertEquals('foo-bar-baz', Str::slug('foo bar baz'));
+        $this->assertEquals('foo-bar-baz', Str::slug('Foo Bar Baz'));
+        $this->assertEquals('foo-bar-baz', Str::slug('foo-bar-baz'));
+        $this->assertEquals('foo_bar-baz', Str::slug('foo_bar baz'));
+    }
+
+    /** @test */
     function it_converts_studly_to_slug()
     {
         $this->assertEquals('foo-bar-baz', Str::studlyToSlug('FooBarBaz'));
