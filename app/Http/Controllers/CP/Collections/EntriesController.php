@@ -233,7 +233,7 @@ class EntriesController extends CpController
         $this->authorize('create', [EntryContract::class, $collection]);
 
         $blueprint = $request->blueprint
-            ? Blueprint::find($request->blueprint)
+            ? $collection->ensureEntryBlueprintFields(Blueprint::find($request->blueprint))
             : $collection->entryBlueprint();
 
         if (! $blueprint) {
