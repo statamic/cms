@@ -307,7 +307,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             'published' => $this->published === false ? false : null,
         ]);
 
-        if ($this->blueprint) {
+        if ($this->blueprint && $this->collection()->entryBlueprints()->count() > 1) {
             $array['blueprint'] = $this->blueprint;
         }
 
