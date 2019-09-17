@@ -147,8 +147,8 @@ class BlueprintController extends CpController
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
-            'sections' => $blueprint->sections()->map(function ($section) {
-                return $this->sectionToVue($section);
+            'sections' => $blueprint->sections()->map(function ($section, $i) {
+                return array_merge($this->sectionToVue($section), ['_id' => $i]);
             })->values()->all()
         ];
     }
@@ -158,8 +158,8 @@ class BlueprintController extends CpController
         return [
             'handle' => $section->handle(),
             'display' => $section->display(),
-            'fields' => collect($section->contents()['fields'])->map(function ($field) {
-                return $this->fieldToVue($field);
+            'fields' => collect($section->contents()['fields'])->map(function ($field, $i) {
+                return array_merge($this->fieldToVue($field), ['_id' => $i]);
             })->all()
         ];
     }
