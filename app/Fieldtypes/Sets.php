@@ -12,6 +12,11 @@ class Sets extends Fieldtype
 {
     protected $selectable = false;
 
+    /**
+     * Converts the "sets" array of a Replicator (or Bard) field into what the
+     * <sets-fieldtype> Vue component is expecting, within either the Blueprint
+     * or Fieldset builders in the AJAX request performed when opening the field.
+     */
     public function preProcess($data)
     {
         return collect($data)->map(function ($set, $handle) {
@@ -23,6 +28,10 @@ class Sets extends Fieldtype
         })->values()->all();
     }
 
+    /**
+     * Converts the "sets" array of a Replicator (or Bard) field into what
+     * the <replicator-fieldtype> is expecting in its config.sets array.
+     */
     public function preProcessConfig($data)
     {
         return collect($data)
@@ -37,10 +46,13 @@ class Sets extends Fieldtype
             ->all();
     }
 
+    /**
+     * Converts the Blueprint/Fieldset builder Settings Vue component's representation of the
+     * Replicator's "sets" array into what should be saved to the Blueprint/Fieldset's YAML.
+     * Triggered in the AJAX request when you click "finish" when editing a Replicator field.
+     */
     public function process($sets)
     {
-        // $sets is what you get from the SetsFieldtype.vue when you hit 'finish' when editing a replicator field
-        // in the blueprint or fieldset builders.
         return collect($sets)
             ->mapWithKeys(function ($set) {
                 $handle = Arr::pull($set, 'handle');
