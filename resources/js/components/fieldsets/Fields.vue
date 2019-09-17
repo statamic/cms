@@ -8,7 +8,7 @@
 
         <template v-if="fieldtypesLoaded">
 
-            <data-list :rows="fields" :columns="columns" :sort="false">
+            <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
                 <div class="card p-0 mb-3" slot-scope="{}">
                     <data-list-table>
                         <template slot="cell-display" slot-scope="{ row: field }">
