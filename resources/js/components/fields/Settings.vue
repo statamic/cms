@@ -82,6 +82,7 @@
                     />
 
                     <publish-fields
+                        v-if="blueprint.sections.length"
                         :fields="blueprint.sections[0].fields"
                         @updated="(handle, value) => updateField(handle, value, setFieldValue)"
                     />
@@ -279,7 +280,7 @@ export default {
                 this.fieldtype = response.data.fieldtype;
                 this.blueprint = response.data.blueprint;
                 this.values = response.data.values;
-                this.meta = response.data.meta;
+                this.meta = {...response.data.meta};
             })
         }
 
