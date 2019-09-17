@@ -83,6 +83,7 @@
 
                     <publish-fields
                         v-if="blueprint.sections.length"
+                        class="w-full"
                         :fields="blueprint.sections[0].fields"
                         @updated="(handle, value) => updateField(handle, value, setFieldValue)"
                     />
