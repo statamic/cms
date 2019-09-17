@@ -26,7 +26,7 @@ class FieldTransformer
     {
         return array_filter([
             'handle' => $submitted['handle'],
-            'field' => Arr::removeNullValues(array_except($submitted['config'], ['isNew']))
+            'field' => static::cleanConfig(array_except($submitted['config'], ['isNew']))
         ]);
     }
 
@@ -35,8 +35,19 @@ class FieldTransformer
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $submitted['field_reference'],
-            'config' => Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']))
+            'config' => static::cleanConfig(array_only($submitted['config'], $submitted['config_overrides']))
         ]);
+    }
+
+    private static function cleanConfig($config)
+    {
+        $config = Arr::removeNullValues($config);
+
+        if (Arr::get($config, 'width') === 100) {
+            unset($config['width']);
+        }
+
+        return $config;
     }
 
     public static function toVue($field): array
