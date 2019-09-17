@@ -9,6 +9,7 @@ use Statamic\Fieldtypes\Bard\Augmentor;
 class Bard extends Replicator
 {
     public $category = ['text', 'structured'];
+    protected $defaultValue = '[]';
 
     protected $configFields = [
         'sets' => ['type' => 'sets'],
@@ -142,7 +143,7 @@ class Bard extends Replicator
 
     public function preProcess($value)
     {
-        if (empty($value)) {
+        if (empty($value) || $value === '[]') {
             return '[]';
         }
 

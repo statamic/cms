@@ -387,10 +387,7 @@ export default {
         },
 
         valueToContent(value) {
-            if (! value) {
-                return null;
-            }
-
+            // A json string is passed from PHP since that's what's submitted.
             value = JSON.parse(value);
 
             return value.length
