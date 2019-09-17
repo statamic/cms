@@ -45,6 +45,11 @@ class FieldsetRepository
         return $this->files->exists($path = "{$this->directory}/{$path}.yaml");
     }
 
+    public function make($handle = null): Fieldset
+    {
+        return (new Fieldset)->setHandle($handle);
+    }
+
     public function all(): Collection
     {
         if (! $this->files->exists($this->directory)) {
