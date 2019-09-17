@@ -5,6 +5,7 @@ namespace Statamic\Http\ViewComposers;
 use Statamic\Statamic;
 use Illuminate\View\View;
 use Statamic\Facades\Fieldset;
+use Statamic\Fields\FieldTransformer;
 
 class FieldComposer
 {
@@ -19,7 +20,7 @@ class FieldComposer
     {
         Statamic::provideToScript([
             'fieldsets' => $this->fieldsets(),
-            'fieldsetFields' => $this->fieldsetFields()
+            'fieldsetFields' => FieldTransformer::fieldsetFields(),
         ]);
     }
 
@@ -31,19 +32,5 @@ class FieldComposer
                 'title' => $fieldset->title(),
             ]];
         });
-    }
-
-    private function fieldsetFields()
-    {
-        return $this->fieldsetFields = $this->fieldsetFields ?? collect(Fieldset::all())->flatMap(function ($fieldset) {
-            return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
-                return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
-                    'fieldset' => [
-                        'handle' => $fieldset->handle(),
-                        'title' => $fieldset->title(),
-                    ]
-                ])];
-            });
-        })->sortBy('display')->all();
     }
 }

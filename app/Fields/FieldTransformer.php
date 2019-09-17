@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Statamic\Support\Arr;
+use Statamic\Facades\Fieldset;
 
 class FieldTransformer
 {
@@ -90,5 +91,27 @@ class FieldTransformer
             'fieldset' => $field['import'],
             'prefix' => $field['prefix'] ?? null,
         ];
+    }
+
+    public static function fieldsetFields()
+    {
+        if (app()->has($binding = 'statamic.fieldset.fields')) {
+            return app($binding);
+        }
+
+        $fields = Fieldset::all()->flatMap(function ($fieldset) {
+            return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
+                return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
+                    'fieldset' => [
+                        'handle' => $fieldset->handle(),
+                        'title' => $fieldset->title(),
+                    ]
+                ])];
+            });
+        })->sortBy('display')->all();
+
+        app()->instance($binding, $fields);
+
+        return $fields;
     }
 }
