@@ -174,7 +174,9 @@ class Blueprint
     {
         $handles = $this->sections()->map->contents()->flatMap(function ($contents) {
             return array_get($contents, 'fields', []);
-        })->map->handle;
+        })->map(function ($item) {
+            return $item['handle'] ?? null;
+        })->filter();
 
         if ($field = $handles->duplicates()->first()) {
             throw new \Exception("Duplicate field [{$field}] on blueprint [{$this->handle}].");
