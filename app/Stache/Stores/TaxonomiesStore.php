@@ -41,6 +41,7 @@ class TaxonomiesStore extends BasicStore
             ->title(array_get($data, 'title'))
             ->termBlueprints(array_get($data, 'blueprints'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
+            ->searchIndex(array_get($data, 'search_index'))
             ->sites($sites);
     }
 }

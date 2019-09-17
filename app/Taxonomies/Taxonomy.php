@@ -23,6 +23,7 @@ class Taxonomy implements Contract, Responsable
     protected $collection;
     protected $defaultStatus = 'published';
     protected $revisions = false;
+    protected $searchIndex;
 
     public function id()
     {
@@ -225,6 +226,21 @@ class Taxonomy implements Contract, Responsable
     public function layout()
     {
         return config('statamic.theming.views.layout');
+    }
+
+    public function searchIndex($index = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('searchIndex')
+            ->getter(function ($index) {
+                return $index ?  Search::index($index) : null;
+            })
+            ->args(func_get_args());
+    }
+
+    public function hasSearchIndex()
+    {
+        return $this->searchIndex() !== null;
     }
 
     public static function __callStatic($method, $parameters)
