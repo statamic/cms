@@ -5,12 +5,23 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Fields\FieldTransformer;
 
 class Sets extends Fieldtype
 {
     protected $selectable = false;
 
     public function preProcess($data)
+    {
+        return collect($data)->map(function ($set) {
+            $set['fields'] = collect($set['fields'])->map(function ($field, $i) {
+                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
+            })->all();
+            return $set;
+        })->values()->all();
+    }
+
+    public function preProcessConfig($data)
     {
         return collect($data)
             ->map(function ($config, $name) {
@@ -24,24 +35,18 @@ class Sets extends Fieldtype
             ->all();
     }
 
-    public function process($data)
+    public function process($sets)
     {
-        if (! $data) {
-            return;
-        }
-
-        $processed = [];
-
-        foreach ($data as $set) {
-            $set_name = $set['handle'];
-            unset($set['handle']);
-            $set['fields'] = $this->moveOutNameKey($set['fields']);
-            // Method is called cleanField but the logic applies to the sets too.
-            // We want to get rid of the Vue stuff like ids, isNew, isMeta, etc.
-            $processed[$set_name] = Fieldset::cleanFieldForSaving($set);
-        }
-
-        return empty($processed) ? null : $processed;
+        // $sets is what you get from the SetsFieldtype.vue when you hit 'finish' when editing a replicator field
+        // in the blueprint or fieldset builders.
+        return collect($sets)
+            ->map(function ($set) {
+                $set['fields'] = collect($set['fields'])->map(function ($field) {
+                    return FieldTransformer::fromVue($field);
+                })->all();
+                return $set;
+            })
+            ->all();
     }
 
     private function moveOutNameKey($fields)

@@ -17,7 +17,7 @@
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
-                        <div>{{ __('Add Section') }}</div>
+                        <div v-text="addSectionText" />
                     </div>
 
                     <div class="blueprint-section-draggable-zone outline-none"></div>
@@ -47,6 +47,14 @@ export default {
         initialSections: {
             type: Array,
             required: true
+        },
+        addSectionText: {
+            type: String,
+            default: () => __('Add Section')
+        },
+        newSectionText: {
+            type: String,
+            default: () => __('New Section')
         }
     },
 
@@ -137,8 +145,8 @@ export default {
         addSection() {
             this.sections.push({
                 _id: uniqid(),
-                display: 'New Section',
-                handle: 'new_section',
+                display: this.newSectionText,
+                handle: this.$slugify(this.newSectionText, '_'),
                 fields: []
             });
 
