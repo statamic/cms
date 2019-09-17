@@ -159,7 +159,6 @@ export default {
         },
 
         getResultIcon(result) {
-            console.log(result);
             if (result.is_asset) return 'assets'
             if (result.is_user) return 'user'
             return 'content-writing';
