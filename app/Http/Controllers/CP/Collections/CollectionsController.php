@@ -30,13 +30,6 @@ class CollectionsController extends CpController
                 'title' => $collection->title(),
                 'entries' => \Statamic\Facades\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
-                'blueprints' => $collection->entryBlueprints()->map(function ($blueprint) {
-                    return [
-                        'handle' => $blueprint->handle(),
-                        'title' => $blueprint->title(),
-                        'edit_url' => $blueprint->editUrl()
-                    ];
-                }),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection)
             ];
@@ -46,7 +39,6 @@ class CollectionsController extends CpController
             'collections' => $collections,
             'columns' => [
                 Column::make('title'),
-                Column::make('blueprints')->fieldtype('relationship'),
                 Column::make('entries'),
             ],
         ]);
