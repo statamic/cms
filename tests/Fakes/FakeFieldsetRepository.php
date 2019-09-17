@@ -25,6 +25,6 @@ class FakeFieldsetRepository
 
     public function all()
     {
-        return $this->fieldsets;
+        return collect($this->fieldsets);
     }
 }
