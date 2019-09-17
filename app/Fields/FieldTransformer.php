@@ -2,6 +2,8 @@
 
 namespace Statamic\Fields;
 
+use Statamic\Support\Arr;
+
 class FieldTransformer
 {
     public static function fromVue(array $submitted)
@@ -23,7 +25,7 @@ class FieldTransformer
     {
         return array_filter([
             'handle' => $submitted['handle'],
-            'field' => array_except($submitted['config'], ['isNew'])
+            'field' => Arr::removeNullValues(array_except($submitted['config'], ['isNew']))
         ]);
     }
 
@@ -32,7 +34,7 @@ class FieldTransformer
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $submitted['field_reference'],
-            'config' => array_only($submitted['config'], $submitted['config_overrides'])
+            'config' => Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']))
         ]);
     }
 

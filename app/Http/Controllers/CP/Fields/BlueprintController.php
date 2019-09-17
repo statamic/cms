@@ -92,7 +92,7 @@ class BlueprintController extends CpController
         $sections = collect($request->sections)->mapWithKeys(function ($section) {
             return [array_pull($section, 'handle') => [
                 'display' => $section['display'],
-                'fields' => Arr::filterRecursive($this->sectionFields($section['fields']))
+                'fields' => $this->sectionFields($section['fields'])
             ]];
         })->all();
         $blueprint->setContents([
