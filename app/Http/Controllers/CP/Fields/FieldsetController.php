@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Statamic\Facades;
+use Statamic\Support\Arr;
 use Illuminate\Http\Request;
 use Statamic\Fields\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
@@ -105,7 +106,9 @@ class FieldsetController extends CpController
     private function save(Fieldset $fieldset, Request $request)
     {
         $fields = collect($request->fields)->mapWithKeys(function ($field) {
-            return [array_pull($field, 'handle') => array_except($field, '_id')];
+            $field = Arr::removeNullValues($field);
+            $field = Arr::except($field, ['_id', 'isNew']);
+            return [Arr::pull($field, 'handle') => $field];
         })->all();
 
         $fieldset->setContents([
