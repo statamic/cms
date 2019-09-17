@@ -14,7 +14,8 @@ class Sets extends Fieldtype
 
     public function preProcess($data)
     {
-        return collect($data)->map(function ($set) {
+        return collect($data)->map(function ($set, $handle) {
+            $set['handle'] = $handle;
             $set['fields'] = collect($set['fields'])->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
             })->all();
@@ -41,12 +42,13 @@ class Sets extends Fieldtype
         // $sets is what you get from the SetsFieldtype.vue when you hit 'finish' when editing a replicator field
         // in the blueprint or fieldset builders.
         return collect($sets)
-            ->map(function ($set) {
+            ->mapWithKeys(function ($set) {
+                $handle = Arr::pull($set, 'handle');
                 $set = Arr::except($set, '_id');
                 $set['fields'] = collect($set['fields'])->map(function ($field) {
                     return FieldTransformer::fromVue($field);
                 })->all();
-                return $set;
+                return [$handle => $set];
             })
             ->all();
     }
