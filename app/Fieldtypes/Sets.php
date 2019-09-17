@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Support\Arr;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
@@ -41,6 +42,7 @@ class Sets extends Fieldtype
         // in the blueprint or fieldset builders.
         return collect($sets)
             ->map(function ($set) {
+                $set = Arr::except($set, '_id');
                 $set['fields'] = collect($set['fields'])->map(function ($field) {
                     return FieldTransformer::fromVue($field);
                 })->all();
