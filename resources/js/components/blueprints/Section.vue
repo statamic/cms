@@ -20,60 +20,19 @@
                 </div>
             </div>
 
-            <div class="flex flex-col">
 
-                <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-1 px-1 pt-2">
-                    <component
-                        v-for="(field, i) in section.fields"
-                        :is="fieldComponent(field)"
-                        :key="field._id"
-                        :field="field"
-                        :is-editing="editingField === field._id"
-                        :is-section-expanded="isEditing"
-                        :suggestable-condition-fields="suggestableConditionFields"
-                        @edit="editingField = field._id"
-                        @updated="fieldUpdated(i, $event)"
-                        @deleted="deleteField(i)"
-                        @editor-closed="editingField = null"
-                    />
-                </div>
-
-                <div class="p-2 pt-0 flex items-center -mx-sm">
-                    <div class="w-1/2 px-sm">
-                        <link-fields @linked="fieldLinked" />
-                    </div>
-                    <div class="w-1/2 px-sm">
-                        <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                            <svg-icon name="wireframe" class="mr-1" />
-                            {{ __('Create Field') }}
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
-            <stack name="fieldtype-selector"
-                v-if="isSelectingNewFieldtype"
-                @closed="isSelectingNewFieldtype = false"
-            >
-                <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
-            </stack>
-
-            <stack name="field-settings"
-                v-if="pendingCreatedField != null"
-                @closed="pendingCreatedField = null"
-            >
-                <field-settings
-                    slot-scope="{ close }"
-                    ref="settings"
-                    :type="pendingCreatedField.config.type"
-                    :root="true"
-                    :config="pendingCreatedField.config"
-                    :suggestable-condition-fields="suggestableConditionFields"
-                    @committed="fieldCreated"
-                    @closed="close"
-                />
-            </stack>
+            <fields
+                :fields="section.fields"
+                :editing-field="editingField"
+                :is-section-expanded="isEditing"
+                :suggestable-condition-fields="suggestableConditionFields"
+                @field-created="fieldCreated"
+                @field-updated="fieldUpdated"
+                @field-deleted="deleteField"
+                @field-linked="fieldLinked"
+                @field-editing="editingField = $event"
+                @editor-closed="editingField = null"
+            />
 
         </div>
     </div>
@@ -81,21 +40,12 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
-import LinkFields from './LinkFields.vue';
-import RegularField from './RegularField.vue';
-import ImportField from './ImportField.vue';
-import FieldSettings from '../fields/Settings.vue';
-import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
+import Fields from './Fields.vue';
 
 export default {
 
     components: {
-        RegularField,
-        ImportField,
-        LinkFields,
-        FieldtypeSelector,
-        FieldSettings,
+        Fields,
     },
 
     props: {
@@ -108,9 +58,7 @@ export default {
     data() {
         return {
             isEditing: false,
-            isSelectingNewFieldtype: false,
             editingField: null,
-            pendingCreatedField: null,
         }
     },
 
@@ -146,6 +94,10 @@ export default {
             }
         },
 
+        fieldCreated(field) {
+            this.section.fields.push(field);
+        },
+
         fieldUpdated(i, field) {
             this.section.fields.splice(i, 1, field);
         },
@@ -154,51 +106,12 @@ export default {
             this.section.fields.splice(i, 1);
         },
 
-        fieldComponent(field) {
-            return (field.type === 'import') ? 'ImportField' : 'RegularField';
-        },
-
         focus() {
             this.$refs.displayInput.select();
         },
 
         toggleEditing() {
             this.isEditing = ! this.isEditing
-        },
-
-        fieldtypeSelected(field) {
-            this.isSelectingNewFieldtype = false;
-
-            const handle = field.type;
-
-            const pending = {
-                _id: uniqid(),
-                type: 'inline',
-                handle,
-                config: {
-                    ...field,
-                    isNew: true,
-                    handle,
-                    display: field.type,
-                }
-            };
-
-            this.$nextTick(() => this.pendingCreatedField = pending);
-        },
-
-        fieldCreated(created) {
-            let handle = created.handle;
-            delete created.handle;
-
-            let field = {
-                ...this.pendingCreatedField,
-                ...{ handle },
-                config: created
-            };
-
-            this.section.fields.push(field);
-            this.$notify.success(__('Field added.'));
-            this.pendingCreatedField = null;
         }
 
     }

@@ -4,15 +4,16 @@ namespace Tests\Fields\Fieldtypes;
 
 use Tests\TestCase;
 use Statamic\Fields\Field;
+use Statamic\Facades\Fieldset;
 use Statamic\Fields\Fieldtype;
-use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fieldtypes\NestedFields;
+use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
 class NestedFieldsTest extends TestCase
 {
     /** @test */
-    function it_preprocesses_each_value()
+    function it_preprocesses_each_value_when_used_for_config()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('assets')
@@ -51,7 +52,7 @@ class NestedFieldsTest extends TestCase
                 ]);
             });
 
-        $actual = (new NestedFields)->preProcess([
+        $actual = (new NestedFields)->preProcessConfig([
             [
                 'handle' => 'image',
                 'field' => 'testfieldset.image',
@@ -80,134 +81,147 @@ class NestedFieldsTest extends TestCase
     }
 
     /** @test */
-    function it_moves_handles_out_into_the_keys()
+    function it_preprocesses_from_blueprint_format_to_vue()
     {
-        $actual = (new NestedFields)->process([
-            ['handle' => 'one', 'type' => 'text'],
-            ['handle' => 'two', 'type' => 'text']
-        ]);
+        $testFieldset = Fieldset::make('test')->setContents(['fields' => [
+            'bar' => ['type' => 'text']
+        ]]);
+        Fieldset::shouldReceive('all')->andReturn(collect([$testFieldset]));
 
-        $this->assertSame([
-            'one' => ['type' => 'text'],
-            'two' => ['type' => 'text']
-        ], $actual);
-    }
-
-    /** @test */
-    function it_removes_100_percent_widths_when_processing()
-    {
-        $actual = (new NestedFields)->process([
-            ['handle' => 'one', 'type' => 'text', 'width' => 100],
-            ['handle' => 'two', 'type' => 'text', 'width' => 50]
-        ]);
-
-        $this->assertSame([
-            'one' => ['type' => 'text'],
-            'two' => ['type' => 'text', 'width' => 50]
-        ], $actual);
-    }
-
-    /** @test */
-    function it_removes_ids_when_processing()
-    {
-        $actual = (new NestedFields)->process([
-            ['handle' => 'one', 'type' => 'text', '_id' => '1'],
-            ['handle' => 'two', 'type' => 'text', '_id' => '2']
-        ]);
-
-        $this->assertSame([
-            'one' => ['type' => 'text'],
-            'two' => ['type' => 'text']
-        ], $actual);
-    }
-
-    /** @test */
-    function it_removes_nulls_and_empty_strings_when_processing()
-    {
-        $actual = (new NestedFields)->process([
+        $actual = (new NestedFields)->preProcess([
             [
                 'handle' => 'one',
-                'type' => 'text',
-                'foo' => '',
-                'bar' => null,
-                'baz' => 'qux',
-                'arr' => [
-                    'foo' => '',
-                    'bar' => null,
-                    'baz' => 'qux'
+                'field' => [
+                    'type' => 'plain',
+                    'display' => 'First Field',
                 ]
             ],
+            [
+                'handle' => 'two',
+                'field' => 'test.bar',
+                'config' => [
+                    'width' => 50,
+                    'display' => 'Second Field',
+                ]
+            ],
+            [
+                'import' => 'test',
+                'prefix' => 'foo',
+            ],
+            [
+                'import' => 'test',
+            ]
         ]);
 
         $this->assertSame([
-            'one' => [
-                'type' => 'text',
-                'baz' => 'qux',
-                'arr' => [
-                    'baz' => 'qux'
-                ]
+            [
+                'handle' => 'one',
+                'type' => 'inline',
+                'config' => [
+                    'type' => 'plain',
+                    'display' => 'First Field',
+                    'width' => 100,
+                ],
+                'fieldtype' => 'plain',
+                '_id' => 0,
             ],
+            [
+                'handle' => 'two',
+                'type' => 'reference',
+                'field_reference' => 'test.bar',
+                'config' => [
+                    'placeholder' => null,
+                    'character_limit' => 0,
+                    'prepend' => null,
+                    'append' => null,
+                    'component' => 'text',
+                    'width' => 50,
+                    'display' => 'Second Field',
+                ],
+                'config_overrides' => ['width', 'display'],
+                'fieldtype' => 'text',
+                '_id' => 1,
+            ],
+            [
+                'type' => 'import',
+                'fieldset' => 'test',
+                'prefix' => 'foo',
+                '_id' => 2,
+            ],
+            [
+                'type' => 'import',
+                'fieldset' => 'test',
+                'prefix' => null,
+                '_id' => 3,
+            ]
         ], $actual);
     }
 
     /** @test */
-    function it_processes_each_value()
+    function it_processes_from_vue_to_blueprint_format()
     {
-        FieldtypeRepository::shouldReceive('find')
-            ->with('assets')
-            ->andReturn(new class extends Fieldtype {
-                protected $configFields = [
-                    'max_files' => ['type' => 'integer']
-                ];
-            });
-
-        FieldtypeRepository::shouldReceive('find')
-            ->with('integer')
-            ->andReturn(new class extends Fieldtype {
-                public function process($data) {
-                    return (int) $data;
-                }
-            });
-
-        FieldtypeRepository::shouldReceive('find')
-            ->with('plain')
-            ->andReturn(new class extends Fieldtype {
-                public function preProcess($data) {
-                    return $data;
-                }
-            });
-
         $actual = (new NestedFields)->process([
             [
                 '_id' => 'id-1',
                 'handle' => 'one',
-                'type' => 'plain',
-                'instructions' => null,
-                'width' => 100,
-                'display' => 'First Field'
+                'type' => 'inline',
+                'fieldtype' => 'plain',
+                'config' => [
+                    'type' => 'plain',
+                    'instructions' => null,
+                    'width' => 100,
+                    'display' => 'First Field',
+                ],
             ],
             [
                 '_id' => 'id-2',
                 'handle' => 'two',
-                'type' => 'assets',
-                'instructions' => 'Some instructions',
-                'width' => 50,
-                'display' => 'Second Field',
-                'max_files' => '2',
+                'type' => 'reference',
+                'field_reference' => 'foo.bar',
+                'fieldtype' => 'text',
+                'config' => [
+                    'instructions' => null,
+                    'width' => 50,
+                    'display' => 'Second Field'
+                ],
+                'config_overrides' => ['display', 'width']
             ],
+            [
+                '_id' => 'id-3',
+                'type' => 'import',
+                'fieldset' => 'test',
+                'prefix' => 'foo'
+            ],
+            [
+                '_id' => 'id-4',
+                'type' => 'import',
+                'fieldset' => 'test',
+                'prefix' => null,
+            ]
         ]);
 
         $this->assertSame([
-            'one' => [
-                'type' => 'plain',
-                'display' => 'First Field'
+            [
+                'handle' => 'one',
+                'field' => [
+                    'type' => 'plain',
+                    'display' => 'First Field',
+                ]
             ],
-            'two' => [
-                'type' => 'assets',
-                'instructions' => 'Some instructions',
-                'width' => 50,
-                'display' => 'Second Field',
-                'max_files' => 2, // The `assets` fieldtype's `max_files` is an `integer` fieldtype, which converts to an integer.
+            [
+                'handle' => 'two',
+                'field' => 'foo.bar',
+                'config' => [
+                    'width' => 50,
+                    'display' => 'Second Field',
+                ]
+            ],
+            [
+                'import' => 'test',
+                'prefix' => 'foo',
+            ],
+            [
+                'import' => 'test',
             ]
         ], $actual);
     }
