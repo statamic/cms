@@ -371,4 +371,30 @@ class BlueprintTest extends TestCase
             $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
         });
     }
+
+    /** @test */
+    function it_validates_unique_handles()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['import' => 'test'],
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Duplicate field [one] on blueprint [test].');
+
+        $blueprint->fields();
+    }
 }
