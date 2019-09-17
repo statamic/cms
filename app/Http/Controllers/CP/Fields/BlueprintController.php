@@ -11,8 +11,6 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class BlueprintController extends CpController
 {
-    protected $fieldsetFields;
-
     public function index()
     {
         $this->authorize('index', Blueprint::class, 'You are not authorized to access blueprints.');
@@ -66,11 +64,6 @@ class BlueprintController extends CpController
         $blueprint = Facades\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
-
-        \Statamic::provideToScript([
-            'fieldsets' => $this->fieldsets(),
-            'fieldsetFields' => $this->fieldsetFields()
-        ]);
 
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
@@ -130,29 +123,5 @@ class BlueprintController extends CpController
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
             })->all()
         ];
-    }
-
-    private function fieldsets()
-    {
-        return \Statamic\Facades\Fieldset::all()->mapWithKeys(function ($fieldset) {
-            return [$fieldset->handle() => [
-                'handle' => $fieldset->handle(),
-                'title' => $fieldset->title(),
-            ]];
-        });
-    }
-
-    private function fieldsetFields()
-    {
-        return $this->fieldsetFields = $this->fieldsetFields ?? collect(\Statamic\Facades\Fieldset::all())->flatMap(function ($fieldset) {
-            return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
-                return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
-                    'fieldset' => [
-                        'handle' => $fieldset->handle(),
-                        'title' => $fieldset->title(),
-                    ]
-                ])];
-            });
-        })->sortBy('display')->all();
     }
 }

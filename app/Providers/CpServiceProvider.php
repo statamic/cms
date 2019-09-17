@@ -8,6 +8,7 @@ use Statamic\Statamic;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Extensions\Translation\Loader;
+use Statamic\Http\ViewComposers\FieldComposer;
 use Statamic\Extensions\Translation\Translator;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
@@ -22,6 +23,8 @@ class CpServiceProvider extends ServiceProvider
         View::composer('statamic::*', function ($view) {
             $view->with('user', User::current());
         });
+
+        View::composer(FieldComposer::VIEWS, FieldComposer::class);
 
         tap($this->app->make('view'), function ($view) {
             $view->composer('statamic::layout', 'Statamic\Http\ViewComposers\PermissionComposer');
