@@ -3,9 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
-use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Fields\FieldTransformer;
 
 class NestedFields extends Fieldtype
 {
@@ -13,62 +12,39 @@ class NestedFields extends Fieldtype
 
     protected $selectable = false;
 
-    public function preProcess($config)
+    /**
+     * Converts the "fields" array of a Grid into what the <fields-fieldtype>
+     * Vue component is expecting, within either the Blueprint or Fieldset
+     * builders in the AJAX request performed when opening the field.
+     */
+    public function preProcess($fields)
+    {
+        return collect($fields)->map(function ($field, $i) {
+            return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
+        })->values()->all();
+    }
+
+    /**
+     * Converts the "fields" array of a Grid field into what the
+     * <grid-fieldtype> is expecting in its config.fields array.
+     */
+    public function preProcessConfig($config)
     {
         return (new Fields($config))->toPublishArray();
     }
 
+    /**
+     * Converts the Blueprint/Fieldset builder Settings Vue component's representation of the
+     * Grid's "fields" array into what should be saved to the Blueprint/Fieldset's YAML.
+     * Triggered in the AJAX request when you click "finish" when editing a Grid field.
+     */
     public function process($config)
     {
         return collect($config)
-            ->keyBy('handle')
             ->map(function ($field) {
-                return $this->processField($field);
-            })->all();
-    }
-
-    private function processField($field)
-    {
-        $fieldtype = FieldtypeRepository::find($field['type']);
-
-        $processed = $fieldtype->configFields()->addValues($field)->process()->values();
-
-        return $this->clean(array_merge($field, $processed));
-    }
-
-    private function clean($field)
-    {
-        // TODO: Use the abstracted function instead of this class method.
-        // In v2 it was in Fieldset::cleanFieldForSaving
-
-        $field = array_except($field, ['_id', 'handle']);
-
-        if (in_array(array_get($field, 'width'), [100, '100'])) {
-            unset($field['width']);
-        }
-
-        $field = $this->discardBlankKeys($field);
-
-        return $field;
-    }
-
-    private function discardBlankKeys($array)
-    {
-        // TODO: Use the abstracted function instead of this class method.
-        // In v2 it was in Fieldset::discardBlankKeys
-
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                // Recursion!
-                $array[$key] = $this->discardBlankKeys($value);
-            } else {
-                // Strip out nulls and empty strings. We want to keep literal false values.
-                if (in_array($value, [null, ''], true)) {
-                    unset($array[$key]);
-                }
-            }
-        }
-
-        return $array;
+                return FieldTransformer::fromVue($field);
+            })
+            ->values()
+            ->all();
     }
 }

@@ -54,7 +54,6 @@ export default {
     },
 
     created() {
-        this.addIds();
         this.$mousetrap.bindGlobal(['command+s'], e => {
             e.preventDefault();
             this.save();
@@ -70,17 +69,6 @@ export default {
     },
 
     methods: {
-
-        addIds() {
-            this.sections = this.blueprint.sections.map(section => {
-                section._id = uniqid();
-                section.fields = section.fields.map(field => {
-                    field._id = uniqid();
-                    return field;
-                });
-                return section;
-            });
-        },
 
         sectionsUpdated(sections) {
             this.sections = sections;

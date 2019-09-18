@@ -30,6 +30,7 @@ Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.
 Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtype.vue'));
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue'));
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
+Vue.component('fields-fieldtype', require('../components/fieldtypes/grid/FieldsFieldtype.vue'));
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue'));
 Vue.component('hidden-fieldtype', require('../components/fieldtypes/HiddenFieldtype.vue'));
 Vue.component('integer-fieldtype', require('../components/fieldtypes/IntegerFieldtype.vue'));
@@ -46,6 +47,7 @@ Vue.component('revealer-fieldtype', RevealerFieldtype);
 Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue'));
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue'));
+Vue.component('sets-fieldtype', require('../components/fieldtypes/replicator/SetsFieldtype.vue'));
 Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('structure_sites-fieldtype', require('../components/structures/Sites.vue'));
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue'));

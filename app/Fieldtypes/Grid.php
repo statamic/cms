@@ -15,6 +15,9 @@ class Grid extends Fieldtype
     protected $defaultValue = [];
 
     protected $configFields = [
+        'fields' => [
+            'type' => 'fields'
+        ],
         'mode' => [
             'type' => 'select',
             'default' => 'table',
@@ -42,9 +45,6 @@ class Grid extends Fieldtype
             'type' => 'toggle',
             'default' => true,
             'instructions' => 'Enable to allow row reordering.',
-        ],
-        'fields' => [
-            'type' => 'fields'
         ],
     ];
 

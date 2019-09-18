@@ -121,6 +121,7 @@ export default {
             this.linkAndClose({
                 _id: uniqid(),
                 type: 'reference',
+                fieldtype: field.type,
                 field_reference: this.reference,
                 handle: field.handle,
                 config: { ...field.config, isNew: true },

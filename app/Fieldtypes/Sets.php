@@ -2,15 +2,37 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Support\Arr;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Fields\FieldTransformer;
 
 class Sets extends Fieldtype
 {
     protected $selectable = false;
 
+    /**
+     * Converts the "sets" array of a Replicator (or Bard) field into what the
+     * <sets-fieldtype> Vue component is expecting, within either the Blueprint
+     * or Fieldset builders in the AJAX request performed when opening the field.
+     */
     public function preProcess($data)
+    {
+        return collect($data)->map(function ($set, $handle) {
+            $set['handle'] = $handle;
+            $set['fields'] = collect($set['fields'])->map(function ($field, $i) {
+                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
+            })->all();
+            return $set;
+        })->values()->all();
+    }
+
+    /**
+     * Converts the "sets" array of a Replicator (or Bard) field into what
+     * the <replicator-fieldtype> is expecting in its config.sets array.
+     */
+    public function preProcessConfig($data)
     {
         return collect($data)
             ->map(function ($config, $name) {
@@ -24,24 +46,23 @@ class Sets extends Fieldtype
             ->all();
     }
 
-    public function process($data)
+    /**
+     * Converts the Blueprint/Fieldset builder Settings Vue component's representation of the
+     * Replicator's "sets" array into what should be saved to the Blueprint/Fieldset's YAML.
+     * Triggered in the AJAX request when you click "finish" when editing a Replicator field.
+     */
+    public function process($sets)
     {
-        if (! $data) {
-            return;
-        }
-
-        $processed = [];
-
-        foreach ($data as $set) {
-            $set_name = $set['handle'];
-            unset($set['handle']);
-            $set['fields'] = $this->moveOutNameKey($set['fields']);
-            // Method is called cleanField but the logic applies to the sets too.
-            // We want to get rid of the Vue stuff like ids, isNew, isMeta, etc.
-            $processed[$set_name] = Fieldset::cleanFieldForSaving($set);
-        }
-
-        return empty($processed) ? null : $processed;
+        return collect($sets)
+            ->mapWithKeys(function ($set) {
+                $handle = Arr::pull($set, 'handle');
+                $set = Arr::except($set, '_id');
+                $set['fields'] = collect($set['fields'])->map(function ($field) {
+                    return FieldTransformer::fromVue($field);
+                })->all();
+                return [$handle => $set];
+            })
+            ->all();
     }
 
     private function moveOutNameKey($fields)

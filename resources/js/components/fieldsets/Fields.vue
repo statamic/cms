@@ -8,7 +8,7 @@
 
         <template v-if="fieldtypesLoaded">
 
-            <data-list :rows="fields" :columns="['display', 'handle', 'type']" :sort="false">
+            <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
                 <div class="card p-0 mb-3" slot-scope="{}">
                     <data-list-table>
                         <template slot="cell-display" slot-scope="{ row: field }">
@@ -35,13 +35,17 @@
                         <template slot="actions" slot-scope="{ row: field, index }">
                             <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
                             <a class="mr-1 text-grey" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
-                            <modal v-if="editingField === field._id" :name="`${field._id}-field-settings`" width="90%" height="90%">
+                            <stack v-if="editingField === field._id" :name="`${field._id}-field-settings`">
                                 <field-settings
+                                    slot-scope="{ close }"
                                     ref="settings"
                                     :root="isRootLevel"
                                     :type="field.type"
-                                    v-model="field" />
-                            </modal>
+                                    :config="field"
+                                    @committed="fieldUpdated(field._id, $event)"
+                                    @closed="close"
+                                />
+                            </stack>
                         </template>
                     </data-list-table>
                 </div>
@@ -49,9 +53,9 @@
 
             <button class="btn btn-default" @click="addField">+ {{ __('Add Field') }}</button>
 
-            <modal v-if="selectingFieldtype" name="fieldtype-selector" width="90%" height="90%" @closed="selectingFieldtype = false">
+            <stack v-if="selectingFieldtype" name="fieldtype-selector" @closed="selectingFieldtype = false">
                 <fieldtype-selector @selected="fieldtypeSelected" />
-            </modal>
+            </stack>
 
         </template>
 
@@ -87,6 +91,11 @@ export default {
             fields: null,
             editingField: null,
             selectingFieldtype: false,
+            columns: [
+                { label: __('Display'), field: 'display' },
+                { label: __('Handle'), field: 'handle' },
+                { label: __('Type'), field: 'type' },
+            ]
         }
     },
 
@@ -110,7 +119,6 @@ export default {
 
         edit(id) {
             this.editingField = id;
-            this.$nextTick(() => this.$modal.show(`${id}-field-settings`));
         },
 
         destroy(index) {
@@ -137,6 +145,12 @@ export default {
             this.selectingFieldtype = false;
             this.edit(id);
         },
+
+        fieldUpdated(_id, field) {
+            const i = _.indexOf(this.fields, _.findWhere(this.fields, { _id }));
+            this.fields.splice(i, 1, field);
+            this.editingField = null;
+        }
 
     }
 

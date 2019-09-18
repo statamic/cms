@@ -44,7 +44,7 @@
         <div class="card rounded-tl-none" v-if="!loading">
 
             <publish-container
-                name="base"
+                :name="publishContainer"
                 :fieldset="blueprint"
                 :values="values"
                 :meta="meta"
@@ -82,6 +82,8 @@
                     />
 
                     <publish-fields
+                        v-if="blueprint.sections.length"
+                        class="w-full"
                         :fields="blueprint.sections[0].fields"
                         @updated="(handle, value) => updateField(handle, value, setFieldValue)"
                     />
@@ -152,6 +154,10 @@ export default {
     },
 
     computed: {
+        publishContainer() {
+            return `field-settings-${this._uid}`;
+        },
+
         selectedWidth: function() {
             var width = this.config.width || 100;
             var found = _.findWhere(this.widths, {value: width});
@@ -275,7 +281,7 @@ export default {
                 this.fieldtype = response.data.fieldtype;
                 this.blueprint = response.data.blueprint;
                 this.values = response.data.values;
-                this.meta = response.data.meta;
+                this.meta = {...response.data.meta};
             })
         }
 

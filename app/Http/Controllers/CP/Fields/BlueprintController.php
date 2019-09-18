@@ -6,12 +6,11 @@ use Statamic\Facades;
 use Statamic\Support\Arr;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 
 class BlueprintController extends CpController
 {
-    protected $fieldsetFields;
-
     public function index()
     {
         $this->authorize('index', Blueprint::class, 'You are not authorized to access blueprints.');
@@ -66,11 +65,6 @@ class BlueprintController extends CpController
 
         $this->authorize('edit', $blueprint);
 
-        \Statamic::provideToScript([
-            'fieldsets' => $this->fieldsets(),
-            'fieldsetFields' => $this->fieldsetFields()
-        ]);
-
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
             'blueprintVueObject' => $this->toVueObject($blueprint)
@@ -79,7 +73,6 @@ class BlueprintController extends CpController
 
     public function update(Request $request, $blueprint)
     {
-
         $blueprint = Facades\Blueprint::find($blueprint);
 
         $this->authorize('edit', $blueprint);
@@ -92,7 +85,7 @@ class BlueprintController extends CpController
         $sections = collect($request->sections)->mapWithKeys(function ($section) {
             return [array_pull($section, 'handle') => [
                 'display' => $section['display'],
-                'fields' => Arr::filterRecursive($this->sectionFields($section['fields']))
+                'fields' => $this->sectionFields($section['fields'])
             ]];
         })->all();
         $blueprint->setContents([
@@ -106,40 +99,8 @@ class BlueprintController extends CpController
     private function sectionFields(array $fields)
     {
         return collect($fields)->map(function ($field) {
-            return $this->sectionField($field);
+            return FieldTransformer::fromVue($field);
         })->all();
-    }
-
-    private function sectionField(array $submitted)
-    {
-        $method = $submitted['type'] . 'SectionField';
-
-        return $this->$method($submitted);
-    }
-
-    private function importSectionField(array $submitted)
-    {
-        return array_filter([
-            'import' => $submitted['fieldset'],
-            'prefix' => $submitted['prefix'] ?? null
-        ]);
-    }
-
-    private function inlineSectionField(array $submitted)
-    {
-        return array_filter([
-            'handle' => $submitted['handle'],
-            'field' => array_except($submitted['config'], ['isNew'])
-        ]);
-    }
-
-    private function referenceSectionField(array $submitted)
-    {
-        return array_filter([
-            'handle' => $submitted['handle'],
-            'field' => $submitted['field_reference'],
-            'config' => array_only($submitted['config'], $submitted['config_overrides'])
-        ]);
     }
 
     private function toVueObject(Blueprint $blueprint): array
@@ -147,8 +108,8 @@ class BlueprintController extends CpController
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
-            'sections' => $blueprint->sections()->map(function ($section) {
-                return $this->sectionToVue($section);
+            'sections' => $blueprint->sections()->map(function ($section, $i) {
+                return array_merge($this->sectionToVue($section), ['_id' => $i]);
             })->values()->all()
         ];
     }
@@ -158,87 +119,9 @@ class BlueprintController extends CpController
         return [
             'handle' => $section->handle(),
             'display' => $section->display(),
-            'fields' => collect($section->contents()['fields'])->map(function ($field) {
-                return $this->fieldToVue($field);
+            'fields' => collect($section->contents()['fields'])->map(function ($field, $i) {
+                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
             })->all()
         ];
-    }
-
-    private function fieldToVue($field): array
-    {
-        if (isset($field['import'])) {
-            return $this->importFieldToVue($field);
-        }
-
-        return (is_string($field['field']))
-            ? $this->referenceFieldToVue($field)
-            : $this->inlineFieldToVue($field);
-    }
-
-    private function referenceFieldToVue($field): array
-    {
-        $fieldsetField = array_get($this->fieldsetFields(), $field['field'], []);
-
-        $mergedConfig = array_merge(
-            $fieldsetFieldConfig = array_get($fieldsetField, 'config', []),
-            $config = array_get($field, 'config', [])
-        );
-
-        $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
-
-        return [
-            'handle' => $field['handle'],
-            'type' => 'reference',
-            'field_reference' => $field['field'],
-            'config' => $mergedConfig,
-            'config_overrides' => array_keys($config),
-            'fieldtype' => $fieldsetField['type'],
-        ];
-    }
-
-    private function inlineFieldToVue($field): array
-    {
-        $config = $field['field'];
-        $config['width'] = $config['width'] ?? 100;
-
-        return [
-            'handle' => $field['handle'],
-            'type' => 'inline',
-            'config' => $config,
-            'fieldtype' => $field['type'] ?? 'text',
-        ];
-    }
-
-    private function importFieldToVue($field): array
-    {
-        return [
-            'type' => 'import',
-            'fieldset' => $field['import'],
-            'prefix' => $field['prefix'] ?? null,
-        ];
-    }
-
-    private function fieldsets()
-    {
-        return \Statamic\Facades\Fieldset::all()->mapWithKeys(function ($fieldset) {
-            return [$fieldset->handle() => [
-                'handle' => $fieldset->handle(),
-                'title' => $fieldset->title(),
-            ]];
-        });
-    }
-
-    private function fieldsetFields()
-    {
-        return $this->fieldsetFields = $this->fieldsetFields ?? collect(\Statamic\Facades\Fieldset::all())->flatMap(function ($fieldset) {
-            return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
-                return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
-                    'fieldset' => [
-                        'handle' => $fieldset->handle(),
-                        'title' => $fieldset->title(),
-                    ]
-                ])];
-            });
-        })->sortBy('display')->all();
     }
 }
