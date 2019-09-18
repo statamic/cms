@@ -55,19 +55,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Locale
-    |--------------------------------------------------------------------------
-    |
-    | The locale in which the Control Panel should be translated.
-    | If left blank, the default site locale will be used.
-    | This may be overridden on a per-user basis.
-    |
-    */
-
-    'locale' => null,
-
-    /*
-    |--------------------------------------------------------------------------
     | Pagination
     |--------------------------------------------------------------------------
     |
