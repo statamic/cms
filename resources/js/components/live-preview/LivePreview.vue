@@ -17,7 +17,7 @@
                             <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
                             <button v-if="!poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
-                            <select-input :options="deviceSelectOptions" :placeholder="__('Responsive')" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
+                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
 
                             <component
                                 v-for="(component, handle) in inputs"
@@ -124,9 +124,11 @@ export default {
         },
 
         deviceSelectOptions() {
-            return Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
+            let options = Object.values(_.mapObject(this.$config.get('livePreview.devices'), (dimensions, device) => {
                 return { value: device, label: __(device) };
             }));
+            options.unshift({ value: null, label: __('Responsive') });
+            return options;
         },
 
         previewDeviceWidth() {
