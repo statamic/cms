@@ -137,6 +137,13 @@ class Blueprint
         return $this;
     }
 
+    public function delete()
+    {
+        BlueprintRepository::delete($this);
+
+        return true;
+    }
+
     public function ensureField($handle, $field, $section = null, $prepend = false)
     {
         if ($this->hasField($handle)) {

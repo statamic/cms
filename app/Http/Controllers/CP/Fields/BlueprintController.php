@@ -124,4 +124,13 @@ class BlueprintController extends CpController
             })->all()
         ];
     }
+
+    public function destroy($blueprint)
+    {
+        $blueprint = Facades\Blueprint::find($blueprint);
+
+        $blueprint->delete();
+
+        return response('');
+    }
 }

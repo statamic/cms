@@ -13,7 +13,7 @@
             @endcan
         </div>
 
-        <blueprint-listing :blueprints="{{ json_encode($blueprints) }}"></blueprint-listing>
+        <blueprint-listing :initial-rows="{{ json_encode($blueprints) }}"></blueprint-listing>
 
     @else
 
