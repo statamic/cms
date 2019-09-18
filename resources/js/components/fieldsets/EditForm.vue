@@ -30,25 +30,42 @@
 </template>
 
 <script>
-import Form from './Form.vue';
+import FieldsetFields from './Fields.vue';
 
 export default {
 
-    mixins: [Form],
+    components: {
+        FieldsetFields
+    },
+
+    props: ['action', 'initialFieldset'],
 
     data() {
         return {
             method: 'patch',
-            initialTitle: this.initialFieldset.title
+            initialTitle: this.initialFieldset.title,
+            fieldset: JSON.parse(JSON.stringify(this.initialFieldset)),
+            errors: {}
         }
     },
 
     methods: {
 
-        saved(response) {
-            this.$notify.success('Saved');
-            this.errors = {};
-        }
+        save() {
+            this.$axios[this.method](this.action, this.fieldset)
+                .then(response => {
+                    this.$notify.success('Saved');
+                    this.errors = {};
+                })
+                .catch(e => {
+                    this.$notify.error(e.response.data.message);
+                    this.errors = e.response.data.errors;
+                })
+        },
+
+        fieldsUpdated(fields) {
+            this.fieldset.fields = fields;
+        },
 
     }
 

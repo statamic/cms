@@ -115,7 +115,6 @@ Statamic.app({
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue'),
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
-        FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue'),
         BlueprintListing: require('./components/blueprints/Listing.vue'),
         BlueprintBuilder: require('./components/blueprints/Builder.vue'),
         FormListing: require('./components/forms/Listing.vue'),
