@@ -20,13 +20,23 @@ export default {
             return __('Delete') + ' ' + this.rows[this.deletingRow.index][key];
         },
 
-        deleteRow(resourceRoute) {
-            this.$axios.delete(`${resourceRoute}/${this.deletingRow.id}`)
+        deleteRow(resourceRoute, message) {
+            const id = this.deletingRow.id;
+            message = message || __('Deleted');
+
+            this.$axios.delete(`${resourceRoute}/${id}`)
                 .then(() => {
-                    location.reload();
+                    let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
+                    this.rows.splice(i, 1);
+                    this.deletingRow = false;
+                    this.$notify.success(message);
+
+                    if (this.rows.length === 0) location.reload();
                 })
-                .catch(() => {
-                    this.$notify.error(__('Something went wrong'));
+                .catch(e => {
+                    this.$notify.error(e.response
+                        ? e.response.data.message
+                        : __('Something went wrong'));
                 });
         },
 
