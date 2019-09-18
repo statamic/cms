@@ -2,12 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Support\Str;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\CP\Column;
-use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
+use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Forms\Form as FormContract;
 
@@ -41,30 +39,6 @@ class FormsController extends CpController
         $this->authorize('view', $form);
 
         return view('statamic::forms.show', compact('form'));
-    }
-
-    public function getFormsetJson($form)
-    {
-        $array = $form->toArray();
-
-        $array['honeypot'] = $form->honeypot();
-        $array['columns'] = []; // = $form->columns()->map->field();
-        $array['metrics'] = []; // = $this->preProcessMetrics($form);
-        $array['email'] = $form->email();
-
-        foreach ($form->fields() as $name => $field) {
-            $field = $field->toArray();
-            $field['name'] = $name;
-
-            // Vue relies on a boolean being available on the field itself.
-            if (collect($array['columns'])->contains($field['name'])) {
-                $field['column'] = true;
-            }
-
-            $array['fields'][] = $field;
-        }
-
-        return json_encode($array);
     }
 
     /**
@@ -188,28 +162,6 @@ class FormsController extends CpController
     }
 
     /**
-     * Clean up the metric values from the Grid + Array field
-     *
-     * @return array
-     */
-    private function prepareMetrics()
-    {
-        $metrics = [];
-
-        foreach ($this->request->input('formset.metrics') as $metric) {
-            foreach ($metric['params'] as $param) {
-                $metric[$param['value']] = $param['text'];
-            }
-
-            unset($metric['params'], $metric['_id']);
-
-            $metrics[] = $metric;
-        }
-
-        return $metrics;
-    }
-
-    /**
      * Clean up the email values from the Grid field
      *
      * @return array
@@ -223,38 +175,6 @@ class FormsController extends CpController
         }
 
         return $emails;
-    }
-
-    /**
-     * Get the columns array
-     *
-     * @return array
-     */
-    private function prepareColumns()
-    {
-        return collect($this->request->input('formset.fields'))->filter(function ($field) {
-            return array_get($field, 'column');
-        })->map(function ($field) {
-            return $field['name'];
-        })->values()->all();
-    }
-
-    /**
-     * Get an array of submitted fields, keyed by the field names
-     *
-     * @return array
-     */
-    private function prepareFields()
-    {
-        $fields = [];
-
-        foreach ($this->request->input('form.fields') as $field) {
-            $field_name = $field['name'];
-            unset($field['name'], $field['column']);
-            $fields[$field_name] = $field;
-        }
-
-        return $fields;
     }
 
     public function destroy($form)
