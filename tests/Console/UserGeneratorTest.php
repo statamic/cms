@@ -61,7 +61,7 @@ class UserGeneratorTest extends TestCase
         $this->assertEmpty(User::all());
 
         $this->artisan('statamic:make:user', ['email' => 'jason'])
-            ->expectsOutput(trans('validation.email'));
+            ->expectsOutput(trans('validation.email', ['attribute' => 'input']));
 
         $this->artisan('statamic:make:user', ['email' => 'jason@keeponrunnin.com'])
             ->expectsOutput('User created successfully.');
