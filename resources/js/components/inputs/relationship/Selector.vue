@@ -61,6 +61,12 @@
                                 @sorted="sorted"
                                 class="cursor-pointer"
                             >
+                                <template slot="cell-title" slot-scope="{ row: entry }">
+                                    <div class="flex items-center">
+                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                                        {{ entry.title }}
+                                    </div>
+                                </template>
                                 <template slot="cell-url" slot-scope="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
                                 </template>
