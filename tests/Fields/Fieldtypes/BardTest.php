@@ -13,6 +13,16 @@ class BardTest extends TestCase
     {
         $data = [
             [
+                'type' => 'set',
+                'attrs' => [
+                    'values' => [
+                        'type' => 'image',
+                        'image' => 'test.jpg',
+                        'caption' => 'test',
+                    ]
+                ],
+            ],
+            [
                 'type' => 'paragraph',
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
@@ -44,6 +54,11 @@ class BardTest extends TestCase
         ];
 
         $expected = [
+            [
+                'type' => 'image',
+                'image' => 'test.jpg',
+                'caption' => 'test',
+            ],
             [
                 'type' => 'text',
                 'text' => '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p><p></p>',

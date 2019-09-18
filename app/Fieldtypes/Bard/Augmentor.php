@@ -66,7 +66,7 @@ class Augmentor
         return collect($value)->map(function ($value, $index) {
             if ($value['type'] == 'set') {
                 $this->sets[$index] = $value['attrs']['values'];
-                $value['index'] = $index;
+                $value['index'] = 'index-'.$index;
             }
 
             return $value;
@@ -89,10 +89,10 @@ class Augmentor
 
     protected function convertToSets($html)
     {
-        $arr = preg_split('/(<set>\d+<\/set>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $arr = preg_split('/(<set>index-\d+<\/set>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         return collect($arr)->map(function ($html) {
-            if (preg_match('/^<set>(\d+)<\/set>/', $html, $matches)) {
+            if (preg_match('/^<set>index-(\d+)<\/set>/', $html, $matches)) {
                 return $this->sets[$matches[1]];
             }
 
