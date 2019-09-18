@@ -6,7 +6,6 @@ use Statamic\Facades\File;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
-use Statamic\Search\Comb\Exceptions\BadData;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 
@@ -21,13 +20,13 @@ class Index extends BaseIndex
     {
         $data = $this->data()->map(function ($item, $id) {
             return $item + ['id' => $id];
-        })->values();
+        })->values()->toArray();
 
         $comb = new Comb($data, $this->settings());
 
         try {
             $results = $comb->lookUp($query)['data'];
-        } catch (NoResultsFound | NotEnoughCharacters | BadData $e) {
+        } catch (NoResultsFound | NotEnoughCharacters $e) {
             return collect();
         }
 

@@ -2,7 +2,6 @@
 
 namespace Statamic\Search\Comb;
 
-use Statamic\Search\Comb\Exceptions\BadData;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
@@ -182,13 +181,13 @@ class Comb {
     /**
      * Constructor
      *
-     * @param mixed  $data_target  JSON of data or URL to find data
+     * @param mixed  $haystack  Array to find data
      * @param array  $settings  An array of settings for overriding defaults
      * @return Comb
      */
-    public function __construct($data_target, $settings=array())
+    public function __construct(array $haystack, $settings=array())
     {
-        $this->setHaystack($data_target);
+        $this->setHaystack($haystack);
         $this->setSettings($settings);
     }
 
@@ -198,26 +197,9 @@ class Comb {
      *
      * @param string  $data  Data to parse for haystack
      * @return void
-     * @throws BadData
      */
-    private function setHaystack($data)
+    private function setHaystack(array $data)
     {
-        // if this is not an array, try to resolve it
-        if (!is_array($data)) {
-            // is this not JSON? it might be a remote file
-            if (!$this->isJSON($data)) {
-                $data = file_get_contents($data);
-            }
-
-            // attempt to convert to PHP
-            $data = json_decode($data);
-        }
-
-        // make sure that we found JSON
-        if (!$data) {
-            throw new BadData('Could not create usable data out of the `$data` given.');
-        }
-
         reset($data);
         $firstKey = array_keys($data)[0];
         reset($data);
@@ -835,19 +817,6 @@ class Comb {
 
     // helpers
     // ----------------------------------------------------------------------
-
-    /**
-     * Is a given string JSON?
-     *
-     * @param string  $string  String to check
-     * @return boolean
-     */
-    private function isJSON($string)
-    {
-        $first_character = substr(trim($string), 0, 1);
-        return ($first_character === "{" || $first_character === "[");
-    }
-
 
     /**
      * Parses the query for search parameters
