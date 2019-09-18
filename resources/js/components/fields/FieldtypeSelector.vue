@@ -215,7 +215,10 @@ export default {
             this.$refs.search.focus();
         },
 
-        cancelSearch() {
+        cancelSearch(event) {
+            if (! this.search) return;
+
+            event.stopPropagation();
             this.isSearchOpen = false;
             this.search = '';
         }
