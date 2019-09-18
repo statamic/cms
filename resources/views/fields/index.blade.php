@@ -18,7 +18,11 @@
                     </div>
                     <div class="flex p-3 border-t items-center">
                         <a href="{{ cp_route('blueprints.create') }}" class="btn-primary mr-2">Create Blueprint</a>
-                        <a href="{{ cp_route('blueprints.index') }}" class="font-bold text-blue text-sm hover:text-grey-90">View All &rarr;</a>
+                        @unless($blueprints->isEmpty())
+                            <a href="{{ cp_route('blueprints.index') }}" class="font-bold text-blue text-sm hover:text-grey-90">
+                                View All <span class="font-normal">({{ $blueprints->count() }})</span> &rarr;
+                            </a>
+                        @endunless
                     </div>
                 </div>
             </div>
@@ -31,7 +35,11 @@
                     </div>
                     <div class="flex p-3 border-t items-center">
                         <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary mr-2">Create Fieldset</a>
-                        <a href="{{ cp_route('fieldsets.index') }}" class="font-bold text-blue text-sm hover:text-grey-90">View All &rarr;</a>
+                        @unless($fieldsets->isEmpty())
+                            <a href="{{ cp_route('fieldsets.index') }}" class="font-bold text-blue text-sm hover:text-grey-90">
+                                View All <span class="font-normal">({{ $fieldsets->count() }})</span> &rarr;
+                            </a>
+                        @endunless
                     </div>
                 </div>
             </div>

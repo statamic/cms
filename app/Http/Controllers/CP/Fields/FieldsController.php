@@ -3,6 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
@@ -10,7 +12,10 @@ class FieldsController extends CpController
 {
     public function index(Request $request)
     {
-        return view('statamic::fields.index');
+        return view('statamic::fields.index', [
+            'blueprints' => Blueprint::all(),
+            'fieldsets' => Fieldset::all(),
+        ]);
     }
 
     public function edit(Request $request)
