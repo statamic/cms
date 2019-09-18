@@ -26,16 +26,18 @@ class CpServiceProvider extends ServiceProvider
             $view->composer('statamic::layout', 'Statamic\Http\ViewComposers\PermissionComposer');
         });
 
-        Statamic::provideToScript([
-            'translationLocale' => $this->app['translator']->locale(),
-            'translations' => $this->app['translator']->toJson(),
-            'sites' => $this->sites(),
-            'selectedSite' => Site::selected()->handle(),
-            'ampEnabled' => config('statamic.amp.enabled'),
-            'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
-            'livePreview' => config('statamic.live_preview'),
-            'locale' => config('app.locale'),
-        ]);
+        View::composer('statamic::layout', function ($view) {
+            Statamic::provideToScript([
+                'translationLocale' => $this->app['translator']->locale(),
+                'translations' => $this->app['translator']->toJson(),
+                'sites' => $this->sites(),
+                'selectedSite' => Site::selected()->handle(),
+                'ampEnabled' => config('statamic.amp.enabled'),
+                'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
+                'livePreview' => config('statamic.live_preview'),
+                'locale' => config('app.locale'),
+            ]);
+        });
     }
 
     protected function sites()
