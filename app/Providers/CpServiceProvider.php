@@ -16,10 +16,6 @@ class CpServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if ($this->preventRegistration()) {
-            return;
-        }
-
         View::composer('statamic::*', function ($view) {
             $view->with('user', User::current());
         });
@@ -61,14 +57,5 @@ class CpServiceProvider extends ServiceProvider
         $this->app->extend('translator', function ($translator, $app) {
             return new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
         });
-    }
-
-    private function preventRegistration()
-    {
-        if (app()->environment('testing')) {
-            return false;
-        }
-
-        return ! Statamic::isCpRoute();
     }
 }
