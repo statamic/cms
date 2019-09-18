@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\ViewComposers;
+namespace Statamic\Http\View\Composers;
 
 use Statamic\Statamic;
 use Illuminate\View\View;
