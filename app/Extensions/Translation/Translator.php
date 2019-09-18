@@ -2,6 +2,7 @@
 
 namespace Statamic\Extensions\Translation;
 
+use Statamic\Statamic;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Translation\Translator as BaseTranslator;
@@ -16,7 +17,7 @@ class Translator extends BaseTranslator
 
     public function parseKey($key)
     {
-        if (starts_with($key, 'validation.')) {
+        if (Statamic::isCpRoute() && starts_with($key, 'validation.')) {
             $key = 'statamic::' . $key;
         }
 

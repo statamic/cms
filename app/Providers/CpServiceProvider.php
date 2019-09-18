@@ -54,10 +54,6 @@ class CpServiceProvider extends ServiceProvider
 
     public function register()
     {
-        if ($this->preventRegistration()) {
-            return;
-        }
-
         $this->app->extend('translation.loader', function ($loader, $app) {
             return new Loader($loader, $app['path.lang']);
         });
