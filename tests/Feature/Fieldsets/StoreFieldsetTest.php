@@ -2,12 +2,9 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Mockery;
-use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
-use Statamic\Fields\Fieldset;
-use Statamic\Entries\Collection;
+use Statamic\Facades;
 use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 
@@ -50,66 +47,15 @@ class StoreFieldsetTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), [
-                'handle' => 'test',
-                'title' => 'Test',
-                'fields' => [
-                    [
-                        '_id' => 'id-one',
-                        'handle' => 'one',
-                        'type' => 'textarea',
-                        'display' => 'First Field',
-                        'instructions' => 'First field instructions',
-                        'foo' => 'bar'
-                    ],
-                    [
-                        '_id' => 'id-two',
-                        'handle' => 'two',
-                        'type' => 'text',
-                        'display' => 'Second Field',
-                        'instructions' => 'Second field instructions',
-                        'baz' => 'qux'
-                    ],
-                ]
-            ])
-            ->assertStatus(200)
-            ->assertJson([
-                'redirect' => cp_route('fieldsets.edit', 'test')
-            ])
+            ->post(cp_route('fieldsets.store'), ['title' => 'Test'])
+            ->assertRedirect(cp_route('fieldsets.edit', 'test'))
             ->assertSessionHas('message', __('Saved'));
 
         $this->assertCount(1, Facades\Fieldset::all());
         $this->assertEquals([
             'title' => 'Test',
-            'fields' => [
-                'one' => [
-                    'type' => 'textarea',
-                    'display' => 'First Field',
-                    'instructions' => 'First field instructions',
-                    'foo' => 'bar'
-                ],
-                'two' => [
-                    'type' => 'text',
-                    'display' => 'Second Field',
-                    'instructions' => 'Second field instructions',
-                    'baz' => 'qux'
-                ]
-            ]
+            'fields' => []
         ], Facades\Fieldset::find('test')->contents());
-    }
-
-    /** @test */
-    function handle_is_required()
-    {
-        $user = Facades\User::make()->makeSuper();
-        $this->assertCount(0, Facades\Fieldset::all());
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), $this->validParams(['handle' => '']))
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('handle');
     }
 
     /** @test */
@@ -121,45 +67,8 @@ class StoreFieldsetTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), $this->validParams(['title' => '']))
+            ->post(cp_route('fieldsets.store'), ['title' => ''])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
-    }
-
-    /** @test */
-    function fields_are_required()
-    {
-        $user = Facades\User::make()->makeSuper();
-        $this->assertCount(0, Facades\Fieldset::all());
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), $this->validParams(['fields' => '']))
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('fields');
-    }
-
-    /** @test */
-    function fields_must_be_an_array()
-    {
-        $user = Facades\User::make()->makeSuper();
-        $this->assertCount(0, Facades\Fieldset::all());
-
-        $this
-            ->from('/original')
-            ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), $this->validParams(['fields' => 'string']))
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('fields');
-    }
-
-    private function validParams($overrides = [])
-    {
-        return array_merge([
-            'handle' => 'test',
-            'title' => 'Test',
-            'fields' => [],
-        ], $overrides);
     }
 }
