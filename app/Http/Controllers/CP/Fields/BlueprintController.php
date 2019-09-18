@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Statamic\Facades;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Illuminate\Http\Request;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldTransformer;
@@ -45,7 +46,7 @@ class BlueprintController extends CpController
         ]);
 
         $blueprint = (new Blueprint)
-            ->setHandle(snake_case($request->title))
+            ->setHandle(Str::snake($request->title))
             ->setContents([
                 'title' => $request->title,
                 'sections' => [

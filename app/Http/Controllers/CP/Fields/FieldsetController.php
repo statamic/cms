@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Statamic\Facades;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Illuminate\Http\Request;
 use Statamic\Fields\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
@@ -68,18 +69,17 @@ class FieldsetController extends CpController
         $this->authorize('create', Fieldset::class);
 
         $request->validate([
-            'handle' => 'required',
             'title' => 'required',
-            'fields' => 'array',
         ]);
 
-        $fieldset = (new Fieldset)->setHandle($request->handle);
+        $fieldset = (new Fieldset)
+            ->setHandle(Str::snake($request->title))
+            ->setContents([
+                'title' => $request->title,
+                'fields' => []
+            ])->save();
 
-        $this->save($fieldset, $request);
-
-        session()->flash('message', __('Saved'));
-
-        return ['redirect' => $fieldset->editUrl()];
+        return redirect($fieldset->editUrl())->with('message', __('Saved'));
     }
 
     public function destroy($fieldset)
