@@ -82,6 +82,15 @@ class FieldsetController extends CpController
         return ['redirect' => $fieldset->editUrl()];
     }
 
+    public function destroy($fieldset)
+    {
+        $fieldset = Facades\Fieldset::find($fieldset);
+
+        $fieldset->delete();
+
+        return response('');
+    }
+
     /**
      * Quickly create a new barebones fieldset from within the fieldtype
      *

@@ -83,4 +83,9 @@ class FieldsetRepository
             YAML::dump($fieldset->contents())
         );
     }
+
+    public function delete(Fieldset $fieldset)
+    {
+        $this->files->delete("{$this->directory}/{$fieldset->handle()}.yaml");
+    }
 }

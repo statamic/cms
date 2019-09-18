@@ -13,7 +13,7 @@
             @endcan
         </div>
 
-        <fieldset-listing :fieldsets="{{ json_encode($fieldsets) }}"></fieldset-listing>
+        <fieldset-listing :initial-rows="{{ json_encode($fieldsets) }}"></fieldset-listing>
 
     @else
 

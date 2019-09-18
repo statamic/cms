@@ -66,6 +66,13 @@ class Fieldset
         return $this;
     }
 
+    public function delete()
+    {
+        FieldsetRepository::delete($this);
+
+        return true;
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Fieldset::{$method}(...$parameters);
