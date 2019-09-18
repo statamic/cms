@@ -20,7 +20,7 @@
 }
 
 .blueprint-section-field {
-    @apply relative mb-1 mx-1 z-10 outline-none;
+    @apply relative mb-1 z-10 outline-none;
 
     .blueprint-section-field-inner {
         @apply relative border rounded bg-grey-20 shadow-sm flex outline-none z-10;
@@ -33,6 +33,12 @@
     &.draggable-mirror {
         @apply shadow-lg;
     }
+}
+
+// Use specific selector because we don't want it to happen
+// when used inside  a grid field configuratormajig.
+.blueprint-section .blueprint-section-field-actions > div {
+    @apply w-1/2;
 }
 
 .blueprint-section-import {

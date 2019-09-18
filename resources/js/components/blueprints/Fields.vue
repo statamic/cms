@@ -1,8 +1,12 @@
 <template>
 
-    <div class="flex flex-col">
+    <div class="flex flex-col text-sm">
 
-        <div class="blueprint-section-draggable-zone flex flex-wrap flex-1 mb-1 px-1 pt-2">
+        <div class="blueprint-section-draggable-zone"
+            :class="{ 'flex flex-wrap flex-1': fields.length }"
+        >
+            <slot name="empty-state" v-if="!fields.length" />
+
             <component
                 v-for="(field, i) in fields"
                 :is="fieldComponent(field)"
@@ -18,11 +22,11 @@
             />
         </div>
 
-        <div class="p-2 pt-0 flex items-center -mx-sm">
-            <div class="w-1/2 px-sm">
+        <div class="blueprint-section-field-actions flex mt-1 -mx-sm">
+            <div class="px-sm">
                 <link-fields @linked="$emit('field-linked', $event)" />
             </div>
-            <div class="w-1/2 px-sm">
+            <div class="px-sm">
                 <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
                     <svg-icon name="wireframe" class="mr-1" />
                     {{ __('Create Field') }}

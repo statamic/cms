@@ -22,6 +22,7 @@
 
 
             <fields
+                class="p-2"
                 :fields="section.fields"
                 :editing-field="editingField"
                 :is-section-expanded="isEditing"
@@ -32,7 +33,14 @@
                 @field-linked="fieldLinked"
                 @field-editing="editingField = $event"
                 @editor-closed="editingField = null"
-            />
+            >
+                <template v-slot:empty-state>
+                    <div
+                        v-text="__('Add or drag fields here')"
+                        class="text-2xs text-grey-60 text-center border border-dashed rounded mb-1 p-1"
+                    />
+                </template>
+            </fields>
 
         </div>
     </div>

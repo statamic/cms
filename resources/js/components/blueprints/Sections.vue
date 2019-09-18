@@ -2,7 +2,7 @@
 
     <div>
 
-        <div ref="sections" class="blueprint-sections flex flex-wrap -mx-1 text-sm outline-none">
+        <div ref="sections" class="blueprint-sections flex flex-wrap -mx-1 outline-none">
 
             <blueprint-section
                 ref="section"
