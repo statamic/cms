@@ -89,7 +89,7 @@ class Augmentor
 
     protected function convertToSets($html)
     {
-        $arr = preg_split('/(<set>index-\d+<\/set>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $arr = preg_split('/(<set>index-\d+<\/set>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         return collect($arr)->map(function ($html) {
             if (preg_match('/^<set>index-(\d+)<\/set>/', $html, $matches)) {
