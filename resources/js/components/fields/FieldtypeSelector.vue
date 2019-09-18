@@ -132,6 +132,15 @@ export default {
 
         show(val) {
             if (val) this.$refs.search.focus();
+        },
+
+        fieldtypesLoaded: {
+            immediate: true,
+            handler() {
+                this.$nextTick(() => {
+                    if (this.$refs.search) this.$refs.search.focus();
+                });
+            }
         }
 
     },
