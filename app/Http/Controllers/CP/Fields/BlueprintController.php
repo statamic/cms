@@ -129,6 +129,8 @@ class BlueprintController extends CpController
     {
         $blueprint = Facades\Blueprint::find($blueprint);
 
+        $this->authorize('delete', $blueprint);
+
         $blueprint->delete();
 
         return response('');

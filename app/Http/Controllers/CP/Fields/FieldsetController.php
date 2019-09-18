@@ -86,6 +86,8 @@ class FieldsetController extends CpController
     {
         $fieldset = Facades\Fieldset::find($fieldset);
 
+        $this->authorize('delete', $fieldset);
+
         $fieldset->delete();
 
         return response('');
