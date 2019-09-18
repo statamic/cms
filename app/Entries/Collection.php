@@ -488,7 +488,7 @@ class Collection implements Contract
             ->getter(function ($taxonomies) {
                 return collect($taxonomies)->map(function ($taxonomy) {
                     return Taxonomy::findByHandle($taxonomy);
-                });
+                })->filter();
             })
             ->args(func_get_args());
     }
