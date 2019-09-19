@@ -2,6 +2,8 @@
 
 namespace Tests\Filesystem;
 
+use Illuminate\Support\Collection;
+use Statamic\Support\FileCollection;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Filesystem\FilesystemAdapter;
 
@@ -22,6 +24,14 @@ trait FilesystemAdapterTests
         parent::tearDown();
 
         (new Filesystem)->deleteDirectory($this->tempDir);
+    }
+
+    /** @test */
+    function it_makes_a_file_collection()
+    {
+        $collection = $this->adapter->collection(['one', 'two']);
+        $this->assertInstanceOf(FileCollection::class, $collection);
+        $this->assertEquals(2, $collection->count());
     }
 
     /** @test */
@@ -177,12 +187,16 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/sub/three.txt', '');
         file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
 
+        $files = $this->adapter->getFiles('sub');
+        $this->assertInstanceOf(FileCollection::class, $files);
         $this->assertArraysHaveSameValues(
             ['sub/two.txt', 'sub/three.txt'],
-            $this->adapter->getFiles('sub')
+            $files->all()
         );
 
-        $this->assertEquals([], $this->adapter->getFiles('non-existent-directory'));
+        $files = $this->adapter->getFiles('non-existent-directory');
+        $this->assertInstanceOf(FileCollection::class, $files);
+        $this->assertEquals([], $files->all());
     }
 
     /** @test */
@@ -195,8 +209,14 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
 
         $expected = ['sub/two.txt', 'sub/three.txt', 'sub/sub/four.txt'];
-        $this->assertArraysHaveSameValues($expected, $this->adapter->getFiles('sub', true));
-        $this->assertArraysHaveSameValues($expected, $this->adapter->getFilesRecursively('sub'));
+
+        $files = $this->adapter->getFiles('sub', true);
+        $this->assertInstanceOf(FileCollection::class, $files);
+        $this->assertArraysHaveSameValues($expected, $files->all());
+
+        $files = $this->adapter->getFilesRecursively('sub');
+        $this->assertInstanceOf(FileCollection::class, $files);
+        $this->assertArraysHaveSameValues($expected, $files->all());
     }
 
     /** @test */
@@ -210,9 +230,11 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
         file_put_contents($this->tempDir.'/sub/exclude/five.txt', '');
 
+        $files = $this->adapter->getFilesRecursivelyExcept('sub', ['exclude']);
+        $this->assertInstanceOf(FileCollection::class, $files);
         $this->assertArraysHaveSameValues(
             ['sub/two.txt', 'sub/three.txt', 'sub/sub/four.txt'],
-            $this->adapter->getFilesRecursivelyExcept('sub', ['exclude'])
+            $files->all()
         );
     }
 
@@ -226,9 +248,11 @@ trait FilesystemAdapterTests
         mkdir($this->tempDir.'/baz');
         mkdir($this->tempDir.'/baz/foo');
 
+        $folders = $this->adapter->getFolders('foo');
+        $this->assertInstanceOf(Collection::class, $folders);
         $this->assertArraysHaveSameValues(
             ['foo/bar', 'foo/baz'],
-            $this->adapter->getFolders('foo')
+            $folders->all()
         );
     }
 
@@ -242,9 +266,11 @@ trait FilesystemAdapterTests
         mkdir($this->tempDir.'/baz');
         mkdir($this->tempDir.'/baz/foo');
 
+        $folders = $this->adapter->getFoldersRecursively('foo');
+        $this->assertInstanceOf(Collection::class, $folders);
         $this->assertArraysHaveSameValues(
             ['foo/bar', 'foo/baz', 'foo/bar/qux'],
-            $this->adapter->getFoldersRecursively('foo')
+            $folders->all()
         );
     }
 
@@ -259,24 +285,28 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/docs/test.pdf', '');
         file_put_contents($this->tempDir.'/docs/photo.jpg', '');
 
+        $files = $this->adapter->getFilesByType('/', 'jpg');
+        $this->assertInstanceOf(FileCollection::class, $files);
         $this->assertArraysHaveSameValues(
             ['image.jpg', 'image2.jpg'],
-            $this->adapter->getFilesByType('/', 'jpg')
+            $files->all()
         );
 
         $this->assertArraysHaveSameValues(
             ['docs/test.pdf'],
-            $this->adapter->getFilesByType('docs', 'pdf')
+            $this->adapter->getFilesByType('docs', 'pdf')->all()
         );
 
         $this->assertArraysHaveSameValues(
              ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
-            $this->adapter->getFilesByType('/', 'jpg', true)
+            $this->adapter->getFilesByType('/', 'jpg', true)->all()
         );
 
+        $files = $this->adapter->getFilesByTypeRecursively('/', 'jpg');
+        $this->assertInstanceOf(FileCollection::class, $files);
         $this->assertArraysHaveSameValues(
              ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
-            $this->adapter->getFilesByTypeRecursively('/', 'jpg')
+            $files->all()
         );
     }
 

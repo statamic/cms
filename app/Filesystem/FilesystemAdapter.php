@@ -49,14 +49,14 @@ class FilesystemAdapter extends AbstractAdapter
         $method = $recursive ? 'allFiles' : 'files';
 
         if (! $this->exists($path)) {
-            return [];
+            return $this->collection();
         }
 
         $files = $this->filesystem->$method($this->normalizePath($path), true);
 
-        return collect($files)->map(function ($file) {
+        return $this->collection($files)->map(function ($file) {
             return $this->relativePath($file->getPathname());
-        })->all();
+        });
     }
 
     public function getFolders($path, $recursive = false)
@@ -68,7 +68,7 @@ class FilesystemAdapter extends AbstractAdapter
 
         return collect($finder)->map(function ($file) {
             return $this->relativePath($file->getPathname());
-        })->values()->all();
+        })->values();
     }
 
     public function copyDirectory($src, $dest, $overwrite = false)

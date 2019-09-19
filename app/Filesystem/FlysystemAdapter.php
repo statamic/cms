@@ -2,6 +2,7 @@
 
 namespace Statamic\Filesystem;
 
+use Statamic\Support\FileCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemAdapter;
 
@@ -36,17 +37,21 @@ class FlysystemAdapter extends AbstractAdapter
     public function getFiles($path, $recursive = false)
     {
         if (! $this->exists($path)) {
-            return [];
+            return $this->collection();
         }
 
-        return $this->filesystem->files($this->normalizePath($path), $recursive);
+        return $this->collection(
+            $this->filesystem->files($this->normalizePath($path), $recursive)
+        );
     }
 
     public function getFolders($path, $recursive = false)
     {
         $method = $recursive ? 'allDirectories' : 'directories';
 
-        return $this->filesystem->$method($this->normalizePath($path));
+        return collect(
+            $this->filesystem->$method($this->normalizePath($path))
+        );
     }
 
     public function copyDirectory($src, $dest, $overwrite = false)

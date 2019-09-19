@@ -5,6 +5,7 @@ namespace Statamic\Filesystem;
 use Statamic\Support\Str;
 use Statamic\Facades\Helper;
 use Statamic\Filesystem\Filesystem;
+use Statamic\Support\FileCollection;
 
 abstract class AbstractAdapter implements Filesystem
 {
@@ -116,7 +117,7 @@ abstract class AbstractAdapter implements Filesystem
 
     public function getFilesRecursivelyExcept($path, $exclude = [])
     {
-        $files = collect($this->getFiles($path));
+        $files = $this->getFiles($path);
         $folders = $this->getFolders($path);
 
         foreach ($folders as $folder) {
@@ -128,7 +129,7 @@ abstract class AbstractAdapter implements Filesystem
             $files = $files->merge($this->getFilesRecursively($folder));
         }
 
-        return $files->all();
+        return $files;
     }
 
     public function getFoldersRecursively($folder)
@@ -142,9 +143,9 @@ abstract class AbstractAdapter implements Filesystem
 
         $files = $this->getFiles($folder, $recursive);
 
-        return collect($files)->filter(function ($file) use ($extensions) {
+        return $this->collection($files)->filter(function ($file) use ($extensions) {
             return in_array($this->extension($file), $extensions);
-        })->all();
+        });
     }
 
     public function getFilesByTypeRecursively($folder, $extension)
@@ -154,9 +155,7 @@ abstract class AbstractAdapter implements Filesystem
 
     public function isEmpty($folder)
     {
-        $files = $this->getFilesRecursively($folder);
-
-        return empty($files);
+        return $this->getFilesRecursively($folder)->isEmpty();
     }
 
     public function isDirectory($path)
@@ -172,7 +171,7 @@ abstract class AbstractAdapter implements Filesystem
 
         // Sort by deepest first. In order to delete a folder, it must be empty.
         // This means we need to delete the deepest child folders first.
-        uasort($folders, function ($a, $b) {
+        $folders->sort(function ($a, $b) {
             return (substr_count($a, '/') >= substr_count($b, '/')) ? -1 : 1;
         });
 
@@ -192,5 +191,10 @@ abstract class AbstractAdapter implements Filesystem
     protected function relativePath($path)
     {
         return Str::removeLeft($path, $this->root);
+    }
+
+    public function collection($files = [])
+    {
+        return FileCollection::make($files);
     }
 }
