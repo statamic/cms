@@ -61,7 +61,7 @@ class Route implements Responsable
         }
 
         if ($content = $this->getItem($load)) {
-            return $content->toArray();
+            return $content->toAugmentedArray();
         }
 
         return [];
