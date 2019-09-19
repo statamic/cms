@@ -31,11 +31,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Statamic\\": "app/",
+            "Statamic\\": "src/",
             "Statamic\\Addons\\": "bundles/"
         },
         "files": [
-            "app/helpers.php"
+            "src/helpers.php"
         ]
     },
     "autoload-dev": {
