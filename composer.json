@@ -31,8 +31,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Statamic\\": "src/",
-            "Statamic\\Addons\\": "bundles/"
+            "Statamic\\": "src/"
         },
         "files": [
             "src/helpers.php"
