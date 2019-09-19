@@ -126,4 +126,13 @@ class StructuresStore extends BasicStore
     {
         return $file->getExtension() === 'yaml';
     }
+
+    public function save($structure)
+    {
+        parent::save($structure);
+
+        if (Site::hasMultiple()) {
+            $structure->trees()->each->writeFile();
+        }
+    }
 }

@@ -123,4 +123,13 @@ class GlobalsStore extends BasicStore
             return $this->paths()->flip()->get($path);
         }
     }
+
+    public function save($set)
+    {
+        parent::save($set);
+
+        if (Site::hasMultiple()) {
+            $set->localizations()->each->writeFile();
+        }
+    }
 }
