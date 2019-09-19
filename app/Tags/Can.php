@@ -3,6 +3,8 @@
 namespace Statamic\Tags;
 
 use Statamic\Tags\Tags;
+use Statamic\Support\Arr;
+use Statamic\Facades\User;
 
 class Can extends Tags
 {
@@ -13,10 +15,22 @@ class Can extends Tags
      * @param  array $args
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
-        if ($this->api()->can($method)) {
-            return $this->parse([]);
+        if (! $user = User::current()) {
+            return;
+        }
+
+        $permission = $method === 'index'
+            ? $this->params->explode(['permission', 'do'])
+            : $method;
+
+        $permissions = Arr::wrap($permission);
+
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                return $this->parse();
+            }
         }
     }
 }

@@ -269,10 +269,16 @@ class UserTags extends Tags
      */
     public function can()
     {
-        $permission = $this->get(['permission', 'do']);
+        if (! $user = User::current()) {
+            return;
+        }
 
-        if ($this->api('Can')->can($permission)) {
-            return $this->parse([]);
+        $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
+
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                return $this->parse();
+            }
         }
     }
 
@@ -285,11 +291,22 @@ class UserTags extends Tags
      */
     public function cant()
     {
-        $permission = $this->get(['permission', 'do']);
-
-        if (! $this->api('Can')->can($permission)) {
-            return $this->parse([]);
+        if (! $user = User::current()) {
+            return $this->parse();
         }
+
+        $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
+
+        $can = false;
+
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                $can = true;
+                break;
+            }
+        }
+
+        return $can ? null : $this->parse();
     }
 
     /**
