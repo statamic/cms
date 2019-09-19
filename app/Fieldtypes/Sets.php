@@ -39,7 +39,7 @@ class Sets extends Fieldtype
                 return array_merge($config, [
                     'handle' => $name,
                     'id' => $name,
-                    'fields' => (new NestedFields)->preProcess(array_get($config, 'fields', [])),
+                    'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
                 ]);
             })
             ->values()
