@@ -124,7 +124,7 @@ class Config
      */
     public function getDefaultLocale()
     {
-        return config('statamic.sites.default');
+        return Site::default()->handle();
     }
 
     /**
