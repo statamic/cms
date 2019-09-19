@@ -191,12 +191,12 @@ class EntriesController extends CpController
         $values = array_except($fields->values(), ['slug', 'date']);
 
         if ($entry->hasOrigin()) {
-            $values = array_only($values, $request->input('_localized'));
+            $entry->data(array_only($values, $request->input('_localized')));
+        } else {
+            $entry->merge($values);
         }
 
-        $entry
-            ->merge($values)
-            ->slug($request->slug);
+        $entry->slug($request->slug);
 
         if ($entry->collection()->dated()) {
             $entry->date($this->formatDateForSaving($request->date));
