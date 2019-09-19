@@ -32,6 +32,8 @@ global.data_get = function(obj, path, fallback=null) {
 };
 
 global.clone = function (value) {
+    if (value === undefined) return undefined;
+
     return JSON.parse(JSON.stringify(value));
 }
 
