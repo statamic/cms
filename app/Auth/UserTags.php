@@ -318,10 +318,16 @@ class UserTags extends Tags
      */
     public function is()
     {
-        $role = $this->get(['role', 'roles']);
+        if (! $user = User::current()) {
+            return;
+        }
 
-        if ($this->api('Is')->is($role)) {
-            return $this->parse([]);
+        $roles = Arr::wrap($this->params->explode(['role', 'roles']));
+
+        foreach ($roles as $role) {
+            if ($user->hasRole($role)) {
+                return $this->parse();
+            }
         }
     }
 
@@ -334,11 +340,22 @@ class UserTags extends Tags
      */
     public function isnt()
     {
-        $role = $this->get(['role', 'roles']);
-
-        if (! $this->api('Is')->is($role)) {
-            return $this->parse([]);
+        if (! $user = User::current()) {
+            return $this->parse();
         }
+
+        $roles = Arr::wrap($this->params->explode(['roles', 'role']));
+
+        $is = false;
+
+        foreach ($roles as $permission) {
+            if ($user->hasRole($permission)) {
+                $is = true;
+                break;
+            }
+        }
+
+        return $is ? null : $this->parse();
     }
 
     /**

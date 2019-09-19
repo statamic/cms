@@ -3,6 +3,8 @@
 namespace Statamic\Tags;
 
 use Statamic\Tags\Tags;
+use Statamic\Support\Arr;
+use Statamic\Facades\User;
 
 class Is extends Tags
 {
@@ -13,10 +15,22 @@ class Is extends Tags
      * @param  array $args
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
-        if ($this->api()->is($method)) {
-            return $this->parse([]);
+        if (! $user = User::current()) {
+            return;
+        }
+
+        $role = $method === 'index'
+            ? $this->params->explode(['role', 'roles'])
+            : $method;
+
+        $roles = Arr::wrap($role);
+
+        foreach ($roles as $role) {
+            if ($user->hasRole($role)) {
+                return $this->parse();
+            }
         }
     }
 }
