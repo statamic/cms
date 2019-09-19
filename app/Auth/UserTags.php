@@ -367,10 +367,16 @@ class UserTags extends Tags
      */
     public function in()
     {
-        $group = $this->get(['group', 'groups']);
+        if (! $user = User::current()) {
+            return;
+        }
 
-        if ($this->api('In')->in($group)) {
-            return $this->parse([]);
+        $groups = Arr::wrap($this->params->explode(['group', 'groups']));
+
+        foreach ($groups as $group) {
+            if ($user->isInGroup($group)) {
+                return $this->parse();
+            }
         }
     }
 
@@ -383,11 +389,22 @@ class UserTags extends Tags
      */
     public function notIn()
     {
-        $group = $this->get(['group', 'groups']);
-
-        if (! $this->api('In')->in($group)) {
-            return $this->parse([]);
+        if (! $user = User::current()) {
+            return $this->parse();
         }
+
+        $groups = Arr::wrap($this->params->explode(['groups', 'group']));
+
+        $in = false;
+
+        foreach ($groups as $permission) {
+            if ($user->isInGroup($permission)) {
+                $in = true;
+                break;
+            }
+        }
+
+        return $in ? null : $this->parse();
     }
 
     /**

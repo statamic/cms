@@ -3,6 +3,8 @@
 namespace Statamic\Tags;
 
 use Statamic\Tags\Tags;
+use Statamic\Support\Arr;
+use Statamic\Facades\User;
 
 class In extends Tags
 {
@@ -13,10 +15,22 @@ class In extends Tags
      * @param  array $args
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($method)
     {
-        if ($this->api()->in($method)) {
-            return $this->parse([]);
+        if (! $user = User::current()) {
+            return;
+        }
+
+        $group = $method === 'index'
+            ? $this->params->explode(['group', 'groups'])
+            : $method;
+
+        $groups = Arr::wrap($group);
+
+        foreach ($groups as $group) {
+            if ($user->isInGroup($group)) {
+                return $this->parse();
+            }
         }
     }
 }
