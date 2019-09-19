@@ -29,6 +29,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StaticClear::class,
         // Commands\MakeUserMigration::class,
         Commands\AuthMigration::class,
+        Commands\Multisite::class
     ];
 
     public function boot()
