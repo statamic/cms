@@ -1,11 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Lists;
+namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;
 
-class ListsFieldtype extends Fieldtype
+class Lists extends Fieldtype
 {
     protected static $handle = 'list';
 

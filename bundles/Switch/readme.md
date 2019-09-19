@@ -1,1 +1,0 @@
-The `Rotate` plugin class is mapped here. `Switch` is a reserved word.

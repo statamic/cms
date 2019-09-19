@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Tags;
+namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class TagsFieldtype extends Fieldtype
+class Tags extends Fieldtype
 {
     public function preProcess($data)
     {

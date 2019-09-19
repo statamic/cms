@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Revealer;
+namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class RevealerFieldtype extends Fieldtype
+class Revealer extends Fieldtype
 {
     public function canBeValidated()
     {

@@ -20,26 +20,6 @@ class ExtensionServiceProvider extends ServiceProvider
     use DetectsApplicationNamespace;
 
     /**
-     * Fieldtypes bundled with Statamic.
-     *
-     * @var array
-     */
-    protected $bundledFieldtypes = [
-        'fieldset', 'hidden', 'lists', 'locale_settings',
-        'revealer', 'table', 'tags',
-    ];
-
-    /**
-     * Aliases for fieldtypes bundled with Statamic.
-     *
-     * @var array
-     */
-    protected $bundledFieldtypeAliases = [
-        'array' => 'Arr',
-        'list' => 'lists'
-    ];
-
-    /**
      * Aliases for modifiers bundled with Statamic.
      *
      * @var array
@@ -95,19 +75,24 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Grid::class,
+        Fieldtypes\Hidden::class,
         Fieldtypes\Integer::class,
+        Fieldtypes\Lists::class,
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Range::class,
         Fieldtypes\Relationship::class,
         Fieldtypes\Replicator::class,
+        Fieldtypes\Revealer::class,
         Fieldtypes\Section::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
         Fieldtypes\Structures::class,
         Fieldtypes\StructureSites::class,
         Fieldtypes\Slug::class,
+        Fieldtypes\Table::class,
+        Fieldtypes\Tags::class,
         Fieldtypes\Taxonomy::class,
         Fieldtypes\Taxonomies::class,
         Fieldtypes\Template::class,
@@ -256,31 +241,12 @@ class ExtensionServiceProvider extends ServiceProvider
         $parent = 'statamic.fieldtypes';
 
         $this->registerParent($parent);
-        $this->registerBundledFieldtypes($parent);
+
+        foreach ($this->fieldtypes as $fieldtype) {
+            $this->registerExtension($fieldtype, $parent);
+        }
+
         $this->registerExtensionsInAppFolder('Fieldtypes', $parent);
-    }
-
-    /**
-     * Register bundled fieldtypes.
-     *
-     * @param string $parent
-     * @return void
-     */
-    protected function registerBundledFieldtypes($parent)
-    {
-        foreach ($this->bundledFieldtypes as $tag) {
-            $studly = studly_case($tag);
-            $this->app[$parent][$tag] = "Statamic\\Addons\\{$studly}\\{$studly}Fieldtype";
-        }
-
-        foreach ($this->bundledFieldtypeAliases as $alias => $actual) {
-            $studly = studly_case($actual);
-            $this->app[$parent][$alias] = "Statamic\\Addons\\{$actual}\\{$actual}Fieldtype";
-        }
-
-        foreach ($this->fieldtypes as $handle => $class) {
-            $this->app[$parent][$class::handle()] = $class;
-        }
     }
 
     /**
