@@ -262,7 +262,7 @@ class Tree implements Localization
             }
         }
 
-        return [$match, $branches];
+        return [$match, array_values($branches)];
     }
 
     protected function validateRoot($root)

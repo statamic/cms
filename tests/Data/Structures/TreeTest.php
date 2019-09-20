@@ -206,6 +206,41 @@ class TreeTest extends TestCase
         $this->assertEquals($arr, $tree->tree());
     }
 
+    /** @test */
+    function it_fixes_indexes_when_moving()
+    {
+        $tree = $this->tree()->tree([
+            [
+                'entry' => 'pages-blog',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ]
+                ],
+            ]
+        ]);
+
+        $tree->move('pages-blog', 'pages-about');
+
+        // If the indexes hadn't been fixed, we'd have an array starting with 1.
+        $this->assertEquals([
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-blog',
+                    ]
+                ],
+            ]
+        ], $tree->tree());
+    }
+
     protected function tree()
     {
         return (new Tree)
