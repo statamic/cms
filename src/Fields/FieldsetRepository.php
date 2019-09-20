@@ -26,10 +26,6 @@ class FieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
-        if (! $handle) {
-            return null;
-        }
-
         if ($cached = array_get($this->fieldsets, $handle)) {
             return $cached;
         }
