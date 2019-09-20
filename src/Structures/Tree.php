@@ -16,7 +16,6 @@ class Tree implements Localization
     protected $locale;
     protected $root;
     protected $tree = [];
-    protected $withParent = true;
     protected $structure;
     protected $cachedFlattenedPages;
 
@@ -98,8 +97,7 @@ class Tree implements Localization
             ->setTree($this)
             ->setPages($this->tree)
             ->setParent($this->parent())
-            ->setDepth(1)
-            ->prependParent($this->withParent);
+            ->setDepth(1);
 
         if ($route = $this->route()) {
             $pages->setRoute($route);
@@ -128,13 +126,6 @@ class Tree implements Localization
             ->filter->reference()
             ->keyBy->reference()
             ->get($id);
-    }
-
-    public function withoutParent()
-    {
-        $this->withParent = false;
-
-        return $this;
     }
 
     public function save()

@@ -17,11 +17,11 @@ class TreeBuilder
             return null;
         }
 
-        if (! Arr::get($params, 'include_home')) {
-            $tree->withoutParent();
-        }
+        $pages = $tree->pages()
+            ->prependParent(Arr::get($params, 'include_home'))
+            ->all();
 
-        return $this->toTree($tree->pages()->all(), 1);
+        return $this->toTree($pages, 1);
     }
 
     protected function toTree($pages, $depth)

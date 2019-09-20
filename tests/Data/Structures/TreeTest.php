@@ -65,21 +65,12 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_child_pages_including_the_parent_by_default()
+    function it_gets_the_child_pages_including_the_root()
     {
         $pages = $this->tree()->pages();
 
         $this->assertInstanceOf(Pages::class, $pages);
         $this->assertCount(3, $pages->all());
-    }
-
-    /** @test */
-    function it_gets_the_child_pages_without_the_parent()
-    {
-        $pages = $this->tree()->withoutParent()->pages();
-
-        $this->assertInstanceOf(Pages::class, $pages);
-        $this->assertCount(2, $pages->all());
     }
 
     /** @test */
