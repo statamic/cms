@@ -30,6 +30,7 @@
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
+                :error-key="`${parentName}.${index}.${field.handle}`"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -164,7 +165,7 @@ export default {
 
         expand() {
             this.$emit('expanded');
-        },
+        }
 
     }
 

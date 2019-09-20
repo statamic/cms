@@ -2,8 +2,7 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Fields\Field;
-use Statamic\Fields\Fieldset;
+use Illuminate\Support\Facades\Validator;
 
 class Validation
 {
@@ -58,6 +57,11 @@ class Validation
         }
 
         return collect($original);
+    }
+
+    public function validate()
+    {
+        return Validator::validate($this->fields->values(), $this->rules());
     }
 
     public static function explodeRules($rules)

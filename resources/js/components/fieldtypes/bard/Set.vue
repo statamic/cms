@@ -25,7 +25,7 @@
                 </dropdown-list>
             </div>
         </div>
-        <div class="replicator-set-body" v-show="!collapsed">
+        <div class="replicator-set-body" v-show="!collapsed" v-if="index">
             <set-field
                 v-for="field in config.fields"
                 v-show="showField(field)"
@@ -35,6 +35,7 @@
                 :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
+                :error-key="`${parentName}.${index}.attrs.values.${field.handle}`"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
@@ -105,8 +106,8 @@ export default {
         },
 
         index() {
-            return 0; // todo
-        },
+            return this.options.bard.setIndexes[this.node.attrs.id];
+        }
 
     },
 
@@ -175,7 +176,7 @@ export default {
         expand() {
             // this.$events.$emit('expanded', this.node.attrs.id);
             this.options.bard.expandSet(this.node.attrs.id);
-        },
+        }
 
     }
 }

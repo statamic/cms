@@ -181,12 +181,10 @@ class EntriesController extends CpController
 
         $fields = $entry->blueprint()->fields()->addValues($request->except('id'))->process();
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        (new Validation)->fields($fields)->withRules([
             'title' => 'required',
             'slug' => 'required|alpha_dash',
-        ]);
-
-        $request->validate($validation->rules());
+        ])->validate();
 
         $values = $fields->values();
         $parent = array_pull($values, 'parent');

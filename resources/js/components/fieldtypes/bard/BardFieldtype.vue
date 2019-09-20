@@ -150,7 +150,7 @@ export default {
         return {
             editor: null,
             html: null,
-            json: null,
+            json: [],
             showSource: false,
             fullScreenMode: false,
             buttons: [],
@@ -191,6 +191,18 @@ export default {
 
         id() {
             return `${this.storeName}.${this.name}`;
+        },
+
+        setIndexes() {
+            let indexes = {}
+
+            this.json.forEach((item, i) => {
+                if (item.type === 'set') {
+                    indexes[item.attrs.id] = i;
+                }
+            });
+
+            return indexes;
         }
 
     },
@@ -212,14 +224,12 @@ export default {
                 }, 1);
             },
             onUpdate: ({ getJSON, getHTML }) => {
-                let value = getJSON().content;
-                // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
-                value = JSON.stringify(value);
-                this.update(value);
+                this.json = getJSON().content;
                 this.html = getHTML();
             },
         });
 
+        this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
         this.$mousetrap.bind('esc', this.closeFullscreen)
@@ -230,6 +240,11 @@ export default {
     },
 
     watch: {
+
+        json(json) {
+            // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
+            this.update(JSON.stringify(json));
+        },
 
         value(value, oldValue) {
             if (value === oldValue) return;

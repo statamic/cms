@@ -57,6 +57,9 @@ export default {
             type: Number,
             required: true
         },
+        errorKey: {
+            type: String
+        },
         readOnly: Boolean,
     },
 
@@ -78,10 +81,6 @@ export default {
 
         hasError() {
             return this.errors.length > 0;
-        },
-
-        errorKey() {
-            return `${this.parentName}.${this.setIndex}.${this.field.handle}`;
         },
 
         errors() {

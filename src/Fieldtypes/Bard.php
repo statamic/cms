@@ -199,7 +199,19 @@ class Bard extends Replicator
             return [];
         }
 
-        return parent::extraRules();
+        return collect($this->field->value())->filter(function ($set) {
+            return $set['type'] === 'set';
+        })->map(function ($set, $index) {
+            $set = $set['attrs']['values'];
+            return $this->setRules($set['type'], $set, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
+    }
+
+    protected function setRuleFieldKey($handle, $index)
+    {
+        return "{$this->field->handle()}.{$index}.attrs.values.{$handle}";
     }
 
     public function isLegacyData($value)
