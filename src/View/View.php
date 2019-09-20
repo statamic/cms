@@ -84,8 +84,12 @@ class View
             ->toArray();
     }
 
-    public function cascadeContent($content)
+    public function cascadeContent($content = null)
     {
+        if (func_num_args() === 0) {
+            return $this->cascadeContent;
+        }
+
         $this->cascadeContent = $content;
 
         return $this;

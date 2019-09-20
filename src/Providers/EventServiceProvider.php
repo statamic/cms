@@ -15,6 +15,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Statamic\View\Events\ViewRendered::class => [
             \Statamic\View\Debugbar\AddVariables::class,
+            \Statamic\View\Debugbar\AddRequestMessage::class,
         ],
         \Illuminate\Auth\Events\Login::class => [
             \Statamic\Auth\SetLastLoginTimestamp::class

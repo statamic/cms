@@ -41,7 +41,6 @@ class FrontendController extends Controller
         }
 
         if ($data = Data::findByUri($url, Site::current()->handle())) {
-            debugbar()->addMessage("Item {$data->id()} loaded by URL Request", 'statamic');
             return $data;
         }
 
