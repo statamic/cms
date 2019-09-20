@@ -81,7 +81,10 @@ export default {
                 return this.field.config.width;
             },
             set(width) {
-                this.configFieldUpdated('width', width);
+                let field = this.field;
+                field.config.width = width;
+                if (field.type === 'reference') field.config_overrides.push('width');
+                this.$emit('updated', field);
             }
         },
 
