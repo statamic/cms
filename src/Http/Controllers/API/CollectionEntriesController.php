@@ -2,19 +2,84 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Facades\Entry;
+use Statamic\Support\Str;
 use Illuminate\Http\Request;
+use Statamic\Tags\Query\HasConditions;
 use Statamic\Http\Resources\EntryResource;
 use Statamic\Http\Controllers\CP\CpController;
 
 class CollectionEntriesController extends CpController
 {
-    use TemporaryResourcePagination;
+    use HasConditions;
 
     public function index($collection, Request $request)
     {
-        $entries = static::paginate(Entry::whereCollection($collection->handle()));
+        $query = $collection->queryEntries();
 
-        return EntryResource::collection($entries);
+        $this->filter($query, $request);
+        $this->sort($query, $request);
+        $paginator = $this->paginate($query, $request);
+
+        return EntryResource::collection($paginator);
+    }
+
+    /**
+     * Filters a query based on conditions in the filter parameter.
+     *
+     * /endpoint?filter[field:condition]=foo&filter[anotherfield]=bar
+     */
+    protected function filter($query, $request)
+    {
+        collect($request->filter ?? [])
+            ->each(function ($value, $filter) use ($query) {
+                if (Str::contains($filter, ':')) {
+                    [$field, $condition] = explode(':', $filter);
+                } else {
+                    $field = $filter;
+                    $condition = 'equals';
+                }
+
+                $this->queryCondition($query, $field, $condition, $value);
+            });
+    }
+
+    /**
+     * Gets a paginator, limited if requested by the limit paramter.
+     *
+     * /endpoint?limit=10
+     */
+    protected function paginate($query, $request)
+    {
+        return $query
+            ->paginate($request->input('limit', 25))
+            ->appends($request->only(['filter', 'limit', 'page']));
+    }
+
+    /**
+     * Sorts the query based on the sort parameter.
+     *
+     * Fields can be prexied with a hyphen to sort descending.
+     *
+     * /endpoint?sort=field
+     * /endpoint?sort=field,anotherfield
+     * /endpoint?sort=-field
+     */
+    protected function sort($query, $request)
+    {
+        if (! $sorts = $request->sort) {
+            return;
+        }
+
+        collect(explode(',', $sorts))
+            ->each(function ($sort) use ($query) {
+                $order = 'asc';
+
+                if (Str::startsWith($sort, '-')) {
+                    $sort = substr($sort, 1);
+                    $order = 'desc';
+                }
+
+                $query->orderBy($sort, $order);
+            });
     }
 }
