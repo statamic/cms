@@ -227,6 +227,10 @@ class Tree implements Localization
 
     public function move($entry, $target)
     {
+        if ($this->page($entry)->parent()->id() === $target) {
+            return $this;
+        }
+
         [$match, $branches] = $this->removeFromInBranches($entry, $this->tree);
 
         $this->tree = $branches;

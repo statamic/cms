@@ -181,6 +181,31 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
+    /** @test */
+    function it_doesnt_get_moved_if_its_already_in_the_target()
+    {
+        $tree = $this->tree()->tree($arr = [
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                    ]
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ]
+        ]);
+
+        $tree->move('pages-board', 'pages-about');
+
+        $this->assertEquals($arr, $tree->tree());
+    }
+
     protected function tree()
     {
         return (new Tree)
