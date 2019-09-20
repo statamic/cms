@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 
 class FieldsetRepository
 {
+    protected $fieldsets = [];
     protected $files;
     protected $directory;
 
@@ -25,6 +26,14 @@ class FieldsetRepository
 
     public function find(string $handle): ?Fieldset
     {
+        if (! $handle) {
+            return null;
+        }
+
+        if ($cached = array_get($this->fieldsets, $handle)) {
+            return $cached;
+        }
+
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
@@ -32,9 +41,13 @@ class FieldsetRepository
             return null;
         }
 
-        return (new Fieldset)
+        $fieldset = (new Fieldset)
             ->setHandle($handle)
             ->setContents(YAML::parse($this->files->get($path)));
+
+        $this->fieldsets[$handle] = $fieldset;
+
+        return $fieldset;
     }
 
     public function exists(string $handle): bool
