@@ -188,7 +188,9 @@ class EntriesController extends CpController
 
         $request->validate($validation->rules());
 
-        $values = array_except($fields->values(), ['slug', 'date']);
+        $values = $fields->values();
+        $parent = array_pull($values, 'parent');
+        $values = array_except($values, ['slug', 'date']);
 
         if ($entry->hasOrigin()) {
             $entry->data(array_only($values, $request->input('_localized')));
@@ -218,10 +220,10 @@ class EntriesController extends CpController
                 ->save();
         }
 
-        if ($request->parent && ($structure = $collection->structure())) {
+        if ($parent && ($structure = $collection->structure())) {
             $structure
                 ->in($entry->locale())
-                ->move($entry->id(), $values['parent'])
+                ->move($entry->id(), $parent)
                 ->save();
         }
 
