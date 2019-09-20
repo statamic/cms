@@ -56,6 +56,10 @@ class Translator extends BaseTranslator
 
     protected function phpFiles($path)
     {
+        if (! $this->files->exists($path)) {
+            return collect();
+        }
+
         return collect($this->files->allFiles($path))
             ->filter(function ($file) {
                 return $file->getExtension() === 'php';
