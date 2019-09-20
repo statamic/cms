@@ -8,7 +8,6 @@ use Statamic\Statamic;
 class Sites
 {
     protected $config;
-    protected $default;
     protected $sites;
     protected $current;
 
@@ -50,7 +49,7 @@ class Sites
     {
         return $this->current
             ?? $this->findByUrl(request()->getUri())
-            ?? $this->get($this->default);
+            ?? $this->default();
     }
 
     public function setCurrent($site)
@@ -73,7 +72,6 @@ class Sites
             array_set($this->config, $key, $value);
         }
 
-        $this->default = $this->config['default'];
         $this->sites = $this->toSites($this->config['sites']);
     }
 
