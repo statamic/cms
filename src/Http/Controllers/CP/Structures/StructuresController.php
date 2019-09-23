@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Structure;
@@ -126,12 +127,14 @@ class StructuresController extends CpController
 
         $this->authorize('update', $structure, 'You are not authorized to edit this structure.');
 
+        $expectedRoot = $structure->expectsRoot();
+
         $values = $fields->values();
 
         $structure
             ->title($values['title'])
             ->handle($values['handle'])
-            ->expectsRoot($values['expects_root'])
+            ->expectsRoot($expectsRoot = $values['expects_root'])
             ->sites(collect($values['sites'])->filter->enabled->map->handle->values()->all());
 
         foreach ($values['sites'] as $site) {
@@ -163,6 +166,8 @@ class StructuresController extends CpController
         } else {
             $structure->collections($values['collections']);
         }
+
+        $this->updateRootExpectations($structure, $expectedRoot, $expectsRoot);
 
         $structure->save();
 
@@ -215,6 +220,36 @@ class StructuresController extends CpController
         }
 
         return ['redirect' => $structure->showUrl()];
+    }
+
+    protected function updateRootExpectations($structure, $expected, $expecting)
+    {
+        if ($expected === $expecting) {
+            return;
+        }
+
+        $structure->trees()->each(function ($tree) use ($expecting) {
+            return $expecting
+                ? $this->moveFirstPageToRoot($tree)
+                : $this->moveRootToFirstPage($tree);
+        });
+    }
+
+    protected function moveFirstPageToRoot($tree)
+    {
+        $arr = $tree->tree();
+        $first = Arr::pull($arr, 0);
+        $tree
+            ->tree(array_values($arr))
+            ->root($first['entry']);
+    }
+
+    protected function moveRootToFirstPage($tree)
+    {
+        $root = $tree->root();
+        $arr = $tree->tree();
+        array_unshift($arr, ['entry' => $root]);
+        $tree->root(null)->tree($arr);
     }
 
     public function editFormBlueprint()
