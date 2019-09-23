@@ -84,7 +84,7 @@
                             :config="{ handle: 'collections', type: 'collections' }"
                             :value="value"
                             :meta="meta"
-                            name="collections"
+                            handle="collections"
                             @input="structure.collections = $event" />
                     </div>
                 </publish-field-meta>
@@ -104,7 +104,7 @@
                             :config="{ handle: 'collection', type: 'collections', max_items: 1 }"
                             :value="value"
                             :meta="meta"
-                            name="collections"
+                            handle="collections"
                             @input="structure.collection = $event[0]" />
                     </div>
                 </publish-field-meta>
