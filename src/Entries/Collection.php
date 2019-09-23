@@ -28,7 +28,7 @@ class Collection implements Contract
     protected $title;
     protected $template;
     protected $layout;
-    protected $sites = [];
+    protected $sites;
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
@@ -223,7 +223,7 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect($sites);
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
             })
             ->args(func_get_args());
     }

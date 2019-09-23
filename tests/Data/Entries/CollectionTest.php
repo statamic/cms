@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Statamic\Facades;
 use Tests\TestCase;
+use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Entries\Entry;
 use Statamic\Entries\Collection;
@@ -79,16 +80,38 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_sites_it_can_be_used_in()
+    function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+        ]]);
+
         $collection = new Collection;
-        $this->assertCount(0, $collection->sites());
+
+        $sites = $collection->sites();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $sites);
+        $this->assertEquals([], $sites->all());
 
         $return = $collection->sites(['en', 'fr']);
 
         $this->assertEquals($collection, $return);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->sites());
         $this->assertEquals(['en', 'fr'], $collection->sites()->all());
+    }
+
+    /** @test */
+    function it_gets_the_default_site_when_in_single_site_mode()
+    {
+        $collection = new Collection;
+
+        $sites = $collection->sites();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $sites);
+        $this->assertEquals(['en'], $sites->all());
+
+        $return = $collection->sites(['en', 'fr']); // has no effect
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals(['en'], $collection->sites()->all());
     }
 
     /** @test */
