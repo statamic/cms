@@ -54,7 +54,7 @@
             <button class="btn btn-default" @click="addField">+ {{ __('Add Field') }}</button>
 
             <stack v-if="selectingFieldtype" name="fieldtype-selector" @closed="selectingFieldtype = false">
-                <fieldtype-selector @selected="fieldtypeSelected" />
+                <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
             </stack>
 
         </template>
