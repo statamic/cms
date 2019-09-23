@@ -113,6 +113,16 @@
                     <span>If the collection you intend to use does not exist yet, choose <b>this structure</b> later while creating it.</span>
                 </div>
             </div>
+            <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'collection'">
+                <label class="font-bold text-base mb-sm" for="name">Expect a root page</label>
+                <toggle-fieldtype
+                    handle="expects_root"
+                    v-model="structure.expects_root"  />
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                    <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
+                    Whether you want the first page in the tree to be considered the "root" or "home" page.
+                </div>
+            </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Max Depth</label>
                 <input type="number" min="1" step="1" v-model="structure.max_depth" class="input-text">
@@ -165,6 +175,7 @@ export default {
                 collection: null,
                 max_depth: null,
                 route: '{parent_uri}/{slug}',
+                expects_root: null,
             }
         }
     },
@@ -178,6 +189,12 @@ export default {
     watch: {
         'structure.title': function(val) {
             this.structure.handle = this.$slugify(val, '_');
+        },
+
+        purpose(purpose) {
+            if (purpose === 'collection') {
+                this.structure.expects_root = true;
+            }
         }
     },
 

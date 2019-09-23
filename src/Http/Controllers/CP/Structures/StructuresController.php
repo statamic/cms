@@ -193,6 +193,7 @@ class StructuresController extends CpController
             'collections' => 'array',
             'collection' => 'nullable',
             'max_depth' => 'nullable|integer',
+            'expects_root' => 'nullable',
             'route' => 'nullable', // todo: change to the structuresites fieldtype
         ]);
 
@@ -200,7 +201,8 @@ class StructuresController extends CpController
             ->title($values['title'])
             ->handle($values['handle'])
             ->collections($values['collections'] ?? [])
-            ->maxDepth($values['max_depth']);
+            ->maxDepth($values['max_depth'])
+            ->expectsRoot($values['expects_root']);
 
         $sites = [ // todo: change to the structuresites fieldtype
             ['handle' => Site::default()->handle(), 'route' => $values['route']],
