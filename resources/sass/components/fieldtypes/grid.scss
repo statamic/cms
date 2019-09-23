@@ -15,6 +15,7 @@
         display: table-cell;
         position: sticky;
         top: -1px;
+        z-index: auto;
 
         &:first-child { @apply .rounded-tl pl-1.5; }
         &:last-child { @apply .rounded-tr; }
