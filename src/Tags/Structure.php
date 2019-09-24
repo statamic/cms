@@ -8,9 +8,14 @@ use Statamic\Structures\TreeBuilder;
 
 class Structure extends Tags
 {
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        return $this->structure($this->method);
+        return $this->structure($tag);
+    }
+
+    public function index()
+    {
+        return $this->structure($this->get('for'));
     }
 
     protected function structure($handle)
