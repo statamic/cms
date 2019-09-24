@@ -16,25 +16,11 @@ use Illuminate\Contracts\View\Engine as EngineInterface;
 class Engine implements EngineInterface
 {
     /**
-     * Data to be injected into the view
-     *
-     * @var array
-     */
-    private $data;
-
-    /**
      * The Antlers Parser
      *
      * @return Parser
      */
     private $parser;
-
-    /**
-     * Full path to the view
-     *
-     * @var string
-     */
-    private $path;
 
     /**
      * @var Filesystem
