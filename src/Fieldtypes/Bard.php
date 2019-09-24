@@ -274,4 +274,9 @@ class Bard extends Replicator
 
         return compact('existing', 'new', 'defaults', 'collapsed');
     }
+
+    public function preProcessValidatable($value)
+    {
+        return json_decode($value, true);
+    }
 }

@@ -116,13 +116,11 @@ class GlobalsController extends CpController
 
         $this->authorize('edit', $set);
 
-        $fields = $set->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $set->blueprint()->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields);
+        (new Validation)->fields($fields)->validate();
 
-        $request->validate($validation->rules());
-
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         if ($set->hasOrigin()) {
             $values = array_only($values, $request->input('_localized'));

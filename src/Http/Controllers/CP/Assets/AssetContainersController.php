@@ -68,13 +68,11 @@ class AssetContainersController extends CpController
 
         $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
-        $validation = (new Validation)->fields(
-            $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->formBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        (new Validation)->fields($fields)->validate();
 
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         $container
             ->title($values['title'])

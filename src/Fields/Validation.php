@@ -61,6 +61,8 @@ class Validation
 
     public function validate()
     {
+        $this->fields = $this->fields->preProcessValidatables();
+
         return Validator::validate($this->fields->values(), $this->rules());
     }
 

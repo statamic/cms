@@ -8,8 +8,8 @@ class ConfigField extends Field
     {
         $value = $this->value ?? $this->defaultValue();
 
-        $this->value = $this->fieldtype()->preProcessConfig($value);
+        $value = $this->fieldtype()->preProcessConfig($value);
 
-        return $this;
+        return $this->newInstance()->setValue($value);
     }
 }

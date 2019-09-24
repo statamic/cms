@@ -125,15 +125,13 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
-        $fields = $blueprint->fields()->addValues($request->all())->process();
+        $fields = $blueprint->fields()->addValues($request->all());
 
         $validation = (new Validation)->fields($fields)->withRules([
             'email' => 'required', // TODO: Needs to be more clever re: different logic for email as login
-        ]);
+        ])->validate();
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['email', 'groups', 'roles']);
+        $values = array_except($fields->process()->values(), ['email', 'groups', 'roles']);
 
         $user = User::make()
             ->email($request->email)
@@ -195,15 +193,13 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $user->blueprint()->fields()->addValues($request->all());
 
         $validation = (new Validation)->fields($fields)->withRules([
             'email' => 'required', // TODO: Needs to be more clever re: different logic for username as login
-        ]);
+        ])->validate();
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['email', 'groups', 'roles']);
+        $values = array_except($fields->process()->values(), ['email', 'groups', 'roles']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);

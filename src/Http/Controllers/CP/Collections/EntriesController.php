@@ -179,14 +179,14 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->except('id'))->process();
+        $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
 
         (new Validation)->fields($fields)->withRules([
             'title' => 'required',
             'slug' => 'required|alpha_dash',
         ])->validate();
 
-        $values = $fields->values();
+        $values = $fields->process()->values();
         $parent = array_pull($values, 'parent');
         $values = array_except($values, ['slug', 'date']);
 
@@ -295,16 +295,14 @@ class EntriesController extends CpController
             Blueprint::find($request->blueprint)
         );
 
-        $fields = $blueprint->fields()->addValues($request->all())->process();
+        $fields = $blueprint->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        (new Validation)->fields($fields)->withRules([
             'title' => 'required',
             'slug' => 'required',
-        ]);
+        ])->validate();
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['slug', 'blueprint']);
+        $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
 
         $entry = Entry::make()
             ->collection($collection)

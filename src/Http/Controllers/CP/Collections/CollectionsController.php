@@ -148,13 +148,11 @@ class CollectionsController extends CpController
     {
         $this->authorize('update', $collection, 'You are not authorized to edit collections.');
 
-        $validation = (new Validation)->fields(
-            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        (new Validation)->fields($fields)->validate();
 
-        $collection = $this->updateCollection($collection, $values = $fields->values());
+        $collection = $this->updateCollection($collection, $values = $fields->process()->values());
 
         if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
             $collection->futureDateBehavior($futureDateBehavior);

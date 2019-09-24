@@ -102,6 +102,11 @@ abstract class Fieldtype implements Arrayable
         return array_map([Validation::class, 'explodeRules'], $this->extraRules);
     }
 
+    public function preProcessValidatable($value)
+    {
+        return $value;
+    }
+
     public function defaultValue()
     {
         return $this->defaultValue;

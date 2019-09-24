@@ -19,6 +19,11 @@ class Field implements Arrayable
         $this->config = $config;
     }
 
+    public function newInstance()
+    {
+        return (new static($this->handle, $this->config))->setValue($this->value);
+    }
+
     public function setHandle(string $handle)
     {
         $this->handle = $handle;
@@ -169,34 +174,46 @@ class Field implements Arrayable
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
     }
 
+    public function validationValue()
+    {
+        return $this->fieldtype()->validationValue($this->value);
+    }
+
     public function process()
     {
-        $this->value = $this->fieldtype()->process($this->value);
-
-        return $this;
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->process($this->value)
+        );
     }
 
     public function preProcess()
     {
         $value = $this->value ?? $this->defaultValue();
 
-        $this->value = $this->fieldtype()->preProcess($value);
+        $value = $this->fieldtype()->preProcess($value);
 
-        return $this;
+        return $this->newInstance()->setValue($value);
     }
 
     public function preProcessIndex()
     {
-        $this->value = $this->fieldtype()->preProcessIndex($this->value);
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->preProcessIndex($this->value)
+        );
+    }
 
-        return $this;
+    public function preProcessValidatable()
+    {
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->preProcessValidatable($this->value)
+        );
     }
 
     public function augment()
     {
-        $this->value = $this->fieldtype()->augment($this->value);
-
-        return $this;
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->augment($this->value)
+        );
     }
 
     public function toArray()

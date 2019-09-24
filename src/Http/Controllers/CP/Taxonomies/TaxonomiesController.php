@@ -124,13 +124,11 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('update', $taxonomy, 'You are not authorized to edit taxonomies.');
 
-        $validation = (new Validation)->fields(
-            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        (new Validation)->fields($fields)->validate();
 
-        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->values());
+        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values());
 
         $taxonomy->save();
 

@@ -117,11 +117,9 @@ class StructuresController extends CpController
 
     public function update(Request $request, $structure)
     {
-        $validation = (new Validation)->fields(
-            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        (new Validation)->fields($fields)->validate();
 
         $structure = Structure::find($structure);
 
@@ -129,7 +127,7 @@ class StructuresController extends CpController
 
         $expectedRoot = $structure->expectsRoot();
 
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         $structure
             ->title($values['title'])

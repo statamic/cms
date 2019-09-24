@@ -63,11 +63,11 @@ class AssetsController extends CpController
 
         // TODO: Auth
 
-        $fields = $asset->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $asset->blueprint()->fields()->addValues($request->all());
 
-        $request->validate((new Validation)->fields($fields)->rules());
+        (new Validation)->fields($fields)->validate();
 
-        $values = array_merge($fields->values(), [
+        $values = array_merge($fields->process()->values(), [
             'focus' => $request->focus
         ]);
 

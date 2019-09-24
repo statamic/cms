@@ -364,8 +364,8 @@ class FieldsTest extends TestCase
 
         $return = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
-        $this->assertEquals($fields, $return);
-        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $fields->values());
+        $this->assertNotSame($fields->get('one'), $return->get('one'));
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $return->values());
     }
 
     /** @test */
@@ -391,12 +391,19 @@ class FieldsTest extends TestCase
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values());
 
-        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
+        $processed = $fields->process();
+
+        $this->assertNotSame($fields, $processed);
+        $this->assertEquals([
+            'one' => 'foo',
+            'two' => 'bar'
+        ], $fields->values());
         $this->assertEquals([
             'one' => 'foo processed',
             'two' => 'bar processed'
-        ], $fields->process()->values());
+        ], $processed->values());
     }
 
     /** @test */
@@ -422,12 +429,57 @@ class FieldsTest extends TestCase
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values());
 
-        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
+        $preProcessed = $fields->preProcess();
+
+        $this->assertNotSame($fields, $preProcessed);
+        $this->assertEquals([
+            'one' => 'foo',
+            'two' => 'bar'
+        ], $fields->values());
         $this->assertEquals([
             'one' => 'foo preprocessed',
             'two' => 'bar preprocessed'
-        ], $fields->preProcess()->values());
+        ], $preProcessed->values());
+    }
+
+    /** @test */
+    function it_augments_each_fields_values_by_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+            public function augment($data) {
+                return $data . ' augmented';
+            }
+        });
+
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'fieldtype']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'fieldtype']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two']
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $augmented = $fields->augment();
+
+        $this->assertNotSame($fields, $augmented);
+        $this->assertEquals([
+            'one' => 'foo',
+            'two' => 'bar'
+        ], $fields->values());
+        $this->assertEquals([
+            'one' => 'foo augmented',
+            'two' => 'bar augmented'
+        ], $augmented->values());
     }
 
     /** @test */
@@ -460,20 +512,25 @@ class FieldsTest extends TestCase
     /** @test */
     function it_filters_down_to_localizable_fields()
     {
-        $items = [
+        $fields = new Fields([
             ['handle' => 'one', 'field' => ['type' => 'text', 'localizable' => false]],
             ['handle' => 'two', 'field' => ['type' => 'text', 'localizable' => false]],
             ['handle' => 'three', 'field' => ['type' => 'text', 'localizable' => true]],
-        ];
+        ]);
+
+        $this->assertEquals(
+            ['one', 'two', 'three'],
+            $fields->all()->keys()->all()
+        );
 
         $this->assertEquals(
             ['one', 'two'],
-            $fields = (new Fields($items))->unlocalizable()->all()->keys()->all()
+            $fields->unlocalizable()->all()->keys()->all()
         );
 
         $this->assertEquals(
             ['three'],
-            $fields = (new Fields($items))->localizable()->all()->keys()->all()
+            $fields->localizable()->all()->keys()->all()
         );
     }
 }

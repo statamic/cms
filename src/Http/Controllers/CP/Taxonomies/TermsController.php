@@ -167,16 +167,14 @@ class TermsController extends CpController
 
         $term = $term->fromWorkingCopy();
 
-        $fields = $term->blueprint()->fields()->addValues($request->except('id'))->process();
+        $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        (new Validation)->fields($fields)->withRules([
             'title' => 'required',
             'slug' => 'required|alpha_dash',
-        ]);
+        ])->validate();
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['slug', 'date']);
+        $values = array_except($fields->process()->values(), ['slug', 'date']);
 
         if ($term->hasOrigin()) {
             $values = array_only($values, $request->input('_localized'));
@@ -263,16 +261,14 @@ class TermsController extends CpController
             Blueprint::find($request->blueprint)
         );
 
-        $fields = $blueprint->fields()->addValues($request->all())->process();
+        $fields = $blueprint->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        (new Validation)->fields($fields)->withRules([
             'title' => 'required',
             'slug' => 'required',
-        ]);
+        ])->validate();
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['slug', 'blueprint']);
+        $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
 
         $term = Term::make()
             ->taxonomy($taxonomy)

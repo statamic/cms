@@ -31,6 +31,13 @@ class Fields
         return $this;
     }
 
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
     public function items()
     {
         return $this->items;
@@ -41,18 +48,25 @@ class Fields
         return $this->fields;
     }
 
+    public function newInstance()
+    {
+        return (new static)
+            ->setItems($this->items)
+            ->setFields($this->fields);
+    }
+
     public function localizable()
     {
-        $this->fields = $this->fields->filter->isLocalizable();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->filter->isLocalizable()
+        );
     }
 
     public function unlocalizable()
     {
-        $this->fields = $this->fields->reject->isLocalizable();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->reject->isLocalizable()
+        );
     }
 
     public function merge($fields)
@@ -79,11 +93,11 @@ class Fields
 
     public function addValues(array $values)
     {
-        $this->fields->each(function ($field) use ($values) {
-            return $field->setValue(array_get($values, $field->handle()));
+        $fields = $this->fields->map(function ($field) use ($values) {
+            return $field->newInstance()->setValue(array_get($values, $field->handle()));
         });
 
-        return $this;
+        return $this->newInstance()->setFields($fields);
     }
 
     public function values()
@@ -95,23 +109,30 @@ class Fields
 
     public function process()
     {
-        $this->fields->each->process();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->map->process()
+        );
     }
 
     public function preProcess()
     {
-        $this->fields->each->preProcess();
+        return $this->newInstance()->setFields(
+            $this->fields->map->preProcess()
+        );
+    }
 
-        return $this;
+    public function preProcessValidatables()
+    {
+        return $this->newInstance()->setFields(
+            $this->fields->map->preProcessValidatable()
+        );
     }
 
     public function augment()
     {
-        $this->fields->each->augment();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->map->augment()
+        );
     }
 
     public function createFields(array $config): array
