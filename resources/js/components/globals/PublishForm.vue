@@ -80,7 +80,7 @@
             :localized-fields="localizedFields"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, components }">
+            <div slot-scope="{ container, components, setFieldMeta }">
                 <component
                     v-for="component in components"
                     :key="component.name"
@@ -93,6 +93,7 @@
                     :syncable="hasOrigin"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
                     @synced="syncField"
                     @desynced="desyncField"
                     @focus="container.$emit('focus', $event)"

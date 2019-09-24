@@ -125,7 +125,7 @@
                     :errors="errors"
                     @updated="values = $event"
                 >
-                    <div class="editor-form" slot-scope="{ setFieldValue }">
+                    <div class="editor-form" slot-scope="{ setFieldValue, setFieldMeta }">
 
                         <div v-if="saving" class="loading">
                             <loading-graphic text="Saving" />
@@ -133,7 +133,7 @@
 
                         <div class="editor-form-fields">
                             <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
-                            <publish-fields :fields="fields" @updated="setFieldValue" />
+                            <publish-fields :fields="fields" @updated="setFieldValue" @meta-updated="setFieldMeta" />
                         </div>
 
                         <div class="editor-form-actions text-right">
