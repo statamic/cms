@@ -86,11 +86,9 @@ class Engine implements EngineInterface
 
         $contents = $parser->parseView($path, $contents, $data);
 
-        if (Arr::last($this->injectExtractions)) {
+        if (array_pop($this->injectExtractions)) {
             $contents = $parser->injectNoparse($contents);
         }
-
-        Arr::forget($this->injectExtractions, count($this->injectExtractions)-1);
 
         return $contents;
     }
