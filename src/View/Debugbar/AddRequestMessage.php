@@ -19,7 +19,9 @@ class AddRequestMessage
             return;
         }
 
-        $item = $event->view->cascadeContent();
+        if (! $item = $event->view->cascadeContent()) {
+            return;
+        }
 
         $message = "{$this->label($item)} loaded by URL Request";
 
