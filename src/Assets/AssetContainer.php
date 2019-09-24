@@ -221,7 +221,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         $files = $files->reject(function ($path) {
             return Str::startsWith($path, '.meta/')
                 || Str::contains($path, '/.meta/')
-                || Str::endsWith($path, ['.DS_Store']);
+                || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
         });
 
         return $files->values();
