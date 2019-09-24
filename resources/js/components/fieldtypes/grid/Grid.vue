@@ -102,6 +102,12 @@ export default {
     },
 
     watch: {
+        value(newVal) {
+            if (JSON.stringify(this.rows) == JSON.stringify(newVal)) {
+                return;
+            }
+            this.rows = newVal;
+        },
 
         rows(rows) {
             this.update(rows);

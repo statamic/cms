@@ -29,6 +29,12 @@ export default {
     },
 
     watch: {
+        rows(rows) {
+            if (JSON.stringify(this.sortableRows) == JSON.stringify(rows)) {
+                return;
+            }
+            this.sortableRows = rows;
+        },
 
         sortableRows(rows) {
             this.$emit('sorted', rows);
