@@ -82,7 +82,7 @@ class Assets extends Tags
             return;
         }
 
-        $urls = (array) $urls;
+        $urls = Arr::wrap($urls);
 
         $this->assets = new AssetCollection;
 
