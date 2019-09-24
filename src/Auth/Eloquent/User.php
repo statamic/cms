@@ -254,8 +254,6 @@ class User extends BaseUser
         $this->saveRoles();
         $this->saveGroups();
 
-        dd($this->model());
-
         $this->model()->save();
 
         // event(new UserSaved($this, [])); // TODO
