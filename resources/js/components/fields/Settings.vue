@@ -12,7 +12,7 @@
                     <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" :name="fieldtype.icon"></svg-icon>
                     {{ fieldtype.title }}
                 </small>
-                {{ config.display || config.handle }}
+                {{ values.display || config.display || config.handle }}
             </h1>
             <button
                 class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
