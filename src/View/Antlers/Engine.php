@@ -42,11 +42,13 @@ class Engine implements EngineInterface
     private $filesystem;
 
     /**
-     * Whether noparse extractions should be injected
+     * Array of whether noparse extractions should be injected. The last
+     * value is always the most recent view / innermost view, since
+     * views can be parsed inside other views (partials).
      *
-     * @var bool
+     * @var array
      */
-    private $injectExtractions = true;
+    private $injectExtractions = [true];
 
     /**
      * Create a new AntlersEngine instance
@@ -67,7 +69,7 @@ class Engine implements EngineInterface
      */
     public function withoutExtractions()
     {
-        $this->injectExtractions = false;
+        $this->injectExtractions[] = false;
 
         return $this;
     }
@@ -98,11 +100,11 @@ class Engine implements EngineInterface
 
         $contents = $parser->parseView($path, $contents, $data);
 
-        if ($this->injectExtractions) {
+        if (Arr::last($this->injectExtractions)) {
             $contents = $parser->injectNoparse($contents);
         }
 
-        $this->injectExtractions = true;
+        Arr::forget($this->injectExtractions, count($this->injectExtractions)-1);
 
         return $contents;
     }

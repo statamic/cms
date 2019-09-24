@@ -16,7 +16,9 @@ class Partial extends Tags
             '__frontmatter' => $this->parameters->all()
         ]);
 
-        return view($this->viewName($partial), $variables)->render();
+        return view($this->viewName($partial), $variables)
+            ->withoutExtractions()
+            ->render();
     }
 
     protected function viewName($partial)
