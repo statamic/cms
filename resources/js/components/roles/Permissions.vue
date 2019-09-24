@@ -27,13 +27,19 @@ export default {
 
     props: {
         initialSuper: Boolean,
-        initialPermissions: Array
+        value: Array
     },
 
     data() {
         return {
             isSuper: this.initialSuper,
-            permissions: this.initialPermissions
+            permissions: this.value
+        }
+    },
+
+    watch: {
+        isSuper(isSuper) {
+            this.$emit('super-updated', isSuper);
         }
     }
 

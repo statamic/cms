@@ -36,7 +36,8 @@
 
                 <role-permissions
                     :initial-super="isSuper"
-                    :initial-permissions="permissions"
+                    v-model="permissions"
+                    @super-updated="isSuper = $event"
                 ></role-permissions>
 
             </div>
