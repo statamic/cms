@@ -52,7 +52,7 @@ class ParserTest extends TestCase
         $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
     }
 
-    public function testListVariable()
+    public function testArrayVariable()
     {
         $template = <<<EOT
 before
@@ -145,6 +145,13 @@ after
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    public function testScopeGlue()
+    {
+        $template = "{{ associative:one }} {{ associative.two }}";
+
+        $this->assertEquals('hello wilderness', Antlers::parse($template, $this->variables));
     }
 
     public function testNonExistantVariablesShouldBeNull()

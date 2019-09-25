@@ -1179,16 +1179,16 @@ class Parser
             return [true, Arr::get($context, $key)];
         }
 
-        // If there was no colon, there's nothing more we can check.
-        if (! str_contains($key, ':')) {
+        // If there was no scope glue, there's nothing more we can check.
+        if (! str_contains($key, [':', '.'])) {
             return [false, null];
         }
 
-        // If it didn't exist and the key contained a colon, we'll try again, but this
+        // If it didn't exist and the key contained a scope glue, we'll try again, but this
         // time using the first part of the key as the new context. For example, if
         // we had been given "foo:bar:baz" as the key, we'll try to get the "foo"
         // from the context and get the "bar:baz" from within within its value.
-        list($first, $rest) = explode(':', $key, 2);
+        list($first, $rest) = preg_split("/(\:|\.)/", $key, 2);
 
         if (! Arr::has($context, $first)) {
             // If it's not found in the context, we'll try looking for it in the cascade.
