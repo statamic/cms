@@ -118,7 +118,7 @@ class TermsController extends CpController
             'meta' => $meta,
             'taxonomy' => $this->taxonomyToArray($taxonomy),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $term),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizedFields' => array_keys($term->data()),
@@ -187,7 +187,7 @@ class TermsController extends CpController
         if ($term->revisionsEnabled() && $term->published()) {
             $term
                 ->makeWorkingCopy()
-                ->user($request->user())
+                ->user(User::fromUser($request->user()))
                 ->save();
         } else {
             if (! $term->revisionsEnabled()) {
@@ -195,7 +195,7 @@ class TermsController extends CpController
             }
 
             $term
-                ->set('updated_by', $request->user()->id())
+                ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
         }
@@ -281,11 +281,11 @@ class TermsController extends CpController
         if ($term->revisionsEnabled()) {
             $term->store([
                 'message' => $request->message,
-                'user' => $request->user(),
+                'user' => User::fromUser($request->user()),
             ]);
         } else {
             $term
-                ->set('updated_by', $request->user()->id())
+                ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
         }

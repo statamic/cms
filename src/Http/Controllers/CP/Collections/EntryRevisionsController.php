@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -34,7 +35,7 @@ class EntryRevisionsController extends CpController
     {
         $entry->createRevision([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
     }
 

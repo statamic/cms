@@ -131,7 +131,7 @@ class EntriesController extends CpController
             'meta' => $meta,
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $entry),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $entry),
             'published' => $entry->published(),
             'locale' => $entry->locale(),
             'localizedFields' => array_keys($entry->data()),
@@ -205,7 +205,7 @@ class EntriesController extends CpController
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
-                ->user($request->user())
+                ->user(User::fromUser($request->user()))
                 ->save();
         } else {
             if (! $entry->revisionsEnabled()) {
@@ -213,7 +213,7 @@ class EntriesController extends CpController
             }
 
             $entry
-                ->set('updated_by', $request->user()->id())
+                ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
         }
@@ -322,11 +322,11 @@ class EntriesController extends CpController
         if ($entry->revisionsEnabled()) {
             $entry->store([
                 'message' => $request->message,
-                'user' => $request->user(),
+                'user' => User::fromUser($request->user()),
             ]);
         } else {
             $entry
-                ->set('updated_by', $request->user()->id())
+                ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
         }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Statamic\Facades\User;
 use Statamic\Facades\Entry;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
@@ -14,7 +15,7 @@ class PublishedEntriesController extends CpController
 
         $entry = $entry->publish([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
 
         return $entry->toArray();
@@ -26,7 +27,7 @@ class PublishedEntriesController extends CpController
 
         $entry->unpublish([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
     }
 }

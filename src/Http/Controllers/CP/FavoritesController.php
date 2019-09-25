@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\Facades\URL;
+use Statamic\Facades\User;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Action;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class FavoritesController extends CpController
             'url'  => 'required'
         ]);
 
-        $request->user()->appendPreference('favorites', [
+        User::fromUser($request->user())->appendPreference('favorites', [
             'name' => request()->name,
             'url' => URL::makeRelative(request()->url)
         ])->save();

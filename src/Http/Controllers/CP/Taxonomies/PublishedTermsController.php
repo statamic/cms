@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
+use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -13,7 +14,7 @@ class PublishedTermsController extends CpController
 
         $term = $term->publish([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
 
         return $term->toArray();
@@ -25,7 +26,7 @@ class PublishedTermsController extends CpController
 
         $term->unpublish([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
     }
 }

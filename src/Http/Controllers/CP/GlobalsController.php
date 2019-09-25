@@ -69,7 +69,7 @@ class GlobalsController extends CpController
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $set),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $set),
             'locale' => $set->locale(),
             'localizedFields' => array_keys($set->data()),
             'hasOrigin' => $hasOrigin,

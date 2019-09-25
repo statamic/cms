@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -34,7 +35,7 @@ class TermRevisionsController extends CpController
     {
         $term->createRevision([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
     }
 
@@ -70,7 +71,7 @@ class TermRevisionsController extends CpController
             'meta' => $fields->meta(),
             'taxonomy' => $this->taxonomyToArray($term->taxonomy()),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $term),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizations' => $term->taxonomy()->sites()->map(function ($handle) use ($term) {

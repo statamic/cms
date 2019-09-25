@@ -177,7 +177,7 @@ class UsersController extends CpController
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
             ],
-            'canEditPassword' => $request->user()->can('editPassword', $user)
+            'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user)
         ];
 
         if ($request->wantsJson()) {
