@@ -140,7 +140,7 @@ class Page implements Entry, AugmentableContract, Responsable
     public function uri()
     {
         if (! $this->reference) {
-            return $this->parent->uri();
+            return optional($this->parent)->uri();
         }
 
         $uris = app(UriCache::class);
