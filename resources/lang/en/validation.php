@@ -115,6 +115,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Custom Statamic Validation Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | Here you may validation messages for the custom rules provided by Statamic.
+    |
+    */
+
+    'unique_entry_value' => 'This value has already been taken.',
+
+    /*
+    |--------------------------------------------------------------------------
     | Custom Validation Language Lines
     |--------------------------------------------------------------------------
     |

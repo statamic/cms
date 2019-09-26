@@ -1,0 +1,67 @@
+<?php
+
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Validator;
+use Statamic\Entries\Collection;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
+
+class UniqueEntryValueTest extends TestCase
+{
+    use PreventSavingStacheItemsToDisk;
+
+    /** @test */
+    function it_fails_when_theres_a_duplicate_entry_entry_value_in_across_all_collections()
+    {
+        Collection::make('collection-one')->save();
+        Collection::make('collection-two')->save();
+        EntryFactory::id('123')->slug('foo')->collection('collection-one')->create();
+        EntryFactory::id('456')->slug('bar')->collection('collection-two')->create();
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => 'unique_entry_value']
+        )->fails());
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'baz'],
+            ['slug' => 'unique_entry_value']
+        )->passes());
+    }
+
+    /** @test */
+    function it_fails_when_theres_a_duplicate_entry_entry_value_in_a_specific_collection()
+    {
+        Collection::make('collection-one')->save();
+        Collection::make('collection-two')->save();
+        EntryFactory::slug('foo')->collection('collection-one')->create();
+        EntryFactory::slug('bar')->collection('collection-two')->create();
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => 'unique_entry_value:collection-one']
+        )->fails());
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'bar'],
+            ['slug' => 'unique_entry_value:collection-one']
+        )->passes());
+    }
+
+    /** @test */
+    function it_passes_duplicate_slug_validation_when_updating_in_a_single_collection()
+    {
+        Collection::make('collection-one')->save();
+        EntryFactory::id('123')->slug('foo')->collection('collection-one')->create();
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => 'unique_entry_value:collection-one,123']
+        )->passes());
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => 'unique_entry_value:collection-one,456']
+        )->fails());
+    }
+}
