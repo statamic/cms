@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'repository' => env('STATAMIC_USERS', 'eloquent'),
+    'repository' => 'eloquent',
 
     'repositories' => [
 
