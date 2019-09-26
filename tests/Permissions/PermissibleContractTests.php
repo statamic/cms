@@ -204,9 +204,9 @@ trait PermissibleContractTests
             {
                 return 'superrole';
             }
-            public function isSuper(): bool
+            public function permissions($permissions = null)
             {
-                return true;
+                return ['super'];
             }
         };
         $nonSuperRole = new class extends Role {
@@ -214,9 +214,9 @@ trait PermissibleContractTests
             {
                 return 'nonsuperrole';
             }
-            public function isSuper(): bool
+            public function permissions($permissions = null)
             {
-                return false;
+                return [];
             }
         };
 
