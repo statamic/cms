@@ -56,7 +56,7 @@
 
                     <transition name="live-preview-contents-slide">
                         <div v-show="panesVisible" ref="contents" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
-                            <iframe ref="iframe" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: `${previewDeviceWidth}px`, height: `${previewDeviceHeight}px` }" />
+                            <iframe ref="iframe" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: previewDeviceWidth, height: previewDeviceHeight }" />
                         </div>
                     </transition>
 
@@ -133,13 +133,13 @@ export default {
 
         previewDeviceWidth() {
             if (this.previewDevice) {
-                return this.$config.get('livePreview.devices')[this.previewDevice].width;
+                return `${this.$config.get('livePreview.devices')[this.previewDevice].width}px`;
             }
         },
 
         previewDeviceHeight() {
             if (this.previewDevice) {
-                return this.$config.get('livePreview.devices')[this.previewDevice].height;
+                return `${this.$config.get('livePreview.devices')[this.previewDevice].height}px`;
             }
         },
 
