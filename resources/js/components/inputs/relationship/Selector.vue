@@ -177,6 +177,13 @@ export default {
             handler(loading) {
                 this.$progress.loading('relationship-selector-listing', loading);
             }
+        },
+
+        searchQuery(query) {
+            this.sortColumn = null;
+            this.sortDirection = null;
+            this.page = 1;
+            this.request();
         }
 
     },
