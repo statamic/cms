@@ -14,7 +14,7 @@ trait UserContractTests
     function user()
     {
         return $this->makeUser()
-            ->id('123')
+            ->id(123)
             ->email('john@example.com')
             ->data([
                 'name' => 'John Smith',
@@ -37,7 +37,7 @@ trait UserContractTests
     /** @test */
     function it_gets_data()
     {
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             'name' => 'John Smith',
             'foo' => 'bar',
             'content' => 'Lorem Ipsum',
@@ -49,7 +49,12 @@ trait UserContractTests
                 'group_one',
                 'group_two',
             ]
-        ], $this->user()->data());
+        ], $this->additionalDataValues()), $this->user()->data());
+    }
+
+    function additionalDataValues()
+    {
+        return [];
     }
 
     /** @test */
@@ -132,12 +137,12 @@ trait UserContractTests
     /** @test */
     function converts_to_array()
     {
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             'name' => 'John Smith',
             'foo' => 'bar',
             'content' => 'Lorem Ipsum',
             'email' => 'john@example.com',
-            'id' => '123',
+            'id' => 123,
             'roles' => [
                 'role_one',
                 'role_two'
@@ -159,7 +164,12 @@ trait UserContractTests
             'edit_url' => 'http://localhost/cp/users/123/edit',
             'permissions' => [],
             'last_login' => null,
-        ], $this->user()->toArray());
+        ], $this->additionalToArrayValues()), $this->user()->toArray());
+    }
+
+    function additionalToArrayValues()
+    {
+        return [];
     }
 
     private function createRole($handle)
