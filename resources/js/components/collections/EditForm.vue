@@ -88,7 +88,7 @@ export default {
     },
 
     created() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$mousetrap.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.submit();
         });

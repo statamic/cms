@@ -550,7 +550,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$mousetrap.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.canPublish ? this.confirmPublish() : this.save();
