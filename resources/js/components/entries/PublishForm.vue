@@ -327,13 +327,13 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && !this.somethingIsLoading;
         },
 
         canPublish() {
             if (!this.revisionsEnabled) return false;
 
-            return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading && this.isWorkingCopy;
+            return !this.readOnly && !this.isCreating && !this.somethingIsLoading && this.isWorkingCopy;
         },
 
         livePreviewUrl() {
@@ -576,7 +576,7 @@ export default {
         this.$mousetrap.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
-            this.canPublish ? this.confirmPublish() : this.save();
+            this.save();
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
