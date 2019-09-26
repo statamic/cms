@@ -454,6 +454,8 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$notify.error(message);
+            } else if (e.response) {
+                this.$notify.error(e.response.data.message);
             } else {
                 this.$notify.error(e || 'Something went wrong');
             }
