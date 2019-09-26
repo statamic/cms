@@ -249,16 +249,13 @@ class User extends BaseUser
         return $this;
     }
 
-    public function save()
+    public function saveToDatabase()
     {
         $this->saveRoles();
+
         $this->saveGroups();
 
         $this->model()->save();
-
-        // event(new UserSaved($this, [])); // TODO
-
-        return $this;
     }
 
     public function delete()

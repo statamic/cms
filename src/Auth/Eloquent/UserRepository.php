@@ -80,7 +80,7 @@ class UserRepository extends BaseRepository
 
     public function save(UserContract $user)
     {
-        // todo
+        $user->saveToDatabase();
     }
 
     public function delete(UserContract $user)
