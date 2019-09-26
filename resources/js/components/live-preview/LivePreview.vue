@@ -27,6 +27,8 @@
                                 @input="componentUpdated(handle, $event)"
                                 class="ml-2" />
 
+                            <slot name="buttons" />
+
                             <button
                                 type="button"
                                 class="btn-close"

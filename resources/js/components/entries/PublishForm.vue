@@ -66,6 +66,7 @@
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
+
                 <div>
                     <component
                         v-for="component in components"
@@ -175,6 +176,26 @@
                         </publish-sections>
                     </transition>
                 </div>
+                <template v-slot:buttons>
+                   <button
+                    v-if="!readOnly"
+                    class="btn ml-2"
+                    :class="{
+                        'btn-primary': isCreating || !revisionsEnabled,
+                    }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="saveText" />
+
+                    <button
+                        v-if="revisionsEnabled && !isCreating"
+                        class="ml-2 btn btn-primary flex items-center"
+                        :disabled="!canPublish"
+                        @click="confirmingPublish = true">
+                        <span v-text="__('Publish')" />
+                        <svg-icon name="chevron-down-xs" class="ml-1" />
+                    </button>
+                </template>
             </live-preview>
         </publish-container>
 
