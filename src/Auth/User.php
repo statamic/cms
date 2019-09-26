@@ -68,6 +68,15 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             : null;
     }
 
+    public function isSuper()
+    {
+        if ((bool) $this->get('super')) {
+            return true;
+        }
+
+        return $this->hasPermission('super');
+    }
+
     public function isTaxonomizable()
     {
         return true;

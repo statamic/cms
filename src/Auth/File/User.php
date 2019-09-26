@@ -270,17 +270,6 @@ class User extends BaseUser
         return $this->permissions()->contains($permission);
     }
 
-    public function isSuper()
-    {
-        if ($this->get('super')) {
-            return true;
-        }
-
-        return null !== $this->groups()->flatMap->roles()
-            ->merge($this->roles())
-            ->first->isSuper();
-    }
-
     public function makeSuper()
     {
         $this->set('super', true);

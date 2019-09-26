@@ -233,15 +233,6 @@ class User extends BaseUser
         return $this->permissions()->contains($permission);
     }
 
-    public function isSuper()
-    {
-        if ((bool) $this->model()->super) {
-            return true;
-        }
-
-        return $this->hasPermission('super');
-    }
-
     public function makeSuper()
     {
         $this->model()->super = true;
