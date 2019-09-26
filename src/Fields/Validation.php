@@ -26,6 +26,8 @@ class Validation
 
     public function rules()
     {
+        $this->fields = $this->fields->preProcessValidatables();
+
         return $this
             ->merge($this->fieldRules(), $this->extraRules)
             ->all();
@@ -61,8 +63,6 @@ class Validation
 
     public function validate()
     {
-        $this->fields = $this->fields->preProcessValidatables();
-
         return Validator::validate($this->fields->values(), $this->rules());
     }
 

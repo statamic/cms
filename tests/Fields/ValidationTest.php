@@ -61,6 +61,7 @@ class ValidationTest extends TestCase
         ]);
 
         $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
         $fields->shouldReceive('all')->andReturn(collect([
             $fieldWithItsOwnRules,
             $fieldWithExtraRules,
@@ -78,7 +79,11 @@ class ValidationTest extends TestCase
     /** @test */
     function it_adds_additional_rules()
     {
-        $validation = (new Validation)->withRules([
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        $validation = (new Validation)->fields($fields)->withRules([
             'foo' => 'required',
             'test' => 'required|array'
         ]);
@@ -100,6 +105,7 @@ class ValidationTest extends TestCase
 
         $fields = Mockery::mock(Fields::class);
         $fields->shouldReceive('all')->andReturn(collect([$field]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
 
         $validation = (new Validation)->fields($fields)->withRules([
             'one' => 'required|min:2',
