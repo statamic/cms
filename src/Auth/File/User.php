@@ -13,11 +13,11 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Statamic\Preferences\HasPreferences;
 use Statamic\Notifications\PasswordReset;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
 /**
@@ -25,7 +25,7 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasPreferences, ContainsData {
+    use ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty, ContainsData {
         data as traitData;
     }
 

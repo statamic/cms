@@ -2,39 +2,58 @@
 
 namespace Tests\Preferences;
 
-use Tests\TestCase;
 use Statamic\Preferences\HasPreferences;
 
-class HasPreferencesTest extends TestCase
+trait HasPreferencesTests
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->person = new Person;
-    }
-
     /** @test */
     function it_can_get_and_set_array_of_preferences()
     {
         $preferences = ['language' => 'english'];
 
-        $this->assertEquals([], $this->person->preferences());
+        $user = $this->makeUser();
 
-        $this->person->preferences($preferences);
+        $this->assertEquals([], $user->preferences());
 
-        $this->assertEquals($preferences, $this->person->preferences());
+        $user->preferences($preferences);
+
+        $this->assertEquals($preferences, $user->preferences());
     }
 
     /** @test */
     function it_can_set_array_of_preferences()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'language' => 'english',
             'color' => 'red'
         ]);
 
-        $this->person->setPreferences([
+        $user->setPreferences([
+            'language' => 'french',
+            'music' => 'metal'
+        ]);
+
+        $expected = [
+            'language' => 'french',
+            'music' => 'metal'
+        ];
+
+        $this->assertEquals($expected, $user->preferences());
+    }
+
+    /** @test */
+    function it_can_merge_array_of_preferences()
+    {
+        $user = $this->makeUser();
+
+        $user->preferences([
+            'language' => 'english',
+            'color' => 'red'
+        ]);
+
+        $user->mergePreferences([
             'language' => 'french',
             'music' => 'metal'
         ]);
@@ -45,13 +64,15 @@ class HasPreferencesTest extends TestCase
             'music' => 'metal'
         ];
 
-        $this->assertEquals($expected, $this->person->preferences());
+        $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
     function it_can_set_a_single_preference()
     {
-        $this->person->setPreference('collection.columns', ['date', 'title']);
+        $user = $this->makeUser();
+
+        $user->setPreference('collection.columns', ['date', 'title']);
 
         $expected = [
             'collection' => [
@@ -62,13 +83,15 @@ class HasPreferencesTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->person->preferences());
+        $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
     function it_can_remove_a_single_preference()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'collection' => [
                 'columns' => [
                     'date',
@@ -80,7 +103,7 @@ class HasPreferencesTest extends TestCase
             ]
         ]);
 
-        $this->person->removePreference('collection.columns');
+        $user->removePreference('collection.columns');
 
         $expected = [
             'collection' => [
@@ -90,13 +113,15 @@ class HasPreferencesTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->person->preferences());
+        $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
     function it_can_remove_a_single_preference_array_value()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'collection' => [
                 'columns' => [
                     'date',
@@ -116,9 +141,9 @@ class HasPreferencesTest extends TestCase
             ]
         ]);
 
-        $this->person->removePreference('collection.columns', 'date');
-        $this->person->removePreference('collection.columns', 'slug');
-        $this->person->removePreference('favorites', [
+        $user->removePreference('collection.columns', 'date');
+        $user->removePreference('collection.columns', 'slug');
+        $user->removePreference('favorites', [
             'name' => 'Updates',
             'url' => 'https://worldwideweb.com/cp/updater/statamic'
         ]);
@@ -137,13 +162,15 @@ class HasPreferencesTest extends TestCase
             ]
         ];
 
-        $this->assertEquals($expected, $this->person->preferences());
+        $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
     function it_cleans_up_by_default_after_removing()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'favorites' => [
                 [
                     'name' => 'Updates',
@@ -152,18 +179,20 @@ class HasPreferencesTest extends TestCase
             ]
         ]);
 
-        $this->person->removePreference('favorites', [
+        $user->removePreference('favorites', [
             'name' => 'Updates',
             'url' => 'https://worldwideweb.com/cp/updater/statamic'
         ]);
 
-        $this->assertEquals([], $this->person->preferences());
+        $this->assertEquals([], $user->preferences());
     }
 
     /** @test */
     function it_can_remove_with_cleanup_disabled()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'favorites' => [
                 [
                     'name' => 'Updates',
@@ -172,7 +201,7 @@ class HasPreferencesTest extends TestCase
             ]
         ]);
 
-        $this->person->removePreference('favorites', [
+        $user->removePreference('favorites', [
             'name' => 'Updates',
             'url' => 'https://worldwideweb.com/cp/updater/statamic'
         ], false);
@@ -181,13 +210,15 @@ class HasPreferencesTest extends TestCase
             'favorites' => []
         ];
 
-        $this->assertEquals($expected, $this->person->preferences());
+        $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
     function it_can_get_a_single_preference()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'collection' => [
                 'filters' => [
                     'published'
@@ -195,15 +226,17 @@ class HasPreferencesTest extends TestCase
             ]
         ]);
 
-        $this->assertEquals(['filters' => ['published']], $this->person->getPreference('collection'));
-        $this->assertEquals(['published'], $this->person->getPreference('collection.filters'));
-        $this->assertEquals(null, $this->person->getPreference('language'));
+        $this->assertEquals(['filters' => ['published']], $user->getPreference('collection'));
+        $this->assertEquals(['published'], $user->getPreference('collection.filters'));
+        $this->assertEquals(null, $user->getPreference('language'));
     }
 
     /** @test */
     function it_can_check_if_a_single_preference_exists()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'collection' => [
                 'filters' => [
                     'published'
@@ -211,28 +244,32 @@ class HasPreferencesTest extends TestCase
             ]
         ]);
 
-        $this->assertTrue($this->person->hasPreference('collection'));
-        $this->assertTrue($this->person->hasPreference('collection.filters'));
-        $this->assertFalse($this->person->hasPreference('language'));
+        $this->assertTrue($user->hasPreference('collection'));
+        $this->assertTrue($user->hasPreference('collection.filters'));
+        $this->assertFalse($user->hasPreference('language'));
     }
 
     /** @test */
     function it_can_modify_a_preference()
     {
-        $this->person->setPreference('favorite', 'pizza');
+        $user = $this->makeUser();
 
-        $this->person->modifyPreference('favorite', function ($value) {
+        $user->setPreference('favorite', 'pizza');
+
+        $user->modifyPreference('favorite', function ($value) {
             return strtoupper($value);
         });
 
-        $this->assertEquals('PIZZA', $this->person->getPreference('favorite'));
+        $this->assertEquals('PIZZA', $user->getPreference('favorite'));
     }
 
     /** @test */
     function it_can_append_to_a_preference()
     {
-        $this->person->appendPreferences('favorite', ['pizza', 'lasagna']);
-        $this->person->appendPreference('favorite', 'rigatoni');
+        $user = $this->makeUser();
+
+        $user->appendPreferences('favorite', ['pizza', 'lasagna']);
+        $user->appendPreference('favorite', 'rigatoni');
 
         $expected = [
             'pizza',
@@ -240,13 +277,15 @@ class HasPreferencesTest extends TestCase
             'rigatoni'
         ];
 
-        $this->assertEquals($expected, $this->person->getPreference('favorite'));
+        $this->assertEquals($expected, $user->getPreference('favorite'));
     }
 
     /** @test */
     function it_can_cleanup_a_preference()
     {
-        $this->person->preferences([
+        $user = $this->makeUser();
+
+        $user->preferences([
             'collection' => [
                 'example-one' => [
                     'deeply' => [
@@ -302,7 +341,7 @@ class HasPreferencesTest extends TestCase
             'filled-top-level' => false
         ];
 
-        $this->person
+        $user
             ->cleanupPreference('collection.example-one.deeply.nested.empty-array')
             ->cleanupPreference('collection.example-two.deeply.nested.empty-string')
             ->cleanupPreference('collection.example-three.deeply.nested.null')
@@ -312,11 +351,6 @@ class HasPreferencesTest extends TestCase
             ->cleanupPreference('filled-top-level')
             ->cleanupPreference('empty-top-level');
 
-        $this->assertEquals($expected, $this->person->preferences());
+        $this->assertEquals($expected, $user->preferences());
     }
-}
-
-class Person
-{
-    use HasPreferences;
 }

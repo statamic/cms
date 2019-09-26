@@ -16,6 +16,7 @@ class StatamicAuthTables extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('super')->default(false);
             $table->string('avatar')->nullable();
+            $table->json('preferences')->nullable();
             $table->timestamp('last_login')->nullable();
         });
 
