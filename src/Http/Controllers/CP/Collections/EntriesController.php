@@ -184,6 +184,7 @@ class EntriesController extends CpController
         (new Validation)->fields($fields)->withRules([
             'title' => 'required',
             'slug' => 'required|alpha_dash',
+            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id(),
         ])->validate();
 
         $values = $fields->process()->values();
@@ -299,7 +300,7 @@ class EntriesController extends CpController
 
         (new Validation)->fields($fields)->withRules([
             'title' => 'required',
-            'slug' => 'required',
+            'slug' => 'required|unique_entry_value:'.$collection->handle(),
         ])->validate();
 
         $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
