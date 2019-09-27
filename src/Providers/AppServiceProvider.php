@@ -138,11 +138,10 @@ class AppServiceProvider extends ServiceProvider
 
     protected function swapSessionMiddleware()
     {
-        $middleware = version_compare($this->app->version(), '5.8.0', '<')
-            ? \Statamic\Http\Middleware\CP\StartSession57::class
-            : \Statamic\Http\Middleware\CP\StartSession::class;
-
-        $this->app->singleton(\Illuminate\Session\Middleware\StartSession::class, $middleware);
+        $this->app->singleton(
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Statamic\Http\Middleware\CP\StartSession::class
+        );
     }
 
     protected function registerIgnitionSolutionProviders()
