@@ -7,12 +7,7 @@
 <body>
     <div id="statamic" :style="{ marginRight: panes.length ? `24rem` : null }">
 
-      <session-expiry
-          email="{{ $user->email() }}"
-          :warn-at="60"
-          :lifetime="{{ config('session.lifetime') * 60 }}"
-      ></session-expiry>
-
+      @include('statamic::partials.session-expiry')
       @include('statamic::partials.global-header')
       @include('statamic::partials.alerts')
 

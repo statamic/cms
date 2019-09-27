@@ -11,6 +11,7 @@ use Statamic\Extensions\Translation\Loader;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Extensions\Translation\Translator;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Http\View\Composers\SessionExpiryComposer;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,7 @@ class CpServiceProvider extends ServiceProvider
         });
 
         View::composer(FieldComposer::VIEWS, FieldComposer::class);
+        View::composer(SessionExpiryComposer::VIEWS, SessionExpiryComposer::class);
 
         View::composer('statamic::layout', function ($view) {
             Statamic::provideToScript([

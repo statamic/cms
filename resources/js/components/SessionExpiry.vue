@@ -11,7 +11,17 @@
             <div class="flex items-center p-3 bg-grey-20 border-b text-center">
                 {{ __('Resume Your Session') }}
             </div>
-            <div class="publish-fields">
+
+            <div v-if="isUsingOauth" class="p-3">
+                <a :href="oauthProvider.loginUrl" target="_blank" class="btn btn-primary">
+                    {{ __('Login with :provider', {provider: oauthProvider.label}) }}
+                </a>
+                <div class="text-2xs text-grey mt-2">
+                    {{ __(`Opens in a new window. Come back once you've logged in.`) }}
+                </div>
+            </div>
+
+            <div v-if="!isUsingOauth" class="publish-fields">
                 <div class="form-group">
                     <label v-text="__('Enter your password to continue where you left off')" />
                     <small
@@ -49,7 +59,8 @@ export default {
     props: {
         warnAt: Number,
         lifetime: Number,
-        email: String
+        email: String,
+        oauthProvider: String
     },
 
     data() {
@@ -75,6 +86,10 @@ export default {
             return (this.remaining === 0)
                 ? __("You have been logged out because you've been inactive for a while.")
                 : __('You have been inactive for a while and will be logged out in :seconds seconds.', { seconds: this.remaining });
+        },
+
+        isUsingOauth() {
+            return this.oauthProvider != null;
         }
 
     },
