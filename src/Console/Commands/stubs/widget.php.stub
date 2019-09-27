@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Statamic\Extend\Widget;
+use Statamic\Widgets\Widget;
 
 class DummyClass extends Widget
 {

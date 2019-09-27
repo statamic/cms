@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Statamic\Extend\Tags;
+use Statamic\Tags\Tags;
 
 class DummyClass extends Tags
 {
