@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import Fuse from 'fuse.js';
 import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
 
 export default {
@@ -95,9 +96,14 @@ export default {
             let options = this.allFieldtypes;
 
             if (this.search) {
-                options = options.filter(fieldtype => {
-                    return fieldtype.text.toLowerCase().includes(this.search.toLowerCase());
-                })
+                const fuse = new Fuse(options, {
+                    findAllMatches: true,
+                    threshold: 0.1,
+                    minMatchCharLength: 2,
+                    keys: ['text'],
+                });
+
+                options = fuse.search(this.search);
             }
 
             return options;
