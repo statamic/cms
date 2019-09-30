@@ -27,13 +27,13 @@ class AssetsController extends CpController
         $asset = $this->supplementAssetForEditing($asset);
 
         $fields = $asset->blueprint()->fields()
-            ->addValues($asset->data())
+            ->addValues($asset->data()->all())
             ->preProcess();
 
         return [
             'asset' => $asset->toArray(),
             'container' => $asset->container()->toArray(),
-            'values' => array_merge($asset->data(), $fields->values()),
+            'values' => $asset->data()->merge($fields->values()),
             'meta' => $fields->meta(),
             'actionUrl' => cp_route('assets.actions'),
             'actions' => Action::for('asset-browser', ['container' => $asset->container()->handle()], $asset),
