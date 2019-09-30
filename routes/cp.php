@@ -189,8 +189,8 @@ Route::group([
     });
 
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
+
+    Route::view('/playground', 'statamic::playground')->name('playground');
+
+    Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');
 });
-
-Route::view('/playground', 'statamic::playground')->name('playground');
-
-Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');
