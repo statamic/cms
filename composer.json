@@ -27,6 +27,7 @@
         "codedungeon/phpunit-result-printer": "^0.26",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
+        "nunomaduro/collision": "^3.0",
         "orchestra/testbench": "3.8|4.0"
     },
     "autoload": {
