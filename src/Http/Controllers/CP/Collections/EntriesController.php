@@ -134,7 +134,7 @@ class EntriesController extends CpController
             'readOnly' => User::fromUser($request->user())->cant('edit', $entry),
             'published' => $entry->published(),
             'locale' => $entry->locale(),
-            'localizedFields' => array_keys($entry->data()),
+            'localizedFields' => $entry->data()->keys()->all(),
             'isRoot' => $entry->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
@@ -364,7 +364,7 @@ class EntriesController extends CpController
 
     protected function extractFromFields($entry, $blueprint)
     {
-        $values = $entry->values();
+        $values = $entry->values()->all();
 
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);

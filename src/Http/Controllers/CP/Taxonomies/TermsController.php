@@ -121,7 +121,7 @@ class TermsController extends CpController
             'readOnly' => User::fromUser($request->user())->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
-            'localizedFields' => array_keys($term->data()),
+            'localizedFields' => $term->data()->keys()->all(),
             'isRoot' => $term->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
@@ -308,7 +308,7 @@ class TermsController extends CpController
     {
         $fields = $blueprint
             ->fields()
-            ->addValues($term->values())
+            ->addValues($term->values()->all())
             ->preProcess();
 
         $values = array_merge($fields->values(), [
