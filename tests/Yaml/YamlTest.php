@@ -61,6 +61,18 @@ EOT;
     }
 
     /** @test */
+    function it_dumps_without_front_matter_when_content_is_null()
+    {
+        $expected = <<<EOT
+foo: bar
+
+EOT;
+
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], null));
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar']));
+    }
+
+    /** @test */
     function it_explicitly_dumps_front_matter()
     {
         $expected = <<<EOT
@@ -99,6 +111,20 @@ content:
 EOT;
 
         $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    /** @test */
+    function it_explicitly_dumps_front_matter_without_content_when_its_null()
+    {
+        $expected = <<<EOT
+---
+foo: bar
+---
+
+EOT;
+
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */

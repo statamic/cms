@@ -81,9 +81,9 @@ class Yaml
      * @param string|bool  $content
      * @return string
      */
-    public function dumpFrontMatter($data, $content = '')
+    public function dumpFrontMatter($data, $content = null)
     {
-        if (! is_string($content)) {
+        if ($content && !is_string($content)) {
             $data['content'] = $content;
             $content = '';
         }
