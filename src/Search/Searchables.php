@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
@@ -24,6 +25,7 @@ class Searchables
         if ($searchables->contains('all')) {
             return collect()
                 ->merge(Entry::all())
+                ->merge(Term::all())
                 ->merge(Asset::all())
                 ->merge(User::all());
         }
@@ -31,6 +33,10 @@ class Searchables
         return $searchables->flatMap(function ($item) {
             if (starts_with($item, 'collection:')) {
                 return Entry::whereCollection(str_after($item, 'collection:'));
+            }
+
+            if (starts_with($item, 'taxonomy:')) {
+                return Term::whereTaxonomy(str_after($item, 'taxonomy:'));
             }
 
             if (starts_with($item, 'assets:')) {
