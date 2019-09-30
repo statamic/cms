@@ -23,6 +23,7 @@ abstract class ServiceProvider extends LaravelServiceProvider
     protected $scripts = [];
     protected $publishables = [];
     protected $routes = [];
+    protected $middleware = [];
 
     public function boot()
     {
@@ -40,7 +41,8 @@ abstract class ServiceProvider extends LaravelServiceProvider
             ->bootStylesheets()
             ->bootScripts()
             ->bootPublishables()
-            ->bootRoutes();
+            ->bootRoutes()
+            ->bootMiddleware();
     }
 
     public function bootEvents()
@@ -242,6 +244,21 @@ abstract class ServiceProvider extends LaravelServiceProvider
         return array_merge($overrides, [
             'namespace' => $this->getAddon()->namespace()
         ]);
+    }
+
+    protected function bootMiddleware()
+    {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
+        foreach (array_get($this->middleware, 'web', []) as $middleware) {
+            Statamic::pushWebMiddleware($middleware);
+        }
+
+        foreach (array_get($this->middleware, 'cp', []) as $middleware) {
+            Statamic::pushCpMiddleware($middleware);
+        }
     }
 
     public function registerScript(string $path)

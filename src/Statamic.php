@@ -10,6 +10,7 @@ use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\Authorize;
 use Statamic\Http\Middleware\CP\Localize;
+use Statamic\StaticCaching\Middleware\Cache;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -23,7 +24,10 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
-    protected static $middleware = [
+    protected static $webMiddleware = [
+        Cache::class
+    ];
+    protected static $cpMiddleware = [
         Authorize::class,
         Localize::class,
     ];
@@ -188,11 +192,21 @@ class Statamic
 
     public static function cpMiddleware()
     {
-        return static::$middleware;
+        return static::$cpMiddleware;
+    }
+
+    public static function webMiddleware()
+    {
+        return static::$webMiddleware;
     }
 
     public static function pushCpMiddleware($middleware)
     {
-        static::$middleware[] = $middleware;
+        static::$cpMiddleware[] = $middleware;
+    }
+
+    public static function pushWebMiddleware($middleware)
+    {
+        static::$webMiddleware[] = $middleware;
     }
 }
