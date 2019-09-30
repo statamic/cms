@@ -202,7 +202,8 @@ class Collection implements Contract
             $blueprint->ensureField('parent', [
                 'type' => 'relationship',
                 'collections' => [$this->handle()],
-                'max_items' => 1
+                'max_items' => 1,
+                'listable' => false,
             ], 'sidebar');
         }
 
