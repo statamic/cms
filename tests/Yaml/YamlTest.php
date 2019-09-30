@@ -153,6 +153,34 @@ EOT;
     }
 
     /** @test */
+    function it_parses_with_content_when_its_in_the_front_matter()
+    {
+        $yaml = <<<EOT
+---
+foo: bar
+content: some content
+---
+EOT;
+
+        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+    }
+
+    /** @test */
+    function it_throws_exception_when_there_is_a_content_var_and_a_content_area()
+    {
+        $yaml = <<<EOT
+---
+foo: bar
+content: some content
+---
+some text
+EOT;
+
+        $this->expectException(ParseException::class);
+        YAML::parse($yaml);
+    }
+
+    /** @test */
     function it_parses_a_file_when_no_argument_is_given()
     {
         $yaml = <<<EOT

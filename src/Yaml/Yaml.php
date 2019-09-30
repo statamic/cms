@@ -47,7 +47,11 @@ class Yaml
             $yaml = SymfonyYaml::parse($str);
         } catch (\Exception $e) {
             throw $this->viewException($e, $str);
-        };
+        }
+
+        if (isset($content) && $content != '' && isset($yaml['content'])) {
+            throw new StatamicParseException('You cannot have a YAML variable named "content" while document content is present');
+        }
 
         return isset($content)
             ? $yaml + ['content' => $content]
