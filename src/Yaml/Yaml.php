@@ -61,20 +61,21 @@ class Yaml
      * @param string|bool  $content
      * @return string
      */
-    public function dump($data, $content = false)
+    public function dump($data, $content = null)
     {
-        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-
         if ($content) {
-            $fenced = "---".PHP_EOL . $yaml . "---".PHP_EOL;
-            $yaml = $fenced . $content;
+            if (is_string($content)) {
+                return $this->dumpFrontMatter($data, $content);
+            }
+
+            $data['content'] = $content;
         }
 
-        return $yaml ?: '';
+        return SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
     }
 
-        /**
-     * Dump some YAML
+    /**
+     * Dump some YAML with fenced front-matter
      *
      * @param array        $data
      * @param string|bool  $content
@@ -82,11 +83,12 @@ class Yaml
      */
     public function dumpFrontMatter($data, $content = '')
     {
-        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        if (! is_string($content)) {
+            $data['content'] = $content;
+            $content = '';
+        }
 
-        $yaml = "---".PHP_EOL . $yaml . "---".PHP_EOL . $content;
-
-        return $yaml ?: '';
+        return '---' . PHP_EOL . $this->dump($data) . '---' . PHP_EOL . $content;
     }
 
     protected function viewException($e, $str)
