@@ -32,7 +32,12 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, HasOrigin;
+    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable;
+
+    use HasOrigin {
+        value as originValue;
+        values as originValues;
+    }
 
     protected $id;
     protected $collection;
@@ -541,5 +546,15 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     public function offsetUnset($key)
     {
         $this->remove($key);
+    }
+
+    public function value($key)
+    {
+        return $this->originValue($key) ?? $this->collection()->cascade($key);
+    }
+
+    public function values()
+    {
+        return array_merge($this->collection()->cascade()->all(), $this->originValues());
     }
 }

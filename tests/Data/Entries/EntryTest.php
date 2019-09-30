@@ -70,6 +70,7 @@ class EntryTest extends TestCase
         $this->assertEquals($entry, $return);
         $this->assertTrue($entry->has('foo'));
         $this->assertEquals('bar', $entry->get('foo'));
+        $this->assertEquals('bar', $entry->value('foo'));
         $this->assertEquals('fallback', $entry->get('unknown', 'fallback'));
 
         $return = $entry->remove('foo');
@@ -93,7 +94,8 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_sets_and_removes_data_values_using_array_access()
     {
-        $entry = new Entry;
+        Collection::make('test')->save();
+        $entry = (new Entry)->collection('test');
         $this->assertNull($entry['foo']);
         $this->assertFalse(isset($entry['foo']));
 
@@ -143,6 +145,47 @@ class EntryTest extends TestCase
             'baz' => 'qux',
             'qux' => 'merged qux',
         ], $entry->data());
+    }
+
+    /** @test */
+    function values_fall_back_to_the_origin_then_the_collection()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $origin = (new Entry)->collection('test');
+        $entry = (new Entry)->origin($origin)->collection('test');
+
+        $this->assertNull($entry->value('test'));
+
+        $collection->cascade(['test' => 'from collection']);
+        $this->assertEquals('from collection', $entry->value('test'));
+
+        $origin->set('test', 'from origin');
+        $this->assertEquals('from origin', $entry->value('test'));
+    }
+
+    /** @test */
+    function it_gets_values_from_origin_and_collection()
+    {
+        tap(Collection::make('test')->cascade([
+            'one' => 'one in collection',
+            'two' => 'two in collection',
+            'three' => 'three in collection',
+        ]))->save();
+
+        $origin = (new Entry)->collection('test')->data([
+            'two' => 'two in origin',
+            'three' => 'three in origin',
+        ]);
+
+        $entry = (new Entry)->origin($origin)->collection('test')->data([
+            'three' => 'three in entry',
+        ]);
+
+        $this->assertEquals([
+            'one' => 'one in collection',
+            'two' => 'two in origin',
+            'three' => 'three in entry',
+        ], $entry->values());
     }
 
     /** @test */
