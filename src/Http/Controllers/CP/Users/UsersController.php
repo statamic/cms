@@ -164,7 +164,7 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()
             ->fields()
-            ->addValues(array_merge($user->data(), ['email' => $user->email()]))
+            ->addValues($user->data()->merge(['email' => $user->email()])->all())
             ->preProcess();
 
         $viewData = [
