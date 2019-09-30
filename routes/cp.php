@@ -1,8 +1,5 @@
 <?php
 
-use Statamic\Http\Middleware\CP\Localize;
-use Statamic\Http\Middleware\CP\Authorize;
-
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('login', 'LoginController@showLoginForm')->name('login');
     Route::post('login', 'LoginController@login');
@@ -18,7 +15,7 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 });
 
 Route::group([
-    'middleware' => [Authorize::class, Localize::class]
+    'middleware' => Statamic::cpMiddleware()
 ], function () {
     Statamic::additionalCpRoutes();
 

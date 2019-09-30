@@ -3,12 +3,14 @@
 namespace Statamic;
 
 use Closure;
-use Statamic\Facades\URL;
+use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\Authorize;
+use Statamic\Http\Middleware\CP\Localize;
 use Stringy\StaticStringy;
-use Illuminate\Http\Request;
 
 class Statamic
 {
@@ -21,6 +23,10 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $middleware = [
+        Authorize::class,
+        Localize::class,
+    ];
 
     public static function version()
     {
@@ -178,5 +184,15 @@ class Statamic
     public static function crumb(...$values)
     {
         return implode(' ‹ ', array_map("__", $values));
+    }
+
+    public static function cpMiddleware()
+    {
+        return static::$middleware;
+    }
+
+    public static function pushCpMiddleware($middleware)
+    {
+        static::$middleware[] = $middleware;
     }
 }
