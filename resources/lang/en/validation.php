@@ -123,6 +123,7 @@ return [
     */
 
     'unique_entry_value' => 'This value has already been taken.',
+    'unique_user_value' => 'This value has already been taken.',
 
     /*
     |--------------------------------------------------------------------------

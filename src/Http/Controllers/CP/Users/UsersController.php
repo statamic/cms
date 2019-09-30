@@ -127,8 +127,8 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
-            'email' => 'required', // TODO: Needs to be more clever re: different logic for email as login
+        (new Validation)->fields($fields)->withRules([
+            'email' => 'required|email|unique_user_value',
         ])->validate();
 
         $values = array_except($fields->process()->values(), ['email', 'groups', 'roles']);
@@ -195,8 +195,8 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
-            'email' => 'required', // TODO: Needs to be more clever re: different logic for username as login
+        (new Validation)->fields($fields)->withRules([
+            'email' => 'required|unique_user_value:'.$id,
         ])->validate();
 
         $values = array_except($fields->process()->values(), ['email', 'groups', 'roles']);
