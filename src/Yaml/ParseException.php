@@ -23,15 +23,12 @@ class ParseException extends ErrorException implements ProvidesSolution
     protected function getSolutionParts()
     {
         if ($this->message === 'You cannot have a YAML variable named "content" while document content is present') {
-            return [
-                '',
-                'If `content` is a string, it can go under the `---`. Otherwise, it should go in the front-matter.',
-            ];
+            $description = 'If `content` is a string, it can go under the `---`. Otherwise, it should go in the front-matter.';
         }
 
         return [
-            'Invalid YAML encountered',
-            'Correct any syntax errors. You may have used YAML 1.0 syntax, but 1.2 is expected.'
+            'Invalid YAML',
+            $description ?? 'Correct any syntax errors. You may have used YAML 1.0 syntax, but 1.2 is expected.'
         ];
     }
 }
