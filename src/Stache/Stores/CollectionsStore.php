@@ -44,7 +44,7 @@ class CollectionsStore extends BasicStore
             ->sites($sites)
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
-            ->data(array_get($data, 'data'))
+            ->cascade(array_get($data, 'inject', []))
             ->entryBlueprints(array_get($data, 'blueprints'))
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))

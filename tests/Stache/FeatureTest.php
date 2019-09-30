@@ -179,12 +179,12 @@ class FeatureTest extends TestCase
             ->orderable(true)
             ->dated(true)
             ->revisionsEnabled(true)
-            ->data(['foo' => 'bar'])
+            ->cascade(['foo' => 'bar'])
             ->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
-            "title: 'New Collection'\ndefault_status: published\ndata:\n  foo: bar\norderable: true\nrevisions: true\ndate: true\n"
+            "title: 'New Collection'\ndefault_status: published\norderable: true\nrevisions: true\ndate: true\ninject:\n  foo: bar\n"
         );
         @unlink($path);
     }

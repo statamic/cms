@@ -12,14 +12,13 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Structure;
-use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Entries\Collection as Contract;
 
 class Collection implements Contract
 {
-    use ContainsData, FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile;
 
     protected $handle;
     protected $route;
@@ -43,6 +42,12 @@ class Collection implements Contract
     protected $pastDateBehavior = 'public';
     protected $structure;
     protected $taxonomies = [];
+    protected $cascade;
+
+    public function __construct()
+    {
+        $this->cascade = collect();
+    }
 
     public function id()
     {
@@ -340,6 +345,20 @@ class Collection implements Contract
         return $index === null ? null : $index + 1;
     }
 
+    public function cascade($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return $this->cascade;
+        }
+
+        if (is_array($key)) {
+            $this->cascade = collect($key);
+            return $this;
+        }
+
+        return $this->cascade->get($key, $default);
+    }
+
     public function fileData()
     {
         $array = Arr::except($this->toArray(), [
@@ -370,6 +389,8 @@ class Collection implements Contract
         if ($array['date_behavior'] == ['past' => 'public', 'future' => 'public']) {
             unset($array['date_behavior']);
         }
+
+        $array['inject'] = Arr::pull($array, 'cascade');
 
         return $array;
     }
@@ -404,7 +425,7 @@ class Collection implements Contract
             'sites' => $this->sites,
             'template' => $this->template,
             'layout' => $this->layout,
-            'data' => $this->data,
+            'cascade' => $this->cascade->all(),
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,

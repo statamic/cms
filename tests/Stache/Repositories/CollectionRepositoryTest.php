@@ -78,13 +78,13 @@ class CollectionRepositoryTest extends TestCase
     function it_saves_a_collection_to_the_stache_and_to_a_file()
     {
         $collection = CollectionAPI::make('new');
-        $collection->data(['foo' => 'bar']);
+        $collection->cascade(['foo' => 'bar']);
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($collection);
 
         $this->assertNotNull($item = $this->repo->findByHandle('new'));
-        $this->assertEquals(['foo' => 'bar'], $item->data());
+        $this->assertEquals(['foo' => 'bar'], $item->cascade()->all());
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }

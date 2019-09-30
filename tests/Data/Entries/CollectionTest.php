@@ -115,28 +115,42 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_and_gets_data_values()
+    function it_stores_cascading_data_in_a_collection()
     {
         $collection = new Collection;
-        $this->assertNull($collection->get('foo'));
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->cascade());
+        $this->assertTrue($collection->cascade()->isEmpty());
 
-        $return = $collection->set('foo', 'bar');
+        $collection->cascade()->put('foo', 'bar');
 
-        $this->assertEquals($collection, $return);
-        $this->assertTrue($collection->has('foo'));
-        $this->assertEquals('bar', $collection->get('foo'));
+        $this->assertTrue($collection->cascade()->has('foo'));
+        $this->assertEquals('bar', $collection->cascade()->get('foo'));
     }
 
     /** @test */
-    function it_gets_and_sets_all_data()
+    function it_sets_all_the_cascade_data_when_passing_an_array()
     {
         $collection = new Collection;
-        $this->assertEquals([], $collection->data());
 
-        $return = $collection->data(['foo' => 'bar']);
-
+        $return = $collection->cascade($arr = ['foo' => 'bar', 'baz' => 'qux']);
         $this->assertEquals($collection, $return);
-        $this->assertEquals(['foo' => 'bar'], $collection->data());
+        $this->assertEquals($arr, $collection->cascade()->all());
+
+        // test that passing an empty array is not treated as passing null
+        $return = $collection->cascade([]);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals([], $collection->cascade()->all());
+    }
+
+    /** @test */
+    function it_gets_values_from_the_cascade_with_fallbacks()
+    {
+        $collection = new Collection;
+        $collection->cascade(['foo' => 'bar']);
+
+        $this->assertEquals('bar', $collection->cascade('foo'));
+        $this->assertNull($collection->cascade('baz'));
+        $this->assertEquals('qux', $collection->cascade('baz', 'qux'));
     }
 
     /** @test */
