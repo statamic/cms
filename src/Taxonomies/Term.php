@@ -195,7 +195,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function augmentedArrayData()
     {
-        return array_merge($this->values(), [
+        return $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'uri' => $this->uri(),
@@ -203,7 +203,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
             'title' => $this->title(),
             'entries' => $entryQuery = $this->queryEntries(),
             'entries_count' => $entryQuery->count(),
-        ]);
+        ])->all();
     }
 
     public function collection($collection = null)
