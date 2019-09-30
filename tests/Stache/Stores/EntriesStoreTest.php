@@ -92,7 +92,7 @@ class EntriesStoreTest extends TestCase
         $this->assertInstanceOf(Entry::class, $item);
         $this->assertEquals('123', $item->id());
         $this->assertEquals('Example', $item->get('title'));
-        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
+        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data()->all());
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2017-01-02 00:00')->eq($item->date()));
         $this->assertEquals('my-post', $item->slug());
         $this->assertTrue($item->published());

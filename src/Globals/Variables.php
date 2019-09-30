@@ -21,6 +21,12 @@ class Variables implements Contract, Localization, AugmentableContract
     protected $set;
     protected $locale;
 
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
+
     public function globalSet($set = null)
     {
         return $this->fluentlyGetOrSet('set')->args(func_get_args());
@@ -124,17 +130,17 @@ class Variables implements Contract, Localization, AugmentableContract
 
     public function toArray()
     {
-        return array_merge($this->values(), [
+        return $this->values()->merge([
             'id' => $this->id(),
             'handle' => $this->handle(),
-        ], $this->supplements);
+        ])->merge($this->supplements)->all();
     }
 
     public function fileData()
     {
         return array_merge([
             'origin' => $this->hasOrigin() ? $this->origin->locale() : null,
-        ], $this->data());
+        ], $this->data()->all());
     }
 
     protected function augmentedArrayData()

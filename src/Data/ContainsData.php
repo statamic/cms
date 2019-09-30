@@ -6,7 +6,7 @@ trait ContainsData
 {
     use ContainsSupplementalData;
 
-    protected $data = [];
+    protected $data;
 
     public function get($key, $fallback = null)
     {
@@ -47,14 +47,14 @@ trait ContainsData
             return $this->data;
         }
 
-        $this->data = $data;
+        $this->data = collect($data);
 
         return $this;
     }
 
     public function merge($data)
     {
-        $this->data(array_merge($this->data(), $data));
+        $this->data = $this->data->merge($data);
 
         return $this;
     }

@@ -52,7 +52,7 @@ class User extends BaseUser
                 'roles' => $this->roles()->map->handle()->values()->all(),
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
-            return array_except($data, ['id', 'email']);
+            return collect(array_except($data, ['id', 'email']));
         }
 
         foreach ($data as $key => $value) {

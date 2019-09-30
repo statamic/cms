@@ -134,7 +134,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             return ["in_{$group->handle()}" => true];
         })->all();
 
-        return array_merge($this->data(), [
+        return $this->data()->merge([
             'id' => $this->id(),
             'title' => $this->title(),
             'email' => $this->email(),
@@ -145,7 +145,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'edit_url' => $this->editUrl(),
             'is_user' => true,
             'last_login' => $this->lastLogin(),
-        ], $roles, $groups, $this->supplements);
+        ])->merge($roles)->merge($groups)->merge($this->supplements)->all();
     }
 
     public function toJavascriptArray()

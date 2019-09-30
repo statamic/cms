@@ -42,6 +42,12 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     protected $path;
     protected $meta;
 
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
+
     public function id($id = null)
     {
         if ($id) {
@@ -88,7 +94,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
         $this->meta = $this->meta();
 
-        $this->data = $this->meta['data'];
+        $this->data = collect($this->meta['data']);
 
         return $this;
     }
@@ -115,7 +121,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     public function meta()
     {
         if ($this->meta) {
-            return array_merge($this->meta, ['data' => $this->data]);
+            return array_merge($this->meta, ['data' => $this->data->all()]);
         }
 
         if ($this->disk()->exists($path = $this->metaPath())) {
@@ -129,7 +135,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
     public function generateMeta()
     {
-        $meta = ['data' => $this->data];
+        $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
             $dimensions = Dimensions::asset($this)->get();
@@ -557,7 +563,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
             ]);
         }
 
-        return array_merge($this->data(), $attributes, $this->supplements);
+        return $this->data()->merge($attributes)->merge($this->supplements)->all();
     }
 
     /**

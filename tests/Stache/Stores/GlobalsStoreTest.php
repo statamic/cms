@@ -64,7 +64,7 @@ class GlobalsStoreTest extends TestCase
         $this->assertEquals('globals-example', $item->id());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals(['foo' => 'bar'], $item->in('en')->data());
+        $this->assertEquals(['foo' => 'bar'], $item->in('en')->data()->all());
     }
 
     /** @test */

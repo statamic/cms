@@ -33,6 +33,12 @@ class User extends BaseUser
     protected $email;
     protected $password;
 
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
+
     public function data($data = null)
     {
         if (func_num_args() === 0) {
@@ -356,10 +362,10 @@ class User extends BaseUser
 
     public function fileData()
     {
-        return array_merge($this->data(), [
+        return $this->data()->merge([
             'id' => (string) $this->id(),
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
-        ]);
+        ])->all();
     }
 }

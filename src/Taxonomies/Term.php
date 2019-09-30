@@ -42,6 +42,12 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
     protected $locale;
     protected $collection;
 
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
+
     public function id()
     {
         return $this->taxonomyHandle() . '::' . $this->slug();
@@ -92,10 +98,10 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function routeData()
     {
-        return array_merge($this->values(), [
+        return $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
-        ]);
+        ])->all();
     }
 
     public function blueprint()
@@ -111,19 +117,19 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function toArray()
     {
-        return array_merge($this->values(), [
+        return $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'title' => $this->title(),
             'taxonomy' => $this->taxonomyHandle(),
             'edit_url' => $this->editUrl(),
             'permalink' => $this->absoluteUrl(),
-        ], $this->supplements);
+        ])->merge($this->supplements);
     }
 
     public function fileData()
     {
-        $array = array_merge($this->data(), [
+        $array = array_merge($this->data()->all(), [
             'origin' => optional($this->origin)->id(),
             'published' => $this->published === false ? false : null,
         ]);

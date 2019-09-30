@@ -49,7 +49,7 @@ trait UserContractTests
                 'group_one',
                 'group_two',
             ]
-        ], $this->additionalDataValues()), $this->user()->data());
+        ], $this->additionalDataValues()), $this->user()->data()->all());
     }
 
     function additionalDataValues()

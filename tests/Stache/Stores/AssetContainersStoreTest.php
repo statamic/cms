@@ -83,7 +83,9 @@ EOL;
                 'nested/nested-b.txt' => ['title' => 'Nested File B'],
                 'nested/double-nested/double-nested-a.txt' => ['title' => 'Double Nested File A'],
                 'nested/double-nested/double-nested-b.txt' => ['title' => 'Double Nested File B'],
-            ], $assets->keyBy->path()->map->data()->all());
+            ], $assets->keyBy->path()->map(function ($item) {
+                return $item->data()->all();
+            })->all());
         });
     }
 

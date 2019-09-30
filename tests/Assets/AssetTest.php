@@ -68,12 +68,12 @@ class AssetTest extends TestCase
     function it_gets_and_sets_all_data()
     {
         $asset = (new Asset)->container($this->container);
-        $this->assertEquals([], $asset->data());
+        $this->assertEquals([], $asset->data()->all());
 
         $return = $asset->data(['foo' => 'bar']);
 
         $this->assertEquals($asset, $return);
-        $this->assertEquals(['foo' => 'bar'], $asset->data());
+        $this->assertEquals(['foo' => 'bar'], $asset->data()->all());
     }
 
     /** @test */
@@ -327,7 +327,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
 
-        $this->assertEquals(['hello' => 'world'], $asset->data());
+        $this->assertEquals(['hello' => 'world'], $asset->data()->all());
     }
 
     /** @test */
@@ -380,7 +380,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->move('new');
 
@@ -391,7 +393,9 @@ class AssetTest extends TestCase
         $disk->assertExists('new/.meta/asset.txt.yaml');
         $this->assertEquals([
             'new/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */
@@ -408,7 +412,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->move('new', 'newfilename');
 
@@ -419,7 +425,9 @@ class AssetTest extends TestCase
         $disk->assertExists('new/.meta/newfilename.txt.yaml');
         $this->assertEquals([
             'new/newfilename.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */
@@ -435,7 +443,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->rename('newfilename');
 
@@ -446,7 +456,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
         $this->assertEquals([
             'old/newfilename.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */

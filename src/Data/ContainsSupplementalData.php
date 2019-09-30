@@ -4,7 +4,7 @@ namespace Statamic\Data;
 
 trait ContainsSupplementalData
 {
-    protected $supplements = [];
+    protected $supplements;
 
     public function supplements()
     {

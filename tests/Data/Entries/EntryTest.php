@@ -116,12 +116,12 @@ class EntryTest extends TestCase
     function it_gets_and_sets_all_data()
     {
         $entry = new Entry;
-        $this->assertEquals([], $entry->data());
+        $this->assertEquals([], $entry->data()->all());
 
         $return = $entry->data(['foo' => 'bar']);
 
         $this->assertEquals($entry, $return);
-        $this->assertEquals(['foo' => 'bar'], $entry->data());
+        $this->assertEquals(['foo' => 'bar'], $entry->data()->all());
     }
 
     /** @test */
@@ -144,7 +144,7 @@ class EntryTest extends TestCase
             'bar' => 'merged bar',
             'baz' => 'qux',
             'qux' => 'merged qux',
-        ], $entry->data());
+        ], $entry->data()->all());
     }
 
     /** @test */
@@ -185,7 +185,7 @@ class EntryTest extends TestCase
             'one' => 'one in collection',
             'two' => 'two in origin',
             'three' => 'three in entry',
-        ], $entry->values());
+        ], $entry->values()->all());
     }
 
     /** @test */
@@ -229,13 +229,13 @@ class EntryTest extends TestCase
     function it_gets_and_sets_supplemental_data()
     {
         $entry = new Entry;
-        $this->assertEquals([], $entry->supplements());
+        $this->assertEquals([], $entry->supplements()->all());
 
         $return = $entry->setSupplement('foo', 'bar');
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements());
+        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
     }
 
     /** @test */
