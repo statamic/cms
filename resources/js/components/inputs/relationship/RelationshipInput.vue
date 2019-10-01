@@ -170,10 +170,10 @@ export default {
     },
 
     mounted() {
-        this.initializeData()
-            .then(() => this.makeSortable());
-
-        this.$nextTick(() => this.initializing = false);
+        this.initializeData().then(() => {
+            this.initializing = false;
+            this.$nextTick(() => this.makeSortable());
+        });
     },
 
     watch: {
