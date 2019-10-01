@@ -333,7 +333,9 @@ export default {
         canPublish() {
             if (!this.revisionsEnabled) return false;
 
-            return !this.readOnly && !this.isCreating && !this.somethingIsLoading && this.isWorkingCopy;
+            if (this.readOnly || this.isCreating || this.somethingIsLoading || this.isDirty) return false;
+
+            return true;
         },
 
         livePreviewUrl() {
