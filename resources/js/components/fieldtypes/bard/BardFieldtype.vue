@@ -155,6 +155,7 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            mounted: false,
         }
     },
 
@@ -233,6 +234,8 @@ export default {
         this.html = this.editor.getHTML();
 
         this.$mousetrap.bind('esc', this.closeFullscreen)
+
+        this.$nextTick(() => this.mounted = true);
     },
 
     beforeDestroy() {
@@ -242,6 +245,8 @@ export default {
     watch: {
 
         json(json) {
+            if (!this.mounted) return;
+
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
             this.update(JSON.stringify(json));
         },
