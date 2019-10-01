@@ -49,7 +49,7 @@ class EntryRevisionsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($entry->data())
+            ->addValues($entry->data()->all())
             ->preProcess();
 
         $values = array_merge($fields->values(), [
