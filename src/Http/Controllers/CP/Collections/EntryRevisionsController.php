@@ -37,6 +37,8 @@ class EntryRevisionsController extends CpController
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
+
+        return $entry->toArray();
     }
 
     public function show(Request $request, $collection, $entry, $slug, $revision)
