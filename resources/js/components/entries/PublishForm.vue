@@ -123,21 +123,17 @@
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
                                     </div>
-                                    <div class="mb-sm flex items-center" v-else="published">
+                                    <div class="mb-sm flex items-center" v-else>
                                         <span class="text-orange w-6 text-center">!</span>
                                         <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-sm flex items-center" v-if="isWorkingCopy && isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
-                                    </div>
-                                    <div class="mb-sm flex items-center" v-else-if="isWorkingCopy">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
                                     </div>
                                     <div class="mb-sm flex items-center" v-if="!isWorkingCopy && published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
+                                    </div>
+                                    <div class="mb-sm flex items-center" v-if="isDirty">
+                                        <span class="text-orange w-6 text-center">!</span>
+                                        <span class="text-2xs" v-text="__('Unsaved changes')"></span>
                                     </div>
                                     <button
                                             class="flex items-center justify-center mt-2 btn-flat px-1 w-full"
@@ -367,10 +363,6 @@ export default {
     },
 
     watch: {
-
-        published(published) {
-            this.$refs.container.dirty();
-        },
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
