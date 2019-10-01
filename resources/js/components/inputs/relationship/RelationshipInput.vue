@@ -243,7 +243,7 @@ export default {
             new Sortable(this.$refs.items, {
                 draggable: '.item',
                 handle: '.item-move',
-                mirror: { constrainDimensions: true },
+                mirror: { constrainDimensions: true, xAxis: false },
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
