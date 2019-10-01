@@ -29,5 +29,7 @@ class PublishedEntriesController extends CpController
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
+
+        return $entry->toArray();
     }
 }
