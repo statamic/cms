@@ -34,7 +34,7 @@ class Engine implements EngineInterface
      *
      * @var array
      */
-    private $injectExtractions = [true];
+    private $injectExtractions = [];
 
     /**
      * Create a new AntlersEngine instance
@@ -86,7 +86,7 @@ class Engine implements EngineInterface
 
         $contents = $parser->parseView($path, $contents, $data);
 
-        if (array_pop($this->injectExtractions)) {
+        if (array_pop($this->injectExtractions) !== false) {
             $contents = $parser->injectNoparse($contents);
         }
 
