@@ -38,6 +38,8 @@ return [
     'permission_change_passwords' => 'Change passwords',
     'permission_edit_user_groups' => 'Edit groups',
     'permission_edit_roles' => 'Edit roles',
+    'permission_view_updates' => 'View updates',
+    'permission_perform_updates' => 'Perform updates',
 
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
 
