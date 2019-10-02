@@ -15,7 +15,7 @@
 }
 
 .data-table {
-	@apply text-left text-grey outline-none block max-w-full;
+	@apply text-left text-grey outline-none max-w-full block;
 	overflow-x: auto;
 	width: fit-content;
 
@@ -88,6 +88,12 @@
 
 	.sortable-row.draggable-mirror {
 		@apply bg-white border-b;
+	}
+}
+
+@screen md {
+	.data-table {
+		@apply w-full table;
 	}
 }
 
