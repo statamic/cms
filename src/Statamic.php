@@ -209,4 +209,9 @@ class Statamic
     {
         static::$webMiddleware[] = $middleware;
     }
+
+    public static function docsUrl($url)
+    {
+        return URL::tidy('https://statamic.dev/' . $url);
+    }
 }
