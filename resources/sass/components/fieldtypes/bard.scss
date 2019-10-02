@@ -15,7 +15,7 @@
 }
 
 .bard-fixed-toolbar {
-    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between z-5;
+    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
     position: sticky;
     top: 0;
     padding: 4px 8px;
