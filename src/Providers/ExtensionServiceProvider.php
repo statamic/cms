@@ -65,7 +65,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Arr::class,
         Fieldtypes\AssetContainer::class,
         Fieldtypes\AssetFolder::class,
-        Fieldtypes\Assets::class,
+        Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
         Fieldtypes\Blueprints::class,

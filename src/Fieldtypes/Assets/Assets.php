@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Fieldtypes;
+namespace Statamic\Fieldtypes\Assets;
 
 use Statamic\Support\Arr;
 use Statamic\Facades\Asset;
@@ -92,9 +92,10 @@ class Assets extends Fieldtype
 
     public function preload()
     {
-        $data = $this->getItemData($this->field->value() ?? $this->defaultValue);
-
-        return compact('data');
+        return [
+            'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
+            'container' => $this->container()->handle(),
+        ];
     }
 
     public function getItemData($items)
@@ -128,7 +129,15 @@ class Assets extends Fieldtype
 
     protected function container()
     {
-        return AssetContainer::find($this->config('container'));
+        if ($configured = $this->config('container')) {
+            return AssetContainer::find($configured);
+        }
+
+        if (($containers = AssetContainer::all())->count() === 1) {
+            return $containers->first();
+        }
+
+        throw new ContainerException('An asset container has not been configured');
     }
 
     public function rules(): array
