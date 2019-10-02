@@ -4,12 +4,12 @@
 @section('content')
 
         <div class="content">
-            <h1 class="mb">Fields</h1>
+            <h1>Fields</h1>
             {{-- <p class="text-base max-w-lg">Each field is an instance of a <b>Field type</b>, which determines its user interface, the data it can store, and how you interact with it in your templates. Fields are organized into Blueprints and reususable Fieldsets.</p> --}}
         </div>
 
-        <div class="flex flex-wrap -mx-3 mt-3">
-            <div class="w-1/2 px-3">
+        <div class="flex flex-wrap md:-mx-3 mt-3">
+            <div class="w-full md:w-1/2 md:px-3 mb-3">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-3">
                         <h2><a href="{{ cp_route('blueprints.index') }}" class="text-grey-90 hover:text-blue">Blueprints</a></h2>
@@ -26,7 +26,7 @@
                     </div>
                 </div>
             </div>
-            <div class="w-1/2 px-3">
+            <div class="w-full md:w-1/2 md:px-3 mb-3">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-3">
                         <h2>Fieldsets</h2>
