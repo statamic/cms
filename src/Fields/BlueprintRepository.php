@@ -96,6 +96,17 @@ class BlueprintRepository
         $this->files->delete("{$this->directory}/{$blueprint->handle()}.yaml");
     }
 
+    public function make($handle = null)
+    {
+        $blueprint = new Blueprint;
+
+        if ($handle) {
+            $blueprint->setHandle($handle);
+        }
+
+        return $blueprint;
+    }
+
     public function makeFromFields($fields)
     {
         $fields = collect($fields)->map(function ($field, $handle) {
