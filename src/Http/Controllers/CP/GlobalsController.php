@@ -71,7 +71,7 @@ class GlobalsController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::fromUser($request->user())->cant('edit', $set),
             'locale' => $set->locale(),
-            'localizedFields' => array_keys($set->data()),
+            'localizedFields' => $set->data()->keys()->all(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -219,7 +219,7 @@ class GlobalsController extends CpController
     {
         $fields = $blueprint
             ->fields()
-            ->addValues($set->values())
+            ->addValues($set->values()->all())
             ->preProcess();
 
         return [$fields->values(), $fields->meta()];
