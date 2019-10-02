@@ -170,15 +170,13 @@ class BlueprintTest extends TestCase
     /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
-        $this->markTestSkipped('Needs to be updated to match newer blueprint schema.');
-
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
             ->andReturn(new Field('field_one', [
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
-                'require' => true,
+                'validate' => 'required|min:2',
             ]));
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_two')
@@ -221,17 +219,16 @@ class BlueprintTest extends TestCase
                     'fields' => [
                         [
                             'handle' => 'one',
-                            'field' => [
-                                'type' => 'text',
-                                'display' => 'One',
-                                'instructions' => 'One instructions',
-                                'required' => true,
-                                'component' => 'text',
-                                'placeholder' => null,
-                                'character_limit' => 0,
-                                'prepend' => null,
-                                'append' => null,
-                            ]
+                            'type' => 'text',
+                            'display' => 'One',
+                            'instructions' => 'One instructions',
+                            'required' => true,
+                            'validate' => 'required|min:2',
+                            'component' => 'text',
+                            'placeholder' => null,
+                            'character_limit' => 0,
+                            'prepend' => null,
+                            'append' => null,
                         ]
                     ]
                 ],
@@ -241,19 +238,17 @@ class BlueprintTest extends TestCase
                     'fields' => [
                         [
                             'handle' => 'two',
-                            'field' => [
-                                'type' => 'textarea',
-                                'display' => 'Two',
-                                'instructions' => 'Two instructions',
-                                'required' => false,
-                                'validate' => 'min:2',
-                                'character_limit' => null,
-                                'component' => 'textarea',
-                            ]
+                            'type' => 'textarea',
+                            'display' => 'Two',
+                            'instructions' => 'Two instructions',
+                            'required' => false,
+                            'validate' => 'min:2',
+                            'character_limit' => null,
+                            'component' => 'textarea',
                         ]
                     ]
                 ]
-            ]
+            ],
         ], $blueprint->toPublishArray());
     }
 
