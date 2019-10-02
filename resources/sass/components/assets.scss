@@ -352,14 +352,6 @@
 
     .meta-item {
 		@apply flex items-start flex-col border-l px-2 cursor-text h-full justify-center;
-
-        &.one-line {
-			@apply flex-row;
-        }
-
-        &:first-child {
-            @apply pl-2 items-center;
-        }
     }
 
     .meta-label {
@@ -368,12 +360,6 @@
 
 	.meta-value {
 		@apply block p-0 text-xs text-grey-60;
-    }
-
-    .file-icon {
-        width: 25px;
-        height: 25px;
-        margin-right: 10px;
     }
 }
 
