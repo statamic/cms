@@ -56,8 +56,8 @@ export default {
 
     data() {
         return {
-            date: this.parseDate(),
-            time: this.parseTime(),
+            date: null,
+            time: null,
             formats: {
                 title: 'MMMM YYYY',
                 weekdays: 'W',
@@ -102,6 +102,14 @@ export default {
 
     watch: {
 
+        value: {
+            immediate: true,
+            handler(value) {
+                this.date = this.parseDate(value);
+                this.time = this.parseTime(value);
+            }
+        },
+
         date(value) {
             this.handleUpdate(value)
         },
@@ -139,14 +147,14 @@ export default {
             this.time = null;
         },
 
-        parseDate() {
-            if (this.value) {
+        parseDate(value) {
+            if (value) {
                 if (this.config.mode === "single") {
-                    return Vue.moment(this.value).toDate()
+                    return Vue.moment(value).toDate()
                 } else if (this.config.mode === "range") {
                     return {
-                        'start': Vue.moment(this.value.start).toDate(),
-                        'end': Vue.moment(this.value.end).toDate()
+                        'start': Vue.moment(value.start).toDate(),
+                        'end': Vue.moment(value.end).toDate()
                     }
                 }
              } else {
@@ -154,9 +162,9 @@ export default {
              }
         },
 
-        parseTime() {
-            if (this.value && this.config.time_enabled) {
-                return Vue.moment(this.value).format('HH:mm');
+        parseTime(value) {
+            if (value && this.config.time_enabled) {
+                return Vue.moment(value).format('HH:mm');
             } else if (this.config.time_required) {
                 return Vue.moment().format('HH:mm');
             } else {
