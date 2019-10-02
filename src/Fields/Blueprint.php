@@ -152,8 +152,8 @@ class Blueprint
                 foreach ($blueprint_section['fields'] as $field_key => $blueprint_field) {
                     if (array_get($blueprint_field, 'handle') == $handle) {
                         $this->contents['sections'][$section_key]['fields'][$field_key]['field'] = array_merge(
-                            $this->contents['sections'][$section_key]['fields'][$field_key]['field'],
-                            $field
+                            $field,
+                            $this->contents['sections'][$section_key]['fields'][$field_key]['field']
                         );
 
                         return $this->resetFieldsCache();

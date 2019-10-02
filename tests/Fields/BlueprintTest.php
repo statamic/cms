@@ -285,15 +285,18 @@ class BlueprintTest extends TestCase
 
         $return = $blueprint
             ->ensureField('three', ['type' => 'textarea']) // field "three" doesnt exist, so it should get added.
-            ->ensureField('two', ['type' => 'textarea']);  // field "two" exists so the config is merged
+            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar']);  // field "two" exists so the config is merged
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('three'));
         tap($blueprint->fields()->all(), function ($items) {
             $this->assertCount(3, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals(['one', 'three', 'two'], $items->map->handle()->values()->all());
-            $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            $this->assertEquals([
+                'one' => ['type' => 'text'],
+                'three' => ['type' => 'textarea'],
+                'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
+            ], $items->map->config()->all());
         });
     }
 
@@ -343,7 +346,7 @@ class BlueprintTest extends TestCase
                 ],
                 'section_two' => [
                     'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                        ['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']]
                     ]
                 ]
             ]
@@ -363,8 +366,13 @@ class BlueprintTest extends TestCase
         tap($blueprint->fields()->all(), function ($items) {
             $this->assertCount(3, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
-            $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            // $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
+            // $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            $this->assertEquals([
+                'one' => ['type' => 'text'],
+                'three' => ['type' => 'textarea'],
+                'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
+            ], $items->map->config()->all());
         });
     }
 
