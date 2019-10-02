@@ -132,7 +132,6 @@ class EntriesController extends CpController
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::fromUser($request->user())->cant('edit', $entry),
-            'published' => $entry->published(),
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
             'isRoot' => $entry->isRoot(),
@@ -377,7 +376,8 @@ class EntriesController extends CpController
 
         $values = array_merge($fields->values(), [
             'title' => $entry->value('title'),
-            'slug' => $entry->slug()
+            'slug' => $entry->slug(),
+            'published' => $entry->published(),
         ]);
 
         if ($entry->collection()->dated()) {

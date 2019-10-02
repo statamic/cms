@@ -10,7 +10,6 @@
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
-        :initial-published="published"
         :initial-localizations="localizations"
         :initial-has-origin="false"
         :initial-is-root="true"
@@ -31,7 +30,6 @@ export default {
         'fieldset',
         'values',
         'meta',
-        'published',
         'localizations',
         'revisions',
         'breadcrumbs',

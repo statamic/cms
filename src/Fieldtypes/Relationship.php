@@ -33,7 +33,6 @@ class Relationship extends Fieldtype
         'initialValues' => 'values',
         'initialLocalizedFields' => 'localizedFields',
         'initialMeta' => 'meta',
-        'initialPublished' => 'published',
         'initialPermalink' => 'permalink',
         'initialLocalizations' => 'localizations',
         'initialHasOrigin' => 'hasOrigin',

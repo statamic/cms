@@ -272,7 +272,6 @@ export default {
         initialActions: Object,
         method: String,
         amp: Boolean,
-        initialPublished: Boolean,
         isCreating: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
@@ -304,7 +303,14 @@ export default {
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
-            published: this.initialPublished,
+
+            // The current value. What it will be when saving. User interaction updates this.
+            published: this.initialValues.published,
+
+            // Whether it was published the last time it was saved.
+            // Successful publish actions (if using revisions) or just saving (if not) will update this.
+            initialPublished: this.initialValues.published,
+
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
@@ -366,6 +372,14 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
+        },
+
+        published(published) {
+            this.$refs.container.setFieldValue('published', published);
+        },
+
+        'values.published': function (published) {
+            this.published = published;
         }
 
     },
@@ -404,7 +418,6 @@ export default {
             // We build the payload here because the before hook may have modified values.
             const payload = { ...this.values, ...{
                 blueprint: this.fieldset.handle,
-                published: this.published,
                 _localized: this.localizedFields,
             }};
 
@@ -429,6 +442,8 @@ export default {
                     response
                 })
                 .then(() => {
+                    if (! this.revisionsEnabled) this.initialPublished = response.data.published;
+
                     // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
                     // if this form is being shown in a stack, we only want to close it once everything's done.
                     this.$nextTick(() => this.$emit('saved', response));
@@ -532,7 +547,7 @@ export default {
         publishActionCompleted({ published, isWorkingCopy, response }) {
             this.saving = false;
             this.$refs.container.saved();
-            if (published !== undefined) this.published = published;
+            if (published !== undefined) this.published = this.initialPublished = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.title;
