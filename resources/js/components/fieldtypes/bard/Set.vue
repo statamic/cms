@@ -25,7 +25,7 @@
                 </dropdown-list>
             </div>
         </div>
-        <div class="replicator-set-body" v-show="!collapsed" v-if="index">
+        <div class="replicator-set-body" v-show="!collapsed" v-if="index !== undefined">
             <set-field
                 v-for="field in config.fields"
                 v-show="showField(field)"
