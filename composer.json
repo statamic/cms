@@ -8,7 +8,7 @@
         "erusev/parsedown-extra": "^0.7.1",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
-        "laravel/framework": "5.6.*|5.7.*|5.8.*|6.0.*",
+        "laravel/framework": "5.6.*|5.7.*|5.8.*|^6.0",
         "laravel/helpers": "^1.1",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
