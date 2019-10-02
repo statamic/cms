@@ -249,6 +249,7 @@ class BlueprintTest extends TestCase
                     ]
                 ]
             ],
+            'empty' => false,
         ], $blueprint->toPublishArray());
     }
 
