@@ -2,39 +2,39 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\Asset;
-use Statamic\Support\Str;
-use Statamic\Facades\Action;
 use Illuminate\Http\Request;
-use Statamic\Facades\AssetContainer;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\Action;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Statamic\Support\Str;
 
 class BrowserController extends CpController
 {
+    use RedirectsToFirstAssetContainer;
+
     public function index()
     {
-        $containers = AssetContainer::all();
+        $this->redirectToFirstContainer();
 
-        if ($containers->isEmpty()) {
-            return view('statamic::assets.index');
+        if (User::current()->can('create', AssetContainerContract::class)) {
+            return redirect()->cpRoute('assets.index');
         }
 
-        // TODO: Filter out unauthorized containers
-        // TODO: Handle no authorized containers
-
-        return redirect()
-            ->cpRoute('assets.browse.show', $containers->first()->handle());
+        throw new AuthorizationException;
     }
 
     public function show($containerHandle, $path = '/')
     {
-        // TODO: Auth
-
         $container = AssetContainer::find($containerHandle);
 
         abort_unless($container, 404);
+
+        $this->authorize('view', $container);
 
         return view('statamic::assets.browse', [
             'container' => $this->toContainerArray($container),

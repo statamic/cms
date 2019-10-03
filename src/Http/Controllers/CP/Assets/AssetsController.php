@@ -2,20 +2,30 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\Asset;
-use Statamic\Facades\Action;
 use Illuminate\Http\Request;
-use Statamic\Fields\Validation;
-use Statamic\Facades\AssetContainer;
-use Statamic\CP\Publish\ProcessesFields;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\Action;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
+use Statamic\Fields\Validation;
+use Statamic\Http\Controllers\CP\CpController;
 
 class AssetsController extends CpController
 {
+    use RedirectsToFirstAssetContainer;
+
     public function index()
     {
-        return redirect()->cpRoute('assets.browse.index');
+        $this->redirectToFirstContainer();
+
+        if (User::current()->can('create', AssetContainerContract::class)) {
+            return view('statamic::assets.index');
+        }
+
+        throw new AuthorizationException;
     }
 
     public function show($asset)

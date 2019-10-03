@@ -108,6 +108,8 @@ class CorePermissions
 
     protected function registerAssetContainers()
     {
+        Permission::register('configure asset containers');
+
         Permission::register('view {container} assets', function ($permission) {
             $permission->withChildren([
                 Permission::make('upload {container} assets'),

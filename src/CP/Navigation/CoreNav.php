@@ -17,6 +17,7 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Structures\Structure;
+use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 
 class CoreNav
@@ -103,11 +104,12 @@ class CoreNav
         Nav::content('Assets')
             ->route('assets.index')
             ->icon('assets')
-            // ->can() // TODO: Permission to manage assets/containers?
+            ->can('index', AssetContainer::class)
             ->children(function () {
                 return AssetContainerAPI::all()->map(function ($assetContainer) {
                     return Nav::item($assetContainer->title())
-                        ->url($assetContainer->showUrl());
+                        ->url($assetContainer->showUrl())
+                        ->can('view', $assetContainer);
                 });
             });
 
