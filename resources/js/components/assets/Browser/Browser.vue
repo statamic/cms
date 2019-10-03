@@ -98,7 +98,7 @@
                             >
 
                                 <template slot="tbody-start">
-                                    <tr v-if="folder.parent_path && !restrictFolderNavigation">
+                                    <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer">
@@ -327,11 +327,11 @@ export default {
         },
 
         canUpload() {
-            return this.container.allow_uploads;
+            return this.folder && this.container.allow_uploads;
         },
 
         canCreateFolders() {
-            return this.container.create_folders;
+            return this.folder && this.container.create_folders;
         },
 
         parameters() {
@@ -443,12 +443,20 @@ export default {
                 : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
-                this.assets = response.data.data;
-                this.folders = response.data.meta.folders;
-                this.folder = response.data.meta.folder;
-                this.actionUrl = response.data.meta.actionUrl;
-                this.folderActionUrl = response.data.meta.folderActionUrl;
-                this.meta = response.data.meta;
+                const data = response.data;
+                this.assets = data.data.assets;
+                this.meta = data.meta;
+
+                if (this.searchQuery) {
+                    this.folder = null;
+                    this.folders = [];
+                } else {
+                    this.folder = data.data.folder;
+                    this.folders = data.data.folder.folders;
+                    this.actionUrl = data.links.asset_actions;
+                    this.folderActionUrl = data.links.folder_actions;
+                }
+
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {

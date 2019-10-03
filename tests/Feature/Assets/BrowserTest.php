@@ -143,19 +143,7 @@ class BrowserTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/folders/test/')
             ->assertSuccessful()
-            ->assertJsonStructure([
-                'links',
-                'meta' => [
-                    'container' => ['id'],
-                    'folders',
-                    'folder' => ['title', 'path', 'parent_path', 'actions'],
-                    'folderActionUrl',
-                ],
-                'data' => [
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail', 'toenail'],
-                ]
-            ]);
+            ->assertJsonStructure($this->jsonStructure());
     }
 
     /** @test */
@@ -176,19 +164,7 @@ class BrowserTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/folders/test/nested/subdirectory')
             ->assertSuccessful()
-            ->assertJsonStructure([
-                'links',
-                'meta' => [
-                    'container' => ['id'],
-                    'folders',
-                    'folder' => ['title', 'path', 'parent_path', 'actions'],
-                    'folderActionUrl',
-                ],
-                'data' => [
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail', 'toenail'],
-                ]
-            ]);
+            ->assertJsonStructure($this->jsonStructure());
     }
 
     /** @test */
@@ -234,5 +210,22 @@ class BrowserTest extends TestCase
         $this->setTestRoles(['test' => ['access cp']]);
 
         return User::make()->assignRole('test')->save();
+    }
+
+    private function jsonStructure()
+    {
+        return [
+            'meta',
+            'links' => ['folder_actions', 'asset_actions'],
+            'data' => [
+                'assets' => [
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail', 'toenail'],
+                ],
+                'folder' => [
+                    'title', 'path', 'parent_path', 'actions', 'folders'
+                ]
+            ]
+        ];
     }
 }
