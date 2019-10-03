@@ -75,6 +75,17 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function getFilterItemValue($item, $column)
+    {
+        if (is_array($item)) {
+            return $item[$column] ?? null;
+        }
+
+        return method_exists($item, $column)
+            ? $item->{$column}()
+            : $item->get($column);
+    }
+
     abstract protected function getBaseItems();
 
     public function inRandomOrder()
