@@ -16,7 +16,6 @@ class CorePermissions
     {
         $this
             ->register('access cp')
-            ->register('view drafts on frontend')
             ->registerCollections()
             ->registerStructures()
             ->registerGlobals()

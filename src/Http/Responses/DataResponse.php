@@ -109,17 +109,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        if ($this->data->published()) {
-            return $this;
-        }
-
-        $user = optional($this->request->user());
-
-        if (! $user->can('view drafts on frontend')) {
-            throw new NotFoundHttpException;
-        }
-
-        $this->headers['X-Statamic-Draft'] = true;
+        throw_unless($this->data->published(), new NotFoundHttpException);
 
         return $this;
     }

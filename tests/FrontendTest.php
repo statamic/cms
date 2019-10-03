@@ -96,23 +96,6 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
-    function drafts_are_visible_if_logged_in_with_correct_permission()
-    {
-        $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
-        $user = User::make()->assignRole('draft_viewer');
-
-        $this->createPage('about')->published(false)->set('content', 'Testing 123')->save();
-
-        $response = $this
-            ->actingAs($user)
-            ->get('/about')
-            ->assertStatus(200)
-            ->assertHeader('X-Statamic-Draft', true);
-
-        $this->assertEquals('Testing 123', $response->content());
-    }
-
-    /** @test */
     function drafts_dont_get_statically_cached()
     {
         $this->markTestIncomplete();

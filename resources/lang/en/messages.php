@@ -10,7 +10,6 @@ return [
 
     'permission_super' => 'This grants the user unrestricted access to everything. Use caution.',
     'permission_access_cp' => 'Access the Control Panel',
-    'permission_view_drafts_on_frontend' => 'View drafts on the front-end',
     'permission_configure_collections' => 'Configure collections',
     'permission_view_{collection}_entries' => 'View :collection entries',
     'permission_edit_{collection}_entries' => 'Edit entries',
