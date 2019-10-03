@@ -66,6 +66,8 @@ class EntryPreviewController extends CpController
 
         $subrequest = Request::createFromBase(SymfonyRequest::create($url));
 
+        $subrequest->headers->set('X-Statamic-Live-Preview', true);
+
         app()->instance('request', $subrequest);
         Facade::clearResolvedInstance('request');
 

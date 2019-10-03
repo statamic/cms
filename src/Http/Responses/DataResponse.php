@@ -109,7 +109,11 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->data->published(), new NotFoundHttpException);
+        if (!$this->isLivePreview() && !$this->data->published()) {
+            throw new NotFoundHttpException;
+        }
+
+        $this->headers['X-Statamic-Draft'] = true;
 
         return $this;
     }
@@ -186,5 +190,10 @@ class DataResponse implements Responsable
         $this->with = $data;
 
         return $this;
+    }
+
+    protected function isLivePreview()
+    {
+        return $this->request->headers->get('X-Statamic-Live-Preview');
     }
 }
