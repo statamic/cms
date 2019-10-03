@@ -55,7 +55,7 @@ abstract class IteratorBuilder extends Builder
             $method = 'filterWhere'.$where['type'];
             $entries = $this->{$method}($entries, $where);
         }
-        return $entries;
+        return $entries->values();
     }
 
     protected function filterWhereIn($entries, $where)
