@@ -176,6 +176,7 @@ class AssetContainersController extends CpController
                 'instructions' => __('The filesystem disk this container will use.'),
                 'options' => $this->disks()->all(),
                 'width' => 50,
+                'validate' => 'required',
             ],
             'blueprint' => [
                 'type' => 'blueprints',

@@ -56,6 +56,7 @@ class UpdateAssetContainerTest extends TestCase
             ->assertJsonValidationErrors([
                 'title' => trans('statamic::validation.required'),
                 'handle' => trans('statamic::validation.required'),
+                'disk' => trans('statamic::validation.required')
             ]);
 
         $this->assertEquals('Original Title', AssetContainer::find('test')->title());
