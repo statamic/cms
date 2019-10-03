@@ -60,18 +60,18 @@ class BrowserController extends CpController
 
     public function folder(Request $request, $container, $path = '/')
     {
-        // TODO: Auth
-
         $container = AssetContainer::find($container);
 
         if (! $container) {
             return $this->pageNotFound();
         }
 
+        $this->authorize('view', $container);
+
         $paginator = $container
             ->queryAssets()
             ->where('folder', $path)
-            ->orderBy($request->sort, $request->order)
+            ->orderBy($request->sort ?? 'basename', $request->order ?? 'asc')
             ->paginate(30);
 
         $this->supplementAssetsForDisplay($paginator->getCollection());

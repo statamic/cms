@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Assets;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -12,6 +14,24 @@ class BrowserTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => $this->tempDir = __DIR__.'/tmp',
+        ]]);
+    }
+
+    public function tearDown(): void
+    {
+        app('files')->deleteDirectory($this->tempDir);
+        app('files')->deleteDirectory(storage_path('statamic/dimension-cache'));
+
+        parent::tearDown();
+    }
 
     /** @test */
     function it_redirects_to_the_first_container_from_the_index()
@@ -102,6 +122,104 @@ class BrowserTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->get($container->showUrl())
             ->assertSuccessful();
+    }
+
+    /** @test */
+    function it_lists_assets_in_the_root_folder()
+    {
+        $this->withoutExceptionHandling();
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $assetOne = $container
+            ->makeAsset('one.txt')
+            ->upload(UploadedFile::fake()->create('one.txt'));
+        $assetTwo = $container
+            ->makeAsset('two.jpg')
+            ->upload(UploadedFile::fake()->image('two.jpg'));
+        $assetInOtherFolder = $container
+            ->makeAsset('subdirectory/other.txt')
+            ->upload(UploadedFile::fake()->create('other.txt'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/folders/test/')
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'links',
+                'meta' => [
+                    'container' => ['id'],
+                    'folders',
+                    'folder' => ['title', 'path', 'parent_path', 'actions'],
+                    'folderActionUrl',
+                ],
+                'data' => [
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail', 'toenail'],
+                ]
+            ]);
+    }
+
+    /** @test */
+    function it_lists_assets_in_a_subfolder()
+    {
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $assetOne = $container
+            ->makeAsset('nested/subdirectory/one.txt')
+            ->upload(UploadedFile::fake()->create('one.txt'));
+        $assetTwo = $container
+            ->makeAsset('nested/subdirectory/two.jpg')
+            ->upload(UploadedFile::fake()->image('two.jpg'));
+        $assetInOtherFolder = $container
+            ->makeAsset('other.txt')
+            ->upload(UploadedFile::fake()->create('other.txt'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/folders/test/nested/subdirectory')
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'links',
+                'meta' => [
+                    'container' => ['id'],
+                    'folders',
+                    'folder' => ['title', 'path', 'parent_path', 'actions'],
+                    'folderActionUrl',
+                ],
+                'data' => [
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail', 'toenail'],
+                ]
+            ]);
+    }
+
+    /** @test */
+    function it_denies_access_to_the_root_folder_without_permission()
+    {
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithoutPermission())
+            ->getJson('/cp/assets/browse/folders/test')
+            ->assertForbidden();
+    }
+
+    /** @test */
+    function it_denies_access_to_a_subfolder_without_permission()
+    {
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithoutPermission())
+            ->getJson('/cp/assets/browse/folders/test/nested/subdirectory')
+            ->assertForbidden();
+    }
+
+    /** @test */
+    function it_404s_when_requesting_a_folder_in_a_container_that_doesnt_exist()
+    {
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/folders/unknown')
+            ->assertNotFound();
     }
 
     private function userWithPermission()
