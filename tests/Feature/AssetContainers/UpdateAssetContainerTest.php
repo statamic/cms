@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Assets;
+namespace Tests\Feature\AssetContainers;
 
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
