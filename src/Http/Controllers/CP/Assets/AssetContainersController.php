@@ -2,20 +2,20 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
-use Statamic\Fields\Validation;
-use Statamic\Facades\AssetContainer;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
+use Statamic\Fields\Validation;
+use Statamic\Http\Controllers\CP\CpController;
 
 class AssetContainersController extends CpController
 {
     public function index(Request $request)
     {
         $containers = AssetContainer::all()->filter(function ($container) {
-            return true; // TODO: auth.
-            // return \Statamic\Facades\User::current()->can('view', $container);
+            return User::current()->can('view', $container);
         })->map(function ($container) {
             return [
                 'id' => $container->handle(),
@@ -35,7 +35,7 @@ class AssetContainersController extends CpController
         }
 
         return view('statamic::assets.containers.index', [
-            'containers' => $containers,
+            'containers' => $containers->all(),
             'columns' => ['title'],
             'visibleColumns' => ['title'],
         ]);
