@@ -18,7 +18,6 @@ export default class SetNode extends Node {
                 enabled: { default: true },
                 values: {},
             },
-            group: 'block',
             draggable: true,
             parseDOM: [{
                 tag: 'bard-set',

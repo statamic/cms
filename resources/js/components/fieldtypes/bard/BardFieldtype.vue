@@ -110,6 +110,7 @@ import {
     CodeBlockHighlight
 } from 'tiptap-extensions';
 import Set from './Set';
+import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
@@ -417,6 +418,7 @@ export default {
 
         getExtensions() {
             let extensions = [
+                new Doc(),
                 new Blockquote(),
                 new BulletList(),
                 new CodeBlock(),
