@@ -25,7 +25,7 @@
     </div>
 
     <h2 class="mt-4 mb-1 font-bold text-xl">Configuration</h2>
-    <p class="text-sm text-grey mb-2">Mail settings are configured in <code>{{ config_path('mail') }}</code></p>
+    <p class="text-sm text-grey mb-2">Mail settings are configured in <code>{{ config_path('mail.php') }}</code></p>
     <div class="card p-0">
         <table class="data-table">
             <tr>
