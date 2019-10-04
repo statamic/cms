@@ -50,4 +50,9 @@ class Select extends Fieldtype
     {
         return array_get($this->field->get('options'), $value, $value);
     }
+
+    public function augment($value)
+    {
+        return array_get($this->config('options'), $value, $value);
+    }
 }
