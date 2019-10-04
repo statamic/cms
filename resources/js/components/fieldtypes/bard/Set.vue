@@ -1,11 +1,9 @@
 <template>
 
-    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
-        @mousedown="parentMousedown"
-        @dragstart="parentDragStart"
-    >
+    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow" contenteditable="false">
+        <div ref="content" hidden />
         <div class="replicator-set-header" :class="{'collapsed': collapsed}" @dblclick="toggleCollapsedState">
-            <div class="item-move sortable-handle" ref="dragHandle"></div>
+            <div class="item-move sortable-handle" data-drag-handle />
             <div class="flex-1 ml-1 flex items-center" @click="expand">
                 <label v-text="config.display" class="text-xs"/>
                 <div
@@ -68,12 +66,6 @@ export default {
 
     inject: ['setConfigs'],
 
-    data() {
-        return {
-            lastClicked: null,
-        }
-    },
-
     computed: {
 
         values() {
@@ -131,20 +123,6 @@ export default {
             let pos = this.getPos();
             tr.delete(pos, pos + this.node.nodeSize);
             this.view.dispatch(tr);
-        },
-
-        parentMousedown(e) {
-            this.lastClicked = e.target;
-        },
-
-        parentDragStart(e) {
-            const handle = this.$refs.dragHandle;
-
-            if (this.lastClicked === handle || handle.contains(this.lastClicked)) {
-                return;
-            }
-
-            e.preventDefault();
         },
 
         focused() {
