@@ -597,15 +597,38 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_url()
+    function it_gets_the_url_when_the_container_has_a_relative_url()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('private')->andReturnFalse();
-        $container->shouldReceive('url')->andReturn('http://example.com');
+        $container->shouldReceive('url')->andReturn('/container');
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
-        $this->assertEquals('http://example.com/path/to/test.txt', $asset->url());
-        $this->assertEquals('http://example.com/path/to/test.txt', (string) $asset);
+        $this->assertEquals('/container/path/to/test.txt', $asset->url());
+        $this->assertEquals('/container/path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    function it_gets_the_url_when_the_container_has_an_absolute_url()
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('http://example.com/container');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('http://example.com/container/path/to/test.txt', $asset->url());
+        $this->assertEquals('http://example.com/container/path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    function it_gets_the_absolute_url()
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('absoluteUrl')->andReturn('http://example.com');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('http://example.com/path/to/test.txt', $asset->absoluteUrl());
     }
 
     /** @test */
@@ -617,6 +640,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
         $this->assertNull($asset->url());
+        $this->assertNull($asset->absoluteUrl());
         $this->assertEquals('container-id::path/to/test.txt', (string) $asset);
     }
 

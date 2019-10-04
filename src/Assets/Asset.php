@@ -244,6 +244,15 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
         return URL::assemble($this->container()->url(), $this->path());
     }
 
+    public function absoluteUrl()
+    {
+        if ($this->container()->private()) {
+            return null;
+        }
+
+        return URL::assemble($this->container()->absoluteUrl(), $this->path());
+    }
+
     public function thumbnailUrl($preset = null)
     {
         return cp_route('assets.thumbnails.show', [
