@@ -163,6 +163,7 @@ class CoreNav
                 Nav::item('Cache')->route('utilities.cache.index'),
                 Nav::item('PHP Info')->route('utilities.phpinfo'),
                 Nav::item('Search')->route('utilities.search'),
+                Nav::item('Email')->route('utilities.email'),
             ]);
 
         return $this;

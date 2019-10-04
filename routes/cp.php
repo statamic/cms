@@ -173,6 +173,8 @@ Route::group([
         Route::post('utilities/cache/{cache}', 'CacheController@clear')->name('utilities.cache.clear');
         Route::get('utilities/search', 'UpdateSearchController@index')->name('utilities.search');
         Route::post('utilities/search', 'UpdateSearchController@update');
+        Route::get('utilities/email', 'EmailController@index')->name('utilities.email');
+        Route::post('utilities/email', 'EmailController@send');
     });
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
