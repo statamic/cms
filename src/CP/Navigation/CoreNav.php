@@ -215,7 +215,8 @@ class CoreNav
     {
         Nav::site('Addons')
             ->route('addons.index')
-            ->icon('addons');
+            ->icon('addons')
+            ->can('configure addons');
 
         Nav::site('Fields')
             ->route('fields.index')

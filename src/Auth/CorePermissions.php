@@ -24,7 +24,8 @@ class CorePermissions
             ->registerUpdates()
             ->registerUsers()
             ->registerForms()
-            ->register('configure fields');
+            ->register('configure fields')
+            ->register('configure addons');
     }
 
     protected function register($permission)

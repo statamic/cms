@@ -8,10 +8,13 @@ use Facades\Statamic\Extend\AddonInstaller;
 
 class AddonsController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware('can:configure addons');
+    }
+
     public function index()
     {
-        // TODO: Setup permissions to see this.
-
         return view('statamic::addons.index', [
             'title' => 'Addons'
         ]);
