@@ -11,7 +11,7 @@
             <h3 class="mb-0">Read the Documentation</h3>
             <p>Get to know Statamic understand its capabilities the right way.</p>
         </div>
-        <a href="{{ cp_route('collections.create') }}" class="btn btn-primary min-w-xs block">
+        <a href="https://statamic.dev" class="btn btn-primary min-w-xs block">
             Visit the Docs
         </a>
     </div>
@@ -41,6 +41,18 @@
     </div>
     <div class="p-3 border-t md:flex items-center">
         <div class="h-8 w-8 mr-2 hidden md:block text-blue">
+            @svg('structures')
+        </div>
+        <div class="flex-1 mb-2 md:mb-0 md:mr-3">
+            <h3 class="mb-0">Structures</h3>
+            <p>Structures establish the heirarchy of your pages and help you manage your site navigation.</p>
+        </div>
+        <a href="{{ cp_route('structures.create') }}" class="btn btn-primary min-w-xs block">
+            Create Structure
+        </a>
+    </div>
+    {{-- <div class="p-3 border-t md:flex items-center">
+        <div class="h-8 w-8 mr-2 hidden md:block text-blue">
             @svg('addons')
         </div>
         <div class="flex-1 mb-2 md:mb-0 md:mr-3">
@@ -50,5 +62,5 @@
         <a href="{{ cp_route('addons.index') }}" class="btn btn-primary min-w-xs block">
             Explore Addons
         </a>
-    </div>
+    </div> --}}
 </div>
