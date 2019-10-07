@@ -4,7 +4,7 @@
             <loading-graphic  />
         </div>
 
-        <data-list :columns="[]" :rows="rows" :visible-columns="[]" v-if="loaded">
+        <data-list :rows="rows" v-if="loaded">
             <div class="" slot-scope="{ rows: addons }">
                 <div class="data-list-header flex items-center card p-0">
                     <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>

@@ -4,7 +4,8 @@ import Fuse from 'fuse.js';
 export default {
     props: {
         columns: {
-            required: true,
+            type: Array,
+            default: () => []
         },
         rows: {
             type: Array,
@@ -89,12 +90,20 @@ export default {
     },
 
     created() {
-        let firstVisibleColumn = this.sharedState.columns.filter(col => col.visible)[0];
-        firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : this.sharedState.columns[0].field;
-        this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
+        this.setInitialSortColumn();
     },
 
     methods: {
+
+        setInitialSortColumn() {
+            const columns = this.sharedState.columns;
+
+            if (columns.length === 0) return;
+
+            let firstVisibleColumn = columns.filter(col => col.visible)[0];
+            firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : columns[0].field;
+            this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
+        },
 
         filterBySearch(rows) {
             if (!this.search || !this.searchQuery) return rows;
