@@ -38,15 +38,26 @@ class UtilityRepository
         });
     }
 
+    public function find($handle)
+    {
+        return $this->utilities->get($handle);
+    }
+
     public function routes()
     {
-        Route::group(['namespace' => '\\'], function () {
+        Route::namespace('\\')->prefix('utilities')->name('utilities.')->group(function () {
             $this->all()->each(function ($utility) {
-                Route::get($utility->slug(), $utility->action())
-                    ->name('utilities.'.$utility->slug());
+                if ($utility->action()) {
+                    Route::get($utility->slug(), $utility->action())
+                        ->name($utility->slug());
+                }
 
                 if ($routeClosure = $utility->routes()) {
-                    $routeClosure(Route::getFacadeRoot());
+                    Route::name($utility->slug().'.')
+                        ->prefix($utility->slug())
+                        ->group(function () use ($routeClosure) {
+                            $routeClosure(Route::getFacadeRoot());
+                        });
                 }
             });
         });

@@ -9,11 +9,6 @@ use Statamic\Mail\Test;
 
 class EmailController
 {
-    public function index()
-    {
-        return view('statamic::utilities.email');
-    }
-
     public function send(Request $request)
     {
         $request->validate(['email' => 'required|email']);

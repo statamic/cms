@@ -168,10 +168,8 @@ Route::group([
 
     Route::get('search', 'SearchController')->name('search');
 
-    Route::group(['namespace' => 'Utilities', 'prefix' => 'utilities'], function () {
-        Route::get('/', 'UtilitiesController@index')->name('utilities.index');
-        Utility::routes();
-    });
+    Route::get('utilities', 'Utilities\UtilitiesController@index')->name('utilities.index');
+    Utility::routes();
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');

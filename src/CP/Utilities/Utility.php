@@ -3,6 +3,7 @@
 namespace Statamic\CP\Utilities;
 
 use Closure;
+use Statamic\Http\Controllers\CP\Utilities\UtilitiesController;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -12,6 +13,7 @@ class Utility
 
     protected $handle;
     protected $action;
+    protected $view;
     protected $title;
     protected $navTitle;
     protected $description;
@@ -30,7 +32,14 @@ class Utility
 
     public function action($action = null)
     {
-        return $this->fluentlyGetOrSet('action')->args(func_get_args());
+        return $this->fluentlyGetOrSet('action')->getter(function ($action) {
+            return $action ?? [UtilitiesController::class, 'show'];
+        })->args(func_get_args());
+    }
+
+    public function view($view = null)
+    {
+        return $this->fluentlyGetOrSet('view')->args(func_get_args());
     }
 
     public function title($title = null)
@@ -59,7 +68,7 @@ class Utility
 
     public function url()
     {
-        return cp_route("utilities.{$this->handle()}");
+        return cp_route('utilities.index') . '/' . $this->slug();
     }
 
     public function routes(Closure $routes = null)

@@ -13,7 +13,7 @@
                 <p class="mb-1"><small class="help-block text-red">{{ $errors->first() }}</small></p>
             @endif
 
-            @foreach ($indexes as $index)
+            @foreach (\Statamic\Facades\Search::indexes() as $index)
                 <label class="mb-1">
                     <input type="checkbox" name="indexes[]" value="{{ $index->name() }}" class="mr-1">
                     {{ $index->title() }}
