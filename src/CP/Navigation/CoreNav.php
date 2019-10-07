@@ -225,9 +225,9 @@ class CoreNav
                 Nav::item('Fieldsets')->route('fieldsets.index'),
             ]);
 
-        Nav::site('Preferences')
-            ->route('')
-            ->icon('hammer-wrench');
+        // Nav::site('Preferences')
+        //     ->route('')
+        //     ->icon('hammer-wrench');
 
         return $this;
     }
