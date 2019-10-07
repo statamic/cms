@@ -231,9 +231,9 @@ class CollectionsController extends CpController
                 'instructions' => __('How past dated entries should behave.'),
                 'width' => 50,
                 'options' => [
-                    'public' => 'Public - Always visible.',
-                    'unlisted' => 'Unlisted - Hidden from listings, but available at their URLs.',
-                    'private' => 'Private - Hidden from listings and trigger 404s when accessed directly.'
+                    'public' => 'Public - Always visible',
+                    'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
+                    'private' => 'Private - Hidden from listings, URLs 404'
                 ],
             ],
             'future_date_behavior' => [
@@ -242,16 +242,16 @@ class CollectionsController extends CpController
                 'instructions' => __('How future dated entries should behave.'),
                 'width' => 50,
                 'options' => [
-                    'public' => 'Public - Always visible.',
-                    'unlisted' => 'Unlisted - Hidden from listings, but available at their URLs.',
-                    'private' => 'Private - Hidden from listings and trigger 404s when accessed directly.'
+                    'public' => 'Public - Always visible',
+                    'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
+                    'private' => 'Private - Hidden from listings, URLs 404'
                 ],
             ],
 
             'ordering' => ['type' => 'section'],
             'orderable' => [
                 'type' => 'toggle',
-                'instructions' => __('Whether entries can have a manual order defined. This enables drag and drop reordering.'),
+                'instructions' => __('Enable manual ordering via drag & drop.'),
                 'width' => 50,
                 'if' => ['structure' => 'empty']
             ],
@@ -268,7 +268,7 @@ class CollectionsController extends CpController
             'structure' => [
                 'type' => 'structures',
                 'max_items' => 1,
-                'instructions' => __('Choosing a structure will let your page hierarchy dictate its order and URLs.'),
+                'instructions' => __('Structures enable page hierarchies that control order and URL.'),
             ],
 
             'content_model' => ['type' => 'section'],
@@ -279,21 +279,21 @@ class CollectionsController extends CpController
             ],
             'taxonomies' => [
                 'type' => 'taxonomies',
-                'instructions' => __('Entries in this collection may be related to terms in these taxonomies. Fields will be automatically added to publish forms.'),
+                'instructions' => __('Connect entries in this collection to taxonomies. Fields are be automatically added to publish forms.'),
             ],
             'template' => [
                 'type' => 'text',
-                'instructions' => __('The default template, unless otherwise specified.'),
+                'instructions' => __('Set a default template.'),
                 'width' => 50
             ],
             'layout' => [
                 'type' => 'text',
-                'instructions' => __('The default layout, unless otherwise specified.'),
+                'instructions' => __('Set a default layout.'),
                 'width' => 50
             ],
             'default_status' => [
                 'type' => 'radio',
-                'instructions' => __('The default publish status when creating new entries.'),
+                'instructions' => __('Default publish status when creating new entries.'),
                 'width' => 100,
                  'options' => [
                     'published' => 'Published',
@@ -304,17 +304,17 @@ class CollectionsController extends CpController
             'routing' => ['type' => 'section'],
             'route' => [
                 'type' => 'text',
-                'instructions' => __('The route controls the URL pattern all entries in the collection will follow.'),
+                'instructions' => __("The route controls entries URL pattern."),
             ],
             'mount' => [
                 'type' => 'relationship',
                 'max_items' => 1,
-                'instructions' => __('Mounting to an entry will give you shortcuts to add and edit this collection\'s entries from within a Structure. It will also let you use the `mount` variable in your routes, which will be the URL of the entry.'),
+                'instructions' => __('Enable add/edit shortcuts from Structures and `mount` variable in your route.'),
             ],
             'amp' => [
                 'type' => 'toggle',
                 'display' => __('Accelerated Mobile Pages (AMP)'),
-                'instructions' => __('Whether AMP pages should be enabled'),
+                'instructions' => __('Enable AMP'),
             ],
         ]);
     }
