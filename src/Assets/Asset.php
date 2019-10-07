@@ -120,6 +120,10 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
     public function meta()
     {
+        if (! config('statamic.assets.cache_meta')) {
+            return $this->generateMeta();
+        }
+
         if ($this->meta) {
             return array_merge($this->meta, ['data' => $this->data->all()]);
         }
