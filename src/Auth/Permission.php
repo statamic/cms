@@ -41,6 +41,10 @@ class Permission
             $replacements = [$this->original->placeholder() => $this->replacementLabel];
         }
 
+        if ($this->label && !$this->placeholder) {
+            return $this->label;
+        }
+
         $key = $this->label
             ? $this->label
             : 'statamic::messages.permission_' .  str_replace(' ', '_', $permission->value);
