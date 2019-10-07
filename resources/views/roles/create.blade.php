@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Create Role'))
+@section('title', Statamic::crumb(__('Create Role'), __('Roles & Permissions')))
 
 @section('content')
 
@@ -11,8 +11,9 @@
     >
 
         <h1 class="flex-1" slot="heading" slot-scope="{ title }">
-            <a href="{{ cp_route('roles.index') }}">{{ __('Roles & Permissions') }}</a>
-            @svg('chevron-right')
+            <div class="subhead">
+                <a href="{{ cp_route('roles.index') }}">{{ __('Roles & Permissions') }}</a>
+            </div>
             {{ __('Create Role') }}
         </h1>
 
