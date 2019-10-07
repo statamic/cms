@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Blueprints'))
+@section('title', __('Fields'))
 
 @section('content')
 
