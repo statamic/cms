@@ -18,7 +18,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Name of your Taxonomy</label>
                 <input type="text" v-model="taxonomy.title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Usually a noun, like "Categories" or "Tags".
                 </div>
@@ -26,7 +26,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Handle</label>
                 <input type="text" v-model="taxonomy.handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     How you'll reference to this taxonomy in your templates. Cannot be easily changed.
                 </div>
@@ -54,7 +54,7 @@
                             @input="taxonomy.blueprints = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     You can pick an existing Blueprint or creates a new one.
                 </div>
@@ -81,7 +81,7 @@
                             @input="taxonomy.collections = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     When a collection is linked to a taxonomy, its entries will automatically get fields added to their forms.
                 </div>

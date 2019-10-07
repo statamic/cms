@@ -18,7 +18,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Name of your Collection</label>
                 <input type="text" v-model="collection.title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Usually a plural noun, like "Articles", "Products", or "Breakfast Foods".
                 </div>
@@ -26,7 +26,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Handle</label>
                 <input type="text" v-model="collection.handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     How you'll reference to this collection in your templates. Cannot easily be changed.
                 </div>
@@ -141,7 +141,7 @@
                             @input="collection.blueprints = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     If you choose multiple Blueprints, users will be able to select from one when creating entries. The first will be the default.
                 </div>
@@ -161,7 +161,7 @@
                             @input="collection.taxonomies = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Entries in this collection may be related to terms in these taxonomies. Fields will be automatically added to publish forms.
                 </div>
@@ -180,7 +180,7 @@
                             @input="collection.template = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default template.
                 </div>
@@ -199,7 +199,7 @@
                             @input="collection.layout = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Set your default layout.
                 </div>
@@ -237,7 +237,7 @@
                             @input="collection.structure = $event[0]" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Choosing a structure will let your page hierarchy dictate its URLs.
                 </div>
@@ -257,7 +257,7 @@
                             @input="collection.mount = $event[0]" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     Add Structure shortcuts to this collection.
                 </div>
@@ -265,7 +265,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
                 <input type="text" v-model="collection.route" class="input-text">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     <template v-if="collection.structure">A route is required when choosing a structure. You can also use `parent_uri` and `depth`.</template>
                     <template v-else>Routes are optional. If you don't need a URL, you don't need a route.</template>
@@ -274,7 +274,7 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm">Accelerated Mobile Pages (AMP)</label>
                 <label><input type="checkbox" v-model="collection.amp" /> Enable AMP</label>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
                     AMP versions will be routed to <code>{site url}/amp/{entry url}</code>
                 </div>
