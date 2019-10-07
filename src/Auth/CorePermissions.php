@@ -24,6 +24,7 @@ class CorePermissions
             ->registerUpdates()
             ->registerUsers()
             ->registerForms()
+            ->registerUtilities()
             ->register('configure fields')
             ->register('configure addons');
     }
@@ -170,6 +171,16 @@ class CorePermissions
                 });
             });
         });
+
+        return $this;
+    }
+
+    protected function registerUtilities()
+    {
+        $this->register('access cache utility');
+        $this->register('access phpinfo utility');
+        $this->register('access search utility');
+        $this->register('access email utility');
 
         return $this;
     }

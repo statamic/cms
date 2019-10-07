@@ -8,6 +8,7 @@
         </div>
 
         <div class="flex flex-wrap -mx-2 mt-3">
+            @can('access cache utility')
             <div class="w-full md:w-1/3 px-2 mb-4">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-2">
@@ -20,6 +21,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('access phpinfo utility')
             <div class="w-full md:w-1/3 px-2 mb-4">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-2">
@@ -32,6 +35,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('access search utility')
             <div class="w-full md:w-1/3 px-2 mb-4">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-2">
@@ -44,6 +49,8 @@
                     </div>
                 </div>
             </div>
+            @endcan
+            @can('access email utility')
             <div class="w-full md:w-1/3 px-2 mb-4">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-2">
@@ -56,6 +63,7 @@
                     </div>
                 </div>
             </div>
+            @endcan
         </div>
 
 @endsection

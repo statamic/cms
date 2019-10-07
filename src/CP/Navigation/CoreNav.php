@@ -4,9 +4,10 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\Role as RoleAPI;
-use Statamic\Contracts\Auth\User;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
@@ -154,17 +155,38 @@ class CoreNav
             ->view('statamic::nav.updates')
             ->can('view updates');
 
-        Nav::tools('Utilities')
-            ->route('utilities.index')
-            ->active('utilities*')
-            ->icon('settings-slider')
-            // ->can() // TODO: Permission to use utilities?
-            ->children([
-                Nav::item('Cache')->route('utilities.cache.index'),
-                Nav::item('PHP Info')->route('utilities.phpinfo'),
-                Nav::item('Search')->route('utilities.search'),
-                Nav::item('Email')->route('utilities.email'),
-            ]);
+        $this->makeUtilitiesSection();
+
+        return $this;
+    }
+
+    protected function makeUtilitiesSection()
+    {
+        $utilities = [];
+
+        if (User::current()->can('access cache utility')) {
+            $utilities[] = Nav::item('Cache')->route('utilities.cache.index');
+        }
+
+        if (User::current()->can('access phpinfo utility')) {
+            $utilities[] = Nav::item('PHP Info')->route('utilities.phpinfo');
+        }
+
+        if (User::current()->can('access search utility')) {
+            $utilities[] = Nav::item('Search')->route('utilities.search');
+        }
+
+        if (User::current()->can('access email utility')) {
+            $utilities[] = Nav::item('Email')->route('utilities.email');
+        }
+
+        if (count($utilities)) {
+            Nav::tools('Utilities')
+                ->route('utilities.index')
+                ->active('utilities*')
+                ->icon('settings-slider')
+                ->children($utilities);
+        }
 
         return $this;
     }
@@ -179,7 +201,7 @@ class CoreNav
         Nav::users('Users')
             ->route('users.index')
             ->icon('users-box')
-            ->can('index', User::class);
+            ->can('index', UserContract::class);
 
         Nav::users('Groups')
             ->route('user-groups.index')
