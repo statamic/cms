@@ -9,8 +9,11 @@ use Statamic\Support\Arr;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
 use Statamic\Data\Augmentable;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Notifications\Notifiable;
+use Statamic\Notifications\PasswordReset;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Notifications\ActivateAccount;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -209,6 +212,20 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public function routeNotificationForMail($notification = null)
     {
         return $this->email();
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $notification = $this->password() ? new PasswordReset($token) : new ActivateAccount($token);
+
+        $this->notify($notification);
+    }
+
+    public function generateTokenAndSendPasswordResetNotification()
+    {
+        $token = Password::broker()->createToken($this);
+
+        $this->sendPasswordResetNotification($token);
     }
 
     public static function __callStatic($method, $parameters)
