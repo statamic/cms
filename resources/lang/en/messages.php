@@ -39,6 +39,7 @@ return [
     'permission_edit_roles' => 'Edit roles',
     'permission_view_updates' => 'View updates',
     'permission_perform_updates' => 'Perform updates',
+    'permission_configure_fields' => 'Configure fields',
 
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
 

@@ -10,6 +10,11 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldsController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware('can:configure fields');
+    }
+
     public function index(Request $request)
     {
         return view('statamic::fields.index', [

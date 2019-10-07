@@ -220,6 +220,7 @@ class CoreNav
         Nav::site('Fields')
             ->route('fields.index')
             ->icon('wireframe')
+            ->can('configure fields')
             ->children([
                 Nav::item('Blueprints')->route('blueprints.index'),
                 Nav::item('Fieldsets')->route('fieldsets.index'),

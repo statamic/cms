@@ -23,7 +23,8 @@ class CorePermissions
             ->registerAssetContainers()
             ->registerUpdates()
             ->registerUsers()
-            ->registerForms();
+            ->registerForms()
+            ->register('configure fields');
     }
 
     protected function register($permission)
