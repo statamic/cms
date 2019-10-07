@@ -20,7 +20,7 @@ class UtilitiesController extends CpController
         $utility = Utility::find($request->segment(3));
 
         if ($view = $utility->view()) {
-            return view($view);
+            return view($view, $utility->viewData($request));
         }
 
         throw new \Exception("Utility [{$utility->handle()}] has not been provided with an action or view.");

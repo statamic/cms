@@ -14,6 +14,7 @@ class Utility
     protected $handle;
     protected $action;
     protected $view;
+    protected $viewData;
     protected $title;
     protected $navTitle;
     protected $description;
@@ -37,9 +38,23 @@ class Utility
         })->args(func_get_args());
     }
 
-    public function view($view = null)
+    public function view($view = null, $data = null)
     {
-        return $this->fluentlyGetOrSet('view')->args(func_get_args());
+        return $this->fluentlyGetOrSet('view')->setter(function ($view) use ($data) {
+            $this->viewData = $data;
+            return $view;
+        })->args(func_get_args());
+    }
+
+    public function viewData($request)
+    {
+        $callback = $this->viewData;
+
+        if (! $callback) {
+            return [];
+        }
+
+        return $callback($request);
     }
 
     public function title($title = null)
