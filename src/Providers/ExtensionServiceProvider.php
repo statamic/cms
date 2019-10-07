@@ -287,7 +287,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Delete::class,
             Actions\Publish::class,
             Actions\Unpublish::class,
-            Actions\SendActivationEmail::class,
+            Actions\SendPasswordReset::class,
             Actions\MoveAsset::class,
             Actions\RenameAsset::class,
             Actions\DeleteEntry::class,

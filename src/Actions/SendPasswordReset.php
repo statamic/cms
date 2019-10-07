@@ -4,7 +4,7 @@ namespace Statamic\Actions;
 
 use Statamic\Facades\User;
 
-class SendActivationEmail extends Action
+class SendPasswordReset extends Action
 {
     public function visibleTo($key, $context)
     {
@@ -13,7 +13,7 @@ class SendActivationEmail extends Action
 
     public function authorize($user)
     {
-        return User::current()->can('sendActivationEmail', $user);
+        return User::current()->can('sendPasswordReset', $user);
     }
 
     public function run($users)

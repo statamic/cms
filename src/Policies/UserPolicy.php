@@ -56,7 +56,7 @@ class UserPolicy
         return $authed->hasPermission('change passwords');
     }
 
-    public function sendActivationEmail($authed, $user)
+    public function sendPasswordReset($authed, $user)
     {
         return $this->edit($authed, $user);
     }
