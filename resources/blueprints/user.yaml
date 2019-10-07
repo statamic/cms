@@ -26,4 +26,3 @@ fields:
     field:
       type: assets
       max_files: 1
-      container: main
