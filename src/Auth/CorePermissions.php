@@ -9,6 +9,7 @@ use Statamic\Facades\Structure;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Permission;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Utility;
 
 class CorePermissions
 {
@@ -177,10 +178,11 @@ class CorePermissions
 
     protected function registerUtilities()
     {
-        $this->register('access cache utility');
-        $this->register('access phpinfo utility');
-        $this->register('access search utility');
-        $this->register('access email utility');
+        Utility::all()->each(function ($utility) {
+            Permission::register("access {$utility->handle()} utility", function ($perm) use ($utility) {
+                return $perm->withLabel(__('statamic::messages.permission_access_utility', ['title' => $utility->title()]));
+            });
+        });
 
         return $this;
     }

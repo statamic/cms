@@ -1,5 +1,7 @@
 <?php
 
+use Statamic\Facades\Utility;
+
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('login', 'LoginController@showLoginForm')->name('login');
     Route::post('login', 'LoginController@login');
@@ -166,15 +168,9 @@ Route::group([
 
     Route::get('search', 'SearchController')->name('search');
 
-    Route::group(['namespace' => 'Utilities'], function () {
-        Route::get('utilities', 'UtilitiesController@index')->name('utilities.index');
-        Route::get('utilities/phpinfo', 'PhpInfoController')->name('utilities.phpinfo');
-        Route::get('utilities/cache', 'CacheController@index')->name('utilities.cache.index');
-        Route::post('utilities/cache/{cache}', 'CacheController@clear')->name('utilities.cache.clear');
-        Route::get('utilities/search', 'UpdateSearchController@index')->name('utilities.search');
-        Route::post('utilities/search', 'UpdateSearchController@update');
-        Route::get('utilities/email', 'EmailController@index')->name('utilities.email');
-        Route::post('utilities/email', 'EmailController@send');
+    Route::group(['namespace' => 'Utilities', 'prefix' => 'utilities'], function () {
+        Route::get('/', 'UtilitiesController@index')->name('utilities.index');
+        Utility::routes();
     });
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {

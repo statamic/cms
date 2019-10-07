@@ -79,7 +79,9 @@ class AuthServiceProvider extends ServiceProvider
             return User::fromUser($user)->hasPermission($ability) === true ? true : null;
         });
 
-        CorePermissions::boot();
+        $this->app->booted(function () {
+            CorePermissions::boot();
+        });
 
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);

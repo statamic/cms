@@ -2,16 +2,18 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\User;
-use Statamic\Facades\Site;
-use Statamic\Statamic;
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Statamic\CP\Utilities\CoreUtilities;
+use Statamic\CP\Utilities\UtilityRepository;
 use Statamic\Extensions\Translation\Loader;
-use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Extensions\Translation\Translator;
-use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\SessionExpiryComposer;
+use Statamic\Statamic;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -36,6 +38,8 @@ class CpServiceProvider extends ServiceProvider
                 'locale' => config('app.locale'),
             ]);
         });
+
+        CoreUtilities::boot();
     }
 
     protected function sites()
@@ -56,6 +60,10 @@ class CpServiceProvider extends ServiceProvider
 
         $this->app->extend('translator', function ($translator, $app) {
             return new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
+        });
+
+        $this->app->singleton(UtilityRepository::class, function () {
+            return new UtilityRepository;
         });
     }
 }

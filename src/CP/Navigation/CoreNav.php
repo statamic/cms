@@ -20,6 +20,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Structures\Structure;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Utility;
 
 class CoreNav
 {
@@ -162,23 +163,9 @@ class CoreNav
 
     protected function makeUtilitiesSection()
     {
-        $utilities = [];
-
-        if (User::current()->can('access cache utility')) {
-            $utilities[] = Nav::item('Cache')->route('utilities.cache.index');
-        }
-
-        if (User::current()->can('access phpinfo utility')) {
-            $utilities[] = Nav::item('PHP Info')->route('utilities.phpinfo');
-        }
-
-        if (User::current()->can('access search utility')) {
-            $utilities[] = Nav::item('Search')->route('utilities.search');
-        }
-
-        if (User::current()->can('access email utility')) {
-            $utilities[] = Nav::item('Email')->route('utilities.email');
-        }
+        $utilities = Utility::authorized()->map(function ($utility) {
+            return Nav::item($utility->navTitle())->url($utility->url());
+        });
 
         if (count($utilities)) {
             Nav::tools('Utilities')

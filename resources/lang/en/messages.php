@@ -41,10 +41,7 @@ return [
     'permission_perform_updates' => 'Perform updates',
     'permission_configure_fields' => 'Configure fields',
     'permission_configure_addons' => 'Configure addons',
-    'permission_access_cache_utility' => 'Access Cache Utility',
-    'permission_access_phpinfo_utility' => 'Access PHPInfo Utility',
-    'permission_access_search_utility' => 'Access Search Utility',
-    'permission_access_email_utility' => 'Access Email Utility',
+    'permission_access_utility' => 'Access :title utility',
 
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
 
