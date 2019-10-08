@@ -12,10 +12,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Statamic\Ignition\SolutionProviders;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Facade\IgnitionContracts\SolutionProviderRepository;
-use Illuminate\Contracts\Container\BindingResolutionException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,8 +25,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->registerIgnitionSolutionProviders();
-
         $this->swapSessionMiddleware();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
@@ -142,16 +137,5 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Session\Middleware\StartSession::class,
             \Statamic\Http\Middleware\CP\StartSession::class
         );
-    }
-
-    protected function registerIgnitionSolutionProviders()
-    {
-        try {
-            $this->app->make(SolutionProviderRepository::class)->registerSolutionProviders([
-                SolutionProviders\OAuthDisabled::class
-            ]);
-        } catch (BindingResolutionException $e) {
-            //
-        }
     }
 }

@@ -13,6 +13,7 @@ class StatamicServiceProvider extends AggregateServiceProvider
      * @var array
      */
     protected $providers = [
+        IgnitionServiceProvider::class,
         ViewServiceProvider::class,
         AppServiceProvider::class,
         ConsoleServiceProvider::class,
