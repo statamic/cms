@@ -50,15 +50,27 @@
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">Encryption</th>
-                <td><code>{{ config('mail.encryption') }}</code></td>
+                <td>
+                    @if (config('mail.encryption'))
+                        <code>{{ config('mail.encryption') }}</code>
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">Username</th>
-                <td><code>{{ config('mail.username') }}</code></td>
+                <td>
+                    @if (config('mail.username'))
+                        <code>{{ config('mail.username') }}</code>
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">Password</th>
-                <td><code>{{ config('mail.password') }}</code></td>
+                <td>
+                    @if (config('mail.password'))
+                        <code>{{ config('mail.password') }}</code>
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">Sendmail</th>
