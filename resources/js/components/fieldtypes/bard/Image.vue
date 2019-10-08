@@ -7,7 +7,7 @@
                 <img :src="src" class="block mx-auto" data-drag-handle />
             </div>
 
-            <div class="flex items-center p-1 pt-0 rounded-b" v-if="src">
+            <div class="flex items-center p-1 pt-0 rounded-b">
                 <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
                 <button class="btn-flat mr-1" @click="openSelector">
                     {{ __('Replace') }}
