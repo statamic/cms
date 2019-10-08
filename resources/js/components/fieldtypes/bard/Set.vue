@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow" contenteditable="false">
+    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow" contenteditable="false" @paste.stop>
         <div ref="content" hidden />
         <div class="replicator-set-header" :class="{'collapsed': collapsed}" @dblclick="toggleCollapsedState">
             <div class="item-move sortable-handle" data-drag-handle />
