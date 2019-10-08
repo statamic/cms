@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class Dimensions
 {
-    const CACHE_EXPIRY_MINUTES = 60;
-
     /**
      * @var Asset
      */
@@ -31,17 +29,13 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions of an asset, and cache them.
+     * Get the dimensions of an asset
      *
      * @return array
      */
     public function get()
     {
-        if (! $this->asset->isImage()) {
-            return [null, null];
-        }
-
-        return $this->getImageDimensions();
+        return $this->asset->isImage() ? $this->getImageDimensions() : [null, null];
     }
 
     /**
