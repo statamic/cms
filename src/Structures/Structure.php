@@ -201,7 +201,7 @@ class Structure implements StructureContract
 
     public function isCollectionBased()
     {
-        return $this->collection();
+        return $this->collection() !== null;
     }
 
     public function maxDepth($maxDepth = null)
