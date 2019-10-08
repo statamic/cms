@@ -4,7 +4,6 @@ namespace Statamic\Assets;
 
 use League\Flysystem\MountManager;
 use Statamic\Imaging\ImageGenerator;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class Dimensions
@@ -42,13 +41,7 @@ class Dimensions
             return [null, null];
         }
 
-        if ($cached = $this->cached()) {
-            return $cached;
-        }
-
-        $this->cache($dimensions = $this->getImageDimensions());
-
-        return $dimensions;
+        return $this->getImageDimensions();
     }
 
     /**
@@ -94,32 +87,6 @@ class Dimensions
         $cache->delete($cachePath);
 
         return array_splice($size, 0, 2);
-    }
-
-    /**
-     * Get the cached dimension value
-     *
-     * @return array|null
-     */
-    private function cached()
-    {
-        return Cache::get($this->cacheKey());
-    }
-
-    /**
-     * Cache the dimensions
-     *
-     * @param array $dimensions
-     * @return void
-     */
-    private function cache($dimensions)
-    {
-        Cache::put($this->cacheKey(), $dimensions, now()->addMinutes(self::CACHE_EXPIRY_MINUTES));
-    }
-
-    private function cacheKey()
-    {
-        return 'assets.dimensions.' . $this->asset->containerId() . '.' . $this->asset->path();
     }
 
     private function getCacheFlysystem()
