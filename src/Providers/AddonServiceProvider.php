@@ -8,10 +8,10 @@ use Statamic\Statamic;
 use Statamic\Facades\Addon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
-abstract class AddonServiceProvider extends LaravelServiceProvider
+abstract class AddonServiceProvider extends ServiceProvider
 {
     protected $listen = [];
     protected $subscribe = [];
