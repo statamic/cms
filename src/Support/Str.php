@@ -103,6 +103,11 @@ class Str extends \Illuminate\Support\Str
         return Str::modifyMultiple($string, ['snake', 'slugToTitle']);
     }
 
+    public static function studlyToWords($string)
+    {
+        return Str::modifyMultiple($string, ['snake', 'deslugify']);
+    }
+
     public static function slugToTitle($string)
     {
         return Str::modifyMultiple($string, ['deslugify', 'title']);
