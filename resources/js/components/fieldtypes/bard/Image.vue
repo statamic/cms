@@ -1,13 +1,10 @@
 <template>
 
-    <div class="bard-inline-image-container"
-        @mousedown="parentMousedown"
-        @dragstart="parentDragStart"
-        ref="dragHandle"
-    >
+    <div class="bard-inline-image-container">
+        <div ref="content" />
         <div v-if="src">
             <div class="p-1 text-center">
-                <img :src="src" class="block mx-auto" />
+                <img :src="src" class="block mx-auto" data-drag-handle />
             </div>
 
             <div class="flex items-center p-1 pt-0 rounded-b" v-if="src">
@@ -80,7 +77,6 @@ export default {
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
-            lastClicked: null,
         }
     },
 
@@ -182,18 +178,6 @@ export default {
             this.loading = false;
             this.updateAttrs({ src: this.actualSrc });
         },
-
-        parentMousedown(e) {
-            this.lastClicked = e.target;
-        },
-
-        parentDragStart(e) {
-            const handle = this.$refs.dragHandle;
-
-            if (this.lastClicked !== handle && !handle.contains(this.lastClicked)) {
-                e.preventDefault();
-            }
-        }
 
     }
 

@@ -20,6 +20,7 @@ export default class ImageNode extends Node {
             },
             group: 'inline',
             draggable: true,
+            selectable: false,
             parseDOM: [
                 {
                     tag: 'img[src]',
