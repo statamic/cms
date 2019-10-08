@@ -46,6 +46,14 @@ class UsingOldClass implements HasSolutionsForThrowable
             'Statamic\Extend\Modifier' => [
                 'class' => \Statamic\Modifiers\Modifier::class,
                 'docs' => ['Modifiers Documentation' => Statamic::docsUrl('extending/modifiers')],
+            ],
+            'Statamic\Extend\Tags' => [
+                'class' => \Statamic\Tags\Tags::class,
+                'docs' => ['Tags Documentation' => Statamic::docsUrl('extending/tags')],
+            ],
+            'Statamic\Extend\Widget' => [
+                'class' => \Statamic\Widgets\Widget::class,
+                'docs' => ['Widgets Documentation' => Statamic::docsUrl('extending/widgets')],
             ]
         ];
     }
