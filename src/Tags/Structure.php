@@ -38,6 +38,10 @@ class Structure extends Tags
                 return null;
             }
 
+            if (! $this->get('show_unpublished') && $page->entry() && !$page->entry()->published()) {
+                return null;
+            }
+
             $data = $page->toArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data);
 
