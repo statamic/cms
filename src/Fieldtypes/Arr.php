@@ -9,11 +9,22 @@ class Arr extends Fieldtype
     protected static $handle = 'array';
 
     protected $configFields = [
+        'mode' => [
+            'type' => 'radio',
+            'options' => [
+                'dynamic' => 'Dynamic',
+                'keyed' => 'Keyed'
+            ],
+            'default' => 'dynamic'
+        ],
         'keys' => [
             'type' => 'array',
-            'value_header' => 'Label',
-            'instructions' => 'Set the array keys and their optional labels.'
-        ]
+            'value_header' => 'Label (optional)',
+            'instructions' => 'Set the array keys (variables) and optional labels.',
+            'if' => [
+                'mode' => 'keyed'
+            ]
+        ],
     ];
 
     public function preProcess($data)
