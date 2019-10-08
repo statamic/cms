@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Exceptions;
+namespace Statamic\Modifiers;
 
 class ModifierException extends \Exception
 {

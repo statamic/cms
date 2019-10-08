@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\View;
+namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
 use Statamic\Facades\URL;
@@ -18,11 +18,11 @@ use Statamic\Facades\Parse;
 use Statamic\Facades\Theme;
 use Statamic\Facades\Config;
 use Statamic\Facades\Helper;
-use Statamic\Extend\Modifier;
 use Statamic\Facades\Localization;
 use Stringy\StaticStringy as Stringy;
+use Statamic\Modifiers\Modifier;
 
-class BaseModifiers extends Modifier
+class CoreModifiers extends Modifier
 {
     /**
      * Adds values together with science. Context aware.
@@ -1038,7 +1038,7 @@ class BaseModifiers extends Modifier
     }
 
     /**
-     * Rough macro prototype that only uses BaseModifiers
+     * Rough macro prototype that only uses CoreModifiers
      *
      * @param $value
      * @param $params

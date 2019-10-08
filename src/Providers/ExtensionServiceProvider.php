@@ -6,9 +6,9 @@ use Statamic\Tags;
 use Statamic\Actions;
 use Statamic\Fieldtypes;
 use Statamic\Query\Scopes;
-use Statamic\Extend\Modifier;
-use Statamic\View\BaseModifiers;
+use Statamic\Modifiers\Modifier;
 use Statamic\Extensions\FileStore;
+use Statamic\Modifiers\CoreModifiers;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -218,16 +218,16 @@ class ExtensionServiceProvider extends ServiceProvider
     protected function registerBundledModifiers($parent)
     {
         $methods = array_diff(
-            get_class_methods(BaseModifiers::class),
+            get_class_methods(CoreModifiers::class),
             get_class_methods(Modifier::class)
         );
 
         foreach ($methods as $method) {
-            $this->app[$parent][$method] = "Statamic\\View\\BaseModifiers@{$method}";
+            $this->app[$parent][$method] = "Statamic\\Modifiers\\CoreModifiers@{$method}";
         }
 
         foreach ($this->bundledModifierAliases as $alias => $actual) {
-            $this->app[$parent][$alias] = "Statamic\\View\\BaseModifiers@{$actual}";
+            $this->app[$parent][$alias] = "Statamic\\Modifiers\\CoreModifiers@{$actual}";
         }
     }
 

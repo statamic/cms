@@ -1,7 +1,8 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Modifiers;
 
+use Statamic\Extend\HasHandle;
 use Statamic\Support\Str;
 
 /**

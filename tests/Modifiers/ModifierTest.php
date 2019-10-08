@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Extend;
+namespace Tests\Modifiers;
 
 use Tests\TestCase;
 use Tests\TestDependency;
-use Statamic\Extend\Modifier;
+use Statamic\Modifiers\Modifier;
 
 class ModifierTest extends TestCase
 {

@@ -6,7 +6,7 @@ use Statamic\Support\Arr;
 use ReflectionProperty;
 use Statamic\Facades\Config;
 use Statamic\Facades\Helper;
-use Statamic\View\Modify;
+use Statamic\Modifiers\Modify;
 use Statamic\Fields\Value;
 use Statamic\Query\Builder;
 use Illuminate\Support\Str;

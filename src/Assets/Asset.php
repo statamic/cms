@@ -568,7 +568,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
                 'last_modified'  => (string) $this->lastModified(),
                 'last_modified_timestamp' => $this->lastModified()->timestamp,
                 'last_modified_instance'  => $this->lastModified(),
-                'focus_css' => \Statamic\View\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
+                'focus_css' => \Statamic\Modifiers\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
                 'height' => $this->height(),
                 'width' => $this->width(),
                 'orientation' => $this->orientation(),

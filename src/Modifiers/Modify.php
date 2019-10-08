@@ -1,13 +1,13 @@
 <?php
 
-namespace Statamic\View;
+namespace Statamic\Modifiers;
 
 use Exception;
 use ArrayIterator;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Facades\Helper;
-use Statamic\Exceptions\ModifierException;
+use Statamic\Modifiers\ModifierException;
 use Statamic\Extend\Management\ModifierLoader;
 
 class Modify implements \IteratorAggregate
@@ -36,7 +36,7 @@ class Modify implements \IteratorAggregate
      * Specify a value to start the modification chain
      *
      * @param mixed $value
-     * @return \Statamic\View\Modify
+     * @return \Statamic\Modifiers\Modify
      */
     public static function value($value)
     {
@@ -74,7 +74,7 @@ class Modify implements \IteratorAggregate
      * Get the value as a string
      *
      * @return string
-     * @throws \Statamic\Exceptions\ModifierException
+     * @throws \Statamic\Modifiers\ModifierException
      */
     public function __toString()
     {
@@ -91,7 +91,7 @@ class Modify implements \IteratorAggregate
      * Get the value as an array
      *
      * @return \Traversable
-     * @throws \Statamic\Exceptions\ModifierException
+     * @throws \Statamic\Modifiers\ModifierException
      */
     public function getIterator()
     {
