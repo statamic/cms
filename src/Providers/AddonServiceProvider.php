@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Extend;
+namespace Statamic\Providers;
 
 use Closure;
 use Statamic\Support\Str;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
-abstract class ServiceProvider extends LaravelServiceProvider
+abstract class AddonServiceProvider extends LaravelServiceProvider
 {
     protected $listen = [];
     protected $subscribe = [];
