@@ -260,19 +260,35 @@ class Relationship extends Fieldtype
 
     public function getIndexItems($request)
     {
-        return $this->getIndexQuery($request)
-            ->orderBy($this->getSortColumn($request), $this->getSortDirection($request))
-            ->paginate();
+        $query = $this->getIndexQuery($request);
+
+        if ($sort = $this->getSortColumn($request)) {
+            $query->orderBy($sort, $this->getSortDirection($request));
+        }
+
+        return $query->paginate();
     }
 
     public function getSortColumn($request)
     {
-        return $request->get('sort', 'title');
+        $column = $request->get('sort');
+
+        if (!$column && !$request->search) {
+            $column = 'title';
+        }
+
+        return $column;
     }
 
     public function getSortDirection($request)
     {
-        return $request->get('order', 'asc');
+        $order = $request->get('order', 'asc');
+
+        if (!$order && !$request->search) {
+            $order = 'title';
+        }
+
+        return $order;
     }
 
     protected function getIndexQuery($request)

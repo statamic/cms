@@ -132,7 +132,8 @@ export default {
             page: 1,
             searchQuery: '',
             selections: _.clone(this.initialSelections),
-            isCreating: false
+            isCreating: false,
+            requestOnParameterChange: true,
         }
     },
 
@@ -143,7 +144,6 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 page: this.page,
-                search: this.searchQuery,
                 site: this.site
             }
         },
@@ -168,8 +168,8 @@ export default {
 
     watch: {
 
-        parameters() {
-            this.request();
+        parameters(param, oldparam) {
+            if (this.requestOnParameterChange) this.request();
         },
 
         loading: {
@@ -180,10 +180,14 @@ export default {
         },
 
         searchQuery(query) {
+            this.requestOnParameterChange = false;
+
             this.sortColumn = null;
             this.sortDirection = null;
             this.page = 1;
-            this.request();
+
+            this.request()
+                .then(() => this.requestOnParameterChange = true);
         }
 
     },
@@ -193,7 +197,11 @@ export default {
         request() {
             this.loading = true;
 
-            return this.$axios.get(this.url, { params: this.parameters }).then(response => {
+            const params = {...this.parameters, ...{
+                search: this.searchQuery
+            }};
+
+            return this.$axios.get(this.url, { params }).then(response => {
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
