@@ -42,6 +42,18 @@ class TaxonomiesStore extends BasicStore
             ->termBlueprints(array_get($data, 'blueprints'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->searchIndex(array_get($data, 'search_index'))
+            ->defaultPublishState($this->getDefaultPublishState($data))
             ->sites($sites);
+    }
+
+    protected function getDefaultPublishState($data)
+    {
+        $value = array_get($data, 'default_status', 'published');
+
+        if (! in_array($value, ['published', 'draft'])) {
+            throw new \Exception('Invalid taxonomy default_status value. Must be "published" or "draft".');
+        }
+
+        return $value === 'published';
     }
 }

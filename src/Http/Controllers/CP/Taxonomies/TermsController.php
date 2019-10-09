@@ -221,7 +221,8 @@ class TermsController extends CpController
 
         $values = array_merge($fields->values(), [
             'title' => null,
-            'slug' => null
+            'slug' => null,
+            'published' => $taxonomy->defaultPublishState()
         ]);
 
         $viewData = [
@@ -233,7 +234,7 @@ class TermsController extends CpController
             'meta' => $fields->meta(),
             'taxonomy' => $this->taxonomyToArray($taxonomy),
             'blueprint' => $blueprint->toPublishArray(),
-            'published' => $taxonomy->defaultStatus() === 'published',
+            'published' => $taxonomy->defaultPublishState(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
                 return [
                     'handle' => $handle,
