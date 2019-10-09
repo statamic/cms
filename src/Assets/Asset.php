@@ -547,6 +547,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
             'container'      => $this->container()->id(),
             'folder'         => $this->folder(),
             'url'            => $this->url(),
+            'permalink'      => $this->absoluteUrl(),
         ];
 
         if ($this->exists()) {
