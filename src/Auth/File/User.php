@@ -29,6 +29,7 @@ class User extends BaseUser
     protected $id;
     protected $email;
     protected $password;
+    protected $permissions;
 
     public function __construct()
     {
@@ -259,13 +260,17 @@ class User extends BaseUser
 
     public function permissions()
     {
-        return $this
+        if (empty($this->permissions)) {
+            $this->permissions = $this
             ->groups()
             ->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions()
             ->unique()
             ->values();
+        }
+
+        return $this->permissions;
     }
 
     public function hasPermission($permission)
@@ -317,13 +322,13 @@ class User extends BaseUser
         return array_get($yaml, $key, $default);
     }
 
-     /**
-     * Write to the user's meta YAML file
-     *
-     * @param  string $key
-     * @param  mixed $value
-     * @return void
-     */
+    /**
+    * Write to the user's meta YAML file
+    *
+    * @param  string $key
+    * @param  mixed $value
+    * @return void
+    */
     public function setMeta($key, $value)
     {
         $yaml = YAML::parse(File::get($this->metaPath(), ''));
