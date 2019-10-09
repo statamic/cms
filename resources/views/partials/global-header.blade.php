@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
+    <global-search class="pl-2" endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
     </global-search>
 
     <div class="head-link h-full md:pl-3 flex items-center">

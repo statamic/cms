@@ -59,7 +59,6 @@ export default {
     mixins: [ clickaway ],
 
     props: {
-        limit: Number,
         endpoint: String,
         placeholder: String
     },
@@ -104,11 +103,11 @@ export default {
                 return;
             }
 
-            let payload = {params: Object.assign({ q:this.query }, this.data) };
+            let payload = {params: { q: this.query }};
 
             this.$axios.get(this.endpoint, payload)
                 .then(response => {
-                    this.results = !!this.limit ? response.data.slice(0, this.limit) : response.data;
+                    this.results = response.data;
                     this.current = -1;
                     this.searching = false;
                 });

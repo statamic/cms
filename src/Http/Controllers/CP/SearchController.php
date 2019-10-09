@@ -14,6 +14,7 @@ class SearchController extends CpController
         return Search::index()
             ->ensureExists()
             ->search($request->query('q'))
+            ->limit(10)
             ->get();
     }
 }
